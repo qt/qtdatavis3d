@@ -63,6 +63,8 @@ public slots:
     void changeMode(int mode);
 
 private:
+    Q3DTheme *m_thermalTheme;
+    Q3DTheme *m_highlightTheme;
     Q3DSurface *m_surface;
     Q3DScatter *m_scatter;
     Q3DBars *m_bars;

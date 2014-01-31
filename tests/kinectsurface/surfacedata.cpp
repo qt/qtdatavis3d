@@ -32,7 +32,7 @@
 
 using namespace QtDataVisualization;
 
-#define LOW_END_DEVICE // Uncomment for devices with limited processing/grpahics power
+//#define LOW_END_DEVICE // Uncomment for devices with limited processing/grpahics power
 
 #ifdef LOW_END_DEVICE
 const QSize lowRes = QSize(160, 120);
@@ -48,6 +48,8 @@ const QSize maxRes = QSize(640, 480);
 
 SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
                          QTextEdit *statusArea) :
+    m_thermalTheme(new Q3DTheme(Q3DTheme::ThemeIsabelle)),
+    m_highlightTheme(new Q3DTheme(Q3DTheme::ThemeQt)),
     m_surface(surface),
     m_scatter(scatter),
     m_bars(bars),
@@ -57,8 +59,32 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_resolutionLevel(0),
     m_mode(Surface)
 {
+    // Initialize themes for surface
+    m_thermalTheme->setGridEnabled(false);
+    m_thermalTheme->setBackgroundEnabled(false);
+    m_thermalTheme->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+    QLinearGradient thermalGradient;
+    thermalGradient.setColorAt(0.0, Qt::black);
+    thermalGradient.setColorAt(0.33, Qt::blue);
+    thermalGradient.setColorAt(0.67, Qt::red);
+    thermalGradient.setColorAt(1.0, Qt::yellow);
+    QList<QLinearGradient> thermalGradients;
+    thermalGradients.append(thermalGradient);
+    m_thermalTheme->setBaseGradients(thermalGradients);
+
+    m_highlightTheme->setGridEnabled(false);
+    m_highlightTheme->setBackgroundEnabled(false);
+    m_highlightTheme->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+    QLinearGradient highlightGradient;
+    highlightGradient.setColorAt(0.0, Qt::white);
+    highlightGradient.setColorAt(0.8, Qt::red);
+    highlightGradient.setColorAt(1.0, Qt::green);
+    QList<QLinearGradient> highlightGradients;
+    highlightGradients.append(highlightGradient);
+    m_highlightTheme->setBaseGradients(highlightGradients);
+
     // Initialize surface
-    m_surface->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
+    m_surface->setActiveTheme(m_thermalTheme);
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
@@ -66,15 +92,11 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     gradient.setColorAt(1.0, Qt::yellow);
     m_surface->setSelectionMode(QAbstract3DGraph::SelectionNone);
     m_surface->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
-    m_surface->activeTheme()->setGridEnabled(false);
-    m_surface->activeTheme()->setBackgroundEnabled(false);
     m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150);
     m_surface->axisY()->setMax(255);
     QSurface3DSeries *series1 = new QSurface3DSeries(new QHeightMapSurfaceDataProxy());
     series1->setFlatShadingEnabled(true);
     series1->setDrawMode(QSurface3DSeries::DrawSurface);
-    series1->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
-    series1->setBaseGradient(gradient);
     m_surface->addSeries(series1);
 
     // Initialize scatter
@@ -82,7 +104,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_scatter->setSelectionMode(QAbstract3DGraph::SelectionNone);
     m_scatter->activeTheme()->setGridEnabled(false);
     m_scatter->setShadowQuality(QAbstract3DGraph::ShadowQualityLow);
-    m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 85.0, 150);
+    m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 60.0, 150);
     QScatter3DSeries *series2 = new QScatter3DSeries;
 #ifdef LOW_END_DEVICE
     series2->setMesh(QAbstract3DSeries::MeshPoint);
@@ -260,26 +282,13 @@ void SurfaceData::scrollDown()
 
 void SurfaceData::useGradientOne()
 {
-    m_surface->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
-    QLinearGradient gradient;
-    gradient.setColorAt(0.0, Qt::black);
-    gradient.setColorAt(0.33, Qt::blue);
-    gradient.setColorAt(0.67, Qt::red);
-    gradient.setColorAt(1.0, Qt::yellow);
-    m_surface->seriesList().at(0)->setBaseGradient(gradient);
-    m_surface->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+    m_surface->setActiveTheme(m_thermalTheme);
     m_statusArea->append(QStringLiteral("<b>Colors:</b> Thermal image imitation"));
 }
 
 void SurfaceData::useGradientTwo()
 {
-    m_surface->activeTheme()->setType(Q3DTheme::ThemeQt);
-    QLinearGradient gradient;
-    gradient.setColorAt(0.0, Qt::white);
-    gradient.setColorAt(0.8, Qt::red);
-    gradient.setColorAt(1.0, Qt::green);
-    m_surface->seriesList().at(0)->setBaseGradient(gradient);
-    m_surface->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+    m_surface->setActiveTheme(m_highlightTheme);
     m_statusArea->append(QStringLiteral("<b>Colors:</b> Highlight foreground"));
 }
 

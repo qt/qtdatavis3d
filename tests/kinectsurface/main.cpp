@@ -71,27 +71,36 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
 
     QPushButton *startButton = new QPushButton(widget);
-    startButton->setMinimumHeight(60);
+    startButton->setFont(QFont("Arial", 30));
     startButton->setText(QStringLiteral("Start Kinect"));
 
     QPushButton *stopButton = new QPushButton(widget);
-    stopButton->setMinimumHeight(60);
+    stopButton->setFont(QFont("Arial", 30));
     stopButton->setText(QStringLiteral("Stop Kinect"));
 
+    QLabel *resolutionLabel = new QLabel(QStringLiteral("Change resolution"));
+    resolutionLabel->setFont(QFont("Arial", 15));
+
     QComboBox *resolutionBox = new QComboBox(widget);
-    resolutionBox->setMinimumHeight(60);
+    resolutionBox->setFont(QFont("Arial", 30));
     resolutionBox->addItem(QStringLiteral("Low"));
     resolutionBox->addItem(QStringLiteral("Medium"));
     resolutionBox->addItem(QStringLiteral("High"));
     resolutionBox->addItem(QStringLiteral("Max")); // Comment this out if demo machine is low-perf
     resolutionBox->setCurrentIndex(0);
 
+    QLabel *modeLabel = new QLabel(QStringLiteral("Change visualization type"));
+    modeLabel->setFont(QFont("Arial", 15));
+
     QComboBox *modeBox = new QComboBox(widget);
-    modeBox->setMinimumHeight(60);
+    modeBox->setFont(QFont("Arial", 30));
     modeBox->addItem(QStringLiteral("Surface Plot"));
     modeBox->addItem(QStringLiteral("Scatter Chart"));
     modeBox->addItem(QStringLiteral("Bar Chart"));
     modeBox->setCurrentIndex(0);
+
+    QLabel *distanceLabel = new QLabel(QStringLiteral("Adjust far distance"));
+    distanceLabel->setFont(QFont("Arial", 15));
 
     QSlider *distanceSlider = new QSlider(Qt::Horizontal, widget);
     distanceSlider->setMinimumHeight(60);
@@ -100,6 +109,9 @@ int main(int argc, char **argv)
     distanceSlider->setMinimum(10);
     distanceSlider->setValue(50);
     distanceSlider->setMaximum(200);
+
+    QLabel *gradientLabel = new QLabel(QStringLiteral("Change color scheme"));
+    gradientLabel->setFont(QFont("Arial", 15));
 
     QLinearGradient gradientOne(0, 0, 200, 1);
     gradientOne.setColorAt(0.0, Qt::black);
@@ -137,13 +149,13 @@ int main(int argc, char **argv)
 
     vLayout->addWidget(startButton);
     vLayout->addWidget(stopButton);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change resolution")));
+    vLayout->addWidget(resolutionLabel);
     vLayout->addWidget(resolutionBox);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change visualization type")));
+    vLayout->addWidget(modeLabel);
     vLayout->addWidget(modeBox);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust far distance")));
+    vLayout->addWidget(distanceLabel);
     vLayout->addWidget(distanceSlider);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change color scheme")));
+    vLayout->addWidget(gradientLabel);
     vLayout->addWidget(gradientOneButton);
     vLayout->addWidget(gradientTwoButton);
     vLayout->addWidget(status, 1, Qt::AlignBottom);
