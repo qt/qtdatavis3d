@@ -43,7 +43,7 @@ int main(int argc, char *argv[])
 #endif
     viewer.setTitle(QStringLiteral("QML scatter example"));
     //! [0]
-    viewer.setSource(QUrl("qrc:/qml/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/qmlscatter/main.qml"));
     //! [0]
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     //! [1]

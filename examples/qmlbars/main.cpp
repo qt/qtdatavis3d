@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 #endif
     viewer.setTitle(QStringLiteral("Monthly income/expenses"));
 
-    viewer.setSource(QUrl("qrc:/qml/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/qmlbars/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
 

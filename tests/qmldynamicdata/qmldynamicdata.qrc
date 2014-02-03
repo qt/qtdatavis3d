@@ -1,6 +1,6 @@
 <RCC>
-    <qresource prefix="/qml">
-        <file alias="main.qml">qml/qmldynamicdata/main.qml</file>
-        <file alias="NewButton.qml">qml/qmldynamicdata/newbutton.qml</file>
+    <qresource prefix="/">
+        <file>qml/qmldynamicdata/main.qml</file>
+        <file>qml/qmldynamicdata/NewButton.qml</file>
     </qresource>
 </RCC>

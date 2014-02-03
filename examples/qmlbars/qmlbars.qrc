@@ -1,7 +1,7 @@
 <RCC>
-    <qresource prefix="/qml">
-        <file alias="Axes.qml">qml/qmlbars/axes.qml</file>
-        <file alias="Data.qml">qml/qmlbars/data.qml</file>
-        <file alias="main.qml">qml/qmlbars/main.qml</file>
+    <qresource prefix="/">
+        <file>qml/qmlbars/Axes.qml</file>
+        <file>qml/qmlbars/Data.qml</file>
+        <file>qml/qmlbars/main.qml</file>
     </qresource>
 </RCC>

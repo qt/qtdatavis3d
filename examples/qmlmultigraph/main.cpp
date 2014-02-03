@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
                                                                        QString::fromLatin1("lib")));
 #endif
     viewer.setTitle(QStringLiteral("QML multigraph example"));
-    viewer.setSource(QUrl("qrc:/qml/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/qmlmultigraph/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.showExpanded();
 

@@ -40,7 +40,7 @@ int main(int argc, char *argv[])
                                                                        QString::fromLatin1("lib")));
 #endif
 
-    viewer.setSource(QUrl("qrc:/qml/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/qml/qmlsurface/main.qml"));
 
     viewer.setTitle(QStringLiteral("Tycho crater on the Moon (height exaggerated)"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);

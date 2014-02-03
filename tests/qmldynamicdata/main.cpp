@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 #endif
     viewer.setTitle(QStringLiteral("QML Dynamic Data Test"));
 
-    viewer.setSource(QUrl("qrc:/qml/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/qmldynamicdata/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
 

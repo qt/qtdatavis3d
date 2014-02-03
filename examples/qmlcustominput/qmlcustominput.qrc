@@ -1,7 +1,7 @@
 <RCC>
-    <qresource prefix="/qml">
-        <file alias="main.qml">qml/qmlcustominput/main.qml</file>
-        <file alias="Data.qml">qml/qmlcustominput/data.qml</file>
-        <file alias="NewButton.qml">qml/qmlcustominput/newbutton.qml</file>
+    <qresource prefix="/">
+        <file>qml/qmlcustominput/Data.qml</file>
+        <file>qml/qmlcustominput/main.qml</file>
+        <file>qml/qmlcustominput/NewButton.qml</file>
     </qresource>
 </RCC>
