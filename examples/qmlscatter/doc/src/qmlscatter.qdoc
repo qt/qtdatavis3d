@@ -140,7 +140,7 @@
     In the main component we'll add the data itself in a \c ListModel and name it
     \c {dataModel}:
 
-    \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 0
+    \snippet ../examples/qmlscatter/qml/qmlscatter/Data.qml 0
     \dots
 
     We'll add two more of these for the other two series, and name them \c dataModelTwo and
@@ -149,7 +149,7 @@
     Then we need to expose the data models to be usable from \c {main.qml}. We do this by defining
     them as aliases in the main data component:
 
-    \snippet ../examples/qmlscatter/qml/qmlscatter/data.qml 1
+    \snippet ../examples/qmlscatter/qml/qmlscatter/Data.qml 1
 
     Now we can use the data from \c data.qml with \c scatterGraph in \c {main.qml}. First we'll add
     a Scatter3DSeries and call it \c {scatterSeries}:

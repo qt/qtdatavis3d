@@ -36,7 +36,7 @@
     The example data is monthly income and expenses of a fictional company over several years.
     The data is defined in a list model in \c data.qml like this:
 
-    \snippet ../examples/qmlbars/qml/qmlbars/data.qml 0
+    \snippet ../examples/qmlbars/qml/qmlbars/Data.qml 0
     \dots
 
     Each data item has four roles: year, month, income, and expenses. Years and months are natural to
@@ -65,7 +65,7 @@
     \c axes.qml. This is done because the data contains abbreviated month names, which we don't want
     to use for our column labels:
 
-    \snippet ../examples/qmlbars/qml/qmlbars/axes.qml 0
+    \snippet ../examples/qmlbars/qml/qmlbars/Axes.qml 0
 
     \section1 Switching series
 

@@ -47,7 +47,7 @@
     The other method to set surface data used in this example is with model mapping. We do that by
     first defining a \c ListModel containing the data for the surface:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/data.qml 0
+    \snippet ../examples/qmlsurface/qml/qmlsurface/Data.qml 0
     \dots 4
 
     Then we set up a Surface3DSeries with a ItemModelSurfaceDataProxy:
