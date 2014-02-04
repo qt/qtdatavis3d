@@ -63,16 +63,16 @@
     We won't look into that any closer, as we'll change nothing in the generated
     \c qtquick2applicationviewer files.
 
-    Next we'll create new qml files for data (\c data.qml) and a QtQuick.Controls button
-    we want to modify a bit (\c newbutton.qml), and add them to the resource file, in addition to
+    Next we'll create new qml files for data (\c Data.qml) and a QtQuick.Controls button
+    we want to modify a bit (\c NewButton.qml), and add them to the resource file, in addition to
     main.qml:
 
     \code
     <RCC>
-        <qresource prefix="/qml">
-            <file alias="main.qml">qml/qmlscatter/main.qml</file>
-            <file alias="Data.qml">qml/qmlscatter/data.qml</file>
-            <file alias="NewButton.qml">qml/qmlscatter/newbutton.qml</file>
+        <qresource prefix="/">
+            <file>qml/qmlscatter/Data.qml</file>
+            <file>qml/qmlscatter/main.qml</file>
+            <file>qml/qmlscatter/NewButton.qml</file>
         </qresource>
     </RCC>
     \endcode
@@ -89,7 +89,7 @@
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 0
 
     The last \c import just imports all the qml files in the same directory as our \c {main.qml},
-    because that's where \c newbutton.qml and \c data.qml are.
+    because that's where \c NewButton.qml and \c Data.qml are.
 
     Then we create our main \c Item and call it \c mainView:
 
@@ -134,7 +134,7 @@
 
     The \c seriesData item contains the data models for all three series we use in this example.
 
-    This is the component that holds our data in \c {data.qml}. It has an \c Item as the main
+    This is the component that holds our data in \c {Data.qml}. It has an \c Item as the main
     component.
 
     In the main component we'll add the data itself in a \c ListModel and name it
@@ -151,7 +151,7 @@
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/Data.qml 1
 
-    Now we can use the data from \c data.qml with \c scatterGraph in \c {main.qml}. First we'll add
+    Now we can use the data from \c Data.qml with \c scatterGraph in \c {main.qml}. First we'll add
     a Scatter3DSeries and call it \c {scatterSeries}:
 
     \snippet ../examples/qmlscatter/qml/qmlscatter/main.qml 5
