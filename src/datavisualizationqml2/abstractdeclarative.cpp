@@ -27,6 +27,8 @@
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 static QList<const QQuickWindow *> clearList;
+static QHash<AbstractDeclarative *, QQuickWindow *> graphWindowList;
+static QHash<QQuickWindow *, bool> windowClearList;
 
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
@@ -39,6 +41,8 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 
 AbstractDeclarative::~AbstractDeclarative()
 {
+    disconnect(this, 0, this, 0);
+    checkWindowList(0);
 }
 
 Declarative3DScene* AbstractDeclarative::scene() const
@@ -107,20 +111,20 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
     defaultTheme->setType(Q3DTheme::ThemeQt);
     m_controller->setActiveTheme(defaultTheme);
 
-    QObject::connect(m_controller, &Abstract3DController::shadowQualityChanged, this,
+    QObject::connect(m_controller.data(), &Abstract3DController::shadowQualityChanged, this,
                      &AbstractDeclarative::handleShadowQualityChange);
-    QObject::connect(m_controller, &Abstract3DController::activeInputHandlerChanged, this,
+    QObject::connect(m_controller.data(), &Abstract3DController::activeInputHandlerChanged, this,
                      &AbstractDeclarative::inputHandlerChanged);
-    QObject::connect(m_controller, &Abstract3DController::activeThemeChanged, this,
+    QObject::connect(m_controller.data(), &Abstract3DController::activeThemeChanged, this,
                      &AbstractDeclarative::themeChanged);
-    QObject::connect(m_controller, &Abstract3DController::selectionModeChanged, this,
+    QObject::connect(m_controller.data(), &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::handleSelectionModeChange);
 
-    QObject::connect(m_controller, &Abstract3DController::axisXChanged, this,
+    QObject::connect(m_controller.data(), &Abstract3DController::axisXChanged, this,
                      &AbstractDeclarative::handleAxisXChanged);
-    QObject::connect(m_controller, &Abstract3DController::axisYChanged, this,
+    QObject::connect(m_controller.data(), &Abstract3DController::axisYChanged, this,
                      &AbstractDeclarative::handleAxisYChanged);
-    QObject::connect(m_controller, &Abstract3DController::axisZChanged, this,
+    QObject::connect(m_controller.data(), &Abstract3DController::axisZChanged, this,
                      &AbstractDeclarative::handleAxisZChanged);
 }
 
@@ -134,17 +138,16 @@ void AbstractDeclarative::synchDataToRenderer()
 
 void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
 {
+    checkWindowList(window);
+
     if (!window)
         return;
-
-    // Disable clearing of the window as we render underneath
-    window->setClearBeforeRendering(false);
 
     connect(window, &QQuickWindow::beforeSynchronizing, this,
             &AbstractDeclarative::synchDataToRenderer, Qt::DirectConnection);
     connect(window, &QQuickWindow::beforeRendering, this,
             &AbstractDeclarative::render, Qt::DirectConnection);
-    connect(m_controller, &Abstract3DController::needRender, window,
+    connect(m_controller.data(), &Abstract3DController::needRender, window,
             &QQuickWindow::update);
 
     updateWindowParameters();
@@ -267,6 +270,44 @@ void AbstractDeclarative::mouseMoveEvent(QMouseEvent *event)
 void AbstractDeclarative::wheelEvent(QWheelEvent *event)
 {
     m_controller->wheelEvent(event);
+}
+
+void AbstractDeclarative::checkWindowList(QQuickWindow *window)
+{
+    QQuickWindow *oldWindow = graphWindowList.value(this);
+
+    graphWindowList[this] = window;
+
+    if (oldWindow) {
+        QObject::disconnect(oldWindow, &QQuickWindow::beforeSynchronizing, this,
+                            &AbstractDeclarative::synchDataToRenderer);
+        QObject::disconnect(oldWindow, &QQuickWindow::beforeRendering, this,
+                            &AbstractDeclarative::render);
+        if (!m_controller.isNull()) {
+            QObject::disconnect(m_controller.data(), &Abstract3DController::needRender,
+                                oldWindow, &QQuickWindow::update);
+        }
+    }
+
+    const QList<QQuickWindow *> windowList = graphWindowList.values();
+
+    if (oldWindow && !windowList.contains(oldWindow)) {
+        // Return window clear value
+        oldWindow->setClearBeforeRendering(windowClearList.value(oldWindow));
+        windowClearList.remove(oldWindow);
+    }
+
+    if (!window) {
+        graphWindowList.remove(this);
+        return;
+    }
+
+    if (window != oldWindow && windowList.size() == 1) {
+        // Save old value clear value
+        windowClearList[window] = window->clearBeforeRendering();
+        // Disable clearing of the window as we render underneath
+        window->setClearBeforeRendering(false);
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

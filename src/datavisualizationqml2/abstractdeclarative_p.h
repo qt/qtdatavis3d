@@ -38,6 +38,7 @@
 #include <QQuickItem>
 #include <QObject>
 #include <QQuickWindow>
+#include <QPointer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -108,6 +109,8 @@ public:
     void synchDataToRenderer();
     void render();
 
+    void checkWindowList(QQuickWindow *window);
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -136,7 +139,7 @@ signals:
     void clearWindowBeforeRenderingChanged(bool enable);
 
 private:
-    Abstract3DController *m_controller;
+    QPointer<Abstract3DController> m_controller;
     QRectF m_cachedGeometry;
     bool m_clearWindowBeforeRendering;
 };
