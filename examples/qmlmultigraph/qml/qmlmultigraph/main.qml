@@ -23,18 +23,20 @@ import "."
 
 Item {
     id: mainView
-    width: 1280
-    height: 400
+    width: 800
+    height: 600
 
     Data {
         id: data
     }
 
     //! [0]
-    RowLayout {
-        id: graphLayout
-        spacing: 1
-        anchors.top: buttonLayout.bottom
+    GridLayout {
+        id: gridLayout
+        columns: 2
+        Layout.fillHeight: true
+        Layout.fillWidth: true
+        anchors.top: mainView.top
         anchors.bottom: mainView.bottom
         anchors.left: mainView.left
         anchors.right: mainView.right
@@ -59,7 +61,7 @@ Item {
                 Surface3DSeries {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     ItemModelSurfaceDataProxy {
-                        itemModel: data.surfaceData
+                        itemModel: data.data
                         // The surface data points are not neatly lined up in rows and columns,
                         // so we define explicit row and column roles.
                         rowRole: "row"
@@ -68,6 +70,52 @@ Item {
                         zPosRole: "longitude"
                         yPosRole: "pop_density"
                     }
+                }
+            }
+        }
+
+        // We'll use one grid cell for buttons
+        Rectangle {
+            Layout.fillHeight: true
+            Layout.fillWidth: true
+            border.color: surfaceGraph.theme.gridLineColor // Let's use neighbor's border color
+            border.width: 2
+
+            GridLayout {
+                anchors.right: parent.right
+                anchors.left: parent.left
+                anchors.top: parent.top
+                anchors.bottom: parent.bottom
+                columns: 2
+
+                NewButton {
+                    Layout.minimumWidth: parent.width / 2
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    text: "Clear Selections"
+                    onClicked: clearSelections() // call a helper function to keep button itself simpler
+                }
+
+                NewButton {
+                    Layout.minimumWidth: parent.width / 2
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    text: "Quit"
+                    onClicked: Qt.quit(0);
+                }
+
+                NewButton {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    text: "Reset Cameras"
+                    onClicked: resetCameras() // call a helper function to keep button itself simpler
+                }
+
+                NewButton {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    text: "Toggle Mesh Styles"
+                    onClicked: toggleMeshStyle() // call a helper function to keep button itself simpler
                 }
             }
         }
@@ -90,12 +138,13 @@ Item {
                 scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
 
                 Scatter3DSeries {
+                    itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     ItemModelScatterDataProxy {
-                        itemModel: data.scatterData
+                        itemModel: data.data
                         // Mapping model roles to scatter series item coordinates.
-                        xPosRole: "xPos"
-                        yPosRole: "yPos"
-                        zPosRole: "zPos"
+                        xPosRole: "latitude"
+                        zPosRole: "longitude"
+                        yPosRole: "pop_density"
                     }
                 }
             }
@@ -120,28 +169,15 @@ Item {
                 scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
 
                 Bar3DSeries {
-                    itemLabelFormat: "@seriesName for @colLabel, @rowLabel: @valueLabel"
-                    name: "Yearly expenses"
+                    itemLabelFormat: "@seriesName: @valueLabel"
+                    name: "Population density"
 
                     ItemModelBarDataProxy {
-                        itemModel: data.barData
+                        itemModel: data.data
                         // Mapping model roles to bar series rows, columns, and values.
-                        rowRole: "year"
-                        columnRole: "city"
-                        valueRole: "expenses"
-                    }
-                }
-
-                Bar3DSeries {
-                    itemLabelFormat: "@seriesName for @colLabel, @rowLabel: @valueLabel"
-                    name: "Yearly income"
-
-                    ItemModelBarDataProxy {
-                        itemModel: data.barData
-                        // Mapping model roles to bar series rows, columns, and values.
-                        rowRole: "year"
-                        columnRole: "city"
-                        valueRole: "income"
+                        rowRole: "row"
+                        columnRole: "col"
+                        valueRole: "pop_density"
                     }
                 }
             }
@@ -149,32 +185,31 @@ Item {
     }
     //! [0]
 
-    RowLayout {
-        id: buttonLayout
-        Layout.minimumHeight: exitButton.height
-        width: parent.width
-        anchors.left: parent.left
-        anchors.top: parent.top
-        spacing: 0
+    function clearSelections() {
+        barGraph.clearSelection()
+        scatterGraph.clearSelection()
+        surfaceGraph.clearSelection()
+    }
 
-        NewButton {
-            id: clearSelectionsButton
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            text: "Clear Selections"
-            onClicked: {
-                barGraph.clearSelection()
-                scatterGraph.clearSelection()
-                surfaceGraph.clearSelection()
-            }
-        }
+    function resetCameras() {
+        surfaceGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
+        scatterGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
+        barGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
+        surfaceGraph.scene.activeCamera.zoomLevel = 100
+        scatterGraph.scene.activeCamera.zoomLevel = 100
+        barGraph.scene.activeCamera.zoomLevel = 100
+    }
 
-        NewButton {
-            id: exitButton
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            text: "Quit"
-            onClicked: Qt.quit(0);
+    function toggleMeshStyle() {
+        if (barGraph.seriesList[0].meshSmooth === true) {
+            barGraph.seriesList[0].meshSmooth = false
+            if (surfaceGraph.seriesList[0].flatShadingSupported)
+                surfaceGraph.seriesList[0].flatShadingEnabled = true
+            scatterGraph.seriesList[0].meshSmooth = false
+        } else {
+            barGraph.seriesList[0].meshSmooth = true
+            surfaceGraph.seriesList[0].flatShadingEnabled = false
+            scatterGraph.seriesList[0].meshSmooth = true
         }
     }
 }

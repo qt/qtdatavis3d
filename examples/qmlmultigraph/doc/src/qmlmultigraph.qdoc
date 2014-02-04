@@ -33,11 +33,14 @@
     \section1 Multiple Graphs
 
     Using multiple graphs in a single application doesn't require anything special, simply define
-    and position the graphs as normal. In this example the graphs are shown side by side in a RowLayout:
+    and position the graphs as normal. In this example the graphs are shown in a 2 x 2 grid with
+    \c{GridLayout}:
 
     \snippet ../examples/qmlmultigraph/qml/qmlmultigraph/main.qml 0
 
-    Each graph has a parent Rectangle item to provide it with a border. The color of the rectangle is set
-    to fully transparent, because otherwise the rectangles would hide the graphs, which are always drawn behind
-    all other QML elements.
+    Each graph has a parent \c Rectangle item to provide it with a border. The color of the rectangle
+    is set to fully transparent, because otherwise the rectangles would hide the graphs, which are
+    always drawn behind all other QML elements.
+
+    Note that one of the grid cells is used for buttons in an another \c{GridLayout}.
 */
