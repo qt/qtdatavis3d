@@ -130,7 +130,6 @@ protected:
     virtual void handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality);
 
 signals:
-    // Signals shadow quality changes.
     void selectionModeChanged(SelectionFlags mode);
     void shadowQualityChanged(ShadowQuality quality);
     void sceneChanged(Q3DScene *scene);
@@ -147,4 +146,4 @@ Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // ABSTRACTDECLARATIVE_P_H
+#endif

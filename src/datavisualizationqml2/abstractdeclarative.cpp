@@ -172,8 +172,8 @@ void AbstractDeclarative::updateWindowParameters()
 {
     // Update the device pixel ratio, window size and bounding box
     QQuickWindow *win = window();
-    Q3DScene *scene = m_controller->scene();
-    if (win) {
+    if (win && !m_controller.isNull()) {
+        Q3DScene *scene = m_controller->scene();
         if (win->devicePixelRatio() != scene->devicePixelRatio()) {
             scene->setDevicePixelRatio(win->devicePixelRatio());
             win->update();
@@ -185,10 +185,8 @@ void AbstractDeclarative::updateWindowParameters()
         }
 
         QPointF point = QQuickItem::mapToScene(QPointF(0.0f, 0.0f));
-        if (m_controller) {
-            scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
-                                            m_cachedGeometry.height()));
-        }
+        scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
+                                        m_cachedGeometry.height()));
     }
 }
 
