@@ -85,6 +85,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
            automatically. If you wish to control the slice view yourself via Q3DScene, do not set this
            flag. When setting this mode flag, either \c SelectionRow or \c SelectionColumn must also
            be set, but not both. Slicing is supported by Q3DBars and Q3DSurface only.
+           When this flag is set, slice mode is entered in the following situations:
+           \list
+           \li When selection is changed explicitly via series API to a visible item
+           \li When selection is changed by clicking on the graph
+           \li When the selection mode changes and the selected item is visible
+           \endlist
     \value SelectionMultiSeries
            Setting this mode means that items for all series at same position are highlighted, instead
            of just the selected item. The actual selection in the other series doesn't change.

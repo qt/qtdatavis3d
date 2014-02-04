@@ -76,7 +76,7 @@ public:
     virtual void synchDataToRenderer();
 
     void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
-    void setSelectedPoint(const QPoint &position, QSurface3DSeries *series);
+    void setSelectedPoint(const QPoint &position, QSurface3DSeries *series, bool enterSlice);
     virtual void clearSelection();
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(

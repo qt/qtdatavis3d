@@ -427,6 +427,16 @@ const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
 }
 
 /*!
+ * \return pointer to the item at \a position. The X-value of \a position indicates the row
+ * and the Y-value indicates the column. The item is guaranteed to be valid only
+ * until the next call that modifies data.
+ */
+const QBarDataItem *QBarDataProxy::itemAt(const QPoint &position) const
+{
+    return itemAt(position.x(), position.y());
+}
+
+/*!
  * \internal
  */
 QBarDataProxyPrivate *QBarDataProxy::dptr()

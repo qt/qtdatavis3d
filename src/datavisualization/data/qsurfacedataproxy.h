@@ -49,7 +49,8 @@ public:
     int rowCount() const;
     int columnCount() const;
     const QSurfaceDataArray *array() const;
-    const QSurfaceDataItem *itemAt(int index) const;
+    const QSurfaceDataItem *itemAt(int rowIndex, int columnIndex) const;
+    const QSurfaceDataItem *itemAt(const QPoint &position) const;
 
     void resetArray(QSurfaceDataArray *newArray);
 

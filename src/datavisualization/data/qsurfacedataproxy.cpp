@@ -259,6 +259,29 @@ const QSurfaceDataArray *QSurfaceDataProxy::array() const
 }
 
 /*!
+ * \return pointer to the item at \a rowIndex, \a columnIndex. It is guaranteed to be valid only
+ * until the next call that modifies data.
+ */
+const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int rowIndex, int columnIndex) const
+{
+    const QSurfaceDataArray &dataArray = *dptrc()->m_dataArray;
+    Q_ASSERT(rowIndex >= 0 && rowIndex < dataArray.size());
+    const QSurfaceDataRow &dataRow = *dataArray[rowIndex];
+    Q_ASSERT(columnIndex >= 0 && columnIndex < dataRow.size());
+    return &dataRow.at(columnIndex);
+}
+
+/*!
+ * \return pointer to the item at \a position. The X-value of \a position indicates the row
+ * and the Y-value indicates the column. The item is guaranteed to be valid only
+ * until the next call that modifies data.
+ */
+const QSurfaceDataItem *QSurfaceDataProxy::itemAt(const QPoint &position) const
+{
+    return itemAt(position.x(), position.y());
+}
+
+/*!
  * \property QSurfaceDataProxy::rowCount
  *
  * \return number of rows in the data.
@@ -279,15 +302,6 @@ int QSurfaceDataProxy::columnCount() const
         return dptrc()->m_dataArray->at(0)->size();
     else
         return 0;
-}
-
-/*!
- * \return pointer to the item at \a index. It is guaranteed to be valid only until the next call that
- * modifies data.
- */
-const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int index) const
-{
-    return &dptrc()->m_dataArray->at(index)->at(2);
 }
 
 /*!

@@ -1,9 +1,11 @@
-!include( ../tests.pri ) {
-    error( "Couldn't find the tests.pri file!" )
+!include( ../examples.pri ) {
+    error( "Couldn't find the examples.pri file!" )
 }
 
+QT += datavisualization
+
 # Add more folders to ship with the application, here
-folder_01.source = qml/qmldynamicdata
+folder_01.source = qml/qmloscilloscope
 folder_01.target = qml
 DEPLOYMENTFOLDERS = folder_01
 
@@ -11,14 +13,15 @@ DEPLOYMENTFOLDERS = folder_01
 QML_IMPORT_PATH =
 
 # The .cpp file which was generated for your project. Feel free to hack it.
-SOURCES += main.cpp
+SOURCES += main.cpp \
+           datasource.cpp
+HEADERS += datasource.h
 
 # Please do not modify the following two lines. Required for deployment.
 include(qtquick2applicationviewer/qtquick2applicationviewer.pri)
 qtcAddDeployment()
 
-RESOURCES += \
-    qmldynamicdata.qrc
+RESOURCES += qmloscilloscope.qrc
 
 OTHER_FILES += doc/src/* \
                doc/images/*

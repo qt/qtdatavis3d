@@ -58,6 +58,7 @@ public:
     const QBarDataArray *array() const;
     const QBarDataRow *rowAt(int rowIndex) const;
     const QBarDataItem *itemAt(int rowIndex, int columnIndex) const;
+    const QBarDataItem *itemAt(const QPoint &position) const;
 
     void resetArray();
     void resetArray(QBarDataArray *newArray);

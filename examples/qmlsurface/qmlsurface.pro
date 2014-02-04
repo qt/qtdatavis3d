@@ -2,8 +2,6 @@
     error( "Couldn't find the examples.pri file!" )
 }
 
-QT += widgets
-
 # Add more folders to ship with the application, here
 folder_01.source = qml/qmlsurface
 folder_01.target = qml
