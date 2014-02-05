@@ -95,7 +95,7 @@ public:
     bool isBarSpecRelative();
 
     void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
-    void setSelectedBar(const QPoint &position, QBar3DSeries *series);
+    void setSelectedBar(const QPoint &position, QBar3DSeries *series, bool enterSlice);
     virtual void clearSelection();
 
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);

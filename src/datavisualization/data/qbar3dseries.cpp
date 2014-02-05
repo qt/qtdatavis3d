@@ -198,7 +198,7 @@ void QBar3DSeries::setSelectedBar(const QPoint &position)
 {
     // Don't do this in private to avoid loops, as that is used for callback from controller.
     if (d_ptr->m_controller)
-        static_cast<Bars3DController *>(d_ptr->m_controller)->setSelectedBar(position, this);
+        static_cast<Bars3DController *>(d_ptr->m_controller)->setSelectedBar(position, this, true);
     else
         dptr()->setSelectedBar(position);
 }

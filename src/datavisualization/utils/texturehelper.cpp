@@ -22,8 +22,6 @@
 #include <QImage>
 #include <QPainter>
 
-#include <QDebug>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 TextureHelper::TextureHelper()
@@ -45,7 +43,6 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     GLuint temp;
-    //qDebug() << "old size" << image.size();
     GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width(), temp);
     GLuint imageHeight = Utils::getNearestPowerOfTwo(image.height(), temp);
     if (smoothScale) {
@@ -54,7 +51,6 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     } else {
         texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio);
     }
-    //qDebug() << "new size" << texImage.size();
 #endif
 
     GLuint textureId;

@@ -111,6 +111,10 @@ void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
     Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
 
     adjustValueAxisRange();
+
+    // Visibility changes may require disabling slicing,
+    // so just reset selection to ensure everything is still valid.
+    setSelectedPoint(m_selectedPoint, m_selectedSeries, false);
 }
 
 void Surface3DController::handlePendingClick()
