@@ -214,16 +214,18 @@ void AbstractDeclarative::render()
         glClear(GL_COLOR_BUFFER_BIT);
     }
 
-    glDepthMask(GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
-    glDisable(GL_BLEND);
+    if (isVisible()) {
+        glDepthMask(GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+        glDepthFunc(GL_LESS);
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_BACK);
+        glDisable(GL_BLEND);
 
-    m_controller->render();
+        m_controller->render();
 
-    glEnable(GL_BLEND);
+        glEnable(GL_BLEND);
+    }
 }
 
 QAbstract3DInputHandler* AbstractDeclarative::inputHandler() const
