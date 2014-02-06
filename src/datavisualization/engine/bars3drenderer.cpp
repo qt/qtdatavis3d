@@ -44,7 +44,6 @@ const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 
 const bool sliceGridLabels = true;
-const QQuaternion identityQuaternion;
 
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
     : Abstract3DRenderer(controller),
@@ -262,13 +261,6 @@ void Bars3DRenderer::updateData()
 void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility)
 {
     Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
-
-    // Fix the series rotations - ignore any rotations that are not along Y-axis
-    for (int series = 0; series < m_visibleSeriesList.size(); series++) {
-        QVector3D vector = m_visibleSeriesList.at(series).meshRotation().vector();
-        if (vector.x() || vector.z())
-            m_visibleSeriesList[series].setMeshRotation(identityQuaternion);
-    }
 }
 
 void Bars3DRenderer::updateScene(Q3DScene *scene)

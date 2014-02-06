@@ -32,7 +32,7 @@ const int numberOfCols = 8;
 const int numberOfRows = 8;
 const float limit = 8.0f;
 const float PI = 3.14159f;
-//#define HEDGEHOG
+#define HEDGEHOG
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
@@ -111,7 +111,8 @@ void ScatterDataModifier::addData()
 #endif
 
             ptrToDataArray->setPosition(QVector3D(x, y, z));
-            ptrToDataArray->setRotation(rotation);
+            ptrToDataArray->setRotationAxis(rotation.vector());
+            ptrToDataArray->setRotationAngle(qAcos(rotation.scalar()) * 360.0f / M_PI);
             ptrToDataArray++;
         }
     }
@@ -172,15 +173,13 @@ void ScatterDataModifier::triggerRotation()
     if (m_graph->seriesList().size()) {
         int selectedIndex = m_graph->seriesList().at(0)->selectedItem();
         if (selectedIndex != QScatter3DSeries::invalidSelectionIndex()) {
-            static float itemAngle = 0.0f;
             QScatterDataItem item(*(m_graph->seriesList().at(0)->dataProxy()->itemAt(selectedIndex)));
-            QQuaternion itemRotation = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, itemAngle++);
-            item.setRotation(itemRotation);
+            item.setRotationAngle(item.rotationAngle() + 1);
             m_graph->seriesList().at(0)->dataProxy()->setItem(selectedIndex, item);
         } else {
             static float seriesAngle = 0.0f;
-            QQuaternion rotation = QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 1.0f, seriesAngle++);
-            m_graph->seriesList().at(0)->setMeshRotation(rotation);
+            m_graph->seriesList().at(0)->setMeshRotationAxis(QVector3D(1.0f, 1.0f, 1.0f));
+            m_graph->seriesList().at(0)->setMeshRotationAngle(seriesAngle++);
         }
     }
 }

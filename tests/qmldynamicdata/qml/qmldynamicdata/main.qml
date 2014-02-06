@@ -28,8 +28,8 @@ Item {
 
     ListModel {
         id: graphModel
-        ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0; rotation: "0.92388, 0.220942, 0.220942, 0.220942"}
-        ListElement{ xPos: 1.0; yPos: 1.0; zPos: 1.0; rotation: "0.953717, 0.173613, 0.173613, 0.173613"}
+        ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0; rotationAxis: "1.0,1.0,1.0"; rotationAngle: 45 }
+        ListElement{ xPos: 1.0; yPos: 1.0; zPos: 1.0; rotationAxis: "1.0,1.0,1.0"; rotationAngle: 45 }
     }
 
     Timer {
@@ -39,18 +39,34 @@ Item {
         repeat: true
         property bool isIncreasing: true
 
+        function generateAngle() {
+            return Math.random() * 360
+        }
+
+        function generateAxis() {
+            return Math.random() + "," + Math.random() + "," + Math.random()
+        }
+
+        function appendRow() {
+            graphModel.append({"xPos": Math.random(),
+                                  "yPos": Math.random(),
+                                  "zPos": Math.random(),
+                                  "rotationAxis": generateAxis(),
+                                  "rotationAngle": generateAngle()});
+        }
+
         onTriggered: {
             if (isIncreasing) {
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
-                graphModel.append({"xPos": Math.random(), "yPos": Math.random(), "zPos": Math.random()});
+                appendRow()
+                appendRow()
+                appendRow()
+                appendRow()
+                appendRow()
+                appendRow()
+                appendRow()
+                appendRow()
+                appendRow()
+                appendRow()
                 if (graphModel.count > 5000) {
                     scatterGraph.theme.type = Theme3D.ThemeIsabelle;
                     isIncreasing = false;
@@ -114,7 +130,8 @@ Item {
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
-                    rotationRole: "rotation"
+                    rotationAxisRole: "rotationAxis"
+                    rotationAngleRole: "rotationAngle"
                 }
             }
         }

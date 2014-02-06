@@ -58,7 +58,8 @@ private:
     int m_xPosRole;
     int m_yPosRole;
     int m_zPosRole;
-    int m_rotationRole;
+    int m_rotationAxisRole;
+    int m_rotationAngleRole;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

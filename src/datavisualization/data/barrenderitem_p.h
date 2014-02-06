@@ -74,9 +74,6 @@ public:
     inline void setSeriesIndex(int seriesIndex) { m_seriesIndex = seriesIndex; }
     inline int seriesIndex() const { return m_seriesIndex; }
 
-    inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
-    inline const QQuaternion &rotation() const { return m_rotation; }
-
 protected:
     float m_value;
     QPoint m_position; // x = row, y = column
@@ -84,7 +81,6 @@ protected:
     QString m_sliceLabel;
     LabelItem *m_sliceLabelItem;
     int m_seriesIndex;
-    QQuaternion m_rotation;
 
     friend class QBarDataItem;
 };

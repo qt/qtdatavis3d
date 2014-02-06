@@ -30,7 +30,7 @@ class DataSource : public QObject
 {
     Q_OBJECT
 public:
-    explicit DataSource(QQuickView *appViewer, QObject *parent = 0);
+    explicit DataSource(QObject *parent = 0);
     virtual ~DataSource();
 
     //! [0]
@@ -46,7 +46,6 @@ public slots:
 private:
     void clearData();
 
-    QQuickView *m_appViewer;
     QVector<QSurfaceDataArray> m_data;
     int m_index;
     QSurfaceDataArray *m_resetArray;

@@ -32,6 +32,7 @@
 #include "qdatavisualizationglobal.h"
 #include <QOpenGLFunctions>
 #include <QVector3D>
+#include <QQuaternion>
 #include <QDebug>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -49,6 +50,7 @@ static const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, 0.0f);
 static const QVector3D zeroVector = QVector3D(0.0f, 0.0f, 0.0f);
 static const QVector3D upVector = QVector3D(0.0f, 1.0f, 0.0f);
 static const QVector3D cameraDistanceVector = QVector3D(0.0f, 0.0f, cameraDistance);
+static const QQuaternion identityQuaternion;
 
 // Skip color == selection texture's background color
 static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f);

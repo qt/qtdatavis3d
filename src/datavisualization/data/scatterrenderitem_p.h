@@ -53,19 +53,11 @@ public:
         }
     }
 
-    inline QQuaternion rotation() const { return m_rotation; }
-    inline void setRotation(const QQuaternion &rotation)
-    {
-        if (m_rotation != rotation)
-            m_rotation = rotation;
-    }
-
     inline bool isVisible() const { return m_visible; }
     inline void setVisible(bool visible) { m_visible = visible; }
 
 protected:
     QVector3D m_position;
-    QQuaternion m_rotation;
     bool m_visible;
 
     friend class QScatterDataItem;

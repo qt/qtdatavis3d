@@ -57,10 +57,18 @@ public:
     void setSelectionLabel(const QString &label);
     QString &selectionLabel(); // Formats selection label if not previously formatted
 
+    inline QQuaternion rotation() const { return m_rotation; }
+    inline void setRotation(const QQuaternion &rotation)
+    {
+        if (m_rotation != rotation)
+            m_rotation = rotation;
+    }
+
 protected:
     QString m_selectionLabel;
     QVector3D m_translation;
     LabelItem *m_selectionLabelItem;
+    QQuaternion m_rotation;
 
     friend class QAbstractDataItem;
 };

@@ -37,7 +37,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Constructs QScatterDataItem.
  */
 QScatterDataItem::QScatterDataItem()
-    : d_ptr(0) // private data doesn't exist by default (optimization)
+    : d_ptr(0), // private data doesn't exist by default (optimization)
+      m_rotationAxis(upVector),
+      m_rotationAngle(0.0f)
 
 {
 }
@@ -47,7 +49,18 @@ QScatterDataItem::QScatterDataItem()
  */
 QScatterDataItem::QScatterDataItem(const QVector3D &position)
     : d_ptr(0),
-      m_position(position)
+      m_position(position),
+      m_rotationAxis(upVector),
+      m_rotationAngle(0.0f)
+{
+}
+
+QScatterDataItem::QScatterDataItem(const QVector3D &position, const QVector3D &rotationAxis,
+                                   float rotationAngle)
+    : d_ptr(0),
+      m_position(position),
+      m_rotationAxis(rotationAxis),
+      m_rotationAngle(rotationAngle)
 {
 }
 
@@ -72,7 +85,8 @@ QScatterDataItem::~QScatterDataItem()
 QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 {
     m_position = other.m_position;
-    m_rotation = other.m_rotation;
+    m_rotationAxis = other.m_rotationAxis;
+    m_rotationAngle = other.m_rotationAngle;
 
     if (other.d_ptr)
         createExtraData();
@@ -93,17 +107,35 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
  */
 
 /*!
- * \fn void QScatterDataItem::setRotation(const QQuaternion &rotation)
- * Sets \a rotation to this data item.
- * The \a rotation should be a normalized QQuaternion.
- * If the series also has rotation, item and series rotations are multiplied together.
- * Defaults to no rotation.
+ * \fn void QScatterDataItem::setRotationAxis(const QVector3D &axis)
+ * Sets rotation \a axis of this data item.
+ * If the series also has rotation, the resulting rotation quaternions
+ * are multiplied together at render time.
+ * Defaults to Y-axis.
+ *
+ * \sa setRotationAngle()
  */
 
 /*!
- * \fn QQuaternion QScatterDataItem::rotation() const
- * \return rotation of this data item.
- * \sa setRotation()
+ * \fn QVector3D QScatterDataItem::rotationAxis() const
+ * \return rotation axis of this data item.
+ * \sa setRotationAxis(), setRotationAngle()
+ */
+
+/*!
+ * \fn void QScatterDataItem::setRotationAngle(float angle)
+ * Sets rotation \a angle of this data item.
+ * If the series also has rotation, the resulting rotation quaternions
+ * are multiplied together at render time.
+ * Defaults to no rotation.
+ *
+ * \sa setRotationAxis()
+ */
+
+/*!
+ * \fn float QScatterDataItem::rotationAngle() const
+ * \return rotation angle of this data item.
+ * \sa setRotationAxis(), setRotationAngle()
  */
 
 /*!

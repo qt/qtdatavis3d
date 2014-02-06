@@ -29,6 +29,7 @@ AbstractRenderItem::AbstractRenderItem(const AbstractRenderItem &other)
 {
     m_selectionLabel = other.m_selectionLabel;
     m_translation = other.m_translation;
+    m_rotation = other.m_rotation;
     m_selectionLabelItem = 0;
 }
 

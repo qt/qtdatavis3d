@@ -128,7 +128,11 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
     }
 
     if (seriesChanged || changeTracker.meshRotationChanged) {
-        m_meshRotation = series->meshRotation();
+        float angle = series->meshRotationAngle();
+        if (angle)
+            m_meshRotation = QQuaternion::fromAxisAndAngle(series->meshRotationAxis(), series->meshRotationAngle());
+        else
+            m_meshRotation = identityQuaternion;
         changeTracker.meshRotationChanged = false;
     }
 

@@ -32,11 +32,9 @@
 
 int main(int argc, char **argv)
 {
-    //! [0]
     QApplication app(argc, argv);
     Q3DScatter *graph = new Q3DScatter();
     QWidget *container = QWidget::createWindowContainer(graph);
-    //! [0]
 
     QSize screenSize = graph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
@@ -44,17 +42,14 @@ int main(int argc, char **argv)
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    //! [1]
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
-    //! [1]
 
     widget->setWindowTitle(QStringLiteral("Directional scatter"));
 
-    //! [4]
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
     themeList->addItem(QStringLiteral("Primary Colors"));
@@ -79,7 +74,7 @@ int main(int argc, char **argv)
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
     QPushButton *toggleRotationButton = new QPushButton(widget);
-    toggleRotationButton->setText(QStringLiteral("Toggle rotation"));
+    toggleRotationButton->setText(QStringLiteral("Toggle animation"));
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
@@ -101,9 +96,7 @@ int main(int argc, char **argv)
 
     QFontComboBox *fontList = new QFontComboBox(widget);
     fontList->setCurrentFont(QFont("Arial"));
-    //! [4]
 
-    //! [5]
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(toggleRotationButton, 0, Qt::AlignTop);
@@ -117,13 +110,9 @@ int main(int argc, char **argv)
     vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList, 1, Qt::AlignTop);
-    //! [5]
 
-    //! [2]
     ScatterDataModifier *modifier = new ScatterDataModifier(graph);
-    //! [2]
 
-    //! [6]
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::changePresetCamera);
     QObject::connect(toggleRotationButton, &QPushButton::clicked, modifier,
@@ -159,12 +148,9 @@ int main(int argc, char **argv)
 
     QObject::connect(modifier, &ScatterDataModifier::fontChanged, fontList,
                      &QFontComboBox::setCurrentFont);
-    //! [6]
 
     itemStyleList->setCurrentIndex(0);
 
-    //! [3]
     widget->show();
     return app.exec();
-    //! [3]
 }

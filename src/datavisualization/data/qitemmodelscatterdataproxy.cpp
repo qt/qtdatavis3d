@@ -93,9 +93,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty string ItemModelScatterDataProxy::rotationRole
+ * \qmlproperty string ItemModelScatterDataProxy::rotationAxisRole
  *
- * Defines the rotation role for the mapping.
+ * Defines the rotation axis role for the mapping.
+ */
+
+/*!
+ * \qmlproperty string ItemModelScatterDataProxy::rotationAngleRole
+ *
+ * Defines the rotation angle role for the mapping.
  */
 
 /*!
@@ -143,13 +149,15 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel 
  * Constructs QItemModelScatterDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
  * ownership of the \a itemModel, as typically item models are owned by other controls.
  * The xPosRole property is set to \a xPosRole, yPosRole property to \a yPosRole, zPosRole property
- * to \a zPosRole, and rotationRole property to \a rotationRole.
+ * to \a zPosRole, rotationAxisRole property to \a rotationAxisRole, and rotationAngleRole
+ * property to \a rotationAngleRole.
  */
 QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
                                                        const QString &xPosRole,
                                                        const QString &yPosRole,
                                                        const QString &zPosRole,
-                                                       const QString &rotationRole,
+                                                       const QString &rotationAxisRole,
+                                                       const QString &rotationAngleRole,
                                                        QObject *parent)
     : QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this), parent)
 {
@@ -157,7 +165,8 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel 
     dptr()->m_xPosRole = xPosRole;
     dptr()->m_yPosRole = yPosRole;
     dptr()->m_zPosRole = zPosRole;
-    dptr()->m_rotationRole = rotationRole;
+    dptr()->m_rotationAxisRole = rotationAxisRole;
+    dptr()->m_rotationAngleRole = rotationAngleRole;
     dptr()->connectItemModelHandler();
 }
 
@@ -239,32 +248,53 @@ QString QItemModelScatterDataProxy::zPosRole() const
 }
 
 /*!
- * \property QItemModelScatterDataProxy::rotationRole
+ * \property QItemModelScatterDataProxy::rotationAxisRole
  *
- * Defines the rotation role for the mapping.
+ * Defines the rotation axis role for the mapping.
  */
-void QItemModelScatterDataProxy::setRotationRole(const QString &role)
+void QItemModelScatterDataProxy::setRotationAxisRole(const QString &role)
 {
-    if (dptr()->m_rotationRole != role) {
-        dptr()->m_rotationRole = role;
-        emit rotationRoleChanged(role);
+    if (dptr()->m_rotationAxisRole != role) {
+        dptr()->m_rotationAxisRole = role;
+        emit rotationAxisRoleChanged(role);
     }
 }
 
-QString QItemModelScatterDataProxy::rotationRole() const
+QString QItemModelScatterDataProxy::rotationAxisRole() const
 {
-    return dptrc()->m_rotationRole;
+    return dptrc()->m_rotationAxisRole;
 }
 
 /*!
- * Changes \a xPosRole, \a yPosRole and \a zPosRole mapping.
+ * \property QItemModelScatterDataProxy::rotationAngleRole
+ *
+ * Defines the rotation angle role for the mapping.
+ */
+void QItemModelScatterDataProxy::setRotationAngleRole(const QString &role)
+{
+    if (dptr()->m_rotationAngleRole != role) {
+        dptr()->m_rotationAngleRole = role;
+        emit rotationAngleRoleChanged(role);
+    }
+}
+
+QString QItemModelScatterDataProxy::rotationAngleRole() const
+{
+    return dptrc()->m_rotationAngleRole;
+}
+
+/*!
+ * Changes \a xPosRole, \a yPosRole, \a zPosRole, \a rotationAxis, and \a rotationAngle mapping.
  */
 void QItemModelScatterDataProxy::remap(const QString &xPosRole, const QString &yPosRole,
-                                       const QString &zPosRole)
+                                       const QString &zPosRole, const QString &rotationAxis,
+                                       const QString &rotationAngle)
 {
     setXPosRole(xPosRole);
     setYPosRole(yPosRole);
     setZPosRole(zPosRole);
+    setRotationAxisRole(rotationAxis);
+    setRotationAngleRole(rotationAngle);
 }
 
 /*!

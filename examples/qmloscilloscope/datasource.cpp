@@ -17,18 +17,14 @@
 ****************************************************************************/
 
 #include "datasource.h"
-#include <QtQuick/QQuickView>
-#include <QtQuick/QQuickItem>
-#include <QDebug>
 #include <qmath.h>
 
 using namespace QtDataVisualization;
 
 Q_DECLARE_METATYPE(QSurface3DSeries *)
 
-DataSource::DataSource(QQuickView *appViewer, QObject *parent) :
+DataSource::DataSource(QObject *parent) :
     QObject(parent),
-    m_appViewer(appViewer),
     m_index(-1),
     m_resetArray(0)
 {
@@ -46,7 +42,6 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
                               float zMin, float zMax)
 {
     clearData();
-
     // Re-create the cache array
     m_data.resize(cacheCount);
     for (int i(0); i < cacheCount; i++) {

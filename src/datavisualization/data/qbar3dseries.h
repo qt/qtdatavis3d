@@ -32,7 +32,6 @@ class QT_DATAVISUALIZATION_EXPORT QBar3DSeries : public QAbstract3DSeries
     Q_OBJECT
     Q_PROPERTY(QBarDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
     Q_PROPERTY(QPoint selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
-    Q_PROPERTY(float meshAngle READ meshAngle WRITE setMeshAngle NOTIFY meshAngleChanged)
 
 public:
     explicit QBar3DSeries(QObject *parent = 0);
@@ -46,13 +45,9 @@ public:
     QPoint selectedBar() const;
     static QPoint invalidSelectionPosition();
 
-    void setMeshAngle(float angle);
-    float meshAngle() const;
-
 signals:
     void dataProxyChanged(QBarDataProxy *proxy);
     void selectedBarChanged(QPoint position);
-    void meshAngleChanged(float angle);
 
 protected:
     explicit QBar3DSeries(QBar3DSeriesPrivate *d, QObject *parent = 0);

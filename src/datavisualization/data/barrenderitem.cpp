@@ -39,7 +39,6 @@ BarRenderItem::BarRenderItem(const BarRenderItem &other)
     m_sliceLabel = other.m_sliceLabel;
     m_sliceLabelItem = 0;
     m_seriesIndex = other.m_seriesIndex;
-    m_rotation = other.m_rotation;
 }
 
 BarRenderItem::~BarRenderItem()

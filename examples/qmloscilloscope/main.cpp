@@ -44,7 +44,7 @@ int main(int argc, char *argv[])
     viewer.setTitle(QStringLiteral("Oscilloscope example"));
 
     //! [0]
-    DataSource dataSource(&viewer);
+    DataSource dataSource;
     viewer.rootContext()->setContextProperty("dataSource", &dataSource);
     //! [0]
 

@@ -22,7 +22,6 @@
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 
 #include <QVector3D>
-#include <QQuaternion>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -33,6 +32,7 @@ class QT_DATAVISUALIZATION_EXPORT QScatterDataItem
 public:
     QScatterDataItem();
     QScatterDataItem(const QVector3D &position);
+    QScatterDataItem(const QVector3D &position, const QVector3D &rotationAxis, float rotationAngle);
     QScatterDataItem(const QScatterDataItem &other);
     ~QScatterDataItem();
 
@@ -40,8 +40,10 @@ public:
 
     inline void setPosition(const QVector3D &position) { m_position = position; }
     inline QVector3D position() const { return m_position; }
-    inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
-    inline QQuaternion rotation() const { return m_rotation; }
+    inline void setRotationAxis(const QVector3D &axis) { m_rotationAxis = axis; }
+    inline QVector3D rotationAxis() const { return m_rotationAxis; }
+    inline void setRotationAngle(float angle) { m_rotationAngle = angle; }
+    inline float rotationAngle() const { return m_rotationAngle; }
     inline void setX(float value) { m_position.setX(value); }
     inline void setY(float value) { m_position.setY(value); }
     inline void setZ(float value) { m_position.setZ(value); }
@@ -56,7 +58,8 @@ protected:
 
 private:
     QVector3D m_position;
-    QQuaternion m_rotation;
+    QVector3D m_rotationAxis;
+    float m_rotationAngle;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION
