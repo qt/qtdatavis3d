@@ -30,6 +30,7 @@ SeriesRenderCache::SeriesRenderCache()
     : m_series(0),
       m_object(0),
       m_mesh(QAbstract3DSeries::MeshCube),
+      m_baseUniformTexture(0),
       m_baseGradientTexture(0),
       m_singleHighlightGradientTexture(0),
       m_multiHighlightGradientTexture(0)
@@ -138,6 +139,8 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
 
     if (seriesChanged || changeTracker.baseColorChanged) {
         m_baseColor = Utils::vectorFromColor(series->baseColor());
+        if (m_series->type() == QAbstract3DSeries::SeriesTypeSurface)
+            renderer->generateBaseColorTexture(series->baseColor(), &m_baseUniformTexture);
         changeTracker.baseColorChanged = false;
     }
 
@@ -178,6 +181,7 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
 void SeriesRenderCache::cleanup(TextureHelper *texHelper)
 {
     delete m_object;
+    texHelper->deleteTexture(&m_baseUniformTexture);
     texHelper->deleteTexture(&m_baseGradientTexture);
     texHelper->deleteTexture(&m_singleHighlightGradientTexture);
     texHelper->deleteTexture(&m_multiHighlightGradientTexture);

@@ -58,6 +58,7 @@ public:
     inline ObjectHelper *object() const { return m_object; }
     inline const Q3DTheme::ColorStyle &colorStyle() const { return m_colorStyle; }
     inline const QVector3D &baseColor() const { return m_baseColor; }
+    inline const GLuint &baseUniformTexture() const { return m_baseUniformTexture; }
     inline const GLuint &baseGradientTexture() const { return m_baseGradientTexture; }
     inline const QVector3D &singleHighlightColor() const { return m_singleHighlightColor; }
     inline const GLuint &singleHighlightGradientTexture() const { return m_singleHighlightGradientTexture; }
@@ -74,6 +75,7 @@ protected:
 
     Q3DTheme::ColorStyle m_colorStyle;
     QVector3D m_baseColor;
+    GLuint m_baseUniformTexture;
     GLuint m_baseGradientTexture;
     QVector3D m_singleHighlightColor;
     GLuint m_singleHighlightGradientTexture;

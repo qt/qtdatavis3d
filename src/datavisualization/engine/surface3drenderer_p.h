@@ -34,6 +34,7 @@
 #include "abstract3drenderer_p.h"
 #include "scatterrenderitem_p.h"
 #include "qsurfacedataproxy.h"
+#include "surfaceseriesrendercache_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -60,7 +61,8 @@ private:
     // Internal attributes purely related to how the scene is drawn with GL.
     ShaderHelper *m_depthShader;
     ShaderHelper *m_backgroundShader;
-    ShaderHelper *m_surfaceShader;
+    ShaderHelper *m_surfaceFlatShader;
+    ShaderHelper *m_surfaceSmoothShader;
     ShaderHelper *m_surfaceGridShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_labelShader;
@@ -84,19 +86,15 @@ private:
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
     SurfaceObject *m_surfaceObj;
-    SurfaceObject *m_sliceSurfaceObj;
     GLuint m_depthTexture;
     GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
-    GLuint m_selectionTexture;
     GLuint m_selectionResultTexture;
     GLfloat m_shadowQualityToShader;
     bool m_cachedFlatShading;
     bool m_flatSupported;
-    bool m_cachedSurfaceVisible;
-    bool m_cachedSurfaceGridOn;
     SelectionPointer *m_selectionPointer;
     bool m_selectionActive;
     bool m_xFlipped;
@@ -104,7 +102,6 @@ private:
     bool m_yFlipped;
     AbstractRenderItem m_dummyRenderItem;
     QSurfaceDataArray m_dataArray;
-    QSurfaceDataArray m_sliceDataArray;
     QRect m_sampleSpace;
     GLint m_shadowQualityMultiplier;
     QSizeF m_areaSize;
@@ -112,9 +109,10 @@ private:
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedPoint;
     const QSurface3DSeries *m_selectedSeries;
-    GLuint m_uniformGradientTexture;
     QVector3D m_uniformGradientTextureColor;
     QPoint m_clickedPosition;
+    QHash<QSurface3DSeries *, SurfaceSeriesRenderCache *> m_renderCacheList;
+    bool m_selectionTexturesDirty;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -122,11 +120,11 @@ public:
 
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
+    void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode);
+    void modifiedSeriesList(const QVector<QSurface3DSeries *> &seriesList);
     void updateRows(const QVector<int> &rows);
     void updateItem(const QVector<QPoint> &points);
     void updateScene(Q3DScene *scene);
-    bool updateFlatStatus(bool enable);
-    void updateSurfaceGridStatus(bool enable);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);
     inline QPoint clickedPosition() const { return m_clickedPosition; }
@@ -142,6 +140,8 @@ signals:
     void flatShadingSupportedChanged(bool supported);
 
 private:
+    void checkFlatSupport(SurfaceSeriesRenderCache *cache);
+    void updateObjects(SurfaceSeriesRenderCache *cache, bool dimensionChanged);
     void updateSliceDataModel(const QPoint &point);
     void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     void updateTextures();
@@ -150,8 +150,6 @@ private:
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();
-    void loadSurfaceObj();
-    void loadSliceSurfaceObj();
     void drawScene(GLuint defaultFboHandle);
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -160,7 +158,8 @@ private:
     void initSurfaceShaders();
     void initSelectionBuffer();
     void initDepthShader();
-    void updateSelectionTexture();
+    void updateSelectionTextures();
+    void createSelectionTexture(SurfaceSeriesRenderCache *cache, uint &lastSelectionId);
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
     void surfacePointSelected(const QPoint &point);
@@ -170,7 +169,6 @@ private:
     void updateDepthBuffer();
 #endif
     void emitSelectedPointChanged(QPoint position);
-    void generateUniformGradient(const QVector3D newColor);
 
     Q_DISABLE_COPY(Surface3DRenderer)
 };

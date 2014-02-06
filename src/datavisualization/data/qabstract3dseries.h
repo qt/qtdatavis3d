@@ -142,6 +142,7 @@ private:
     friend class Abstract3DController;
     friend class Bars3DController;
     friend class Surface3DController;
+    friend class Surface3DRenderer;
     friend class Scatter3DController;
     friend class QBar3DSeries;
     friend class SeriesRenderCache;

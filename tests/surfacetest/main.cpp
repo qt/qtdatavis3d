@@ -31,6 +31,7 @@
 #include <QScreen>
 #include <QPainter>
 #include <QFontComboBox>
+#include <QFrame>
 #include <QDebug>
 
 using namespace QtDataVisualization;
@@ -82,6 +83,72 @@ int main(int argc, char *argv[])
     seriesVisibleCB->setText(QStringLiteral("Series Visible"));
     seriesVisibleCB->setChecked(true);
 
+#ifdef MULTI_SERIES
+    smoothCB->setText(QStringLiteral("S1 Flat Surface"));
+    surfaceGridCB->setText(QStringLiteral("S1 Surface Grid"));
+    surfaceCB->setText(QStringLiteral("S1 Surface Visible"));
+    seriesVisibleCB->setText(QStringLiteral("Series 1 Visible"));
+
+    QCheckBox *smoothS2CB = new QCheckBox(widget);
+    smoothS2CB->setText(QStringLiteral("S2 Flat Surface"));
+    smoothS2CB->setChecked(true);
+
+    QCheckBox *surfaceGridS2CB = new QCheckBox(widget);
+    surfaceGridS2CB->setText(QStringLiteral("S2 Surface Grid"));
+    surfaceGridS2CB->setChecked(true);
+
+    QCheckBox *surfaceS2CB = new QCheckBox(widget);
+    surfaceS2CB->setText(QStringLiteral("S2 Surface Visible"));
+    surfaceS2CB->setChecked(true);
+
+    QCheckBox *series2VisibleCB = new QCheckBox(widget);
+    series2VisibleCB->setText(QStringLiteral("Series 2 Visible"));
+    series2VisibleCB->setChecked(true);
+
+    QCheckBox *smoothS3CB = new QCheckBox(widget);
+    smoothS3CB->setText(QStringLiteral("S3 Flat Surface"));
+    smoothS3CB->setChecked(true);
+
+    QCheckBox *surfaceGridS3CB = new QCheckBox(widget);
+    surfaceGridS3CB->setText(QStringLiteral("S3 Surface Grid"));
+    surfaceGridS3CB->setChecked(true);
+
+    QCheckBox *surfaceS3CB = new QCheckBox(widget);
+    surfaceS3CB->setText(QStringLiteral("S3 Surface Visible"));
+    surfaceS3CB->setChecked(true);
+
+    QCheckBox *series3VisibleCB = new QCheckBox(widget);
+    series3VisibleCB->setText(QStringLiteral("Series 3 Visible"));
+    series3VisibleCB->setChecked(true);
+
+    QCheckBox *smoothS4CB = new QCheckBox(widget);
+    smoothS4CB->setText(QStringLiteral("S4 Flat Surface"));
+    smoothS4CB->setChecked(true);
+
+    QCheckBox *surfaceGridS4CB = new QCheckBox(widget);
+    surfaceGridS4CB->setText(QStringLiteral("S4 Surface Grid"));
+    surfaceGridS4CB->setChecked(true);
+
+    QCheckBox *surfaceS4CB = new QCheckBox(widget);
+    surfaceS4CB->setText(QStringLiteral("S4 Surface Visible"));
+    surfaceS4CB->setChecked(true);
+
+    QCheckBox *series4VisibleCB = new QCheckBox(widget);
+    series4VisibleCB->setText(QStringLiteral("Series 4 Visible"));
+    series4VisibleCB->setChecked(true);
+
+    QCheckBox *series1CB = new QCheckBox(widget);
+    series1CB->setText(QStringLiteral("Series 1"));
+
+    QCheckBox *series2CB = new QCheckBox(widget);
+    series2CB->setText(QStringLiteral("Series 2"));
+
+    QCheckBox *series3CB = new QCheckBox(widget);
+    series3CB->setText(QStringLiteral("Series 3"));
+
+    QCheckBox *series4CB = new QCheckBox(widget);
+    series4CB->setText(QStringLiteral("Series 4"));
+#else
     //QCheckBox *sqrtSinCB = new QCheckBox(widget);
     QRadioButton *sqrtSinCB = new QRadioButton(widget);
     sqrtSinCB->setText(QStringLiteral("Sqrt & Sin"));
@@ -111,6 +178,7 @@ int main(int argc, char *argv[])
     gridSliderZ->setValue(30);
     gridSliderZ->setMaximum(200);
     gridSliderZ->setEnabled(true);
+#endif
 
     QSlider *axisRangeSliderX = new QSlider(Qt::Horizontal, widget);
     axisRangeSliderX->setTickInterval(1);
@@ -209,6 +277,7 @@ int main(int argc, char *argv[])
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn));
     selectionMode->setCurrentIndex(1);
 
+#ifndef MULTI_SERIES
     QPushButton *selectButton = new QPushButton(widget);
     selectButton->setText(QStringLiteral("Select random point"));
 
@@ -216,6 +285,7 @@ int main(int argc, char *argv[])
     flipViewsButton->setText(QStringLiteral("Flip Views"));
 
     QLabel *selectionInfoLabel = new QLabel(widget);
+#endif
 
     QPushButton *changeRowButton = new QPushButton(widget);
     changeRowButton->setText(QStringLiteral("Change a row"));
@@ -247,11 +317,47 @@ int main(int argc, char *argv[])
     QPushButton *removeRowButton = new QPushButton(widget);
     removeRowButton->setText(QStringLiteral("Remove a row"));
 
+    QFrame* line = new QFrame();
+    line->setFrameShape(QFrame::HLine);
+    line->setFrameShadow(QFrame::Sunken);
+
+    QFrame* line2 = new QFrame();
+    line2->setFrameShape(QFrame::HLine);
+    line2->setFrameShadow(QFrame::Sunken);
+
+    QFrame* line3 = new QFrame();
+    line3->setFrameShape(QFrame::HLine);
+    line3->setFrameShadow(QFrame::Sunken);
+
     // Add controls to the layout
+#ifdef MULTI_SERIES
+    vLayout->addWidget(series1CB);
+#endif
     vLayout->addWidget(smoothCB);
     vLayout->addWidget(surfaceGridCB);
     vLayout->addWidget(surfaceCB);
     vLayout->addWidget(seriesVisibleCB);
+#ifdef MULTI_SERIES
+    vLayout->addWidget(line);
+    vLayout->addWidget(series2CB);
+    vLayout->addWidget(smoothS2CB);
+    vLayout->addWidget(surfaceGridS2CB);
+    vLayout->addWidget(surfaceS2CB);
+    vLayout->addWidget(series2VisibleCB);
+    vLayout->addWidget(line2);
+    vLayout->addWidget(series3CB);
+    vLayout->addWidget(smoothS3CB);
+    vLayout->addWidget(surfaceGridS3CB);
+    vLayout->addWidget(surfaceS3CB);
+    vLayout->addWidget(series3VisibleCB);
+    vLayout->addWidget(line3);
+    vLayout->addWidget(series4CB);
+    vLayout->addWidget(smoothS4CB);
+    vLayout->addWidget(surfaceGridS4CB);
+    vLayout->addWidget(surfaceS4CB);
+    vLayout->addWidget(series4VisibleCB);
+#endif
+#ifndef MULTI_SERIES
     vLayout->addWidget(new QLabel(QStringLiteral("Select surface sample")));
     vLayout->addWidget(sqrtSinCB);
     vLayout->addWidget(planeCB);
@@ -260,6 +366,7 @@ int main(int argc, char *argv[])
     vLayout->addWidget(gridSlidersLockCB);
     vLayout->addWidget(gridSliderX);
     vLayout->addWidget(gridSliderZ);
+#endif
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis range")));
     vLayout->addWidget(axisRangeSliderX);
     vLayout->addWidget(axisRangeSliderZ);
@@ -277,9 +384,11 @@ int main(int argc, char *argv[])
     vLayout->addWidget(shadowQuality);
     vLayout->addWidget(new QLabel(QStringLiteral("Selection Mode")));
     vLayout->addWidget(selectionMode);
+#ifndef MULTI_SERIES
     vLayout->addWidget(selectButton);
     vLayout->addWidget(selectionInfoLabel);
     vLayout->addWidget(flipViewsButton);
+#endif
 
     vLayout2->addWidget(changeRowButton);
     vLayout2->addWidget(changeRowsButton);
@@ -305,6 +414,78 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::toggleSurface);
     QObject::connect(seriesVisibleCB, &QCheckBox::stateChanged,
                      modifier, &GraphModifier::toggleSeriesVisible);
+#ifdef MULTI_SERIES
+    QObject::connect(smoothS2CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSmoothS2);
+    QObject::connect(surfaceGridS2CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSurfaceGridS2);
+    QObject::connect(surfaceS2CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSurfaceS2);
+    QObject::connect(series2VisibleCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeries2Visible);
+
+    QObject::connect(smoothS3CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSmoothS3);
+    QObject::connect(surfaceGridS3CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSurfaceGridS3);
+    QObject::connect(surfaceS3CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSurfaceS3);
+    QObject::connect(series3VisibleCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeries3Visible);
+
+    QObject::connect(smoothS4CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSmoothS4);
+    QObject::connect(surfaceGridS4CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSurfaceGridS4);
+    QObject::connect(surfaceS4CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSurfaceS4);
+    QObject::connect(series4VisibleCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeries4Visible);
+
+    QObject::connect(series1CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeries1);
+    QObject::connect(series1CB, &QCheckBox::stateChanged,
+                     smoothCB, &QPushButton::setEnabled);
+    QObject::connect(series1CB, &QCheckBox::stateChanged,
+                     surfaceGridCB, &QPushButton::setEnabled);
+    QObject::connect(series1CB, &QCheckBox::stateChanged,
+                     surfaceCB, &QPushButton::setEnabled);
+    QObject::connect(series1CB, &QCheckBox::stateChanged,
+                     seriesVisibleCB, &QPushButton::setEnabled);
+
+    QObject::connect(series2CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeries2);
+    QObject::connect(series2CB, &QCheckBox::stateChanged,
+                     smoothS2CB, &QPushButton::setEnabled);
+    QObject::connect(series2CB, &QCheckBox::stateChanged,
+                     surfaceGridS2CB, &QPushButton::setEnabled);
+    QObject::connect(series2CB, &QCheckBox::stateChanged,
+                     surfaceS2CB, &QPushButton::setEnabled);
+    QObject::connect(series2CB, &QCheckBox::stateChanged,
+                     series2VisibleCB, &QPushButton::setEnabled);
+
+    QObject::connect(series3CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeries3);
+    QObject::connect(series3CB, &QCheckBox::stateChanged,
+                     smoothS3CB, &QPushButton::setEnabled);
+    QObject::connect(series3CB, &QCheckBox::stateChanged,
+                     surfaceGridS3CB, &QPushButton::setEnabled);
+    QObject::connect(series3CB, &QCheckBox::stateChanged,
+                     surfaceS3CB, &QPushButton::setEnabled);
+    QObject::connect(series3CB, &QCheckBox::stateChanged,
+                     series3VisibleCB, &QPushButton::setEnabled);
+
+    QObject::connect(series4CB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleSeries4);
+    QObject::connect(series4CB, &QCheckBox::stateChanged,
+                     smoothS4CB, &QPushButton::setEnabled);
+    QObject::connect(series4CB, &QCheckBox::stateChanged,
+                     surfaceGridS4CB, &QPushButton::setEnabled);
+    QObject::connect(series4CB, &QCheckBox::stateChanged,
+                     surfaceS4CB, &QPushButton::setEnabled);
+    QObject::connect(series4CB, &QCheckBox::stateChanged,
+                     series4VisibleCB, &QPushButton::setEnabled);
+#else
     QObject::connect(sqrtSinCB, &QRadioButton::toggled,
                      modifier, &GraphModifier::toggleSqrtSin);
     QObject::connect(planeCB, &QCheckBox::toggled,
@@ -317,6 +498,7 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::adjustXCount);
     QObject::connect(gridSliderZ, &QSlider::valueChanged,
                      modifier, &GraphModifier::adjustZCount);
+#endif
     QObject::connect(axisRangeSliderX, &QSlider::valueChanged,
                      modifier, &GraphModifier::adjustXRange);
     QObject::connect(axisRangeSliderZ, &QSlider::valueChanged,
@@ -339,10 +521,12 @@ int main(int argc, char *argv[])
                      modifier, SLOT(changeShadowQuality(int)));
     QObject::connect(selectionMode, SIGNAL(currentIndexChanged(int)),
                      modifier, SLOT(changeSelectionMode(int)));
+#ifndef MULTI_SERIES
     QObject::connect(selectButton, &QPushButton::clicked,
                      modifier, &GraphModifier::selectButtonClicked);
     QObject::connect(flipViewsButton, &QPushButton::clicked,
                      modifier, &GraphModifier::flipViews);
+#endif
     QObject::connect(changeRowButton,&QPushButton::clicked,
                      modifier, &GraphModifier::changeRow);
     QObject::connect(changeRowsButton,&QPushButton::clicked,
@@ -364,15 +548,27 @@ int main(int argc, char *argv[])
     QObject::connect(removeRowButton,&QPushButton::clicked,
                      modifier, &GraphModifier::removeRow);
 
-    modifier->setGridSliderZ(gridSliderZ);
-    modifier->setGridSliderX(gridSliderX);
+#ifdef MULTI_SERIES
+    modifier->setSeries1CB(series1CB);
+    modifier->setSeries2CB(series2CB);
+    modifier->setSeries3CB(series3CB);
+    modifier->setSeries4CB(series4CB);
+    series1CB->setChecked(true);
+    series2CB->setChecked(true);
+    series3CB->setChecked(true);
+    series4CB->setChecked(false);
+#endif
     modifier->setAxisRangeSliderX(axisRangeSliderX);
     modifier->setAxisRangeSliderZ(axisRangeSliderZ);
     modifier->setAxisMinSliderX(axisMinSliderX);
     modifier->setAxisMinSliderZ(axisMinSliderZ);
+#ifndef MULTI_SERIES
+    modifier->setGridSliderZ(gridSliderZ);
+    modifier->setGridSliderX(gridSliderX);
     modifier->toggleGridSliderLock(gridSlidersLockCB->checkState());
     modifier->setSelectionInfoLabel(selectionInfoLabel);
     sqrtSinCB->setChecked(true);
+#endif
     shadowQuality->setCurrentIndex(3);
 
     return app.exec();

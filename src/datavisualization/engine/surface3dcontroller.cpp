@@ -68,6 +68,11 @@ void Surface3DController::synchDataToRenderer()
     if (!isInitialized())
         return;
 
+    if (m_changedSeriesList.size()) {
+        m_renderer->modifiedSeriesList(m_changedSeriesList);
+        m_changedSeriesList.clear();
+    }
+
     Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
@@ -143,14 +148,10 @@ void Surface3DController::addSeries(QAbstract3DSeries *series)
 {
     Q_ASSERT(series && series->type() == QAbstract3DSeries::SeriesTypeSurface);
 
-    if (!m_seriesList.size()) {
-        Abstract3DController::addSeries(series);
+    Abstract3DController::addSeries(series);
 
-        if (series->isVisible())
-            adjustValueAxisRange();
-    } else {
-        qWarning("Surface graph only supports a single series.");
-    }
+    if (series->isVisible())
+        adjustValueAxisRange();
 
     QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
     if (surfaceSeries->selectedPoint() != invalidSelectionPosition())
@@ -260,7 +261,7 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
         emitNeedRender();
     }
 
-    if (pos != m_selectedPoint) {
+    if (pos != m_selectedPoint || series != m_selectedSeries) {
         m_selectedPoint = pos;
         m_selectedSeries = series;
         m_changeTracker.selectedPointChanged = true;
@@ -288,6 +289,8 @@ void Surface3DController::handleArrayReset()
     QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
     if (series->isVisible()) {
         adjustValueAxisRange();
+        if (!m_changedSeriesList.contains(series))
+            m_changedSeriesList.append(series);
         m_isDataDirty = true;
     }
     // Clear selection unless still valid
@@ -375,6 +378,8 @@ void Surface3DController::handleRowsAdded(int startIndex, int count)
     if (series->isVisible()) {
         adjustValueAxisRange();
         m_isDataDirty = true;
+        if (!m_changedSeriesList.contains(series))
+            m_changedSeriesList.append(series);
     }
     emitNeedRender();
 }
@@ -396,6 +401,8 @@ void Surface3DController::handleRowsInserted(int startIndex, int count)
     if (series->isVisible()) {
         adjustValueAxisRange();
         m_isDataDirty = true;
+        if (!m_changedSeriesList.contains(series))
+            m_changedSeriesList.append(series);
     }
 
     emitNeedRender();
@@ -422,6 +429,8 @@ void Surface3DController::handleRowsRemoved(int startIndex, int count)
     if (series->isVisible()) {
         adjustValueAxisRange();
         m_isDataDirty = true;
+        if (!m_changedSeriesList.contains(series))
+            m_changedSeriesList.append(series);
     }
 
     emitNeedRender();

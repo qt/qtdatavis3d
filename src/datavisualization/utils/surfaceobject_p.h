@@ -40,6 +40,13 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 class SurfaceObject : public AbstractObjectHelper
 {
 public:
+    enum SurfaceType {
+        SurfaceSmooth,
+        SurfaceFlat,
+        Undefined
+    };
+
+public:
     SurfaceObject();
     ~SurfaceObject();
 
@@ -71,11 +78,7 @@ private:
                        bool changeGeometry);
 
 private:
-    enum SurfaceType {
-        SurfaceSmooth,
-        SurfaceFlat
-    };
-    int m_surfaceType;
+    SurfaceType m_surfaceType;
     int m_columns;
     int m_rows;
     GLuint m_gridElementbuffer;

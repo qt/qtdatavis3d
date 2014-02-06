@@ -94,6 +94,7 @@ public:
     virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation, const QString &format);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
+    void generateBaseColorTexture(const QColor &color, GLuint *texture);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
 
     inline bool isClickPending() { return m_clickPending; }

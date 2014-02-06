@@ -25,6 +25,10 @@
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 SurfaceObject::SurfaceObject()
+    : m_surfaceType(Undefined),
+      m_columns(0),
+      m_rows(0),
+      m_gridIndexCount(0)
 {
     m_indicesType = GL_UNSIGNED_INT;
     initializeOpenGLFunctions();
@@ -668,6 +672,9 @@ GLuint SurfaceObject::gridIndexCount()
 QVector3D SurfaceObject::vertexAt(int column, int row)
 {
     int pos = 0;
+    if (m_surfaceType == Undefined || !m_vertices.size())
+        return zeroVector;
+
     if (m_surfaceType == SurfaceFlat)
         pos = row * (m_columns * 2 - 2) + column * 2 - (column > 0);
     else

@@ -426,8 +426,17 @@ void Abstract3DRenderer::lowerShadowQuality()
     updateShadowQuality(newQuality);
 }
 
-void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient,
-                                                       GLuint *gradientTexture)
+void Abstract3DRenderer::generateBaseColorTexture(const QColor &color, GLuint *texture)
+{
+    if (*texture) {
+        m_textureHelper->deleteTexture(texture);
+        *texture = 0;
+    }
+
+    *texture = m_textureHelper->createUniformTexture(color);
+}
+
+void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture)
 {
     // Readjust start/stop to match gradient texture size
     gradient->setStart(qreal(gradientTextureWidth), qreal(gradientTextureHeight));

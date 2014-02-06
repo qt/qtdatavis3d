@@ -151,6 +151,18 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     return textureid;
 }
 
+GLuint TextureHelper::createUniformTexture(const QColor &color)
+{
+    QImage image(QSize(int(uniformTextureWidth), int(uniformTextureHeight)),
+                 QImage::Format_RGB32);
+    QPainter pmp(&image);
+    pmp.setBrush(QBrush(color));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, int(uniformTextureWidth), int(uniformTextureHeight));
+
+    return create2DTexture(image, false, true, false, true);
+}
+
 GLuint TextureHelper::createGradientTexture(const QLinearGradient &gradient)
 {
     QImage image(QSize(int(gradientTextureWidth), int(gradientTextureHeight)),

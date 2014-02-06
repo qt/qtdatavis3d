@@ -67,6 +67,7 @@ private:
     bool m_flatShadingSupported;
     QVector<QPoint> m_changedItems;
     QVector<int> m_changedRows;
+    QVector<QSurface3DSeries *> m_changedSeriesList;
 
 public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
