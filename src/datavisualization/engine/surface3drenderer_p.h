@@ -113,6 +113,7 @@ private:
     QPoint m_clickedPosition;
     QHash<QSurface3DSeries *, SurfaceSeriesRenderCache *> m_renderCacheList;
     bool m_selectionTexturesDirty;
+    GLuint m_noShadowTexture;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);

@@ -106,7 +106,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),
       m_selectedSeries(0),
       m_clickedPosition(Surface3DController::invalidSelectionPosition()),
-      m_selectionTexturesDirty(false)
+      m_selectionTexturesDirty(false),
+      m_noShadowTexture(0)
 {
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
@@ -131,6 +132,7 @@ Surface3DRenderer::~Surface3DRenderer()
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
         m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
 
+        m_textureHelper->deleteTexture(&m_noShadowTexture);
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_textureHelper->deleteTexture(&m_depthModelTexture);
         m_textureHelper->deleteTexture(&m_selectionResultTexture);
@@ -187,6 +189,11 @@ void Surface3DRenderer::initializeOpenGL()
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
+
+    // Create texture for no shadows
+    QImage image(2, 2, QImage::Format_RGB32);
+    image.fill(Qt::white);
+    m_noShadowTexture = m_textureHelper->create2DTexture(image, false, true, false, true);
 }
 
 void Surface3DRenderer::updateData()
@@ -225,7 +232,7 @@ void Surface3DRenderer::updateData()
                 for (int i = 0; i < sampleSpace.height(); i++) {
                     for (int j = 0; j < sampleSpace.width(); j++) {
                         (*(dataArray.at(i)))[j] = array.at(i + sampleSpace.y())->at(
-                                j + sampleSpace.x());
+                                    j + sampleSpace.x());
                     }
                 }
 
@@ -427,7 +434,8 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
         // Make a duplicate, so that we get a little bit depth
         QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
         for (int i = 0; i < sliceRow->size(); i++) {
-            (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(), sliceRow->at(i).y() - stepDown,
+            (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(),
+                                                 sliceRow->at(i).y() - stepDown,
                                                  1.0f));
         }
 
@@ -437,10 +445,12 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 
         if (sliceRow->size() > 0) {
             if (cache->isFlatShadingEnabled()) {
-                cache->sliceSurfaceObject()->setUpData(sliceDataArray, sliceRect, m_heightNormalizer,
+                cache->sliceSurfaceObject()->setUpData(sliceDataArray, sliceRect,
+                                                       m_heightNormalizer,
                                                        m_axisCacheY.min(), true);
             } else {
-                cache->sliceSurfaceObject()->setUpSmoothData(sliceDataArray, sliceRect, m_heightNormalizer,
+                cache->sliceSurfaceObject()->setUpSmoothData(sliceDataArray, sliceRect,
+                                                             m_heightNormalizer,
                                                              m_axisCacheY.min(), true);
             }
         }
@@ -540,7 +550,8 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
     // Set initial camera position
     // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
     if (m_hasHeightAdjustmentChanged) {
-        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
+        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector, zeroVector,
+                                                         upVector);
         // For now this is used just to make things once. Proper use will come
         m_hasHeightAdjustmentChanged = false;
     }
@@ -852,6 +863,7 @@ void Surface3DRenderer::drawSlicedScene()
 
 void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 {
+    bool noShadows = true;
     GLfloat backgroundRotation = 0;
     QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
@@ -1100,6 +1112,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
             QRect sampleSpace = cache->sampleSpace();
             if (cache->isSeriesVisible() && sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
+                noShadows = false;
                 if (cache->surfaceGridVisible()) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
                     glPolygonOffset(0.5f, 1.0f);
@@ -1117,10 +1130,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     shader->setUniformValue(shader->view(), viewMatrix);
                     shader->setUniformValue(shader->model(), modelMatrix);
                     shader->setUniformValue(shader->nModel(),
-                                                     itModelMatrix.inverted().transposed());
+                                            itModelMatrix.inverted().transposed());
                     shader->setUniformValue(shader->MVP(), MVPMatrix);
                     shader->setUniformValue(shader->ambientS(),
-                                                     m_cachedTheme->ambientLightStrength());
+                                            m_cachedTheme->ambientLightStrength());
                     shader->setUniformValue(shader->lightColor(), lightColor);
 
                     GLuint gradientTexture;
@@ -1129,7 +1142,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     else
                         gradientTexture = cache->baseGradientTexture();
 
-    #if !defined(QT_OPENGL_ES_2)
+#if !defined(QT_OPENGL_ES_2)
                     if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                         // Set shadow shader bindings
                         QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -1138,13 +1151,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                         shader->setUniformValue(shader->lightS(), adjustedLightStrength);
 
                         // Draw the objects
-                        m_drawer->drawObject(shader, cache->surfaceObject(), gradientTexture, m_depthModelTexture);
+                        m_drawer->drawObject(shader, cache->surfaceObject(), gradientTexture,
+                                             m_depthModelTexture);
                     } else
-    #endif
+#endif
                     {
                         // Set shadowless shader bindings
                         shader->setUniformValue(shader->lightS(),
-                                                         m_cachedTheme->lightStrength());
+                                                m_cachedTheme->lightStrength());
 
                         // Draw the objects
                         m_drawer->drawObject(shader, cache->surfaceObject(), gradientTexture);
@@ -1163,7 +1177,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
                 QRect sampleSpace = cache->sampleSpace();
                 if (cache->surfaceGridVisible() && cache->isSeriesVisible() &&
-                    sampleSpace.width() >= 2 && sampleSpace.height() >= 2)
+                        sampleSpace.width() >= 2 && sampleSpace.height() >= 2)
                     m_drawer->drawSurfaceGrid(m_surfaceGridShader, cache->surfaceObject());
             }
 
@@ -1223,9 +1237,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
                                                 adjustedLightStrength);
-
             // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
+            if (noShadows)
+                m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_noShadowTexture);
+            else
+                m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
         } else
 #endif
         {
@@ -1792,7 +1808,8 @@ void Surface3DRenderer::updateSelectionTextures()
     m_selectionTexturesDirty = false;
 }
 
-void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache, uint &lastSelectionId)
+void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
+                                               uint &lastSelectionId)
 {
     // Create the selection ID image. Each grid corner gets 2x2 pixel area of
     // ID color so that each vertex (data point) has 4x4 pixel area of ID color
@@ -1948,7 +1965,8 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
     int row = point.x();
     int column = point.y();
 
-    SurfaceSeriesRenderCache *cache = m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+    SurfaceSeriesRenderCache *cache =
+            m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
     QSurfaceDataArray &dataArray = cache->dataArray();
     float value = dataArray.at(row)->at(column).y();
 
