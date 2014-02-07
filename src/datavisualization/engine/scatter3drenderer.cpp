@@ -210,14 +210,10 @@ void Scatter3DRenderer::updateData()
                     && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
                 renderItem.setPosition(dotPos);
                 renderItem.setVisible(true);
-                float angle = dataArray.at(i).rotationAngle();
-                if (angle) {
-                    renderItem.setRotation(QQuaternion::fromAxisAndAngle(
-                                               dataArray.at(i).rotationAxis(),
-                                               dataArray.at(i).rotationAngle()));
-                } else {
+                if (!dataArray.at(i).rotation().isIdentity())
+                    renderItem.setRotation(dataArray.at(i).rotation().normalized());
+                else
                     renderItem.setRotation(identityQuaternion);
-                }
                 calculateTranslation(renderItem);
             } else {
                 renderItem.setVisible(false);

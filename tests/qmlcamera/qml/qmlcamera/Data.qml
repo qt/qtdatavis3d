@@ -38,7 +38,7 @@ Item {
         dataProxy: modelProxy
         itemLabelFormat: "@valueTitle for @colLabel, @rowLabel: @valueLabel"
 
-        onMeshRotationAngleChanged: console.log("angle changed:", angle)
+        onMeshAngleChanged: console.log("angle changed:", angle)
     }
 
     ListModel {

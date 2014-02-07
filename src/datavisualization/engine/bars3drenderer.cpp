@@ -258,11 +258,6 @@ void Bars3DRenderer::updateData()
     updateSelectedBar(m_selectedBarPos, m_selectedBarSeries);
 }
 
-void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility)
-{
-    Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
-}
-
 void Bars3DRenderer::updateScene(Q3DScene *scene)
 {
     if (m_hasNegativeValues)

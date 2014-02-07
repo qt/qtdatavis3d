@@ -28,8 +28,8 @@ Item {
 
     ListModel {
         id: graphModel
-        ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0; rotationAxis: "1.0,1.0,1.0"; rotationAngle: 45 }
-        ListElement{ xPos: 1.0; yPos: 1.0; zPos: 1.0; rotationAxis: "1.0,1.0,1.0"; rotationAngle: 45 }
+        ListElement{ xPos: 0.0; yPos: 0.0; zPos: 0.0; rotation: "0.92388, 0.220942, 0.220942, 0.220942"}
+        ListElement{ xPos: 1.0; yPos: 1.0; zPos: 1.0; rotation: "@45,1.0,1.0,1.0" }
     }
 
     Timer {
@@ -38,24 +38,23 @@ Item {
         running: true
         repeat: true
         property bool isIncreasing: true
+        property real rotationAngle: 0
 
-        function generateAngle() {
-            return Math.random() * 360
-        }
-
-        function generateAxis() {
-            return Math.random() + "," + Math.random() + "," + Math.random()
+        function generateQuaternion() {
+            return "@" + Math.random() * 360 + "," + Math.random() + "," + Math.random() + "," + Math.random()
         }
 
         function appendRow() {
             graphModel.append({"xPos": Math.random(),
                                   "yPos": Math.random(),
                                   "zPos": Math.random(),
-                                  "rotationAxis": generateAxis(),
-                                  "rotationAngle": generateAngle()});
+                                  "rotation": generateQuaternion()
+                              });
         }
 
         onTriggered: {
+            rotationAngle = rotationAngle + 1
+            scatterSeries.setMeshAxisAndAngle(Qt.vector3d(1,1,1), rotationAngle)
             if (isIncreasing) {
                 appendRow()
                 appendRow()
@@ -130,8 +129,7 @@ Item {
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
-                    rotationAxisRole: "rotationAxis"
-                    rotationAngleRole: "rotationAngle"
+                    rotationRole: "rotation"
                 }
             }
         }

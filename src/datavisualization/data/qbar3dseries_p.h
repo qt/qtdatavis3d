@@ -44,7 +44,11 @@ public:
     virtual void setDataProxy(QAbstractDataProxy *proxy);
     virtual void connectControllerAndProxy(Abstract3DController *newController);
 
+    void handleMeshRotationChanged(const QQuaternion &rotation);
+
     void setSelectedBar(const QPoint &position);
+
+    void connectSignals();
 
 private:
     QBar3DSeries *qptr();

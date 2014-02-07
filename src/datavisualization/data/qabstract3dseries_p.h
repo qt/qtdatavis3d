@@ -108,8 +108,7 @@ public:
     void setVisible(bool visible);
     void setMesh(QAbstract3DSeries::Mesh mesh);
     void setMeshSmooth(bool enable);
-    void setMeshRotationAxis(const QVector3D &axis);
-    void setMeshRotationAngle(float angle);
+    void setMeshRotation(const QQuaternion &rotation);
     void setUserDefinedMesh(const QString &meshFile);
 
     void setColorStyle(Q3DTheme::ColorStyle style);
@@ -133,8 +132,7 @@ public:
     Abstract3DController *m_controller;
     QAbstract3DSeries::Mesh m_mesh;
     bool m_meshSmooth;
-    QVector3D m_meshRotationAxis;
-    float m_meshRotationAngle;
+    QQuaternion m_meshRotation;
     QString m_userDefinedMesh;
 
     Q3DTheme::ColorStyle m_colorStyle;

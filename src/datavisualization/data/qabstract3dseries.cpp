@@ -142,28 +142,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty vector3d Abstract3DSeries::meshRotationAxis
+ * \qmlproperty quaternion Abstract3DSeries::meshRotation
  *
- * Sets the mesh rotation \a axis that is applied to all items of the series.
- * For those series types that support item specific rotation, the resulting
- * rotation quaternions are multiplied together at render time.
- * Bar3DSeries ignores rotation axis, as it only supports rotation around Y-axis.
+ * Sets the mesh \a rotation that is applied to all items of the series.
+ * The \a rotation should be a normalized quaternion.
+ * For those series types that support item specific rotation, the rotations are
+ * multiplied together.
+ * Bar3DSeries ignores any rotation that is not around Y-axis.
  * Surface3DSeries applies the rotation only to the selection pointer.
- * Defaults to Y-axis.
- *
- * \sa meshRotationAngle
- */
-
-/*!
- * \qmlproperty float Abstract3DSeries::meshRotationAngle
- *
- * Sets the mesh rotation \a angle that is applied to all items of the series.
- * For those series types that support item specific rotation, the resulting
- * rotation quaternions are multiplied together at render time.
- * Surface3DSeries applies the rotation only to the selection pointer.
- * Defaults to 0.
- *
- * \sa meshRotationAxis
+ * Defaults to no rotation.
  */
 
 /*!
@@ -250,6 +237,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Series name can be used in item label format with tag \c{@seriesName}.
  *
  * \sa itemLabelFormat
+ */
+
+/*!
+ * \qmlmethod void Abstract3DSeries::setMeshAxisAndAngle(vector3d axis, real angle)
+ *
+ * A convenience function to construct mesh rotation quaternion from axis and angle.
+ *
+ * \sa meshRotation
  */
 
 /*!
@@ -364,54 +359,37 @@ bool QAbstract3DSeries::isMeshSmooth() const
 }
 
 /*!
- * \property QAbstract3DSeries::meshRotationAxis
+ * \property QAbstract3DSeries::meshRotation
  *
- * Sets the mesh rotation \a axis that is applied to all items of the series.
- * For those series types that support item specific rotation, the resulting
- * rotation quaternions are multiplied together at render time.
- * QBar3DSeries ignores rotation axis, as it only supports rotation around Y-axis.
+ * Sets the mesh \a rotation that is applied to all items of the series.
+ * The \a rotation should be a normalized QQuaternion.
+ * For those series types that support item specific rotation, the rotations are
+ * multiplied together.
+ * QBar3DSeries ignores any rotation that is not around Y-axis.
  * QSurface3DSeries applies the rotation only to the selection pointer.
- * Defaults to Y-axis.
- *
- * \sa meshRotationAngle
+ * Defaults to no rotation.
  */
-void QAbstract3DSeries::setMeshRotationAxis(const QVector3D &axis)
+void QAbstract3DSeries::setMeshRotation(const QQuaternion &rotation)
 {
-    if (d_ptr->m_type != SeriesTypeBar) {
-        if (d_ptr->m_meshRotationAxis != axis) {
-            d_ptr->setMeshRotationAxis(axis);
-            emit meshRotationAxisChanged(axis);
-        }
+    if (d_ptr->m_meshRotation != rotation) {
+        d_ptr->setMeshRotation(rotation);
+        emit meshRotationChanged(rotation);
     }
 }
 
-QVector3D QAbstract3DSeries::meshRotationAxis() const
+QQuaternion QAbstract3DSeries::meshRotation() const
 {
-   return d_ptr->m_meshRotationAxis;
+    return d_ptr->m_meshRotation;
 }
 
 /*!
- * \property QAbstract3DSeries::meshRotationAngle
+ * A convenience function to construct mesh rotation quaternion from \a axis and \a angle.
  *
- * Sets the mesh rotation \a angle that is applied to all items of the series.
- * For those series types that support item specific rotation, the resulting
- * rotation quaternions are multiplied together at render time.
- * QSurface3DSeries applies the rotation only to the selection pointer.
- * Defaults to 0.
- *
- * \sa meshRotationAxis
+ * \sa meshRotation
  */
-void QAbstract3DSeries::setMeshRotationAngle(float angle)
+void QAbstract3DSeries::setMeshAxisAndAngle(const QVector3D &axis, float angle)
 {
-    if (d_ptr->m_meshRotationAngle != angle) {
-        d_ptr->setMeshRotationAngle(angle);
-        emit meshRotationAngleChanged(angle);
-    }
-}
-
-float QAbstract3DSeries::meshRotationAngle() const
-{
-   return d_ptr->m_meshRotationAngle;
+    setMeshRotation(QQuaternion::fromAxisAndAngle(axis, angle));
 }
 
 /*!
@@ -619,8 +597,6 @@ QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstra
       m_controller(0),
       m_mesh(QAbstract3DSeries::MeshCube),
       m_meshSmooth(false),
-      m_meshRotationAxis(upVector),
-      m_meshRotationAngle(0.0f),
       m_colorStyle(Q3DTheme::ColorStyleUniform)
 {
 }
@@ -687,17 +663,9 @@ void QAbstract3DSeriesPrivate::setMeshSmooth(bool enable)
         m_controller->markSeriesVisualsDirty();
 }
 
-void QAbstract3DSeriesPrivate::setMeshRotationAxis(const QVector3D &axis)
+void QAbstract3DSeriesPrivate::setMeshRotation(const QQuaternion &rotation)
 {
-    m_meshRotationAxis = axis;
-    m_changeTracker.meshRotationChanged = true;
-    if (m_controller)
-        m_controller->markSeriesVisualsDirty();
-}
-
-void QAbstract3DSeriesPrivate::setMeshRotationAngle(float angle)
-{
-    m_meshRotationAngle = angle;
+    m_meshRotation = rotation;
     m_changeTracker.meshRotationChanged = true;
     if (m_controller)
         m_controller->markSeriesVisualsDirty();

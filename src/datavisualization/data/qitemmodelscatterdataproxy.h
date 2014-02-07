@@ -34,8 +34,7 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelScatterDataProxy : public QScatterDa
     Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole NOTIFY xPosRoleChanged)
     Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole NOTIFY yPosRoleChanged)
     Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole NOTIFY zPosRoleChanged)
-    Q_PROPERTY(QString rotationAxisRole READ rotationAxisRole WRITE setRotationAxisRole NOTIFY rotationAxisRoleChanged)
-    Q_PROPERTY(QString rotationAngleRole READ rotationAngleRole WRITE setRotationAngleRole NOTIFY rotationAngleRoleChanged)
+    Q_PROPERTY(QString rotationRole READ rotationRole WRITE setRotationRole NOTIFY rotationRoleChanged)
 
 public:
     explicit QItemModelScatterDataProxy(QObject *parent = 0);
@@ -45,8 +44,7 @@ public:
                                const QString &zPosRole, QObject *parent = 0);
     QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
                                const QString &xPosRole, const QString &yPosRole,
-                               const QString &zPosRole, const QString &rotationAxisRole,
-                               const QString &rotationAngleRole,
+                               const QString &zPosRole, const QString &rotationRole,
                                QObject *parent = 0);
     virtual ~QItemModelScatterDataProxy();
 
@@ -59,21 +57,18 @@ public:
     QString yPosRole() const;
     void setZPosRole(const QString &role);
     QString zPosRole() const;
-    void setRotationAxisRole(const QString &role);
-    QString rotationAxisRole() const;
-    void setRotationAngleRole(const QString &role);
-    QString rotationAngleRole() const;
+    void setRotationRole(const QString &role);
+    QString rotationRole() const;
 
     void remap(const QString &xPosRole, const QString &yPosRole, const QString &zPosRole,
-               const QString &rotationAxis, const QString &rotationAngle);
+               const QString &rotationRole);
 
 signals:
     void itemModelChanged(const QAbstractItemModel* itemModel);
     void xPosRoleChanged(QString role);
     void yPosRoleChanged(QString role);
     void zPosRoleChanged(QString role);
-    void rotationAxisRoleChanged(QString role);
-    void rotationAngleRoleChanged(QString role);
+    void rotationRoleChanged(QString role);
 
 protected:
     QItemModelScatterDataProxyPrivate *dptr();
