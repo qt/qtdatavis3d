@@ -55,6 +55,9 @@ QScatterDataItem::QScatterDataItem(const QVector3D &position)
 {
 }
 
+/*!
+ * Constructs QScatterDataItem with \a position, \a rotationAxis and \a rotationAngle.
+ */
 QScatterDataItem::QScatterDataItem(const QVector3D &position, const QVector3D &rotationAxis,
                                    float rotationAngle)
     : d_ptr(0),
