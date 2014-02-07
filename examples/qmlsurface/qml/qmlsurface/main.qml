@@ -75,6 +75,9 @@ Item {
             axisY.segmentCount: 5
             axisY.subSegmentCount: 2
             axisY.labelFormat: "%i"
+            axisY.title: "Height"
+            axisX.title: "Latitude"
+            axisZ.title: "Longitude"
 
             //! [5]
             Surface3DSeries {

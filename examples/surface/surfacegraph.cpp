@@ -136,6 +136,10 @@ void SurfaceGraph::enableHeightMapModel(bool enable)
         m_graph->axisY()->setAutoAdjustRange(true);
         m_graph->axisZ()->setRange(18.0f, 24.0f);
 
+        m_graph->axisX()->setTitle(QStringLiteral("Latitude"));
+        m_graph->axisY()->setTitle(QStringLiteral("Height"));
+        m_graph->axisZ()->setTitle(QStringLiteral("Longitude"));
+
         m_graph->removeSeries(m_sqrtSinSeries);
         m_graph->addSeries(m_heightMapSeries);
         //! [4]

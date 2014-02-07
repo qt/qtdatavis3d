@@ -613,6 +613,8 @@ void Surface3DRenderer::drawSlicedScene()
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
+    const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
+
     bool rowMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow);
 
     GLfloat scaleX = 0.0f;
@@ -780,7 +782,7 @@ void Surface3DRenderer::drawSlicedScene()
         }
     }
 
-    // Draw axis labels
+    // Draw labels
     m_labelShader->bind();
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
@@ -805,7 +807,7 @@ void Surface3DRenderer::drawSlicedScene()
             m_dummyRenderItem.setTranslation(labelTrans);
             m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 positionComp, rotation, 0, m_cachedSelectionMode, m_labelShader,
-                                m_labelObj, m_cachedScene->activeCamera(),
+                                m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, Qt::AlignRight, true);
         }
         labelNbr++;
@@ -846,12 +848,34 @@ void Surface3DRenderer::drawSlicedScene()
 
             m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
                                 positionComp, rotation, 0, QAbstract3DGraph::SelectionRow,
-                                m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                m_labelShader, m_labelObj, activeCamera,
                                 false, false, Drawer::LabelBelow, Qt::AlignBottom, true);
         }
         labelNbr++;
         labelPos += posStep;
     }
+
+    // Draw labels for axes
+    AbstractRenderItem *dummyItem(0);
+    positionComp.setY(m_autoScaleAdjustment);
+    if (rowMode) {
+        m_drawer->drawLabel(*dummyItem, m_axisCacheX.titleItem(), viewMatrix, projectionMatrix,
+                            positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
+                            m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
+                            Qt::AlignCenter, true);
+    } else {
+        m_drawer->drawLabel(*dummyItem, m_axisCacheZ.titleItem(), viewMatrix, projectionMatrix,
+                            positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
+                            m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
+                            Qt::AlignCenter, true);
+    }
+    // Y-axis label
+    labelTrans = QVector3D(-scaleXBackground - labelMargin, 0.0f, 0.0f);
+    m_dummyRenderItem.setTranslation(labelTrans);
+    m_drawer->drawLabel(m_dummyRenderItem, m_axisCacheY.titleItem(), viewMatrix,
+                        projectionMatrix, zeroVector, QVector3D(0.0f, 0.0f, 90.0f), 0,
+                        m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
+                        false, false, Drawer::LabelMid, Qt::AlignHCenter);
 
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
@@ -877,8 +901,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     projectionMatrix.perspective(45.0f, (GLfloat)m_primarySubViewport.width()
                                  / (GLfloat)m_primarySubViewport.height(), 0.1f, 100.0f);
 
+    const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
+
     // Calculate view matrix
-    QMatrix4x4 viewMatrix = m_cachedScene->activeCamera()->d_ptr->viewMatrix();
+    QMatrix4x4 viewMatrix = activeCamera->d_ptr->viewMatrix();
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
@@ -934,7 +960,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        QVector3D depthLightPos = m_cachedScene->activeCamera()->d_ptr->calculatePositionRelativeToCamera(
+        QVector3D depthLightPos = activeCamera->d_ptr->calculatePositionRelativeToCamera(
                     zeroVector, 0.0f, 3.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
 
@@ -1627,7 +1653,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    m_labelShader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
@@ -1673,7 +1699,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    m_labelShader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
@@ -1733,7 +1759,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_dummyRenderItem.setTranslation(labelTransBack);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, labelRotateVectorBack, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    m_labelShader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignmentBack);
 
                 // Side wall
@@ -1741,7 +1767,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_dummyRenderItem.setTranslation(labelTransSide);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, labelRotateVectorSide, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, m_cachedScene->activeCamera(),
+                                    m_labelShader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignmentSide);
             }
             labelNbr++;
