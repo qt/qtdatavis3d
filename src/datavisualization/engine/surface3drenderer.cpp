@@ -645,7 +645,7 @@ void Surface3DRenderer::drawSlicedScene()
         bool drawGrid = false;
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->surfaceVisible()) {
+            if (cache->sliceSurfaceObject()->indexCount() && cache->surfaceVisible()) {
                 if (cache->surfaceGridVisible()) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
                     glPolygonOffset(0.5f, 1.0f);
@@ -682,7 +682,7 @@ void Surface3DRenderer::drawSlicedScene()
                                                  Utils::vectorFromColor(m_cachedTheme->gridLineColor()));
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
             foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-                if (cache->surfaceGridVisible())
+                if (cache->sliceSurfaceObject()->indexCount() && cache->surfaceGridVisible())
                     m_drawer->drawSurfaceGrid(m_surfaceGridShader, cache->sliceSurfaceObject());
             }
 
@@ -990,8 +990,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->surfaceVisible() && cache->isSeriesVisible()) {
-                SurfaceObject *object = cache->surfaceObject();
+            SurfaceObject *object = cache->surfaceObject();
+            if (object->indexCount() && cache->surfaceVisible() && cache->isSeriesVisible()) {
                 // 1st attribute buffer : vertices
                 glEnableVertexAttribArray(m_depthShader->posAtt());
                 glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
@@ -1015,8 +1015,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glClear(GL_DEPTH_BUFFER_BIT);
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->surfaceVisible() && cache->isSeriesVisible()) {
-                SurfaceObject *object = cache->surfaceObject();
+            SurfaceObject *object = cache->surfaceObject();
+            if (object->indexCount() && cache->surfaceVisible() && cache->isSeriesVisible()) {
                 // 1st attribute buffer : vertices
                 glEnableVertexAttribArray(m_depthShader->posAtt());
                 glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
@@ -1083,7 +1083,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->surfaceVisible() && cache->isSeriesVisible()) {
+            if (cache->surfaceObject()->indexCount() && cache->surfaceVisible() &&
+                    cache->isSeriesVisible()) {
                 m_drawer->drawObject(m_selectionShader, cache->surfaceObject(),
                                      cache->selectionTexture());
             }
@@ -1137,7 +1138,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
             QRect sampleSpace = cache->sampleSpace();
-            if (cache->isSeriesVisible() && sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
+            if (cache->surfaceObject()->indexCount() && cache->isSeriesVisible() &&
+                    sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
                 noShadows = false;
                 if (cache->surfaceGridVisible()) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
@@ -1202,8 +1204,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(), MVPMatrix);
             foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
                 QRect sampleSpace = cache->sampleSpace();
-                if (cache->surfaceGridVisible() && cache->isSeriesVisible() &&
-                        sampleSpace.width() >= 2 && sampleSpace.height() >= 2)
+                if (cache->surfaceObject()->indexCount() && cache->surfaceGridVisible() &&
+                        cache->isSeriesVisible() && sampleSpace.width() >= 2 && sampleSpace.height() >= 2)
                     m_drawer->drawSurfaceGrid(m_surfaceGridShader, cache->surfaceObject());
             }
 
