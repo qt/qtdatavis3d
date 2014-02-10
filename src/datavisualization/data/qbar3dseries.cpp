@@ -120,7 +120,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * A convenience property for defining the series rotation \a angle in degrees.
  *
  * \note: When reading this property, it is calculated from Abstract3DSeries::meshRotation value
- * with floating point precision and always returns a value from zero to 360 degrees.
+ * using floating point precision and always returns a value from zero to 360 degrees.
  *
  * \sa Abstract3DSeries::meshRotation
  */

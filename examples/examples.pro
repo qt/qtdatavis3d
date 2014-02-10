@@ -13,7 +13,8 @@ SUBDIRS += qmlbars \
                customproxy \
                itemmodel \
                scatter \
-               surface
+               surface \
+               rotations
 }
 
 qtHaveModule(multimedia):!android:!ios: SUBDIRS += audiolevels

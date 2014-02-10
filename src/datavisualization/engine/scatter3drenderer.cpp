@@ -717,7 +717,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 dotShader->setUniformValue(dotShader->color(), dotColor);
             } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
                 dotShader->setUniformValue(dotShader->gradientMin(),
-                                           (item.position().y() + 1.0f) / 2.0f);
+                                           (item.translation().y() + 1.0f) / 2.0f);
             }
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {

@@ -1,0 +1,68 @@
+/****************************************************************************
+**
+** Copyright (C) 2014 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \example rotations
+    \title Rotations Example
+    \ingroup qtdatavisualization_examples
+    \brief Using rotated scatter items
+
+    This example shows how to do the following:
+
+    \list
+        \li Use item rotations
+        \li Use custom item meshes
+        \li Use range gradient to color the series
+    \endlist
+
+    For more basic example about using Qt Data Visualization graphs, see \l{Bars Example}.
+
+    \image rotations-example.png
+
+    \section1 Using rotations
+
+    In this example we want to orient the arrow items tangentially to the origin. This requires
+    rotating them, which can be achieved by specifying rotation quaternion to each item:
+
+    \snippet ../examples/rotations/scatterdatamodifier.cpp 0
+    \snippet ../examples/rotations/scatterdatamodifier.cpp 1
+    \snippet ../examples/rotations/scatterdatamodifier.cpp 2
+
+    Since the items need to be rotated along two axes, we define two rotation quaternions, one
+    for Y-axis and one for Z-axis, and then multiply these together to get the total rotation,
+    which we set to the data item.
+
+    \section1 Using custom item meshes
+
+    The narrow arrow mesh we use for magnetic field arrow items is not a standard mesh. Instead
+    we supply our own \c{narrowarrow.obj} file which contains the object definition for the mesh
+    in \c Wavefront obj format:
+
+    \snippet ../examples/rotations/scatterdatamodifier.cpp 3
+
+    \section1 Using range gradient
+
+    Setting the color style to range gradient in a series means that the item is colored according
+    to its relative Y-value on the visible Y-coordinate range. We want the arrows on the bottom
+    part of the graph to be darker and gradually get lighter higher they are, so we define a
+    range gradient with black color at the position 0.0 and white color at the position 1.0:
+
+    \snippet ../examples/rotations/scatterdatamodifier.cpp 4
+
+    \section1 Example contents
+*/
