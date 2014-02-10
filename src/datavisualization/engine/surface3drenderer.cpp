@@ -202,7 +202,7 @@ void Surface3DRenderer::updateData()
             QSurfaceDataArray &dataArray = cache->dataArray();
             bool dimensionChanged = false;
             if (cache->sampleSpace() != sampleSpace) {
-                if (cache->sampleSpace().width())
+                if (sampleSpace.width() >= 2)
                     m_selectionTexturesDirty = true;
 
                 dimensionChanged = true;
