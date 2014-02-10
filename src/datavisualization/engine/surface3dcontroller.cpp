@@ -262,6 +262,7 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
     }
 
     if (pos != m_selectedPoint || series != m_selectedSeries) {
+        bool seriesChanged = (series != m_selectedSeries);
         m_selectedPoint = pos;
         m_selectedSeries = series;
         m_changeTracker.selectedPointChanged = true;
@@ -274,6 +275,9 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
         }
         if (m_selectedSeries)
             m_selectedSeries->dptr()->setSelectedPoint(m_selectedPoint);
+
+        if (seriesChanged)
+            emit selectedSeriesChanged(m_selectedSeries);
 
         emitNeedRender();
     }

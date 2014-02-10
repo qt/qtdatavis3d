@@ -72,13 +72,18 @@
  */
 
 /*!
+ * \qmlproperty Surface3DSeries Surface3D::selectedSeries
+ * The selected series or \c null. If \l {QAbstract3DGraph::selectionMode}{selectionMode} has
+ * \c SelectionMultiSeries flag set, this property holds the series which owns the selected point.
+ */
+
 /*!
   \qmlproperty ColorGradient Surface3D::gradient
   The current surface gradient. Setting this property replaces the previous gradient.
  */
 
 /*!
- * \qmlproperty list<QSurface3DSeries> Surface3D::seriesList
+ * \qmlproperty list<Surface3DSeries> Surface3D::seriesList
  * \default
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
@@ -87,12 +92,12 @@
  */
 
 /*!
- * \qmlmethod void Surface3D::addSeries(QSurface3DSeries *series)
+ * \qmlmethod void Surface3D::addSeries(Surface3DSeries series)
  * Adds the \a series to the graph.
  * \note The surface graph currently supports only a single series at a time.
  */
 
 /*!
- * \qmlmethod void Surface3D::removeSeries(QSurface3DSeries *series)
+ * \qmlmethod void Surface3D::removeSeries(Surface3DSeries series)
  * Remove the \a series from the graph.
  */

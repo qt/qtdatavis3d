@@ -94,7 +94,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
     \value SelectionMultiSeries
            Setting this mode means that items for all series at same position are highlighted, instead
            of just the selected item. The actual selection in the other series doesn't change.
-           Multi-series selection is only supported for Q3DBars.
+           Multi-series selection is not supported for Q3DScatter.
 */
 
 /*!

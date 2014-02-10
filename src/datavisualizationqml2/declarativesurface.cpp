@@ -32,6 +32,9 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_surfaceController = new Surface3DController(boundingRect().toRect(), new Declarative3DScene);
     setSharedController(m_surfaceController);
+
+    QObject::connect(m_surfaceController, &Surface3DController::selectedSeriesChanged,
+                     this, &DeclarativeSurface::selectedSeriesChanged);
 }
 
 DeclarativeSurface::~DeclarativeSurface()
@@ -69,16 +72,22 @@ void DeclarativeSurface::setAxisZ(QValue3DAxis *axis)
     m_surfaceController->setAxisZ(axis);
 }
 
+QSurface3DSeries *DeclarativeSurface::selectedSeries() const
+{
+    return m_surfaceController->selectedSeries();
+}
+
 QQmlListProperty<QSurface3DSeries> DeclarativeSurface::seriesList()
 {
     return QQmlListProperty<QSurface3DSeries>(this, this,
-                                          &DeclarativeSurface::appendSeriesFunc,
-                                          &DeclarativeSurface::countSeriesFunc,
-                                          &DeclarativeSurface::atSeriesFunc,
-                                          &DeclarativeSurface::clearSeriesFunc);
+                                              &DeclarativeSurface::appendSeriesFunc,
+                                              &DeclarativeSurface::countSeriesFunc,
+                                              &DeclarativeSurface::atSeriesFunc,
+                                              &DeclarativeSurface::clearSeriesFunc);
 }
 
-void DeclarativeSurface::appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, QSurface3DSeries *series)
+void DeclarativeSurface::appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list,
+                                          QSurface3DSeries *series)
 {
     reinterpret_cast<DeclarativeSurface *>(list->data)->addSeries(series);
 }

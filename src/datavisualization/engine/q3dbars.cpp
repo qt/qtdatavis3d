@@ -104,6 +104,8 @@ Q3DBars::Q3DBars(const QSurfaceFormat *format, QWindow *parent)
     dptr()->m_shared->initializeOpenGL();
     QObject::connect(dptr()->m_shared, &Bars3DController::primarySeriesChanged,
                      this, &Q3DBars::primarySeriesChanged);
+    QObject::connect(dptr()->m_shared, &Bars3DController::selectedSeriesChanged,
+                     this, &Q3DBars::selectedSeriesChanged);
 }
 
 /*!
@@ -325,6 +327,17 @@ void Q3DBars::setValueAxis(QValue3DAxis *axis)
 QValue3DAxis *Q3DBars::valueAxis() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
+}
+
+/*!
+ * \property Q3DBars::selectedSeries
+ *
+ * The selected series or \c null. If selectionMode has \c SelectionMultiSeries flag set, this
+ * property holds the series which owns the selected bar.
+ */
+QBar3DSeries *Q3DBars::selectedSeries() const
+{
+    return dptrc()->m_shared->selectedSeries();
 }
 
 /*!

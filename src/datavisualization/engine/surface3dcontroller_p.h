@@ -80,6 +80,8 @@ public:
     void setSelectedPoint(const QPoint &position, QSurface3DSeries *series, bool enterSlice);
     virtual void clearSelection();
 
+    inline QSurface3DSeries *selectedSeries() const { return m_selectedSeries; }
+
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
@@ -102,6 +104,9 @@ public slots:
     void handleItemChanged(int rowIndex, int columnIndex);
 
     void handleFlatShadingSupportedChange(bool supported);
+
+signals:
+    void selectedSeriesChanged(QSurface3DSeries *series);
 
 private:
     void adjustValueAxisRange();

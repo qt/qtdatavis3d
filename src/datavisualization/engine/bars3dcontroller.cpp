@@ -472,6 +472,7 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
     }
 
     if (pos != m_selectedBar || series != m_selectedBarSeries) {
+        bool seriesChanged = (series != m_selectedBarSeries);
         m_selectedBar = pos;
         m_selectedBarSeries = series;
         m_changeTracker.selectedBarChanged = true;
@@ -484,6 +485,9 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
         }
         if (m_selectedBarSeries)
             m_selectedBarSeries->dptr()->setSelectedBar(m_selectedBar);
+
+        if (seriesChanged)
+            emit selectedSeriesChanged(m_selectedBarSeries);
 
         emitNeedRender();
     }

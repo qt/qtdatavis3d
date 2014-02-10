@@ -93,6 +93,12 @@
  */
 
 /*!
+ * \qmlproperty Bar3DSeries Bars3D::selectedSeries
+ * The selected series or \c null. If \l {QAbstract3DGraph::selectionMode}{selectionMode} has
+ * \c SelectionMultiSeries flag set, this property holds the series which owns the selected bar.
+ */
+
+/*!
  * \qmlproperty list<Bar3DSeries> Bars3D::seriesList
  * \default
  * This property holds the series of the graph.

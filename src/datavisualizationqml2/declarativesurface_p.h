@@ -50,6 +50,7 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
     Q_PROPERTY(QValue3DAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
+    Q_PROPERTY(QSurface3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -72,6 +73,8 @@ public:
     Q_INVOKABLE void addSeries(QSurface3DSeries *series);
     Q_INVOKABLE void removeSeries(QSurface3DSeries *series);
 
+    QSurface3DSeries *selectedSeries() const;
+
 public slots:
     void handleAxisXChanged(QAbstract3DAxis *axis);
     void handleAxisYChanged(QAbstract3DAxis *axis);
@@ -81,6 +84,7 @@ signals:
     void axisXChanged(QValue3DAxis *axis);
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);
+    void selectedSeriesChanged(QSurface3DSeries *series);
 
 private:
     Surface3DController *m_surfaceController;

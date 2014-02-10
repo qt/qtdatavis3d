@@ -72,7 +72,12 @@
  */
 
 /*!
- * \qmlproperty list<QScatter3DSeries> Scatter3D::seriesList
+ * \qmlproperty Scatter3DSeries Scatter3D::selectedSeries
+ * The selected series or \c null.
+ */
+
+/*!
+ * \qmlproperty list<Scatter3DSeries> Scatter3D::seriesList
  * \default
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
@@ -80,13 +85,13 @@
  */
 
 /*!
- * \qmlmethod void Scatter3D::addSeries(QScatter3DSeries *series)
+ * \qmlmethod void Scatter3D::addSeries(Scatter3DSeries series)
  * Adds the \a series to the graph. A graph can contain multiple series, but has only one set of
  * axes. If the newly added series has specified a selected item, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  */
 
 /*!
- * \qmlmethod void Scatter3D::removeSeries(QScatter3DSeries *series)
+ * \qmlmethod void Scatter3D::removeSeries(Scatter3DSeries series)
  * Remove the \a series from the graph.
  */

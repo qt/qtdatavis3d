@@ -100,6 +100,8 @@ Q3DSurface::Q3DSurface(const QSurfaceFormat *format, QWindow *parent)
     dptr()->m_shared = new Surface3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Surface3DController::selectedSeriesChanged,
+                     this, &Q3DSurface::selectedSeriesChanged);
 }
 
 /*!
@@ -220,6 +222,17 @@ void Q3DSurface::setAxisZ(QValue3DAxis *axis)
 QValue3DAxis *Q3DSurface::axisZ() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisZ());
+}
+
+/*!
+ * \property Q3DSurface::selectedSeries
+ *
+ * The selected series or \c null. If selectionMode has \c SelectionMultiSeries flag set, this
+ * property holds the series which owns the selected point.
+ */
+QSurface3DSeries *Q3DSurface::selectedSeries() const
+{
+    return dptrc()->m_shared->selectedSeries();
 }
 
 /*!
