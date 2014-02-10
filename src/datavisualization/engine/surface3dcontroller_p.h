@@ -58,6 +58,16 @@ class QT_DATAVISUALIZATION_EXPORT Surface3DController : public Abstract3DControl
 {
     Q_OBJECT
 
+public:
+    struct ChangeItem {
+        QSurface3DSeries *series;
+        QPoint point;
+    };
+    struct ChangeRow {
+        QSurface3DSeries *series;
+        int row;
+    };
+
 private:
     Surface3DChangeBitField m_changeTracker;
     Surface3DRenderer *m_renderer;
@@ -65,8 +75,8 @@ private:
     QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
                                         // single series selection cases.
     bool m_flatShadingSupported;
-    QVector<QPoint> m_changedItems;
-    QVector<int> m_changedRows;
+    QVector<ChangeItem> m_changedItems;
+    QVector<ChangeRow> m_changedRows;
     QVector<QSurface3DSeries *> m_changedSeriesList;
 
 public:

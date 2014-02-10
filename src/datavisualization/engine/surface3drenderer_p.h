@@ -48,13 +48,6 @@ class QT_DATAVISUALIZATION_EXPORT Surface3DRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 
-public:
-    // Visual parameters
-    QRect m_boundingRect;
-    bool m_labelBackground;
-    QFont m_font;
-    bool m_isGridEnabled;
-
 private:
     bool m_cachedIsSlicingActivated;
 
@@ -85,7 +78,6 @@ private:
     ObjectHelper *m_backgroundObj;
     ObjectHelper *m_gridLineObj;
     ObjectHelper *m_labelObj;
-    SurfaceObject *m_surfaceObj;
     GLuint m_depthTexture;
     GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;
@@ -93,7 +85,6 @@ private:
     GLuint m_selectionDepthBuffer;
     GLuint m_selectionResultTexture;
     GLfloat m_shadowQualityToShader;
-    bool m_cachedFlatShading;
     bool m_flatSupported;
     SelectionPointer *m_selectionPointer;
     bool m_selectionActive;
@@ -101,15 +92,11 @@ private:
     bool m_zFlipped;
     bool m_yFlipped;
     AbstractRenderItem m_dummyRenderItem;
-    QSurfaceDataArray m_dataArray;
-    QRect m_sampleSpace;
     GLint m_shadowQualityMultiplier;
     QSizeF m_areaSize;
-    uint m_clickedPointId;
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedPoint;
     const QSurface3DSeries *m_selectedSeries;
-    QVector3D m_uniformGradientTextureColor;
     QPoint m_clickedPosition;
     QHash<QSurface3DSeries *, SurfaceSeriesRenderCache *> m_renderCacheList;
     bool m_selectionTexturesDirty;
@@ -123,8 +110,8 @@ public:
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode);
     void modifiedSeriesList(const QVector<QSurface3DSeries *> &seriesList);
-    void updateRows(const QVector<int> &rows);
-    void updateItem(const QVector<QPoint> &points);
+    void updateRows(const QVector<Surface3DController::ChangeRow> &rows);
+    void updateItem(const QVector<Surface3DController::ChangeItem> &points);
     void updateScene(Q3DScene *scene);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);

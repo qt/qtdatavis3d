@@ -122,9 +122,9 @@ void GraphModifier::fillSeries()
         QSurfaceDataRow *newRow3 = new QSurfaceDataRow(m_xCount);
         QSurfaceDataRow *newRow4 = new QSurfaceDataRow(m_xCount);
 
+        float z = float(i) - m_limitZ + 0.5f;
         for (int j = 0; j < m_xCount; j++) {
             float x = float(j) - m_limitX + 0.5f;
-            float z = float(i) - m_limitZ + 0.5f;
             float angle = (z * x) / float(full) * 1.57f;
             (*newRow1)[j].setPosition(QVector3D(x, qSin(angle), z));
             angle *= 1.3f;
@@ -701,8 +701,37 @@ void GraphModifier::changeRow()
 
         m_theSeries->dataProxy()->setRow(int(i), newRow);
     } else {
+#ifdef MULTI_SERIES
+        static int changeRowSeries = 0;
+        qDebug() << "Generating new values to a row at random pos for series " << changeRowSeries;
+
+        int row = rand() % m_zCount;
+        QSurfaceDataRow *newRow = createMultiRow(row, changeRowSeries);
+        m_multiseries[changeRowSeries]->dataProxy()->setRow(row, newRow);
+
+        changeRowSeries++;
+        if (changeRowSeries > 3)
+            changeRowSeries = 0;
+#else
         qDebug() << "Change row function active only for SqrtSin";
+#endif
     }
+}
+
+QSurfaceDataRow *GraphModifier::createMultiRow(int row, int series)
+{
+    int full = m_limitX * m_limitZ;
+    float i = float(row);
+    QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+    float z = float(i) - m_limitZ + 0.5f;
+    for (int j = 0; j < m_xCount; j++) {
+        float x = float(j) - m_limitX + 0.5f;
+        float angle = (z * x) / float(full) * 1.57f;
+        float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f + 1.1f *series;
+        (*newRow)[j].setPosition(QVector3D(x, y, z));
+    }
+
+    return newRow;
 }
 
 void GraphModifier::changeRows()
@@ -734,7 +763,24 @@ void GraphModifier::changeRows()
 
         m_theSeries->dataProxy()->setRows(int(start), dataArray);
     } else {
+#ifdef MULTI_SERIES
+        static int changeRowSeries = 0;
+        qDebug() << "Generating new values for 3 rows at random pos for series " << changeRowSeries;
+
+        int row = rand() % (m_zCount - 3);
+        QSurfaceDataArray dataArray;
+        for (int i = 0; i < 3; i++) {
+            QSurfaceDataRow *newRow = createMultiRow(row + i, changeRowSeries);
+            dataArray.append(newRow);
+        }
+        m_multiseries[changeRowSeries]->dataProxy()->setRows(row, dataArray);
+
+        changeRowSeries++;
+        if (changeRowSeries > 3)
+            changeRowSeries = 0;
+#else
         qDebug() << "Change row function active only for SqrtSin";
+#endif
     }
 }
 
@@ -759,7 +805,23 @@ void GraphModifier::changeItem()
 
         m_theSeries->dataProxy()->setItem(int(i), int(j), newItem);
     } else {
-        qDebug() << "Change row function active only for SqrtSin";
+#ifdef MULTI_SERIES
+        static int changeItemSeries = 0;
+        int full = m_limitX * m_limitZ;
+        float i = float(rand() % m_zCount);
+        float j = float(rand() % m_xCount);
+        float x = float(j) - m_limitX + 0.5f;
+        float z = float(i) - m_limitZ + 0.5f;
+        float angle = (z * x) / float(full) * 1.57f;
+        float y = qSin(angle * float(qPow(1.3f, changeItemSeries))) + 0.2f + 1.1f *changeItemSeries;
+        QSurfaceDataItem newItem(QVector3D(x, y, z));
+        m_multiseries[changeItemSeries]->dataProxy()->setItem(int(i), int(j), newItem);
+        changeItemSeries++;
+        if (changeItemSeries > 3)
+            changeItemSeries = 0;
+#else
+        qDebug() << "Change item function active only for SqrtSin";
+#endif
     }
 }
 

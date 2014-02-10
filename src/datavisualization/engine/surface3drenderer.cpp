@@ -45,18 +45,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
 const GLfloat labelMargin = 0.05f;
-const GLfloat backgroundBottom = 1.0f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
 const GLfloat sliceUnits = 2.5f;
-const int subViewDivider = 5;
-const uint invalidSelectionId = uint(-1);
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
-      m_labelBackground(false),
-      m_font(QFont(QStringLiteral("Arial"))),
-      m_isGridEnabled(true),
       m_cachedIsSlicingActivated(false),
       m_depthShader(0),
       m_backgroundShader(0),
@@ -84,7 +78,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
-      m_surfaceObj(0),
       m_depthTexture(0),
       m_depthModelTexture(0),
       m_depthFrameBuffer(0),
@@ -92,16 +85,13 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionDepthBuffer(0),
       m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
-      m_cachedFlatShading(false),
       m_flatSupported(true),
       m_selectionPointer(0),
       m_selectionActive(false),
       m_xFlipped(false),
       m_zFlipped(false),
       m_yFlipped(false),
-      m_sampleSpace(QRect(0, 0, 0, 0)),
       m_shadowQualityMultiplier(3),
-      m_clickedPointId(invalidSelectionId),
       m_hasHeightAdjustmentChanged(true),
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),
       m_selectedSeries(0),
@@ -318,81 +308,86 @@ void Surface3DRenderer::modifiedSeriesList(const QVector<QSurface3DSeries *> &se
     }
 }
 
-void Surface3DRenderer::updateRows(const QVector<int> &rows)
+void Surface3DRenderer::updateRows(const QVector<Surface3DController::ChangeRow> &rows)
 {
-    // Surface only supports single series for now, so we are only interested in the first series
-    const QSurfaceDataArray *array = 0;
-    if (m_visibleSeriesList.size()) {
-        QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
-        QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+    foreach (Surface3DController::ChangeRow item, rows) {
+        SurfaceSeriesRenderCache *cache = m_renderCacheList.value(item.series);
+        QSurfaceDataArray &dstArray = cache->dataArray();
+        QRect sampleSpace = cache->sampleSpace();
+
+        const QSurfaceDataArray *srcArray = 0;
+        QSurfaceDataProxy *dataProxy = item.series->dataProxy();
         if (dataProxy)
-            array = dataProxy->array();
-    }
+            srcArray = dataProxy->array();
 
-    if (array && array->size() >= 2 && array->at(0)->size() >= 2
-            && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
-        bool updateBuffers = false;
-        int sampleSpaceTop = m_sampleSpace.y() + m_sampleSpace.height();
-        foreach (int row, rows) {
-            if (row >= m_sampleSpace.y() && row <= sampleSpaceTop) {
+        if (cache && srcArray->size() >= 2 && srcArray->at(0)->size() >= 2 &&
+                sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
+            bool updateBuffers = false;
+            int sampleSpaceTop = sampleSpace.y() + sampleSpace.height();
+            int row = item.row;
+            if (row >= sampleSpace.y() && row <= sampleSpaceTop) {
                 updateBuffers = true;
-                for (int j = 0; j < m_sampleSpace.width(); j++)
-                    (*(m_dataArray.at(row - m_sampleSpace.y())))[j] =
-                        array->at(row)->at(j + m_sampleSpace.x());
+                for (int j = 0; j < sampleSpace.width(); j++) {
+                    (*(dstArray.at(row - sampleSpace.y())))[j] =
+                        srcArray->at(row)->at(j + sampleSpace.x());
+                }
 
-                if (m_cachedFlatShading) {
-                    m_surfaceObj->updateCoarseRow(m_dataArray, row - m_sampleSpace.y(),
-                                                  m_heightNormalizer,
-                                                  m_axisCacheY.min());
+                if (cache->isFlatShadingEnabled()) {
+                    cache->surfaceObject()->updateCoarseRow(dstArray, row - sampleSpace.y(),
+                                                            m_heightNormalizer,
+                                                            m_axisCacheY.min());
                 } else {
-                    m_surfaceObj->updateSmoothRow(m_dataArray, row - m_sampleSpace.y(),
-                                                  m_heightNormalizer,
-                                                  m_axisCacheY.min());
+                    cache->surfaceObject()->updateSmoothRow(dstArray, row - sampleSpace.y(),
+                                                            m_heightNormalizer,
+                                                            m_axisCacheY.min());
                 }
             }
+            if (updateBuffers)
+                cache->surfaceObject()->uploadBuffers();
         }
-        if (updateBuffers)
-            m_surfaceObj->uploadBuffers();
     }
 
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
-void Surface3DRenderer::updateItem(const QVector<QPoint> &points)
+void Surface3DRenderer::updateItem(const QVector<Surface3DController::ChangeItem> &points)
 {
-    // Surface only supports single series for now, so we are only interested in the first series
-    const QSurfaceDataArray *array = 0;
-    if (m_visibleSeriesList.size()) {
-        QSurface3DSeries *firstSeries = static_cast<QSurface3DSeries *>(m_visibleSeriesList.at(0).series());
-        QSurfaceDataProxy *dataProxy = firstSeries->dataProxy();
+    foreach (Surface3DController::ChangeItem item, points) {
+        SurfaceSeriesRenderCache *cache = m_renderCacheList.value(item.series);
+        QSurfaceDataArray &dstArray = cache->dataArray();
+        QRect sampleSpace = cache->sampleSpace();
+
+        const QSurfaceDataArray *srcArray = 0;
+        QSurfaceDataProxy *dataProxy = item.series->dataProxy();
         if (dataProxy)
-            array = dataProxy->array();
-    }
+            srcArray = dataProxy->array();
 
-    if (array && array->size() >= 2 && array->at(0)->size() >= 2
-            && m_sampleSpace.width() >= 2 && m_sampleSpace.height() >= 2) {
-        int sampleSpaceTop = m_sampleSpace.y() + m_sampleSpace.height();
-        int sampleSpaceRight = m_sampleSpace.x() + m_sampleSpace.width();
-        bool updateBuffers = false;
-        foreach (QPoint item, points) {
-            if (item.y() <= sampleSpaceTop && item.y() >= m_sampleSpace.y() &&
-                    item.x() <= sampleSpaceRight && item.x() >= m_sampleSpace.x()) {
+        if (cache && srcArray->size() >= 2 && srcArray->at(0)->size() >= 2 &&
+                sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
+            int sampleSpaceTop = sampleSpace.y() + sampleSpace.height();
+            int sampleSpaceRight = sampleSpace.x() + sampleSpace.width();
+            bool updateBuffers = false;
+            QPoint point = item.point;
+
+            if (point.y() <= sampleSpaceTop && point.y() >= sampleSpace.y() &&
+                    point.x() <= sampleSpaceRight && point.x() >= sampleSpace.x()) {
                 updateBuffers = true;
-                int x = item.x() - m_sampleSpace.x();
-                int y = item.y() - m_sampleSpace.y();
-                (*(m_dataArray.at(y)))[x] = array->at(item.y())->at(item.x());
+                int x = point.x() - sampleSpace.x();
+                int y = point.y() - sampleSpace.y();
+                (*(dstArray.at(y)))[x] = srcArray->at(point.y())->at(point.x());
 
-                if (m_cachedFlatShading) {
-                    m_surfaceObj->updateCoarseItem(m_dataArray, y, x, m_heightNormalizer,
-                                                   m_axisCacheY.min());
+                if (cache->isFlatShadingEnabled()) {
+                    cache->surfaceObject()->updateCoarseItem(dstArray, y, x, m_heightNormalizer,
+                                                             m_axisCacheY.min());
                 } else {
-                    m_surfaceObj->updateSmoothItem(m_dataArray, y, x, m_heightNormalizer,
-                                                   m_axisCacheY.min());
+                    cache->surfaceObject()->updateSmoothItem(dstArray, y, x, m_heightNormalizer,
+                                                             m_axisCacheY.min());
                 }
             }
+            if (updateBuffers)
+                cache->surfaceObject()->uploadBuffers();
         }
-        if (updateBuffers)
-            m_surfaceObj->uploadBuffers();
+
     }
 
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);

@@ -322,29 +322,29 @@ void Surface3DController::handleRowsChanged(int startIndex, int count)
         m_changedRows.reserve(sender->rowCount());
 
     QSurface3DSeries *series = sender->series();
-    if (series->isVisible()) {
-        // Change is for the visible series, put the change to queue
-        int oldChangeCount = m_changedRows.size();
-        for (int i = 0; i < count; i++) {
-            bool newItem = true;
-            int candidate = startIndex + i;
-            for (int i = 0; i < oldChangeCount; i++) {
-                if (m_changedRows.at(i) == candidate) {
-                    newItem = false;
-                    break;
-                }
+    int oldChangeCount = m_changedRows.size();
+    for (int i = 0; i < count; i++) {
+        bool newItem = true;
+        int candidate = startIndex + i;
+        for (int i = 0; i < oldChangeCount; i++) {
+            if (m_changedRows.at(i).row == candidate &&
+                series == m_changedRows.at(i).series) {
+                newItem = false;
+                break;
             }
-            if (newItem)
-                m_changedRows.append(candidate);
         }
-        if (m_changedRows.size()) {
-            m_changeTracker.rowsChanged = true;
+        if (newItem) {
+            ChangeRow newItem = {series, candidate};
+            m_changedRows.append(newItem);
+        }
+    }
+    if (m_changedRows.size()) {
+        m_changeTracker.rowsChanged = true;
 
-            adjustValueAxisRange();
-            // Clear selection unless still valid
-            setSelectedPoint(m_selectedPoint, m_selectedSeries, false);
-            emitNeedRender();
-        }
+        adjustValueAxisRange();
+        // Clear selection unless still valid
+        setSelectedPoint(m_selectedPoint, m_selectedSeries, false);
+        emitNeedRender();
     }
 }
 
@@ -352,25 +352,24 @@ void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
 {
     QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
     QSurface3DSeries *series = sender->series();
-    if (series->isVisible()) {
-        // Change is for the visible series, put the change to queue
-        bool newItem = true;
-        QPoint candidate(columnIndex, rowIndex);
-        foreach (QPoint item, m_changedItems) {
-            if (item == candidate) {
-                newItem = false;
-                break;
-            }
-        }
-        if (newItem) {
-            m_changedItems.append(candidate);
-            m_changeTracker.itemChanged = true;
 
-            adjustValueAxisRange();
-            // Clear selection unless still valid
-            setSelectedPoint(m_selectedPoint, m_selectedSeries, false);
-            emitNeedRender();
+    bool newItem = true;
+    QPoint candidate(columnIndex, rowIndex);
+    foreach (ChangeItem item, m_changedItems) {
+        if (item.point == candidate && item.series == series) {
+            newItem = false;
+            break;
         }
+    }
+    if (newItem) {
+        ChangeItem newItem = {series, candidate};
+        m_changedItems.append(newItem);
+        m_changeTracker.itemChanged = true;
+
+        adjustValueAxisRange();
+        // Clear selection unless still valid
+        setSelectedPoint(m_selectedPoint, m_selectedSeries, false);
+        emitNeedRender();
     }
 }
 

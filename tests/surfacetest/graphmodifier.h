@@ -119,6 +119,7 @@ private:
     void fillSeries();
     void resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX,
                               float maxX);
+    QSurfaceDataRow *createMultiRow(int row, int series);
 
     Q3DSurface *m_graph;
     QSurface3DSeries *m_multiseries[4];
