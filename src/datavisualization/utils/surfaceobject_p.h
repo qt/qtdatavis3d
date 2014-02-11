@@ -70,6 +70,7 @@ public:
     GLuint gridElementBuf();
     GLuint gridIndexCount();
     QVector3D vertexAt(int column, int row);
+    void clear();
 
 private:
     QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);

@@ -682,6 +682,13 @@ QVector3D SurfaceObject::vertexAt(int column, int row)
     return m_vertices.at(pos);
 }
 
+void SurfaceObject::clear()
+{
+    m_gridIndexCount = 0;
+    m_indexCount = 0;
+    m_surfaceType = Undefined;
+}
+
 QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QVector3D &c)
 {
     QVector3D v1 = b - a;

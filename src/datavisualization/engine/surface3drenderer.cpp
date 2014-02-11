@@ -395,59 +395,72 @@ void Surface3DRenderer::updateItem(const QVector<Surface3DController::ChangeItem
 
 void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 {
+    foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
+        cache->sliceSurfaceObject()->clear();
+
+    if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)) {
+        foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
+            updateSliceObject(cache, point);
+    } else {
+        if (m_selectedSeries) {
+            SurfaceSeriesRenderCache *cache =
+                m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+            if (cache)
+                updateSliceObject(cache, point);
+        }
+    }
+}
+
+void Surface3DRenderer::updateSliceObject(SurfaceSeriesRenderCache *cache, const QPoint &point)
+{
     int column = point.y();
     int row = point.x();
 
-    foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-        QSurfaceDataArray &sliceDataArray = cache->sliceDataArray();
-        for (int i = 0; i < sliceDataArray.size(); i++)
-            delete sliceDataArray.at(i);
-        sliceDataArray.clear();
-        sliceDataArray.reserve(2);
+    QSurfaceDataArray &sliceDataArray = cache->sliceDataArray();
+    for (int i = 0; i < sliceDataArray.size(); i++)
+        delete sliceDataArray.at(i);
+    sliceDataArray.clear();
+    sliceDataArray.reserve(2);
 
-        QSurfaceDataRow *sliceRow;
-        QSurfaceDataArray &dataArray = cache->dataArray();
-        float adjust = (0.025f * m_heightNormalizer) / 2.0f;
-        float stepDown = 2.0f * adjust;
-        if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
-            QSurfaceDataRow *src = dataArray.at(row);
-            sliceRow = new QSurfaceDataRow(src->size());
-            for (int i = 0; i < sliceRow->size(); i++)
-                (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y() + adjust, -1.0f));
+    QSurfaceDataRow *sliceRow;
+    QSurfaceDataArray &dataArray = cache->dataArray();
+    float adjust = (0.025f * m_heightNormalizer) / 2.0f;
+    float stepDown = 2.0f * adjust;
+    if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
+        QSurfaceDataRow *src = dataArray.at(row);
+        sliceRow = new QSurfaceDataRow(src->size());
+        for (int i = 0; i < sliceRow->size(); i++)
+            (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y() + adjust, -1.0f));
+    } else {
+        QRect sampleSpace = cache->sampleSpace();
+        sliceRow = new QSurfaceDataRow(sampleSpace.height());
+        for (int i = 0; i < sampleSpace.height(); i++) {
+            (*sliceRow)[i].setPosition(QVector3D(dataArray.at(i)->at(column).z(),
+                                                 dataArray.at(i)->at(column).y() + adjust,
+                                                 -1.0f));
+        }
+    }
+    sliceDataArray << sliceRow;
+
+    // Make a duplicate, so that we get a little bit depth
+    QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
+    for (int i = 0; i < sliceRow->size(); i++) {
+        (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(),
+                                             sliceRow->at(i).y() - stepDown,
+                                             1.0f));
+    }
+    sliceDataArray << duplicateRow;
+
+    QRect sliceRect(0, 0, sliceRow->size(), 2);
+    if (sliceRow->size() > 0) {
+        if (cache->isFlatShadingEnabled()) {
+            cache->sliceSurfaceObject()->setUpData(sliceDataArray, sliceRect,
+                                                   m_heightNormalizer,
+                                                   m_axisCacheY.min(), true);
         } else {
-            QRect sampleSpace = cache->sampleSpace();
-            sliceRow = new QSurfaceDataRow(sampleSpace.height());
-            for (int i = 0; i < sampleSpace.height(); i++) {
-                (*sliceRow)[i].setPosition(QVector3D(dataArray.at(i)->at(column).z(),
-                                                     dataArray.at(i)->at(column).y() + adjust,
-                                                     -1.0f));
-            }
-        }
-
-        sliceDataArray << sliceRow;
-
-        // Make a duplicate, so that we get a little bit depth
-        QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
-        for (int i = 0; i < sliceRow->size(); i++) {
-            (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(),
-                                                 sliceRow->at(i).y() - stepDown,
-                                                 1.0f));
-        }
-
-        sliceDataArray << duplicateRow;
-
-        QRect sliceRect(0, 0, sliceRow->size(), 2);
-
-        if (sliceRow->size() > 0) {
-            if (cache->isFlatShadingEnabled()) {
-                cache->sliceSurfaceObject()->setUpData(sliceDataArray, sliceRect,
-                                                       m_heightNormalizer,
-                                                       m_axisCacheY.min(), true);
-            } else {
-                cache->sliceSurfaceObject()->setUpSmoothData(sliceDataArray, sliceRect,
-                                                             m_heightNormalizer,
-                                                             m_axisCacheY.min(), true);
-            }
+            cache->sliceSurfaceObject()->setUpSmoothData(sliceDataArray, sliceRect,
+                                                         m_heightNormalizer,
+                                                         m_axisCacheY.min(), true);
         }
     }
 }

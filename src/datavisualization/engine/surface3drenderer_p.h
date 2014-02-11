@@ -131,6 +131,7 @@ private:
     void checkFlatSupport(SurfaceSeriesRenderCache *cache);
     void updateObjects(SurfaceSeriesRenderCache *cache, bool dimensionChanged);
     void updateSliceDataModel(const QPoint &point);
+    void updateSliceObject(SurfaceSeriesRenderCache *cache, const QPoint &point);
     void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     void updateTextures();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);

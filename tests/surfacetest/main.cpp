@@ -267,14 +267,22 @@ int main(int argc, char *argv[])
                                int(QAbstract3DGraph::SelectionRowAndColumn));
     selectionMode->addItem(QStringLiteral("Item, Row and Column"),
                                int(QAbstract3DGraph::SelectionItemRowAndColumn));
+    selectionMode->addItem(QStringLiteral("Multi: Item, Row and Column"),
+                               int(QAbstract3DGraph::SelectionItemRowAndColumn | QAbstract3DGraph::SelectionMultiSeries));
     selectionMode->addItem(QStringLiteral("Slice into Row"),
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionRow));
     selectionMode->addItem(QStringLiteral("Slice into Row and Item"),
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndRow));
+    selectionMode->addItem(QStringLiteral("Multi: Slice, Row & Item"),
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndRow
+                                   | QAbstract3DGraph::SelectionMultiSeries));
     selectionMode->addItem(QStringLiteral("Slice into Column"),
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionColumn));
     selectionMode->addItem(QStringLiteral("Slice into Column and Item"),
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn));
+    selectionMode->addItem(QStringLiteral("Multi: Slice, Column & Item"),
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn
+                                   | QAbstract3DGraph::SelectionMultiSeries));
     selectionMode->setCurrentIndex(1);
 
 #ifndef MULTI_SERIES
