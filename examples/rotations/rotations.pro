@@ -11,5 +11,5 @@ RESOURCES += rotations.qrc
 
 INSTALLS += target
 
-OTHER_FILES += doc/src/* \
-               doc/images/*
+OTHER_FILES += doc/src \
+               doc/images
