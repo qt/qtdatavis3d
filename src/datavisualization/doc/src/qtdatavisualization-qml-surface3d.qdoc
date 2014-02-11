@@ -88,13 +88,11 @@
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
  * To set the series, either use the addSeries() function or define them as children of the graph.
- * \note The surface graph currently supports only a single series at a time.
  */
 
 /*!
  * \qmlmethod void Surface3D::addSeries(Surface3DSeries series)
  * Adds the \a series to the graph.
- * \note The surface graph currently supports only a single series at a time.
  */
 
 /*!

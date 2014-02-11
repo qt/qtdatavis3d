@@ -86,8 +86,7 @@
     code. First we set the decorative issues like enable the grid for the surface and
     select the flat shading mode. Next lines define the axis label format and value
     ranges. Finally we make sure the correct series is added to the
-    graph. We need to first remove the other series, since surface graphs only support a single
-    series at a time:
+    graph:
 
     \snippet ../examples/surface/surfacegraph.cpp 3
 
