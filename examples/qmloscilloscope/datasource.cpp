@@ -41,6 +41,9 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
                               float xMin, float xMax, float yMin, float yMax,
                               float zMin, float zMax)
 {
+    if (!cacheCount)
+        return;
+
     clearData();
     // Re-create the cache array
     m_data.resize(cacheCount);
@@ -54,25 +57,38 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
     float xRange = xMax - xMin;
     float yRange = yMax - yMin;
     float zRange = zMax - zMin;
+    int cacheIndexStep = columnCount / cacheCount;
+    float cacheStep = float(cacheIndexStep) * xRange / float(columnCount);
 
     // Populate caches
     for (int i(0); i < cacheCount; i++) {
         QSurfaceDataArray &cache = m_data[i];
+        float cacheXAdjustment = cacheStep * i;
+        float cacheIndexAdjustment = cacheIndexStep * i;
         for (int j(0); j < rowCount; j++) {
             QSurfaceDataRow &row = *(cache[j]);
+            float rowMod = (float(j)) / float(rowCount);
+            float yRangeMod = yRange * rowMod;
+            float zRangeMod = zRange * rowMod;
+            float z = zRangeMod + zMin;
+            qreal rowColWaveAngleMul = M_PI * M_PI * rowMod;
+            float rowColWaveMul = yRangeMod * 0.2f;
             for (int k(0); k < columnCount; k++) {
-                float colMod = (float(k)) / float(columnCount - 1.0f);
-                float rowMod = (float(j)) / float(rowCount - 1.0f);
+                float colMod = (float(k)) / float(columnCount);
                 float xRangeMod = xRange * colMod;
-                float yRangeMod = yRange * rowMod;
-                float zRangeMod = zRange * rowMod;
-                float x = xRangeMod + xMin;
-                float y = (((float(qSin(M_PI * rowMod / 2.0) + 1.0)))
-                           + ((float(qSin(M_PI * rowMod * colMod * 5.0) + 1.0))))
-                              * yRangeMod * 0.2f +
-                           + (0.15f * float(rand()) / float(RAND_MAX)) * yRangeMod;
-                float z = zRangeMod + zMin;
-                row[k] = QVector3D(x, y, z);
+                float x = xRangeMod + xMin + cacheXAdjustment;
+                float colWave = float(qSin((2.0 * M_PI * colMod) - (1.0 / 2.0 * M_PI)) + 1.0);
+                float y = (colWave * ((float(qSin(rowColWaveAngleMul * colMod) + 1.0))))
+                        * rowColWaveMul
+                        + (0.15f * float(rand()) / float(RAND_MAX)) * yRangeMod;
+
+                int index = k + cacheIndexAdjustment;
+                if (index >= columnCount) {
+                    // Wrap over
+                    index -= columnCount;
+                    x -= xRange;
+                }
+                row[index] = QVector3D(x, y, z);
             }
         }
     }
@@ -82,7 +98,7 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
 //! [1]
 void DataSource::update(QSurface3DSeries *series)
 {
-    if (series) {
+    if (series && m_data.size()) {
         // Each iteration uses data from a different cached array
         m_index++;
         if (m_index > m_data.count() - 1)

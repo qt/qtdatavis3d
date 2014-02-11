@@ -27,9 +27,14 @@ Item {
     width: 1280
     height: 1024
 
-    property int sampleCache: 5
     property int sampleColumns: sampleSlider.value
     property int sampleRows: sampleColumns / 2
+    property int sampleCache: 24
+
+    onSampleRowsChanged: {
+        surfaceSeries.selectedPoint = surfaceSeries.invalidSelectionPosition
+        generateData()
+    }
 
     Item {
         id: dataView
@@ -123,17 +128,11 @@ Item {
                         Layout.fillWidth: true
                         Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                         Layout.minimumWidth: 100
-                        minimumValue: 10
-                        maximumValue: 400
-                        stepSize: 5
-                        updateValueWhileDragging: true
-                        value: 50
-
-                        onValueChanged: {
-                            refreshTimer
-                            surfaceSeries.selectedPoint = surfaceSeries.invalidSelectionPosition
-                            mainView.generateData()
-                        }
+                        minimumValue: mainView.sampleCache * 2
+                        maximumValue: minimumValue * 10
+                        stepSize: mainView.sampleCache
+                        updateValueWhileDragging: false
+                        value: minimumValue * 2
                     }
 
                     Rectangle {
