@@ -5,7 +5,8 @@ SUBDIRS += qmlbars \
            qmlcustominput \
            qmllegend \
            qmlmultigraph \
-           qmloscilloscope
+           qmloscilloscope \
+           qmlsurfacelayers
 
 !android:!ios {
     SUBDIRS += bars \
