@@ -16,14 +16,11 @@
 **
 ****************************************************************************/
 
-#include <QtDataVisualization/qutils.h>
-#include <QtGui/QGuiApplication>
 #include "qtquick2applicationviewer.h"
-#ifdef Q_OS_ANDROID
-#include <QDir>
-#include <QQmlEngine>
-#endif
-#include <QDebug>
+#include <QtDataVisualization/qutils.h>
+
+#include <QtGui/QGuiApplication>
+#include <QtCore/QDir>
 
 int main(int argc, char *argv[])
 {
@@ -34,10 +31,14 @@ int main(int argc, char *argv[])
     // Enable antialiasing
     viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
 
-#ifdef Q_OS_ANDROID
-    viewer.addImportPath(QString::fromLatin1("assets:/qml"));
-    viewer.engine()->addPluginPath(QString::fromLatin1("%1/../%2").arg(QDir::homePath(),
-                                                                       QString::fromLatin1("lib")));
+    // The following are needed to make examples run without having to install the module
+    // in desktop environments.
+#ifdef Q_OS_WIN
+    viewer.addImportPath(QString::fromLatin1("%1/../../../%2").arg(QGuiApplication::applicationDirPath(),
+                                                               QString::fromLatin1("qml")));
+#else
+    viewer.addImportPath(QString::fromLatin1("%1/../../%2").arg(QGuiApplication::applicationDirPath(),
+                                                               QString::fromLatin1("qml")));
 #endif
     viewer.setTitle(QStringLiteral("QML Dynamic Data Test"));
 

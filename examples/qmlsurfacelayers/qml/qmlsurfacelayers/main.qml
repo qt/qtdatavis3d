@@ -204,12 +204,12 @@ Item {
                 if (surfaceLayers.selectionMode & AbstractGraph3D.SelectionMultiSeries) {
                     surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
                             | AbstractGraph3D.SelectionSlice
-                    text: "Slice All Layers"
+                    text = "Slice All Layers"
                 } else {
                     surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
                             | AbstractGraph3D.SelectionSlice
                             | AbstractGraph3D.SelectionMultiSeries
-                    text: "Slice One Layer"
+                    text = "Slice One Layer"
                 }
             }
         }
@@ -223,10 +223,10 @@ Item {
             onClicked: {
                 if (surfaceLayers.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
                     surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityLow
-                    text: "Hide Shadows"
+                    text = "Hide Shadows"
                 } else {
                     surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityNone
-                    text: "Show Shadows"
+                    text = "Show Shadows"
                 }
             }
         }

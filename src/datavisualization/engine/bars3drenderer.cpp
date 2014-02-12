@@ -1291,6 +1291,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         // Draw the object
                         m_drawer->drawObject(barShader, barObj, gradientTexture, m_depthTexture);
                     } else
+#else
+                    Q_UNUSED(shadowLightStrength);
 #endif
                     {
                         // Set shadowless shader bindings

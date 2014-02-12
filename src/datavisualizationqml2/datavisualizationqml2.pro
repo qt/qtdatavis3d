@@ -1,19 +1,10 @@
-TEMPLATE = lib
 TARGET = datavisualizationqml2
 QT += qml quick datavisualization
-CONFIG += qt plugin
+TARGETPATH = QtDataVisualization
+IMPORT_VERSION = $$MODULE_VERSION
 
-TARGET = $$qtLibraryTarget($$TARGET)
-uri = QtDataVisualization
-
-static {
-    DEFINES += QT_DATAVISUALIZATION_STATICLIB
-    # Only build qml plugin static if Qt itself is also built static
-    !contains(QT_CONFIG, static): CONFIG -= static staticlib
-
-    # Insert the plugin URI into its meta data to enable static plugin usage
-    QMAKE_MOC_OPTIONS += -Muri=$$uri
-}
+# Only build qml plugin static if Qt itself is also built static
+!contains(QT_CONFIG, static): CONFIG -= static staticlib
 
 INCLUDEPATH += ../../include \
                ../../include/QtDataVisualization \
@@ -48,18 +39,14 @@ HEADERS += \
 
 OTHER_FILES = qmldir
 
-!equals(_PRO_FILE_PWD_, $$OUT_PWD) {
-    copy_qmldir.target = $$OUT_PWD/qmldir
-    copy_qmldir.depends = $$_PRO_FILE_PWD_/qmldir
-    copy_qmldir.commands = $(COPY_FILE) \"$$replace(copy_qmldir.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_qmldir.target, /, $$QMAKE_DIR_SEP)\"
-    QMAKE_EXTRA_TARGETS += copy_qmldir
-    PRE_TARGETDEPS += $$copy_qmldir.target
-}
+CONFIG += no_cxx_module
 
-qmldir.files = qmldir
+load(qml_plugin)
 
-installPath = $$[QT_INSTALL_QML]/$$replace(uri, \\., /)
-qmldir.path = $$installPath
-target.path = $$installPath
-INSTALLS += target qmldir
-
+# Copy qmldir to DESTDIR so we can use the plugin directly from there in our examples
+# without having to do 'make install'.
+copy_qmldir.target = $$DESTDIR/qmldir
+copy_qmldir.depends = $$_PRO_FILE_PWD_/qmldir
+copy_qmldir.commands = $(COPY_FILE) \"$$replace(copy_qmldir.depends, /, $$QMAKE_DIR_SEP)\" \"$$replace(copy_qmldir.target, /, $$QMAKE_DIR_SEP)\"
+QMAKE_EXTRA_TARGETS += copy_qmldir
+PRE_TARGETDEPS += $$copy_qmldir.target

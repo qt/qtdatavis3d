@@ -896,6 +896,7 @@ void Surface3DRenderer::drawSlicedScene()
 void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 {
     bool noShadows = true;
+
     GLfloat backgroundRotation = 0;
     QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
@@ -1279,6 +1280,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             else
                 m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
         } else
+#else
+        Q_UNUSED(noShadows);
 #endif
         {
             // Set shadowless shader bindings

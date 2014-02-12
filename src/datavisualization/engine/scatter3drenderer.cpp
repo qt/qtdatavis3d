@@ -447,6 +447,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     ShaderHelper *pointSelectionShader = m_selectionShader;
 #else
+    Q_UNUSED(havePointSeries);
     ShaderHelper *pointSelectionShader = m_pointShader;
 #endif
     ShaderHelper *selectionShader = m_selectionShader;
