@@ -12,3 +12,6 @@ SOURCES += main.cpp \
 
 HEADERS += audiolevels.h \
            audiolevelsiodevice.h
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

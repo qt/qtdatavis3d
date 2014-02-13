@@ -5,3 +5,6 @@
 SOURCES += main.cpp
 
 QT += widgets
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

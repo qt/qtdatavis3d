@@ -8,3 +8,6 @@ HEADERS += scatterdatamodifier.h
 QT += widgets
 
 RESOURCES += rotations.qrc
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

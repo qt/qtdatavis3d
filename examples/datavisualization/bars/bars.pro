@@ -6,3 +6,6 @@ SOURCES += main.cpp graphmodifier.cpp
 HEADERS += graphmodifier.h
 
 QT += widgets
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

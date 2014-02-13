@@ -6,3 +6,6 @@ SOURCES += main.cpp scatterdatamodifier.cpp
 HEADERS += scatterdatamodifier.h
 
 QT += widgets
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

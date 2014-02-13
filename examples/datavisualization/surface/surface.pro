@@ -10,3 +10,6 @@ HEADERS += surfacegraph.h
 QT += widgets
 
 RESOURCES += surface.qrc
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

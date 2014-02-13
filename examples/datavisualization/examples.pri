@@ -6,8 +6,9 @@ TEMPLATE = app
 
 QT += datavisualization
 
+contains(TARGET, qml.*) {
+    QT += qml quick
+}
+
 target.path = $$[QT_INSTALL_EXAMPLES]/datavisualization/$$TARGET
 INSTALLS += target
-
-OTHER_FILES += doc/src/* \
-               doc/images/*

@@ -16,17 +16,18 @@
 **
 ****************************************************************************/
 
-#include "qtquick2applicationviewer.h"
 #include <QtDataVisualization/qutils.h>
 
 #include <QtGui/QGuiApplication>
 #include <QtCore/QDir>
+#include <QtQuick/QQuickView>
+#include <QtQml/QQmlEngine>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    QtQuick2ApplicationViewer viewer;
+    QQuickView viewer;
 
     // Enable antialiasing
     viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
@@ -34,12 +35,14 @@ int main(int argc, char *argv[])
     // The following are needed to make examples run without having to install the module
     // in desktop environments.
 #ifdef Q_OS_WIN
-    viewer.addImportPath(QString::fromLatin1("%1/../../../%2").arg(QGuiApplication::applicationDirPath(),
-                                                               QString::fromLatin1("qml")));
+    QString extraImportPath(QStringLiteral("%1/../../../%2"));
 #else
-    viewer.addImportPath(QString::fromLatin1("%1/../../%2").arg(QGuiApplication::applicationDirPath(),
-                                                               QString::fromLatin1("qml")));
+    QString extraImportPath(QStringLiteral("%1/../../%2"));
 #endif
+    viewer.engine()->addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
+                                      QString::fromLatin1("qml")));
+    QObject::connect(viewer.engine(), &QQmlEngine::quit, &viewer, &QWindow::close);
+
     viewer.setTitle(QStringLiteral("QML Dynamic Data Test"));
 
     viewer.setSource(QUrl("qrc:/qml/qmldynamicdata/main.qml"));

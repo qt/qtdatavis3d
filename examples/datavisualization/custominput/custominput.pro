@@ -10,3 +10,6 @@ HEADERS += scatterdatamodifier.h \
 QT += widgets
 
 RESOURCES += custominput.qrc
+
+OTHER_FILES += doc/src/* \
+               doc/images/*

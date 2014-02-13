@@ -17,18 +17,19 @@
 ****************************************************************************/
 
 #include "datasource.h"
-#include "qtquick2applicationviewer.h"
 #include <QtDataVisualization/qutils.h>
 
 #include <QtGui/QGuiApplication>
 #include <QtCore/QDir>
 #include <QtQml/QQmlContext>
+#include <QtQuick/QQuickView>
+#include <QtQml/QQmlEngine>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    QtQuick2ApplicationViewer viewer;
+    QQuickView viewer;
 
     // Enable antialiasing
     viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
@@ -40,8 +41,9 @@ int main(int argc, char *argv[])
 #else
     QString extraImportPath(QStringLiteral("%1/../../../%2"));
 #endif
-    viewer.addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
+    viewer.engine()->addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
                                       QString::fromLatin1("qml")));
+    QObject::connect(viewer.engine(), &QQmlEngine::quit, &viewer, &QWindow::close);
 
     viewer.setTitle(QStringLiteral("Oscilloscope example"));
 
