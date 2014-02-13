@@ -39,23 +39,23 @@
 
     In the header file for \c AudioLevels class we declare necessary members:
 
-    \snippet ../examples/audiolevels/audiolevels.h 0
+    \snippet audiolevels/audiolevels.h 0
 
     And initialize the microphone listening in the source:
 
-    \snippet ../examples/audiolevels/audiolevels.cpp 0
+    \snippet audiolevels/audiolevels.cpp 0
 
     In the header file for \c AudioLevelsIODevice class we store pointers to the data proxy and
     also the data array we give to the proxy, because we reuse the same array to keep memory
     reallocations to the minimum:
 
-    \snippet ../examples/audiolevels/audiolevelsiodevice.h 0
+    \snippet audiolevels/audiolevelsiodevice.h 0
 
     In the source file we define some static constants to define size of the data array and
     the middle row index, as well as the resolution of the visualization. You may need to adjust
     these values to get decent performance in low-end devices:
 
-    \snippet ../examples/audiolevels/audiolevelsiodevice.cpp 1
+    \snippet audiolevels/audiolevelsiodevice.cpp 1
 
     The \c resolution constant indicates the sample rate, for example, value 8 means every eighth
     byte from audio input is visualized. This is necessary to make the data readable, as it would
@@ -63,13 +63,13 @@
 
     In the \c AudioLevelsIODevice class constructor we initialize the data array:
 
-    \snippet ../examples/audiolevels/audiolevelsiodevice.cpp 0
+    \snippet audiolevels/audiolevelsiodevice.cpp 0
 
     The \c AudioLevelsIODevice::writeData function is called whenever there is new audio data
     available to be visualized. There we move the old data along the rows and insert new
     data in the beginning of the rows:
 
-    \snippet ../examples/audiolevels/audiolevelsiodevice.cpp 2
+    \snippet audiolevels/audiolevelsiodevice.cpp 2
 
     We use a couple of techniques here to improve performance. First, we reuse
     the existing data array, as this allows us to avoid any extra memory allocations in our

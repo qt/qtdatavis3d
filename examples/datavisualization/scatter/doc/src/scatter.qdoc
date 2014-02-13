@@ -41,7 +41,7 @@
     First, in main.cpp, we create a QApplication, instantiate Q3DScatter, and a window container
     for it:
 
-    \snippet ../examples/scatter/main.cpp 0
+    \snippet scatter/main.cpp 0
 
     The call to QWidget::createWindowContainer is required, as all data visualization types
     (Q3DBars, Q3DScatter, and Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
@@ -50,7 +50,7 @@
     Then we'll create horizontal and vertical layouts. We'll add the graph and the vertical
     layout into the horizontal one:
 
-    \snippet ../examples/scatter/main.cpp 1
+    \snippet scatter/main.cpp 1
 
     We're not using the vertical layout for anything yet, but we'll get back to it in
     \l {Using widgets to control the graph}
@@ -59,18 +59,18 @@
     graph. Let's call it \c ScatterDataModifier (See \l {Setting up the graph} and
     \l {Adding data to the graph} for details):
 
-    \snippet ../examples/scatter/main.cpp 2
+    \snippet scatter/main.cpp 2
 
     The application main is done. We can show the graph and start the event loop:
 
-    \snippet ../examples/scatter/main.cpp 3
+    \snippet scatter/main.cpp 3
 
     \section1 Setting up the graph
 
     Let's set up some visual qualities for the graph in the constructor of the \c ScatterDataModifier
     class we instantiated in the application main:
 
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 0
+    \snippet scatter/scatterdatamodifier.cpp 0
 
     None of these are required, but are used to override graph defaults. You can try how it looks
     with the preset defaults by commenting the block above out.
@@ -78,7 +78,7 @@
     Finally we create a QScatterDataProxy and the associated QScatter3DSeries. We set custom label format
     and mesh smoothing for the series and add it to the graph:
 
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 2
+    \snippet scatter/scatterdatamodifier.cpp 2
 
     That concludes setting up the graph.
 
@@ -86,26 +86,26 @@
 
     The last thing we do in the \c ScatterDataModifier constructor is to add data to the graph:
 
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 3
+    \snippet scatter/scatterdatamodifier.cpp 3
 
     The actual data addition is done in \c addData() method. First we configure the axes:
 
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 4
+    \snippet scatter/scatterdatamodifier.cpp 4
 
     This could have been done in the constructor of \c {ScatterDataModifier}, but we added it here
     to keep the constructor simpler and the axes configuration near the data.
 
     Next we create a data array:
 
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 5
+    \snippet scatter/scatterdatamodifier.cpp 5
 
     and populate it:
 
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 6
+    \snippet scatter/scatterdatamodifier.cpp 6
 
     Finally we tell the proxy to start using the data we gave it:
 
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 7
+    \snippet scatter/scatterdatamodifier.cpp 7
 
     Now our graph has the data and is ready to be used. There isn't much interaction yet, though,
     so let's continue by adding some widgets to play with.
@@ -114,19 +114,19 @@
 
     First, back in the application main, we'll create some widgets:
 
-    \snippet ../examples/scatter/main.cpp 4
+    \snippet scatter/main.cpp 4
 
     And add them to the vertical layout we created earlier:
 
-    \snippet ../examples/scatter/main.cpp 5
+    \snippet scatter/main.cpp 5
 
     Now, let's connect them to methods in ScatterDataModifier:
 
-    \snippet ../examples/scatter/main.cpp 6
+    \snippet scatter/main.cpp 6
 
     Here are the methods in ScatterDataModifier the signals were connected to:
 
-    \snippet ../examples/scatter/scatterdatamodifier.cpp 8
+    \snippet scatter/scatterdatamodifier.cpp 8
 
     And so we have an application in which we can control:
 

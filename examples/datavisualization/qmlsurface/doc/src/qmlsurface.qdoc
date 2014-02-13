@@ -42,17 +42,17 @@
     crater at imaginary position from 67 to 97 and from 30 to 60. Note that on the graph the scale
     on the Y dimension exaggerates the height.
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 4
+    \snippet qmlsurface/qml/qmlsurface/main.qml 4
 
     The other method to set surface data used in this example is with model mapping. We do that by
     first defining a \c ListModel containing the data for the surface:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/Data.qml 0
+    \snippet qmlsurface/qml/qmlsurface/Data.qml 0
     \dots 4
 
     Then we set up a Surface3DSeries with a ItemModelSurfaceDataProxy:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 5
+    \snippet qmlsurface/qml/qmlsurface/main.qml 5
     \dots
 
     We add the actual data to the \c itemModel of the ItemModelSurfaceDataProxy. We also define the
@@ -60,7 +60,7 @@
     for latitude and the value is for height.
 
     \dots 0
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 6
+    \snippet qmlsurface/qml/qmlsurface/main.qml 6
 
     \section1 Showing data
 
@@ -70,25 +70,25 @@
     First is the gradient to be used for the surface, which can be defined as seen in the following
     snippet. With the ColorGradient we set example colors from position 0.0 to 1.0.
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 0
+    \snippet qmlsurface/qml/qmlsurface/main.qml 0
 
     This element is set into the \c baseGradients property in the \c theme used in Surface3D:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 7
+    \snippet qmlsurface/qml/qmlsurface/main.qml 7
 
     Other interesting features can be controlled with buttons.
 
     The first button is to toggle on and off the surface grid, for which we use the following code:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 1
+    \snippet qmlsurface/qml/qmlsurface/main.qml 1
 
     Second button is for surface shading mode, which is controlled with this code:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 2
+    \snippet qmlsurface/qml/qmlsurface/main.qml 2
 
     Third button is for series visibility, which is controlled with this code:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 8
+    \snippet qmlsurface/qml/qmlsurface/main.qml 8
 
     Notice that the \c drawMode and \c flatShadingEnable properties are set for both series.
 
@@ -98,7 +98,7 @@
     HeightMapSurfaceDataProxy and the other one ItemModelSurfaceDataProxy. For this we use the
     following code:
 
-    \snippet ../examples/qmlsurface/qml/qmlsurface/main.qml 3
+    \snippet qmlsurface/qml/qmlsurface/main.qml 3
 
     We also set the maximum value to 500 in model proxy to make the surface flatter and
     250 on height map proxy to show exaggerated height. At the same time the middle color position

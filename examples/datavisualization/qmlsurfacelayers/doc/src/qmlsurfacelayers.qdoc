@@ -38,43 +38,43 @@
 
     Let's start by creating a specific gradient for each layer:
 
-    \snippet ../examples/qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 0
+    \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 0
 
     Then we'll create the series themselves. It happens simply by adding 3 separate Surface3DSeries
     to the Surface3D graph as children:
 
     \dots 0
-    \snippet ../examples/qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 1
+    \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 1
     \dots 0
 
     You'll notice we added the created gradients to the \c baseGradient properties of the series.
     We could have added them to the \c baseGradients property of the Theme3D in Surface3D instead,
     but doing it this way ensures each gradient is applied to a correct series:
 
-    \snippet ../examples/qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 2
+    \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 2
     \dots
 
     \section1 Controlling the graph
 
     Let's add some checkboxes to control the visibility of layers:
 
-    \snippet ../examples/qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 3
+    \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 3
 
     We don't need to do anything on the \c onCheckedChanged as we bound the \c checked state to
     the \c visible property of the series directly:
 
     \dots 0
-    \snippet ../examples/qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 4
+    \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 4
     \dots 0
 
     Let's add some more checkboxes to control how the layers are displayed, when visible:
 
-    \snippet ../examples/qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 5
+    \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 5
 
     In addition to these we have two buttons, one of which is of special interest to us. It is used
     to control whether we want to slice into only one layer, or all of them:
 
-    \snippet ../examples/qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 6
+    \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 6
 
     \section1 Example contents
 */

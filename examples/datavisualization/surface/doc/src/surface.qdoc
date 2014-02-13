@@ -44,7 +44,7 @@
     First, in \c main.cpp, we create a QApplication, instantiate Q3DSurface, and a window container
     for it:
 
-    \snippet ../examples/surface/main.cpp 0
+    \snippet surface/main.cpp 0
 
     The call to QWidget::createWindowContainer is required, as all data visualization types
     (Q3DBars, Q3DScatter, and Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
@@ -53,7 +53,7 @@
     Then we'll create horizontal and vertical layouts. We'll add the graph with the container and
     the vertical layout into the horizontal one:
 
-    \snippet ../examples/surface/main.cpp 1
+    \snippet surface/main.cpp 1
 
     The rest of the code in \c main.cpp is creating control widgets for features in Q3DSurface. We
     have separated code for changing these features into \c surfacegraph.cpp and only connect
@@ -64,13 +64,13 @@
 
     First we instantiate a new QSurfaceDataProxy and attach it to a new QSurface3DSeries:
 
-    \snippet ../examples/surface/surfacegraph.cpp 0
+    \snippet surface/surfacegraph.cpp 0
 
     Then we fill the proxy with a simple square root and sine wave data. This is done by
     creating a new \c QSurfaceDataArray instance and adding \c QSurfaceDataRow elements to it.
     The created \c QSurfaceDataArray is set to be the data array for the QSurfaceDataProxy.
 
-    \snippet ../examples/surface/surfacegraph.cpp 1
+    \snippet surface/surfacegraph.cpp 1
 
     The height map is created by instantiating a QHeightMapSurfaceDataProxy with
     a QImage containing the height data. The method QHeightMapSurfaceDataProxy::setValueRanges() is
@@ -78,7 +78,7 @@
     34.0\unicode 0x00B0 N - 40.0\unicode 0x00B0 N and 18.0\unicode 0x00B0 E - 24.0\unicode 0x00B0 E.
     These values are used to show and position the map to the axis.
 
-    \snippet ../examples/surface/surfacegraph.cpp 2
+    \snippet surface/surfacegraph.cpp 2
 
     For demonstrating different proxies this example has two radio buttons which
     the user can use to switch between the series. When the user selects the
@@ -88,13 +88,13 @@
     ranges. Finally we make sure the correct series is added to the
     graph:
 
-    \snippet ../examples/surface/surfacegraph.cpp 3
+    \snippet surface/surfacegraph.cpp 3
 
     When the \c{Height Map} radio button is activated, the following code sets the correct series active.
     The axis label format is set to show N and E letters and ranges are set to the imaginary coordinates.
     Auto adjusting Y-axis range is fine for our height map surface, so we ensure it is set.
 
-    \snippet ../examples/surface/surfacegraph.cpp 4
+    \snippet surface/surfacegraph.cpp 4
 
     \section1 Selection modes
 
@@ -102,7 +102,7 @@
     example with radio buttons, which the user can use to activate a suitable selection mode.
     The following inline methods are connected to radio buttons to activate the selected mode.
 
-    \snippet ../examples/surface/surfacegraph.h 0
+    \snippet surface/surfacegraph.h 0
 
     \section1 Axis ranges for studying the graph
 
@@ -110,11 +110,11 @@
     axis. When selecting the proxy these sliders are adjusted so that one step on the slider
     moves the range by one segment step:
 
-    \snippet ../examples/surface/surfacegraph.cpp 8
+    \snippet surface/surfacegraph.cpp 8
 
     The ranges are set for the axes like this:
 
-    \snippet ../examples/surface/surfacegraph.cpp 5
+    \snippet surface/surfacegraph.cpp 5
 
     \section1 Themes
 
@@ -123,7 +123,7 @@
     menu to activate the selected theme. The theme type is changed to another predefined theme,
     which overwrites all theme properties to predefined values:
 
-    \snippet ../examples/surface/surfacegraph.cpp 6
+    \snippet surface/surfacegraph.cpp 6
 
     \section1 Custom surface gradients
 
@@ -132,5 +132,5 @@
     code shows how to create an example gradient and set it to the series. Note that you also need
     to change the color style to Q3DTheme::ColorStyleRangeGradient to actually use the gradient.
 
-    \snippet ../examples/surface/surfacegraph.cpp 7
+    \snippet surface/surfacegraph.cpp 7
 */

@@ -45,10 +45,10 @@
 
     \c VariantDataSet class provides a simple API:
 
-    \snippet ../examples/customproxy/variantdataset.h 1
+    \snippet customproxy/variantdataset.h 1
     \dots 0
     \codeline
-    \snippet ../examples/customproxy/variantdataset.h 0
+    \snippet customproxy/variantdataset.h 0
 
     As you can see, the data items are simply QVariantList objects, and the data can be added either
     singly or in lists. The only additional functionality provided is clearing the data set and querying
@@ -60,17 +60,17 @@
     \c VariantBarDataProxy is a subclass of QBarDataProxy and provides a simple API of just getters
     and setters for the data set and the mapping:
 
-    \snippet ../examples/customproxy/variantbardataproxy.h 0
+    \snippet customproxy/variantbardataproxy.h 0
     \dots 0
     \codeline
-    \snippet ../examples/customproxy/variantbardataproxy.h 1
+    \snippet customproxy/variantbardataproxy.h 1
 
     On the implementation side, the proxy listens for the changes in the data set and the mapping,
     and resolves the data set if any changes are detected. It is not particularly efficient
     implementation in that any change will cause re-resolving of the entire data set, but that is not
     an issue for this example. The interesting part is the \c resolveDataSet() method:
 
-    \snippet ../examples/customproxy/variantbardataproxy.cpp 0
+    \snippet customproxy/variantbardataproxy.cpp 0
 
     In \c resolveDataSet() method we sort the variant data values into rows and columns based on the
     mapping. This is very similar to how QItemModelBarDataProxy handles mapping, except we use
@@ -83,16 +83,16 @@
     and rows, columns, and values of \c QBarDataArray. It also contains the lists of rows and columns to
     be included in the resolved data:
 
-    \snippet ../examples/customproxy/variantbardatamapping.h 0
+    \snippet customproxy/variantbardatamapping.h 0
     \dots 0
     \codeline
-    \snippet ../examples/customproxy/variantbardatamapping.h 1
+    \snippet customproxy/variantbardatamapping.h 1
     \dots 0
     \codeline
-    \snippet ../examples/customproxy/variantbardatamapping.h 2
+    \snippet customproxy/variantbardatamapping.h 2
     \dots 0
     \codeline
-    \snippet ../examples/customproxy/variantbardatamapping.h 3
+    \snippet customproxy/variantbardatamapping.h 3
 
     The primary way to use a \c VariantBarDataMapping object is to give the mappings already at the
     constructor, though they can be set later individually or all together with the \c remap() method.
@@ -104,10 +104,10 @@
     \c RainfallGraph class handles the setup of the graph. The interesting part is the \c addDataSet()
     method:
 
-    \snippet ../examples/customproxy/rainfallgraph.cpp 0
+    \snippet customproxy/rainfallgraph.cpp 0
 
     The bulk of that method is used for populating the variant data set. Once the set is populated,
     visualizing the data is trivial with the help of our custom proxy:
 
-    \snippet ../examples/customproxy/rainfallgraph.cpp 1
+    \snippet customproxy/rainfallgraph.cpp 1
 */

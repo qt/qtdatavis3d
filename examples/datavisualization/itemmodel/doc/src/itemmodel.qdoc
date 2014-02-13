@@ -39,7 +39,7 @@
 
     First, in main.cpp, we create a QApplication, instantiate Q3DBars and a window container for it:
 
-    \snippet ../examples/itemmodel/main.cpp 0
+    \snippet itemmodel/main.cpp 0
 
     The call to QWidget::createWindowContainer is required, as all data visualization types
     (Q3DBars, Q3DScatter, and Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
@@ -47,7 +47,7 @@
 
     Then we'll create a layout and add the graph and the table widget into it:
 
-    \snippet ../examples/itemmodel/main.cpp 1
+    \snippet itemmodel/main.cpp 1
 
     The table widget is going to be used to display the numerical data being inserted into the
     graph, and to modify it (See \l {Adding data to the graph} and \l {Interacting with the data}).
@@ -55,7 +55,7 @@
     We need to instantiate QItemModelBarDataProxy and a QBar3DSeries for it, and give the series
     to the graph:
 
-    \snippet ../examples/itemmodel/main.cpp 2
+    \snippet itemmodel/main.cpp 2
 
     Here we tell the proxy to directly map the model's rows and columns into the proxy's rows and
     columns instead of defining row and column roles to map for them. Then we give the model from
@@ -68,19 +68,19 @@
     \l {Adding data to the graph} for details) and connect some signals between QBar3DSeries,
     \c GraphDataGenerator, and QTableWidget (See \l {Interacting with the data} for a closer look):
 
-    \snippet ../examples/itemmodel/main.cpp 3
+    \snippet itemmodel/main.cpp 3
 
     The application main is done and we can show the graph and start the event loop:
 
-    \snippet ../examples/itemmodel/main.cpp 4
+    \snippet itemmodel/main.cpp 4
 
     \section1 Setting up the graph
 
     Let's set up the visual attributes for the graph in the constructor of \c GraphDataGenerator:
 
-    \snippet ../examples/itemmodel/main.cpp 5
-    \snippet ../examples/itemmodel/main.cpp 6
-    \snippet ../examples/itemmodel/main.cpp 7
+    \snippet itemmodel/main.cpp 5
+    \snippet itemmodel/main.cpp 6
+    \snippet itemmodel/main.cpp 7
 
     First we set bar thickness ratio to 1.0, which means bars will be as wide as they are deep. 1.0
     is also the default value, so the line is basically unnecessary. It's left there so you could
@@ -116,7 +116,7 @@
 
     Let's have a look at the contents of the \c start() method:
 
-    \snippet ../examples/itemmodel/main.cpp 8
+    \snippet itemmodel/main.cpp 8
 
     The main thing \c start() does is set up the data model. It also activates a timer for getting
     the accurate dimensions of the table widget after it's been filled with data. The reason we
@@ -126,26 +126,26 @@
 
     In \c setupModel() we first introduce the row and column labels, and the actual data:
 
-    \snippet ../examples/itemmodel/main.cpp 9
+    \snippet itemmodel/main.cpp 9
 
     Then we set up the axes:
 
-    \snippet ../examples/itemmodel/main.cpp 10
+    \snippet itemmodel/main.cpp 10
 
     Next we will set up the table widget:
 
-    \snippet ../examples/itemmodel/main.cpp 11
+    \snippet itemmodel/main.cpp 11
 
     After that all that's left is adding the data to the table widget:
 
-    \snippet ../examples/itemmodel/main.cpp 12
+    \snippet itemmodel/main.cpp 12
 
     Now we have a bar graph and a table widget, both displaying the same data.
 
     You're probably wondering how the data can be displayed in the graph, as the only thing we did
     was add it to the table widget? That's because of what we did earlier, in the application main:
 
-    \snippet ../examples/itemmodel/main.cpp 2
+    \snippet itemmodel/main.cpp 2
 
     We created QItemModelBarDataProxy instance, and gave the proxy the model of the table widget
     we just created. The proxy maps the rows and the columns in the model of the table widget into
@@ -156,7 +156,7 @@
 
     We made a couple of signal connections in the application main earlier:
 
-    \snippet ../examples/itemmodel/main.cpp 3
+    \snippet itemmodel/main.cpp 3
 
     Now we'll find out what these were for.
 
@@ -164,12 +164,12 @@
     QBar3DSeries::selectedBarChanged() is emitted when a bar is selected from the series. We connect
     that to a method in the data generator that selects the same data item in the table widget:
 
-    \snippet ../examples/itemmodel/main.cpp 13
+    \snippet itemmodel/main.cpp 13
 
     The second connection does the opposite; it connects a signal from the table widget to a
     method in the data generator. The method then selects the corresponding bar in the series:
 
-    \snippet ../examples/itemmodel/main.cpp 14
+    \snippet itemmodel/main.cpp 14
 
     You can even select an item in the widget and change the value of it, and the new value is
     updated to the graph. This is handled again by the proxy with mapping between the data

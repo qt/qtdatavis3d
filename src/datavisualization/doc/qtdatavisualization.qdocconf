@@ -4,7 +4,7 @@ project             = QtDataVisualization
 description         = Qt Data Visualization Reference Documentation
 version             = 1.0.0
 
-exampledirs += ../../../examples \
+exampledirs += ../../../examples/datavisualization \
                snippets
 
 headerdirs += ..

@@ -36,7 +36,7 @@
     and position the graphs as normal. In this example the graphs are shown in a 2 x 2 grid with
     \c{GridLayout}:
 
-    \snippet ../examples/qmlmultigraph/qml/qmlmultigraph/main.qml 0
+    \snippet qmlmultigraph/qml/qmlmultigraph/main.qml 0
 
     Each graph has a parent \c Rectangle item to provide it with a border. The color of the rectangle
     is set to fully transparent, because otherwise the rectangles would hide the graphs, which are

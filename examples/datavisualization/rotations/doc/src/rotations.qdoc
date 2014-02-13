@@ -39,9 +39,9 @@
     In this example we want to orient the arrow items tangentially to the origin. This requires
     rotating them, which can be achieved by specifying rotation quaternion to each item:
 
-    \snippet ../examples/rotations/scatterdatamodifier.cpp 0
-    \snippet ../examples/rotations/scatterdatamodifier.cpp 1
-    \snippet ../examples/rotations/scatterdatamodifier.cpp 2
+    \snippet rotations/scatterdatamodifier.cpp 0
+    \snippet rotations/scatterdatamodifier.cpp 1
+    \snippet rotations/scatterdatamodifier.cpp 2
 
     Since the items need to be rotated along two axes, we define two rotation quaternions, one
     for Y-axis and one for Z-axis, and then multiply these together to get the total rotation,
@@ -53,7 +53,7 @@
     we supply our own \c{narrowarrow.obj} file which contains the object definition for the mesh
     in \c Wavefront obj format:
 
-    \snippet ../examples/rotations/scatterdatamodifier.cpp 3
+    \snippet rotations/scatterdatamodifier.cpp 3
 
     \section1 Using range gradient
 
@@ -62,7 +62,7 @@
     part of the graph to be darker and gradually get lighter higher they are, so we define a
     range gradient with black color at the position 0.0 and white color at the position 1.0:
 
-    \snippet ../examples/rotations/scatterdatamodifier.cpp 4
+    \snippet rotations/scatterdatamodifier.cpp 4
 
     \section1 Example contents
 */

@@ -36,7 +36,7 @@
     The example data is monthly income and expenses of a fictional company over several years.
     The data is defined in a list model in \c Data.qml like this:
 
-    \snippet ../examples/qmlbars/qml/qmlbars/Data.qml 0
+    \snippet qmlbars/qml/qmlbars/Data.qml 0
     \dots
 
     Each data item has four roles: year, month, income, and expenses. Years and months are natural to
@@ -46,7 +46,7 @@
     Now we need to add the data to the Bars3D graph. We will create two Bar3DSeries inside it,
     starting with a series for the income:
 
-    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 3
+    \snippet qmlbars/qml/qmlbars/main.qml 3
     \dots
 
     The data is attached to the \c itemModel property of the ItemModelBarDataProxy inside the
@@ -54,7 +54,7 @@
 
     Then we add another series for the expenses:
 
-    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 4
+    \snippet qmlbars/qml/qmlbars/main.qml 4
     \dots
 
     We use the \c visible property of the series to hide the second series for now.
@@ -65,7 +65,7 @@
     \c Axes.qml. This is done because the data contains abbreviated month names, which we don't want
     to use for our column labels:
 
-    \snippet ../examples/qmlbars/qml/qmlbars/Axes.qml 0
+    \snippet qmlbars/qml/qmlbars/Axes.qml 0
 
     \section1 Switching series
 
@@ -74,14 +74,14 @@
     visualized data between income, expenses, and both, by simply changing visibility of the two
     series:
 
-    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 0
+    \snippet qmlbars/qml/qmlbars/main.qml 0
 
     The axis change is done because income and expenses have a different label format. The same could have
     been achieved using a single axis and just changing the label format.
 
     The second interesting block is where we filter some of the rows away from the visualized data:
 
-    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 1
+    \snippet qmlbars/qml/qmlbars/main.qml 1
 
     The filtering is done by setting \c autoRowCategories to false on the ItemModelBarDataProxy item and defining
     the row categories explicitly. This way, only the items in specified rows are visualized.
@@ -89,5 +89,5 @@
     The third interesting block shows how to get the row and column index of an item if you know the
     row and column values by using ItemModelBarDataProxy methods \c rowCategoryIndex() and \c columnCategoryIndex():
 
-    \snippet ../examples/qmlbars/qml/qmlbars/main.qml 2
+    \snippet qmlbars/qml/qmlbars/main.qml 2
 */

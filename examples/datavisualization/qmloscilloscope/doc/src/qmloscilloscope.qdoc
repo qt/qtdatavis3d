@@ -42,18 +42,18 @@
 
     The \c DataSource class provides three methods that can be called from QML:
 
-    \snippet ../examples/qmloscilloscope/datasource.h 0
+    \snippet qmloscilloscope/datasource.h 0
 
     The first method, \c generateData(), creates a cache of simulated oscilloscope data for us
     to display. The data is cached in a format accepted by QSurfaceDataProxy:
 
-    \snippet ../examples/qmloscilloscope/datasource.cpp 0
+    \snippet qmloscilloscope/datasource.cpp 0
 
     The secod method, \c update(), copies one set of the cached data into another array, which we
     set to the data proxy of the series by calling QSurfaceDataProxy::resetArray().
     We reuse the same array if the array dimensions have not changed to minimize overhead:
 
-    \snippet ../examples/qmloscilloscope/datasource.cpp 1
+    \snippet qmloscilloscope/datasource.cpp 1
 
     \note Even though we are operating on the array pointer we have previously set to the proxy
     we still need to call QSurfaceDataProxy::resetArray() after changing the data in it to prompt
@@ -62,18 +62,18 @@
     The final method, \c selectionLabel(), is used to generate a label string we can show on the
     QML ui. This method utilizes the axis formats to format the label:
 
-    \snippet ../examples/qmloscilloscope/datasource.cpp 2
+    \snippet qmloscilloscope/datasource.cpp 2
 
     To be able to access the \c DataSource methods from QML, we need to expose it. We do this by
     defining a context property in application main:
 
-    \snippet ../examples/qmloscilloscope/main.cpp 0
+    \snippet qmloscilloscope/main.cpp 0
 
     \section1 QML
 
     In the QML codes, we define a Surface3D graph normally and give it a Surface3DSeries:
 
-    \snippet ../examples/qmloscilloscope/qml/qmloscilloscope/main.qml 0
+    \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 0
 
     One interesting detail is that we don't specify a proxy for the Surface3DSeries we attach
     to the graph. This makes the series to utilize the default QSurfaceDataProxy.
@@ -86,17 +86,17 @@
     \c updateSelectionLabel(), which calls one of the methods we defined for our \c DataSource class
     to obtain the label:
 
-    \snippet ../examples/qmloscilloscope/qml/qmloscilloscope/main.qml 1
+    \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 1
 
     We initialize the \c DataSource cache when the graph is complete by calling a helper function
     \c generateData(), which calls the method with the same name on the \c DataSource:
 
-    \snippet ../examples/qmloscilloscope/qml/qmloscilloscope/main.qml 2
+    \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 2
     \dots 4
-    \snippet ../examples/qmloscilloscope/qml/qmloscilloscope/main.qml 4
+    \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 4
 
     To trigger the updates in data, we define a \c Timer item which calls the \c update() method on the \c
     DataSource at requested intervals. The label update is also triggered on each cycle:
 
-    \snippet ../examples/qmloscilloscope/qml/qmloscilloscope/main.qml 3
+    \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 3
 */
