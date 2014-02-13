@@ -8,7 +8,5 @@ HEADERS += data.h
 
 QT += widgets
 
-INSTALLS += target
-
 RESOURCES += \
     multigraphs.qrc

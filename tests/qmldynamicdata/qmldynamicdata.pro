@@ -19,6 +19,3 @@ qtcAddDeployment()
 
 RESOURCES += \
     qmldynamicdata.qrc
-
-OTHER_FILES += doc/src/* \
-               doc/images/*

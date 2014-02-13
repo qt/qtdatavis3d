@@ -6,4 +6,5 @@ TEMPLATE = app
 
 QT += datavisualization
 
-target.path = $$[QT_INSTALL_EXAMPLES]/datavisualization/$$TARGET
+target.path = $$[QT_INSTALL_TESTS]/datavisualization/$$TARGET
+INSTALLS += target
