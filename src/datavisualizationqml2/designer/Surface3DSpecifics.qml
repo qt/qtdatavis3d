@@ -51,7 +51,9 @@ Column {
             SecondColumnLayout {
                 ComboBox {
                     backendValue: backendValues.shadowQuality
-                    model: ["ShadowQualityNone", "ShadowQualityLow", "ShadowQualityMedium", "ShadowQualityHigh", "ShadowQualityLowSoft", "ShadowQualityMediumSoft", "ShadowQualityHighSoft"]
+                    model: ["ShadowQualityNone", "ShadowQualityLow", "ShadowQualityMedium",
+                        "ShadowQualityHigh", "ShadowQualityLowSoft", "ShadowQualityMediumSoft",
+                        "ShadowQualityHighSoft"]
                     Layout.fillWidth: true
                 }
             }
@@ -63,10 +65,20 @@ Column {
             SecondColumnLayout {
                 ComboBox {
                     backendValue: backendValues.selectionMode
-                    model: ["SelectionNone", "SelectionItem"]
+                    model: [
+                        "SelectionNone",
+                        "SelectionItem",
+                        "SelectionRow | SelectionSlice",
+                        "SelectionItemAndRow | SelectionSlice",
+                        "SelectionColumn | SelectionSlice",
+                        "SelectionItemAndColumn | SelectionSlice",
+                        "SelectionRow | SelectionSlice | SelectionMultiSeries",
+                        "SelectionItemAndRow | SelectionSlice | SelectionMultiSeries",
+                        "SelectionColumn | SelectionSlice | SelectionMultiSeries",
+                        "SelectionItemAndColumn | SelectionSlice | SelectionMultiSeries"
+                    ]
                     Layout.fillWidth: true
                 }
-                // How to add SelectionSlice and SelectionMultiSeries?
             }
         }
     }

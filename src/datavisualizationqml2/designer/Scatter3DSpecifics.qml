@@ -51,7 +51,9 @@ Column {
             SecondColumnLayout {
                 ComboBox {
                     backendValue: backendValues.shadowQuality
-                    model: ["ShadowQualityNone", "ShadowQualityLow", "ShadowQualityMedium", "ShadowQualityHigh", "ShadowQualityLowSoft", "ShadowQualityMediumSoft", "ShadowQualityHighSoft"]
+                    model: ["ShadowQualityNone", "ShadowQualityLow", "ShadowQualityMedium",
+                        "ShadowQualityHigh", "ShadowQualityLowSoft", "ShadowQualityMediumSoft",
+                        "ShadowQualityHighSoft"]
                     Layout.fillWidth: true
                 }
             }

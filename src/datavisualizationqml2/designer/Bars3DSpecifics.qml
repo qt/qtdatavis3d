@@ -45,7 +45,7 @@ Column {
             }
             Label {
                 text: qsTr("barThickness")
-                toolTip: qsTr("Bar Thickness")
+                toolTip: qsTr("Bar Thickness Ratio")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -65,6 +65,7 @@ Column {
             }
             SecondColumnLayout {
                 SpinBox {
+                    prefix: "col: "
                     backendValue: backendValues.barSpacing.width // Does not work
                     minimumValue: 0.0
                     maximumValue: 10.0
@@ -73,6 +74,7 @@ Column {
                     Layout.fillWidth: true
                 }
                 SpinBox {
+                    prefix: "row: "
                     backendValue: backendValues.barSpacing.height // Does not work
                     minimumValue: 0.0
                     maximumValue: 10.0
@@ -111,7 +113,9 @@ Column {
             SecondColumnLayout {
                 ComboBox {
                     backendValue: backendValues.shadowQuality
-                    model: ["ShadowQualityNone", "ShadowQualityLow", "ShadowQualityMedium", "ShadowQualityHigh", "ShadowQualityLowSoft", "ShadowQualityMediumSoft", "ShadowQualityHighSoft"]
+                    model: ["ShadowQualityNone", "ShadowQualityLow", "ShadowQualityMedium",
+                        "ShadowQualityHigh", "ShadowQualityLowSoft", "ShadowQualityMediumSoft",
+                        "ShadowQualityHighSoft"]
                     Layout.fillWidth: true
                 }
             }
@@ -123,10 +127,30 @@ Column {
             SecondColumnLayout {
                 ComboBox {
                     backendValue: backendValues.selectionMode
-                    model: ["SelectionNone", "SelectionItem", "SelectionRow", "SelectionItemAndRow", "SelectionColumn", "SelectionItemAndColumn", "SelectionRowAndColumn", "SelectionItemRowAndColumn"]
+                    model: [
+                        "SelectionNone",
+                        "SelectionItem",
+                        "SelectionRow",
+                        "SelectionItemAndRow",
+                        "SelectionColumn",
+                        "SelectionItemAndColumn",
+                        "SelectionRowAndColumn",
+                        "SelectionItemRowAndColumn",
+                        "SelectionRow | SelectionSlice",
+                        "SelectionItemAndRow | SelectionSlice",
+                        "SelectionColumn | SelectionSlice",
+                        "SelectionItemAndColumn | SelectionSlice",
+                        "SelectionRow | SelectionMultiSeries",
+                        "SelectionItemAndRow | SelectionMultiSeries",
+                        "SelectionColumn | SelectionMultiSeries",
+                        "SelectionItemAndColumn | SelectionMultiSeries",
+                        "SelectionRow | SelectionSlice | SelectionMultiSeries",
+                        "SelectionItemAndRow | SelectionSlice | SelectionMultiSeries",
+                        "SelectionColumn | SelectionSlice | SelectionMultiSeries",
+                        "SelectionItemAndColumn | SelectionSlice | SelectionMultiSeries"
+                    ]
                     Layout.fillWidth: true
                 }
-                // How to add SelectionSlice and SelectionMultiSeries?
             }
         }
     }
