@@ -16,7 +16,9 @@
 **
 ****************************************************************************/
 
+//! [1]
 #include <QtDataVisualization/qutils.h>
+//! [1]
 
 #include <QtGui/QGuiApplication>
 #include <QtCore/QDir>
@@ -30,9 +32,9 @@ int main(int argc, char *argv[])
     QQuickView viewer;
 
     // Enable antialiasing
-    //! [2]
+    //! [0]
     viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
-    //! [2]
+    //! [0]
 
     // The following are needed to make examples run without having to install the module
     // in desktop environments.
@@ -43,16 +45,21 @@ int main(int argc, char *argv[])
 #endif
     viewer.engine()->addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
                                       QString::fromLatin1("qml")));
+    //! [4]
     QObject::connect(viewer.engine(), &QQmlEngine::quit, &viewer, &QWindow::close);
+    //! [4]
 
     viewer.setTitle(QStringLiteral("QML scatter example"));
-    //! [0]
+
+    //! [3]
     viewer.setSource(QUrl("qrc:/qml/qmlscatter/main.qml"));
-    //! [0]
+    //! [3]
+
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
-    //! [1]
+
+    //! [2]
     viewer.showMaximized();
-    //! [1]
+    //! [2]
 
     return app.exec();
 }

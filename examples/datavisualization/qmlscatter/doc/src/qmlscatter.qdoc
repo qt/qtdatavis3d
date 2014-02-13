@@ -27,45 +27,31 @@
 
     For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
 
+    For instructions how to create a new Qt Quick 2 application of your own, see Qt Creator help.
+
     \image qmlscatter-example.png
 
-    \section1 Creating the application
+    \section1 Application basics
 
-    The application main is created by creating a new Qt Quick Application project in QtCreator.
-    The dialog shown here is from QtCreator 3.0.0, and it may look a bit different in other
-    versions:
+    Before diving into the QML code, let's take a look at the application \c main.cpp.
 
-    \image qmlscatter-newproject.png
-
-    We'll modify the generated \c main.cpp a bit, as we want to add our \c main.qml file as a
-    resource. We do it by replacing
-
-    \code viewer.setMainQmlFile(QStringLiteral("qml/qmlscatter/main.qml")); \endcode
-
-    with
-
-    \snippet qmlscatter/main.cpp 0
-
-    This will make application deployment easier.
-
-    We'll enable anti-aliasing for our application in environments that support it:
-
-    \snippet qmlscatter/main.cpp 2
-
-    We'll also change the application to be shown maximized by replacing
-
-    \code viewer.showExpanded(); \endcode
-
-    with
+    Anti-aliasing for Qt Data Visualization graphs in Qt Quick 2 is not supported by default due
+    to technological limitations. To enable anti-aliasing, a custom surface format must be set to
+    the QQuickWindow we are using to show the application in the application \c main.cpp:
 
     \snippet qmlscatter/main.cpp 1
+    \dots 0
+    \snippet qmlscatter/main.cpp 0
 
-    We won't look into that any closer, as we'll change nothing in the generated
-    \c qtquick2applicationviewer files.
+    This will make the graphs nicer to look at.
 
-    Next we'll create new qml files for data (\c Data.qml) and a QtQuick.Controls button
-    we want to modify a bit (\c NewButton.qml), and add them to the resource file, in addition to
-    main.qml:
+    This application implements a 'Quit' button in the UI, so we want to connect the QQmlEngine::quit()
+    signal to our application's QWindow::close() slot:
+
+    \snippet qmlscatter/main.cpp 4
+
+    To make deployment little simpler, we gather all of the application's \c .qml files to a resource
+    file (\c qmlscatter.qrc):
 
     \code
     <RCC>
@@ -77,12 +63,15 @@
     </RCC>
     \endcode
 
-    Now the base for our application is done, and we can start setting up the graph.
+    This also requires us to set the \c main.qml to be read from the resource (\c{qrc:}):
+
+    \snippet qmlscatter/main.cpp 3
+
+    Lastly, we want the application to run in a maximized window:
+
+    \snippet qmlscatter/main.cpp 2
 
     \section1 Setting up the graph
-
-    Let's start modifying the generated \c {main.qml}. We can remove all previous content from it,
-    as it has nothing we need.
 
     First we'll import all the QML modules we need:
 
@@ -96,12 +85,13 @@
     \snippet qmlscatter/qml/qmlscatter/main.qml 1
 
     \note The Qt Creator application wizard will set a \c Rectangle item as the main item, which
-    is opaque white by default. This doesn't work for us, because the graphs are rendered behind the other
-    QML elements. We change the main item type to \c Item, which is invisible. This way the graph is
-    not covered by the main item.
+    is opaque white by default. This doesn't work for an application using Qt Data Visualization graphs,
+    because the graphs are rendered behind the other QML elements. When creating a new application,
+    you should change the main item type to \c Item instead, which is invisible.
+    This way the graph is not covered by the main item.
 
-    Then we'll add another \c Item inside it, and call it \c dataView. This will be the item to hold
-    the Scatter3D graph. We'll anchor it to the parent bottom:
+    Then we'll add another \c Item inside the main \c Item, and call it \c dataView.
+    This will be the item to hold the Scatter3D graph. We'll anchor it to the parent bottom:
 
     \snippet qmlscatter/qml/qmlscatter/main.qml 9
 
