@@ -19,7 +19,8 @@
 #ifndef DATASOURCE_H
 #define DATASOURCE_H
 
-#include <QtDataVisualization>
+#include <QtDataVisualization/QSurface3DSeries>
+#include <QtDataVisualization/QValue3DAxis>
 #include <QObject>
 
 class QQuickView;
