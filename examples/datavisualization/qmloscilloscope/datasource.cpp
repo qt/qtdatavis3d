@@ -21,16 +21,20 @@
 
 using namespace QtDataVisualization;
 
+//! [3]
 Q_DECLARE_METATYPE(QSurface3DSeries *)
 Q_DECLARE_METATYPE(QValue3DAxis *)
+//! [3]
 
 DataSource::DataSource(QObject *parent) :
     QObject(parent),
     m_index(-1),
     m_resetArray(0)
 {
+    //! [4]
     qRegisterMetaType<QSurface3DSeries *>();
     qRegisterMetaType<QValue3DAxis *>();
+    //! [4]
 }
 
 DataSource::~DataSource()
