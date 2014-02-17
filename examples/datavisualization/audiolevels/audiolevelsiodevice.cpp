@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "audiolevelsiodevice.h"
-#include <QDebug>
+#include <QtCore/QDebug>
 
 using namespace QtDataVisualization;
 

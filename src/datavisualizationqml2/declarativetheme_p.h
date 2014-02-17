@@ -34,7 +34,7 @@
 #include "colorgradient_p.h"
 #include "q3dtheme_p.h"
 
-#include <QtQml/qqmlparserstatus.h>
+#include <QtQml/QQmlParserStatus>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

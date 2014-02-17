@@ -32,10 +32,10 @@
 #include "datavisualizationglobal_p.h"
 #include "labelitem_p.h"
 
-#include <QOpenGLFunctions>
-#include <QString>
-#include <QVector3D>
-#include <QQuaternion>
+#include <QtCore/QString>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QVector3D>
+#include <QtGui/QQuaternion>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -23,7 +23,7 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qscatter3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
-#include <qmath.h>
+#include <QtCore/qmath.h>
 
 using namespace QtDataVisualization;
 

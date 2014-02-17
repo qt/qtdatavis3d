@@ -23,7 +23,6 @@ HEADERS += $$PWD/qabstract3dgraph_p.h \
            $$PWD/q3dscene.h \
            $$PWD/q3dlight.h \
            $$PWD/q3dlight_p.h \
-           $$PWD/q3dbox.h \
            $$PWD/q3dobject.h \
            $$PWD/q3dobject_p.h \
            $$PWD/q3dscene_p.h \
@@ -47,7 +46,6 @@ SOURCES += $$PWD/qabstract3dgraph.cpp \
            $$PWD/selectionpointer.cpp \
            $$PWD/q3dcamera.cpp \
            $$PWD/q3dlight.cpp \
-           $$PWD/q3dbox.cpp \
            $$PWD/q3dobject.cpp \
            $$PWD/q3dscene.cpp \
            $$PWD/surfaceseriesrendercache.cpp

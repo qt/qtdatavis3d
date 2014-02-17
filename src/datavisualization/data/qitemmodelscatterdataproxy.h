@@ -20,8 +20,8 @@
 #define QITEMMODELSCATTERDATAPROXY_H
 
 #include <QtDataVisualization/qscatterdataproxy.h>
-#include <QAbstractItemModel>
-#include <QStringList>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QString>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -65,10 +65,10 @@ public:
 
 signals:
     void itemModelChanged(const QAbstractItemModel* itemModel);
-    void xPosRoleChanged(QString role);
-    void yPosRoleChanged(QString role);
-    void zPosRoleChanged(QString role);
-    void rotationRoleChanged(QString role);
+    void xPosRoleChanged(const QString &role);
+    void yPosRoleChanged(const QString &role);
+    void zPosRoleChanged(const QString &role);
+    void rotationRoleChanged(const QString &role);
 
 protected:
     QItemModelScatterDataProxyPrivate *dptr();

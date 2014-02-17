@@ -34,7 +34,7 @@
 #include "qscatter3dseries.h"
 #include "qsurface3dseries.h"
 #include "colorgradient_p.h"
-#include <QQmlListProperty>
+#include <QtQml/QQmlListProperty>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

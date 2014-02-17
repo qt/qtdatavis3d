@@ -22,6 +22,8 @@
 #include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
 
+class QTimer;
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DInputHandler;

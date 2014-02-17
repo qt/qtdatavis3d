@@ -24,7 +24,6 @@
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DLightPrivate;
-class Q3DScene;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DLight : public Q3DObject
 {

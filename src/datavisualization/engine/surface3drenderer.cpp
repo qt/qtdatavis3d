@@ -30,11 +30,9 @@
 #include "q3dlight.h"
 #include "qsurface3dseries_p.h"
 
-#include <QMatrix4x4>
-#include <QMouseEvent>
-#include <qmath.h>
-
-#include <QDebug>
+#include <QtGui/QMatrix4x4>
+#include <QtGui/QMouseEvent>
+#include <QtCore/qmath.h>
 
 static const int ID_TO_RGBA_MASK = 0xff;
 

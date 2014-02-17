@@ -18,8 +18,8 @@
 
 #include "audiolevels.h"
 
-#include <QGuiApplication>
-#include <QAudio>
+#include <QtGui/QGuiApplication>
+#include <QtMultimedia/QAudio>
 
 using namespace QtDataVisualization;
 

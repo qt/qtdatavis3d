@@ -38,11 +38,6 @@
 #include "qbardataproxy.h"
 #include "qbar3dseries.h"
 
-#include <QAbstractItemModel>
-#include <QQuickItem>
-#include <QObject>
-#include <QQuickWindow>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class DeclarativeBars : public AbstractDeclarative

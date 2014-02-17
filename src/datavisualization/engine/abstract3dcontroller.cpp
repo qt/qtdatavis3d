@@ -32,8 +32,7 @@
 #include "q3dtheme_p.h"
 #include "q3dscene_p.h"
 #include "q3dscene.h"
-
-#include <QThread>
+#include <QtCore/QThread>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

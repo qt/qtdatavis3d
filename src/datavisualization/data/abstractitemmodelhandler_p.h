@@ -30,9 +30,9 @@
 #define ABSTRACTITEMMODELHANDLER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QAbstractItemModel>
-#include <QPointer>
-#include <QTimer>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QPointer>
+#include <QtCore/QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

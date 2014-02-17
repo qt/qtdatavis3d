@@ -18,7 +18,6 @@
 
 #include "qitemmodelbardataproxy_p.h"
 #include "baritemmodelhandler_p.h"
-#include <QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -379,7 +378,7 @@ void QItemModelBarDataProxy::setRowCategories(const QStringList &categories)
 {
     if (dptr()->m_rowCategories != categories) {
         dptr()->m_rowCategories = categories;
-        emit rowCategoriesChanged(categories);
+        emit rowCategoriesChanged();
     }
 }
 
@@ -397,7 +396,7 @@ void QItemModelBarDataProxy::setColumnCategories(const QStringList &categories)
 {
     if (dptr()->m_columnCategories != categories) {
         dptr()->m_columnCategories = categories;
-        emit columnCategoriesChanged(categories);
+        emit columnCategoriesChanged();
     }
 }
 

@@ -23,11 +23,10 @@
 #include "q3dscene_p.h"
 #include "qutils.h"
 
-#include <QGuiApplication>
-#include <QOpenGLContext>
-#include <QOpenGLPaintDevice>
-#include <QPainter>
-
+#include <QtGui/QGuiApplication>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLPaintDevice>
+#include <QtGui/QPainter>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -222,7 +221,7 @@ void QAbstract3DGraph::setActiveInputHandler(QAbstract3DInputHandler *inputHandl
     d_ptr->m_visualController->setActiveInputHandler(inputHandler);
 }
 
-QAbstract3DInputHandler *QAbstract3DGraph::activeInputHandler()
+QAbstract3DInputHandler *QAbstract3DGraph::activeInputHandler() const
 {
     return d_ptr->m_visualController->activeInputHandler();
 }

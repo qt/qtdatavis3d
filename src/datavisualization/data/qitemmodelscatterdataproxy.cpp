@@ -18,7 +18,6 @@
 
 #include "qitemmodelscatterdataproxy_p.h"
 #include "scatteritemmodelhandler_p.h"
-#include <QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -20,10 +20,6 @@
 #define Q3DCAMERA_H
 
 #include <QtDataVisualization/q3dobject.h>
-#include <QMatrix4x4>
-
-class QVector3D;
-class QPoint;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -69,7 +65,6 @@ public:
         CameraPresetDirectlyBelow
     };
 
-public:
     Q3DCamera(QObject *parent = 0);
     virtual ~Q3DCamera();
 
@@ -116,7 +111,6 @@ private:
     friend class SelectionPointer;
     friend class Q3DInputHandler;
     friend class QTouch3DInputHandlerPrivate;
-    friend class QMac3DInputHandler;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

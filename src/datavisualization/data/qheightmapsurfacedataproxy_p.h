@@ -31,7 +31,7 @@
 
 #include "qheightmapsurfacedataproxy.h"
 #include "qsurfacedataproxy_p.h"
-#include <QTimer>
+#include <QtCore/QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

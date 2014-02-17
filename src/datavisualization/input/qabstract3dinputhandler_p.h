@@ -31,7 +31,6 @@
 
 #include "datavisualizationglobal_p.h"
 #include "qabstract3dinputhandler.h"
-#include <QRect>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -62,7 +61,6 @@ public:
 private:
     QAbstract3DInputHandler::InputView m_inputView;
     QPoint m_inputPosition;
-    QRect m_mainViewPort;
 
     Q3DScene *m_scene;
     bool m_isDefaultHandler;

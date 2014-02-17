@@ -26,9 +26,7 @@
 #include "qsurface3dseries_p.h"
 #include "shaderhelper_p.h"
 
-#include <QMatrix4x4>
-
-#include <QDebug>
+#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

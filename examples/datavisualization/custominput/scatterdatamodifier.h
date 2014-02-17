@@ -24,9 +24,9 @@
 #include <QtDataVisualization/q3dscatter.h>
 #include <QtGui/QFont>
 #include <QtCore/QTimer>
-#include <QPropertyAnimation>
-#include <QSequentialAnimationGroup>
-#include <QVector3D>
+#include <QtCore/QPropertyAnimation>
+#include <QtCore/QSequentialAnimationGroup>
+#include <QtGui/QVector3D>
 
 using namespace QtDataVisualization;
 

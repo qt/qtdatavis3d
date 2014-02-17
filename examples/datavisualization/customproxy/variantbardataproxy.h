@@ -22,9 +22,9 @@
 #include "qbardataproxy.h"
 #include "variantdataset.h"
 #include "variantbardatamapping.h"
-#include <QStringList>
-#include <QMap>
-#include <QPointer>
+#include <QtCore/QStringList>
+#include <QtCore/QMap>
+#include <QtCore/QPointer>
 
 using namespace QtDataVisualization;
 

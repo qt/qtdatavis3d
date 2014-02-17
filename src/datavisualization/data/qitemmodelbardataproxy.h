@@ -20,8 +20,7 @@
 #define QITEMMODELBARDATAPROXY_H
 
 #include <QtDataVisualization/qbardataproxy.h>
-#include <QAbstractItemModel>
-#include <QStringList>
+#include <QtCore/QAbstractItemModel>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -96,12 +95,12 @@ public:
 
 signals:
     void itemModelChanged(const QAbstractItemModel* itemModel);
-    void rowRoleChanged(QString role);
-    void columnRoleChanged(QString role);
-    void valueRoleChanged(QString role);
-    void rotationRoleChanged(QString role);
-    void rowCategoriesChanged(QStringList categories);
-    void columnCategoriesChanged(QStringList categories);
+    void rowRoleChanged(const QString &role);
+    void columnRoleChanged(const QString &role);
+    void valueRoleChanged(const QString &role);
+    void rotationRoleChanged(const QString &role);
+    void rowCategoriesChanged();
+    void columnCategoriesChanged();
     void useModelCategoriesChanged(bool enable);
     void autoRowCategoriesChanged(bool enable);
     void autoColumnCategoriesChanged(bool enable);

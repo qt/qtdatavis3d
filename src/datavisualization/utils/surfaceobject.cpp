@@ -19,8 +19,7 @@
 #include "surfaceobject_p.h"
 #include "abstractobjecthelper_p.h"
 
-#include <QVector3D>
-#include <QVector2D>
+#include <QtGui/QVector2D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

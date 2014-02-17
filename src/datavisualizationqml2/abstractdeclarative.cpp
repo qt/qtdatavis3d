@@ -21,9 +21,9 @@
 #include "declarativetheme_p.h"
 #include "declarativerendernode_p.h"
 
-#include <QThread>
-#include <QGuiApplication>
-#include <QSGSimpleRectNode>
+#include <QtCore/QThread>
+#include <QtGui/QGuiApplication>
+#include <QtQuick/QSGSimpleRectNode>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

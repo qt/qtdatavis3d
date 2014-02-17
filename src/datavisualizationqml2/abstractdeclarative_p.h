@@ -34,11 +34,10 @@
 #include "qabstract3dinputhandler.h"
 #include "declarativescene_p.h"
 
-#include <QAbstractItemModel>
-#include <QQuickItem>
-#include <QObject>
-#include <QQuickWindow>
-#include <QPointer>
+#include <QtCore/QAbstractItemModel>
+#include <QtQuick/QQuickItem>
+#include <QtQuick/QQuickWindow>
+#include <QtCore/QPointer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

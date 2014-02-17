@@ -44,7 +44,7 @@
 #include "declarativecolor_p.h"
 #include "declarativescene_p.h"
 
-#include <QQmlExtensionPlugin>
+#include <QtQml/QQmlExtensionPlugin>
 
 using namespace QtDataVisualization;
 

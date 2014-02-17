@@ -20,18 +20,15 @@
 #define QABSTRACT3DGRAPH_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
-
-#include <QWindow>
-#include <QOpenGLFunctions>
-#include <QScreen>
+#include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/q3dscene.h>
+#include <QtDataVisualization/qabstract3dinputhandler.h>
+#include <QtGui/QWindow>
+#include <QtGui/QOpenGLFunctions>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DGraphPrivate;
-class Abstract3DController;
-class QAbstract3DInputHandler;
-class Q3DTheme;
-class Q3DScene;
 
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
@@ -78,7 +75,7 @@ public:
     void addInputHandler(QAbstract3DInputHandler *inputHandler);
     void releaseInputHandler(QAbstract3DInputHandler *inputHandler);
     void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
-    QAbstract3DInputHandler *activeInputHandler();
+    QAbstract3DInputHandler *activeInputHandler() const;
     QList<QAbstract3DInputHandler *> inputHandlers() const;
 
     void addTheme(Q3DTheme *theme);
@@ -117,6 +114,7 @@ signals:
     void shadowQualityChanged(ShadowQuality quality);
 
 private:
+    Q_DISABLE_COPY(QAbstract3DGraph)
     QScopedPointer<QAbstract3DGraphPrivate> d_ptr;
 
     friend class Q3DBars;

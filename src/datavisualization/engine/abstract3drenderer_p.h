@@ -33,7 +33,7 @@
 
 #include <QtGui/QOpenGLFunctions>
 #ifdef DISPLAY_RENDER_SPEED
-#include <QTime>
+#include <QtCore/QTime>
 #endif
 
 #include "datavisualizationglobal_p.h"
@@ -133,7 +133,6 @@ protected:
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
     TextureHelper *m_textureHelper;
-    Q3DBox m_boundingBox;
 
     Q3DScene *m_cachedScene;
     bool m_selectionDirty;

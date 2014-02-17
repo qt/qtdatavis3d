@@ -19,12 +19,10 @@
 #include "q3dcamera.h"
 #include "q3dcamera_p.h"
 #include "q3dscene.h"
-#include "q3dbox.h"
 #include "q3dobject.h"
 #include "utils_p.h"
 
-#include <qmath.h>
-#include <QVector3D>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

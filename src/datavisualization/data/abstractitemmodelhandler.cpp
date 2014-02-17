@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "abstractitemmodelhandler_p.h"
-#include <QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

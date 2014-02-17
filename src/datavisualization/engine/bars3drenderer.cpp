@@ -28,11 +28,10 @@
 #include "q3dlight.h"
 #include "qbar3dseries_p.h"
 
-#include <QMatrix4x4>
-#include <QMouseEvent>
-#include <QThread>
-#include <qmath.h>
-#include <QDebug>
+#include <QtGui/QMatrix4x4>
+#include <QtGui/QMouseEvent>
+#include <QtCore/QThread>
+#include <QtCore/qmath.h>
 
 // You can verify that depth buffer drawing works correctly by uncommenting this.
 // You should see the scene from  where the light is

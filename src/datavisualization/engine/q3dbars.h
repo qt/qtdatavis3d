@@ -20,16 +20,13 @@
 #define Q3DBARS_H
 
 #include <QtDataVisualization/qabstract3dgraph.h>
-#include <QFont>
-#include <QLinearGradient>
+#include <QtDataVisualization/qvalue3daxis.h>
+#include <QtDataVisualization/qcategory3daxis.h>
+#include <QtDataVisualization/qbar3dseries.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DBarsPrivate;
-class QAbstract3DAxis;
-class QCategory3DAxis;
-class QValue3DAxis;
-class QBar3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
 {
@@ -82,7 +79,7 @@ public:
 signals:
     void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
-    void barSpacingChanged(QSizeF spacing);
+    void barSpacingChanged(const QSizeF &spacing);
     void barSpacingRelativeChanged(bool relative);
     void rowAxisChanged(QCategory3DAxis *axis);
     void columnAxisChanged(QCategory3DAxis *axis);

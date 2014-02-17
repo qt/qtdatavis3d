@@ -30,10 +30,10 @@
 #define DATAVISUALIZATIONGLOBAL_P_H
 
 #include "qdatavisualizationglobal.h"
-#include <QOpenGLFunctions>
-#include <QVector3D>
-#include <QQuaternion>
-#include <QDebug>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QVector3D>
+#include <QtGui/QQuaternion>
+#include <QtCore/QDebug>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

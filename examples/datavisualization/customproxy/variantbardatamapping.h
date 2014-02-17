@@ -19,7 +19,7 @@
 #ifndef VARIANTBARDATAMAPPING_H
 #define VARIANTBARDATAMAPPING_H
 
-#include <QStringList>
+#include <QtCore/QStringList>
 
 class VariantBarDataMapping : public QObject
 {

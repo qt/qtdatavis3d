@@ -25,14 +25,14 @@
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
 
-#include <QApplication>
-#include <QVBoxLayout>
-#include <QTableWidget>
-#include <QScreen>
-#include <QTimer>
-#include <QFont>
-#include <QDebug>
-#include <QHeaderView>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QTableWidget>
+#include <QtGui/QScreen>
+#include <QtCore/QTimer>
+#include <QtGui/QFont>
+#include <QtCore/QDebug>
+#include <QtWidgets/QHeaderView>
 
 #define USE_STATIC_DATA
 

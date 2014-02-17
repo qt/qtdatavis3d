@@ -19,7 +19,7 @@
 #ifndef QDATAVISUALIZATIONGLOBAL_H
 #define QDATAVISUALIZATIONGLOBAL_H
 
-#include <qglobal.h>
+#include <QtCore/qglobal.h>
 
 #define QT_DATAVISUALIZATION_VERSION_STR   "1.0.0"
 /*

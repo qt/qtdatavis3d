@@ -27,11 +27,10 @@
 #include "q3dlight.h"
 #include "qscatter3dseries_p.h"
 
-#include <QMatrix4x4>
-#include <QMouseEvent>
-#include <QThread>
-#include <qmath.h>
-#include <QDebug>
+#include <QtGui/QMatrix4x4>
+#include <QtGui/QMouseEvent>
+#include <QtCore/QThread>
+#include <QtCore/qmath.h>
 
 // Commenting this draws the shadow map with perspective projection. Otherwise it's drawn in
 // orthographic projection.

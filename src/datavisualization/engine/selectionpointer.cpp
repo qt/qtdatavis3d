@@ -26,7 +26,7 @@
 #include "utils_p.h"
 #include "q3dlight.h"
 
-#include <QMatrix4x4>
+#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

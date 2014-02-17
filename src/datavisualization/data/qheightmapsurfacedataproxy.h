@@ -20,8 +20,8 @@
 #define QHEIGHTMAPSURFACEDATAPROXY_H
 
 #include <QtDataVisualization/qsurfacedataproxy.h>
-
-#include <QImage>
+#include <QtGui/QImage>
+#include <QtCore/QString>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -41,6 +41,7 @@ class QT_DATAVISUALIZATION_EXPORT QHeightMapSurfaceDataProxy : public QSurfaceDa
 public:
     explicit QHeightMapSurfaceDataProxy(QObject *parent = 0);
     explicit QHeightMapSurfaceDataProxy(const QImage &image, QObject *parent = 0);
+    explicit QHeightMapSurfaceDataProxy(const QString &filename, QObject *parent = 0);
     virtual ~QHeightMapSurfaceDataProxy();
 
     void setHeightMap(const QImage &image);
@@ -59,8 +60,8 @@ public:
     float maxZValue() const;
 
 signals:
-    void heightMapChanged(QImage image);
-    void heightMapFileChanged(QString filename);
+    void heightMapChanged(const QImage &image);
+    void heightMapFileChanged(const QString &filename);
     void minXValueChanged(float value);
     void maxXValueChanged(float value);
     void minZValueChanged(float value);

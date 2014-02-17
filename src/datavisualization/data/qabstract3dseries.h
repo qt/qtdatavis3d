@@ -20,10 +20,11 @@
 #define QABSTRACT3DSERIES_H
 
 #include <QtDataVisualization/q3dtheme.h>
-#include <QObject>
-#include <QScopedPointer>
-#include <QLinearGradient>
-#include <QQuaternion>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QString>
+#include <QtGui/QLinearGradient>
+#include <QtGui/QQuaternion>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -119,20 +120,20 @@ public:
     QString name() const;
 
 signals:
-    void itemLabelFormatChanged(QString format);
+    void itemLabelFormatChanged(const QString &format);
     void visibilityChanged(bool visible);
     void meshChanged(Mesh mesh);
     void meshSmoothChanged(bool enabled);
-    void meshRotationChanged(QQuaternion rotation);
-    void userDefinedMeshChanged(QString fileName);
+    void meshRotationChanged(const QQuaternion &rotation);
+    void userDefinedMeshChanged(const QString &fileName);
     void colorStyleChanged(Q3DTheme::ColorStyle style);
-    void baseColorChanged(QColor color);
-    void baseGradientChanged(QLinearGradient gradient);
-    void singleHighlightColorChanged(QColor color);
-    void singleHighlightGradientChanged(QLinearGradient gradient);
-    void multiHighlightColorChanged(QColor color);
-    void multiHighlightGradientChanged(QLinearGradient gradient);
-    void nameChanged(QString name);
+    void baseColorChanged(const QColor &color);
+    void baseGradientChanged(const QLinearGradient &gradient);
+    void singleHighlightColorChanged(const QColor &color);
+    void singleHighlightGradientChanged(const QLinearGradient &gradient);
+    void multiHighlightColorChanged(const QColor &color);
+    void multiHighlightGradientChanged(const QLinearGradient &gradient);
+    void nameChanged(const QString &name);
 
 protected:
     QScopedPointer<QAbstract3DSeriesPrivate> d_ptr;

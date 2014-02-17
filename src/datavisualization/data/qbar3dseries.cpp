@@ -147,15 +147,6 @@ QBar3DSeries::QBar3DSeries(QBarDataProxy *dataProxy, QObject *parent) :
 }
 
 /*!
- * \internal
- */
-QBar3DSeries::QBar3DSeries(QBar3DSeriesPrivate *d, QObject *parent) :
-    QAbstract3DSeries(d, parent)
-{
-    dptr()->connectSignals();
-}
-
-/*!
  * Destroys QBar3DSeries.
  */
 QBar3DSeries::~QBar3DSeries()

@@ -24,8 +24,8 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
-#include <QTime>
-#include <QComboBox>
+#include <QtCore/QTime>
+#include <QtWidgets/QComboBox>
 
 using namespace QtDataVisualization;
 

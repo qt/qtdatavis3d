@@ -130,7 +130,7 @@ QBarDataProxy::~QBarDataProxy()
  *
  *  The series this proxy is attached to.
  */
-QBar3DSeries *QBarDataProxy::series()
+QBar3DSeries *QBarDataProxy::series() const
 {
     return static_cast<QBar3DSeries *>(d_ptr->series());
 }
@@ -224,6 +224,15 @@ void QBarDataProxy::setItem(int rowIndex, int columnIndex, const QBarDataItem &i
 {
     dptr()->setItem(rowIndex, columnIndex, item);
     emit itemChanged(rowIndex, columnIndex);
+}
+
+/*!
+ * Changes a single item at \a position to the \a item.
+ * The X-value of \a position indicates the row and the Y-value indicates the column.
+ */
+void QBarDataProxy::setItem(const QPoint &position, const QBarDataItem &item)
+{
+    setItem(position.x(), position.y(), item);
 }
 
 /*!

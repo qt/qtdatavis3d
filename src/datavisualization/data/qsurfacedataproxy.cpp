@@ -131,7 +131,7 @@ QSurfaceDataProxy::~QSurfaceDataProxy()
  *
  *  The series this proxy is attached to.
  */
-QSurface3DSeries *QSurfaceDataProxy::series()
+QSurface3DSeries *QSurfaceDataProxy::series() const
 {
     return static_cast<QSurface3DSeries *>(d_ptr->series());
 }
@@ -183,6 +183,15 @@ void QSurfaceDataProxy::setItem(int rowIndex, int columnIndex, const QSurfaceDat
 {
     dptr()->setItem(rowIndex, columnIndex, item);
     emit itemChanged(rowIndex, columnIndex);
+}
+
+/*!
+ * Changes a single item at \a position to the \a item.
+ * The X-value of \a position indicates the row and the Y-value indicates the column.
+ */
+void QSurfaceDataProxy::setItem(const QPoint &position, const QSurfaceDataItem &item)
+{
+    setItem(position.x(), position.y(), item);
 }
 
 /*!

@@ -20,16 +20,12 @@
 #define Q3DSCATTER_H
 
 #include <QtDataVisualization/qabstract3dgraph.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QFont>
-#include <QLinearGradient>
+#include <QtDataVisualization/qvalue3daxis.h>
+#include <QtDataVisualization/qscatter3dseries.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DScatterPrivate;
-class QValue3DAxis;
-class QCategory3DAxis;
-class QScatter3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public QAbstract3DGraph
 {

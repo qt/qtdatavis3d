@@ -26,8 +26,8 @@
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
 
-#include <QAudioDeviceInfo>
-#include <QAudioInput>
+#include <QtMultimedia/QAudioDeviceInfo>
+#include <QtMultimedia/QAudioInput>
 
 using namespace QtDataVisualization;
 

@@ -20,14 +20,12 @@
 #define Q3DSURFACE_H
 
 #include <QtDataVisualization/qabstract3dgraph.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QFont>
+#include <QtDataVisualization/qvalue3daxis.h>
+#include <QtDataVisualization/qsurface3dseries.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DSurfacePrivate;
-class QValue3DAxis;
-class QSurface3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public QAbstract3DGraph
 {

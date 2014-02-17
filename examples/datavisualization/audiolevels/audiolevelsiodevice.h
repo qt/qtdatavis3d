@@ -20,7 +20,7 @@
 #define AUDIOLEVELSIODEVICE_H
 
 #include <QtDataVisualization/qbardataproxy.h>
-#include <QIODevice>
+#include <QtCore/QIODevice>
 
 using namespace QtDataVisualization;
 

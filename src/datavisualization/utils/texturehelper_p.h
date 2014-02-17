@@ -30,9 +30,9 @@
 #define TEXTUREHELPER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QOpenGLFunctions>
-#include <QRgb>
-#include <QLinearGradient>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QRgb>
+#include <QtGui/QLinearGradient>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

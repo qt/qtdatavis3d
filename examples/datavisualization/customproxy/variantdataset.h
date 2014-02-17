@@ -19,8 +19,8 @@
 #ifndef VARIANTDATASET_H
 #define VARIANTDATASET_H
 
-#include <QScopedPointer>
-#include <QVariantList>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QVariantList>
 
 //! [1]
 typedef QVariantList VariantDataItem;

@@ -21,7 +21,6 @@
 
 #include <QtDataVisualization/QSurface3DSeries>
 #include <QtDataVisualization/QValue3DAxis>
-#include <QObject>
 
 class QQuickView;
 

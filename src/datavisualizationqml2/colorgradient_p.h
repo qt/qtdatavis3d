@@ -30,8 +30,8 @@
 #define COLORGRADIENT_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QColor>
-#include <QQmlListProperty>
+#include <QtGui/QColor>
+#include <QtQml/QQmlListProperty>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

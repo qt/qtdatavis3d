@@ -20,8 +20,7 @@
 #define QSCATTERDATAITEM_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
-
-#include <QQuaternion>
+#include <QtGui/QQuaternion>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -50,7 +49,7 @@ public:
     inline float z() const { return m_position.z(); }
 
 protected:
-    virtual void createExtraData();
+    void createExtraData();
 
     QScatterDataItemPrivate *d_ptr;
 

@@ -23,11 +23,11 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
-#include <QGuiApplication>
-#include <QFont>
-#include <QDebug>
-#include <QTextStream>
-#include <QFile>
+#include <QtGui/QGuiApplication>
+#include <QtGui/QFont>
+#include <QtCore/QDebug>
+#include <QtCore/QTextStream>
+#include <QtCore/QFile>
 
 using namespace QtDataVisualization;
 

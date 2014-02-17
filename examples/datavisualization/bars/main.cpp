@@ -18,17 +18,17 @@
 
 #include "graphmodifier.h"
 
-#include <QApplication>
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QCheckBox>
-#include <QSlider>
-#include <QFontComboBox>
-#include <QLabel>
-#include <QScreen>
-#include <QFontDatabase>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QCheckBox>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QFontComboBox>
+#include <QtWidgets/QLabel>
+#include <QtGui/QScreen>
+#include <QtGui/QFontDatabase>
 
 int main(int argc, char **argv)
 {

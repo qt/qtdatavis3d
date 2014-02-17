@@ -34,7 +34,6 @@
 #include "q3dtheme.h"
 #include "labelitem_p.h"
 #include "abstractrenderitem_p.h"
-#include <QFont>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

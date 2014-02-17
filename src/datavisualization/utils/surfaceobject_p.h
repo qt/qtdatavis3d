@@ -33,7 +33,7 @@
 #include "abstractobjecthelper_p.h"
 #include "qsurfacedataproxy.h"
 
-#include <QRect>
+#include <QtCore/QRect>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

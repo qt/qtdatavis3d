@@ -29,6 +29,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QLabel>
 #include <QtGui/QPainter>
+#include <QtGui/QScreen>
 
 int main(int argc, char **argv)
 {

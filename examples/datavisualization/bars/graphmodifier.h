@@ -23,10 +23,10 @@
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/qabstract3dseries.h>
 
-#include <QFont>
-#include <QDebug>
-#include <QStringList>
-#include <QPointer>
+#include <QtGui/QFont>
+#include <QtCore/QDebug>
+#include <QtCore/QStringList>
+#include <QtCore/QPointer>
 
 using namespace QtDataVisualization;
 

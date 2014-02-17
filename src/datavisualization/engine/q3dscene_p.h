@@ -30,7 +30,7 @@
 #define Q3DSCENE_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QRect>
+#include "q3dscene.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

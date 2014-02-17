@@ -16,8 +16,8 @@
 **
 ****************************************************************************/
 
-#ifndef QDEFAULT3DINPUTHANDLER_H
-#define QDEFAULT3DINPUTHANDLER_H
+#ifndef Q3DINPUTHANDLER_H
+#define Q3DINPUTHANDLER_H
 
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 

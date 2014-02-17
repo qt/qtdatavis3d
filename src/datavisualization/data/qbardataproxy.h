@@ -21,8 +21,8 @@
 
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qbardataitem.h>
-#include <QVector>
-#include <QStringList>
+#include <QtCore/QVector>
+#include <QtCore/QStringList>
 
 namespace QtDataVisualization {
 // typedefs introduced this way because QDoc doesn't understand namespace macros
@@ -47,7 +47,7 @@ public:
     explicit QBarDataProxy(QObject *parent = 0);
     virtual ~QBarDataProxy();
 
-    QBar3DSeries *series();
+    QBar3DSeries *series() const;
     int rowCount() const;
 
     QStringList rowLabels() const;
@@ -71,6 +71,7 @@ public:
     void setRows(int rowIndex, const QBarDataArray &rows, const QStringList &labels);
 
     void setItem(int rowIndex, int columnIndex, const QBarDataItem &item);
+    void setItem(const QPoint &position, const QBarDataItem &item);
 
     int addRow(QBarDataRow *row);
     int addRow(QBarDataRow *row, const QString &label);

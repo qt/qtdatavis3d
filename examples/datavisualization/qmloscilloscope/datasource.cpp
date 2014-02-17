@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "datasource.h"
-#include <qmath.h>
+#include <QtCore/qmath.h>
 
 using namespace QtDataVisualization;
 

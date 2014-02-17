@@ -31,6 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dcamera.h"
+#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -106,7 +107,6 @@ public:
     friend class SelectionPointer;
     friend class Q3DInputHandler;
     friend class QTouch3DInputHandler;
-    friend class QMac3DInputHandler;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

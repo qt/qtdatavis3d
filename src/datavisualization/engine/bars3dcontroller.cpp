@@ -27,8 +27,8 @@
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
 
-#include <QMatrix4x4>
-#include <qmath.h>
+#include <QtGui/QMatrix4x4>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

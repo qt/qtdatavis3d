@@ -20,8 +20,8 @@
 #define QITEMMODELSURFACEDATAPROXY_H
 
 #include <QtDataVisualization/qsurfacedataproxy.h>
-#include <QAbstractItemModel>
-#include <QStringList>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QStringList>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -101,13 +101,13 @@ public:
 
 signals:
     void itemModelChanged(const QAbstractItemModel* itemModel);
-    void rowRoleChanged(QString role);
-    void columnRoleChanged(QString role);
-    void xPosRoleChanged(QString role);
-    void yPosRoleChanged(QString role);
-    void zPosRoleChanged(QString role);
-    void rowCategoriesChanged(QStringList categories);
-    void columnCategoriesChanged(QStringList categories);
+    void rowRoleChanged(const QString &role);
+    void columnRoleChanged(const QString &role);
+    void xPosRoleChanged(const QString &role);
+    void yPosRoleChanged(const QString &role);
+    void zPosRoleChanged(const QString &role);
+    void rowCategoriesChanged();
+    void columnCategoriesChanged();
     void useModelCategoriesChanged(bool enable);
     void autoRowCategoriesChanged(bool enable);
     void autoColumnCategoriesChanged(bool enable);

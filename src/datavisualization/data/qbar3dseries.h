@@ -21,7 +21,7 @@
 
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtDataVisualization/qbardataproxy.h>
-#include <QPoint>
+#include <QtCore/QPoint>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -51,11 +51,10 @@ public:
 
 signals:
     void dataProxyChanged(QBarDataProxy *proxy);
-    void selectedBarChanged(QPoint position);
+    void selectedBarChanged(const QPoint &position);
     void meshAngleChanged(float angle);
 
 protected:
-    explicit QBar3DSeries(QBar3DSeriesPrivate *d, QObject *parent = 0);
     QBar3DSeriesPrivate *dptr();
     const QBar3DSeriesPrivate *dptrc() const;
 

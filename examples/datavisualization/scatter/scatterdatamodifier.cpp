@@ -23,8 +23,8 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qscatter3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
-#include <qmath.h>
-#include <QComboBox>
+#include <QtCore/qmath.h>
+#include <QtWidgets/QComboBox>
 
 using namespace QtDataVisualization;
 

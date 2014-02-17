@@ -29,8 +29,6 @@
 #ifndef SELECTIONPOINTER_P_H
 #define SELECTIONPOINTER_P_H
 
-#include <QVector3D>
-
 #include "q3dscene.h"
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"

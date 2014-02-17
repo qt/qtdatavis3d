@@ -20,10 +20,10 @@
 #define Q3DTHEME_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
-
-#include <QLinearGradient>
-#include <QFont>
-#include <QColor>
+#include <QtCore/QObject>
+#include <QtGui/QLinearGradient>
+#include <QtGui/QFont>
+#include <QtGui/QColor>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -149,23 +149,23 @@ public:
 
 signals:
     void typeChanged(Theme themeType);
-    void baseColorsChanged(QList<QColor> colors);
-    void backgroundColorChanged(QColor color);
-    void windowColorChanged(QColor color);
-    void labelTextColorChanged(QColor color);
-    void labelBackgroundColorChanged(QColor color);
-    void gridLineColorChanged(QColor color);
-    void singleHighlightColorChanged(QColor color);
-    void multiHighlightColorChanged(QColor color);
-    void lightColorChanged(QColor color);
-    void baseGradientsChanged(QList<QLinearGradient> gradients);
-    void singleHighlightGradientChanged(QLinearGradient gradient);
-    void multiHighlightGradientChanged(QLinearGradient gradient);
+    void baseColorsChanged(const QList<QColor> &colors);
+    void backgroundColorChanged(const QColor &color);
+    void windowColorChanged(const QColor &color);
+    void labelTextColorChanged(const QColor &color);
+    void labelBackgroundColorChanged(const QColor &color);
+    void gridLineColorChanged(const QColor &color);
+    void singleHighlightColorChanged(const QColor &color);
+    void multiHighlightColorChanged(const QColor &color);
+    void lightColorChanged(const QColor &color);
+    void baseGradientsChanged(const QList<QLinearGradient> &gradients);
+    void singleHighlightGradientChanged(const QLinearGradient &gradient);
+    void multiHighlightGradientChanged(const QLinearGradient &gradient);
     void lightStrengthChanged(float strength);
     void ambientLightStrengthChanged(float strength);
     void highlightLightStrengthChanged(float strength);
     void labelBorderEnabledChanged(bool enabled);
-    void fontChanged(QFont font);
+    void fontChanged(const QFont &font);
     void backgroundEnabledChanged(bool enabled);
     void gridEnabledChanged(bool enabled);
     void labelBackgroundEnabledChanged(bool enabled);
@@ -173,16 +173,17 @@ signals:
 
 protected:
     explicit Q3DTheme(Q3DThemePrivate *d, Theme themeType, QObject *parent = 0);
+
     QScopedPointer<Q3DThemePrivate> d_ptr;
+
+private:
+    Q_DISABLE_COPY(Q3DTheme)
 
     friend class ThemeManager;
     friend class Abstract3DRenderer;
     friend class Bars3DController;
     friend class AbstractDeclarative;
     friend class Abstract3DController;
-
-private:
-    Q_DISABLE_COPY(Q3DTheme)
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

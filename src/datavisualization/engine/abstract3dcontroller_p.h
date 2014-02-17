@@ -35,10 +35,7 @@
 #include "qabstract3dinputhandler.h"
 #include "qabstractdataproxy.h"
 #include "q3dscene_p.h"
-#include "q3dbox.h"
-
-#include <QObject>
-#include <QLinearGradient>
+#include <QtGui/QLinearGradient>
 
 class QFont;
 

@@ -18,9 +18,8 @@
 
 #include "camerahelper_p.h"
 
-#include <qmath.h>
-#include <QMatrix4x4>
-#include <QVector3D>
+#include <QtCore/qmath.h>
+#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

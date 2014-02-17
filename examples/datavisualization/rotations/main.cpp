@@ -18,14 +18,14 @@
 
 #include "scatterdatamodifier.h"
 
-#include <QApplication>
-#include <QWidget>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
-#include <QPushButton>
-#include <QScreen>
-#include <QSlider>
-#include <QLabel>
+#include <QtWidgets/QApplication>
+#include <QtWidgets/QWidget>
+#include <QtWidgets/QHBoxLayout>
+#include <QtWidgets/QVBoxLayout>
+#include <QtWidgets/QPushButton>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QLabel>
+#include <QtGui/QScreen>
 
 int main(int argc, char **argv)
 {

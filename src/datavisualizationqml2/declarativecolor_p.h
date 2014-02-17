@@ -30,7 +30,7 @@
 #define DECLARATIVECOLOR_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QColor>
+#include <QtGui/QColor>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

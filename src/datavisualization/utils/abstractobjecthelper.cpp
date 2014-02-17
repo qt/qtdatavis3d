@@ -18,8 +18,6 @@
 
 #include "abstractobjecthelper_p.h"
 
-#include <QDebug>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 AbstractObjectHelper::AbstractObjectHelper()

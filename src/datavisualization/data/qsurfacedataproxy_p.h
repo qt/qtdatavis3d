@@ -32,8 +32,6 @@
 #include "qsurfacedataproxy.h"
 #include "qabstractdataproxy_p.h"
 
-#include <QSize>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QSurfaceDataProxyPrivate : public QAbstractDataProxyPrivate

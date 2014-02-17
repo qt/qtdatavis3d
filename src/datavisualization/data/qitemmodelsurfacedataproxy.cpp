@@ -18,7 +18,6 @@
 
 #include "qitemmodelsurfacedataproxy_p.h"
 #include "surfaceitemmodelhandler_p.h"
-#include <QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -426,7 +425,7 @@ void QItemModelSurfaceDataProxy::setRowCategories(const QStringList &categories)
 {
     if (dptr()->m_rowCategories != categories) {
         dptr()->m_rowCategories = categories;
-        emit rowCategoriesChanged(categories);
+        emit rowCategoriesChanged();
     }
 }
 
@@ -444,7 +443,7 @@ void QItemModelSurfaceDataProxy::setColumnCategories(const QStringList &categori
 {
     if (dptr()->m_columnCategories != categories) {
         dptr()->m_columnCategories = categories;
-        emit columnCategoriesChanged(categories);
+        emit columnCategoriesChanged();
     }
 }
 

@@ -37,10 +37,6 @@
 #include "qscatterdataproxy.h"
 #include "qscatter3dseries.h"
 
-#include <QAbstractItemModel>
-#include <QQuickItem>
-#include <QObject>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class DeclarativeScatter : public AbstractDeclarative

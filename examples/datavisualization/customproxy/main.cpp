@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 #include "rainfallgraph.h"
-#include <QGuiApplication>
+#include <QtGui/QGuiApplication>
 
 using namespace QtDataVisualization;
 

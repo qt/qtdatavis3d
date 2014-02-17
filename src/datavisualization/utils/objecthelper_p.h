@@ -31,7 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 #include "abstractobjecthelper_p.h"
-#include <QOpenGLFunctions>
+#include <QtGui/QOpenGLFunctions>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

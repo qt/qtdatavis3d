@@ -24,7 +24,9 @@
 #include <QtDataVisualization/Q3DCamera>
 #include <QtDataVisualization/QScatter3DSeries>
 #include <QtDataVisualization/Q3DTheme>
-#include <qmath.h>
+#include <QtCore/qmath.h>
+#include <QtCore/QTextStream>
+#include <QtCore/QDebug>
 
 using namespace QtDataVisualization;
 

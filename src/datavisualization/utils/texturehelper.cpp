@@ -19,8 +19,8 @@
 #include "texturehelper_p.h"
 #include "utils_p.h"
 
-#include <QImage>
-#include <QPainter>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

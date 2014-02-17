@@ -31,8 +31,6 @@
 
 #include "datavisualizationglobal_p.h"
 
-#include <QObject>
-
 class QOpenGLContext;
 class QOpenGLPaintDevice;
 
