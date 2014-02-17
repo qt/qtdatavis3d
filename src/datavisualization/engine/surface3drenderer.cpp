@@ -1095,8 +1095,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->surfaceObject()->indexCount() && cache->surfaceVisible() &&
-                    cache->isSeriesVisible()) {
+            if (cache->surfaceObject()->indexCount() && cache->isSeriesVisible()
+                    && (cache->surfaceVisible() || cache->surfaceGridVisible())) {
                 m_drawer->drawObject(m_selectionShader, cache->surfaceObject(),
                                      cache->selectionTexture());
             }
