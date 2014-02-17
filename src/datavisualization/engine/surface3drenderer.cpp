@@ -329,7 +329,7 @@ void Surface3DRenderer::updateRows(const QVector<Surface3DController::ChangeRow>
                 updateBuffers = true;
                 for (int j = 0; j < sampleSpace.width(); j++) {
                     (*(dstArray.at(row - sampleSpace.y())))[j] =
-                        srcArray->at(row)->at(j + sampleSpace.x());
+                            srcArray->at(row)->at(j + sampleSpace.x());
                 }
 
                 if (cache->isFlatShadingEnabled()) {
@@ -404,7 +404,7 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
     } else {
         if (m_selectedSeries) {
             SurfaceSeriesRenderCache *cache =
-                m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+                    m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
             if (cache)
                 updateSliceObject(cache, point);
         }
@@ -653,34 +653,36 @@ void Surface3DRenderer::drawSlicedScene()
         bool drawGrid = false;
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->sliceSurfaceObject()->indexCount() && cache->surfaceVisible()
-                    && cache->isSeriesVisible()) {
+            if (cache->sliceSurfaceObject()->indexCount() && cache->isSeriesVisible()
+                    && (cache->surfaceVisible() || cache->surfaceGridVisible())) {
                 if (cache->surfaceGridVisible()) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
                     glPolygonOffset(0.5f, 1.0f);
                     drawGrid = true;
                 }
 
-                ShaderHelper *surfaceShader = m_surfaceFlatShader;
-                surfaceShader->bind();
+                if (cache->surfaceVisible()) {
+                    ShaderHelper *surfaceShader = m_surfaceFlatShader;
+                    surfaceShader->bind();
 
-                GLuint colorTexture = cache->baseUniformTexture();;
-                if (cache->colorStyle() != Q3DTheme::ColorStyleUniform)
-                    colorTexture = cache->baseGradientTexture();
+                    GLuint colorTexture = cache->baseUniformTexture();;
+                    if (cache->colorStyle() != Q3DTheme::ColorStyleUniform)
+                        colorTexture = cache->baseGradientTexture();
 
-                // Set shader bindings
-                surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
-                surfaceShader->setUniformValue(surfaceShader->view(), viewMatrix);
-                surfaceShader->setUniformValue(surfaceShader->model(), modelMatrix);
-                surfaceShader->setUniformValue(surfaceShader->nModel(),
-                                               itModelMatrix.inverted().transposed());
-                surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
-                surfaceShader->setUniformValue(surfaceShader->lightS(), 0.15f);
-                surfaceShader->setUniformValue(surfaceShader->ambientS(),
-                                               m_cachedTheme->ambientLightStrength() * 2.3f);
-                surfaceShader->setUniformValue(surfaceShader->lightColor(), lightColor);
+                    // Set shader bindings
+                    surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
+                    surfaceShader->setUniformValue(surfaceShader->view(), viewMatrix);
+                    surfaceShader->setUniformValue(surfaceShader->model(), modelMatrix);
+                    surfaceShader->setUniformValue(surfaceShader->nModel(),
+                                                   itModelMatrix.inverted().transposed());
+                    surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
+                    surfaceShader->setUniformValue(surfaceShader->lightS(), 0.15f);
+                    surfaceShader->setUniformValue(surfaceShader->ambientS(),
+                                                   m_cachedTheme->ambientLightStrength() * 2.3f);
+                    surfaceShader->setUniformValue(surfaceShader->lightColor(), lightColor);
 
-                m_drawer->drawObject(surfaceShader, cache->sliceSurfaceObject(), colorTexture);
+                    m_drawer->drawObject(surfaceShader, cache->sliceSurfaceObject(), colorTexture);
+                }
             }
         }
 
