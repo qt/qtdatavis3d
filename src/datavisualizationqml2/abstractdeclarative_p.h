@@ -42,17 +42,20 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+class DeclarativeRenderNode;
+
 class AbstractDeclarative : public QQuickItem
 {
     Q_OBJECT
     Q_ENUMS(ShadowQuality)
+    Q_ENUMS(RenderingMode)
     Q_FLAGS(SelectionFlag SelectionFlags)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Declarative3DScene* scene READ scene NOTIFY sceneChanged)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
-    Q_PROPERTY(bool clearWindowBeforeRendering READ clearWindowBeforeRendering WRITE setClearWindowBeforeRendering NOTIFY clearWindowBeforeRenderingChanged)
+    Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
 
 public:
     enum SelectionFlag {
@@ -79,9 +82,18 @@ public:
         ShadowQualitySoftHigh
     };
 
+    enum RenderingMode {
+        DirectToBackground = 0,
+        DirectToBackground_NoClear,
+        Indirect_NoAA
+    };
+
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
     virtual ~AbstractDeclarative();
+
+    virtual void setRenderingMode(RenderingMode mode);
+    virtual AbstractDeclarative::RenderingMode renderingMode() const;
 
     virtual void setSelectionMode(SelectionFlags mode);
     virtual AbstractDeclarative::SelectionFlags selectionMode() const;
@@ -98,9 +110,6 @@ public:
     virtual Q3DTheme *theme() const;
 
     Q_INVOKABLE virtual void clearSelection();
-
-    virtual void setClearWindowBeforeRendering(bool enable);
-    virtual bool clearWindowBeforeRendering() const;
 
     virtual void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry);
 
@@ -128,6 +137,7 @@ protected:
     virtual void updateWindowParameters();
     virtual void handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode);
     virtual void handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality);
+    virtual QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
 signals:
     void selectionModeChanged(SelectionFlags mode);
@@ -135,12 +145,14 @@ signals:
     void sceneChanged(Q3DScene *scene);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
-    void clearWindowBeforeRenderingChanged(bool enable);
+    void renderingModeChanged(RenderingMode mode);
 
 private:
     QPointer<Abstract3DController> m_controller;
     QRectF m_cachedGeometry;
-    bool m_clearWindowBeforeRendering;
+    AbstractDeclarative::RenderingMode m_renderMode;
+    DeclarativeRenderNode *m_node;
+    QSize m_initialisedSize;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
 

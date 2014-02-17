@@ -19,6 +19,7 @@
 #include "abstractdeclarative_p.h"
 #include "qvalue3daxis.h"
 #include "declarativetheme_p.h"
+#include "declarativerendernode_p.h"
 
 #include <QThread>
 #include <QGuiApplication>
@@ -33,7 +34,9 @@ static QHash<QQuickWindow *, bool> windowClearList;
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
     m_controller(0),
-    m_clearWindowBeforeRendering(true)
+    m_renderMode(DirectToBackground),
+    m_node(0),
+    m_initialisedSize(0, 0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
     setAntialiasing(true);
@@ -43,6 +46,68 @@ AbstractDeclarative::~AbstractDeclarative()
 {
     disconnect(this, 0, this, 0);
     checkWindowList(0);
+}
+
+void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mode)
+{
+    if (mode == m_renderMode)
+        return;
+
+    m_renderMode = mode;
+
+    switch (mode) {
+    case DirectToBackground:
+        // Intentional flowthrough
+    case DirectToBackground_NoClear:
+        // Delete render node
+        delete m_node;
+        m_node = 0;
+        m_initialisedSize = QSize(0, 0);
+        setAntialiasing(true);
+        setFlag(QQuickItem::ItemHasContents, false);
+        break;
+    case Indirect_NoAA:
+        // Force recreation of render node by resetting the initialized size
+        setAntialiasing(false);
+        m_initialisedSize = QSize(0, 0);
+        setFlag(QQuickItem::ItemHasContents, true);
+        break;
+    }
+
+    updateWindowParameters();
+
+    emit renderingModeChanged(mode);
+}
+
+AbstractDeclarative::RenderingMode AbstractDeclarative::renderingMode() const
+{
+    return m_renderMode;
+}
+
+QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+{
+    // If old node exists and has right size, reuse it.
+    if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
+        // Update bounding rectangle (that has same size as before).
+        DeclarativeRenderNode *renderNode = static_cast<DeclarativeRenderNode *>(oldNode);
+        renderNode->setRect(boundingRect());
+        return oldNode;
+    }
+
+    // Create a new render node when size changes or if there is no node yet
+    m_initialisedSize = boundingRect().size().toSize();
+
+    // Delete old node
+    if (oldNode) {
+        m_node = 0;
+        delete oldNode;
+    }
+
+    // Create a new one and set its bounding rectangle
+    DeclarativeRenderNode *node = new DeclarativeRenderNode(window(), m_controller, m_renderMode, this);
+    node->setRect(boundingRect());
+    m_node = node;
+    return node;
 }
 
 Declarative3DScene* AbstractDeclarative::scene() const
@@ -63,19 +128,6 @@ Q3DTheme *AbstractDeclarative::theme() const
 void AbstractDeclarative::clearSelection()
 {
     m_controller->clearSelection();
-}
-
-void AbstractDeclarative::setClearWindowBeforeRendering(bool enable)
-{
-    if (m_clearWindowBeforeRendering != enable) {
-        m_clearWindowBeforeRendering = enable;
-        emit clearWindowBeforeRenderingChanged(enable);
-    }
-}
-
-bool AbstractDeclarative::clearWindowBeforeRendering() const
-{
-    return m_clearWindowBeforeRendering;
 }
 
 void AbstractDeclarative::setSelectionMode(SelectionFlags mode)
@@ -130,7 +182,7 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
 void AbstractDeclarative::synchDataToRenderer()
 {
-    if (m_clearWindowBeforeRendering && clearList.size())
+    if (m_renderMode == DirectToBackground && clearList.size())
         clearList.clear();
     m_controller->initializeOpenGL();
     m_controller->synchDataToRenderer();
@@ -143,12 +195,14 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     if (!window)
         return;
 
-    connect(window, &QQuickWindow::beforeSynchronizing, this,
-            &AbstractDeclarative::synchDataToRenderer, Qt::DirectConnection);
-    connect(window, &QQuickWindow::beforeRendering, this,
-            &AbstractDeclarative::render, Qt::DirectConnection);
-    connect(m_controller.data(), &Abstract3DController::needRender, window,
-            &QQuickWindow::update);
+    connect(window, &QQuickWindow::beforeSynchronizing,
+            this, &AbstractDeclarative::synchDataToRenderer,
+            Qt::DirectConnection);
+    connect(window, &QQuickWindow::beforeRendering,
+            this, &AbstractDeclarative::render,
+            Qt::DirectConnection);
+    connect(m_controller.data(), &Abstract3DController::needRender,
+            window, &QQuickWindow::update);
 
     updateWindowParameters();
 }
@@ -184,9 +238,15 @@ void AbstractDeclarative::updateWindowParameters()
             win->update();
         }
 
-        QPointF point = QQuickItem::mapToScene(QPointF(0.0f, 0.0f));
-        scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
-                                        m_cachedGeometry.height()));
+        if (m_renderMode == DirectToBackground || m_renderMode == DirectToBackground_NoClear) {
+            // Origo mapping is needed when rendering directly to background
+            QPointF point = QQuickItem::mapToScene(QPointF(0.0f, 0.0f));
+            scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
+                                            m_cachedGeometry.height()));
+        } else {
+            // No translation needed when rendering to FBO
+            scene->d_ptr->setViewport(m_cachedGeometry.toRect());
+        }
     }
 }
 
@@ -205,9 +265,13 @@ void AbstractDeclarative::render()
 {
     updateWindowParameters();
 
+    // If we're not rendering directly to the background, return
+    if (m_renderMode != DirectToBackground && m_renderMode != DirectToBackground_NoClear)
+        return;
+
     // Clear the background once per window as that is not done by default
     const QQuickWindow *win = window();
-    if (m_clearWindowBeforeRendering && !clearList.contains(win)) {
+    if (m_renderMode == DirectToBackground && !clearList.contains(win)) {
         clearList.append(win);
         QColor clearColor = win->color();
         glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
