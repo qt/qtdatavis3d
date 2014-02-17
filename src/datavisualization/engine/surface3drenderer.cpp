@@ -1003,7 +1003,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
             SurfaceObject *object = cache->surfaceObject();
-            if (object->indexCount() && cache->surfaceVisible() && cache->isSeriesVisible()) {
+            if (object->indexCount() && cache->surfaceVisible() && cache->isSeriesVisible()
+                    && cache->sampleSpace().width() >= 2 && cache->sampleSpace().height() >= 2) {
                 // 1st attribute buffer : vertices
                 glEnableVertexAttribArray(m_depthShader->posAtt());
                 glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
@@ -1028,7 +1029,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
             SurfaceObject *object = cache->surfaceObject();
-            if (object->indexCount() && cache->surfaceVisible() && cache->isSeriesVisible()) {
+            if (object->indexCount() && cache->surfaceVisible() && cache->isSeriesVisible()
+                    && cache->sampleSpace().width() >= 2 && cache->sampleSpace().height() >= 2) {
                 // 1st attribute buffer : vertices
                 glEnableVertexAttribArray(m_depthShader->posAtt());
                 glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
