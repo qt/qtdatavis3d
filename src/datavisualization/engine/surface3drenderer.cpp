@@ -653,7 +653,8 @@ void Surface3DRenderer::drawSlicedScene()
         bool drawGrid = false;
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->sliceSurfaceObject()->indexCount() && cache->surfaceVisible()) {
+            if (cache->sliceSurfaceObject()->indexCount() && cache->surfaceVisible()
+                    && cache->isSeriesVisible()) {
                 if (cache->surfaceGridVisible()) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
                     glPolygonOffset(0.5f, 1.0f);
