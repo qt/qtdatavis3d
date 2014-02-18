@@ -45,7 +45,8 @@ class DeclarativeRenderNode : public QObject, public QSGSimpleTextureNode
 {
     Q_OBJECT
 public:
-    explicit DeclarativeRenderNode(QQuickWindow *window, Abstract3DController *controller, AbstractDeclarative::RenderingMode mode, QObject *parent = 0);
+    explicit DeclarativeRenderNode(QQuickWindow *window, Abstract3DController *controller,
+                                   AbstractDeclarative::RenderingMode mode, QObject *parent = 0);
     virtual ~DeclarativeRenderNode();
 
     // Renders view to FBO before render cycle starts.
@@ -61,4 +62,4 @@ private:
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 
-#endif // DECLARATIVERENDERNODE_P_H
+#endif

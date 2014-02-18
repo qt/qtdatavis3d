@@ -35,11 +35,14 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
     m_controller(0),
     m_renderMode(DirectToBackground),
-    m_node(0),
     m_initialisedSize(0, 0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
+#if !defined(QT_OPENGL_ES_2)
     setAntialiasing(true);
+#else
+    setAntialiasing(false);
+#endif
 }
 
 AbstractDeclarative::~AbstractDeclarative()
@@ -53,24 +56,41 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
     if (mode == m_renderMode)
         return;
 
+    RenderingMode previousMode = m_renderMode;
+
     m_renderMode = mode;
+
+    QQuickWindow *win = window();
 
     switch (mode) {
     case DirectToBackground:
         // Intentional flowthrough
     case DirectToBackground_NoClear:
-        // Delete render node
-        delete m_node;
-        m_node = 0;
         m_initialisedSize = QSize(0, 0);
+#if !defined(QT_OPENGL_ES_2)
         setAntialiasing(true);
+#else
+        setAntialiasing(false);
+#endif
         setFlag(QQuickItem::ItemHasContents, false);
+
+        if (win && previousMode == Indirect_NoAA) {
+            QObject::connect(win, &QQuickWindow::beforeRendering, this,
+                             &AbstractDeclarative::render);
+            checkWindowList(win);
+        }
+
         break;
     case Indirect_NoAA:
         // Force recreation of render node by resetting the initialized size
         setAntialiasing(false);
         m_initialisedSize = QSize(0, 0);
         setFlag(QQuickItem::ItemHasContents, true);
+        if (win) {
+            QObject::disconnect(win, &QQuickWindow::beforeRendering, this,
+                                &AbstractDeclarative::render);
+            checkWindowList(win);
+        }
         break;
     }
 
@@ -98,15 +118,13 @@ QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeD
     m_initialisedSize = boundingRect().size().toSize();
 
     // Delete old node
-    if (oldNode) {
-        m_node = 0;
+    if (oldNode)
         delete oldNode;
-    }
 
     // Create a new one and set its bounding rectangle
-    DeclarativeRenderNode *node = new DeclarativeRenderNode(window(), m_controller, m_renderMode, this);
+    DeclarativeRenderNode *node = new DeclarativeRenderNode(window(), m_controller,
+                                                            m_renderMode, this);
     node->setRect(boundingRect());
-    m_node = node;
     return node;
 }
 
@@ -198,9 +216,11 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     connect(window, &QQuickWindow::beforeSynchronizing,
             this, &AbstractDeclarative::synchDataToRenderer,
             Qt::DirectConnection);
-    connect(window, &QQuickWindow::beforeRendering,
-            this, &AbstractDeclarative::render,
-            Qt::DirectConnection);
+    if (m_renderMode == DirectToBackground_NoClear || m_renderMode == DirectToBackground) {
+        connect(window, &QQuickWindow::beforeRendering,
+                this, &AbstractDeclarative::render,
+                Qt::DirectConnection);
+    }
     connect(m_controller.data(), &Abstract3DController::needRender,
             window, &QQuickWindow::update);
 
@@ -342,7 +362,7 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
 
     graphWindowList[this] = window;
 
-    if (oldWindow) {
+    if (oldWindow != window && oldWindow) {
         QObject::disconnect(oldWindow, &QQuickWindow::beforeSynchronizing, this,
                             &AbstractDeclarative::synchDataToRenderer);
         QObject::disconnect(oldWindow, &QQuickWindow::beforeRendering, this,
@@ -353,7 +373,12 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
         }
     }
 
-    const QList<QQuickWindow *> windowList = graphWindowList.values();
+    QList<QQuickWindow *> windowList;
+
+    foreach (AbstractDeclarative *graph, graphWindowList.keys()) {
+        if (graph->m_renderMode == DirectToBackground)
+            windowList.append(graphWindowList.value(graph));
+    }
 
     if (oldWindow && !windowList.contains(oldWindow)) {
         // Return window clear value
@@ -366,7 +391,7 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
         return;
     }
 
-    if (window != oldWindow && windowList.size() == 1) {
+    if (m_renderMode == DirectToBackground && windowClearList.values(window).size() == 0) {
         // Save old value clear value
         windowClearList[window] = window->clearBeforeRendering();
         // Disable clearing of the window as we render underneath

@@ -22,7 +22,10 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-DeclarativeRenderNode::DeclarativeRenderNode(QQuickWindow *window, Abstract3DController *controller, AbstractDeclarative::RenderingMode mode, QObject *parent)
+DeclarativeRenderNode::DeclarativeRenderNode(QQuickWindow *window,
+                                             Abstract3DController *controller,
+                                             AbstractDeclarative::RenderingMode mode,
+                                             QObject *parent)
     : QObject(parent),
       m_fbo(0),
       m_texture(0),

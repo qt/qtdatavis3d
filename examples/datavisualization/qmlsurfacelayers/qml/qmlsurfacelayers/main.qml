@@ -230,5 +230,28 @@ Item {
                 }
             }
         }
+
+        NewButton {
+            id: aaButton
+            text: "Disable Antialiasing"
+            Layout.fillWidth: true
+            Layout.minimumHeight: 40
+            visible: false
+            onClicked: {
+                if (surfaceLayers.renderingMode === AbstractGraph3D.Indirect_NoAA) {
+                    surfaceLayers.renderingMode = AbstractGraph3D.DirectToBackground
+                    text = "Disable Antialiasing"
+                } else {
+                    surfaceLayers.renderingMode = AbstractGraph3D.Indirect_NoAA
+                    text = "Enable Antialiasing"
+                }
+            }
+        }
+
+        Component.onCompleted: {
+            if (surfaceLayers.antialiasing) {
+                aaButton.visible = true
+            }
+        }
     }
 }

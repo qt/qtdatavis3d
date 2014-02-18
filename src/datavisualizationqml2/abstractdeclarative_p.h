@@ -150,7 +150,6 @@ private:
     QPointer<Abstract3DController> m_controller;
     QRectF m_cachedGeometry;
     AbstractDeclarative::RenderingMode m_renderMode;
-    DeclarativeRenderNode *m_node;
     QSize m_initialisedSize;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
