@@ -68,41 +68,41 @@
 /*!
   \qmlproperty AbstractGraph3D.RenderingMode AbstractGraph3D::renderingMode
 
-  Defaults to DirectToBackground.
+  Defaults to RenderDirectToBackground.
 
   \table
        \header
            \li Render Mode
            \li Description
        \row
-           \li DirectToBackground
+           \li RenderDirectToBackground
            \li Indicates that the graph should also clear the whole window before
   rendering the graph, including the areas outside the graph.
   Since the graphs in this rendering mode are drawn first under other QML items, the
   regular QML window clearing before rendering is suppressed when there are any graphs
   in the window; the graphs handle the clearing themselves instead.
   If you have any other items besides graphs that do similar
-  custom drawing under other QML items, you need to set this property to DirectToBackground_NoClear
+  custom drawing under other QML items, you need to set this property to RenderDirectToBackground_NoClear
   on all graphs drawn to same window with the other custom items, or it is likely that the
   other custom items do not render properly. If the graphics hardware and current configuration
   supports antialiasing that will be used to provide a higher quality rendering with good performance.
   See \c {QtDataVisualization::qDefaultSurfaceFormat}.
        \row
-           \li DirectToBackground_NoClear
+           \li RenderDirectToBackground_NoClear
            \li Indicates the graph will not clear the whole window before rendering
   the graph. The graphs in this renderind mode are drawn first under other QML items.
   If the graphics hardware and current configuration supports antialiasing that will be
   used to provide a higher quality rendering with good performance.
   See \c {QtDataVisualization::qDefaultSurfaceFormat}.
        \row
-           \li Indirect_NoAA
+           \li RenderIndirect_NoAA
            \li Indicates the graph will be first rendered to an offscreen surface that
   is then drawn during normal QML item rendering to the correct Z order. No antialiasing
   post processing is done on the graph, meaning the quality will be lower but performance
   should be better.
   \endtable
 
-  \note If one graph in the window uses either DirectToBackground or DirectToBackground_NoClear, then all
+  \note If one graph in the window uses either RenderDirectToBackground or RenderDirectToBackground_NoClear, then all
   other graphs in the window drawn in direct mode should use the same rendering mode in that window.
   Otherwise some graphs may not show.
 

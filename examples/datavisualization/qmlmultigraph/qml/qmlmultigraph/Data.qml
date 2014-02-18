@@ -41,8 +41,8 @@ Item {
         ListElement{ row: "3"; col: "3"; longitude: "23.2"; latitude: "13.4"; pop_density: "6.67"; }
         ListElement{ row: "0"; col: "4"; longitude: "20.6"; latitude: "15.0"; pop_density: "6.01"; }
         ListElement{ row: "1"; col: "4"; longitude: "21.3"; latitude: "14.6"; pop_density: "5.83"; }
-        ListElement{ row: "2"; col: "4"; longitude: "22.5"; latitude: "14.8"; pop_density: "5.90"; }
-        ListElement{ row: "3"; col: "4"; longitude: "23.7"; latitude: "14.3"; pop_density: "7.32"; }
+        ListElement{ row: "2"; col: "4"; longitude: "22.5"; latitude: "14.8"; pop_density: "7.32"; }
+        ListElement{ row: "3"; col: "4"; longitude: "23.7"; latitude: "14.3"; pop_density: "6.90"; }
     }
 }
 

@@ -78,8 +78,6 @@ Item {
         Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            border.color: surfaceGraph.theme.gridLineColor // Let's use neighbor's border color
-            border.width: 2
 
             GridLayout {
                 anchors.right: parent.right

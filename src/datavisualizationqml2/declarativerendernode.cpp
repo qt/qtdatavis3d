@@ -80,7 +80,6 @@ void DeclarativeRenderNode::renderFBO()
     m_fbo->release();
 
     // New view is in the FBO, request repaint of scene graph
-    m_window->update();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

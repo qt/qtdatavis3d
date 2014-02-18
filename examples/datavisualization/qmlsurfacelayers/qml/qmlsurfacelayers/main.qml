@@ -238,11 +238,11 @@ Item {
             Layout.minimumHeight: 40
             visible: false
             onClicked: {
-                if (surfaceLayers.renderingMode === AbstractGraph3D.Indirect_NoAA) {
-                    surfaceLayers.renderingMode = AbstractGraph3D.DirectToBackground
+                if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect_NoAA) {
+                    surfaceLayers.renderingMode = AbstractGraph3D.RenderDirectToBackground
                     text = "Disable Antialiasing"
                 } else {
-                    surfaceLayers.renderingMode = AbstractGraph3D.Indirect_NoAA
+                    surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect_NoAA
                     text = "Enable Antialiasing"
                 }
             }

@@ -82,9 +82,9 @@ public:
     };
 
     enum RenderingMode {
-        DirectToBackground = 0,
-        DirectToBackground_NoClear,
-        Indirect_NoAA
+        RenderDirectToBackground = 0,
+        RenderDirectToBackground_NoClear,
+        RenderIndirect_NoAA
     };
 
 public:

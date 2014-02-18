@@ -34,7 +34,7 @@ static QHash<QQuickWindow *, bool> windowClearList;
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
     m_controller(0),
-    m_renderMode(DirectToBackground),
+    m_renderMode(RenderDirectToBackground),
     m_initialisedSize(0, 0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
@@ -63,9 +63,9 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
     QQuickWindow *win = window();
 
     switch (mode) {
-    case DirectToBackground:
+    case RenderDirectToBackground:
         // Intentional flowthrough
-    case DirectToBackground_NoClear:
+    case RenderDirectToBackground_NoClear:
         m_initialisedSize = QSize(0, 0);
 #if !defined(QT_OPENGL_ES_2)
         setAntialiasing(true);
@@ -74,14 +74,14 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
 #endif
         setFlag(QQuickItem::ItemHasContents, false);
 
-        if (win && previousMode == Indirect_NoAA) {
+        if (win && previousMode == RenderIndirect_NoAA) {
             QObject::connect(win, &QQuickWindow::beforeRendering, this,
                              &AbstractDeclarative::render);
             checkWindowList(win);
         }
 
         break;
-    case Indirect_NoAA:
+    case RenderIndirect_NoAA:
         // Force recreation of render node by resetting the initialized size
         setAntialiasing(false);
         m_initialisedSize = QSize(0, 0);
@@ -200,7 +200,7 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
 void AbstractDeclarative::synchDataToRenderer()
 {
-    if (m_renderMode == DirectToBackground && clearList.size())
+    if (m_renderMode == RenderDirectToBackground && clearList.size())
         clearList.clear();
     m_controller->initializeOpenGL();
     m_controller->synchDataToRenderer();
@@ -216,7 +216,7 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     connect(window, &QQuickWindow::beforeSynchronizing,
             this, &AbstractDeclarative::synchDataToRenderer,
             Qt::DirectConnection);
-    if (m_renderMode == DirectToBackground_NoClear || m_renderMode == DirectToBackground) {
+    if (m_renderMode == RenderDirectToBackground_NoClear || m_renderMode == RenderDirectToBackground) {
         connect(window, &QQuickWindow::beforeRendering,
                 this, &AbstractDeclarative::render,
                 Qt::DirectConnection);
@@ -253,19 +253,30 @@ void AbstractDeclarative::updateWindowParameters()
             win->update();
         }
 
-        if (win->size() != scene->d_ptr->windowSize()) {
-            scene->d_ptr->setWindowSize(QSize(win->width(), win->height()));
+        bool directRender = m_renderMode == RenderDirectToBackground
+                || m_renderMode == RenderDirectToBackground_NoClear;
+        QSize windowSize;
+
+        if (directRender)
+            windowSize = win->size();
+        else
+            windowSize = m_cachedGeometry.size().toSize();
+
+
+        if (windowSize != scene->d_ptr->windowSize()) {
+            scene->d_ptr->setWindowSize(windowSize);
             win->update();
         }
 
-        if (m_renderMode == DirectToBackground || m_renderMode == DirectToBackground_NoClear) {
+        if (directRender) {
             // Origo mapping is needed when rendering directly to background
-            QPointF point = QQuickItem::mapToScene(QPointF(0.0f, 0.0f));
+            QPointF point = QQuickItem::mapToScene(QPointF(0.0, 0.0));
             scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
                                             m_cachedGeometry.height()));
         } else {
             // No translation needed when rendering to FBO
-            scene->d_ptr->setViewport(m_cachedGeometry.toRect());
+            scene->d_ptr->setViewport(QRect(0.0, 0.0, m_cachedGeometry.width(),
+                                            m_cachedGeometry.height()));
         }
     }
 }
@@ -286,12 +297,12 @@ void AbstractDeclarative::render()
     updateWindowParameters();
 
     // If we're not rendering directly to the background, return
-    if (m_renderMode != DirectToBackground && m_renderMode != DirectToBackground_NoClear)
+    if (m_renderMode != RenderDirectToBackground && m_renderMode != RenderDirectToBackground_NoClear)
         return;
 
     // Clear the background once per window as that is not done by default
     const QQuickWindow *win = window();
-    if (m_renderMode == DirectToBackground && !clearList.contains(win)) {
+    if (m_renderMode == RenderDirectToBackground && !clearList.contains(win)) {
         clearList.append(win);
         QColor clearColor = win->color();
         glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
@@ -376,7 +387,7 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
     QList<QQuickWindow *> windowList;
 
     foreach (AbstractDeclarative *graph, graphWindowList.keys()) {
-        if (graph->m_renderMode == DirectToBackground)
+        if (graph->m_renderMode == RenderDirectToBackground)
             windowList.append(graphWindowList.value(graph));
     }
 
@@ -391,7 +402,7 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
         return;
     }
 
-    if (m_renderMode == DirectToBackground && windowClearList.values(window).size() == 0) {
+    if (m_renderMode == RenderDirectToBackground && windowClearList.values(window).size() == 0) {
         // Save old value clear value
         windowClearList[window] = window->clearBeforeRendering();
         // Disable clearing of the window as we render underneath
