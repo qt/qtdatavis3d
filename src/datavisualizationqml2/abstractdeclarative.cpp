@@ -72,7 +72,7 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
 #else
         setAntialiasing(false);
 #endif
-        setFlag(QQuickItem::ItemHasContents, false);
+        setFlag(ItemHasContents, false);
 
         if (win && previousMode == RenderIndirect_NoAA) {
             QObject::connect(win, &QQuickWindow::beforeRendering, this,
@@ -85,7 +85,7 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
         // Force recreation of render node by resetting the initialized size
         setAntialiasing(false);
         m_initialisedSize = QSize(0, 0);
-        setFlag(QQuickItem::ItemHasContents, true);
+        setFlag(ItemHasContents, true);
         if (win) {
             QObject::disconnect(win, &QQuickWindow::beforeRendering, this,
                                 &AbstractDeclarative::render);
@@ -269,7 +269,7 @@ void AbstractDeclarative::updateWindowParameters()
         }
 
         if (directRender) {
-            // Origo mapping is needed when rendering directly to background
+            // Origin mapping is needed when rendering directly to background
             QPointF point = QQuickItem::mapToScene(QPointF(0.0, 0.0));
             scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
                                             m_cachedGeometry.height()));
@@ -403,7 +403,7 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
     }
 
     if (m_renderMode == RenderDirectToBackground && windowClearList.values(window).size() == 0) {
-        // Save old value clear value
+        // Save old clear value
         windowClearList[window] = window->clearBeforeRendering();
         // Disable clearing of the window as we render underneath
         window->setClearBeforeRendering(false);
