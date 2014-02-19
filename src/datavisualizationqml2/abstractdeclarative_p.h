@@ -51,6 +51,7 @@ class AbstractDeclarative : public QQuickItem
     Q_FLAGS(SelectionFlag SelectionFlags)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(int msaaSamples READ msaaSamples WRITE setMsaaSamples NOTIFY msaaSamplesChanged)
     Q_PROPERTY(Declarative3DScene* scene READ scene NOTIFY sceneChanged)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
@@ -84,7 +85,7 @@ public:
     enum RenderingMode {
         RenderDirectToBackground = 0,
         RenderDirectToBackground_NoClear,
-        RenderIndirect_NoAA
+        RenderIndirect
     };
 
 public:
@@ -99,6 +100,9 @@ public:
 
     virtual void setShadowQuality(ShadowQuality quality);
     virtual AbstractDeclarative::ShadowQuality shadowQuality() const;
+
+    virtual void setMsaaSamples(int samples);
+    virtual int msaaSamples() const;
 
     virtual Declarative3DScene *scene() const;
 
@@ -116,6 +120,9 @@ public:
     // Used to synch up data model from controller to renderer while main thread is locked
     void synchDataToRenderer();
     void render();
+
+    void activateOpenGLContext(QQuickWindow *window);
+    void doneOpenGLContext(QQuickWindow *window);
 
     void checkWindowList(QQuickWindow *window);
 
@@ -141,6 +148,7 @@ protected:
 signals:
     void selectionModeChanged(SelectionFlags mode);
     void shadowQualityChanged(ShadowQuality quality);
+    void msaaSamplesChanged(int samples);
     void sceneChanged(Q3DScene *scene);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
@@ -149,7 +157,11 @@ signals:
 private:
     QPointer<Abstract3DController> m_controller;
     QRectF m_cachedGeometry;
+    QOpenGLContext *m_context;
+    QOpenGLContext *m_qtContext;
+    QQuickWindow *m_contextWindow;
     AbstractDeclarative::RenderingMode m_renderMode;
+    int m_samples;
     QSize m_initialisedSize;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)

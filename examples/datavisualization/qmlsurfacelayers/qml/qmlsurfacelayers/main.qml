@@ -232,26 +232,40 @@ Item {
         }
 
         NewButton {
-            id: aaButton
-            text: "Disable Antialiasing"
+            id: renderModeButton
+            text: "Switch Render Mode"
             Layout.fillWidth: true
             Layout.minimumHeight: 40
-            visible: false
             onClicked: {
-                if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect_NoAA) {
+                if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
+                        surfaceLayers.msaaSamples === 0) {
                     surfaceLayers.renderingMode = AbstractGraph3D.RenderDirectToBackground
-                    text = "Disable Antialiasing"
+                    renderLabel.text = "Background, " + surfaceLayers.msaaSamples + "xMSAA"
+                } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
+                           surfaceLayers.msaaSamples === 4) {
+                    surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
+                    surfaceLayers.msaaSamples = 0
+                    renderLabel.text = "Indirect, No AA"
+                } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
+                           surfaceLayers.msaaSamples === 8) {
+                    surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
+                    surfaceLayers.msaaSamples = 4
+                    renderLabel.text = "Indirect, 4xMSAA"
                 } else {
-                    surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect_NoAA
-                    text = "Enable Antialiasing"
+                    surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
+                    surfaceLayers.msaaSamples = 8
+                    renderLabel.text = "Indirect, 8xMSAA"
                 }
             }
         }
 
-        Component.onCompleted: {
-            if (surfaceLayers.antialiasing) {
-                aaButton.visible = true
-            }
+        TextField {
+            id: renderLabel
+            Layout.fillWidth: true
+            Layout.minimumHeight: 40
+            enabled: false
+            horizontalAlignment: TextInput.AlignHCenter
+            text: "Indirect, 4xMSAA"
         }
     }
 }

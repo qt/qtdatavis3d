@@ -22,8 +22,6 @@
 #include "declarativerendernode_p.h"
 
 #include <QtCore/QThread>
-#include <QtGui/QGuiApplication>
-#include <QtQuick/QSGSimpleRectNode>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -34,7 +32,15 @@ static QHash<QQuickWindow *, bool> windowClearList;
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
     m_controller(0),
-    m_renderMode(RenderDirectToBackground),
+    m_context(0),
+    m_qtContext(0),
+    m_contextWindow(0),
+    m_renderMode(RenderIndirect),
+#if defined(QT_OPENGL_ES_2)
+    m_samples(0),
+#else
+    m_samples(4),
+#endif
     m_initialisedSize(0, 0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
@@ -43,10 +49,17 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 #else
     setAntialiasing(false);
 #endif
+    setFlag(ItemHasContents, true);
 }
 
 AbstractDeclarative::~AbstractDeclarative()
 {
+    // Context can be in another thread, don't delete it directly in that case
+    if (m_context && m_context->thread() != QThread::currentThread())
+        m_context->deleteLater();
+    else
+        delete m_context;
+
     disconnect(this, 0, this, 0);
     checkWindowList(0);
 }
@@ -68,22 +81,34 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
     case RenderDirectToBackground_NoClear:
         m_initialisedSize = QSize(0, 0);
 #if !defined(QT_OPENGL_ES_2)
-        setAntialiasing(true);
+        if (win && win->format().samples() > 0)
+            setAntialiasing(true);
+        else
+            setAntialiasing(false);
 #else
         setAntialiasing(false);
 #endif
         setFlag(ItemHasContents, false);
 
-        if (win && previousMode == RenderIndirect_NoAA) {
+        if (win && previousMode == RenderIndirect) {
             QObject::connect(win, &QQuickWindow::beforeRendering, this,
                              &AbstractDeclarative::render);
             checkWindowList(win);
+            int samples = win->format().samples();
+            if (samples != m_samples)
+                emit msaaSamplesChanged(samples);
         }
 
         break;
-    case RenderIndirect_NoAA:
-        // Force recreation of render node by resetting the initialized size
+    case RenderIndirect:
+#if !defined(QT_OPENGL_ES_2)
+        if (m_samples > 0)
+            setAntialiasing(true);
+        else
+            setAntialiasing(false);
+#else
         setAntialiasing(false);
+#endif
         m_initialisedSize = QSize(0, 0);
         setFlag(ItemHasContents, true);
         if (win) {
@@ -106,25 +131,25 @@ AbstractDeclarative::RenderingMode AbstractDeclarative::renderingMode() const
 
 QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    // If old node exists and has right size, reuse it.
-    if (oldNode && m_initialisedSize == boundingRect().size().toSize()) {
-        // Update bounding rectangle (that has same size as before).
-        DeclarativeRenderNode *renderNode = static_cast<DeclarativeRenderNode *>(oldNode);
-        renderNode->setRect(boundingRect());
-        return oldNode;
+    QSize boundingSize = boundingRect().size().toSize();
+    if (boundingSize.width() <= 0 || boundingSize.height() <= 0
+            || m_controller.isNull() || !window()) {
+        delete oldNode;
+        return 0;
+    }
+    DeclarativeRenderNode *node = static_cast<DeclarativeRenderNode *>(oldNode);
+
+    if (!node) {
+        node = new DeclarativeRenderNode(this);
+        node->setController(m_controller.data());
+        node->setQuickWindow(window());
     }
 
-    // Create a new render node when size changes or if there is no node yet
-    m_initialisedSize = boundingRect().size().toSize();
+    node->setSize(boundingSize);
+    node->setSamples(m_samples);
+    node->update();
+    node->markDirty(QSGNode::DirtyMaterial);
 
-    // Delete old node
-    if (oldNode)
-        delete oldNode;
-
-    // Create a new one and set its bounding rectangle
-    DeclarativeRenderNode *node = new DeclarativeRenderNode(window(), m_controller,
-                                                            m_renderMode, this);
-    node->setRect(boundingRect());
     return node;
 }
 
@@ -198,12 +223,65 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::handleAxisZChanged);
 }
 
+void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
+{
+    if (!m_context || m_contextWindow != window) {
+        m_contextWindow = window;
+        delete m_context;
+        m_qtContext = QOpenGLContext::currentContext();
+        m_context = new QOpenGLContext();
+        m_context->setFormat(window->requestedFormat());
+        m_context->setShareContext(m_qtContext);
+        m_context->create();
+    }
+    m_context->makeCurrent(window);
+}
+
+void AbstractDeclarative::doneOpenGLContext(QQuickWindow *window)
+{
+    m_qtContext->makeCurrent(window);
+}
+
 void AbstractDeclarative::synchDataToRenderer()
 {
     if (m_renderMode == RenderDirectToBackground && clearList.size())
         clearList.clear();
+
+    QQuickWindow *win = window();
+    activateOpenGLContext(win);
     m_controller->initializeOpenGL();
     m_controller->synchDataToRenderer();
+    doneOpenGLContext(win);
+}
+
+int AbstractDeclarative::msaaSamples() const
+{
+    int samples = m_samples;
+    if (window() && m_renderMode != RenderIndirect)
+        samples = window()->format().samples();
+    return samples;
+}
+
+void AbstractDeclarative::setMsaaSamples(int samples)
+{
+    if (m_renderMode != RenderIndirect) {
+        qWarning("Multisampling cannot be adjusted in this render mode");
+    } else {
+#if defined(QT_OPENGL_ES_2)
+        if (samples > 0)
+            qWarning("Multisampling is not supported in OpenGL ES2");
+#else
+        if (m_samples != samples) {
+            m_samples = samples;
+            if (m_samples > 0)
+                setAntialiasing(true);
+            else
+                setAntialiasing(false);
+            emit msaaSamplesChanged(samples);
+            update();
+        }
+#endif
+    }
 }
 
 void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
@@ -216,13 +294,17 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     connect(window, &QQuickWindow::beforeSynchronizing,
             this, &AbstractDeclarative::synchDataToRenderer,
             Qt::DirectConnection);
-    if (m_renderMode == RenderDirectToBackground_NoClear || m_renderMode == RenderDirectToBackground) {
-        connect(window, &QQuickWindow::beforeRendering,
-                this, &AbstractDeclarative::render,
+
+    if (m_renderMode == RenderDirectToBackground_NoClear
+            || m_renderMode == RenderDirectToBackground) {
+        connect(window, &QQuickWindow::beforeRendering, this, &AbstractDeclarative::render,
                 Qt::DirectConnection);
+        QQuickWindow *oldWindow = graphWindowList.value(this);
+        int samples = window->format().samples();
+        if (oldWindow && samples != oldWindow->format().samples())
+            emit msaaSamplesChanged(samples);
     }
-    connect(m_controller.data(), &Abstract3DController::needRender,
-            window, &QQuickWindow::update);
+    connect(m_controller.data(), &Abstract3DController::needRender, window, &QQuickWindow::update);
 
     updateWindowParameters();
 }
@@ -301,7 +383,8 @@ void AbstractDeclarative::render()
         return;
 
     // Clear the background once per window as that is not done by default
-    const QQuickWindow *win = window();
+    QQuickWindow *win = window();
+    activateOpenGLContext(win);
     if (m_renderMode == RenderDirectToBackground && !clearList.contains(win)) {
         clearList.append(win);
         QColor clearColor = win->color();
@@ -321,6 +404,7 @@ void AbstractDeclarative::render()
 
         glEnable(GL_BLEND);
     }
+    doneOpenGLContext(win);
 }
 
 QAbstract3DInputHandler* AbstractDeclarative::inputHandler() const
@@ -405,7 +489,8 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
         return;
     }
 
-    if ((m_renderMode == RenderDirectToBackground || m_renderMode == RenderDirectToBackground_NoClear)
+    if ((m_renderMode == RenderDirectToBackground
+         || m_renderMode == RenderDirectToBackground_NoClear)
             && windowClearList.values(window).size() == 0) {
         // Save old clear value
         windowClearList[window] = window->clearBeforeRendering();

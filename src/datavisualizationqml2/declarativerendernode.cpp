@@ -17,72 +17,131 @@
 ****************************************************************************/
 
 #include "declarativerendernode_p.h"
-#include <QtQuick/QQuickWindow>
+#include "abstract3dcontroller_p.h"
+#include "abstractdeclarative_p.h"
+#include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFramebufferObject>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-DeclarativeRenderNode::DeclarativeRenderNode(QQuickWindow *window,
-                                             Abstract3DController *controller,
-                                             AbstractDeclarative::RenderingMode mode,
-                                             QObject *parent)
-    : QObject(parent),
-      m_fbo(0),
-      m_texture(0),
-      m_window(window),
-      m_controller(controller),
-      m_mode(mode)
+DeclarativeRenderNode::DeclarativeRenderNode(AbstractDeclarative *declarative)
+    : QSGGeometryNode(),
+    m_geometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4),
+    m_texture(0),
+    m_declarative(declarative),
+    m_controller(0),
+    m_fbo(0),
+    m_multisampledFBO(0),
+    m_window(0),
+    m_dirtyFBO(false),
+    m_samples(0)
 {
-    connect(window, &QQuickWindow::beforeRendering,
-            this, &DeclarativeRenderNode::renderFBO,
-            Qt::DirectConnection);
+    setMaterial(&m_material);
+    setOpaqueMaterial(&m_materialO);
+    setGeometry(&m_geometry);
+    setFlag(UsePreprocess);
 }
 
 DeclarativeRenderNode::~DeclarativeRenderNode()
 {
-    delete m_texture;
     delete m_fbo;
+    delete m_multisampledFBO;
 }
 
-void DeclarativeRenderNode::renderFBO()
+void DeclarativeRenderNode::setSize(const QSize &size)
 {
-    QSize size = rect().size().toSize();
-
-    if (size.width() <= 0 || size.height() <= 0)
+    if (size == m_size)
         return;
 
-    // Create FBO
-    if (!m_fbo) {
-        QOpenGLFramebufferObjectFormat format;
-        format.setAttachment(QOpenGLFramebufferObject::Depth);
-        m_fbo = new QOpenGLFramebufferObject(size, format);
-        m_texture = m_window->createTextureFromId(m_fbo->texture(), size);
+    m_size = size;
+    m_dirtyFBO = true;
+    markDirty(DirtyGeometry);
+}
 
-        setTexture(m_texture);
+void DeclarativeRenderNode::update()
+{
+    if (m_dirtyFBO) {
+        updateFBO();
+        m_dirtyFBO = false;
+    }
+}
 
-        // Flip texture
-        QSize ts = m_texture->textureSize();
-        QRectF sourceRect(0, 0, ts.width(), ts.height());
-        float tmp = sourceRect.top();
-        sourceRect.setTop(sourceRect.bottom());
-        sourceRect.setBottom(tmp);
-        QSGGeometry *geometry = this->geometry();
-        QSGGeometry::updateTexturedRectGeometry(geometry, rect(),
-                                                m_texture->convertToNormalizedSourceRect(sourceRect));
-        markDirty(DirtyMaterial);
+void DeclarativeRenderNode::updateFBO()
+{
+    m_declarative->activateOpenGLContext(m_window);
+
+    if (m_fbo)
+        delete m_fbo;
+
+    m_fbo = new QOpenGLFramebufferObject(m_size);
+    m_fbo->setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+
+    // Multisampled
+    if (m_multisampledFBO) {
+        delete m_multisampledFBO;
+        m_multisampledFBO = 0;
+    }
+    if (m_samples > 0) {
+        QOpenGLFramebufferObjectFormat multisampledFrambufferFormat;
+        multisampledFrambufferFormat.setSamples(m_samples);
+        multisampledFrambufferFormat.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+
+        m_multisampledFBO = new QOpenGLFramebufferObject(m_size, multisampledFrambufferFormat);
     }
 
-    // Call the shared rendering function
-    m_fbo->bind();
-    glDisable(GL_BLEND);
+    QSGGeometry::updateTexturedRectGeometry(&m_geometry,
+                                            QRectF(0, 0, m_size.width(), m_size.height()),
+                                            QRectF(0, 1, 1, -1));
 
-    m_controller->render(m_fbo->handle());
+    delete m_texture;
+    m_texture = m_window->createTextureFromId(m_fbo->texture(), m_size);
+    m_material.setTexture(m_texture);
+    m_materialO.setTexture(m_texture);
 
-    glEnable(GL_BLEND);
+    m_declarative->doneOpenGLContext(m_window);
+}
 
-    m_fbo->release();
+void DeclarativeRenderNode::setQuickWindow(QQuickWindow *window)
+{
+    Q_ASSERT(window);
 
-    // New view is in the FBO, request repaint of scene graph
+    m_window = window;
+}
+
+void DeclarativeRenderNode::setController(Abstract3DController *controller)
+{
+    m_controller = controller;
+}
+
+void DeclarativeRenderNode::setSamples(int samples)
+{
+    if (m_samples == samples)
+        return;
+
+    m_samples = samples;
+    m_dirtyFBO = true;
+}
+
+void DeclarativeRenderNode::preprocess()
+{
+    QOpenGLFramebufferObject *targetFBO;
+    if (m_samples > 0)
+        targetFBO = m_multisampledFBO;
+    else
+        targetFBO = m_fbo;
+
+    m_declarative->activateOpenGLContext(m_window);
+
+    targetFBO->bind();
+    // Render scene here
+    m_controller->render(targetFBO->handle());
+
+    targetFBO->release();
+
+    if (m_samples > 0)
+        QOpenGLFramebufferObject::blitFramebuffer(m_fbo, m_multisampledFBO);
+
+    m_declarative->doneOpenGLContext(m_window);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
