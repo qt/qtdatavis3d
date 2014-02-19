@@ -387,11 +387,14 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
     QList<QQuickWindow *> windowList;
 
     foreach (AbstractDeclarative *graph, graphWindowList.keys()) {
-        if (graph->m_renderMode == RenderDirectToBackground)
+        if (graph->m_renderMode == RenderDirectToBackground
+                || graph->m_renderMode == RenderDirectToBackground_NoClear) {
             windowList.append(graphWindowList.value(graph));
+        }
     }
 
-    if (oldWindow && !windowList.contains(oldWindow)) {
+    if (oldWindow && !windowList.contains(oldWindow)
+            && windowClearList.values(oldWindow).size() != 0) {
         // Return window clear value
         oldWindow->setClearBeforeRendering(windowClearList.value(oldWindow));
         windowClearList.remove(oldWindow);
@@ -402,7 +405,8 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
         return;
     }
 
-    if (m_renderMode == RenderDirectToBackground && windowClearList.values(window).size() == 0) {
+    if ((m_renderMode == RenderDirectToBackground || m_renderMode == RenderDirectToBackground_NoClear)
+            && windowClearList.values(window).size() == 0) {
         // Save old clear value
         windowClearList[window] = window->clearBeforeRendering();
         // Disable clearing of the window as we render underneath
