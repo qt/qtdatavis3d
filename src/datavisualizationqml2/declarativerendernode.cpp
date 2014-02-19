@@ -48,6 +48,9 @@ void DeclarativeRenderNode::renderFBO()
 {
     QSize size = rect().size().toSize();
 
+    if (size.width() <= 0 || size.height() <= 0)
+        return;
+
     // Create FBO
     if (!m_fbo) {
         QOpenGLFramebufferObjectFormat format;
