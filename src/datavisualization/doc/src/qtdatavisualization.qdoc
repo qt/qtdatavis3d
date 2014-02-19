@@ -301,24 +301,34 @@
  * \fn QSurfaceFormat QtDataVisualization::qDefaultSurfaceFormat(bool antialias = true)
  * \relates QAbstract3DGraph
  *
- * Anti-aliasing is turned on by default on C++ and turned off on QML, except in OpenGL ES2
- * environments, where anti-aliasing is not supported by Qt Data Visualization.
- * This convenience function can be used to construct a suitable surface format for use by
+ * This convenience function can be used to create a custom surface format suitable for use by
  * Qt Data Visualization graphs.
- * The \a{antialias} parameter specifies whether or not anti-aliasing is activated.
+ *
+ * The \a antialias parameter specifies whether or not antialiasing is activated.
+ *
  * Give the surface format returned by this function to the graph constructor (C++) or set
  * it as the window format for QQuickView (QML) before calling show on it.
  *
- * For example, disable anti-aliasing on C++ application:
+ * For example, disable antialiasing on C++ application:
  *
  * \code
+ * #include <QtDataVisualization/qutils.h>
+ *
+ * // ...
+ *
  * Q3DBars *graph = new Q3DBars(QtDataVisualization::qDefaultSurfaceFormat(false));
  * \endcode
  *
- * For example, enable anti-aliasing on QML application:
+ * For example, enable antialiasing for direct rendering modes on QML application:
  *
  * \code
- * QtQuick2ApplicationViewer viewer;
+ * #include <QtDataVisualization/qutils.h>
+ *
+ * // ...
+ *
+ * QQuickView viewer;
  * viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
  * \endcode
+ *
+ * \note Antialiasing is not supported in OpenGL ES2 environments.
  */

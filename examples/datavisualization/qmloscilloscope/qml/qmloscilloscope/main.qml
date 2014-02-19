@@ -49,6 +49,9 @@ Item {
             height: dataView.height
             shadowQuality: AbstractGraph3D.ShadowQualityNone
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
+            //! [5]
+            renderingMode: AbstractGraph3D.RenderDirectToBackground
+            //! [5]
 
             axisX.labelFormat: "%d ms"
             axisY.labelFormat: "%d W"

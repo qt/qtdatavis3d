@@ -35,16 +35,6 @@
 
     Before diving into the QML code, let's take a look at the application \c main.cpp.
 
-    Anti-aliasing for Qt Data Visualization graphs in Qt Quick 2 is not supported by default due
-    to technological limitations. To enable anti-aliasing, a custom surface format must be set to
-    the QQuickWindow we are using to show the application in the application \c main.cpp:
-
-    \snippet qmlscatter/main.cpp 1
-    \dots 0
-    \snippet qmlscatter/main.cpp 0
-
-    This will make the graphs nicer to look at.
-
     This application implements a 'Quit' button in the UI, so we want to connect the QQmlEngine::quit()
     signal to our application's QWindow::close() slot:
 

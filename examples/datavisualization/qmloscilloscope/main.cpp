@@ -17,7 +17,10 @@
 ****************************************************************************/
 
 #include "datasource.h"
+
+//! [2]
 #include <QtDataVisualization/qutils.h>
+//! [2]
 
 #include <QtGui/QGuiApplication>
 #include <QtCore/QDir>
@@ -31,8 +34,10 @@ int main(int argc, char *argv[])
 
     QQuickView viewer;
 
-    // Enable antialiasing
+    // Enable antialiasing in direct rendering mode
+    //! [1]
     viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
+    //! [1]
 
     // The following are needed to make examples run without having to install the module
     // in desktop environments.

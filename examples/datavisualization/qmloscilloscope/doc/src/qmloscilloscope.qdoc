@@ -107,4 +107,20 @@
     DataSource at requested intervals. The label update is also triggered on each cycle:
 
     \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 3
+
+    \section1 Enabling direct rendering
+
+    Since this application potentially deals with a lot of rapidly changing data, we use direct
+    rendering mode for performance. To enable antialiasing in this mode the surface format of the application
+    window needs to be changed, as the default format used by QQuickView doesn't support antialiasing.
+    We use the utility function provided by Qt Data Visualization to change the surface format
+    in \c main.cpp:
+
+    \snippet qmloscilloscope/main.cpp 1
+    \dots 0
+    \snippet qmloscilloscope/main.cpp 2
+
+    On the QML side, direct rendering mode is enabled via \l{AbstractGraph3D::renderingMode}{renderingMode} property:
+
+    \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 5
 */

@@ -16,8 +16,6 @@
 **
 ****************************************************************************/
 
-#include <QtDataVisualization/qutils.h>
-
 #include <QtGui/QGuiApplication>
 #include <QtCore/QDir>
 #include <QtQuick/QQuickView>
@@ -28,9 +26,6 @@ int main(int argc, char *argv[])
     QGuiApplication app(argc, argv);
 
     QQuickView viewer;
-
-    // Enable antialiasing
-    viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
 
     // The following are needed to make examples run without having to install the module
     // in desktop environments.
