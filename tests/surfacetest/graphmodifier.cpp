@@ -60,17 +60,34 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe),
       m_drawMode2(QSurface3DSeries::DrawSurfaceAndWireframe),
       m_drawMode3(QSurface3DSeries::DrawSurfaceAndWireframe),
-      m_drawMode4(QSurface3DSeries::DrawSurfaceAndWireframe)
+      m_drawMode4(QSurface3DSeries::DrawSurfaceAndWireframe),
+      m_offset(4.0f)
 {
     m_graph->setAxisX(new QValue3DAxis);
+    m_graph->axisX()->setTitle("X-Axis");
     m_graph->setAxisY(new QValue3DAxis);
+    m_graph->axisY()->setTitle("Value Axis");
     m_graph->setAxisZ(new QValue3DAxis);
+    m_graph->axisZ()->setTitle("Z-Axis");
 #ifdef MULTI_SERIES
     m_limitX = float(m_xCount) / 2.0f;
     m_limitZ = float(m_zCount) / 2.0f;
-    m_graph->axisX()->setRange(-m_limitX, m_limitX);
+    // Series 1
+    m_multiSampleOffsetX[0] = -m_offset;
+    m_multiSampleOffsetZ[0] = -m_offset;
+    // Series 2
+    m_multiSampleOffsetX[1] = -m_offset;
+    m_multiSampleOffsetZ[1] = m_offset;
+    // Series 3
+    m_multiSampleOffsetX[2] = m_offset;
+    m_multiSampleOffsetZ[2] = -m_offset;
+    // Series 4
+    m_multiSampleOffsetX[3] = m_offset;
+    m_multiSampleOffsetZ[3] = m_offset;
+
+    m_graph->axisX()->setRange(-m_limitX - m_offset, m_limitX + m_offset);
     m_graph->axisY()->setRange(-1.0f, 4.5f);
-    m_graph->axisZ()->setRange(-m_limitZ, m_limitZ);
+    m_graph->axisZ()->setRange(-m_limitZ - m_offset, m_limitZ + m_offset);
 #else
     m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
     m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
@@ -79,6 +96,7 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
 
     for (int i = 0; i < 4; i++) {
         m_multiseries[i] = new QSurface3DSeries;
+        m_multiseries[i]->setName(QStringLiteral("Series %1").arg(i+1));
         m_multiseries[i]->setItemLabelFormat(QStringLiteral("@seriesName: (@xLabel, @zLabel): @yLabel"));
     }
 
@@ -105,7 +123,7 @@ GraphModifier::~GraphModifier()
 
 void GraphModifier::fillSeries()
 {
-    int full = m_limitX * m_limitZ;
+    float full = m_limitX * m_limitZ;
 
     QSurfaceDataArray *dataArray1 = new QSurfaceDataArray;
     dataArray1->reserve(m_zCount);
@@ -117,27 +135,21 @@ void GraphModifier::fillSeries()
     dataArray4->reserve(m_zCount);
 
     for (int i = 0; i < m_zCount; i++) {
-        QSurfaceDataRow *newRow1 = new QSurfaceDataRow(m_xCount);
-        QSurfaceDataRow *newRow2 = new QSurfaceDataRow(m_xCount);
-        QSurfaceDataRow *newRow3 = new QSurfaceDataRow(m_xCount);
-        QSurfaceDataRow *newRow4 = new QSurfaceDataRow(m_xCount);
-
-        float z = float(i) - m_limitZ + 0.5f;
-        for (int j = 0; j < m_xCount; j++) {
-            float x = float(j) - m_limitX + 0.5f;
-            float angle = (z * x) / float(full) * 1.57f;
-            (*newRow1)[j].setPosition(QVector3D(x, qSin(angle), z));
-            angle *= 1.3f;
-            (*newRow2)[j].setPosition(QVector3D(x, qSin(angle) + 1.1f, z));
-            angle *= 1.3f;
-            (*newRow3)[j].setPosition(QVector3D(x, qSin(angle) + 2.2f, z));
-            angle *= 1.3f;
-            (*newRow4)[j].setPosition(QVector3D(x, qSin(angle) + 3.3f, z));
+        QSurfaceDataRow *newRow[4];
+        for (int s = 0; s < 4; s++) {
+            newRow[s] = new QSurfaceDataRow(m_xCount);
+            float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[s];
+            for (int j = 0; j < m_xCount; j++) {
+                float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[s];
+                float angle = (z * x) / full * 1.57f;
+                float y = qSin(angle * float(qPow(1.3f, s))) + 1.1f * s;
+                (*newRow[s])[j].setPosition(QVector3D(x, y, z));
+            }
         }
-        *dataArray1 << newRow1;
-        *dataArray2 << newRow2;
-        *dataArray3 << newRow3;
-        *dataArray4 << newRow4;
+        *dataArray1 << newRow[0];
+        *dataArray2 << newRow[1];
+        *dataArray3 << newRow[2];
+        *dataArray4 << newRow[3];
     }
 
     m_multiseries[0]->dataProxy()->resetArray(dataArray1);
@@ -706,7 +718,7 @@ void GraphModifier::changeRow()
         qDebug() << "Generating new values to a row at random pos for series " << changeRowSeries;
 
         int row = rand() % m_zCount;
-        QSurfaceDataRow *newRow = createMultiRow(row, changeRowSeries);
+        QSurfaceDataRow *newRow = createMultiRow(row, changeRowSeries, true);
         m_multiseries[changeRowSeries]->dataProxy()->setRow(row, newRow);
 
         changeRowSeries++;
@@ -718,16 +730,16 @@ void GraphModifier::changeRow()
     }
 }
 
-QSurfaceDataRow *GraphModifier::createMultiRow(int row, int series)
+QSurfaceDataRow *GraphModifier::createMultiRow(int row, int series, bool change)
 {
     int full = m_limitX * m_limitZ;
     float i = float(row);
     QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
-    float z = float(i) - m_limitZ + 0.5f;
+    float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[series];
     for (int j = 0; j < m_xCount; j++) {
-        float x = float(j) - m_limitX + 0.5f;
+        float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[series];
         float angle = (z * x) / float(full) * 1.57f;
-        float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f + 1.1f *series;
+        float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f * float(change) + 1.1f *series;
         (*newRow)[j].setPosition(QVector3D(x, y, z));
     }
 
@@ -770,7 +782,7 @@ void GraphModifier::changeRows()
         int row = rand() % (m_zCount - 3);
         QSurfaceDataArray dataArray;
         for (int i = 0; i < 3; i++) {
-            QSurfaceDataRow *newRow = createMultiRow(row + i, changeRowSeries);
+            QSurfaceDataRow *newRow = createMultiRow(row + i, changeRowSeries, true);
             dataArray.append(newRow);
         }
         m_multiseries[changeRowSeries]->dataProxy()->setRows(row, dataArray);
@@ -810,8 +822,8 @@ void GraphModifier::changeItem()
         int full = m_limitX * m_limitZ;
         float i = float(rand() % m_zCount);
         float j = float(rand() % m_xCount);
-        float x = float(j) - m_limitX + 0.5f;
-        float z = float(i) - m_limitZ + 0.5f;
+        float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[changeItemSeries];
+        float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[changeItemSeries];
         float angle = (z * x) / float(full) * 1.57f;
         float y = qSin(angle * float(qPow(1.3f, changeItemSeries))) + 0.2f + 1.1f *changeItemSeries;
         QSurfaceDataItem newItem(QVector3D(x, y, z));
@@ -864,17 +876,18 @@ void GraphModifier::addRow()
 #ifdef MULTI_SERIES
         qDebug() << "Adding a row into series 3";
         int full = m_limitX * m_limitZ;
+        int series = 2;
 
         QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        float z = float(m_addRowCounter) - m_limitZ + 0.5f + m_multiSampleOffsetZ[series];
         for (int j = 0; j < m_xCount; j++) {
-            float angle = float((float(m_addRowCounter) - m_limitZ + 0.5f) * (float(j) - m_limitX + 0.5f)) / float(full) * 1.57f;
-            (*newRow)[j].setPosition(QVector3D(float(j) - m_limitX + 0.5f,
-                                               qSin(angle * 1.3f * 1.3f) + 2.2f,
-                                               float(m_addRowCounter) - m_limitZ + 0.5f));
+            float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[series];
+            float angle = float(z * x) / float(full) * 1.57f;
+            (*newRow)[j].setPosition(QVector3D(x, qSin(angle *float(qPow(1.3f, series))) + 1.1f * series, z));
         }
         m_addRowCounter++;
 
-        m_multiseries[2]->dataProxy()->addRow(newRow);
+        m_multiseries[series]->dataProxy()->addRow(newRow);
 #else
             qDebug() << "Add row function active only for SqrtSin";
 #endif
@@ -912,22 +925,16 @@ void GraphModifier::addRows()
     } else {
 #ifdef MULTI_SERIES
     qDebug() << "Adding 3 rows into series 3";
-    int full = m_limitX * m_limitZ;
+    int changedSeries = 2;
 
     QSurfaceDataArray dataArray;
     for (int i = 0; i < 3; i++) {
-        QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
-        for (int j = 0; j < m_xCount; j++) {
-            float angle = float((float(m_addRowCounter) - m_limitZ + 0.5f) * (float(j) - m_limitX + 0.5f)) / float(full) * 1.57f;
-            (*newRow)[j].setPosition(QVector3D(float(j) - m_limitX + 0.5f,
-                                               qSin(angle * 1.3f * 1.3f) + 2.2f,
-                                               float(m_addRowCounter) - m_limitZ + 0.5f));
-        }
+        QSurfaceDataRow *newRow = createMultiRow(m_addRowCounter, changedSeries, false);
         dataArray.append(newRow);
         m_addRowCounter++;
     }
 
-    m_multiseries[2]->dataProxy()->addRows(dataArray);
+    m_multiseries[changedSeries]->dataProxy()->addRows(dataArray);
 #else
         qDebug() << "Add rows function active only for SqrtSin";
 #endif
@@ -961,13 +968,16 @@ void GraphModifier::insertRow()
 #ifdef MULTI_SERIES
     qDebug() << "Inserting a row into series 3";
     int full = m_limitX * m_limitZ;
+    int changedSeries = 2;
 
     QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+    float z = float(m_insertTestZPos) - m_limitZ + m_multiSampleOffsetZ[changedSeries];
     for (int j = 0; j < m_xCount; j++) {
-        float angle = float((float(m_insertTestZPos) - m_limitZ) * (float(j) - m_limitX)) / float(full) * 1.57f;
-        (*newRow)[j].setPosition(QVector3D(float(j) - m_limitX + 0.5f,
-                                           qSin(angle) + 2.4f,
-                                           float(m_insertTestZPos) - m_limitZ + 1.0f));
+        float x = float(j) - m_limitX + m_multiSampleOffsetX[changedSeries];
+        float angle = (z * x) / float(full) * 1.57f;
+        (*newRow)[j].setPosition(QVector3D(x + 0.5f,
+                                           qSin(angle * float(qPow(1.3f, changedSeries))) + 1.2f * changedSeries,
+                                           z + 1.0f));
     }
 
     m_insertTestZPos++;
@@ -1011,15 +1021,18 @@ void GraphModifier::insertRows()
 #ifdef MULTI_SERIES
     qDebug() << "Inserting 3 rows into series 3";
     int full = m_limitX * m_limitZ;
+    int changedSeries = 2;
+
     QSurfaceDataArray dataArray;
     float zAdd = 0.25f;
     for (int i = 0; i < 3; i++) {
         QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
+        float z = float(m_insertTestZPos) - m_limitZ  + 0.5f + zAdd + m_multiSampleOffsetZ[changedSeries];
         for (int j = 0; j < m_xCount; j++) {
-            float angle = float((float(m_insertTestZPos) - m_limitZ) * (float(j) - m_limitX)) / float(full) * 1.57f;
-            (*newRow)[j].setPosition(QVector3D(float(j) - m_limitX + 0.5f,
-                                               qSin(angle) + 2.4f,
-                                               float(m_insertTestZPos) - m_limitZ + 0.5f + zAdd));
+            float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[changedSeries];
+            float angle = (z * x) / float(full) * 1.57f;
+            float y = qSin(angle * float(qPow(1.3f, changedSeries))) + + 1.2f * changedSeries;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
         }
         zAdd += 0.25f;
         dataArray.append(newRow);

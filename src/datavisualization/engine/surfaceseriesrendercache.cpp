@@ -37,6 +37,8 @@ SurfaceSeriesRenderCache::SurfaceSeriesRenderCache()
       m_selectionIdEnd(0),
       m_flatChangeAllowed(true),
       m_flatStatusDirty(false),
+      m_scale(QVector3D(1.0f, 1.0f, 1.0f)),
+      m_offset(QVector3D(0.0f, 0.0f, 0.0f)),
       m_valid(false),
       m_objectDirty(true)
 {

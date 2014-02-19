@@ -283,7 +283,6 @@ int main(int argc, char *argv[])
     selectionMode->addItem(QStringLiteral("Multi: Slice, Column & Item"),
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn
                                    | QAbstract3DGraph::SelectionMultiSeries));
-    selectionMode->setCurrentIndex(1);
 
 #ifndef MULTI_SERIES
     QPushButton *selectButton = new QPushButton(widget);
@@ -564,12 +563,13 @@ int main(int argc, char *argv[])
     series1CB->setChecked(true);
     series2CB->setChecked(true);
     series3CB->setChecked(true);
-    series4CB->setChecked(false);
+    series4CB->setChecked(true);
 #endif
     modifier->setAxisRangeSliderX(axisRangeSliderX);
     modifier->setAxisRangeSliderZ(axisRangeSliderZ);
     modifier->setAxisMinSliderX(axisMinSliderX);
     modifier->setAxisMinSliderZ(axisMinSliderZ);
+    selectionMode->setCurrentIndex(1);
 #ifndef MULTI_SERIES
     modifier->setGridSliderZ(gridSliderZ);
     modifier->setGridSliderX(gridSliderX);

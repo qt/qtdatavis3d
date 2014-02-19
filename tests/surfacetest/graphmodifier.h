@@ -119,7 +119,7 @@ private:
     void fillSeries();
     void resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX,
                               float maxX);
-    QSurfaceDataRow *createMultiRow(int row, int series);
+    QSurfaceDataRow *createMultiRow(int row, int series, bool change);
 
     Q3DSurface *m_graph;
     QSurface3DSeries *m_multiseries[4];
@@ -159,6 +159,9 @@ private:
     QSurface3DSeries::DrawFlags m_drawMode4;
     float m_limitX;
     float m_limitZ;
+    float m_offset;
+    float m_multiSampleOffsetX[4];
+    float m_multiSampleOffsetZ[4];
 };
 
 #endif

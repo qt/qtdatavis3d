@@ -65,10 +65,6 @@ private:
     GLfloat m_scaleZ;
     GLfloat m_scaleXWithBackground;
     GLfloat m_scaleZWithBackground;
-    GLfloat m_surfaceScaleX;
-    GLfloat m_surfaceScaleZ;
-    GLfloat m_surfaceOffsetX;
-    GLfloat m_surfaceOffsetZ;
     GLfloat m_minVisibleColumnValue;
     GLfloat m_maxVisibleColumnValue;
     GLfloat m_minVisibleRowValue;
@@ -131,11 +127,14 @@ private:
     void checkFlatSupport(SurfaceSeriesRenderCache *cache);
     void updateObjects(SurfaceSeriesRenderCache *cache, bool dimensionChanged);
     void updateSliceDataModel(const QPoint &point);
+    QPoint mapCoordsToSampleSpace(SurfaceSeriesRenderCache *cache, const QPointF &coords);
+    void findMatchingRow(float y, int &sample, int direction, QSurfaceDataArray &dataArray);
+    void findMatchingColumn(float x, int &sample, int direction, QSurfaceDataArray &dataArray);
     void updateSliceObject(SurfaceSeriesRenderCache *cache, const QPoint &point);
     void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     void updateTextures();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    QRect calculateSampleRect(const QSurfaceDataArray &array);
+    QRect calculateSampleRect(SurfaceSeriesRenderCache *cache, const QSurfaceDataArray &array);
     void loadBackgroundMesh();
     void loadGridLineMesh();
     void loadLabelMesh();

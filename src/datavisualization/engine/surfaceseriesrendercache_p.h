@@ -35,6 +35,8 @@
 #include "qsurface3dseries_p.h"
 #include "surfaceobject_p.h"
 
+#include <QtGui/QMatrix4x4>
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Abstract3DRenderer;
@@ -59,7 +61,7 @@ public:
     inline bool isValid() const { return m_valid; }
     inline SurfaceObject *surfaceObject() { return m_surfaceObj; }
     inline SurfaceObject *sliceSurfaceObject() { return m_sliceSurfaceObj; }
-    inline const QRect sampleSpace() const { return m_sampleSpace; }
+    inline const QRect &sampleSpace() const { return m_sampleSpace; }
     inline void setSampleSpace(const QRect &sampleSpace) { m_sampleSpace = sampleSpace; }
     inline QSurface3DSeries *series() const { return static_cast<QSurface3DSeries *>(m_series); }
     inline QSurfaceDataArray &dataArray() { return m_dataArray; }
@@ -76,6 +78,13 @@ public:
                                                         selection <= m_selectionIdEnd; }
     inline bool isFlatStatusDirty() const { return m_flatStatusDirty; }
     inline void setFlatStatusDirty(bool status) { m_flatStatusDirty = status; }
+    inline void setScale(const QVector3D &scale) { m_scale = scale; }
+    inline const QVector3D &scale() const { return m_scale; }
+    inline void setOffset(const QVector3D &offset) { m_offset = offset; }
+    inline const QVector3D &offset() const { return m_offset; }
+    // m_MVPMatrix is volatile, used only for optimizing rendering a bit
+    inline void setMVPMatrix(const QMatrix4x4 &matrix) { m_MVPMatrix = matrix; }
+    inline const QMatrix4x4 &MVPMatrix() { return m_MVPMatrix; }
 
 protected:
     bool m_surfaceVisible;
@@ -91,6 +100,9 @@ protected:
     uint m_selectionIdEnd;
     bool m_flatChangeAllowed;
     bool m_flatStatusDirty;
+    QVector3D m_scale;
+    QVector3D m_offset;
+    QMatrix4x4 m_MVPMatrix;
 
     bool m_valid;
     bool m_objectDirty;
