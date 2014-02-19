@@ -45,14 +45,14 @@ Item {
 
         ColorGradient {
             id: layerTwoGradient
-            ColorGradientStop { position: 0.0; color: "red" }
-            ColorGradientStop { position: 0.15; color: "black" }
+            ColorGradientStop { position: 0.315; color: "blue" }
+            ColorGradientStop { position: 0.33; color: "white" }
         }
 
         ColorGradient {
             id: layerThreeGradient
-            ColorGradientStop { position: 0.315; color: "blue" }
-            ColorGradientStop { position: 0.33; color: "white" }
+            ColorGradientStop { position: 0.0; color: "red" }
+            ColorGradientStop { position: 0.15; color: "black" }
         }
         //! [0]
 
@@ -140,13 +140,13 @@ Item {
 
                 CheckBox {
                     id: layerTwoToggle
-                    text: "Show Tectonic Layer"
+                    text: "Show Sea Layer"
                     checked: true
                 }
 
                 CheckBox {
                     id: layerThreeToggle
-                    text: "Show Sea Layer"
+                    text: "Show Tectonic Layer"
                     checked: true
                 }
             }
@@ -171,7 +171,7 @@ Item {
 
                 CheckBox {
                     id: layerTwoGrid
-                    text: "Show Tectonic as Grid"
+                    text: "Show Sea as Grid"
                     onCheckedChanged: {
                         if (checked)
                             layerTwoSeries.drawMode = Surface3DSeries.DrawWireframe
@@ -182,7 +182,7 @@ Item {
 
                 CheckBox {
                     id: layerThreeGrid
-                    text: "Show Sea as Grid"
+                    text: "Show Tectonic as Grid"
                     onCheckedChanged: {
                         if (checked)
                             layerThreeSeries.drawMode = Surface3DSeries.DrawWireframe
