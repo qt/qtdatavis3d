@@ -21,7 +21,7 @@ import QtQuick.Controls 1.0
 import QtDataVisualization 1.0
 import "."
 
-Item {
+Rectangle {
     id: mainview
     width: 1280
     height: 1024

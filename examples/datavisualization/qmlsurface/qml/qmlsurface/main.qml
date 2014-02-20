@@ -21,12 +21,11 @@ import QtQuick.Layouts 1.0
 import QtDataVisualization 1.0
 import "."
 
-Item {
+Rectangle {
     id: mainview
     width: 1280
     height: 720
 
-    property int buttonMaximumWidth: surfaceGridToggle.width
     property int buttonMinimumHeight: seriesToggle.height
 
     Data {
@@ -35,9 +34,10 @@ Item {
 
     Item {
         id: surfaceView
-        width: mainview.width - buttonLayout.width
+        width: mainview.width
         height: mainview.height
-        anchors.right: mainview.right;
+        anchors.top: buttonLayout.bottom
+        anchors.left: mainview.left
 
         //! [0]
         ColorGradient {
@@ -49,7 +49,7 @@ Item {
         //! [0]
 
         Surface3D {
-            id: surfaceplot
+            id: surfacePlot
             width: surfaceView.width
             height: surfaceView.height
             //! [7]
@@ -99,35 +99,35 @@ Item {
                     flatShadingToggle.text = "Flat not supported"
                 }
             }
+            //! [4]
+            Surface3DSeries {
+                id: heightSeries
+                flatShadingEnabled: false
+                drawMode: Surface3DSeries.DrawSurface
+                visible: false
+
+                HeightMapSurfaceDataProxy {
+                    heightMapFile: ":/heightmaps/image"
+                    // We don't want the default data values set by heightmap proxy.
+                    minZValue: 30
+                    maxZValue: 60
+                    minXValue: 67
+                    maxXValue: 97
+                }
+            }
+            //! [4]
         }
     }
 
-    // TODO: Kept outside until surface supports multiple added series (QTRD-2579)
-    //! [4]
-    Surface3DSeries {
-        id: heightSeries
-        flatShadingEnabled: false
-        drawMode: Surface3DSeries.DrawSurface
-
-        HeightMapSurfaceDataProxy {
-            heightMapFile: ":/heightmaps/image"
-            // We don't want the default data values set by heightmap proxy.
-            minZValue: 30
-            maxZValue: 60
-            minXValue: 67
-            maxXValue: 97
-        }
-    }
-    //! [4]
-    ColumnLayout {
+    RowLayout {
         id: buttonLayout
+        width: parent.width
         anchors.top: parent.top
         anchors.left: parent.left
         spacing: 0
 
         NewButton {
             id: surfaceGridToggle
-            Layout.maximumWidth: buttonMaximumWidth
             Layout.fillWidth: true
             Layout.minimumHeight: buttonMinimumHeight
             text: "Show Surface Grid"
@@ -148,7 +148,6 @@ Item {
 
         NewButton {
             id: surfaceToggle
-            Layout.maximumWidth: buttonMaximumWidth
             Layout.fillWidth: true
             Layout.minimumHeight: buttonMinimumHeight
             text: "Hide Surface"
@@ -169,7 +168,6 @@ Item {
 
         NewButton {
             id: flatShadingToggle
-            Layout.maximumWidth: buttonMaximumWidth
             Layout.fillWidth: true
             Layout.minimumHeight: buttonMinimumHeight
 
@@ -192,16 +190,15 @@ Item {
 
         NewButton {
             id: backgroundToggle
-            Layout.maximumWidth: buttonMaximumWidth
             Layout.fillWidth: true
             Layout.minimumHeight: buttonMinimumHeight
             text: "Hide Background"
             onClicked: {
-                if (surfaceplot.theme.backgroundEnabled === true) {
-                    surfaceplot.theme.backgroundEnabled = false;
+                if (surfacePlot.theme.backgroundEnabled === true) {
+                    surfacePlot.theme.backgroundEnabled = false;
                     text = "Show Background"
                 } else {
-                    surfaceplot.theme.backgroundEnabled = true;
+                    surfacePlot.theme.backgroundEnabled = true;
                     text = "Hide Background"
                 }
             }
@@ -209,16 +206,15 @@ Item {
 
         NewButton {
             id: gridToggle
-            Layout.maximumWidth: buttonMaximumWidth
             Layout.fillWidth: true
             Layout.minimumHeight: buttonMinimumHeight
             text: "Hide Grid"
             onClicked: {
-                if (surfaceplot.theme.gridEnabled === true) {
-                    surfaceplot.theme.gridEnabled = false;
+                if (surfacePlot.theme.gridEnabled === true) {
+                    surfacePlot.theme.gridEnabled = false;
                     text = "Show Grid"
                 } else {
-                    surfaceplot.theme.gridEnabled = true;
+                    surfacePlot.theme.gridEnabled = true;
                     text = "Hide Grid"
                 }
             }
@@ -226,20 +222,21 @@ Item {
 
         NewButton {
             id: seriesToggle
-            Layout.maximumWidth: buttonMaximumWidth
             Layout.fillWidth: true
             Layout.minimumHeight: buttonMinimumHeight
             text: "Switch to Height Map Series"
             //! [3]
             onClicked: {
-                if (surfaceplot.seriesList[0] === heightSeries) {
-                    surfaceplot.axisY.max = 500.0
-                    surfaceplot.seriesList = [surfaceSeries]
+                if (surfaceSeries.visible === false) {
+                    surfacePlot.axisY.max = 500.0
+                    surfaceSeries.visible = true
+                    heightSeries.visible = false
                     middleGradient.position = 0.25
                     text = "Switch to Height Map Series"
                 } else {
-                    surfaceplot.axisY.max = 250.0
-                    surfaceplot.seriesList = [heightSeries]
+                    surfacePlot.axisY.max = 250.0
+                    surfaceSeries.visible = false
+                    heightSeries.visible = true
                     middleGradient.position = 0.50
                     text = "Switch to Item Model Series"
                 }

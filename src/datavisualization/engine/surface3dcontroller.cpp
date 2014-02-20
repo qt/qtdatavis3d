@@ -445,6 +445,7 @@ void Surface3DController::adjustValueAxisRange()
     bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
     bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
     bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());
+    bool first = true;
 
     if (adjustX || adjustY || adjustZ) {
         float minValueX = 0.0f;
@@ -463,7 +464,7 @@ void Surface3DController::adjustValueAxisRange()
                 QVector3D maxLimits;
                 proxy->dptrc()->limitValues(minLimits, maxLimits);
                 if (adjustX) {
-                    if (!series) {
+                    if (first) {
                         // First series initializes the values
                         minValueX = minLimits.x();
                         maxValueX = maxLimits.x();
@@ -473,7 +474,7 @@ void Surface3DController::adjustValueAxisRange()
                     }
                 }
                 if (adjustY) {
-                    if (!series) {
+                    if (first) {
                         // First series initializes the values
                         minValueY = minLimits.y();
                         maxValueY = maxLimits.y();
@@ -483,7 +484,7 @@ void Surface3DController::adjustValueAxisRange()
                     }
                 }
                 if (adjustZ) {
-                    if (!series) {
+                    if (first) {
                         // First series initializes the values
                         minValueZ = minLimits.z();
                         maxValueZ = maxLimits.z();
@@ -492,6 +493,7 @@ void Surface3DController::adjustValueAxisRange()
                         maxValueZ = qMax(maxValueZ, maxLimits.z());
                     }
                 }
+                first = false;
             }
         }
 

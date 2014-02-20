@@ -21,7 +21,7 @@ import QtQuick.Layouts 1.0
 import QtDataVisualization 1.0
 import "."
 
-Item {
+Rectangle {
     id: mainView
     width: 1280
     height: 720
@@ -168,7 +168,7 @@ Item {
 
             onClicked: {
                 if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftMedium;
+                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
                     text = "Hide Shadows";
                 } else {
                     scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;

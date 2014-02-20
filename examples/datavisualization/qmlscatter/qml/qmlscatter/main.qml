@@ -24,7 +24,7 @@ import "."
 //! [0]
 
 //! [1]
-Item {
+Rectangle {
     id: mainView
     //! [1]
 

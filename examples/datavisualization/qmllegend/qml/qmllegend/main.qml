@@ -22,7 +22,7 @@ import QtQuick.Layouts 1.0
 import QtDataVisualization 1.0
 import "."
 
-Item {
+Rectangle {
     id: mainView
     width: 800
     height: 600
