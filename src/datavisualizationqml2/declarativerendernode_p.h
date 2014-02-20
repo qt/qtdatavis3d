@@ -26,8 +26,8 @@
 //
 // We mean it.
 
-#ifndef DeclarativeRenderNode_P_H
-#define DeclarativeRenderNode_P_H
+#ifndef DECLARATIVERENDERNODE_P_H
+#define DECLARATIVERENDERNODE_P_H
 
 #include "datavisualizationglobal_p.h"
 
