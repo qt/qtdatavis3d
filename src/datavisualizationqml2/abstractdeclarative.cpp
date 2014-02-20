@@ -88,9 +88,10 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
 #else
         setAntialiasing(false);
 #endif
-        setFlag(ItemHasContents, false);
-
         if (win && previousMode == RenderIndirect) {
+            update();
+            setFlag(ItemHasContents, false);
+
             QObject::connect(win, &QQuickWindow::beforeRendering, this,
                              &AbstractDeclarative::render);
             checkWindowList(win);
@@ -111,6 +112,7 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
 #endif
         m_initialisedSize = QSize(0, 0);
         setFlag(ItemHasContents, true);
+        update();
         if (win) {
             QObject::disconnect(win, &QQuickWindow::beforeRendering, this,
                                 &AbstractDeclarative::render);
