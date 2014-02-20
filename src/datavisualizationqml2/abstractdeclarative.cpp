@@ -88,16 +88,17 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
 #else
         setAntialiasing(false);
 #endif
-        if (win && previousMode == RenderIndirect) {
+        if (previousMode == RenderIndirect) {
             update();
             setFlag(ItemHasContents, false);
-
-            QObject::connect(win, &QQuickWindow::beforeRendering, this,
-                             &AbstractDeclarative::render);
-            checkWindowList(win);
-            int samples = win->format().samples();
-            if (samples != m_samples)
-                emit msaaSamplesChanged(samples);
+            if (win) {
+                QObject::connect(win, &QQuickWindow::beforeRendering, this,
+                                 &AbstractDeclarative::render);
+                checkWindowList(win);
+                int samples = win->format().samples();
+                if (samples != m_samples)
+                    emit msaaSamplesChanged(samples);
+            }
         }
 
         break;
