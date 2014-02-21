@@ -33,8 +33,8 @@ DeclarativeRenderNode::DeclarativeRenderNode(AbstractDeclarative *declarative)
     m_fbo(0),
     m_multisampledFBO(0),
     m_window(0),
-    m_dirtyFBO(false),
-    m_samples(0)
+    m_samples(0),
+    m_dirtyFBO(false)
 {
     setMaterial(&m_material);
     setOpaqueMaterial(&m_materialO);

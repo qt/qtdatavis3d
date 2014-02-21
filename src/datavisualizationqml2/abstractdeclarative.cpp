@@ -54,11 +54,13 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 
 AbstractDeclarative::~AbstractDeclarative()
 {
+#if 0 //!defined(Q_OS_MAC)
     // Context can be in another thread, don't delete it directly in that case
     if (m_context && m_context->thread() != QThread::currentThread())
         m_context->deleteLater();
     else
         delete m_context;
+#endif
 
     disconnect(this, 0, this, 0);
     checkWindowList(0);
@@ -93,7 +95,7 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
             setFlag(ItemHasContents, false);
             if (win) {
                 QObject::connect(win, &QQuickWindow::beforeRendering, this,
-                                 &AbstractDeclarative::render);
+                                 &AbstractDeclarative::render, Qt::DirectConnection);
                 checkWindowList(win);
                 int samples = win->format().samples();
                 if (samples != m_samples)
@@ -228,6 +230,7 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 {
+#if 0 //!defined(Q_OS_MAC)
     if (!m_context || m_contextWindow != window) {
         m_contextWindow = window;
         delete m_context;
@@ -238,11 +241,18 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
         m_context->create();
     }
     m_context->makeCurrent(window);
+#else
+    Q_UNUSED(window)
+#endif
 }
 
 void AbstractDeclarative::doneOpenGLContext(QQuickWindow *window)
 {
+#if 0 //!defined(Q_OS_MAC)
     m_qtContext->makeCurrent(window);
+#else
+    Q_UNUSED(window)
+#endif
 }
 
 void AbstractDeclarative::synchDataToRenderer()
