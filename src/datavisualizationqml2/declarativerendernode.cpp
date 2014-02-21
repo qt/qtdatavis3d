@@ -90,7 +90,9 @@ void DeclarativeRenderNode::updateFBO()
     }
 
     QSGGeometry::updateTexturedRectGeometry(&m_geometry,
-                                            QRectF(0, 0, m_size.width(), m_size.height()),
+                                            QRectF(0, 0,
+                                                   m_size.width() / m_controller->scene()->devicePixelRatio(),
+                                                   m_size.height() / m_controller->scene()->devicePixelRatio()),
                                             QRectF(0, 1, 1, -1));
 
     delete m_texture;

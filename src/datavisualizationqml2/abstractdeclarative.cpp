@@ -136,7 +136,7 @@ AbstractDeclarative::RenderingMode AbstractDeclarative::renderingMode() const
 
 QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
-    QSize boundingSize = boundingRect().size().toSize();
+    QSize boundingSize = boundingRect().size().toSize() * m_controller->scene()->devicePixelRatio();
     if (boundingSize.width() <= 0 || boundingSize.height() <= 0
             || m_controller.isNull() || !window()) {
         delete oldNode;
@@ -356,7 +356,6 @@ void AbstractDeclarative::updateWindowParameters()
             windowSize = win->size();
         else
             windowSize = m_cachedGeometry.size().toSize();
-
 
         if (windowSize != scene->d_ptr->windowSize()) {
             scene->d_ptr->setWindowSize(windowSize);
