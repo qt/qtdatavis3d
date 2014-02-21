@@ -1082,20 +1082,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Get the depth view matrix
         // It may be possible to hack lightPos here if we want to make some tweaks to shadow
         QVector3D depthLightPos = activeCamera->d_ptr->calculatePositionRelativeToCamera(
-                    zeroVector, 0.0f, 3.5f / m_autoScaleAdjustment);
+                    zeroVector, 0.0f, 4.0f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
 
         // Set the depth projection matrix
-#ifndef USE_WIDER_SHADOWS
-        // Use this for perspective shadows
         depthProjectionMatrix.perspective(10.0f, (GLfloat)m_primarySubViewport.width()
                                           / (GLfloat)m_primarySubViewport.height(), 3.0f, 100.0f);
-#else
-        // Use these for orthographic shadows
-        depthProjectionMatrix.ortho(-2.0f * 2.0f, 2.0f * 2.0f,
-                                    -2.0f, 2.0f,
-                                    0.0f, 100.0f);
-#endif
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
         glDisable(GL_CULL_FACE);
