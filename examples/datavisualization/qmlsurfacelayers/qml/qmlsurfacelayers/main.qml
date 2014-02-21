@@ -237,25 +237,32 @@ Item {
             Layout.fillWidth: true
             Layout.minimumHeight: 40
             onClicked: {
+                var modeText = "Indirect "
+                var aaText
                 if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
                         surfaceLayers.msaaSamples === 0) {
                     surfaceLayers.renderingMode = AbstractGraph3D.RenderDirectToBackground
-                    renderLabel.text = "Background, " + surfaceLayers.msaaSamples + "xMSAA"
+                    modeText = "BackGround "
                 } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
                            surfaceLayers.msaaSamples === 4) {
                     surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
                     surfaceLayers.msaaSamples = 0
-                    renderLabel.text = "Indirect, No AA"
                 } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
                            surfaceLayers.msaaSamples === 8) {
                     surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
                     surfaceLayers.msaaSamples = 4
-                    renderLabel.text = "Indirect, 4xMSAA"
                 } else {
                     surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
                     surfaceLayers.msaaSamples = 8
-                    renderLabel.text = "Indirect, 8xMSAA"
                 }
+
+                if (surfaceLayers.msaaSamples <= 0) {
+                    aaText = "No AA"
+                } else {
+                    aaText = surfaceLayers.msaaSamples + "xMSAA"
+                }
+
+                renderLabel.text = modeText + aaText
             }
         }
 
@@ -265,7 +272,7 @@ Item {
             Layout.minimumHeight: 40
             enabled: false
             horizontalAlignment: TextInput.AlignHCenter
-            text: "Indirect, 4xMSAA"
+            text: "Indirect, " + surfaceLayers.msaaSamples + "xMSAA"
         }
     }
 }
