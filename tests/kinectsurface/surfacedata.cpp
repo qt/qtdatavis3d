@@ -16,8 +16,6 @@
 **
 ****************************************************************************/
 
-#define NOMINMAX
-
 #include "surfacedata.h"
 #include "QKinectWrapper.h"
 #include <QtDataVisualization/QValue3DAxis>

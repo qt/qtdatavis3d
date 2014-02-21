@@ -19,6 +19,8 @@
 #ifndef SURFACEDATA_H
 #define SURFACEDATA_H
 
+#define NOMINMAX
+
 #include "QKinectWrapper.h"
 #include <QtDataVisualization/Q3DScatter>
 #include <QtDataVisualization/Q3DBars>
