@@ -34,6 +34,7 @@
 #include "qabstract3dseries_p.h"
 #include "qsurface3dseries_p.h"
 #include "surfaceobject_p.h"
+#include "selectionpointer_p.h"
 
 #include <QtGui/QMatrix4x4>
 
@@ -67,6 +68,8 @@ public:
     inline QSurfaceDataArray &dataArray() { return m_dataArray; }
     inline QSurfaceDataArray &sliceDataArray() { return m_sliceDataArray; }
     inline bool isSeriesVisible() const { return m_series->isVisible(); }
+    inline bool renderable() const { return m_series->isVisible() && (m_surfaceVisible ||
+                                                                      m_surfaceGridVisible); }
     inline void setObjectDirty(bool state) { m_objectDirty = state; }
     inline bool objectDirty() const { return m_objectDirty; }
     inline void setSelectionTexture(GLuint texture) { m_selectionTexture = texture; }
@@ -86,6 +89,16 @@ public:
     inline void setMVPMatrix(const QMatrix4x4 &matrix) { m_MVPMatrix = matrix; }
     inline const QMatrix4x4 &MVPMatrix() { return m_MVPMatrix; }
 
+    inline void setSliceSelectionPointer(SelectionPointer *pointer) { m_sliceSelectionPointer = pointer; }
+    inline SelectionPointer *sliceSelectionPointer() const { return m_sliceSelectionPointer; }
+    inline void setMainSelectionPointer(SelectionPointer *pointer) { m_mainSelectionPointer = pointer; }
+    inline SelectionPointer *mainSelectionPointer() const { return m_mainSelectionPointer; }
+
+    inline void setSlicePointerActivity(bool activity) { m_slicePointerActive = activity; }
+    inline bool slicePointerActive() const { return m_slicePointerActive; }
+    inline void setMainPointerActivity(bool activity) { m_mainPointerActive = activity; }
+    inline bool mainPointerActive() const { return m_mainPointerActive; }
+
 protected:
     bool m_surfaceVisible;
     bool m_surfaceGridVisible;
@@ -103,6 +116,10 @@ protected:
     QVector3D m_scale;
     QVector3D m_offset;
     QMatrix4x4 m_MVPMatrix;
+    SelectionPointer *m_sliceSelectionPointer;
+    SelectionPointer *m_mainSelectionPointer;
+    bool m_slicePointerActive;
+    bool m_mainPointerActive;
 
     bool m_valid;
     bool m_objectDirty;

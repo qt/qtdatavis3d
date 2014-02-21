@@ -82,7 +82,6 @@ private:
     GLuint m_selectionResultTexture;
     GLfloat m_shadowQualityToShader;
     bool m_flatSupported;
-    SelectionPointer *m_selectionPointer;
     bool m_selectionActive;
     bool m_xFlipped;
     bool m_zFlipped;
@@ -151,8 +150,9 @@ private:
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
     void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
     void surfacePointSelected(const QPoint &point);
+    void updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point, bool label);
     QPoint selectionIdToSurfacePoint(uint id);
-    QString createSelectionLabel(float value, int column, int row);
+    QString createSelectionLabel(SurfaceSeriesRenderCache *cache, float value, int column, int row);
 #if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();
 #endif

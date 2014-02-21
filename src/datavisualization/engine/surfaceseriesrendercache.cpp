@@ -39,6 +39,10 @@ SurfaceSeriesRenderCache::SurfaceSeriesRenderCache()
       m_flatStatusDirty(false),
       m_scale(QVector3D(1.0f, 1.0f, 1.0f)),
       m_offset(QVector3D(0.0f, 0.0f, 0.0f)),
+      m_sliceSelectionPointer(0),
+      m_mainSelectionPointer(0),
+      m_slicePointerActive(false),
+      m_mainPointerActive(false),
       m_valid(false),
       m_objectDirty(true)
 {
@@ -55,6 +59,9 @@ SurfaceSeriesRenderCache::~SurfaceSeriesRenderCache()
     for (int i = 0; i < m_sliceDataArray.size(); i++)
         delete m_sliceDataArray.at(i);
     m_sliceDataArray.clear();
+
+    delete m_sliceSelectionPointer;
+    delete m_mainSelectionPointer;
 }
 
 void SurfaceSeriesRenderCache::populate(QSurface3DSeries *series, Abstract3DRenderer *renderer)

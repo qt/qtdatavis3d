@@ -80,7 +80,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionResultTexture(0),
       m_shadowQualityToShader(33.3f),
       m_flatSupported(true),
-      m_selectionPointer(0),
       m_selectionActive(false),
       m_xFlipped(false),
       m_zFlipped(false),
@@ -136,8 +135,6 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_backgroundObj;
     delete m_gridLineObj;
     delete m_labelObj;
-
-    delete m_selectionPointer;
 
     foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
         delete cache;
@@ -268,6 +265,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         }
     }
 
+    // Remove non-valid objects from the cache list
     foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
         if (!cache->isValid()) {
             if (cache->series() == m_selectedSeries)
@@ -280,15 +278,23 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         }
     }
 
-    if (m_selectionPointer && m_selectedSeries) {
-        SurfaceSeriesRenderCache *cache =
-                m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
-        if (cache) {
-            m_selectionPointer->setHighlightColor(
-                        Utils::vectorFromColor(m_selectedSeries->singleHighlightColor()));
-            // Make sure selection pointer object reference is still good
-            m_selectionPointer->setPointerObject(cache->object());
-            m_selectionPointer->setRotation(cache->meshRotation());
+    // Selection pointer issues
+    if (m_selectedSeries) {
+        foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
+            QVector3D highlightColor =
+                    Utils::vectorFromColor(cache->series()->singleHighlightColor());
+            SelectionPointer *slicePointer = cache->sliceSelectionPointer();
+            if (slicePointer) {
+                slicePointer->setHighlightColor(highlightColor);
+                slicePointer->setPointerObject(cache->object());
+                slicePointer->setRotation(cache->meshRotation());
+            }
+            SelectionPointer *mainPointer = cache->mainSelectionPointer();
+            if (mainPointer) {
+                mainPointer->setHighlightColor(highlightColor);
+                mainPointer->setPointerObject(cache->object());
+                mainPointer->setRotation(cache->meshRotation());
+            }
         }
     }
 }
@@ -419,7 +425,7 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 }
 
 QPoint Surface3DRenderer::mapCoordsToSampleSpace(SurfaceSeriesRenderCache *cache,
-                                               const QPointF &coords)
+                                                 const QPointF &coords)
 {
     QPoint point(-1, -1);
 
@@ -674,7 +680,7 @@ void Surface3DRenderer::updateScene(Q3DScene *scene)
 
     Abstract3DRenderer::updateScene(scene);
 
-    if (m_selectionPointer && m_selectionActive
+    if (m_selectionActive
             && m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem)) {
         m_selectionDirty = true; // Ball may need repositioning if scene changes
     }
@@ -692,9 +698,16 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
         drawSlicedScene();
 
     // Render selection ball
-    if (m_selectionPointer && m_selectionActive
+    if (m_selectionActive
             && m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem)) {
-        m_selectionPointer->render(defaultFboHandle);
+        foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
+            if (cache->slicePointerActive() && cache->renderable() &&
+                    m_cachedIsSlicingActivated ) {
+                cache->sliceSelectionPointer()->render(defaultFboHandle);
+            }
+            if (cache->mainPointerActive() && cache->renderable())
+                cache->mainSelectionPointer()->render(defaultFboHandle);
+        }
     }
 }
 
@@ -739,8 +752,7 @@ void Surface3DRenderer::drawSlicedScene()
         bool drawGrid = false;
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->sliceSurfaceObject()->indexCount() && cache->isSeriesVisible()
-                    && (cache->surfaceVisible() || cache->surfaceGridVisible())) {
+            if (cache->sliceSurfaceObject()->indexCount() && cache->renderable()) {
                 if (cache->surfaceGridVisible()) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
                     glPolygonOffset(0.5f, 1.0f);
@@ -1189,8 +1201,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glDisable(GL_CULL_FACE);
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            if (cache->surfaceObject()->indexCount() && cache->isSeriesVisible()
-                    && (cache->surfaceVisible() || cache->surfaceGridVisible())) {
+            if (cache->surfaceObject()->indexCount() && cache->renderable()) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
@@ -2111,48 +2122,101 @@ void Surface3DRenderer::loadGridLineMesh()
 
 void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 {
+    foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
+        cache->setSlicePointerActivity(false);
+        cache->setMainPointerActivity(false);
+    }
+
+    if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)) {
+        // Find axis coordinates for the selected point
+        SurfaceSeriesRenderCache *selectedCache =
+            m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+        QSurfaceDataArray &dataArray = selectedCache->dataArray();
+        QSurfaceDataItem item = dataArray.at(point.x())->at(point.y());
+        QPointF coords(item.x(), item.z());
+
+        foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
+            if (cache->series() != m_selectedSeries) {
+                QPoint mappedPoint = mapCoordsToSampleSpace(cache, coords);
+                updateSelectionPoint(cache, mappedPoint, false);
+            } else {
+                updateSelectionPoint(cache, point, true);
+            }
+        }
+    } else {
+        if (m_selectedSeries) {
+            SurfaceSeriesRenderCache *cache =
+                    m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+            if (cache)
+                updateSelectionPoint(cache, point, true);
+        }
+    }
+}
+
+void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point,
+                                             bool label)
+{
     int row = point.x();
     int column = point.y();
 
-    SurfaceSeriesRenderCache *cache =
-            m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+    if (column < 0 || row < 0)
+        return;
+
     QSurfaceDataArray &dataArray = cache->dataArray();
     float value = dataArray.at(row)->at(column).y();
 
-    if (!m_selectionPointer)
-        m_selectionPointer = new SelectionPointer(m_drawer);
-
-    QVector3D pos;
-    const QVector3D &scale = cache->scale();
-    const QVector3D &offset = cache->offset();
-    if (m_cachedIsSlicingActivated) {
-        if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
-            pos = cache->sliceSurfaceObject()->vertexAt(column, 0);
-            pos *= QVector3D(scale.x(), 1.0f, 0.0f);
-            pos += QVector3D(offset.x(), 0.0f, 0.0f);
-            m_selectionPointer->updateBoundingRect(m_secondarySubViewport);
-            m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
-        } else if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
-            pos = cache->sliceSurfaceObject()->vertexAt(row, 0);
-            pos *= QVector3D(scale.z(), 1.0f, 0.0f);
-            pos += QVector3D(-offset.z(), 0.0f, 0.0f);
-            m_selectionPointer->updateBoundingRect(m_secondarySubViewport);
-            m_selectionPointer->updateSliceData(true, m_autoScaleAdjustment);
-        }
-    } else {
-        pos = cache->surfaceObject()->vertexAt(column, row);
-        pos *= scale;
-        pos += offset;
-        m_selectionPointer->updateBoundingRect(m_primarySubViewport);
-        m_selectionPointer->updateSliceData(false, m_autoScaleAdjustment);
+    SelectionPointer *slicePointer = cache->sliceSelectionPointer();
+    if (!slicePointer && m_cachedIsSlicingActivated) {
+        slicePointer = new SelectionPointer(m_drawer);
+        cache->setSliceSelectionPointer(slicePointer);
+    }
+    SelectionPointer *mainPointer = cache->mainSelectionPointer();
+    if (!mainPointer) {
+        mainPointer = new SelectionPointer(m_drawer);
+        cache->setMainSelectionPointer(mainPointer);
     }
 
-    m_selectionPointer->setPosition(pos);
-    m_selectionPointer->setLabel(createSelectionLabel(value, column, row));
-    m_selectionPointer->setPointerObject(cache->object());
-    m_selectionPointer->setHighlightColor(cache->singleHighlightColor());
-    m_selectionPointer->updateScene(m_cachedScene);
-    m_selectionPointer->setRotation(cache->meshRotation());
+    const QVector3D &scale = cache->scale();
+    const QVector3D &offset = cache->offset();
+    QString selectionLabel;
+    if (label)
+        selectionLabel = createSelectionLabel(cache, value, column, row);
+
+    if (m_cachedIsSlicingActivated) {
+        QVector3D subPos;
+        if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
+            subPos = cache->sliceSurfaceObject()->vertexAt(column, 0);
+            subPos *= QVector3D(scale.x(), 1.0f, 0.0f);
+            subPos += QVector3D(offset.x(), 0.0f, 0.0f);
+        } else if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
+            subPos = cache->sliceSurfaceObject()->vertexAt(row, 0);
+            subPos *= QVector3D(scale.z(), 1.0f, 0.0f);
+            subPos += QVector3D(-offset.z(), 0.0f, 0.0f);
+        }
+        slicePointer->updateBoundingRect(m_secondarySubViewport);
+        slicePointer->updateSliceData(true, m_autoScaleAdjustment);
+        slicePointer->setPosition(subPos);
+        slicePointer->setLabel(selectionLabel);
+        slicePointer->setPointerObject(cache->object());
+        slicePointer->setHighlightColor(cache->singleHighlightColor());
+        slicePointer->updateScene(m_cachedScene);
+        slicePointer->setRotation(cache->meshRotation());
+        cache->setSlicePointerActivity(true);
+    }
+
+    QVector3D mainPos;
+    mainPos = cache->surfaceObject()->vertexAt(column, row);
+    mainPos *= scale;
+    mainPos += offset;
+    mainPointer->updateBoundingRect(m_primarySubViewport);
+    mainPointer->updateSliceData(false, m_autoScaleAdjustment);
+    mainPointer->setPosition(mainPos);
+    mainPointer->setLabel(selectionLabel);
+    mainPointer->setPointerObject(cache->object());
+    mainPointer->setHighlightColor(cache->singleHighlightColor());
+    mainPointer->updateScene(m_cachedScene);
+    mainPointer->setRotation(cache->meshRotation());
+    cache->setMainPointerActivity(true);
 }
 
 // Maps selection Id to surface point in data array
@@ -2179,10 +2243,9 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
     return QPoint(row, column);
 }
 
-QString Surface3DRenderer::createSelectionLabel(float value, int column, int row)
+QString Surface3DRenderer::createSelectionLabel(SurfaceSeriesRenderCache *cache, float value,
+                                                int column, int row)
 {
-    SurfaceSeriesRenderCache *cache =
-            m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
     QSurfaceDataArray &dataArray = cache->dataArray();
     QString labelText = cache->itemLabelFormat();
     static const QString xTitleTag(QStringLiteral("@xTitle"));
@@ -2290,6 +2353,11 @@ void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 #endif
 
     m_selectionDirty = true;
+
+    foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
+        if (cache->mainSelectionPointer())
+            cache->mainSelectionPointer()->updateBoundingRect(m_primarySubViewport);
+    }
 }
 
 void Surface3DRenderer::loadLabelMesh()

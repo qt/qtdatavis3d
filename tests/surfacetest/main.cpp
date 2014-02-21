@@ -255,6 +255,8 @@ int main(int argc, char *argv[])
                                int(QAbstract3DGraph::SelectionNone));
     selectionMode->addItem(QStringLiteral("Item"),
                                int(QAbstract3DGraph::SelectionItem));
+    selectionMode->addItem(QStringLiteral("Multi: Item"),
+                               int(QAbstract3DGraph::SelectionItem | QAbstract3DGraph::SelectionMultiSeries));
     selectionMode->addItem(QStringLiteral("Row"),
                                int(QAbstract3DGraph::SelectionRow));
     selectionMode->addItem(QStringLiteral("Item and Row"),
