@@ -50,12 +50,38 @@ Rectangle {
             //! [1]
 
             Scatter3DSeries {
-                id: scatterSeries
-                itemLabelFormat: "X:@xLabel Y:@yLabel Z:@zLabel"
+                id: scatterSeriesOne
+                itemLabelFormat: "One - X:@xLabel Y:@yLabel Z:@zLabel"
                 mesh: Abstract3DSeries.MeshCube
 
                 ItemModelScatterDataProxy {
-                    itemModel: graphData.model
+                    itemModel: graphData.modelOne
+                    xPosRole: "xPos"
+                    yPosRole: "yPos"
+                    zPosRole: "zPos"
+                }
+            }
+
+            Scatter3DSeries {
+                id: scatterSeriesTwo
+                itemLabelFormat: "Two - X:@xLabel Y:@yLabel Z:@zLabel"
+                mesh: Abstract3DSeries.MeshCube
+
+                ItemModelScatterDataProxy {
+                    itemModel: graphData.modelTwo
+                    xPosRole: "xPos"
+                    yPosRole: "yPos"
+                    zPosRole: "zPos"
+                }
+            }
+
+            Scatter3DSeries {
+                id: scatterSeriesThree
+                itemLabelFormat: "Three - X:@xLabel Y:@yLabel Z:@zLabel"
+                mesh: Abstract3DSeries.MeshCube
+
+                ItemModelScatterDataProxy {
+                    itemModel: graphData.modelThree
                     xPosRole: "xPos"
                     yPosRole: "yPos"
                     zPosRole: "zPos"
