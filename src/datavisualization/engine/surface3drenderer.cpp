@@ -753,7 +753,7 @@ void Surface3DRenderer::drawSlicedScene()
 
         foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
             if (cache->sliceSurfaceObject()->indexCount() && cache->renderable()) {
-                if (cache->surfaceGridVisible()) {
+                if (!drawGrid && cache->surfaceGridVisible()) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
                     glPolygonOffset(0.5f, 1.0f);
                     drawGrid = true;
@@ -810,6 +810,7 @@ void Surface3DRenderer::drawSlicedScene()
 
         // Draw surface grid
         if (drawGrid) {
+            glDisable(GL_POLYGON_OFFSET_FILL);
             m_surfaceGridShader->bind();
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
                                                  Utils::vectorFromColor(m_cachedTheme->gridLineColor()));
@@ -820,8 +821,6 @@ void Surface3DRenderer::drawSlicedScene()
                     m_drawer->drawSurfaceGrid(m_surfaceGridShader, cache->sliceSurfaceObject());
                 }
             }
-
-            glDisable(GL_POLYGON_OFFSET_FILL);
         }
     }
 
@@ -1269,7 +1268,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             if (cache->surfaceObject()->indexCount() && cache->isSeriesVisible() &&
                     sampleSpace.width() >= 2 && sampleSpace.height() >= 2) {
                 noShadows = false;
-                if (cache->surfaceGridVisible()) {
+                if (!drawGrid && cache->surfaceGridVisible()) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
                     glPolygonOffset(0.5f, 1.0f);
                     drawGrid = true;
@@ -1326,6 +1325,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Draw surface grid
         if (drawGrid) {
+            glDisable(GL_POLYGON_OFFSET_FILL);
             m_surfaceGridShader->bind();
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
                                                  Utils::vectorFromColor(m_cachedTheme->gridLineColor()));
@@ -1338,8 +1338,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     m_drawer->drawSurfaceGrid(m_surfaceGridShader, cache->surfaceObject());
                 }
             }
-
-            glDisable(GL_POLYGON_OFFSET_FILL);
         }
     }
 
