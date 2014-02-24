@@ -1636,12 +1636,6 @@ void Scatter3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Me
     }
 }
 
-void Scatter3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientation,
-                                        float min, float max)
-{
-    Abstract3DRenderer::updateAxisRange(orientation, min, max);
-}
-
 void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 {
     // We need to normalize translations
