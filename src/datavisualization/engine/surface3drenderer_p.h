@@ -127,7 +127,7 @@ private:
     void updateObjects(SurfaceSeriesRenderCache *cache, bool dimensionChanged);
     void updateSliceDataModel(const QPoint &point);
     QPoint mapCoordsToSampleSpace(SurfaceSeriesRenderCache *cache, const QPointF &coords);
-    void findMatchingRow(float y, int &sample, int direction, QSurfaceDataArray &dataArray);
+    void findMatchingRow(float z, int &sample, int direction, QSurfaceDataArray &dataArray);
     void findMatchingColumn(float x, int &sample, int direction, QSurfaceDataArray &dataArray);
     void updateSliceObject(SurfaceSeriesRenderCache *cache, const QPoint &point);
     void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);

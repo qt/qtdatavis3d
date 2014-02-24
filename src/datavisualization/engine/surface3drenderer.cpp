@@ -476,16 +476,16 @@ QPoint Surface3DRenderer::mapCoordsToSampleSpace(SurfaceSeriesRenderCache *cache
     return point;
 }
 
-void Surface3DRenderer::findMatchingRow(float y, int &sample, int direction,
+void Surface3DRenderer::findMatchingRow(float z, int &sample, int direction,
                                         QSurfaceDataArray &dataArray)
 {
-    int maxY = dataArray.size() - 1;
+    int maxZ = dataArray.size() - 1;
     QSurfaceDataItem item = dataArray.at(sample)->at(0);
-    float distance = qAbs(y - item.z());
+    float distance = qAbs(z - item.z());
     int newSample = sample + direction;
-    while (newSample >= 0 && newSample <= maxY) {
+    while (newSample >= 0 && newSample <= maxZ) {
         item = dataArray.at(newSample)->at(0);
-        float newDist = qAbs(y - item.z());
+        float newDist = qAbs(z - item.z());
         if (newDist < distance) {
             sample = newSample;
             distance = newDist;
