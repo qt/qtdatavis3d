@@ -60,7 +60,7 @@ private:
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
-    QVector<BarRenderItem *> m_sliceSelection;
+    QVector<BarRenderSliceItem> m_sliceSelection;
     AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
     bool m_xFlipped;

@@ -45,12 +45,8 @@ public:
     inline const QVector3D &position() const { return m_position; }
     inline void setPosition(const QVector3D &pos)
     {
-        if (m_position != pos) {
+        if (m_position != pos)
             m_position = pos;
-            // Force reformatting on next access by setting label string to null string
-            if (!m_selectionLabel.isNull())
-                setSelectionLabel(QString());
-        }
     }
 
     inline bool isVisible() const { return m_visible; }

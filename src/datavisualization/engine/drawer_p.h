@@ -43,6 +43,7 @@ class AbstractObjectHelper;
 class SurfaceObject;
 class TextureHelper;
 class Q3DCamera;
+class Abstract3DRenderer;
 
 class Drawer : public QObject, public QOpenGLFunctions
 {
@@ -83,7 +84,7 @@ public:
                    LabelPosition position = LabelOver,
                    Qt::AlignmentFlag alignment = Qt::AlignCenter, bool isSlicing = false);
 
-    void generateSelectionLabelTexture(AbstractRenderItem *item);
+    void generateSelectionLabelTexture(Abstract3DRenderer *item);
     void generateLabelItem(LabelItem &item, const QString &text, int widestLabel = 0);
 
 Q_SIGNALS:

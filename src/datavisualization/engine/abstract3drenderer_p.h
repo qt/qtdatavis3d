@@ -101,6 +101,10 @@ public:
     inline void clearClickPending() { m_clickPending = false; }
     inline QAbstract3DSeries *clickedSeries() const { return m_clickedSeries; }
 
+    LabelItem &selectionLabelItem();
+    void setSelectionLabel(const QString &label);
+    QString &selectionLabel();
+
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
     void requestShadowQuality(QAbstract3DGraph::ShadowQuality quality); // For automatic quality adjustments
@@ -145,6 +149,9 @@ protected:
     bool m_selectionLabelDirty;
     bool m_clickPending;
     QAbstract3DSeries *m_clickedSeries;
+
+    QString m_selectionLabel;
+    LabelItem *m_selectionLabelItem;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;

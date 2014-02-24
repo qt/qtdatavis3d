@@ -1460,10 +1460,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     } else {
         glDisable(GL_DEPTH_TEST);
         // Draw the selection label
-        LabelItem &labelItem = selectedItem->selectionLabelItem();
+        LabelItem &labelItem = selectionLabelItem();
         if (m_selectedItem != selectedItem || m_updateLabels
                 || !labelItem.textureId() || m_selectionLabelDirty) {
-            QString labelText = selectedItem->selectionLabel();
+            QString labelText = selectionLabel();
             if (labelText.isNull() || m_selectionLabelDirty) {
                 static const QString xTitleTag(QStringLiteral("@xTitle"));
                 static const QString yTitleTag(QStringLiteral("@yTitle"));
@@ -1505,7 +1505,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 }
                 labelText.replace(seriesNameTag, m_visibleSeriesList[m_selectedItemSeriesIndex].name());
 
-                selectedItem->setSelectionLabel(labelText);
+                setSelectionLabel(labelText);
                 m_selectionLabelDirty = false;
             }
             m_drawer->generateLabelItem(labelItem, labelText);
@@ -1534,6 +1534,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 void Scatter3DRenderer::updateSelectedItem(int index, const QScatter3DSeries *series)
 {
     m_selectionDirty = true;
+    m_selectionLabelDirty = true;
     m_selectedSeries = series;
     m_selectedItemIndex = Scatter3DController::invalidSelectionIndex();
     m_selectedItemTotalIndex = Scatter3DController::invalidSelectionIndex();

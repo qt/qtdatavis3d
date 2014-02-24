@@ -50,13 +50,6 @@ public:
     inline void setTranslation(const QVector3D &translation) { m_translation = translation; }
     inline const QVector3D &translation() const {return m_translation; }
 
-    // Selection label item (containing special selection texture, if mode is activated)
-    LabelItem &selectionLabelItem();
-
-    // Formatted selection label for item.
-    void setSelectionLabel(const QString &label);
-    QString &selectionLabel(); // Formats selection label if not previously formatted
-
     inline QQuaternion rotation() const { return m_rotation; }
     inline void setRotation(const QQuaternion &rotation)
     {
@@ -65,9 +58,7 @@ public:
     }
 
 protected:
-    QString m_selectionLabel;
     QVector3D m_translation;
-    LabelItem *m_selectionLabelItem;
     QQuaternion m_rotation;
 
     friend class QAbstractDataItem;
