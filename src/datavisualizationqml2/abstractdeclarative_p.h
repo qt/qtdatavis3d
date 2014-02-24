@@ -130,6 +130,7 @@ public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisZChanged(QAbstract3DAxis *axis) = 0;
+    void windowDestroyed(QObject *obj);
 
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event);
@@ -162,6 +163,7 @@ private:
     QQuickWindow *m_contextWindow;
     AbstractDeclarative::RenderingMode m_renderMode;
     int m_samples;
+    int m_windowSamples;
     QSize m_initialisedSize;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)

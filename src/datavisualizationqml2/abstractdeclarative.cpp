@@ -41,14 +41,11 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 #else
     m_samples(4),
 #endif
+    m_windowSamples(0),
     m_initialisedSize(0, 0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
-#if !defined(QT_OPENGL_ES_2)
-    setAntialiasing(true);
-#else
-    setAntialiasing(false);
-#endif
+    setAntialiasing(m_samples > 0);
     setFlag(ItemHasContents, true);
 }
 
@@ -82,14 +79,6 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
         // Intentional flowthrough
     case RenderDirectToBackground_NoClear:
         m_initialisedSize = QSize(0, 0);
-#if !defined(QT_OPENGL_ES_2)
-        if (win && win->format().samples() > 0)
-            setAntialiasing(true);
-        else
-            setAntialiasing(false);
-#else
-        setAntialiasing(false);
-#endif
         if (previousMode == RenderIndirect) {
             update();
             setFlag(ItemHasContents, false);
@@ -97,22 +86,13 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
                 QObject::connect(win, &QQuickWindow::beforeRendering, this,
                                  &AbstractDeclarative::render, Qt::DirectConnection);
                 checkWindowList(win);
-                int samples = win->format().samples();
-                if (samples != m_samples)
-                    emit msaaSamplesChanged(samples);
+                setAntialiasing(m_windowSamples > 0);
+                if (m_windowSamples != m_samples)
+                    emit msaaSamplesChanged(m_windowSamples);
             }
         }
-
         break;
     case RenderIndirect:
-#if !defined(QT_OPENGL_ES_2)
-        if (m_samples > 0)
-            setAntialiasing(true);
-        else
-            setAntialiasing(false);
-#else
-        setAntialiasing(false);
-#endif
         m_initialisedSize = QSize(0, 0);
         setFlag(ItemHasContents, true);
         update();
@@ -121,6 +101,9 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
                                 &AbstractDeclarative::render);
             checkWindowList(win);
         }
+        setAntialiasing(m_samples > 0);
+        if (m_windowSamples != m_samples)
+            emit msaaSamplesChanged(m_samples);
         break;
     }
 
@@ -269,10 +252,10 @@ void AbstractDeclarative::synchDataToRenderer()
 
 int AbstractDeclarative::msaaSamples() const
 {
-    int samples = m_samples;
-    if (window() && m_renderMode != RenderIndirect)
-        samples = window()->format().samples();
-    return samples;
+    if (m_renderMode == RenderIndirect)
+        return m_samples;
+    else
+        return m_windowSamples;
 }
 
 void AbstractDeclarative::setMsaaSamples(int samples)
@@ -286,10 +269,7 @@ void AbstractDeclarative::setMsaaSamples(int samples)
 #else
         if (m_samples != samples) {
             m_samples = samples;
-            if (m_samples > 0)
-                setAntialiasing(true);
-            else
-                setAntialiasing(false);
+            setAntialiasing(m_samples > 0);
             emit msaaSamplesChanged(samples);
             update();
         }
@@ -304,6 +284,13 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     if (!window)
         return;
 
+    connect(window, &QObject::destroyed, this, &AbstractDeclarative::windowDestroyed);
+
+    int oldWindowSamples = m_windowSamples;
+    m_windowSamples = window->format().samples();
+    if (m_windowSamples < 0)
+        m_windowSamples = 0;
+
     connect(window, &QQuickWindow::beforeSynchronizing,
             this, &AbstractDeclarative::synchDataToRenderer,
             Qt::DirectConnection);
@@ -312,11 +299,11 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
             || m_renderMode == RenderDirectToBackground) {
         connect(window, &QQuickWindow::beforeRendering, this, &AbstractDeclarative::render,
                 Qt::DirectConnection);
-        QQuickWindow *oldWindow = graphWindowList.value(this);
-        int samples = window->format().samples();
-        if (oldWindow && samples != oldWindow->format().samples())
-            emit msaaSamplesChanged(samples);
+        setAntialiasing(m_windowSamples > 0);
+        if (m_windowSamples != oldWindowSamples)
+            emit msaaSamplesChanged(m_windowSamples);
     }
+
     connect(m_controller.data(), &Abstract3DController::needRender, window, &QQuickWindow::update);
 
     updateWindowParameters();
@@ -470,6 +457,8 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
     graphWindowList[this] = window;
 
     if (oldWindow != window && oldWindow) {
+        QObject::disconnect(oldWindow, &QObject::destroyed, this,
+                            &AbstractDeclarative::windowDestroyed);
         QObject::disconnect(oldWindow, &QQuickWindow::beforeSynchronizing, this,
                             &AbstractDeclarative::synchDataToRenderer);
         QObject::disconnect(oldWindow, &QQuickWindow::beforeRendering, this,
@@ -509,6 +498,18 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
         // Disable clearing of the window as we render underneath
         window->setClearBeforeRendering(false);
     }
+}
+
+void AbstractDeclarative::windowDestroyed(QObject *obj)
+{
+    // Remove destroyed window from window lists
+    QQuickWindow *win = static_cast<QQuickWindow *>(obj);
+    QQuickWindow *oldWindow = graphWindowList.value(this);
+
+    if (win == oldWindow)
+        graphWindowList.remove(this);
+
+    windowClearList.remove(win);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
