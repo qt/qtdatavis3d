@@ -393,6 +393,17 @@ void Surface3DRenderer::updateItem(const QVector<Surface3DController::ChangeItem
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
+void Surface3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
+                                        float max)
+{
+    Abstract3DRenderer::updateAxisRange(orientation, min, max);
+
+    if (orientation == QAbstract3DAxis::AxisOrientationY) {
+        foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
+            cache->setObjectDirty(true);
+    }
+}
+
 void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 {
     foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
@@ -576,7 +587,8 @@ void Surface3DRenderer::updateSliceObject(SurfaceSeriesRenderCache *cache, const
     }
 }
 
-QRect Surface3DRenderer::calculateSampleRect(SurfaceSeriesRenderCache *cache, const QSurfaceDataArray &array)
+QRect Surface3DRenderer::calculateSampleRect(SurfaceSeriesRenderCache *cache,
+                                             const QSurfaceDataArray &array)
 {
     QRect sampleSpace;
 
@@ -2079,6 +2091,7 @@ void Surface3DRenderer::updateObjects(SurfaceSeriesRenderCache *cache, bool dime
 {
     QSurfaceDataArray &dataArray = cache->dataArray();
     const QRect &sampleSpace = cache->sampleSpace();
+
 
     if (cache->isFlatShadingEnabled()) {
         cache->surfaceObject()->setUpData(dataArray, sampleSpace, m_heightNormalizer,

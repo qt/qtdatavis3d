@@ -107,6 +107,7 @@ public:
     void modifiedSeriesList(const QVector<QSurface3DSeries *> &seriesList);
     void updateRows(const QVector<Surface3DController::ChangeRow> &rows);
     void updateItem(const QVector<Surface3DController::ChangeItem> &points);
+    void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
     void updateScene(Q3DScene *scene);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);
