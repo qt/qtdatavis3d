@@ -23,10 +23,9 @@ import "."
 
 Rectangle {
     id: mainview
-    width: 1280
-    height: 720
-
-    property int buttonMinimumHeight: seriesToggle.height
+    width: 1024
+    height: 768
+    color: surfacePlot.theme.windowColor
 
     Data {
         id: surfaceData
@@ -36,7 +35,7 @@ Rectangle {
         id: surfaceView
         width: mainview.width
         height: mainview.height
-        anchors.top: buttonLayout.bottom
+        anchors.top: mainview.top
         anchors.left: mainview.left
 
         //! [0]
@@ -121,15 +120,15 @@ Rectangle {
 
     RowLayout {
         id: buttonLayout
-        width: parent.width
         anchors.top: parent.top
         anchors.left: parent.left
-        spacing: 0
+        anchors.right: parent.right
+        opacity: 0.5
 
         NewButton {
             id: surfaceGridToggle
             Layout.fillWidth: true
-            Layout.minimumHeight: buttonMinimumHeight
+            Layout.fillHeight: true
             text: "Show Surface Grid"
             //! [1]
             onClicked: {
@@ -149,7 +148,7 @@ Rectangle {
         NewButton {
             id: surfaceToggle
             Layout.fillWidth: true
-            Layout.minimumHeight: buttonMinimumHeight
+            Layout.fillHeight: true
             text: "Hide Surface"
             //! [8]
             onClicked: {
@@ -169,8 +168,7 @@ Rectangle {
         NewButton {
             id: flatShadingToggle
             Layout.fillWidth: true
-            Layout.minimumHeight: buttonMinimumHeight
-
+            Layout.fillHeight: true
             text: "Show Flat"
             enabled: surfaceSeries.flatShadingSupported
             //! [2]
@@ -191,7 +189,7 @@ Rectangle {
         NewButton {
             id: backgroundToggle
             Layout.fillWidth: true
-            Layout.minimumHeight: buttonMinimumHeight
+            Layout.fillHeight: true
             text: "Hide Background"
             onClicked: {
                 if (surfacePlot.theme.backgroundEnabled === true) {
@@ -207,7 +205,7 @@ Rectangle {
         NewButton {
             id: gridToggle
             Layout.fillWidth: true
-            Layout.minimumHeight: buttonMinimumHeight
+            Layout.fillHeight: true
             text: "Hide Grid"
             onClicked: {
                 if (surfacePlot.theme.gridEnabled === true) {
@@ -223,7 +221,7 @@ Rectangle {
         NewButton {
             id: seriesToggle
             Layout.fillWidth: true
-            Layout.minimumHeight: buttonMinimumHeight
+            Layout.fillHeight: true
             text: "Switch to Height Map Series"
             //! [3]
             onClicked: {
