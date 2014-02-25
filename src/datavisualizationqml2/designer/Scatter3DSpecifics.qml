@@ -66,8 +66,8 @@ Column {
                 ComboBox {
                     backendValue: backendValues.shadowQuality
                     model: ["ShadowQualityNone", "ShadowQualityLow", "ShadowQualityMedium",
-                        "ShadowQualityHigh", "ShadowQualityLowSoft", "ShadowQualityMediumSoft",
-                        "ShadowQualityHighSoft"]
+                        "ShadowQualityHigh", "ShadowQualitySoftLow", "ShadowQualitySoftMedium",
+                        "ShadowQualitySoftHigh"]
                     Layout.fillWidth: true
                 }
             }
