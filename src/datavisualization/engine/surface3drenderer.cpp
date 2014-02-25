@@ -119,10 +119,6 @@ Surface3DRenderer::~Surface3DRenderer()
         m_textureHelper->deleteTexture(&m_depthTexture);
         m_textureHelper->deleteTexture(&m_depthModelTexture);
         m_textureHelper->deleteTexture(&m_selectionResultTexture);
-        foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
-            GLuint texture = cache->selectionTexture();
-            m_textureHelper->deleteTexture(&texture);
-        }
     }
     delete m_depthShader;
     delete m_backgroundShader;
@@ -136,8 +132,10 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_gridLineObj;
     delete m_labelObj;
 
-    foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
+    foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
+        cache->cleanup(m_textureHelper);
         delete cache;
+    }
     m_renderCacheList.clear();
 }
 
@@ -272,6 +270,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
                 updateSelectedPoint(Surface3DController::invalidSelectionPosition(), 0);
 
             m_renderCacheList.remove(cache->series());
+            cache->cleanup(m_textureHelper);
             delete cache;
 
             m_selectionTexturesDirty = true;

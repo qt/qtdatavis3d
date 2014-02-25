@@ -51,7 +51,7 @@ public:
     virtual ~SurfaceSeriesRenderCache();
 
     void populate(QSurface3DSeries *series, Abstract3DRenderer *renderer);
-    void cleanup(TextureHelper *texHelper);
+    virtual void cleanup(TextureHelper *texHelper);
 
     inline bool surfaceVisible() const { return m_surfaceVisible; }
     inline bool surfaceGridVisible() const { return m_surfaceGridVisible; }

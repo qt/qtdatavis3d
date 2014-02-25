@@ -185,10 +185,12 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
 void SeriesRenderCache::cleanup(TextureHelper *texHelper)
 {
     delete m_object;
-    texHelper->deleteTexture(&m_baseUniformTexture);
-    texHelper->deleteTexture(&m_baseGradientTexture);
-    texHelper->deleteTexture(&m_singleHighlightGradientTexture);
-    texHelper->deleteTexture(&m_multiHighlightGradientTexture);
+    if (QOpenGLContext::currentContext()) {
+        texHelper->deleteTexture(&m_baseUniformTexture);
+        texHelper->deleteTexture(&m_baseGradientTexture);
+        texHelper->deleteTexture(&m_singleHighlightGradientTexture);
+        texHelper->deleteTexture(&m_multiHighlightGradientTexture);
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

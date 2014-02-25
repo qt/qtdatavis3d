@@ -433,19 +433,21 @@ void ScatterDataModifier::setGradient()
     singleHighlightGradient.setColorAt(0.25, Qt::yellow);
     singleHighlightGradient.setColorAt(0.0, Qt::white);
 
-    m_targetSeries->setBaseColor(Qt::green);
-    m_targetSeries->setSingleHighlightColor(Qt::white);
+    if (m_targetSeries) {
+        m_targetSeries->setBaseColor(Qt::green);
+        m_targetSeries->setSingleHighlightColor(Qt::white);
 
-    m_targetSeries->setBaseGradient(baseGradient);
-    m_targetSeries->setSingleHighlightGradient(singleHighlightGradient);
+        m_targetSeries->setBaseGradient(baseGradient);
+        m_targetSeries->setSingleHighlightGradient(singleHighlightGradient);
 
-    Q3DTheme::ColorStyle oldStyle = m_targetSeries->colorStyle();
-    if (oldStyle == Q3DTheme::ColorStyleUniform)
-        m_targetSeries->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
-    else if (oldStyle == Q3DTheme::ColorStyleObjectGradient)
-        m_targetSeries->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
-    if (oldStyle == Q3DTheme::ColorStyleRangeGradient)
-        m_targetSeries->setColorStyle(Q3DTheme::ColorStyleUniform);
+        Q3DTheme::ColorStyle oldStyle = m_targetSeries->colorStyle();
+        if (oldStyle == Q3DTheme::ColorStyleUniform)
+            m_targetSeries->setColorStyle(Q3DTheme::ColorStyleObjectGradient);
+        else if (oldStyle == Q3DTheme::ColorStyleObjectGradient)
+            m_targetSeries->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+        if (oldStyle == Q3DTheme::ColorStyleRangeGradient)
+            m_targetSeries->setColorStyle(Q3DTheme::ColorStyleUniform);
+    }
 }
 
 void ScatterDataModifier::addSeries()

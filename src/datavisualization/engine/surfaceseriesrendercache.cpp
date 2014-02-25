@@ -50,18 +50,6 @@ SurfaceSeriesRenderCache::SurfaceSeriesRenderCache()
 
 SurfaceSeriesRenderCache::~SurfaceSeriesRenderCache()
 {
-    delete m_surfaceObj;
-    delete m_sliceSurfaceObj;
-    for (int i = 0; i < m_dataArray.size(); i++)
-        delete m_dataArray.at(i);
-    m_dataArray.clear();
-
-    for (int i = 0; i < m_sliceDataArray.size(); i++)
-        delete m_sliceDataArray.at(i);
-    m_sliceDataArray.clear();
-
-    delete m_sliceSelectionPointer;
-    delete m_mainSelectionPointer;
 }
 
 void SurfaceSeriesRenderCache::populate(QSurface3DSeries *series, Abstract3DRenderer *renderer)
@@ -77,6 +65,27 @@ void SurfaceSeriesRenderCache::populate(QSurface3DSeries *series, Abstract3DRend
         m_surfaceFlatShading = series->isFlatShadingEnabled();
         m_flatStatusDirty = true;
     }
+}
+
+void SurfaceSeriesRenderCache::cleanup(TextureHelper *texHelper)
+{
+    if (QOpenGLContext::currentContext())
+        texHelper->deleteTexture(&m_selectionTexture);
+
+    delete m_surfaceObj;
+    delete m_sliceSurfaceObj;
+    for (int i = 0; i < m_dataArray.size(); i++)
+        delete m_dataArray.at(i);
+    m_dataArray.clear();
+
+    for (int i = 0; i < m_sliceDataArray.size(); i++)
+        delete m_sliceDataArray.at(i);
+    m_sliceDataArray.clear();
+
+    delete m_sliceSelectionPointer;
+    delete m_mainSelectionPointer;
+
+    SeriesRenderCache::cleanup(texHelper);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

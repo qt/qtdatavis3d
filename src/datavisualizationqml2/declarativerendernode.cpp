@@ -46,6 +46,7 @@ DeclarativeRenderNode::~DeclarativeRenderNode()
 {
     delete m_fbo;
     delete m_multisampledFBO;
+    delete m_texture;
 }
 
 void DeclarativeRenderNode::setSize(const QSize &size)

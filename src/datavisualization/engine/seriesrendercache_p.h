@@ -45,7 +45,7 @@ public:
     virtual ~SeriesRenderCache();
 
     void populate(QAbstract3DSeries *series, Abstract3DRenderer *renderer);
-    void cleanup(TextureHelper *texHelper);
+    virtual void cleanup(TextureHelper *texHelper);
 
     // NOTE: Series pointer can only be used to access the series when syncing with controller.
     // It is not guaranteed to be valid while rendering and should only be used as an identifier.

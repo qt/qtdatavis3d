@@ -382,23 +382,23 @@ int main(int argc, char *argv[])
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis minimum")));
     vLayout->addWidget(axisMinSliderX);
     vLayout->addWidget(axisMinSliderZ);
-    vLayout->addWidget(colorPB);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
-    vLayout->addWidget(fontList);
-    vLayout->addWidget(labelButton);
-    vLayout->addWidget(meshButton);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
-    vLayout->addWidget(themeList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
-    vLayout->addWidget(shadowQuality);
-    vLayout->addWidget(new QLabel(QStringLiteral("Selection Mode")));
-    vLayout->addWidget(selectionMode);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
+    vLayout2->addWidget(fontList);
+    vLayout2->addWidget(labelButton);
+    vLayout2->addWidget(meshButton);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Change theme")));
+    vLayout2->addWidget(themeList);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout2->addWidget(shadowQuality);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Selection Mode")));
+    vLayout2->addWidget(selectionMode);
 #ifndef MULTI_SERIES
-    vLayout->addWidget(selectButton);
-    vLayout->addWidget(selectionInfoLabel);
-    vLayout->addWidget(flipViewsButton);
+    vLayout2->addWidget(selectButton);
+    vLayout2->addWidget(selectionInfoLabel);
+    vLayout2->addWidget(flipViewsButton);
 #endif
 
+    vLayout2->addWidget(colorPB);
     vLayout2->addWidget(changeRowButton);
     vLayout2->addWidget(changeRowsButton);
     vLayout2->addWidget(changeMultipleRowsButton);
