@@ -33,15 +33,29 @@ Column {
 
         SectionLayout {
             Label {
-                text: qsTr("clearWindowBeforeRendering")
-                toolTip: qsTr("Clear Window Before Rendering")
+                text: qsTr("renderingMode")
+                toolTip: qsTr("Rendering Mode")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
-                CheckBox {
-                    backendValue: backendValues.clearWindowBeforeRendering
+                ComboBox {
+                    backendValue: backendValues.renderingMode
+                    model: ["RenderIndirect", "RenderDirectoToBackground",
+                        "RenderDirectoToBackground_NoClear"]
                     Layout.fillWidth: true
                 }
+            }
+            Label {
+                text: qsTr("msaaSamples")
+                toolTip: qsTr("MSAA Sample Count")
+                Layout.fillWidth: true
+            }
+            SpinBox {
+                suffix: " x MSAA"
+                backendValue: backendValues.msaaSamples
+                minimumValue: 0
+                maximumValue: 16
+                Layout.fillWidth: true
             }
             Label {
                 text: qsTr("shadowQuality")
