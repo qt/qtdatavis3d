@@ -35,6 +35,8 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 
     QObject::connect(m_barsController, &Bars3DController::primarySeriesChanged,
                      this, &DeclarativeBars::primarySeriesChanged);
+    QObject::connect(m_barsController, &Bars3DController::selectedSeriesChanged,
+                     this, &DeclarativeBars::selectedSeriesChanged);
 }
 
 DeclarativeBars::~DeclarativeBars()
@@ -122,6 +124,11 @@ void DeclarativeBars::setBarSpacingRelative(bool relative)
 bool DeclarativeBars::isBarSpacingRelative() const
 {
     return m_barsController->isBarSpecRelative();
+}
+
+QBar3DSeries *DeclarativeBars::selectedSeries() const
+{
+    return m_barsController->selectedSeries();
 }
 
 QQmlListProperty<QBar3DSeries> DeclarativeBars::seriesList()

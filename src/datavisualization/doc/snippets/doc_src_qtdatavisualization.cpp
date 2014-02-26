@@ -72,7 +72,7 @@ QItemModelScatterDataProxy *proxy = new QItemModelScatterDataProxy(customModel,
 QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy(customModel,
                                                                    QStringLiteral("longitude"), // Row role
                                                                    QStringLiteral("latitude"), // Column role
-                                                                   QStringLiteral("height")); // value role
+                                                                   QStringLiteral("height")); // Y-position role
 //! [5]
 
 //! [6]

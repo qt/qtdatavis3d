@@ -221,7 +221,7 @@ void QSurface3DSeries::setSelectedPoint(const QPoint &position)
 {
     // Don't do this in private to avoid loops, as that is used for callback from controller.
     if (d_ptr->m_controller)
-        static_cast<Surface3DController *>(d_ptr->m_controller)->setSelectedPoint(position, this);
+        static_cast<Surface3DController *>(d_ptr->m_controller)->setSelectedPoint(position, this, true);
     else
         dptr()->setSelectedPoint(position);
 }

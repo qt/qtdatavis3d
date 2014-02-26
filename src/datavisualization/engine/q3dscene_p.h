@@ -30,7 +30,7 @@
 #define Q3DSCENE_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QRect>
+#include "q3dscene.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -85,6 +85,10 @@ public:
     QRect glViewport();
     QRect glPrimarySubViewport();
     QRect glSecondarySubViewport();
+
+    void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
+                                          float fixedRotation = 0.0f,
+                                          float distanceModifier = 0.0f);
 
 signals:
     void needRender();

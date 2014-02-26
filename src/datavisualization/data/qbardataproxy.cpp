@@ -130,7 +130,7 @@ QBarDataProxy::~QBarDataProxy()
  *
  *  The series this proxy is attached to.
  */
-QBar3DSeries *QBarDataProxy::series()
+QBar3DSeries *QBarDataProxy::series() const
 {
     return static_cast<QBar3DSeries *>(d_ptr->series());
 }
@@ -224,6 +224,15 @@ void QBarDataProxy::setItem(int rowIndex, int columnIndex, const QBarDataItem &i
 {
     dptr()->setItem(rowIndex, columnIndex, item);
     emit itemChanged(rowIndex, columnIndex);
+}
+
+/*!
+ * Changes a single item at \a position to the \a item.
+ * The X-value of \a position indicates the row and the Y-value indicates the column.
+ */
+void QBarDataProxy::setItem(const QPoint &position, const QBarDataItem &item)
+{
+    setItem(position.x(), position.y(), item);
 }
 
 /*!
@@ -424,6 +433,16 @@ const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
     const QBarDataRow &dataRow = *dataArray[rowIndex];
     Q_ASSERT(columnIndex >= 0 && columnIndex < dataRow.size());
     return &dataRow.at(columnIndex);
+}
+
+/*!
+ * \return pointer to the item at \a position. The X-value of \a position indicates the row
+ * and the Y-value indicates the column. The item is guaranteed to be valid only
+ * until the next call that modifies data.
+ */
+const QBarDataItem *QBarDataProxy::itemAt(const QPoint &position) const
+{
+    return itemAt(position.x(), position.y());
 }
 
 /*!

@@ -43,7 +43,7 @@ public:
     explicit QScatterDataProxy(QObject *parent = 0);
     virtual ~QScatterDataProxy();
 
-    QScatter3DSeries *series();
+    QScatter3DSeries *series() const;
     int itemCount() const;
     const QScatterDataArray *array() const;
     const QScatterDataItem *itemAt(int index) const;

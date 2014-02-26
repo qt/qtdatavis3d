@@ -19,6 +19,8 @@
 #ifndef SURFACEDATA_H
 #define SURFACEDATA_H
 
+#define NOMINMAX
+
 #include "QKinectWrapper.h"
 #include <QtDataVisualization/Q3DScatter>
 #include <QtDataVisualization/Q3DBars>
@@ -63,6 +65,8 @@ public slots:
     void changeMode(int mode);
 
 private:
+    Q3DTheme *m_thermalTheme;
+    Q3DTheme *m_highlightTheme;
     Q3DSurface *m_surface;
     Q3DScatter *m_scatter;
     Q3DBars *m_bars;

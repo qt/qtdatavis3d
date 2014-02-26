@@ -60,7 +60,7 @@ private:
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
-    QVector<BarRenderItem *> m_sliceSelection;
+    QVector<BarRenderSliceItem> m_sliceSelection;
     AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
     bool m_xFlipped;
@@ -114,7 +114,6 @@ public:
     ~Bars3DRenderer();
 
     void updateData();
-    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 

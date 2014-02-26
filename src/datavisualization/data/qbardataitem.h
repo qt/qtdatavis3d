@@ -42,7 +42,7 @@ public:
     inline float rotation() const { return m_angle; }
 
 protected:
-    virtual void createExtraData();
+    void createExtraData();
 
     QBarDataItemPrivate *d_ptr;
 

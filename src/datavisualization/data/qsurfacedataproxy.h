@@ -45,11 +45,12 @@ public:
     explicit QSurfaceDataProxy(QObject *parent = 0);
     virtual ~QSurfaceDataProxy();
 
-    QSurface3DSeries *series();
+    QSurface3DSeries *series() const;
     int rowCount() const;
     int columnCount() const;
     const QSurfaceDataArray *array() const;
-    const QSurfaceDataItem *itemAt(int index) const;
+    const QSurfaceDataItem *itemAt(int rowIndex, int columnIndex) const;
+    const QSurfaceDataItem *itemAt(const QPoint &position) const;
 
     void resetArray(QSurfaceDataArray *newArray);
 
@@ -57,6 +58,7 @@ public:
     void setRows(int rowIndex, const QSurfaceDataArray &rows);
 
     void setItem(int rowIndex, int columnIndex, const QSurfaceDataItem &item);
+    void setItem(const QPoint &position, const QSurfaceDataItem &item);
 
     int addRow(QSurfaceDataRow *row);
     int addRows(const QSurfaceDataArray &rows);

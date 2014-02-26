@@ -24,8 +24,8 @@
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
 
-#include <QMatrix4x4>
-#include <qmath.h>
+#include <QtGui/QMatrix4x4>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -303,6 +303,7 @@ void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
         index = invalidSelectionIndex();
 
     if (index != m_selectedItem || series != m_selectedItemSeries) {
+        bool seriesChanged = (series != m_selectedItemSeries);
         m_selectedItem = index;
         m_selectedItemSeries = series;
         m_changeTracker.selectedItemChanged = true;
@@ -315,6 +316,9 @@ void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
         }
         if (m_selectedItemSeries)
             m_selectedItemSeries->dptr()->setSelectedItem(m_selectedItem);
+
+        if (seriesChanged)
+            emit selectedSeriesChanged(m_selectedItemSeries);
 
         emitNeedRender();
     }

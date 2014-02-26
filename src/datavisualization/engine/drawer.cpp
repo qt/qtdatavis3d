@@ -24,8 +24,10 @@
 #include "q3dcamera.h"
 #include "utils_p.h"
 #include "texturehelper_p.h"
-#include <QMatrix4x4>
-#include <qmath.h>
+#include "abstract3drenderer_p.h"
+
+#include <QtGui/QMatrix4x4>
+#include <QtCore/qmath.h>
 
 // Resources need to be explicitly initialized when building as static library
 class StaticLibInitializer
@@ -348,10 +350,10 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     drawObject(shader, object, labelItem.textureId());
 }
 
-void Drawer::generateSelectionLabelTexture(AbstractRenderItem *item)
+void Drawer::generateSelectionLabelTexture(Abstract3DRenderer *renderer)
 {
-    LabelItem &labelItem = item->selectionLabelItem();
-    generateLabelItem(labelItem, item->selectionLabel());
+    LabelItem &labelItem = renderer->selectionLabelItem();
+    generateLabelItem(labelItem, renderer->selectionLabel());
 }
 
 void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestLabel)

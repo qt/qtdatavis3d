@@ -31,13 +31,15 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dcamera.h"
+#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DCamera;
 
-class Q3DCameraPrivate
+class Q3DCameraPrivate : public QObject
 {
+    Q_OBJECT
 public:
     Q3DCameraPrivate(Q3DCamera *q);
     ~Q3DCameraPrivate();
@@ -47,11 +49,37 @@ public:
     void setXRotation(float rotation);
     void setYRotation(float rotation);
     void setMinXRotation(float rotation);
+    float minXRotation() const;
     void setMinYRotation(float rotation);
+    float minYRotation() const;
     void setMaxXRotation(float rotation);
+    float maxXRotation() const;
     void setMaxYRotation(float rotation);
+    float maxYRotation() const;
 
     void updateViewMatrix(float zoomAdjustment);
+
+    QMatrix4x4 viewMatrix() const;
+    void setViewMatrix(const QMatrix4x4 &viewMatrix);
+
+    bool isViewMatrixAutoUpdateEnabled() const;
+    void setViewMatrixAutoUpdateEnabled(bool isEnabled);
+
+    void setBaseOrientation(const QVector3D &defaultPosition,
+                            const QVector3D &defaultTarget,
+                            const QVector3D &defaultUp);
+
+    QVector3D calculatePositionRelativeToCamera(const QVector3D &relativePosition,
+                                                float fixedRotation,
+                                                float distanceModifier) const;
+
+signals:
+    void minXRotationChanged(float rotation);
+    void minYRotationChanged(float rotation);
+    void maxXRotationChanged(float rotation);
+    void maxYRotationChanged(float rotation);
+    void viewMatrixChanged(QMatrix4x4 viewMatrix);
+    void viewMatrixAutoUpdateChanged(bool enabled);
 
 public:
     Q3DCamera *q_ptr;
@@ -79,7 +107,6 @@ public:
     friend class SelectionPointer;
     friend class Q3DInputHandler;
     friend class QTouch3DInputHandler;
-    friend class QMac3DInputHandler;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -19,8 +19,13 @@
 #ifndef QABSTRACT3DINPUTHANDLER_H
 #define QABSTRACT3DINPUTHANDLER_H
 
+#include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtDataVisualization/q3dscene.h>
-#include <QMouseEvent>
+#include <QtCore/QObject>
+#include <QtCore/QPoint>
+#include <QtGui/QWheelEvent>
+#include <QtGui/QMouseEvent>
+#include <QtGui/QTouchEvent>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -41,8 +46,9 @@ public:
         InputViewOnSecondary
     };
 
-public:
+protected:
     explicit QAbstract3DInputHandler(QObject *parent = 0);
+public:
     virtual ~QAbstract3DInputHandler();
 
     // Input event listeners
@@ -53,7 +59,6 @@ public:
     virtual void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void wheelEvent(QWheelEvent *event);
 
-public:
     InputView inputView() const;
     void setInputView(InputView inputView);
 
@@ -64,9 +69,9 @@ public:
     void setScene(Q3DScene *scene);
 
 signals:
-    void positionChanged(QPoint position);
+    void positionChanged(const QPoint &position);
     void inputViewChanged(InputView view);
-    void sceneChanged(const Q3DScene *scene);
+    void sceneChanged(Q3DScene *scene);
 
 protected:
     void setPrevDistance(int distance);

@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "scatteritemmodelhandler_p.h"
-#include <QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -92,6 +91,41 @@ void ScatterItemModelHandler::handleRowsRemoved(const QModelIndex &parent, int s
     }
 }
 
+static inline QQuaternion toQuaternion(const QVariant &variant)
+{
+    if (variant.canConvert<QQuaternion>()) {
+        return variant.value<QQuaternion>();
+    } else if (variant.canConvert<QString>()) {
+        QString s = variant.toString();
+        if (!s.isEmpty()) {
+            bool angleAndAxis = false;
+            if (s.startsWith(QLatin1Char('@'))) {
+                angleAndAxis = true;
+                s = s.mid(1);
+            }
+            if (s.count(QLatin1Char(',')) == 3) {
+                int index = s.indexOf(QLatin1Char(','));
+                int index2 = s.indexOf(QLatin1Char(','), index + 1);
+                int index3 = s.indexOf(QLatin1Char(','), index2 + 1);
+
+                bool sGood, xGood, yGood, zGood;
+                float sCoord = s.left(index).toFloat(&sGood);
+                float xCoord = s.mid(index + 1, index2 - index - 1).toFloat(&xGood);
+                float yCoord = s.mid(index2 + 1, index3 - index2 - 1).toFloat(&yGood);
+                float zCoord = s.mid(index3 + 1).toFloat(&zGood);
+
+                if (sGood && xGood && yGood && zGood) {
+                    if (angleAndAxis)
+                        return QQuaternion::fromAxisAndAngle(xCoord, yCoord, zCoord, sCoord);
+                    else
+                        return QQuaternion(sCoord, xCoord, yCoord, zCoord);
+                }
+            }
+        }
+    }
+    return QQuaternion();
+}
+
 void ScatterItemModelHandler::modelPosToScatterItem(int modelRow, int modelColumn,
                                                     QScatterDataItem &item)
 {
@@ -105,6 +139,8 @@ void ScatterItemModelHandler::modelPosToScatterItem(int modelRow, int modelColum
         yPos = index.data(m_yPosRole).toFloat();
     if (m_zPosRole != noRoleIndex)
         zPos = index.data(m_zPosRole).toFloat();
+    if (m_rotationRole != noRoleIndex)
+        item.setRotation(toQuaternion(index.data(m_rotationRole)));
     item.setPosition(QVector3D(xPos, yPos, zPos));
 }
 
@@ -121,6 +157,7 @@ void ScatterItemModelHandler::resolveModel()
     m_xPosRole = roleHash.key(m_proxy->xPosRole().toLatin1(), noRoleIndex);
     m_yPosRole = roleHash.key(m_proxy->yPosRole().toLatin1(), noRoleIndex);
     m_zPosRole = roleHash.key(m_proxy->zPosRole().toLatin1(), noRoleIndex);
+    m_rotationRole = roleHash.key(m_proxy->rotationRole().toLatin1(), noRoleIndex);
     const int columnCount = m_itemModel->columnCount();
     const int rowCount = m_itemModel->rowCount();
     const int totalCount = rowCount * columnCount;

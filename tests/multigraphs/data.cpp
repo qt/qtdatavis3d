@@ -149,6 +149,7 @@ void Data::setResolution(int selection)
     if (m_mode == Scatter) {
         m_resize = true;
         m_resolution /= 3;
+        delete m_scatterDataArray;
         m_scatterDataArray = new QScatterDataArray;
         m_scatterDataArray->resize(m_resolution.width() * m_resolution.height());
     } else if (m_mode == Bars) {

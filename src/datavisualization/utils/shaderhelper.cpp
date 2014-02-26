@@ -18,7 +18,7 @@
 
 #include "shaderhelper_p.h"
 
-#include <QOpenGLShader>
+#include <QtGui/QOpenGLShader>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

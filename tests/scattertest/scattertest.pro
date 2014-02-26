@@ -6,5 +6,3 @@ SOURCES += main.cpp scatterchart.cpp
 HEADERS += scatterchart.h
 
 QT += widgets
-
-INSTALLS += target

@@ -240,6 +240,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlmethod void Abstract3DSeries::setMeshAxisAndAngle(vector3d axis, real angle)
+ *
+ * A convenience function to construct mesh rotation quaternion from axis and angle.
+ *
+ * \sa meshRotation
+ */
+
+/*!
  * \internal
  */
 QAbstract3DSeries::QAbstract3DSeries(QAbstract3DSeriesPrivate *d, QObject *parent) :
@@ -372,6 +380,16 @@ void QAbstract3DSeries::setMeshRotation(const QQuaternion &rotation)
 QQuaternion QAbstract3DSeries::meshRotation() const
 {
     return d_ptr->m_meshRotation;
+}
+
+/*!
+ * A convenience function to construct mesh rotation quaternion from \a axis and \a angle.
+ *
+ * \sa meshRotation
+ */
+void QAbstract3DSeries::setMeshAxisAndAngle(const QVector3D &axis, float angle)
+{
+    setMeshRotation(QQuaternion::fromAxisAndAngle(axis, angle));
 }
 
 /*!

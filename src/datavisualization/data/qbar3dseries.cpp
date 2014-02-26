@@ -18,6 +18,7 @@
 
 #include "qbar3dseries_p.h"
 #include "bars3dcontroller_p.h"
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -114,6 +115,17 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty real Bar3DSeries::meshAngle
+ *
+ * A convenience property for defining the series rotation \a angle in degrees.
+ *
+ * \note: When reading this property, it is calculated from Abstract3DSeries::meshRotation value
+ * using floating point precision and always returns a value from zero to 360 degrees.
+ *
+ * \sa Abstract3DSeries::meshRotation
+ */
+
+/*!
  * Constructs QBar3DSeries with the given \a parent.
  */
 QBar3DSeries::QBar3DSeries(QObject *parent) :
@@ -121,6 +133,7 @@ QBar3DSeries::QBar3DSeries(QObject *parent) :
 {
     // Default proxy
     dptr()->setDataProxy(new QBarDataProxy);
+    dptr()->connectSignals();
 }
 
 /*!
@@ -130,14 +143,7 @@ QBar3DSeries::QBar3DSeries(QBarDataProxy *dataProxy, QObject *parent) :
     QAbstract3DSeries(new QBar3DSeriesPrivate(this), parent)
 {
     dptr()->setDataProxy(dataProxy);
-}
-
-/*!
- * \internal
- */
-QBar3DSeries::QBar3DSeries(QBar3DSeriesPrivate *d, QObject *parent) :
-    QAbstract3DSeries(d, parent)
-{
+    dptr()->connectSignals();
 }
 
 /*!
@@ -183,7 +189,7 @@ void QBar3DSeries::setSelectedBar(const QPoint &position)
 {
     // Don't do this in private to avoid loops, as that is used for callback from controller.
     if (d_ptr->m_controller)
-        static_cast<Bars3DController *>(d_ptr->m_controller)->setSelectedBar(position, this);
+        static_cast<Bars3DController *>(d_ptr->m_controller)->setSelectedBar(position, this, true);
     else
         dptr()->setSelectedBar(position);
 }
@@ -202,6 +208,38 @@ QPoint QBar3DSeries::selectedBar() const
 QPoint QBar3DSeries::invalidSelectionPosition()
 {
     return Bars3DController::invalidSelectionPosition();
+}
+
+static inline float quaternionAngle(const QQuaternion &rotation)
+{
+    return qAcos(rotation.scalar()) * 360.0f / M_PI;
+}
+
+/*!
+ * \property QBar3DSeries::meshAngle
+ *
+ * A convenience property for defining the series rotation \a angle in degrees.
+ * Setting this property is equivalent to the following call:
+ * \code setMeshRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angle)) \endcode
+ *
+ * \note: When reading this property, it is calculated from QAbstract3DSeries::meshRotation value
+ * using floating point precision and always returns a value from zero to 360 degrees.
+ *
+ * \sa QAbstract3DSeries::meshRotation
+ */
+void QBar3DSeries::setMeshAngle(float angle)
+{
+    setMeshRotation(QQuaternion::fromAxisAndAngle(upVector, angle));
+}
+
+float QBar3DSeries::meshAngle() const
+{
+    QQuaternion rotation = meshRotation();
+
+    if (rotation.isIdentity() || rotation.x() != 0.0f || rotation.z() != 0.0f)
+        return 0.0f;
+    else
+        return quaternionAngle(rotation);
 }
 
 /*!
@@ -279,12 +317,23 @@ void QBar3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *newCon
     }
 }
 
+void QBar3DSeriesPrivate::handleMeshRotationChanged(const QQuaternion &rotation)
+{
+    emit qptr()->meshAngleChanged(quaternionAngle(rotation));
+}
+
 void QBar3DSeriesPrivate::setSelectedBar(const QPoint &position)
 {
     if (position != m_selectedBar) {
         m_selectedBar = position;
         emit qptr()->selectedBarChanged(m_selectedBar);
     }
+}
+
+void QBar3DSeriesPrivate::connectSignals()
+{
+    QObject::connect(q_ptr, &QAbstract3DSeries::meshRotationChanged, this,
+                     &QBar3DSeriesPrivate::handleMeshRotationChanged);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

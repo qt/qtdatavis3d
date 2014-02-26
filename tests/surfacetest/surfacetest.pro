@@ -7,8 +7,6 @@ SOURCES += main.cpp \
 
 QT += widgets
 
-INSTALLS += target
-
 HEADERS += \
     graphmodifier.h
 

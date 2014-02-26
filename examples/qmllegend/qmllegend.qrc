@@ -1,8 +1,0 @@
-<RCC>
-    <qresource prefix="/qml">
-        <file alias="Data.qml">qml/qmllegend/data.qml</file>
-        <file alias="main.qml">qml/qmllegend/main.qml</file>
-        <file alias="LegendItem.qml">qml/qmllegend/legenditem.qml</file>
-        <file alias="NewButton.qml">qml/qmllegend/newbutton.qml</file>
-    </qresource>
-</RCC>

@@ -20,11 +20,9 @@
 #define QABSTRACT3DAXIS_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
-
-#include <QObject>
-#include <QScopedPointer>
-#include <QVector>
-#include <QStringList>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
+#include <QtCore/QStringList>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -63,7 +61,7 @@ protected:
 public:
     virtual ~QAbstract3DAxis();
 
-    void setTitle(QString title);
+    void setTitle(const QString &title);
     QString title() const;
 
     void setLabels(const QStringList &labels);
@@ -84,7 +82,7 @@ public:
     void setRange(float min, float max);
 
 signals:
-    void titleChanged(QString newTitle);
+    void titleChanged(const QString &newTitle);
     void labelsChanged();
     void orientationChanged(AxisOrientation orientation);
     void minChanged(float value);

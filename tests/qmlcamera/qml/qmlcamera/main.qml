@@ -21,7 +21,7 @@ import QtQuick.Controls 1.0
 import QtDataVisualization 1.0
 import "."
 
-Item {
+Rectangle {
     id: mainview
     width: 1280
     height: 1024
@@ -99,10 +99,10 @@ Item {
         y: 0
         width:  298
         height: 298
-        minXValue: testChart.scene.activeCamera.minXRotation
-        minYValue: testChart.scene.activeCamera.minYRotation
-        maxXValue: testChart.scene.activeCamera.maxXRotation
-        maxYValue: testChart.scene.activeCamera.maxYRotation
+        minXValue: -180
+        minYValue: 0
+        maxXValue: 180
+        maxYValue: 90
     }
 
     Slider {
@@ -133,24 +133,20 @@ Item {
     }
 
     Button {
-        id: shadowToggle
+        id: angleAdjust
         anchors.bottom: mappingToggle.top
         width: camControlArea.width
-        text: "Hide Shadows"
+        text: "Adjust angle"
+        property real currentAngle: 0
         onClicked: {
-            if (testChart.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
-                testChart.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
-                text = "Hide Shadows"
-            } else {
-                testChart.shadowQuality = AbstractGraph3D.ShadowQualityNone;
-                text = "Show Shadows"
-            }
+            currentAngle += 5
+            chartData.series.meshAngle = currentAngle
         }
     }
 
     Button {
         id: dataToggle
-        anchors.bottom: shadowToggle.top
+        anchors.bottom: angleAdjust.top
         width: camControlArea.width
         text: "Show 2010 - 2012"
         onClicked: {

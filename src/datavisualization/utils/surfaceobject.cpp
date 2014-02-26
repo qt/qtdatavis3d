@@ -19,12 +19,15 @@
 #include "surfaceobject_p.h"
 #include "abstractobjecthelper_p.h"
 
-#include <QVector3D>
-#include <QVector2D>
+#include <QtGui/QVector2D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 SurfaceObject::SurfaceObject()
+    : m_surfaceType(Undefined),
+      m_columns(0),
+      m_rows(0),
+      m_gridIndexCount(0)
 {
     m_indicesType = GL_UNSIGNED_INT;
     initializeOpenGLFunctions();
@@ -668,11 +671,21 @@ GLuint SurfaceObject::gridIndexCount()
 QVector3D SurfaceObject::vertexAt(int column, int row)
 {
     int pos = 0;
+    if (m_surfaceType == Undefined || !m_vertices.size())
+        return zeroVector;
+
     if (m_surfaceType == SurfaceFlat)
         pos = row * (m_columns * 2 - 2) + column * 2 - (column > 0);
     else
         pos = row * m_columns + column;
     return m_vertices.at(pos);
+}
+
+void SurfaceObject::clear()
+{
+    m_gridIndexCount = 0;
+    m_indexCount = 0;
+    m_surfaceType = Undefined;
 }
 
 QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QVector3D &c)

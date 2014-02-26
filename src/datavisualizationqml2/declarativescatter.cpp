@@ -31,6 +31,9 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     // Create the shared component on the main GUI thread.
     m_scatterController = new Scatter3DController(boundingRect().toRect(), new Declarative3DScene);
     setSharedController(m_scatterController);
+
+    QObject::connect(m_scatterController, &Scatter3DController::selectedSeriesChanged,
+                     this, &DeclarativeScatter::selectedSeriesChanged);
 }
 
 DeclarativeScatter::~DeclarativeScatter()
@@ -66,6 +69,11 @@ QValue3DAxis *DeclarativeScatter::axisZ() const
 void DeclarativeScatter::setAxisZ(QValue3DAxis *axis)
 {
     m_scatterController->setAxisZ(axis);
+}
+
+QScatter3DSeries *DeclarativeScatter::selectedSeries() const
+{
+    return m_scatterController->selectedSeries();
 }
 
 QQmlListProperty<QScatter3DSeries> DeclarativeScatter::seriesList()

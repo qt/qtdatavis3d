@@ -20,9 +20,7 @@
 #define QSCATTERDATAITEM_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
-
-#include <QVector3D>
-#include <QQuaternion>
+#include <QtGui/QQuaternion>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -33,6 +31,7 @@ class QT_DATAVISUALIZATION_EXPORT QScatterDataItem
 public:
     QScatterDataItem();
     QScatterDataItem(const QVector3D &position);
+    QScatterDataItem(const QVector3D &position, const QQuaternion &rotation);
     QScatterDataItem(const QScatterDataItem &other);
     ~QScatterDataItem();
 
@@ -50,7 +49,7 @@ public:
     inline float z() const { return m_position.z(); }
 
 protected:
-    virtual void createExtraData();
+    void createExtraData();
 
     QScatterDataItemPrivate *d_ptr;
 

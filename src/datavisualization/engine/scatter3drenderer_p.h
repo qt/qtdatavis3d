@@ -141,10 +141,6 @@ private:
     friend class ScatterRenderItem;
 
 public slots:
-    // Overloaded from abstract renderer
-    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
-                                 float max);
-
     void updateSelectedItem(int index, const QScatter3DSeries *series);
 
 private:

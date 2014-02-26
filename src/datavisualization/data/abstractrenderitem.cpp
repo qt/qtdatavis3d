@@ -21,39 +21,17 @@
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 AbstractRenderItem::AbstractRenderItem()
-    : m_selectionLabelItem(0)
 {
 }
 
 AbstractRenderItem::AbstractRenderItem(const AbstractRenderItem &other)
 {
-    m_selectionLabel = other.m_selectionLabel;
     m_translation = other.m_translation;
-    m_selectionLabelItem = 0;
+    m_rotation = other.m_rotation;
 }
 
 AbstractRenderItem::~AbstractRenderItem()
 {
-    delete m_selectionLabelItem;
-}
-
-LabelItem &AbstractRenderItem::selectionLabelItem()
-{
-    if (!m_selectionLabelItem)
-        m_selectionLabelItem = new LabelItem;
-    return *m_selectionLabelItem;
-}
-
-void AbstractRenderItem::setSelectionLabel(const QString &label)
-{
-    if (m_selectionLabelItem)
-        m_selectionLabelItem->clear();
-    m_selectionLabel = label;
-}
-
-QString &AbstractRenderItem::selectionLabel()
-{
-    return m_selectionLabel;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

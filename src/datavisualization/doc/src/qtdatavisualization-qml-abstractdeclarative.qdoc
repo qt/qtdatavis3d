@@ -28,12 +28,6 @@
   Note that this type is uncreatable, but contains properties that are shared between
   the 3D visualizations.
 
-  \note QML doesn't support the type of anti-aliasing used by Qt Data Visualization graphs
-  by default. Setting the \c antialiasing property doesn't affect graphs. To enable
-  anti-aliasing for graphs, a custom surface format must be set up for the QQuickView
-  before showing it. You can use the convenience function
-  \c{QtDataVisualization::qDefaultSurfaceFormat()} to create the custom surface format object.
-
   For AbstractGraph3D enums, see \l QAbstract3DGraph::SelectionFlag and
   \l QAbstract3DGraph::ShadowQuality
 
@@ -66,24 +60,62 @@
  */
 
 /*!
-  \qmlproperty bool AbstractGraph3D::clearWindowBeforeRendering
+  \qmlproperty AbstractGraph3D.RenderingMode AbstractGraph3D::renderingMode
 
-  Indicates if the graph should also clear the whole window before rendering the graph,
-  including the areas outside the graph.
-  Since the graphs are drawn first under other QML items, the regular QML window clearing
-  before rendering is suppressed when there are any graphs in the window; the graphs
-  handle the clearing themselves instead.
-  If you have any other items besides graphs that do similar
-  custom drawing under other QML items, you need to set this property to false on all graphs
-  drawn to same window with the other custom items, or it is likely that the
-  other custom items do not render properly.
-  Defaults to true.
+  Defaults to \c{RenderIndirect}.
 
-  \note This property should be set to the same value for all graphs in the same window.
-  Otherwise some graphs may not show.
+  \table
+       \header
+           \li Render Mode
+           \li Description
+       \row
+           \li RenderDirectToBackground
+           \li Indicates the graph will be rendered directly on the window background.
+  This mode also clears the whole window before rendering the graph, including the areas
+  outside the graph.
+  Since the graphs in this rendering mode are drawn on the window background under other QML
+  items, the regular QML window clearing before rendering is suppressed. The graphs handle the clearing
+  themselves instead.
+  If the surface format of the window supports antialiasing, it will be used (see
+  \c {QtDataVisualization::qDefaultSurfaceFormat()}).
+  This rendering mode offers the best performance at the expense of non-standard QML behavior. For example,
+  the graphs do not obey the Z ordering of QML items and the opacity value has no effect on them.
+       \row
+           \li RenderDirectToBackground_NoClear
+           \li Similar to RenderDirectToBackground mode, except that the graph will not clear the whole
+  window before rendering the graph. This mode is better for windows where you have other custom items
+  besides the graphs that also draw on the window background. In that case you need to either take care
+  of the window clearing yourself or ensure that all areas of the window are fully covered with opaque
+  items.
+  If one graph in the window uses either of the direct rendering modes, then all other graphs in the
+  same window also drawn in direct modes should use the exact same direct rendering mode.
+  Otherwise some graphs may not show up, depending on the drawing order of the graphs.
+       \row
+           \li RenderIndirect
+           \li Indicates the graph will be first rendered to an offscreen surface that
+  is then drawn during normal QML item rendering. The rendered image is
+  antialiased using multisampling method if it is supported in the current environment and the
+  msaaSamples property value is greater than zero.
+  This rendering mode offers good quality and normal QML item behavior at the expense of performance.
+  \endtable
 
-  \note If window clearing before rendering is suppressed, any areas of the window not fully
-  covered with opaque items may not draw properly.
+  \note Antialiasing is not supported in OpenGL ES2 environments in any rendering mode.
+
+  \note Setting the \c antialiasing property of the graphs doesn't do anything. However, it is
+  set by the graph itself if the current rendering mode uses antialiasing.
+
+  \sa msaaSamples
+ */
+
+/*!
+  \qmlproperty int AbstractGraph3D::msaaSamples
+  The number of samples used in multisample antialiasing when renderingMode is \c RenderIndirect.
+  When renderingMode is \c RenderDirectToBackground or \c RenderDirectToBackground_NoClear, this
+  property value is read-only and returns the number of samples specified by the window surface
+  format.
+  Defaults to 4.
+
+  \sa renderingMode
  */
 
 /*!

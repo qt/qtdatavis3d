@@ -30,9 +30,9 @@
 #define TEXTUREHELPER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QOpenGLFunctions>
-#include <QRgb>
-#include <QLinearGradient>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QRgb>
+#include <QtGui/QLinearGradient>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -48,6 +48,7 @@ class TextureHelper : protected QOpenGLFunctions
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
     // Returns selection texture and inserts generated framebuffers to framebuffer parameters
     GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
+    GLuint createUniformTexture(const QColor &color);
     GLuint createGradientTexture(const QLinearGradient &gradient);
 #if !defined(QT_OPENGL_ES_2)
     GLuint createDepthTexture(const QSize &size, GLuint textureSize);

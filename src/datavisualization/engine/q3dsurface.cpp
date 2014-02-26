@@ -32,8 +32,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since Qt Data Visualization 1.0
  *
  * This class enables developers to render 3D surface plots and to view them by rotating the scene
- * freely. The surface plotting includes also gridline that can be set on or off.
- * The visual appearance of the surface can be changed by controlling the smooth status.
+ * freely. The visual properties of the surface such as draw mode and shading can be controlled
+ * via QSurface3DSeries.
  *
  * The Q3DSurface supports selection by showing a highlighted ball on the data point where the user has clicked
  * with left mouse button (when default input handler is in use) or selected via QSurface3DSeries.
@@ -48,8 +48,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If no axes are set explicitly to Q3DSurface, temporary default axes with no labels are created.
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
- *
- * Q3DSurface supports only single series at a time.
  *
  * \section1 How to construct a minimal Q3DSurface graph
  *
@@ -100,6 +98,8 @@ Q3DSurface::Q3DSurface(const QSurfaceFormat *format, QWindow *parent)
     dptr()->m_shared = new Surface3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
+    QObject::connect(dptr()->m_shared, &Surface3DController::selectedSeriesChanged,
+                     this, &Q3DSurface::selectedSeriesChanged);
 }
 
 /*!
@@ -111,8 +111,6 @@ Q3DSurface::~Q3DSurface()
 
 /*!
  * Adds the \a series to the graph.
- *
- * \note The surface graph currently supports only a single series at a time.
  */
 void Q3DSurface::addSeries(QSurface3DSeries *series)
 {
@@ -129,8 +127,6 @@ void Q3DSurface::removeSeries(QSurface3DSeries *series)
 
 /*!
  * \return list of series added to this graph.
- *
- * \note The surface graph currently supports only a single series at a time.
  */
 QList<QSurface3DSeries *> Q3DSurface::seriesList() const
 {
@@ -220,6 +216,17 @@ void Q3DSurface::setAxisZ(QValue3DAxis *axis)
 QValue3DAxis *Q3DSurface::axisZ() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisZ());
+}
+
+/*!
+ * \property Q3DSurface::selectedSeries
+ *
+ * The selected series or \c null. If selectionMode has \c SelectionMultiSeries flag set, this
+ * property holds the series which owns the selected point.
+ */
+QSurface3DSeries *Q3DSurface::selectedSeries() const
+{
+    return dptrc()->m_shared->selectedSeries();
 }
 
 /*!

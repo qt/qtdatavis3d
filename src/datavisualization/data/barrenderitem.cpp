@@ -25,7 +25,6 @@ BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
       m_value(0),
       m_height(0.0f),
-      m_sliceLabelItem(0),
       m_seriesIndex(0)
 {
 }
@@ -36,32 +35,58 @@ BarRenderItem::BarRenderItem(const BarRenderItem &other)
     m_value = other.m_value;
     m_position = other.m_position;
     m_height = other.m_height;
-    m_sliceLabel = other.m_sliceLabel;
-    m_sliceLabelItem = 0;
     m_seriesIndex = other.m_seriesIndex;
-    m_rotation = other.m_rotation;
 }
 
 BarRenderItem::~BarRenderItem()
 {
+}
+
+BarRenderSliceItem::BarRenderSliceItem()
+    : BarRenderItem(),
+      m_sliceLabelItem(0)
+{
+}
+
+BarRenderSliceItem::BarRenderSliceItem(const BarRenderSliceItem &other)
+    : BarRenderItem(other)
+{
+    m_sliceLabel = other.m_sliceLabel;
+    m_sliceLabelItem = 0;
+}
+
+BarRenderSliceItem::~BarRenderSliceItem()
+{
     delete m_sliceLabelItem;
 }
 
-LabelItem &BarRenderItem::sliceLabelItem()
+void BarRenderSliceItem::setItem(const BarRenderItem &renderItem)
+{
+    m_translation = renderItem.translation();
+    m_rotation = renderItem.rotation();
+    m_value = renderItem.value();
+    m_position = renderItem.position();
+    m_height = renderItem.height();
+    m_seriesIndex = renderItem.seriesIndex();
+    m_sliceLabel = QString();
+    m_sliceLabelItem = 0;
+}
+
+LabelItem &BarRenderSliceItem::sliceLabelItem()
 {
     if (!m_sliceLabelItem)
         m_sliceLabelItem = new LabelItem;
     return *m_sliceLabelItem;
 }
 
-void BarRenderItem::setSliceLabel(const QString &label)
+void BarRenderSliceItem::setSliceLabel(const QString &label)
 {
     if (m_sliceLabelItem)
         m_sliceLabelItem->clear();
     m_sliceLabel = label;
 }
 
-const QString &BarRenderItem::sliceLabel() const
+const QString &BarRenderSliceItem::sliceLabel() const
 {
     return m_sliceLabel;
 }

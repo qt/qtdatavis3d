@@ -33,7 +33,7 @@
 
 #include <QtGui/QOpenGLFunctions>
 #ifdef DISPLAY_RENDER_SPEED
-#include <QTime>
+#include <QtCore/QTime>
 #endif
 
 #include "datavisualizationglobal_p.h"
@@ -94,11 +94,16 @@ public:
     virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation, const QString &format);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
+    void generateBaseColorTexture(const QColor &color, GLuint *texture);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
 
     inline bool isClickPending() { return m_clickPending; }
     inline void clearClickPending() { m_clickPending = false; }
     inline QAbstract3DSeries *clickedSeries() const { return m_clickedSeries; }
+
+    LabelItem &selectionLabelItem();
+    void setSelectionLabel(const QString &label);
+    QString &selectionLabel();
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
@@ -132,7 +137,6 @@ protected:
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
     TextureHelper *m_textureHelper;
-    Q3DBox m_boundingBox;
 
     Q3DScene *m_cachedScene;
     bool m_selectionDirty;
@@ -145,6 +149,9 @@ protected:
     bool m_selectionLabelDirty;
     bool m_clickPending;
     QAbstract3DSeries *m_clickedSeries;
+
+    QString m_selectionLabel;
+    LabelItem *m_selectionLabelItem;
 
 #ifdef DISPLAY_RENDER_SPEED
     bool m_isFirstFrame;

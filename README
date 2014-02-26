@@ -1,6 +1,6 @@
------------------------------------
-Qt Data Visualization 1.0.0 (beta)
------------------------------------
+---------------------------
+Qt Data Visualization 1.0.0
+---------------------------
 
 Qt Data Visualization module provides multiple graph types to visualize data in 3D space
 both with C++ and Qt Quick 2.
@@ -10,9 +10,6 @@ System Requirements
 
 - Qt 5.2 or newer
 - OpenGL 2.1 or newer (recommended) or OpenGL ES2 (reduced feature set)
-
-Platform specific recommendations:
-- Mac: OSX 10.8 or later recommended
 
 Building
 ========
@@ -73,12 +70,6 @@ Please refer to the generated documentation for more information:
 Known Issues
 ============
 
-- All other QML elements are drawn on top of the Qt DataVisualization graphs,
-  including the parent elements of the graphs. To ensure the graphs are not
-  hidden, make sure you don't draw anything opaque on top of the graphs.
-  For example, Qt Creator application wizard for Qt Quick 2 applications
-  creates by default an opaque white Rectangle element as the main element,
-  which covers any graph added to it.
 - Android doesn't support both widgets and OpenGL simultaneously, so only
   the Qt Quick 2 API is usable in practice in Android.
 - Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
@@ -89,3 +80,4 @@ Known Issues
 - The color style Q3DTheme::ColorStyleObjectGradient doesn't work for surface graphs.
 - Scatter "point" meshes do not support gradients, they always use the base color.
 - Widget based examples layout incorrectly in iOS.
+- QML implementation doesn't use a shared context on OSX.

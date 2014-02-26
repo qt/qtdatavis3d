@@ -20,16 +20,12 @@
 #define Q3DSCATTER_H
 
 #include <QtDataVisualization/qabstract3dgraph.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QFont>
-#include <QLinearGradient>
+#include <QtDataVisualization/qvalue3daxis.h>
+#include <QtDataVisualization/qscatter3dseries.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DScatterPrivate;
-class QValue3DAxis;
-class QCategory3DAxis;
-class QScatter3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public QAbstract3DGraph
 {
@@ -37,6 +33,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public QAbstract3DGraph
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
     Q_PROPERTY(QValue3DAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
+    Q_PROPERTY(QScatter3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
 
 public:
     explicit Q3DScatter(const QSurfaceFormat *format = 0, QWindow *parent = 0);
@@ -56,10 +53,13 @@ public:
     void releaseAxis(QValue3DAxis *axis);
     QList<QValue3DAxis *> axes() const;
 
+    QScatter3DSeries *selectedSeries() const;
+
 signals:
     void axisXChanged(QValue3DAxis *axis);
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);
+    void selectedSeriesChanged(QScatter3DSeries *series);
 
 private:
     Q3DScatterPrivate *dptr();

@@ -7,3 +7,5 @@ load(qt_parts)
 contains(QT_CONFIG, opengles1) {
     error(QtDataVisualization does not support OpenGL ES 1!)
 }
+
+OTHER_FILES += README dist/*

@@ -134,6 +134,18 @@ QHeightMapSurfaceDataProxy::QHeightMapSurfaceDataProxy(const QImage &image, QObj
 }
 
 /*!
+ * Constructs QHeightMapSurfaceDataProxy from the given image \a filename and \a parent. Height map is set
+ * by calling setHeightMapFile() with \a filename.
+ *
+ * \sa heightMapFile
+ */
+QHeightMapSurfaceDataProxy::QHeightMapSurfaceDataProxy(const QString &filename, QObject *parent) :
+    QSurfaceDataProxy(new QHeightMapSurfaceDataProxyPrivate(this), parent)
+{
+    setHeightMapFile(filename);
+}
+
+/*!
  * \internal
  */
 QHeightMapSurfaceDataProxy::QHeightMapSurfaceDataProxy(

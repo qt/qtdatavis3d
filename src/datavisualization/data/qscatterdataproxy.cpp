@@ -98,7 +98,7 @@ QScatterDataProxy::~QScatterDataProxy()
  *
  *  The series this proxy is attached to.
  */
-QScatter3DSeries *QScatterDataProxy::series()
+QScatter3DSeries *QScatterDataProxy::series() const
 {
     return static_cast<QScatter3DSeries *>(d_ptr->series());
 }

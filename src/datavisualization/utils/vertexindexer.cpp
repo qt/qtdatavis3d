@@ -18,7 +18,7 @@
 
 #include "vertexindexer_p.h"
 
-#include <qmath.h>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

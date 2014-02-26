@@ -18,7 +18,6 @@
 
 #include "qitemmodelbardataproxy_p.h"
 #include "baritemmodelhandler_p.h"
-#include <QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -102,6 +101,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string ItemModelBarDataProxy::valueRole
  * The value role of the mapping.
+ */
+
+/*!
+ * \qmlproperty string ItemModelBarDataProxy::rotationRole
+ *
+ * Defines the rotation role for the mapping.
  */
 
 /*!
@@ -195,6 +200,27 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
 /*!
  * Constructs QItemModelBarDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
  * ownership of the \a itemModel, as typically item models are owned by other controls.
+ * The role mappings are set with \a rowRole, \a columnRole, \a valueRole, and \a rotationRole.
+ */
+QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemModel,
+                                               const QString &rowRole,
+                                               const QString &columnRole,
+                                               const QString &valueRole,
+                                               const QString &rotationRole,
+                                               QObject *parent)
+    : QBarDataProxy(new QItemModelBarDataProxyPrivate(this), parent)
+{
+    dptr()->m_itemModelHandler->setItemModel(itemModel);
+    dptr()->m_rowRole = rowRole;
+    dptr()->m_columnRole = columnRole;
+    dptr()->m_valueRole = valueRole;
+    dptr()->m_rotationRole = rotationRole;
+    dptr()->connectItemModelHandler();
+}
+
+/*!
+ * Constructs QItemModelBarDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
+ * ownership of the \a itemModel, as typically item models are owned by other controls.
  * The role mappings are set with \a rowRole, \a columnRole, and \a valueRole.
  * Row and column categories are set with \a rowCategories and \a columnCategories.
  * This constructor also sets autoRowCategories and autoColumnCategories to false.
@@ -212,6 +238,35 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
     dptr()->m_rowRole = rowRole;
     dptr()->m_columnRole = columnRole;
     dptr()->m_valueRole = valueRole;
+    dptr()->m_rowCategories = rowCategories;
+    dptr()->m_columnCategories = columnCategories;
+    dptr()->m_autoRowCategories = false;
+    dptr()->m_autoColumnCategories = false;
+    dptr()->connectItemModelHandler();
+}
+
+/*!
+ * Constructs QItemModelBarDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
+ * ownership of the \a itemModel, as typically item models are owned by other controls.
+ * The role mappings are set with \a rowRole, \a columnRole, \a valueRole, and \a rotationRole.
+ * Row and column categories are set with \a rowCategories and \a columnCategories.
+ * This constructor also sets autoRowCategories and autoColumnCategories to false.
+ */
+QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemModel,
+                                               const QString &rowRole,
+                                               const QString &columnRole,
+                                               const QString &valueRole,
+                                               const QString &rotationRole,
+                                               const QStringList &rowCategories,
+                                               const QStringList &columnCategories,
+                                               QObject *parent)
+    : QBarDataProxy(new QItemModelBarDataProxyPrivate(this), parent)
+{
+    dptr()->m_itemModelHandler->setItemModel(itemModel);
+    dptr()->m_rowRole = rowRole;
+    dptr()->m_columnRole = columnRole;
+    dptr()->m_valueRole = valueRole;
+    dptr()->m_rotationRole = rotationRole;
     dptr()->m_rowCategories = rowCategories;
     dptr()->m_columnCategories = columnCategories;
     dptr()->m_autoRowCategories = false;
@@ -297,6 +352,24 @@ QString QItemModelBarDataProxy::valueRole() const
 }
 
 /*!
+ * \property QItemModelBarDataProxy::rotationRole
+ *
+ * Defines the rotation role for the mapping.
+ */
+void QItemModelBarDataProxy::setRotationRole(const QString &role)
+{
+    if (dptr()->m_rotationRole != role) {
+        dptr()->m_rotationRole = role;
+        emit rotationRoleChanged(role);
+    }
+}
+
+QString QItemModelBarDataProxy::rotationRole() const
+{
+    return dptrc()->m_rotationRole;
+}
+
+/*!
  * \property QItemModelBarDataProxy::rowCategories
  *
  * Defines the row categories for the mapping.
@@ -305,7 +378,7 @@ void QItemModelBarDataProxy::setRowCategories(const QStringList &categories)
 {
     if (dptr()->m_rowCategories != categories) {
         dptr()->m_rowCategories = categories;
-        emit rowCategoriesChanged(categories);
+        emit rowCategoriesChanged();
     }
 }
 
@@ -323,7 +396,7 @@ void QItemModelBarDataProxy::setColumnCategories(const QStringList &categories)
 {
     if (dptr()->m_columnCategories != categories) {
         dptr()->m_columnCategories = categories;
-        emit columnCategoriesChanged(categories);
+        emit columnCategoriesChanged();
     }
 }
 
@@ -392,24 +465,26 @@ bool QItemModelBarDataProxy::autoColumnCategories() const
 }
 
 /*!
- * Changes \a rowRole, \a columnRole, \a valueRole, \a rowCategories and \a columnCategories to the
- * mapping.
+ * Changes \a rowRole, \a columnRole, \a valueRole, \a rotationRole,
+ * \a rowCategories and \a columnCategories to the mapping.
  */
 void QItemModelBarDataProxy::remap(const QString &rowRole,
                                    const QString &columnRole,
                                    const QString &valueRole,
+                                   const QString &rotationRole,
                                    const QStringList &rowCategories,
                                    const QStringList &columnCategories)
 {
     setRowRole(rowRole);
     setColumnRole(columnRole);
     setValueRole(valueRole);
+    setRotationRole(rotationRole);
     setRowCategories(rowCategories);
     setColumnCategories(columnCategories);
 }
 
 /*!
- * /return index of the specified \a category in row categories list.
+ * \return index of the specified \a category in row categories list.
  * If the row categories list is empty, -1 is returned.
  * \note If the automatic row categories generation is in use, this method will
  * not return a valid index before the data in the model is resolved for the first time.
@@ -420,7 +495,7 @@ int QItemModelBarDataProxy::rowCategoryIndex(const QString &category)
 }
 
 /*!
- * /return index of the specified \a category in column categories list.
+ * \return index of the specified \a category in column categories list.
  * If the category is not found, -1 is returned.
  * \note If the automatic column categories generation is in use, this method will
  * not return a valid index before the data in the model is resolved for the first time.
@@ -476,6 +551,8 @@ void QItemModelBarDataProxyPrivate::connectItemModelHandler()
     QObject::connect(qptr(), &QItemModelBarDataProxy::columnRoleChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelBarDataProxy::valueRoleChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::rotationRoleChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelBarDataProxy::rowCategoriesChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);

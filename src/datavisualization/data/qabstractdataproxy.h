@@ -20,9 +20,8 @@
 #define QABSTRACTDATAPROXY_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
-
-#include <QObject>
-#include <QScopedPointer>
+#include <QtCore/QObject>
+#include <QtCore/QScopedPointer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

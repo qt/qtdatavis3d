@@ -20,7 +20,7 @@
 #include "qbardataproxy.h"
 #include "qscatterdataproxy.h"
 #include "qsurfacedataproxy.h"
-#include <QMetaMethod>
+#include <QtCore/QMetaMethod>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

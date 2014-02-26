@@ -6,5 +6,3 @@ SOURCES += main.cpp scatterdatamodifier.cpp
 HEADERS += scatterdatamodifier.h
 
 QT += widgets
-
-INSTALLS += target

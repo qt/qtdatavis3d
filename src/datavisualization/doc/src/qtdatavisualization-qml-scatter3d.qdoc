@@ -36,11 +36,6 @@
 
   See \l{Qt Quick 2 Scatter Example} for more thorough usage example.
 
-  \note Qt Data Visualization graphs are rendered behind any other QML elements on screen, including
-  the parent elements of the graph. To make the whole graph show, ensure that no other element
-  draws anything over the area the graph occupies. For example, having a non-transparent \c Rectangle
-  item as the parent of a graph causes the graph to be hidden.
-
   \sa Scatter3DSeries, ScatterDataProxy, Bars3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
 
@@ -72,7 +67,12 @@
  */
 
 /*!
- * \qmlproperty list<QScatter3DSeries> Scatter3D::seriesList
+ * \qmlproperty Scatter3DSeries Scatter3D::selectedSeries
+ * The selected series or \c null.
+ */
+
+/*!
+ * \qmlproperty list<Scatter3DSeries> Scatter3D::seriesList
  * \default
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
@@ -80,13 +80,13 @@
  */
 
 /*!
- * \qmlmethod void Scatter3D::addSeries(QScatter3DSeries *series)
+ * \qmlmethod void Scatter3D::addSeries(Scatter3DSeries series)
  * Adds the \a series to the graph. A graph can contain multiple series, but has only one set of
  * axes. If the newly added series has specified a selected item, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  */
 
 /*!
- * \qmlmethod void Scatter3D::removeSeries(QScatter3DSeries *series)
+ * \qmlmethod void Scatter3D::removeSeries(Scatter3DSeries series)
  * Remove the \a series from the graph.
  */

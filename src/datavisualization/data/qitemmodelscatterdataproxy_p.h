@@ -52,6 +52,7 @@ private:
     QString m_xPosRole;
     QString m_yPosRole;
     QString m_zPosRole;
+    QString m_rotationRole;
 
     friend class ScatterItemModelHandler;
     friend class QItemModelScatterDataProxy;

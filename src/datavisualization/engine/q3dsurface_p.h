@@ -32,8 +32,6 @@
 #include "surface3dcontroller_p.h"
 #include "qabstract3dgraph_p.h"
 
-#include <QList>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DSurface;

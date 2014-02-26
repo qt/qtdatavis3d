@@ -31,8 +31,6 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dcamera.h"
-#include "q3dbars.h"
-#include <QObject>
 
 class QMatrix4x4;
 class QVector3D;
@@ -71,17 +69,17 @@ public:
     QPointF getCameraRotations();
     // Set default camera orientation. Position's x and y should be 0.
     void setDefaultCameraOrientation(const QVector3D &defaultPosition,
-                                            const QVector3D &defaultTarget,
-                                            const QVector3D &defaultUp);
+                                     const QVector3D &defaultTarget,
+                                     const QVector3D &defaultUp);
     // Calculate view matrix based on rotation and zoom
     QMatrix4x4 calculateViewMatrix(const QPoint &mousePos, int zoom,
-                                          int screenWidth, int screenHeight,
-                                          bool showUnder = false);
+                                   int screenWidth, int screenHeight,
+                                   bool showUnder = false);
     // Calcluate light position based on rotation. Call after calling calculateViewMatrix to get
     // up-to-date position
     QVector3D calculateLightPosition(const QVector3D &lightPosition,
-                                            GLfloat fixedRotation = 0.0f,
-                                            GLfloat distanceModifier = 0.0f);
+                                     GLfloat fixedRotation = 0.0f,
+                                     GLfloat distanceModifier = 0.0f);
     void updateMousePos(const QPoint &mousePos);
     void setCameraPreset(Q3DCamera::CameraPreset preset);
 };

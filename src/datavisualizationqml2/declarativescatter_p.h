@@ -37,10 +37,6 @@
 #include "qscatterdataproxy.h"
 #include "qscatter3dseries.h"
 
-#include <QAbstractItemModel>
-#include <QQuickItem>
-#include <QObject>
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class DeclarativeScatter : public AbstractDeclarative
@@ -49,6 +45,7 @@ class DeclarativeScatter : public AbstractDeclarative
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
     Q_PROPERTY(QValue3DAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
+    Q_PROPERTY(QScatter3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
@@ -71,6 +68,8 @@ public:
     Q_INVOKABLE void addSeries(QScatter3DSeries *series);
     Q_INVOKABLE void removeSeries(QScatter3DSeries *series);
 
+    QScatter3DSeries *selectedSeries() const;
+
 public slots:
     void handleAxisXChanged(QAbstract3DAxis *axis);
     void handleAxisYChanged(QAbstract3DAxis *axis);
@@ -80,6 +79,7 @@ signals:
     void axisXChanged(QValue3DAxis *axis);
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);
+    void selectedSeriesChanged(QScatter3DSeries *series);
 
 protected:
     Scatter3DController *m_scatterController;

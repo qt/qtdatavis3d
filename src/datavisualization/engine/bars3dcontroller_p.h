@@ -94,11 +94,14 @@ public:
     QSizeF barSpacing();
     bool isBarSpecRelative();
 
+    inline QBar3DSeries *selectedSeries() const { return m_selectedBarSeries; }
+
     void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
-    void setSelectedBar(const QPoint &position, QBar3DSeries *series);
+    void setSelectedBar(const QPoint &position, QBar3DSeries *series, bool enterSlice);
     virtual void clearSelection();
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
+    virtual void handleAxisAutoAdjustRangeChangedInOrientation(
+            QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick();
 
@@ -128,6 +131,7 @@ public slots:
 
 signals:
     void primarySeriesChanged(QBar3DSeries *series);
+    void selectedSeriesChanged(QBar3DSeries *series);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

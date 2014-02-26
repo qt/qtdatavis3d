@@ -28,7 +28,6 @@
 
 #include "datavisualizationglobal_p.h"
 #include "qabstractdataproxy.h"
-#include <QString>
 
 #ifndef QABSTRACTDATAPROXY_P_H
 #define QABSTRACTDATAPROXY_P_H

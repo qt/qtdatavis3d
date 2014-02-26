@@ -27,8 +27,8 @@
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
 
-#include <QMatrix4x4>
-#include <qmath.h>
+#include <QtGui/QMatrix4x4>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -109,7 +109,7 @@ void Bars3DController::handleArrayReset()
         m_isDataDirty = true;
     }
     // Clear selection unless still valid
-    setSelectedBar(m_selectedBar, m_selectedBarSeries);
+    setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
     emitNeedRender();
 }
 
@@ -152,7 +152,7 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
             else
                 selectedRow -= count; // Move selected row down by amount of rows removed
 
-            setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries);
+            setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries, false);
         }
     }
 
@@ -174,7 +174,7 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
         int selectedRow = m_selectedBar.x();
         if (startIndex <= selectedRow) {
             selectedRow += count;
-            setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries);
+            setSelectedBar(QPoint(selectedRow, m_selectedBar.y()), m_selectedBarSeries, false);
         }
     }
 
@@ -240,9 +240,9 @@ void Bars3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 
     adjustAxisRanges();
 
-    // Visibility changes may require disabling/enabling slicing,
+    // Visibility changes may require disabling slicing,
     // so just reset selection to ensure everything is still valid.
-    setSelectedBar(m_selectedBar, m_selectedBarSeries);
+    setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
 }
 
 void Bars3DController::handlePendingClick()
@@ -251,7 +251,7 @@ void Bars3DController::handlePendingClick()
     QPoint position = m_renderer->clickedPosition();
     QBar3DSeries *series = static_cast<QBar3DSeries *>(m_renderer->clickedSeries());
 
-    setSelectedBar(position, series);
+    setSelectedBar(position, series, true);
 
     m_renderer->resetClickedStatus();
 }
@@ -309,7 +309,7 @@ void Bars3DController::removeSeries(QAbstract3DSeries *series)
     Abstract3DController::removeSeries(series);
 
     if (m_selectedBarSeries == series)
-        setSelectedBar(invalidSelectionPosition(), 0);
+        setSelectedBar(invalidSelectionPosition(), 0, false);
 
     if (wasVisible)
         adjustAxisRanges();
@@ -348,7 +348,7 @@ void Bars3DController::insertSeries(int index, QAbstract3DSeries *series)
         }
 
         if (barSeries->selectedBar() != invalidSelectionPosition())
-            setSelectedBar(barSeries->selectedBar(), barSeries);
+            setSelectedBar(barSeries->selectedBar(), barSeries, false);
 
         if (!oldSize)
             emit primarySeriesChanged(m_primarySeries);
@@ -381,7 +381,7 @@ void Bars3DController::handleAxisRangeChangedBySender(QObject *sender)
     Abstract3DController::handleAxisRangeChangedBySender(sender);
 
     // Update selected bar - may be moved offscreen
-    setSelectedBar(m_selectedBar, m_selectedBarSeries);
+    setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
 }
 
 void Bars3DController::setMultiSeriesScaling(bool uniform)
@@ -436,7 +436,7 @@ void Bars3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
         if (mode != oldMode) {
             // Refresh selection upon mode change to ensure slicing is correctly updated
             // according to series the visibility.
-            setSelectedBar(m_selectedBar, m_selectedBarSeries);
+            setSelectedBar(m_selectedBar, m_selectedBarSeries, true);
 
             // Special case: Always deactivate slicing when changing away from slice
             // automanagement, as this can't be handled in setSelectedBar.
@@ -448,7 +448,7 @@ void Bars3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
     }
 }
 
-void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *series)
+void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *series, bool enterSlice)
 {
     // If the selection targets non-existent bar, clear selection instead.
     QPoint pos = position;
@@ -465,13 +465,14 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
                 || pos.y() < m_axisX->min() || pos.y() > m_axisX->max()
                 || !series->isVisible()) {
             scene()->setSlicingActive(false);
-        } else {
+        } else if (enterSlice) {
             scene()->setSlicingActive(true);
         }
         emitNeedRender();
     }
 
     if (pos != m_selectedBar || series != m_selectedBarSeries) {
+        bool seriesChanged = (series != m_selectedBarSeries);
         m_selectedBar = pos;
         m_selectedBarSeries = series;
         m_changeTracker.selectedBarChanged = true;
@@ -485,13 +486,16 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
         if (m_selectedBarSeries)
             m_selectedBarSeries->dptr()->setSelectedBar(m_selectedBar);
 
+        if (seriesChanged)
+            emit selectedSeriesChanged(m_selectedBarSeries);
+
         emitNeedRender();
     }
 }
 
 void Bars3DController::clearSelection()
 {
-    setSelectedBar(invalidSelectionPosition(), 0);
+    setSelectedBar(invalidSelectionPosition(), 0, false);
 }
 
 void Bars3DController::adjustAxisRanges()

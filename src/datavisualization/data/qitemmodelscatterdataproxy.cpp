@@ -18,7 +18,6 @@
 
 #include "qitemmodelscatterdataproxy_p.h"
 #include "scatteritemmodelhandler_p.h"
-#include <QTimer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -93,6 +92,16 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty string ItemModelScatterDataProxy::rotationRole
+ *
+ * Defines the rotation role for the mapping.
+ * The model may supply the value for rotation as either variant that is directly convertible
+ * to QQuaternion, or as one of the string representations: \c{"scalar,x,y,z"} or \c{"@angle,x,y,z"}. The first
+ * will construct the quaternion directly with given values, and the second one will construct
+ * the quaternion using QQuaternion::fromAxisAndAngle() method.
+ */
+
+/*!
  * Constructs QItemModelScatterDataProxy with optional \a parent.
  */
 QItemModelScatterDataProxy::QItemModelScatterDataProxy(QObject *parent)
@@ -130,6 +139,28 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel 
     dptr()->m_xPosRole = xPosRole;
     dptr()->m_yPosRole = yPosRole;
     dptr()->m_zPosRole = zPosRole;
+    dptr()->connectItemModelHandler();
+}
+
+/*!
+ * Constructs QItemModelScatterDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
+ * ownership of the \a itemModel, as typically item models are owned by other controls.
+ * The xPosRole property is set to \a xPosRole, yPosRole property to \a yPosRole, zPosRole property
+ * to \a zPosRole, and rotationRole property to \a rotationRole.
+ */
+QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
+                                                       const QString &xPosRole,
+                                                       const QString &yPosRole,
+                                                       const QString &zPosRole,
+                                                       const QString &rotationRole,
+                                                       QObject *parent)
+    : QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this), parent)
+{
+    dptr()->m_itemModelHandler->setItemModel(itemModel);
+    dptr()->m_xPosRole = xPosRole;
+    dptr()->m_yPosRole = yPosRole;
+    dptr()->m_zPosRole = zPosRole;
+    dptr()->m_rotationRole = rotationRole;
     dptr()->connectItemModelHandler();
 }
 
@@ -211,14 +242,38 @@ QString QItemModelScatterDataProxy::zPosRole() const
 }
 
 /*!
- * Changes \a xPosRole, \a yPosRole and \a zPosRole mapping.
+ * \property QItemModelScatterDataProxy::rotationRole
+ *
+ * Defines the rotation role for the mapping.
+ *
+ * The model may supply the value for rotation as either variant that is directly convertible
+ * to QQuartenion, or as one of the string representations: \c{"scalar,x,y,z"} or \c{"@angle,x,y,z"}. The first
+ * will construct the quaternion directly with given values, and the second one will construct
+ * the quaternion using QQuaternion::fromAxisAndAngle() method.
+ */
+void QItemModelScatterDataProxy::setRotationRole(const QString &role)
+{
+    if (dptr()->m_rotationRole != role) {
+        dptr()->m_rotationRole = role;
+        emit rotationRoleChanged(role);
+    }
+}
+
+QString QItemModelScatterDataProxy::rotationRole() const
+{
+    return dptrc()->m_rotationRole;
+}
+
+/*!
+ * Changes \a xPosRole, \a yPosRole, \a zPosRole, and \a rotationRole mapping.
  */
 void QItemModelScatterDataProxy::remap(const QString &xPosRole, const QString &yPosRole,
-                                       const QString &zPosRole)
+                                       const QString &zPosRole, const QString &rotationRole)
 {
     setXPosRole(xPosRole);
     setYPosRole(yPosRole);
     setZPosRole(zPosRole);
+    setRotationRole(rotationRole);
 }
 
 /*!

@@ -19,12 +19,10 @@
 #include "q3dcamera.h"
 #include "q3dcamera_p.h"
 #include "q3dscene.h"
-#include "q3dbox.h"
 #include "q3dobject.h"
 #include "utils_p.h"
 
-#include <qmath.h>
-#include <QVector3D>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -35,9 +33,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since Qt Data Visualization 1.0
  *
  * Q3DCamera represents a basic orbit around centerpoint 3D camera that is used when rendering the
- * data visualization. The class offers simple methods for setting the orbit point in rotations,
- * but allows also setting the 4x4 view matrix directly in case a more customized camera behavior is
- * needed.
+ * data visualization. The class offers simple methods for rotating the camera around the origin
+ * and setting zoom level.
  */
 
 /*!
@@ -85,9 +82,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \brief Representation of a camera in 3D space.
  *
  * Camera3D represents a basic orbit around centerpoint 3D camera that is used when rendering the
- * data visualization. The class offers simple methods for setting the orbit point in rotations,
- * but allows also setting the 4x4 view matrix directly in case a more customized camera behavior is
- * needed.
+ * data visualization. The type offers simple methods for rotating the camera around the origin
+ * and setting zoom level.
  *
  * For Camera3D enums, see \l Q3DCamera::CameraPreset
  */
@@ -104,74 +100,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This property contains the Y-rotation angle of the camera around the target point in degrees
  * starting from the current base position set by the setBaseOrientation method.
- */
-
-/*!
- * \qmlproperty float Camera3D::minXRotation
- *
- * This property contains the current minimum X-rotation for the camera.
- * The full circle range is \c{[-180, 180]} and the minimum value is limited to \c -180.
- * Also the value can't be higher than the maximum, and is adjusted if necessary.
- *
- * \sa wrapXRotation, maxXRotation
- */
-
-/*!
- * \qmlproperty float Camera3D::minYRotation
- *
- * This property contains the current minimum Y-rotation for the camera.
- * The full Y angle range is \c{[-90, 90]} and the minimum value is limited to \c -90.
- * Also the value can't be higher than the maximum, and is adjusted if necessary.
- *
- * \sa wrapYRotation, maxYRotation
- */
-
-/*!
- * \qmlproperty float Camera3D::maxXRotation
- *
- * This property contains the current maximum X-rotation for the camera.
- * The full circle range is \c{[-180, 180]} and the maximum value is limited to \c 180.
- * Also the value can't be lower than the minimum, and is adjusted if necessary.
- *
- * \sa wrapXRotation, minXRotation
- */
-
-/*!
- * \qmlproperty float Camera3D::maxYRotation
- *
- * This property contains the current maximum Y-rotation for the camera.
- * The full Y angle range is \c{[-90, 90]} and the maximum value is limited to \c 90.
- * Also the value can't be lower than the minimum, and is adjusted if necessary.
- *
- * \sa wrapYRotation, minYRotation
- */
-
-/*!
- * \qmlmethod void Camera3D::setBaseOrientation(vector3d basePosition, vector3d target, vector3d baseUp)
- *
- * Sets the base values for the camera that are used when calculating the camera position using the
- * rotation values. The base position of the camera is defined by \a basePosition, expectation is
- * that the x and y values are 0. Look at target point is defined by \a target and the camera
- * rotates around it. Up direction for the camera is defined by \a baseUp, normally this is a
- * vector with only y value set to 1.
- */
-
-/*!
- * \qmlproperty matrix4x4 Camera3D::viewMatrix
- *
- * This property contains the view matrix used in the 3D calculations. When the default orbiting
- * camera behavior is sufficient, there is no need to touch this property. If the default
- * behavior is insufficient, the view matrix can be set directly.
- * \note When setting the view matrix directly remember to set viewMatrixAutoUpdateEnabled
- * property to \c false.
- */
-
-/*!
- * \qmlproperty bool Camera3D::viewMatrixAutoUpdateEnabled
- *
- * This property determines if view matrix is automatically updated each render cycle using the
- * current base orientation and rotations. If set to \c false, no automatic recalculation is done and
- * the view matrix can be set using the viewMatrix property.
  */
 
 /*!
@@ -272,8 +200,7 @@ void Q3DCamera::copyValuesFrom(const Q3DObject &source)
 /*!
  * \property Q3DCamera::xRotation
  *
- * This property contains the X-rotation angle of the camera around the target point in degrees
- * starting from the current base position set by the setBaseOrientation() method.
+ * This property contains the X-rotation angle of the camera around the target point in degrees.
  */
 float Q3DCamera::xRotation() const {
     return d_ptr->m_xRotation;
@@ -300,8 +227,7 @@ void Q3DCamera::setXRotation(float rotation)
 /*!
  * \property Q3DCamera::yRotation
  *
- * This property contains the Y-rotation angle of the camera around the target point in degrees
- * starting from the current base position set by the setBaseOrientation() method.
+ * This property contains the Y-rotation angle of the camera around the target point in degrees.
  */
 float Q3DCamera::yRotation() const {
     return d_ptr->m_yRotation;
@@ -326,192 +252,10 @@ void Q3DCamera::setYRotation(float rotation)
 }
 
 /*!
- * \property Q3DCamera::minXRotation
- *
- * This property contains the current minimum X-rotation for the camera.
- * The full circle range is \c{[-180, 180]} and the minimum value is limited to \c -180.
- * Also the value can't be higher than the maximum, and is adjusted if necessary.
- *
- * \sa wrapXRotation, maxXRotation
- */
-float Q3DCamera::minXRotation() const
-{
-    return d_ptr->m_minXRotation;
-}
-
-void Q3DCamera::setMinXRotation(float minRotation)
-{
-    minRotation = qBound(-180.0f, minRotation, 180.0f);
-    if (minRotation > d_ptr->m_maxXRotation)
-        minRotation = d_ptr->m_maxXRotation;
-
-    if (d_ptr->m_minXRotation != minRotation) {
-        d_ptr->m_minXRotation = minRotation;
-        emit minXRotationChanged(minRotation);
-
-        if (d_ptr->m_xRotation < d_ptr->m_minXRotation)
-            setXRotation(d_ptr->m_xRotation);
-    }
-}
-
-/*!
- * \property Q3DCamera::minYRotation
- *
- * This property contains the current minimum Y-rotation for the camera.
- * The full Y angle range is \c{[-90, 90]} and the minimum value is limited to \c -90.
- * Also the value can't be higher than the maximum, and is adjusted if necessary.
- *
- * \sa wrapYRotation, maxYRotation
- */
-float Q3DCamera::minYRotation() const
-{
-    return d_ptr->m_minYRotation;
-}
-
-void Q3DCamera::setMinYRotation(float minRotation)
-{
-    minRotation = qBound(-90.0f, minRotation, 90.0f);
-    if (minRotation > d_ptr->m_maxYRotation)
-        minRotation = d_ptr->m_maxYRotation;
-
-    if (d_ptr->m_minYRotation != minRotation) {
-        d_ptr->m_minYRotation = minRotation;
-        emit minYRotationChanged(minRotation);
-
-        if (d_ptr->m_yRotation < d_ptr->m_minYRotation)
-            setYRotation(d_ptr->m_yRotation);
-    }
-}
-
-/*!
- * \property Q3DCamera::maxXRotation
- *
- * This property contains the current maximum X-rotation for the camera.
- * The full circle range is \c{[-180, 180]} and the maximum value is limited to \c 180.
- * Also the value can't be lower than the minimum, and is adjusted if necessary.
- *
- * \sa wrapXRotation, minXRotation
- */
-float Q3DCamera::maxXRotation() const
-{
-    return d_ptr->m_maxXRotation;
-}
-
-void Q3DCamera::setMaxXRotation(float maxRotation)
-{
-    maxRotation = qBound(-180.0f, maxRotation, 180.0f);
-
-    if (maxRotation < d_ptr->m_minXRotation)
-        maxRotation = d_ptr->m_minXRotation;
-
-    if (d_ptr->m_maxXRotation != maxRotation) {
-        d_ptr->m_maxXRotation = maxRotation;
-        emit maxXRotationChanged(maxRotation);
-
-        if (d_ptr->m_xRotation > d_ptr->m_maxXRotation)
-            setXRotation(d_ptr->m_xRotation);
-    }
-}
-
-/*!
- * \property Q3DCamera::maxYRotation
- *
- * This property contains the current maximum Y-rotation for the camera.
- * The full Y angle range is \c{[-90, 90]} and the maximum value is limited to \c 90.
- * Also the value can't be lower than the minimum, and is adjusted if necessary.
- *
- * \sa wrapYRotation, minYRotation
- */
-float Q3DCamera::maxYRotation() const
-{
-    return d_ptr->m_maxYRotation;
-}
-
-void Q3DCamera::setMaxYRotation(float maxRotation)
-{
-    maxRotation = qBound(-90.0f, maxRotation, 90.0f);
-
-    if (maxRotation < d_ptr->m_minYRotation)
-        maxRotation = d_ptr->m_minYRotation;
-
-    if (d_ptr->m_maxYRotation != maxRotation) {
-        d_ptr->m_maxYRotation = maxRotation;
-        emit maxYRotationChanged(maxRotation);
-
-        if (d_ptr->m_yRotation > d_ptr->m_maxYRotation)
-            setYRotation(d_ptr->m_yRotation);
-    }
-}
-
-/*!
- * Sets the base values for the camera that are used when calculating the camera position using the
- * rotation values. The base position of the camera is defined by \a basePosition, expectation is
- * that the x and y values are 0. Look at target point is defined by \a target and the camera
- * rotates around it. Up direction for the camera is defined by \a baseUp, normally this is a
- * vector with only y value set to 1.
- */
-void Q3DCamera::setBaseOrientation(const QVector3D &basePosition,
-                                   const QVector3D &target,
-                                   const QVector3D &baseUp)
-{
-    if (position() != basePosition
-            || d_ptr->m_target != target
-            || d_ptr->m_up != baseUp) {
-        setPosition(basePosition);
-        d_ptr->m_target   = target;
-        d_ptr->m_up       = baseUp;
-        setDirty(true);
-    }
-}
-
-/*!
- * \property Q3DCamera::viewMatrix
- *
- * This property contains the view matrix used in the 3D calculations. When the default orbiting
- * camera behavior is sufficient, there is no need to touch this property. If the default
- * behavior is insufficient, the view matrix can be set directly.
- * \note When setting the view matrix directly remember to set viewMatrixAutoUpdateEnabled to
- * \c false.
- */
-QMatrix4x4 Q3DCamera::viewMatrix() const
-{
-    return d_ptr->m_viewMatrix;
-}
-
-void Q3DCamera::setViewMatrix(const QMatrix4x4 &viewMatrix)
-{
-    if (d_ptr->m_viewMatrix != viewMatrix) {
-        d_ptr->m_viewMatrix = viewMatrix;
-        setDirty(true);
-        emit viewMatrixChanged(d_ptr->m_viewMatrix);
-    }
-}
-
-/*!
- * \property Q3DCamera::viewMatrixAutoUpdateEnabled
- *
- * This property determines if view matrix is automatically updated each render cycle using the
- * current base orientation and rotations. If set to \c false, no automatic recalculation is done
- * and the view matrix can be set using the viewMatrix property.
- */
-bool Q3DCamera::isViewMatrixAutoUpdateEnabled() const
-{
-    return d_ptr->m_isViewMatrixUpdateActive;
-}
-
-void Q3DCamera::setViewMatrixAutoUpdateEnabled(bool isEnabled)
-{
-    d_ptr->m_isViewMatrixUpdateActive = isEnabled;
-    emit viewMatrixAutoUpdateChanged(isEnabled);
-}
-
-/*!
  * \property Q3DCamera::cameraPreset
  *
  * This property contains the currently active camera preset, if no preset is active the value
  * is CameraPresetNone.
- * \note The base camera orientation set by setBaseOrientation() will affect
- * the presets as all calculations are based on those values.
  */
 Q3DCamera::CameraPreset Q3DCamera::cameraPreset() const
 {
@@ -674,42 +418,6 @@ void Q3DCamera::setZoomLevel(int zoomLevel)
 }
 
 /*!
- * Calculates and returns a position relative to the camera using the given parameters
- * and the current camera viewMatrix property.
- * The relative 3D offset to the current camera position is defined in \a relativePosition.
- * An optional fixed rotation of the calculated point around the data visualization area can be
- * given in \a fixedRotation. The rotation is given in degrees.
- * An optional \a distanceModifier modifies the distance of the calculated point from the data
- * visualization.
- * \return calculated position relative to this camera's position.
- */
-QVector3D Q3DCamera::calculatePositionRelativeToCamera(const QVector3D &relativePosition,
-                                                       float fixedRotation,
-                                                       float distanceModifier) const
-{
-    // Move the position with camera
-    GLfloat radiusFactor = cameraDistance * (1.5f + distanceModifier);
-    GLfloat xAngle;
-    GLfloat yAngle;
-    if (!fixedRotation) {
-        xAngle = qDegreesToRadians(d_ptr->m_xRotation);
-        yAngle = qDegreesToRadians(d_ptr->m_yRotation);
-    } else {
-        xAngle = qDegreesToRadians(fixedRotation);
-        yAngle = 0;
-    }
-    GLfloat radius = (radiusFactor + relativePosition.y()); // set radius to match the highest height of the position
-    GLfloat zPos = radius * qCos(xAngle) * qCos(yAngle);
-    GLfloat xPos = radius * qSin(xAngle) * qCos(yAngle);
-    GLfloat yPos = (radiusFactor + relativePosition.y()) * qSin(yAngle);
-
-    // Keep in the set position in relation to camera
-    return QVector3D(-xPos + relativePosition.x(),
-                     yPos + relativePosition.y(),
-                     zPos + relativePosition.z());
-}
-
-/*!
  * \property Q3DCamera::wrapXRotation
  *
  * This property determines the behavior of the minimum and maximum limits in the X-rotation.
@@ -809,34 +517,120 @@ void Q3DCameraPrivate::setYRotation(const float rotation)
     }
 }
 
-void Q3DCameraPrivate::setMinXRotation(const float rotation)
+/*!
+ * \internal
+ * This property contains the current minimum X-rotation for the camera.
+ * The full circle range is \c{[-180, 180]} and the minimum value is limited to \c -180.
+ * Also the value can't be higher than the maximum, and is adjusted if necessary.
+ *
+ * \sa wrapXRotation, maxXRotation
+ */
+float Q3DCameraPrivate::minXRotation() const
 {
-    if (m_minXRotation != rotation) {
-        m_minXRotation = rotation;
+    return m_minXRotation;
+}
+
+void Q3DCameraPrivate::setMinXRotation(float minRotation)
+{
+    minRotation = qBound(-180.0f, minRotation, 180.0f);
+    if (minRotation > m_maxXRotation)
+        minRotation = m_maxXRotation;
+
+    if (m_minXRotation != minRotation) {
+        m_minXRotation = minRotation;
+        emit minXRotationChanged(minRotation);
+
+        if (m_xRotation < m_minXRotation)
+            setXRotation(m_xRotation);
         q_ptr->setDirty(true);
     }
 }
 
-void Q3DCameraPrivate::setMinYRotation(const float rotation)
+/*!
+ * \internal
+ * This property contains the current minimum Y-rotation for the camera.
+ * The full Y angle range is \c{[-90, 90]} and the minimum value is limited to \c -90.
+ * Also the value can't be higher than the maximum, and is adjusted if necessary.
+ *
+ * \sa wrapYRotation, maxYRotation
+ */
+float Q3DCameraPrivate::minYRotation() const
 {
-    if (m_minYRotation != rotation) {
-        m_minYRotation = rotation;
+    return m_minYRotation;
+}
+
+void Q3DCameraPrivate::setMinYRotation(float minRotation)
+{
+    minRotation = qBound(-90.0f, minRotation, 90.0f);
+    if (minRotation > m_maxYRotation)
+        minRotation = m_maxYRotation;
+
+    if (m_minYRotation != minRotation) {
+        m_minYRotation = minRotation;
+        emit minYRotationChanged(minRotation);
+
+        if (m_yRotation < m_minYRotation)
+            setYRotation(m_yRotation);
         q_ptr->setDirty(true);
     }
 }
 
-void Q3DCameraPrivate::setMaxXRotation(const float rotation)
+/*!
+ * \internal
+ * This property contains the current maximum X-rotation for the camera.
+ * The full circle range is \c{[-180, 180]} and the maximum value is limited to \c 180.
+ * Also the value can't be lower than the minimum, and is adjusted if necessary.
+ *
+ * \sa wrapXRotation, minXRotation
+ */
+float Q3DCameraPrivate::maxXRotation() const
 {
-    if (m_maxXRotation != rotation) {
-        m_maxXRotation = rotation;
+    return m_maxXRotation;
+}
+
+void Q3DCameraPrivate::setMaxXRotation(float maxRotation)
+{
+    maxRotation = qBound(-180.0f, maxRotation, 180.0f);
+
+    if (maxRotation < m_minXRotation)
+        maxRotation = m_minXRotation;
+
+    if (m_maxXRotation != maxRotation) {
+        m_maxXRotation = maxRotation;
+        emit maxXRotationChanged(maxRotation);
+
+        if (m_xRotation > m_maxXRotation)
+            setXRotation(m_xRotation);
         q_ptr->setDirty(true);
     }
 }
 
-void Q3DCameraPrivate::setMaxYRotation(const float rotation)
+/*!
+ * \internal
+ * This property contains the current maximum Y-rotation for the camera.
+ * The full Y angle range is \c{[-90, 90]} and the maximum value is limited to \c 90.
+ * Also the value can't be lower than the minimum, and is adjusted if necessary.
+ *
+ * \sa wrapYRotation, minYRotation
+ */
+float Q3DCameraPrivate::maxYRotation() const
 {
-    if (m_maxYRotation != rotation) {
-        m_maxYRotation = rotation;
+    return m_maxYRotation;
+}
+
+void Q3DCameraPrivate::setMaxYRotation(float maxRotation)
+{
+    maxRotation = qBound(-90.0f, maxRotation, 90.0f);
+
+    if (maxRotation < m_minYRotation)
+        maxRotation = m_minYRotation;
+
+    if (m_maxYRotation != maxRotation) {
+        m_maxYRotation = maxRotation;
+        emit maxYRotationChanged(maxRotation);
+
+        if (m_yRotation > m_maxYRotation)
+            setYRotation(m_yRotation);
         q_ptr->setDirty(true);
     }
 }
@@ -866,7 +660,103 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     // Compensate for translation (if d_ptr->m_target is off origin)
     viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
 
-    q_ptr->setViewMatrix(viewMatrix);
+    setViewMatrix(viewMatrix);
+}
+
+/*!
+ * \internal
+ * This property contains the view matrix used in the 3D calculations. When the default orbiting
+ * camera behavior is sufficient, there is no need to touch this property. If the default
+ * behavior is insufficient, the view matrix can be set directly.
+ * \note When setting the view matrix directly remember to set viewMatrixAutoUpdateEnabled to
+ * \c false.
+ */
+QMatrix4x4 Q3DCameraPrivate::viewMatrix() const
+{
+    return m_viewMatrix;
+}
+
+void Q3DCameraPrivate::setViewMatrix(const QMatrix4x4 &viewMatrix)
+{
+    if (m_viewMatrix != viewMatrix) {
+        m_viewMatrix = viewMatrix;
+        q_ptr->setDirty(true);
+        emit viewMatrixChanged(m_viewMatrix);
+    }
+}
+
+/*!
+ * \internal
+ * This property determines if view matrix is automatically updated each render cycle using the
+ * current base orientation and rotations. If set to \c false, no automatic recalculation is done
+ * and the view matrix can be set using the viewMatrix property.
+ */
+bool Q3DCameraPrivate::isViewMatrixAutoUpdateEnabled() const
+{
+    return m_isViewMatrixUpdateActive;
+}
+
+void Q3DCameraPrivate::setViewMatrixAutoUpdateEnabled(bool isEnabled)
+{
+    m_isViewMatrixUpdateActive = isEnabled;
+    emit viewMatrixAutoUpdateChanged(isEnabled);
+}
+
+/*!
+ * \internal
+ * Sets the base values for the camera that are used when calculating the camera position using the
+ * rotation values. The base position of the camera is defined by \a basePosition, expectation is
+ * that the x and y values are 0. Look at target point is defined by \a target and the camera
+ * rotates around it. Up direction for the camera is defined by \a baseUp, normally this is a
+ * vector with only y value set to 1.
+ */
+void Q3DCameraPrivate::setBaseOrientation(const QVector3D &basePosition,
+                                          const QVector3D &target,
+                                          const QVector3D &baseUp)
+{
+    if (q_ptr->position() != basePosition || m_target != target || m_up != baseUp) {
+        q_ptr->setPosition(basePosition);
+        m_target = target;
+        m_up = baseUp;
+        q_ptr->setDirty(true);
+    }
+}
+
+/*!
+ * \internal
+ * Calculates and returns a position relative to the camera using the given parameters
+ * and the current camera viewMatrix property.
+ * The relative 3D offset to the current camera position is defined in \a relativePosition.
+ * An optional fixed rotation of the calculated point around the data visualization area can be
+ * given in \a fixedRotation. The rotation is given in degrees.
+ * An optional \a distanceModifier modifies the distance of the calculated point from the data
+ * visualization.
+ * \return calculated position relative to this camera's position.
+ */
+QVector3D Q3DCameraPrivate::calculatePositionRelativeToCamera(const QVector3D &relativePosition,
+                                                              float fixedRotation,
+                                                              float distanceModifier) const
+{
+    // Move the position with camera
+    GLfloat radiusFactor = cameraDistance * (1.5f + distanceModifier);
+    GLfloat xAngle;
+    GLfloat yAngle;
+    if (!fixedRotation) {
+        xAngle = qDegreesToRadians(m_xRotation);
+        yAngle = qDegreesToRadians(m_yRotation);
+    } else {
+        xAngle = qDegreesToRadians(fixedRotation);
+        yAngle = 0;
+    }
+    GLfloat radius = (radiusFactor + relativePosition.y()); // set radius to match the highest height of the position
+    GLfloat zPos = radius * qCos(xAngle) * qCos(yAngle);
+    GLfloat xPos = radius * qSin(xAngle) * qCos(yAngle);
+    GLfloat yPos = (radiusFactor + relativePosition.y()) * qSin(yAngle);
+
+    // Keep in the set position in relation to camera
+    return QVector3D(-xPos + relativePosition.x(),
+                     yPos + relativePosition.y(),
+                     zPos + relativePosition.z());
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

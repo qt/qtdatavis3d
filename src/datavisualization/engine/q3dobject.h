@@ -19,14 +19,14 @@
 #ifndef Q3DOBJECT_H
 #define Q3DOBJECT_H
 
-#include <QtDataVisualization/q3dscene.h>
-
-#include <QObject>
-#include <QVector3D>
+#include <QtDataVisualization/qdatavisualizationglobal.h>
+#include <QtCore/QObject>
+#include <QtGui/QVector3D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DObjectPrivate;
+class Q3DScene;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DObject : public QObject
 {
@@ -46,7 +46,7 @@ public:
     void setPosition(const QVector3D &position);
 
 signals:
-    void positionChanged(QVector3D position);
+    void positionChanged(const QVector3D &position);
 
 protected:
     void setDirty(bool dirty);

@@ -33,12 +33,19 @@
 #include "abstractobjecthelper_p.h"
 #include "qsurfacedataproxy.h"
 
-#include <QRect>
+#include <QtCore/QRect>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class SurfaceObject : public AbstractObjectHelper
 {
+public:
+    enum SurfaceType {
+        SurfaceSmooth,
+        SurfaceFlat,
+        Undefined
+    };
+
 public:
     SurfaceObject();
     ~SurfaceObject();
@@ -63,6 +70,7 @@ public:
     GLuint gridElementBuf();
     GLuint gridIndexCount();
     QVector3D vertexAt(int column, int row);
+    void clear();
 
 private:
     QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
@@ -71,11 +79,7 @@ private:
                        bool changeGeometry);
 
 private:
-    enum SurfaceType {
-        SurfaceSmooth,
-        SurfaceFlat
-    };
-    int m_surfaceType;
+    SurfaceType m_surfaceType;
     int m_columns;
     int m_rows;
     GLuint m_gridElementbuffer;

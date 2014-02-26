@@ -20,16 +20,13 @@
 #define Q3DBARS_H
 
 #include <QtDataVisualization/qabstract3dgraph.h>
-#include <QFont>
-#include <QLinearGradient>
+#include <QtDataVisualization/qvalue3daxis.h>
+#include <QtDataVisualization/qcategory3daxis.h>
+#include <QtDataVisualization/qbar3dseries.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DBarsPrivate;
-class QAbstract3DAxis;
-class QCategory3DAxis;
-class QValue3DAxis;
-class QBar3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
 {
@@ -42,6 +39,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
     Q_PROPERTY(QCategory3DAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
     Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
     Q_PROPERTY(QBar3DSeries *primarySeries READ primarySeries WRITE setPrimarySeries NOTIFY primarySeriesChanged)
+    Q_PROPERTY(QBar3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
 
 public:
     explicit Q3DBars(const QSurfaceFormat *format = 0, QWindow *parent = 0);
@@ -76,15 +74,18 @@ public:
     void releaseAxis(QAbstract3DAxis *axis);
     QList<QAbstract3DAxis *> axes() const;
 
+    QBar3DSeries *selectedSeries() const;
+
 signals:
     void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
-    void barSpacingChanged(QSizeF spacing);
+    void barSpacingChanged(const QSizeF &spacing);
     void barSpacingRelativeChanged(bool relative);
     void rowAxisChanged(QCategory3DAxis *axis);
     void columnAxisChanged(QCategory3DAxis *axis);
     void valueAxisChanged(QValue3DAxis *axis);
     void primarySeriesChanged(QBar3DSeries *series);
+    void selectedSeriesChanged(QBar3DSeries *series);
 
 private:
     Q3DBarsPrivate *dptr();

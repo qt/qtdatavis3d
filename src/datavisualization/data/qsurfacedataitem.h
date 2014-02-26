@@ -20,8 +20,7 @@
 #define QSURFACEDATAITEM_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
-
-#include <QVector3D>
+#include <QtGui/QVector3D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -47,7 +46,7 @@ public:
     inline float z() const { return m_position.z(); }
 
 protected:
-    virtual void createExtraData();
+    void createExtraData();
 
     QSurfaceDataItemPrivate *d_ptr;
 

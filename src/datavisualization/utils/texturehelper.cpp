@@ -19,10 +19,8 @@
 #include "texturehelper_p.h"
 #include "utils_p.h"
 
-#include <QImage>
-#include <QPainter>
-
-#include <QDebug>
+#include <QtGui/QImage>
+#include <QtGui/QPainter>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -45,7 +43,6 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
 
 #if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
     GLuint temp;
-    //qDebug() << "old size" << image.size();
     GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width(), temp);
     GLuint imageHeight = Utils::getNearestPowerOfTwo(image.height(), temp);
     if (smoothScale) {
@@ -54,7 +51,6 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     } else {
         texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio);
     }
-    //qDebug() << "new size" << texImage.size();
 #endif
 
     GLuint textureId;
@@ -153,6 +149,18 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return textureid;
+}
+
+GLuint TextureHelper::createUniformTexture(const QColor &color)
+{
+    QImage image(QSize(int(uniformTextureWidth), int(uniformTextureHeight)),
+                 QImage::Format_RGB32);
+    QPainter pmp(&image);
+    pmp.setBrush(QBrush(color));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, int(uniformTextureWidth), int(uniformTextureHeight));
+
+    return create2DTexture(image, false, true, false, true);
 }
 
 GLuint TextureHelper::createGradientTexture(const QLinearGradient &gradient)

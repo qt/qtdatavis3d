@@ -44,7 +44,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_devicePixelRatio(1.0f),
       m_selectionLabelDirty(true),
       m_clickPending(false),
-      m_clickedSeries(0)
+      m_clickedSeries(0),
+      m_selectionLabelItem(0)
 #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),
       m_numFrames(0)
@@ -67,6 +68,7 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_textureHelper;
     delete m_cachedScene;
     delete m_cachedTheme;
+    delete m_selectionLabelItem;
 }
 
 void Abstract3DRenderer::initializeOpenGL()
@@ -188,7 +190,7 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
 
     scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
     // Set light position (rotate light with activeCamera, a bit above it (as set in defaultLightPos))
-    scene->setLightPositionRelativeToCamera(defaultLightPos);
+    scene->d_ptr->setLightPositionRelativeToCamera(defaultLightPos);
 
     QPoint logicalPixelPosition = scene->selectionQueryPosition();
     updateInputPosition(QPoint(logicalPixelPosition.x() * m_devicePixelRatio,
@@ -426,8 +428,17 @@ void Abstract3DRenderer::lowerShadowQuality()
     updateShadowQuality(newQuality);
 }
 
-void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient,
-                                                       GLuint *gradientTexture)
+void Abstract3DRenderer::generateBaseColorTexture(const QColor &color, GLuint *texture)
+{
+    if (*texture) {
+        m_textureHelper->deleteTexture(texture);
+        *texture = 0;
+    }
+
+    *texture = m_textureHelper->createUniformTexture(color);
+}
+
+void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture)
 {
     // Readjust start/stop to match gradient texture size
     gradient->setStart(qreal(gradientTextureWidth), qreal(gradientTextureHeight));
@@ -439,6 +450,25 @@ void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient
     }
 
     *gradientTexture = m_textureHelper->createGradientTexture(*gradient);
+}
+
+LabelItem &Abstract3DRenderer::selectionLabelItem()
+{
+    if (!m_selectionLabelItem)
+        m_selectionLabelItem = new LabelItem;
+    return *m_selectionLabelItem;
+}
+
+void Abstract3DRenderer::setSelectionLabel(const QString &label)
+{
+    if (m_selectionLabelItem)
+        m_selectionLabelItem->clear();
+    m_selectionLabel = label;
+}
+
+QString &Abstract3DRenderer::selectionLabel()
+{
+    return m_selectionLabel;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

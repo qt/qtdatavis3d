@@ -45,19 +45,8 @@ public:
     inline const QVector3D &position() const { return m_position; }
     inline void setPosition(const QVector3D &pos)
     {
-        if (m_position != pos) {
+        if (m_position != pos)
             m_position = pos;
-            // Force reformatting on next access by setting label string to null string
-            if (!m_selectionLabel.isNull())
-                setSelectionLabel(QString());
-        }
-    }
-
-    inline QQuaternion rotation() const { return m_rotation; }
-    inline void setRotation(const QQuaternion &rotation)
-    {
-        if (m_rotation != rotation)
-            m_rotation = rotation;
     }
 
     inline bool isVisible() const { return m_visible; }
@@ -65,7 +54,6 @@ public:
 
 protected:
     QVector3D m_position;
-    QQuaternion m_rotation;
     bool m_visible;
 
     friend class QScatterDataItem;

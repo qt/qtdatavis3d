@@ -20,8 +20,8 @@
 #define QITEMMODELSURFACEDATAPROXY_H
 
 #include <QtDataVisualization/qsurfacedataproxy.h>
-#include <QAbstractItemModel>
-#include <QStringList>
+#include <QtCore/QAbstractItemModel>
+#include <QtCore/QStringList>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -33,7 +33,9 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelSurfaceDataProxy : public QSurfaceDa
     Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
     Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY rowRoleChanged)
     Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY columnRoleChanged)
-    Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY valueRoleChanged)
+    Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole NOTIFY xPosRoleChanged)
+    Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole NOTIFY yPosRoleChanged)
+    Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole NOTIFY zPosRoleChanged)
     Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories NOTIFY rowCategoriesChanged)
     Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories NOTIFY columnCategoriesChanged)
     Q_PROPERTY(bool useModelCategories READ useModelCategories WRITE setUseModelCategories NOTIFY useModelCategoriesChanged)
@@ -43,13 +45,22 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelSurfaceDataProxy : public QSurfaceDa
 public:
     explicit QItemModelSurfaceDataProxy(QObject *parent = 0);
     QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, QObject *parent = 0);
-    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &valueRole,
+    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &yPosRole,
                                QObject *parent = 0);
     QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
-                               const QString &columnRole, const QString &valueRole,
+                               const QString &columnRole, const QString &yPosRole,
                                QObject *parent = 0);
     QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
-                               const QString &columnRole, const QString &valueRole,
+                               const QString &columnRole, const QString &xPosRole,
+                               const QString &yPosRole, const QString &zPosRole,
+                               QObject *parent = 0);
+    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+                               const QString &columnRole, const QString &yPosRole,
+                               const QStringList &rowCategories, const QStringList &columnCategories,
+                               QObject *parent = 0);
+    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+                               const QString &columnRole, const QString &xPosRole,
+                               const QString &yPosRole, const QString &zPosRole,
                                const QStringList &rowCategories, const QStringList &columnCategories,
                                QObject *parent = 0);
     virtual ~QItemModelSurfaceDataProxy();
@@ -61,8 +72,12 @@ public:
     QString rowRole() const;
     void setColumnRole(const QString &role);
     QString columnRole() const;
-    void setValueRole(const QString &role);
-    QString valueRole() const;
+    void setXPosRole(const QString &role);
+    QString xPosRole() const;
+    void setYPosRole(const QString &role);
+    QString yPosRole() const;
+    void setZPosRole(const QString &role);
+    QString zPosRole() const;
 
     void setRowCategories(const QStringList &categories);
     QStringList rowCategories() const;
@@ -77,7 +92,8 @@ public:
     bool autoColumnCategories() const;
 
     void remap(const QString &rowRole, const QString &columnRole,
-               const QString &valueRole, const QStringList &rowCategories,
+               const QString &xPosRole, const QString &yPosRole,
+               const QString &zPosRole, const QStringList &rowCategories,
                const QStringList &columnCategories);
 
     Q_INVOKABLE int rowCategoryIndex(const QString& category);
@@ -85,11 +101,13 @@ public:
 
 signals:
     void itemModelChanged(const QAbstractItemModel* itemModel);
-    void rowRoleChanged(QString role);
-    void columnRoleChanged(QString role);
-    void valueRoleChanged(QString role);
-    void rowCategoriesChanged(QStringList categories);
-    void columnCategoriesChanged(QStringList categories);
+    void rowRoleChanged(const QString &role);
+    void columnRoleChanged(const QString &role);
+    void xPosRoleChanged(const QString &role);
+    void yPosRoleChanged(const QString &role);
+    void zPosRoleChanged(const QString &role);
+    void rowCategoriesChanged();
+    void columnCategoriesChanged();
     void useModelCategoriesChanged(bool enable);
     void autoRowCategoriesChanged(bool enable);
     void autoColumnCategoriesChanged(bool enable);

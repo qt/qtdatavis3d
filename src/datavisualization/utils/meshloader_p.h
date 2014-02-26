@@ -30,9 +30,7 @@
 #define MESHLOADER_P_H
 
 #include "datavisualizationglobal_p.h"
-
-class QVector2D;
-class QVector3D;
+#include <QtGui/QVector2D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

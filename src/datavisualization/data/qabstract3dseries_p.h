@@ -28,7 +28,6 @@
 
 #include "datavisualizationglobal_p.h"
 #include "qabstract3dseries.h"
-#include <QString>
 
 #ifndef QABSTRACT3DSERIES_P_H
 #define QABSTRACT3DSERIES_P_H

@@ -16,30 +16,30 @@
 **
 ****************************************************************************/
 
-#include <QtDataVisualization/qutils.h>
 #include <QtGui/QGuiApplication>
-#include "qtquick2applicationviewer.h"
+#include <QtCore/QDir>
+#include <QtQuick/QQuickView>
+#include <QtQml/QQmlEngine>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
 
-    QtQuick2ApplicationViewer viewer;
+    QQuickView viewer;
 
-    // Enable antialiasing
-    viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
-
-#ifdef Q_OS_ANDROID
-    viewer.addImportPath(QString::fromLatin1("assets:/qml"));
-    viewer.engine()->addPluginPath(QString::fromLatin1("%1/../%2").arg(QDir::homePath(),
-                                                                       QString::fromLatin1("lib")));
+    // The following are needed to make examples run without having to install the module
+    // in desktop environments.
+#ifdef Q_OS_WIN
+    QString extraImportPath(QStringLiteral("%1/../../../%2"));
 #else
-    viewer.addImportPath(QString::fromLatin1("%1/%2").arg(QCoreApplication::applicationDirPath(),
-                                                          QString::fromLatin1("qml")));
+    QString extraImportPath(QStringLiteral("%1/../../%2"));
 #endif
-    viewer.setMainQmlFile(QStringLiteral("qml/qmlcamera/main.qml"));
+    viewer.engine()->addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
+                                      QString::fromLatin1("qml")));
+
+    viewer.setSource(QUrl("qrc:/qml/qmlcamera/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
-    viewer.showExpanded();
+    viewer.show();
 
     return app.exec();
 }

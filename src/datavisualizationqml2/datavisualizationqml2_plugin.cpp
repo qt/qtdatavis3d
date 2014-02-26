@@ -18,7 +18,7 @@
 
 #include "datavisualizationqml2_plugin.h"
 
-#include <qqml.h>
+#include <QtQml>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -20,15 +20,13 @@
 #define Q3DSCENE_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
-
-#include <QObject>
-#include <QRect>
+#include <QtDataVisualization/q3dcamera.h>
+#include <QtDataVisualization/q3dlight.h>
+#include <QtCore/QObject>
+#include <QtCore/QRect>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class Q3DCamera;
-class Q3DBox;
-class Q3DLight;
 class Q3DScenePrivate;
 
 class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
@@ -46,7 +44,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
 
 public:
     Q3DScene(QObject *parent = 0);
-    ~Q3DScene();
+    virtual ~Q3DScene();
 
     QRect viewport() const;
 
@@ -77,19 +75,16 @@ public:
     float devicePixelRatio() const;
     void setDevicePixelRatio(float pixelRatio);
 
-    Q_INVOKABLE void setLightPositionRelativeToCamera(const QVector3D &relativePosition,
-                                                      float fixedRotation = 0.0f,
-                                                      float distanceModifier = 0.0f);
 signals:
-    void viewportChanged(QRect viewport);
-    void primarySubViewportChanged(QRect subViewport);
-    void secondarySubViewportChanged(QRect subViewport);
+    void viewportChanged(const QRect &viewport);
+    void primarySubViewportChanged(const QRect &subViewport);
+    void secondarySubViewportChanged(const QRect &subViewport);
     void secondarySubviewOnTopChanged(bool isSecondaryOnTop);
     void slicingActiveChanged(bool isSlicingActive);
-    void activeCameraChanged(const Q3DCamera *camera);
-    void activeLightChanged(const Q3DLight *light);
+    void activeCameraChanged(Q3DCamera *camera);
+    void activeLightChanged(Q3DLight *light);
     void devicePixelRatioChanged(float pixelRatio);
-    void selectionQueryPositionChanged(const QPoint position);
+    void selectionQueryPositionChanged(const QPoint &position);
 
 private:
     QScopedPointer<Q3DScenePrivate> d_ptr;

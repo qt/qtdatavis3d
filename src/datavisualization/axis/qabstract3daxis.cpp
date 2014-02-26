@@ -151,7 +151,7 @@ QAbstract3DAxis::AxisType QAbstract3DAxis::type() const
  *
  * Defines the title for the axis.
  */
-void QAbstract3DAxis::setTitle(QString title)
+void QAbstract3DAxis::setTitle(const QString &title)
 {
     if (d_ptr->m_title != title) {
         d_ptr->m_title = title;

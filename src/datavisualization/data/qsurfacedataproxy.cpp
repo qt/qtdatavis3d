@@ -131,7 +131,7 @@ QSurfaceDataProxy::~QSurfaceDataProxy()
  *
  *  The series this proxy is attached to.
  */
-QSurface3DSeries *QSurfaceDataProxy::series()
+QSurface3DSeries *QSurfaceDataProxy::series() const
 {
     return static_cast<QSurface3DSeries *>(d_ptr->series());
 }
@@ -183,6 +183,15 @@ void QSurfaceDataProxy::setItem(int rowIndex, int columnIndex, const QSurfaceDat
 {
     dptr()->setItem(rowIndex, columnIndex, item);
     emit itemChanged(rowIndex, columnIndex);
+}
+
+/*!
+ * Changes a single item at \a position to the \a item.
+ * The X-value of \a position indicates the row and the Y-value indicates the column.
+ */
+void QSurfaceDataProxy::setItem(const QPoint &position, const QSurfaceDataItem &item)
+{
+    setItem(position.x(), position.y(), item);
 }
 
 /*!
@@ -259,6 +268,29 @@ const QSurfaceDataArray *QSurfaceDataProxy::array() const
 }
 
 /*!
+ * \return pointer to the item at \a rowIndex, \a columnIndex. It is guaranteed to be valid only
+ * until the next call that modifies data.
+ */
+const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int rowIndex, int columnIndex) const
+{
+    const QSurfaceDataArray &dataArray = *dptrc()->m_dataArray;
+    Q_ASSERT(rowIndex >= 0 && rowIndex < dataArray.size());
+    const QSurfaceDataRow &dataRow = *dataArray[rowIndex];
+    Q_ASSERT(columnIndex >= 0 && columnIndex < dataRow.size());
+    return &dataRow.at(columnIndex);
+}
+
+/*!
+ * \return pointer to the item at \a position. The X-value of \a position indicates the row
+ * and the Y-value indicates the column. The item is guaranteed to be valid only
+ * until the next call that modifies data.
+ */
+const QSurfaceDataItem *QSurfaceDataProxy::itemAt(const QPoint &position) const
+{
+    return itemAt(position.x(), position.y());
+}
+
+/*!
  * \property QSurfaceDataProxy::rowCount
  *
  * \return number of rows in the data.
@@ -279,15 +311,6 @@ int QSurfaceDataProxy::columnCount() const
         return dptrc()->m_dataArray->at(0)->size();
     else
         return 0;
-}
-
-/*!
- * \return pointer to the item at \a index. It is guaranteed to be valid only until the next call that
- * modifies data.
- */
-const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int index) const
-{
-    return &dptrc()->m_dataArray->at(index)->at(2);
 }
 
 /*!

@@ -20,6 +20,8 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+static const int noRoleIndex = -1;
+
 BarItemModelHandler::BarItemModelHandler(QItemModelBarDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
       m_proxy(proxy),
@@ -51,8 +53,9 @@ void BarItemModelHandler::resolveModel()
 
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
-    // Default to display role if no mapping
+    // Default value role to display role if no mapping
     int valueRole = roleHash.key(m_proxy->valueRole().toLatin1(), Qt::DisplayRole);
+    int rotationRole = roleHash.key(m_proxy->rotationRole().toLatin1(), noRoleIndex);
     int rowCount = m_itemModel->rowCount();
     int columnCount = m_itemModel->columnCount();
 
@@ -67,8 +70,11 @@ void BarItemModelHandler::resolveModel()
         }
         for (int i = 0; i < rowCount; i++) {
             QBarDataRow &newProxyRow = *m_proxyArray->at(i);
-            for (int j = 0; j < columnCount; j++)
+            for (int j = 0; j < columnCount; j++) {
                 newProxyRow[j].setValue(m_itemModel->index(i, j).data(valueRole).toReal());
+                if (rotationRole != noRoleIndex)
+                    newProxyRow[j].setRotation(m_itemModel->index(i, j).data(rotationRole).toReal());
+            }
         }
         // Generate labels from headers if using model rows/columns
         for (int i = 0; i < rowCount; i++)
@@ -92,12 +98,15 @@ void BarItemModelHandler::resolveModel()
         // Sort values into rows and columns
         typedef QHash<QString, float> ColumnValueMap;
         QHash <QString, ColumnValueMap> itemValueMap;
+        QHash <QString, ColumnValueMap> itemRotationMap;
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
                 QModelIndex index = m_itemModel->index(i, j);
                 QString rowRoleStr = index.data(rowRole).toString();
                 QString columnRoleStr = index.data(columnRole).toString();
                 itemValueMap[rowRoleStr][columnRoleStr] = index.data(valueRole).toReal();
+                if (rotationRole != noRoleIndex)
+                    itemRotationMap[rowRoleStr][columnRoleStr] = index.data(rotationRole).toReal();
                 if (generateRows && !rowListHash.value(rowRoleStr, false)) {
                     rowListHash.insert(rowRoleStr, true);
                     rowList << rowRoleStr;
@@ -131,8 +140,11 @@ void BarItemModelHandler::resolveModel()
         for (int i = 0; i < rowList.size(); i++) {
             QString rowKey = rowList.at(i);
             QBarDataRow &newProxyRow = *m_proxyArray->at(i);
-            for (int j = 0; j < columnList.size(); j++)
+            for (int j = 0; j < columnList.size(); j++) {
                 newProxyRow[j].setValue(itemValueMap[rowKey][columnList.at(j)]);
+                if (rotationRole != noRoleIndex)
+                    newProxyRow[j].setRotation(itemRotationMap[rowKey][columnList.at(j)]);
+            }
         }
 
         rowLabels = rowList;

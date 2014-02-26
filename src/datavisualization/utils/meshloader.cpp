@@ -18,11 +18,10 @@
 
 #include "meshloader_p.h"
 
-#include <QFile>
-#include <QStringList>
-#include <QVector>
-#include <QVector2D>
-#include <QVector3D>
+#include <QtCore/QFile>
+#include <QtCore/QStringList>
+#include <QtCore/QVector>
+#include <QtGui/QVector2D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

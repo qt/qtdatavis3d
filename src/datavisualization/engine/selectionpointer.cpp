@@ -21,12 +21,12 @@
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
-#include "q3dcamera.h"
+#include "q3dcamera_p.h"
 #include "drawer_p.h"
 #include "utils_p.h"
 #include "q3dlight.h"
 
-#include <QMatrix4x4>
+#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -91,11 +91,13 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     QMatrix4x4 projectionMatrix;
     if (m_cachedIsSlicingActivated) {
         GLfloat aspect = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+        GLfloat sliceUnitsScaled = sliceUnits / m_autoScaleAdjustment;
         viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
-        projectionMatrix.ortho(-sliceUnits * aspect, sliceUnits * aspect,
-                               -sliceUnits, sliceUnits, -1.0f, 4.0f);
+        projectionMatrix.ortho(-sliceUnitsScaled * aspect, sliceUnitsScaled * aspect,
+                               -sliceUnitsScaled, sliceUnitsScaled,
+                               -1.0f, 4.0f);
     } else {
-        viewMatrix = camera->viewMatrix();
+        viewMatrix = camera->d_ptr->viewMatrix();
         projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
                                      / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
     }

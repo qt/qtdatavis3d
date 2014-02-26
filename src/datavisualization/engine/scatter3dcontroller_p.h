@@ -93,6 +93,8 @@ public:
     // Change selection mode
     void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
 
+    inline QScatter3DSeries *selectedSeries() const { return m_selectedItemSeries; }
+
     void setSelectedItem(int index, QScatter3DSeries *series);
     static inline int invalidSelectionIndex() { return -1; }
     virtual void clearSelection();
@@ -115,6 +117,9 @@ public slots:
     void handleItemsChanged(int startIndex, int count);
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
+
+signals:
+    void selectedSeriesChanged(QScatter3DSeries *series);
 
 protected:
     virtual void startRecordingRemovesAndInserts();

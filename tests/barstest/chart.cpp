@@ -1095,10 +1095,8 @@ void GraphModifier::triggerRotation()
     } else {
         // Rotate the first series instead
         static float seriesAngle = 0.0f;
-        if (m_graph->seriesList().size()) {
-            QQuaternion rotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, seriesAngle++);
-            m_graph->seriesList().at(0)->setMeshRotation(rotation);
-        }
+        if (m_graph->seriesList().size())
+            m_graph->seriesList().at(0)->setMeshAngle(seriesAngle++);
     }
 }
 

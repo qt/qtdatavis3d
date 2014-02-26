@@ -53,6 +53,7 @@ private:
     QString m_rowRole;
     QString m_columnRole;
     QString m_valueRole;
+    QString m_rotationRole;
 
     // For row/column items, sort items into these categories. Other categories are ignored.
     QStringList m_rowCategories;

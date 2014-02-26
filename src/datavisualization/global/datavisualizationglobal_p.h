@@ -30,9 +30,10 @@
 #define DATAVISUALIZATIONGLOBAL_P_H
 
 #include "qdatavisualizationglobal.h"
-#include <QOpenGLFunctions>
-#include <QVector3D>
-#include <QDebug>
+#include <QtGui/QOpenGLFunctions>
+#include <QtGui/QVector3D>
+#include <QtGui/QQuaternion>
+#include <QtCore/QDebug>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -49,12 +50,15 @@ static const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, 0.0f);
 static const QVector3D zeroVector = QVector3D(0.0f, 0.0f, 0.0f);
 static const QVector3D upVector = QVector3D(0.0f, 1.0f, 0.0f);
 static const QVector3D cameraDistanceVector = QVector3D(0.0f, 0.0f, cameraDistance);
+static const QQuaternion identityQuaternion;
 
 // Skip color == selection texture's background color
 static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f);
 static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
 static const GLfloat gradientTextureHeight = 1024.0f;
 static const GLfloat gradientTextureWidth = 2.0f;
+static const GLfloat uniformTextureHeight = 64.0f;
+static const GLfloat uniformTextureWidth = 2.0f;
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

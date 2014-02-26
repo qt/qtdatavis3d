@@ -18,8 +18,8 @@
 
 #include "qtouch3dinputhandler_p.h"
 #include "q3dcamera_p.h"
-#include <QTimer>
-#include <qmath.h>
+#include <QtCore/QTimer>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

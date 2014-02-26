@@ -52,6 +52,16 @@ QScatterDataItem::QScatterDataItem(const QVector3D &position)
 }
 
 /*!
+ * Constructs QScatterDataItem with \a position and \a rotation.
+ */
+QScatterDataItem::QScatterDataItem(const QVector3D &position, const QQuaternion &rotation)
+    : d_ptr(0),
+      m_position(position),
+      m_rotation(rotation)
+{
+}
+
+/*!
  * Constructs a copy of \a other.
  */
 QScatterDataItem::QScatterDataItem(const QScatterDataItem &other)

@@ -30,8 +30,8 @@
 #define LABELITEM_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QOpenGLFunctions>
-#include <QSize>
+#include <QtGui/QOpenGLFunctions>
+#include <QtCore/QSize>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

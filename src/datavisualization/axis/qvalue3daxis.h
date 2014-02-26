@@ -48,7 +48,7 @@ public:
 signals:
     void segmentCountChanged(int count);
     void subSegmentCountChanged(int count);
-    void labelFormatChanged(QString format);
+    void labelFormatChanged(const QString &format);
 
 protected:
     QValue3DAxisPrivate *dptr();
