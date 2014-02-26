@@ -19,7 +19,8 @@ sourcedirs += ..
 indexes +=  $QT_INSTALL_DOCS/qtcore/qtcore.index \
             $QT_INSTALL_DOCS/qtgui/qtgui.index \
             $QT_INSTALL_DOCS/qtqml/qtqml.index \
-            $QT_INSTALL_DOCS/qtquick/qtquick.index
+            $QT_INSTALL_DOCS/qtquick/qtquick.index \
+            $QT_INSTALL_DOCS/qtmultimedia/qtmultimedia.index
 
 qhp.projects                            = qtdatavisualization
 
