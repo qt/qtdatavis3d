@@ -51,7 +51,7 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 
 AbstractDeclarative::~AbstractDeclarative()
 {
-#if 0 //!defined(Q_OS_MAC)
+#if !defined(Q_OS_MAC)
     // Context can be in another thread, don't delete it directly in that case
     if (m_context && m_context->thread() != QThread::currentThread())
         m_context->deleteLater();
@@ -213,7 +213,7 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 {
-#if 0 //!defined(Q_OS_MAC)
+#if !defined(Q_OS_MAC)
     if (!m_context || m_contextWindow != window) {
         m_contextWindow = window;
         delete m_context;
@@ -231,7 +231,7 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 
 void AbstractDeclarative::doneOpenGLContext(QQuickWindow *window)
 {
-#if 0 //!defined(Q_OS_MAC)
+#if !defined(Q_OS_MAC)
     m_qtContext->makeCurrent(window);
 #else
     Q_UNUSED(window)
