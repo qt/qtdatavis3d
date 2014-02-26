@@ -71,8 +71,8 @@
 
     \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 5
 
-    In addition to these we have two buttons, one of which is of special interest to us. It is used
-    to control whether we want to slice into only one layer, or all of them:
+    In addition to these we have three buttons, one of which is of special interest to us. It is
+    used to control whether we want to slice into only one layer, or all of them:
 
     \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 6
 
