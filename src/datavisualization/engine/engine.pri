@@ -51,3 +51,5 @@ SOURCES += $$PWD/qabstract3dgraph.cpp \
            $$PWD/surfaceseriesrendercache.cpp
 
 RESOURCES += engine/engine.qrc
+
+OTHER_FILES += $$PWD/meshes/* $$PWD/shaders/*
