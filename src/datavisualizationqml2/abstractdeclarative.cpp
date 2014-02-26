@@ -22,6 +22,7 @@
 #include "declarativerendernode_p.h"
 
 #include <QtCore/QThread>
+#include <QtGui/QGuiApplication>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -46,7 +47,9 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
     setAntialiasing(m_samples > 0);
-    setFlag(ItemHasContents, true);
+
+    // Set contents to false in case we are in qml designer to make component look nice
+    setFlag(ItemHasContents, QGuiApplication::applicationDisplayName() != "Qml2Puppet");
 }
 
 AbstractDeclarative::~AbstractDeclarative()
