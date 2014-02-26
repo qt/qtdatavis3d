@@ -18,11 +18,11 @@
 
 /*!
     \example qmlcustominput
-    \title Qt Quick Custom Input Example
+    \title Qt Quick 2 Custom Input Example
     \ingroup qtdatavisualization_examples
-    \brief Customizing input in a Qt Quick application.
+    \brief Customizing input in a QML application.
 
-    The Qt Quick Custom Input example shows how to customize the 3D graph controls from Qt Quick using the MouseArea to capture and process mouse events in Qt Quick.
+    The Qt Quick 2 Custom Input example shows how to customize the 3D graph controls from Qt Quick 2 using the MouseArea to capture and process mouse events in QML.
     Custom input handling code in this example shows how the camera is now controlled by using NumberAnimation to animate the camera and item selection
     is done on mouseover rather than clicking any mouse buttons. Also the code shows how to implement similar zoom with mouse wheel functionality as the default
     input handler implements.
