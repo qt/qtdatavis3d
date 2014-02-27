@@ -96,9 +96,9 @@ public:
     GLfloat m_minYRotation;
     GLfloat m_maxXRotation;
     GLfloat m_maxYRotation;
+    GLfloat m_zoomLevel;
     bool m_wrapXRotation;
     bool m_wrapYRotation;
-    int m_zoomLevel;
     Q3DCamera::CameraPreset m_activePreset;
 
     friend class Bars3DRenderer;

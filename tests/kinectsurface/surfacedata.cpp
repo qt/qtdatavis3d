@@ -90,7 +90,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     gradient.setColorAt(1.0, Qt::yellow);
     m_surface->setSelectionMode(QAbstract3DGraph::SelectionNone);
     m_surface->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
-    m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150);
+    m_surface->scene()->activeCamera()->setCameraPosition(0.0, 90.0, 150.0);
     m_surface->axisY()->setMax(255);
     QSurface3DSeries *series1 = new QSurface3DSeries(new QHeightMapSurfaceDataProxy());
     series1->setFlatShadingEnabled(true);
@@ -102,7 +102,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_scatter->setSelectionMode(QAbstract3DGraph::SelectionNone);
     m_scatter->activeTheme()->setGridEnabled(false);
     m_scatter->setShadowQuality(QAbstract3DGraph::ShadowQualityLow);
-    m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 60.0, 150);
+    m_scatter->scene()->activeCamera()->setCameraPosition(0.0, 60.0, 150.0);
     QScatter3DSeries *series2 = new QScatter3DSeries;
 #ifdef LOW_END_DEVICE
     series2->setMesh(QAbstract3DSeries::MeshPoint);
@@ -138,7 +138,7 @@ SurfaceData::SurfaceData(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars
     m_bars->setShadowQuality(QAbstract3DGraph::ShadowQualityLow);
 #endif
     m_bars->setBarSpacing(QSizeF(0.0, 0.0));
-    m_bars->scene()->activeCamera()->setCameraPosition(0.0, 65.0, 130);
+    m_bars->scene()->activeCamera()->setCameraPosition(0.0, 65.0, 130.0);
     QBar3DSeries *series3 = new QBar3DSeries;
     series3->setMesh(QAbstract3DSeries::MeshBar);
     m_bars->addSeries(series3);

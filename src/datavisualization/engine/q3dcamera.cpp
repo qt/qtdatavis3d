@@ -403,12 +403,12 @@ void Q3DCamera::setCameraPreset(CameraPreset preset)
  * This property contains the the camera zoom level in percentage. \c 100.0f means there is no zoom
  * in or out set in the camera.
  */
-int Q3DCamera::zoomLevel() const
+float Q3DCamera::zoomLevel() const
 {
     return d_ptr->m_zoomLevel;
 }
 
-void Q3DCamera::setZoomLevel(int zoomLevel)
+void Q3DCamera::setZoomLevel(float zoomLevel)
 {
     if (d_ptr->m_zoomLevel != zoomLevel) {
         d_ptr->m_zoomLevel = zoomLevel;
@@ -479,9 +479,9 @@ Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     m_minYRotation(0.0f),
     m_maxXRotation(180.0f),
     m_maxYRotation(90.0f),
+    m_zoomLevel(100.0f),
     m_wrapXRotation(true),
     m_wrapYRotation(false),
-    m_zoomLevel(100),
     m_activePreset(Q3DCamera::CameraPresetNone)
 {
 }
@@ -642,7 +642,7 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     if (!m_isViewMatrixUpdateActive)
         return;
 
-    int zoom = m_zoomLevel * zoomAdjustment;
+    GLfloat zoom = m_zoomLevel * zoomAdjustment;
     QMatrix4x4 viewMatrix;
 
     // Apply to view matrix
@@ -656,7 +656,7 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     // y rotation is always "clean"
     viewMatrix.rotate(m_yRotation, 1.0f, 0.0f, 0.0f);
     // handle zoom by scaling
-    viewMatrix.scale((GLfloat)zoom / 100.0f);
+    viewMatrix.scale(zoom / 100.0f);
     // Compensate for translation (if d_ptr->m_target is off origin)
     viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
 
