@@ -283,9 +283,9 @@ bool QSurface3DSeries::isFlatShadingSupported() const
 /*!
  * \property QSurface3DSeries::drawMode
  *
- * Sets the drawing \a mode to one of QSurface3DSeries::DrawFlag.
+ * Sets the drawing \a mode to one of DrawFlag.
  */
-void QSurface3DSeries::setDrawMode(QSurface3DSeries::DrawFlags mode)
+void QSurface3DSeries::setDrawMode(DrawFlags mode)
 {
     if (dptr()->m_drawMode != mode) {
         dptr()->setDrawMode(mode);

@@ -58,7 +58,7 @@ public:
     void setFlatShadingEnabled(bool enabled);
     bool isFlatShadingEnabled() const;
 
-    void setDrawMode(QSurface3DSeries::DrawFlags mode);
+    void setDrawMode(DrawFlags mode);
     QSurface3DSeries::DrawFlags drawMode() const;
 
     bool isFlatShadingSupported() const;

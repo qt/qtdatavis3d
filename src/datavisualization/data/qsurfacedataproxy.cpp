@@ -58,12 +58,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \typedef QtDataVisualization::QSurfaceDataRow
+ * \relates QSurfaceDataProxy
  *
  * A vector of \l {QSurfaceDataItem}s.
  */
 
 /*!
  * \typedef QtDataVisualization::QSurfaceDataArray
+ * \relates QSurfaceDataProxy
  *
  * A list of pointers to \l {QSurfaceDataRow}s.
  */
