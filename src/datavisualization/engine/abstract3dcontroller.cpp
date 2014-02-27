@@ -81,13 +81,19 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
 
 Abstract3DController::~Abstract3DController()
 {
+    destroyRenderer();
+    delete m_scene;
+    delete m_themeManager;
+}
+
+void Abstract3DController::destroyRenderer()
+{
     // Renderer can be in another thread, don't delete it directly in that case
     if (m_renderer && m_renderer->thread() != QThread::currentThread())
         m_renderer->deleteLater();
     else
         delete m_renderer;
-    delete m_scene;
-    delete m_themeManager;
+    m_renderer = 0;
 }
 
 /**

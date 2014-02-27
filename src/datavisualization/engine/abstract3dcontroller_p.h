@@ -161,6 +161,7 @@ public:
     virtual ~Abstract3DController();
 
     inline bool isInitialized() { return (m_renderer != 0); }
+    virtual void destroyRenderer();
     virtual void synchDataToRenderer();
     virtual void render(const GLuint defaultFboHandle = 0);
     virtual void initializeOpenGL() = 0;

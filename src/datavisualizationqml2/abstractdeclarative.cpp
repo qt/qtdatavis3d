@@ -21,7 +21,6 @@
 #include "declarativetheme_p.h"
 #include "declarativerendernode_p.h"
 
-#include <QtCore/QThread>
 #include <QtGui/QGuiApplication>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -33,8 +32,6 @@ static QHash<QQuickWindow *, bool> windowClearList;
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
     m_controller(0),
-    m_context(0),
-    m_qtContext(0),
     m_contextWindow(0),
     m_renderMode(RenderIndirect),
 #if defined(QT_OPENGL_ES_2)
@@ -43,7 +40,15 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_samples(4),
 #endif
     m_windowSamples(0),
-    m_initialisedSize(0, 0)
+    m_initialisedSize(0, 0),
+#ifdef USE_SHARED_CONTEXT
+    m_context(0),
+#else
+    m_stateStore(0),
+#endif
+    m_qtContext(0),
+    m_mainThread(QThread::currentThread()),
+    m_contextThread(0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
     setAntialiasing(m_samples > 0);
@@ -54,12 +59,23 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 
 AbstractDeclarative::~AbstractDeclarative()
 {
-#if !defined(Q_OS_MAC)
+#ifdef USE_SHARED_CONTEXT
     // Context can be in another thread, don't delete it directly in that case
-    if (m_context && m_context->thread() != QThread::currentThread())
-        m_context->deleteLater();
-    else
+    if (m_contextThread && m_contextThread != m_mainThread) {
+        if (m_context)
+            m_context->deleteLater();
+        m_context = 0;
+    } else {
         delete m_context;
+    }
+#else
+    if (m_contextThread && m_contextThread != m_mainThread) {
+        if (m_stateStore)
+            m_stateStore->deleteLater();
+        m_stateStore = 0;
+    } else {
+        delete m_stateStore;
+    }
 #endif
 
     disconnect(this, 0, this, 0);
@@ -216,28 +232,75 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 {
-#if !defined(Q_OS_MAC)
-    if (!m_context || m_contextWindow != window) {
-        m_contextWindow = window;
+#ifdef USE_SHARED_CONTEXT
+    // We can assume we are not in middle of AbstractDeclarative destructor when we are here,
+    // since m_context creation is always done when this function is called from
+    // synchDataToRenderer(), which blocks main thread -> no need to mutex.
+    if (!m_context || !m_qtContext || m_contextWindow != window) {
+        QOpenGLContext *currentContext = QOpenGLContext::currentContext();
+
+        if (m_context && currentContext != m_qtContext) {
+            // If Qt context has changed, the old renderer needs to go.
+            // If the old context window no longer exists, it is okay to delete renderer
+            // in null context, as we can assume Qt context for the window is also gone.
+            m_context->makeCurrent(m_contextWindow);
+            m_controller->destroyRenderer();
+            m_context->doneCurrent(); // So that we don't delete active context
+        }
+
         delete m_context;
-        m_qtContext = QOpenGLContext::currentContext();
+
+        m_contextThread = QThread::currentThread();
+        m_contextWindow = window;
+        m_qtContext = currentContext;
+
         m_context = new QOpenGLContext();
-        m_context->setFormat(window->requestedFormat());
+        m_context->setFormat(m_qtContext->format());
         m_context->setShareContext(m_qtContext);
         m_context->create();
+
+        m_context->makeCurrent(window);
+        m_controller->initializeOpenGL();
+    } else {
+        m_context->makeCurrent(window);
     }
-    m_context->makeCurrent(window);
 #else
-    Q_UNUSED(window)
+    // Shared contexts don't work properly in some platforms, so just store the
+    // context state on those
+    if (!m_stateStore || !m_qtContext || m_contextWindow != window) {
+        QOpenGLContext *currentContext = QOpenGLContext::currentContext();
+
+        if (m_qtContext && currentContext != m_qtContext) {
+            // If Qt context has changed but still exists, the old renderer needs to go.
+            // If the old context window no longer exists, it is okay to delete renderer
+            // in null context (though it is likely Qt context is gone in that case, too.)
+            m_qtContext->makeCurrent(m_contextWindow);
+            m_controller->destroyRenderer();
+            currentContext->makeCurrent(window);
+        }
+
+        m_contextThread = QThread::currentThread();
+        m_contextWindow = window;
+        m_qtContext = currentContext;
+
+        delete m_stateStore;
+        m_stateStore = new GLStateStore(QOpenGLContext::currentContext());
+
+        m_stateStore->storeGLState();
+        m_controller->initializeOpenGL();
+    } else {
+        m_stateStore->storeGLState();
+    }
 #endif
 }
 
 void AbstractDeclarative::doneOpenGLContext(QQuickWindow *window)
 {
-#if !defined(Q_OS_MAC)
+#ifdef USE_SHARED_CONTEXT
     m_qtContext->makeCurrent(window);
 #else
     Q_UNUSED(window)
+    m_stateStore->restoreGLState();
 #endif
 }
 
@@ -248,7 +311,6 @@ void AbstractDeclarative::synchDataToRenderer()
 
     QQuickWindow *win = window();
     activateOpenGLContext(win);
-    m_controller->initializeOpenGL();
     m_controller->synchDataToRenderer();
     doneOpenGLContext(win);
 }

@@ -450,6 +450,9 @@ QAbstract3DGraphPrivate::QAbstract3DGraphPrivate(QAbstract3DGraph *q)
 
 QAbstract3DGraphPrivate::~QAbstract3DGraphPrivate()
 {
+    if (m_context)
+        m_context->makeCurrent(q_ptr);
+
     delete m_visualController;
 }
 

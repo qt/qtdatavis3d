@@ -29,15 +29,24 @@
 #ifndef ABSTRACTDECLARATIVE_P_H
 #define ABSTRACTDECLARATIVE_P_H
 
+#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID)
+#define USE_SHARED_CONTEXT
+#endif
+
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3dinputhandler.h"
 #include "declarativescene_p.h"
 
+#ifndef USE_SHARED_CONTEXT
+#include "glstatestore_p.h"
+#endif
+
 #include <QtCore/QAbstractItemModel>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
 #include <QtCore/QPointer>
+#include <QtCore/QThread>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -158,13 +167,19 @@ signals:
 private:
     QPointer<Abstract3DController> m_controller;
     QRectF m_cachedGeometry;
-    QOpenGLContext *m_context;
-    QOpenGLContext *m_qtContext;
-    QQuickWindow *m_contextWindow;
+    QPointer<QQuickWindow> m_contextWindow;
     AbstractDeclarative::RenderingMode m_renderMode;
     int m_samples;
     int m_windowSamples;
     QSize m_initialisedSize;
+#ifdef USE_SHARED_CONTEXT
+    QOpenGLContext *m_context;
+#else
+    GLStateStore *m_stateStore;
+#endif
+    QPointer<QOpenGLContext> m_qtContext;
+    QThread *m_mainThread;
+    QThread *m_contextThread;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
 

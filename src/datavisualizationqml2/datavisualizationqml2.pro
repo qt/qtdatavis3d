@@ -26,7 +26,9 @@ SOURCES += \
     declarativetheme.cpp \
     declarativecolor.cpp \
     declarativescene.cpp \
-    declarativerendernode.cpp
+    declarativerendernode.cpp \
+    glstatestore.cpp \
+    enumtostringmap.cpp
 
 HEADERS += \
     datavisualizationqml2_plugin.h \
@@ -39,7 +41,9 @@ HEADERS += \
     declarativetheme_p.h \
     declarativecolor_p.h \
     declarativescene_p.h \
-    declarativerendernode_p.h
+    declarativerendernode_p.h \
+    glstatestore_p.h \
+    enumtostringmap_p.h
 
 OTHER_FILES = qmldir
 
