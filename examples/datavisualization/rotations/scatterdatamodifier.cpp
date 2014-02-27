@@ -111,13 +111,13 @@ void ScatterDataModifier::generateData()
         float xCenter = ellipse_a * qCos(horizontalAngle);
         float zCenter = ellipse_a * qSin(horizontalAngle);
 
-        // Rotate - arrow always tangential to origo
+        // Rotate - arrow always tangential to origin
         //! [0]
         QQuaternion yRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, horizontalAngle * radiansToDegrees);
         //! [0]
 
         for (float j = 0; j < m_arrowsPerLine; j++) {
-            // Calculate point on ellipse centered on origo and parallel to x-axis
+            // Calculate point on ellipse centered on origin and parallel to x-axis
             float verticalAngle = ((doublePi * j) / m_arrowsPerLine) + m_angleOffset;
             float xUnrotated = ellipse_a * qCos(verticalAngle);
             float y = ellipse_b * qSin(verticalAngle);
