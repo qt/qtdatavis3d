@@ -123,7 +123,7 @@ QHeightMapSurfaceDataProxy::QHeightMapSurfaceDataProxy(QObject *parent) :
 
 /*!
  * Constructs QHeightMapSurfaceDataProxy with the given \a image and \a parent. Height map is set
- * by calling setHeighMap() with \a image.
+ * by calling setHeightMap() with \a image.
  *
  * \sa heightMap
  */
@@ -164,16 +164,17 @@ QHeightMapSurfaceDataProxy::~QHeightMapSurfaceDataProxy()
 /*!
  * \property QHeightMapSurfaceDataProxy::heightMap
  *
- * A height map to be visualized. Setting this property replaces current data with height map data.
+ * A height map \a image to be visualized. Setting this property replaces current data with height
+ * map data.
  *
- * There are several formats the image can be given in, but if it is not in a directly usable
+ * There are several formats the \a image can be given in, but if it is not in a directly usable
  * format, a conversion is made. \note If the result seems wrong, the automatic conversion failed
- * and you should try converting the image yourself before setting it. Preferred format is
+ * and you should try converting the \a image yourself before setting it. Preferred format is
  * QImage::Format_RGB32 in grayscale.
  *
- * The height of the image is read from the red component of the pixels if the image is in grayscale,
- * otherwise it is an average calculated from red, green, and blue components of the pixels. Using
- * grayscale images may improve data conversion speed for large images.
+ * The height of the \a image is read from the red component of the pixels if the \a image is in
+ * grayscale, otherwise it is an average calculated from red, green, and blue components of the
+ * pixels. Using grayscale images may improve data conversion speed for large images.
  *
  * Not recommended formats: all mono formats (for example QImage::Format_Mono).
  *
