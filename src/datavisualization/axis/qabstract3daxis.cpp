@@ -129,7 +129,7 @@ QAbstract3DAxis::~QAbstract3DAxis()
 /*!
  * \property QAbstract3DAxis::orientation
  *
- * Defines the orientation of the axis, one of \c QAbstract3DAxis::AxisOrientation.
+ * Defines the orientation of the axis, one of AxisOrientation.
  */
 QAbstract3DAxis::AxisOrientation QAbstract3DAxis::orientation() const
 {
@@ -139,7 +139,7 @@ QAbstract3DAxis::AxisOrientation QAbstract3DAxis::orientation() const
 /*!
  * \property QAbstract3DAxis::type
  *
- * Defines the type of the axis, one of \c QAbstract3DAxis::AxisType.
+ * Defines the type of the axis, one of AxisType.
  */
 QAbstract3DAxis::AxisType QAbstract3DAxis::type() const
 {

@@ -126,7 +126,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty Abstract3DSeries.Mesh Abstract3DSeries::mesh
  *
- * Sets the mesh of the items in the series, or the selection pointer in case of
+ * Sets the \a mesh of the items in the series, or the selection pointer in case of
  * Surface3DSeries. If the \a mesh is \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined},
  * then the userDefinedMesh property must also be set for items to render properly.
  * The default value depends on the graph type.
@@ -138,7 +138,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If \a enable is \c true, smooth versions of predefined meshes set via mesh property are used.
  * This property doesn't affect custom meshes used when mesh is
  * \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined}.
- * Defaults to \c false.
+ * Defaults to \c{false}.
  */
 
 /*!
@@ -173,7 +173,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty Color Abstract3DSeries::baseColor
  *
- * Sets the base \c color of the series.
+ * Sets the base \a color of the series.
  * See \l{Theme3D::baseColors}{Theme3D.baseColors}
  * documentation for more information.
  *
@@ -183,7 +183,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty ColorGradient Abstract3DSeries::baseGradient
  *
- * Sets the base \c gradient of the series.
+ * Sets the base \a gradient of the series.
  * See \l{Theme3D::baseGradients}{Theme3D.baseGradients}
  * documentation for more information.
  *
@@ -193,7 +193,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty Color Abstract3DSeries::singleHighlightColor
  *
- * Sets the single item highlight \c color of the series.
+ * Sets the single item highlight \a color of the series.
  * See \l{Theme3D::singleHighlightColor}{Theme3D.singleHighlightColor}
  * documentation for more information.
  *
@@ -203,7 +203,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty ColorGradient Abstract3DSeries::singleHighlightGradient
  *
- * Sets the single item highlight \c gradient of the series.
+ * Sets the single item highlight \a gradient of the series.
  * See \l{Theme3D::singleHighlightGradient}{Theme3D.singleHighlightGradient}
  * documentation for more information.
  *
@@ -213,7 +213,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty Color Abstract3DSeries::multiHighlightColor
  *
- * Sets the multiple item highlight \c color of the series.
+ * Sets the multiple item highlight \a color of the series.
  * See \l{Theme3D::multiHighlightColor}{Theme3D.multiHighlightColor}
  * documentation for more information.
  *
@@ -223,7 +223,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty ColorGradient Abstract3DSeries::multiHighlightGradient
  *
- * Sets the multiple item highlight \c gradient of the series.
+ * Sets the multiple item highlight \a gradient of the series.
  * See \l{Theme3D::multiHighlightGradient}{Theme3D.multiHighlightGradient}
  * documentation for more information.
  *
@@ -299,7 +299,7 @@ QString QAbstract3DSeries::itemLabelFormat() const
  * \property QAbstract3DSeries::visible
  *
  * Sets the visibility of the series. If \a visible is false, the series is not rendered.
- * Defaults to true.
+ * Defaults to \c{true}.
  */
 void QAbstract3DSeries::setVisible(bool visible)
 {
@@ -317,7 +317,7 @@ bool QAbstract3DSeries::isVisible() const
 /*!
  * \property QAbstract3DSeries::mesh
  *
- * Sets the mesh of the items in the series, or the selection pointer in case of
+ * Sets the \a mesh of the items in the series, or the selection pointer in case of
  * QSurface3DSeries. If the \a mesh is MeshUserDefined, then the userDefinedMesh property
  * must also be set for items to render properly. The default value depends on the graph type.
  */
@@ -343,7 +343,7 @@ QAbstract3DSeries::Mesh QAbstract3DSeries::mesh() const
  *
  * If \a enable is \c true, smooth versions of predefined meshes set via mesh property are used.
  * This property doesn't affect custom meshes used when mesh is MeshUserDefined.
- * Defaults to \c false.
+ * Defaults to \c{false}.
  */
 void QAbstract3DSeries::setMeshSmooth(bool enable)
 {
@@ -436,8 +436,8 @@ Q3DTheme::ColorStyle QAbstract3DSeries::colorStyle() const
 /*!
  * \property QAbstract3DSeries::baseColor
  *
- * Sets the base \c color of the series.
- * See Q3DTheme::baseColor documentation for more information.
+ * Sets the base \a color of the series.
+ * See Q3DTheme::baseColors documentation for more information.
  *
  * \sa colorStyle
  */
@@ -458,8 +458,8 @@ QColor QAbstract3DSeries::baseColor() const
 /*!
  * \property QAbstract3DSeries::baseGradient
  *
- * Sets the base \c gradient of the series.
- * See Q3DTheme::baseGradient documentation for more information.
+ * Sets the base \a gradient of the series.
+ * See Q3DTheme::baseGradients documentation for more information.
  *
  * \sa colorStyle
  */
@@ -480,7 +480,7 @@ QLinearGradient QAbstract3DSeries::baseGradient() const
 /*!
  * \property QAbstract3DSeries::singleHighlightColor
  *
- * Sets the single item highlight \c color of the series.
+ * Sets the single item highlight \a color of the series.
  * See Q3DTheme::singleHighlightColor documentation for more information.
  *
  * \sa colorStyle
@@ -502,7 +502,7 @@ QColor QAbstract3DSeries::singleHighlightColor() const
 /*!
  * \property QAbstract3DSeries::singleHighlightGradient
  *
- * Sets the single item highlight \c gradient of the series.
+ * Sets the single item highlight \a gradient of the series.
  * See Q3DTheme::singleHighlightGradient documentation for more information.
  *
  * \sa colorStyle
@@ -524,7 +524,7 @@ QLinearGradient QAbstract3DSeries::singleHighlightGradient() const
 /*!
  * \property QAbstract3DSeries::multiHighlightColor
  *
- * Sets the multiple item highlight \c color of the series.
+ * Sets the multiple item highlight \a color of the series.
  * See Q3DTheme::multiHighlightColor documentation for more information.
  *
  * \sa colorStyle
@@ -546,7 +546,7 @@ QColor QAbstract3DSeries::multiHighlightColor() const
 /*!
  * \property QAbstract3DSeries::multiHighlightGradient
  *
- * Sets the multiple item highlight \c gradient of the series.
+ * Sets the multiple item highlight \a gradient of the series.
  * See Q3DTheme::multiHighlightGradient documentation for more information.
  *
  * \sa colorStyle
@@ -568,8 +568,8 @@ QLinearGradient QAbstract3DSeries::multiHighlightGradient() const
 /*!
  * \property QAbstract3DSeries::name
  *
- * Sets the series name.
- * Series name can be used in item label format with tag \c{@seriesName}.
+ * Sets the series \a name.
+ * Series \a name can be used in item label format with tag \c{@seriesName}.
  *
  * \sa itemLabelFormat
  */

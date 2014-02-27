@@ -139,7 +139,7 @@ void QAbstract3DInputHandler::wheelEvent(QWheelEvent *event)
  * \property QAbstract3DInputHandler::inputView
  *
  * Current enumerated input view based on the view of the processed input events.
- * When the view changes inputViewChanged() is emitted.
+ * When the view changes \c inputViewChanged signal is emitted.
  */
 QAbstract3DInputHandler::InputView QAbstract3DInputHandler::inputView() const
 {
