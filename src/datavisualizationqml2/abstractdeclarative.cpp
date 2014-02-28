@@ -239,14 +239,7 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
     if (!m_context || !m_qtContext || m_contextWindow != window) {
         QOpenGLContext *currentContext = QOpenGLContext::currentContext();
 
-        if (m_context && currentContext != m_qtContext) {
-            // If Qt context has changed, the old renderer needs to go.
-            // If the old context window no longer exists, it is okay to delete renderer
-            // in null context, as we can assume Qt context for the window is also gone.
-            m_context->makeCurrent(m_contextWindow);
-            m_controller->destroyRenderer();
-            m_context->doneCurrent(); // So that we don't delete active context
-        }
+        // Note: Changing graph to different window when using multithreaded renderer will break!
 
         delete m_context;
 
@@ -270,20 +263,14 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
     if (!m_stateStore || !m_qtContext || m_contextWindow != window) {
         QOpenGLContext *currentContext = QOpenGLContext::currentContext();
 
-        if (m_qtContext && currentContext != m_qtContext) {
-            // If Qt context has changed but still exists, the old renderer needs to go.
-            // If the old context window no longer exists, it is okay to delete renderer
-            // in null context (though it is likely Qt context is gone in that case, too.)
-            m_qtContext->makeCurrent(m_contextWindow);
-            m_controller->destroyRenderer();
-            currentContext->makeCurrent(window);
-        }
+        // Note: Changing graph to different window when using multithreaded renderer will break!
+
+        delete m_stateStore;
 
         m_contextThread = QThread::currentThread();
         m_contextWindow = window;
         m_qtContext = currentContext;
 
-        delete m_stateStore;
         m_stateStore = new GLStateStore(QOpenGLContext::currentContext());
 
         m_stateStore->storeGLState();
