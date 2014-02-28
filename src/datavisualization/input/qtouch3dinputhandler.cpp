@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const float maxTapAndHoldJitter = 20.0f;
 const int maxPinchJitter = 10;
-#if defined (Q_OS_ANDROID) or defined(Q_OS_IOS)
+#if defined (Q_OS_ANDROID) || defined(Q_OS_IOS)
 const int maxSelectionJitter = 10;
 #else
 const int maxSelectionJitter = 5;
