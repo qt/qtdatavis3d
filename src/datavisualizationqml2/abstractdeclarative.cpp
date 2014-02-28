@@ -404,12 +404,13 @@ void AbstractDeclarative::updateWindowParameters()
         if (directRender) {
             // Origin mapping is needed when rendering directly to background
             QPointF point = QQuickItem::mapToScene(QPointF(0.0, 0.0));
-            scene->d_ptr->setViewport(QRect(point.x(), point.y(), m_cachedGeometry.width(),
-                                            m_cachedGeometry.height()));
+            scene->d_ptr->setViewport(QRect(point.x() + 0.5f, point.y() + 0.5f,
+                                            m_cachedGeometry.width() + 0.5f,
+                                            m_cachedGeometry.height() + 0.5f));
         } else {
             // No translation needed when rendering to FBO
-            scene->d_ptr->setViewport(QRect(0.0, 0.0, m_cachedGeometry.width(),
-                                            m_cachedGeometry.height()));
+            scene->d_ptr->setViewport(QRect(0.0, 0.0, m_cachedGeometry.width() + 0.5f,
+                                            m_cachedGeometry.height() + 0.5f));
         }
     }
 }
