@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/">
+        <file>qml/qmlmultiwindow/Data.qml</file>
+        <file>qml/qmlmultiwindow/main.qml</file>
+        <file>qml/qmlmultiwindow/NewButton.qml</file>
+    </qresource>
+</RCC>
