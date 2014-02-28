@@ -29,24 +29,24 @@
 #ifndef ABSTRACTDECLARATIVE_P_H
 #define ABSTRACTDECLARATIVE_P_H
 
-#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID)
-#define USE_SHARED_CONTEXT
-#endif
-
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3dinputhandler.h"
 #include "declarativescene_p.h"
-
-#ifndef USE_SHARED_CONTEXT
-#include "glstatestore_p.h"
-#endif
 
 #include <QtCore/QAbstractItemModel>
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
 #include <QtCore/QPointer>
 #include <QtCore/QThread>
+
+#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID)
+#define USE_SHARED_CONTEXT
+#endif
+
+#ifndef USE_SHARED_CONTEXT
+#include "glstatestore_p.h"
+#endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
