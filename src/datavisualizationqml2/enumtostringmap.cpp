@@ -19,6 +19,8 @@
 #include <QString>
 #include <QDebug>
 
+#ifdef VERBOSE_STATE_STORE
+
 static EnumToStringMap *theInstance = 0;
 static unsigned int theInstanceCount = 0;
 
@@ -390,4 +392,4 @@ QString EnumToStringMap::lookUp(const GLuint value) const
 
     return QString("0x0%1").arg(value, 0, 16);
 }
-
+#endif

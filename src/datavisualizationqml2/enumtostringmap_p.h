@@ -29,6 +29,10 @@
 #ifndef ENUMTOSTRINGMAP_P_H
 #define ENUMTOSTRINGMAP_P_H
 
+//#define VERBOSE_STATE_STORE
+
+#ifdef VERBOSE_STATE_STORE
+
 #include <QtGui/qopengl.h>
 #include <QMap>
 #include <QString>
@@ -45,5 +49,5 @@ private:
     QMap<int, QString> m_map;
     QString m_unknown;
 };
-
+#endif
 #endif

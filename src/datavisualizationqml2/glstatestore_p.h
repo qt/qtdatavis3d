@@ -29,14 +29,10 @@
 #ifndef GLSTATESTORE_P_H
 #define GLSTATESTORE_P_H
 
-//#define VERBOSE_STATE_STORE
-
 #include <QObject>
 #include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOpenGLContext>
-#ifdef VERBOSE_STATE_STORE
 #include "enumtostringmap_p.h"
-#endif
 
 class GLStateStore : public QObject, protected QOpenGLFunctions
 {
