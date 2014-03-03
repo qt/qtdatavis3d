@@ -140,6 +140,13 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty DrawFlag Surface3DSeries::drawMode
+ *
+ * Sets the drawing \a mode to one of \l{QSurface3DSeries::DrawFlag}{Surface3DSeries.DrawFlag}.
+ * Clearing all flags is not allowed.
+ */
+
+/*!
  * \enum QSurface3DSeries::DrawFlag
  *
  * Drawing mode of the surface. Values of this enumeration can be combined with OR operator.
@@ -283,7 +290,7 @@ bool QSurface3DSeries::isFlatShadingSupported() const
 /*!
  * \property QSurface3DSeries::drawMode
  *
- * Sets the drawing \a mode to one of DrawFlag.
+ * Sets the drawing \a mode to one of DrawFlag. Clearing all flags is not allowed.
  */
 void QSurface3DSeries::setDrawMode(DrawFlags mode)
 {
@@ -389,9 +396,14 @@ void QSurface3DSeriesPrivate::setFlatShadingEnabled(bool enabled)
 
 void QSurface3DSeriesPrivate::setDrawMode(QSurface3DSeries::DrawFlags mode)
 {
-    m_drawMode = mode;
-    if (m_controller)
-        m_controller->markSeriesVisualsDirty();
+    if (mode.testFlag(QSurface3DSeries::DrawWireframe)
+            || mode.testFlag(QSurface3DSeries::DrawSurface)) {
+        m_drawMode = mode;
+        if (m_controller)
+            m_controller->markSeriesVisualsDirty();
+    } else {
+        qWarning("You may not clear all draw flags. Mode not changed.");
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

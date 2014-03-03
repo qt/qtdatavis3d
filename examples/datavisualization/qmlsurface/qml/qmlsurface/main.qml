@@ -97,6 +97,8 @@ Rectangle {
                 onFlatShadingSupportedChanged: {
                     flatShadingToggle.text = "Flat not supported"
                 }
+
+                onDrawModeChanged: checkState()
             }
             //! [4]
             Surface3DSeries {
@@ -113,6 +115,8 @@ Rectangle {
                     minXValue: 67
                     maxXValue: 97
                 }
+
+                onDrawModeChanged: checkState()
             }
             //! [4]
         }
@@ -135,11 +139,9 @@ Rectangle {
                 if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
                     surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
                     heightSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
-                    text = "Show Surface Grid"
                 } else {
                     surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
                     heightSeries.drawMode |= Surface3DSeries.DrawWireframe;
-                    text = "Hide Surface Grid"
                 }
             }
             //! [1]
@@ -155,11 +157,9 @@ Rectangle {
                 if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface) {
                     surfaceSeries.drawMode &= ~Surface3DSeries.DrawSurface;
                     heightSeries.drawMode &= ~Surface3DSeries.DrawSurface;
-                    text = "Show Surface"
                 } else {
                     surfaceSeries.drawMode |= Surface3DSeries.DrawSurface;
                     heightSeries.drawMode |= Surface3DSeries.DrawSurface;
-                    text = "Hide Surface"
                 }
             }
             //! [8]
@@ -241,5 +241,17 @@ Rectangle {
             }
             //! [3]
         }
+    }
+
+    function checkState() {
+        if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface)
+            surfaceToggle.text = "Hide Surface"
+        else
+            surfaceToggle.text = "Show Surface"
+
+        if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe)
+            surfaceGridToggle.text = "Hide Surface Grid"
+        else
+            surfaceGridToggle.text = "Show Surface Grid"
     }
 }
