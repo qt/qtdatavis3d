@@ -93,11 +93,6 @@ Rectangle {
                     yPosRole: "height"
                 }
                 //! [6]
-
-                onFlatShadingSupportedChanged: {
-                    flatShadingToggle.text = "Flat not supported"
-                }
-
                 onDrawModeChanged: checkState()
             }
             //! [4]
@@ -169,7 +164,7 @@ Rectangle {
             id: flatShadingToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: "Show Flat"
+            text: surfaceSeries.flatShadingSupported ? "Show Flat" : "Flat not supported"
             enabled: surfaceSeries.flatShadingSupported
             //! [2]
             onClicked: {

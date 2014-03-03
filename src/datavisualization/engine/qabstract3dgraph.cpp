@@ -331,6 +331,15 @@ QAbstract3DGraph::ShadowQuality QAbstract3DGraph::shadowQuality() const
 }
 
 /*!
+ * \return true if shadows are supported with the current configuration.
+ * OpenGL ES2 configurations do not support shadows.
+ */
+bool QAbstract3DGraph::shadowsSupported() const
+{
+    return d_ptr->m_visualController->shadowsSupported();
+}
+
+/*!
  * \property QAbstract3DGraph::scene
  *
  * This property contains the read only Q3DScene that can be used to access, for example, a camera object.

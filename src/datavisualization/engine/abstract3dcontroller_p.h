@@ -202,6 +202,7 @@ public:
 
     virtual void setShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual QAbstract3DGraph::ShadowQuality shadowQuality() const;
+    virtual bool shadowsSupported() const;
 
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);

@@ -45,6 +45,12 @@
  */
 
 /*!
+  \qmlproperty bool AbstractGraph3D::shadowsSupported
+  This read-only property indicates if shadows are supported with the
+  current configuration or not. OpenGL ES2 configurations do not support shadows.
+ */
+
+/*!
   \qmlproperty Scene3D AbstractGraph3D::scene
   Read only Q3DScene that can be used to access e.g. camera object.
  */

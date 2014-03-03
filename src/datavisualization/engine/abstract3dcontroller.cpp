@@ -730,6 +730,15 @@ QAbstract3DGraph::ShadowQuality Abstract3DController::shadowQuality() const
     return m_shadowQuality;
 }
 
+bool Abstract3DController::shadowsSupported() const
+{
+#if defined(QT_OPENGL_ES_2)
+    return false;
+#else
+    return true;
+#endif
+}
+
 bool Abstract3DController::isSlicingActive() const
 {
     return m_scene->isSlicingActive();

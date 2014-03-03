@@ -202,6 +202,11 @@ AbstractDeclarative::ShadowQuality AbstractDeclarative::shadowQuality() const
     return ShadowQuality(m_controller->shadowQuality());
 }
 
+bool AbstractDeclarative::shadowsSupported() const
+{
+    return m_controller->shadowsSupported();
+}
+
 void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);

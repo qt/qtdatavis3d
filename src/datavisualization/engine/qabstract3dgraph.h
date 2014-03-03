@@ -89,6 +89,7 @@ public:
 
     void setShadowQuality(ShadowQuality quality);
     ShadowQuality shadowQuality() const;
+    virtual bool shadowsSupported() const;
 
     Q3DScene *scene() const;
 

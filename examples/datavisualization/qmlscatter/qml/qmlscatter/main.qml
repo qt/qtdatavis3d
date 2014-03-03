@@ -139,7 +139,8 @@ Rectangle {
             id: shadowToggle
             Layout.fillHeight: true
             Layout.fillWidth: true
-            text: "Hide Shadows"
+            text: scatterGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
+            enabled: scatterGraph.shadowsSupported
             onClicked: {
                 if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
                     scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;

@@ -45,10 +45,7 @@ Rectangle {
 
     Item {
         id: dataView
-        anchors.top: buttonLayout.bottom
-        anchors.bottom: parent.bottom
-        anchors.left: parent.left
-        anchors.right: parent.right
+        anchors.fill: parent
 
         Bars3D {
             id: barGraph
@@ -99,12 +96,18 @@ Rectangle {
 
     Rectangle {
         property int legendLocation: 3
+        // Make the height and width fractional of main view height and width.
+        // Reverse the relation if screen is in portrait - this makes legend look the same
+        // if the orientation is rotated.
+        property int fractionalHeight: mainView.width > mainView.height ? mainView.height / 5 : mainView.width / 5
+        property int fractionalWidth: mainView.width > mainView.height ? mainView.width / 5 : mainView.height / 5
 
         id: legendPanel
-        width: 200
-        height: 100
+        width: fractionalWidth > 150 ? fractionalWidth : 150
+        // Adjust legendpanel height to avoid gaps between layouted items.
+        height: fractionalHeight > 99 ? fractionalHeight - fractionalHeight % 3 : 99
         border.color: barGraph.theme.labelTextColor
-        border.width: 2
+        border.width: 3
         color: "#00000000" // Transparent
 
         //! [0]
@@ -152,7 +155,7 @@ Rectangle {
                 when: legendPanel.legendLocation === 1
                 AnchorChanges {
                     target: legendPanel
-                    anchors.top: dataView.top
+                    anchors.top: buttonLayout.bottom
                     anchors.bottom: undefined
                     anchors.left: dataView.left
                     anchors.right: undefined
@@ -163,7 +166,7 @@ Rectangle {
                 when: legendPanel.legendLocation === 2
                 AnchorChanges {
                     target: legendPanel
-                    anchors.top: dataView.top
+                    anchors.top: buttonLayout.bottom
                     anchors.bottom: undefined
                     anchors.left: undefined
                     anchors.right: dataView.right

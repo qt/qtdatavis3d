@@ -217,9 +217,10 @@ Item {
 
         NewButton {
             id: shadowButton
-            text: "Show Shadows"
             Layout.fillWidth: true
             Layout.minimumHeight: 40
+            text: surfaceLayers.shadowsSupported ? "Show Shadows" : "Shadows not supported"
+            enabled: surfaceLayers.shadowsSupported
             onClicked: {
                 if (surfaceLayers.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
                     surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityLow
