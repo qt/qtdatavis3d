@@ -38,8 +38,8 @@ Column {
             SecondColumnLayout {
                 ComboBox {
                     backendValue: backendValues.renderingMode
-                    model: ["RenderIndirect", "RenderDirectoToBackground",
-                        "RenderDirectoToBackground_NoClear"]
+                    model: ["RenderIndirect", "RenderDirectToBackground",
+                        "RenderDirectToBackground_NoClear"]
                     Layout.fillWidth: true
                 }
             }
