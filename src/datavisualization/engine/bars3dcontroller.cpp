@@ -509,8 +509,8 @@ void Bars3DController::adjustAxisRanges()
     bool adjustY = (valueAxis && categoryAxisX && categoryAxisZ && valueAxis->isAutoAdjustRange());
 
     if (adjustZ || adjustX || adjustY) {
-        int maxRowCount = 1;
-        int maxColumnCount = 1;
+        int maxRowCount = 0;
+        int maxColumnCount = 0;
         float minValue = 0.0f;
         float maxValue = 0.0f;
 
