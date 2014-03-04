@@ -54,7 +54,8 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     setAntialiasing(m_samples > 0);
 
     // Set contents to false in case we are in qml designer to make component look nice
-    setFlag(ItemHasContents, QGuiApplication::applicationDisplayName() != "Qml2Puppet");
+    m_runningInDesigner = QGuiApplication::applicationDisplayName() == "Qml2Puppet";
+    setFlag(ItemHasContents, !m_runningInDesigner);
 }
 
 AbstractDeclarative::~AbstractDeclarative()
@@ -113,7 +114,7 @@ void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mo
         break;
     case RenderIndirect:
         m_initialisedSize = QSize(0, 0);
-        setFlag(ItemHasContents, true);
+        setFlag(ItemHasContents, !m_runningInDesigner);
         update();
         if (win) {
             QObject::disconnect(win, &QQuickWindow::beforeRendering, this,
@@ -139,7 +140,7 @@ AbstractDeclarative::RenderingMode AbstractDeclarative::renderingMode() const
 QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
 {
     QSize boundingSize = boundingRect().size().toSize() * m_controller->scene()->devicePixelRatio();
-    if (boundingSize.width() <= 0 || boundingSize.height() <= 0
+    if (m_runningInDesigner || boundingSize.width() <= 0 || boundingSize.height() <= 0
             || m_controller.isNull() || !window()) {
         delete oldNode;
         return 0;

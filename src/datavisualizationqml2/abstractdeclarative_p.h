@@ -184,6 +184,7 @@ private:
     QPointer<QOpenGLContext> m_qtContext;
     QThread *m_mainThread;
     QThread *m_contextThread;
+    bool m_runningInDesigner;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
 
