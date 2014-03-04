@@ -9,6 +9,9 @@ MetaInfo {
             libraryIcon: "images/bars3d-icon.png"
             version: "1.0"
             requiredImport: "QtDataVisualization"
+
+            Property { name: "width"; type: "int"; value: 300; }
+            Property { name: "height"; type: "int"; value: 300; }
         }
     }
     Type {
@@ -21,6 +24,9 @@ MetaInfo {
             libraryIcon: "images/scatter3d-icon.png"
             version: "1.0"
             requiredImport: "QtDataVisualization"
+
+            Property { name: "width"; type: "int"; value: 300; }
+            Property { name: "height"; type: "int"; value: 300; }
         }
     }
     Type {
@@ -33,6 +39,9 @@ MetaInfo {
             libraryIcon: "images/surface3d-icon.png"
             version: "1.0"
             requiredImport: "QtDataVisualization"
+
+            Property { name: "width"; type: "int"; value: 300; }
+            Property { name: "height"; type: "int"; value: 300; }
         }
     }
 }
