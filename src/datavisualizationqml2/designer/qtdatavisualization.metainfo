@@ -10,8 +10,7 @@ MetaInfo {
             version: "1.0"
             requiredImport: "QtDataVisualization"
 
-            Property { name: "width"; type: "int"; value: 300; }
-            Property { name: "height"; type: "int"; value: 300; }
+            QmlSource { source: "default/Bars3D.qml" }
         }
     }
     Type {
@@ -25,8 +24,7 @@ MetaInfo {
             version: "1.0"
             requiredImport: "QtDataVisualization"
 
-            Property { name: "width"; type: "int"; value: 300; }
-            Property { name: "height"; type: "int"; value: 300; }
+            QmlSource { source: "default/Scatter3D.qml" }
         }
     }
     Type {
@@ -40,8 +38,7 @@ MetaInfo {
             version: "1.0"
             requiredImport: "QtDataVisualization"
 
-            Property { name: "width"; type: "int"; value: 300; }
-            Property { name: "height"; type: "int"; value: 300; }
+            QmlSource { source: "default/Surface3D.qml" }
         }
     }
 }
