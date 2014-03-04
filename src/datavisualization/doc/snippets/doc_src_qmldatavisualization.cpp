@@ -110,7 +110,7 @@ Item {
                 // Mapping model roles to surface series rows, columns, and values.
                 rowRole: "longitude"
                 columnRole: "latitude"
-                valueRole: "pop_density"
+                yPosRole: "pop_density"
             }
         }
     }
