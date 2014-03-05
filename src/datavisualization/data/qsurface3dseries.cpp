@@ -125,12 +125,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty bool Surface3DSeries::surfaceGridEnabled
- *
- * Sets surface grid to \a enabled. It is preset to \c true by default.
- */
-
-/*!
  * \qmlproperty bool Surface3DSeries::flatShadingSupported
  *
  * Flat shading for surfaces requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
