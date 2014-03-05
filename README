@@ -76,9 +76,8 @@ Known Issues
 - Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
 - Surfaces with non-straight rows and columns do not always render properly.
 - Q3DLight class (and Light3D QML item) are currently not usable for anything.
-- Q3DScene::secondarySubviewOnTop property has currently no effect.
+- Changing any of Q3DScene properties affecting subviewports currently has no effect.
 - The color style Q3DTheme::ColorStyleObjectGradient doesn't work for surface graphs.
 - Scatter "point" meshes do not support gradients, they always use the base color.
 - Widget based examples layout incorrectly in iOS.
-- QML implementation doesn't use a shared context on OSX or Android.
 - Reparenting a graph to an item in another QQuickWindow is not supported.
