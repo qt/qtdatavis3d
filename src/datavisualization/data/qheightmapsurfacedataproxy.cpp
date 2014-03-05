@@ -31,7 +31,7 @@ const float defaultMaxValue = 10.0f;
  * \since Qt Data Visualization 1.0
  *
  * QHeightMapSurfaceDataProxy takes care of surface related height map data handling. It provides a
- * way for giving the surface plot a height map to be visualized.
+ * way to give a height map to be visualized as a surface plot.
  *
  * Since height maps do not contain values for X or Z axes, those values need to be given
  * separately using minXValue, maxXValue, minZValue, and maxZValue properties. X-value corresponds
@@ -51,7 +51,7 @@ const float defaultMaxValue = 10.0f;
  * \brief Base proxy type for Surface3D.
  *
  * HeightMapSurfaceDataProxy takes care of surface related height map data handling. It provides a
- * way for giving the surface plot a height map to be visualized.
+ * way to give a height map to be visualized as a surface plot.
  *
  * For more complete description, see QHeightMapSurfaceDataProxy.
  *
