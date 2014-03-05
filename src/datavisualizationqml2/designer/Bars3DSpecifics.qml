@@ -42,6 +42,46 @@ Column {
                 }
             }
             Label {
+                text: qsTr("barThickness")
+                toolTip: qsTr("Bar Thickness Ratio")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    backendValue: backendValues.barThickness
+                    minimumValue: 0.001
+                    maximumValue: 1.0
+                    stepSize: 0.001
+                    decimals: 3
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("barSpacing")
+                toolTip: qsTr("Bar Spacing")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    prefix: "col: "
+                    backendValue: backendValues.barSpacing_width
+                    minimumValue: 0.0
+                    maximumValue: 10.0
+                    stepSize: 0.01
+                    decimals: 2
+                    Layout.fillWidth: true
+                }
+                SpinBox {
+                    prefix: "row: "
+                    backendValue: backendValues.barSpacing_height
+                    minimumValue: 0.0
+                    maximumValue: 10.0
+                    stepSize: 0.01
+                    decimals: 2
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
                 text: qsTr("barSpacingRelative")
                 toolTip: qsTr("Bar Spacing Relative")
                 Layout.fillWidth: true
