@@ -60,3 +60,6 @@ load(qml_plugin)
     QMAKE_EXTRA_TARGETS += copy_qmldir
     PRE_TARGETDEPS += $$copy_qmldir.target
 }
+
+QML_FILES += \
+    $$PWD/plugins.qmltypes
