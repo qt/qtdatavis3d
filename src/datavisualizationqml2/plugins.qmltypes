@@ -197,7 +197,7 @@ Module {
         Property { name: "valueAxis"; type: "QValue3DAxis"; isPointer: true }
         Property { name: "columnAxis"; type: "QCategory3DAxis"; isPointer: true }
         Property { name: "multiSeriesUniform"; type: "bool" }
-        Property { name: "barThickness"; type: "float" }
+        Property { name: "barThickness"; type: "double" }
         Property { name: "barSpacing"; type: "QSizeF" }
         Property { name: "barSpacingRelative"; type: "bool" }
         Property { name: "seriesList"; type: "QBar3DSeries"; isList: true; isReadonly: true }
@@ -221,7 +221,7 @@ Module {
         }
         Signal {
             name: "barThicknessChanged"
-            Parameter { name: "thicknessRatio"; type: "float" }
+            Parameter { name: "thicknessRatio"; type: "double" }
         }
         Signal {
             name: "barSpacingChanged"
@@ -490,19 +490,19 @@ Module {
                 "CameraPresetDirectlyBelow": 23
             }
         }
-        Property { name: "xRotation"; type: "float" }
-        Property { name: "yRotation"; type: "float" }
+        Property { name: "xRotation"; type: "double" }
+        Property { name: "yRotation"; type: "double" }
         Property { name: "zoomLevel"; type: "int" }
         Property { name: "cameraPreset"; type: "CameraPreset" }
         Property { name: "wrapXRotation"; type: "bool" }
         Property { name: "wrapYRotation"; type: "bool" }
         Signal {
             name: "xRotationChanged"
-            Parameter { name: "rotation"; type: "float" }
+            Parameter { name: "rotation"; type: "double" }
         }
         Signal {
             name: "yRotationChanged"
-            Parameter { name: "rotation"; type: "float" }
+            Parameter { name: "rotation"; type: "double" }
         }
         Signal {
             name: "zoomLevelChanged"
@@ -552,7 +552,7 @@ Module {
         Property { name: "slicingActive"; type: "bool" }
         Property { name: "activeCamera"; type: "Q3DCamera"; isPointer: true }
         Property { name: "activeLight"; type: "Q3DLight"; isPointer: true }
-        Property { name: "devicePixelRatio"; type: "float" }
+        Property { name: "devicePixelRatio"; type: "double" }
         Signal {
             name: "viewportChanged"
             Parameter { name: "viewport"; type: "QRect" }
@@ -583,7 +583,7 @@ Module {
         }
         Signal {
             name: "devicePixelRatioChanged"
-            Parameter { name: "pixelRatio"; type: "float" }
+            Parameter { name: "pixelRatio"; type: "double" }
         }
         Signal {
             name: "selectionQueryPositionChanged"
@@ -631,9 +631,9 @@ Module {
         Property { name: "baseGradients"; type: "QList<QLinearGradient>" }
         Property { name: "singleHighlightGradient"; type: "QLinearGradient" }
         Property { name: "multiHighlightGradient"; type: "QLinearGradient" }
-        Property { name: "lightStrength"; type: "float" }
-        Property { name: "ambientLightStrength"; type: "float" }
-        Property { name: "highlightLightStrength"; type: "float" }
+        Property { name: "lightStrength"; type: "double" }
+        Property { name: "ambientLightStrength"; type: "double" }
+        Property { name: "highlightLightStrength"; type: "double" }
         Property { name: "labelBorderEnabled"; type: "bool" }
         Property { name: "font"; type: "QFont" }
         Property { name: "backgroundEnabled"; type: "bool" }
@@ -694,15 +694,15 @@ Module {
         }
         Signal {
             name: "lightStrengthChanged"
-            Parameter { name: "strength"; type: "float" }
+            Parameter { name: "strength"; type: "double" }
         }
         Signal {
             name: "ambientLightStrengthChanged"
-            Parameter { name: "strength"; type: "float" }
+            Parameter { name: "strength"; type: "double" }
         }
         Signal {
             name: "highlightLightStrengthChanged"
-            Parameter { name: "strength"; type: "float" }
+            Parameter { name: "strength"; type: "double" }
         }
         Signal {
             name: "labelBorderEnabledChanged"
@@ -756,8 +756,8 @@ Module {
         Property { name: "labels"; type: "QStringList" }
         Property { name: "orientation"; type: "AxisOrientation"; isReadonly: true }
         Property { name: "type"; type: "AxisType"; isReadonly: true }
-        Property { name: "min"; type: "float" }
-        Property { name: "max"; type: "float" }
+        Property { name: "min"; type: "double" }
+        Property { name: "max"; type: "double" }
         Property { name: "autoAdjustRange"; type: "bool" }
         Signal {
             name: "titleChanged"
@@ -769,16 +769,16 @@ Module {
         }
         Signal {
             name: "minChanged"
-            Parameter { name: "value"; type: "float" }
+            Parameter { name: "value"; type: "double" }
         }
         Signal {
             name: "maxChanged"
-            Parameter { name: "value"; type: "float" }
+            Parameter { name: "value"; type: "double" }
         }
         Signal {
             name: "rangeChanged"
-            Parameter { name: "min"; type: "float" }
-            Parameter { name: "max"; type: "float" }
+            Parameter { name: "min"; type: "double" }
+            Parameter { name: "max"; type: "double" }
         }
         Signal {
             name: "autoAdjustRangeChanged"
@@ -921,7 +921,7 @@ Module {
         Method {
             name: "setMeshAxisAndAngle"
             Parameter { name: "axis"; type: "QVector3D" }
-            Parameter { name: "angle"; type: "float" }
+            Parameter { name: "angle"; type: "double" }
         }
     }
     Component {
@@ -949,7 +949,7 @@ Module {
         exportMetaObjectRevisions: [0]
         Property { name: "dataProxy"; type: "QBarDataProxy"; isPointer: true }
         Property { name: "selectedBar"; type: "QPoint" }
-        Property { name: "meshAngle"; type: "float" }
+        Property { name: "meshAngle"; type: "double" }
         Signal {
             name: "dataProxyChanged"
             Parameter { name: "proxy"; type: "QBarDataProxy"; isPointer: true }
@@ -960,7 +960,7 @@ Module {
         }
         Signal {
             name: "meshAngleChanged"
-            Parameter { name: "angle"; type: "float" }
+            Parameter { name: "angle"; type: "double" }
         }
     }
     Component {
@@ -1022,10 +1022,10 @@ Module {
         exportMetaObjectRevisions: [0]
         Property { name: "heightMap"; type: "QImage" }
         Property { name: "heightMapFile"; type: "string" }
-        Property { name: "minXValue"; type: "float" }
-        Property { name: "maxXValue"; type: "float" }
-        Property { name: "minZValue"; type: "float" }
-        Property { name: "maxZValue"; type: "float" }
+        Property { name: "minXValue"; type: "double" }
+        Property { name: "maxXValue"; type: "double" }
+        Property { name: "minZValue"; type: "double" }
+        Property { name: "maxZValue"; type: "double" }
         Signal {
             name: "heightMapChanged"
             Parameter { name: "image"; type: "QImage" }
@@ -1036,19 +1036,19 @@ Module {
         }
         Signal {
             name: "minXValueChanged"
-            Parameter { name: "value"; type: "float" }
+            Parameter { name: "value"; type: "double" }
         }
         Signal {
             name: "maxXValueChanged"
-            Parameter { name: "value"; type: "float" }
+            Parameter { name: "value"; type: "double" }
         }
         Signal {
             name: "minZValueChanged"
-            Parameter { name: "value"; type: "float" }
+            Parameter { name: "value"; type: "double" }
         }
         Signal {
             name: "maxZValueChanged"
-            Parameter { name: "value"; type: "float" }
+            Parameter { name: "value"; type: "double" }
         }
     }
     Component {
@@ -1211,7 +1211,7 @@ Module {
         exportMetaObjectRevisions: [0]
         Property { name: "dataProxy"; type: "QScatterDataProxy"; isPointer: true }
         Property { name: "selectedItem"; type: "int" }
-        Property { name: "itemSize"; type: "float" }
+        Property { name: "itemSize"; type: "double" }
         Signal {
             name: "dataProxyChanged"
             Parameter { name: "proxy"; type: "QScatterDataProxy"; isPointer: true }
@@ -1222,7 +1222,7 @@ Module {
         }
         Signal {
             name: "itemSizeChanged"
-            Parameter { name: "size"; type: "float" }
+            Parameter { name: "size"; type: "double" }
         }
     }
     Component {
