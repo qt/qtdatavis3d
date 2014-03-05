@@ -63,6 +63,7 @@ Column {
                     model: ["RenderIndirect", "RenderDirectToBackground",
                         "RenderDirectToBackground_NoClear"]
                     Layout.fillWidth: true
+                    scope: "AbstractGraph3D"
                 }
             }
             Label {
@@ -89,6 +90,7 @@ Column {
                         "ShadowQualityHigh", "ShadowQualitySoftLow", "ShadowQualitySoftMedium",
                         "ShadowQualitySoftHigh"]
                     Layout.fillWidth: true
+                    scope: "AbstractGraph3D"
                 }
             }
             Label {
@@ -122,6 +124,7 @@ Column {
                         "SelectionItemAndColumn | SelectionSlice | SelectionMultiSeries"
                     ]
                     Layout.fillWidth: true
+                    scope: "AbstractGraph3D"
                 }
             }
         }
