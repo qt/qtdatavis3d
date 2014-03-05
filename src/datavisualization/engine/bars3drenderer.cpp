@@ -1652,6 +1652,70 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glEnable(GL_POLYGON_OFFSET_FILL);
 
+    // Y Labels
+    int labelNbr = 0;
+    GLfloat heightStep = m_axisCacheY.segmentStep();
+    GLfloat startLine = 0.0f;
+    int labelCount = m_axisCacheY.labels().size();
+    if (m_hasNegativeValues) {
+        if (m_noZeroInRange)
+            startLine = m_axisCacheY.min() - m_axisCacheY.max();
+        else
+            startLine = m_axisCacheY.min();
+    }
+    GLfloat labelPos = startLine;
+    GLfloat labelMarginXTrans = labelMargin;
+    GLfloat labelMarginZTrans = labelMargin;
+    GLfloat labelXTrans = rowScaleFactor;
+    GLfloat labelZTrans = columnScaleFactor;
+    QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
+    QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
+    Qt::AlignmentFlag backAlignment = Qt::AlignLeft;
+    Qt::AlignmentFlag sideAlignment = Qt::AlignLeft;
+    if (!m_xFlipped) {
+        labelXTrans = -labelXTrans;
+        labelMarginXTrans = -labelMargin;
+        backLabelRotation.setY(90.0f);
+        sideAlignment = Qt::AlignRight;
+    }
+    if (m_zFlipped) {
+        labelZTrans = -labelZTrans;
+        labelMarginZTrans = -labelMargin;
+        backAlignment = Qt::AlignRight;
+        sideLabelRotation.setY(180.f);
+    }
+    QVector3D backLabelTrans = QVector3D(labelXTrans, 0.0f,
+                                         labelZTrans + labelMarginZTrans);
+    QVector3D sideLabelTrans = QVector3D(-labelXTrans - labelMarginXTrans,
+                                         0.0f, -labelZTrans);
+
+    for (int i = 0; i < labelCount; i++) {
+        if (m_axisCacheY.labelItems().size() > labelNbr) {
+            backLabelTrans.setY(2.0f * labelPos / m_heightNormalizer);
+            sideLabelTrans.setY(backLabelTrans.y());
+
+            glPolygonOffset(GLfloat(i) / -10.0f, 1.0f);
+
+            const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
+
+            // Back wall
+            m_dummyBarRenderItem.setTranslation(backLabelTrans);
+            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                zeroVector, backLabelRotation, 0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, activeCamera,
+                                true, true, Drawer::LabelMid, backAlignment);
+
+            // Side wall
+            m_dummyBarRenderItem.setTranslation(sideLabelTrans);
+            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                zeroVector, sideLabelRotation, 0, m_cachedSelectionMode,
+                                m_labelShader, m_labelObj, activeCamera,
+                                true, true, Drawer::LabelMid, sideAlignment);
+        }
+        labelNbr++;
+        labelPos += heightStep;
+    }
+
     // Calculate the positions for row and column labels and store them
     GLfloat labelYAdjustment = 0.005f;
     GLfloat scaledRowWidth = rowScaleFactor;
@@ -1733,69 +1797,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
     }
 
-    // Y Labels
-    int labelNbr = 0;
-    GLfloat heightStep = m_axisCacheY.segmentStep();
-    GLfloat startLine = 0.0f;
-    int labelCount = m_axisCacheY.labels().size();
-    if (m_hasNegativeValues) {
-        if (m_noZeroInRange)
-            startLine = m_axisCacheY.min() - m_axisCacheY.max();
-        else
-            startLine = m_axisCacheY.min();
-    }
-    GLfloat labelPos = startLine;
-    GLfloat labelMarginXTrans = labelMargin;
-    GLfloat labelMarginZTrans = labelMargin;
-    GLfloat labelXTrans = rowScaleFactor;
-    GLfloat labelZTrans = columnScaleFactor;
-    QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
-    QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
-    Qt::AlignmentFlag backAlignment = Qt::AlignLeft;
-    Qt::AlignmentFlag sideAlignment = Qt::AlignLeft;
-    if (!m_xFlipped) {
-        labelXTrans = -labelXTrans;
-        labelMarginXTrans = -labelMargin;
-        backLabelRotation.setY(90.0f);
-        sideAlignment = Qt::AlignRight;
-    }
-    if (m_zFlipped) {
-        labelZTrans = -labelZTrans;
-        labelMarginZTrans = -labelMargin;
-        backAlignment = Qt::AlignRight;
-        sideLabelRotation.setY(180.f);
-    }
-    QVector3D backLabelTrans = QVector3D(labelXTrans, 0.0f,
-                                         labelZTrans + labelMarginZTrans);
-    QVector3D sideLabelTrans = QVector3D(-labelXTrans - labelMarginXTrans,
-                                         0.0f, -labelZTrans);
-
-    for (int i = 0; i < labelCount; i++) {
-        if (m_axisCacheY.labelItems().size() > labelNbr) {
-            backLabelTrans.setY(2.0f * labelPos / m_heightNormalizer);
-            sideLabelTrans.setY(backLabelTrans.y());
-
-            glPolygonOffset(GLfloat(i) / -10.0f, 1.0f);
-
-            const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
-
-            // Back wall
-            m_dummyBarRenderItem.setTranslation(backLabelTrans);
-            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, backLabelRotation, 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, backAlignment);
-
-            // Side wall
-            m_dummyBarRenderItem.setTranslation(sideLabelTrans);
-            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, sideLabelRotation, 0, m_cachedSelectionMode,
-                                m_labelShader, m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, sideAlignment);
-        }
-        labelNbr++;
-        labelPos += heightStep;
-    }
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     // Handle selected bar label generation
