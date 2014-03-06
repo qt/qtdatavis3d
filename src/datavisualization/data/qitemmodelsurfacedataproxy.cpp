@@ -89,7 +89,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelSurfaceDataProxy::itemModel
+ * \qmlproperty model ItemModelSurfaceDataProxy::itemModel
  * The item model.
  */
 
@@ -125,25 +125,25 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelSurfaceDataProxy::rowCategories
+ * \qmlproperty list<String> ItemModelSurfaceDataProxy::rowCategories
  * The row categories of the mapping. Only items with row roles that are found in this list are
  * included when data is resolved. The rows are ordered in the same order as they are in this list.
  */
 
 /*!
- * \qmlproperty list ItemModelSurfaceDataProxy::columnCategories
+ * \qmlproperty list<String> ItemModelSurfaceDataProxy::columnCategories
  * The column categories of the mapping. Only items with column roles that are found in this list are
  * included when data is resolved. The columns are ordered in the same order as they are in this list.
  */
 
 /*!
- * \qmlproperty list ItemModelSurfaceDataProxy::useModelCategories
+ * \qmlproperty bool ItemModelSurfaceDataProxy::useModelCategories
  * When set to true, the mapping ignores row and column roles and categories, and uses
  * the rows and columns from the model instead. Defaults to \c{false}.
  */
 
 /*!
- * \qmlproperty list ItemModelSurfaceDataProxy::autoRowCategories
+ * \qmlproperty bool ItemModelSurfaceDataProxy::autoRowCategories
  * When set to true, the mapping ignores any explicitly set row categories
  * and overwrites them with automatically generated ones whenever the
  * data from model is resolved. Proxy minimum and maximum row values are also
@@ -151,7 +151,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelSurfaceDataProxy::autoColumnCategories
+ * \qmlproperty bool ItemModelSurfaceDataProxy::autoColumnCategories
  * When set to true, the mapping ignores any explicitly set column categories
  * and overwrites them with automatically generated ones whenever the
  * data from model is resolved. Proxy minimum and maximum column values are also

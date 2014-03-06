@@ -72,7 +72,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelScatterDataProxy::itemModel
+ * \qmlproperty model ItemModelScatterDataProxy::itemModel
  * The item model.
  */
 
