@@ -49,10 +49,10 @@ Column {
             SecondColumnLayout {
                 SpinBox {
                     backendValue: backendValues.barThickness
-                    minimumValue: 0.001
-                    maximumValue: 1.0
-                    stepSize: 0.001
-                    decimals: 3
+                    minimumValue: 0.01
+                    maximumValue: 100.0
+                    stepSize: 0.01
+                    decimals: 2
                     Layout.fillWidth: true
                 }
             }
