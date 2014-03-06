@@ -84,7 +84,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::itemModel
+ * \qmlproperty model ItemModelBarDataProxy::itemModel
  * The item model.
  */
 
@@ -110,33 +110,33 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::rowCategories
+ * \qmlproperty list<String> ItemModelBarDataProxy::rowCategories
  * The row categories of the mapping. Only items with row roles that are found in this list are
  * included when the data is resolved. The rows are ordered in the same order as they are in this list.
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::columnCategories
+ * \qmlproperty list<String> ItemModelBarDataProxy::columnCategories
  * The column categories of the mapping. Only items with column roles that are found in this list are
  * included when the data is resolved. The columns are ordered in the same order as they are in this list.
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::useModelCategories
+ * \qmlproperty bool ItemModelBarDataProxy::useModelCategories
  * When set to true, the mapping ignores row and column roles and categories, and uses
  * the rows and columns from the model instead. Row and column headers are used for row and column
  * labels. Defaults to \c{false}.
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::autoRowCategories
+ * \qmlproperty bool ItemModelBarDataProxy::autoRowCategories
  * When set to true, the mapping ignores any explicitly set row categories
  * and overwrites them with automatically generated ones whenever the
  * data from the model is resolved. Defaults to \c{true}.
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::autoColumnCategories
+ * \qmlproperty bool ItemModelBarDataProxy::autoColumnCategories
  * When set to true, the mapping ignores any explicitly set column categories
  * and overwrites them with automatically generated ones whenever the
  * data from model is resolved. Defaults to \c{true}.
