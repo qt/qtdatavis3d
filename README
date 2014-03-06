@@ -10,6 +10,8 @@ System Requirements
 
 - Qt 5.2 or newer
 - OpenGL 2.1 or newer (recommended) or OpenGL ES2 (reduced feature set)
+- Manipulating Qt Data Visualization graphs with QML Designer requires
+  Qt Creator 3.1 or newer
 
 Building
 ========
