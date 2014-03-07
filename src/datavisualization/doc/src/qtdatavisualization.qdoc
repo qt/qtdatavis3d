@@ -50,6 +50,7 @@
 
 /*!
     \group datavisualization_examples
+    \ingroup all-examples
     \title Qt Data Visualization Examples
 
     \brief Examples for the Qt Data Visualization.
