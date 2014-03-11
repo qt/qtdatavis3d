@@ -1,6 +1,11 @@
 # Target can't start with 'Qt' as it gets major version number inserted into it in that case,
-# which we don't want.
-TARGET = DataVisualization
+# which we don't want. Exception is mac bundles, where the target name must match the module name
+mac:CONFIG(shared, static|shared):contains(QT_CONFIG, qt_framework) {
+    TARGET = QtDataVisualization
+} else {
+    TARGET = DataVisualization
+}
+message($$QT_CONFIG)
 
 QT = core gui
 DEFINES += QT_DATAVISUALIZATION_LIBRARY
