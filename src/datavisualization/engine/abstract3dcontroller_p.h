@@ -73,8 +73,9 @@ struct Abstract3DChangeBitField {
     bool axisXLabelFormatChanged       : 1;
     bool axisYLabelFormatChanged       : 1;
     bool axisZLabelFormatChanged       : 1;
-    bool inputViewChanged              : 1;
-    bool inputPositionChanged          : 1;
+    bool axisXFormatterChanged         : 1;
+    bool axisYFormatterChanged         : 1;
+    bool axisZFormatterChanged         : 1;
 
     Abstract3DChangeBitField() :
         zoomLevelChanged(true),
@@ -102,7 +103,10 @@ struct Abstract3DChangeBitField {
         axisZSubSegmentCountChanged(true),
         axisXLabelFormatChanged(true),
         axisYLabelFormatChanged(true),
-        axisZLabelFormatChanged(true)
+        axisZLabelFormatChanged(true),
+        axisXFormatterChanged(true),
+        axisYFormatterChanged(true),
+        axisZFormatterChanged(true)
     {
     }
 };
@@ -233,6 +237,7 @@ public:
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) = 0;
     virtual void handleAxisLabelFormatChangedBySender(QObject *sender);
+    virtual void handleAxisFormatterDirtyBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick() = 0;
 
@@ -244,6 +249,7 @@ public slots:
     void handleAxisSubSegmentCountChanged(int count);
     void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
     void handleAxisLabelFormatChanged(const QString &format);
+    void handleAxisFormatterDirty();
     void handleInputViewChanged(QAbstract3DInputHandler::InputView view);
     void handleInputPositionChanged(const QPoint &position);
     void handleSeriesVisibilityChanged(bool visible);

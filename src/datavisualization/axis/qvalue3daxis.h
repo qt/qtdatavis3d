@@ -20,6 +20,7 @@
 #define QVALUE3DAXIS_H
 
 #include <QtDataVisualization/qabstract3daxis.h>
+#include <QtDataVisualization/qvalue3daxisformatter.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -31,6 +32,7 @@ class QT_DATAVISUALIZATION_EXPORT QValue3DAxis : public QAbstract3DAxis
     Q_PROPERTY(int segmentCount READ segmentCount WRITE setSegmentCount NOTIFY segmentCountChanged)
     Q_PROPERTY(int subSegmentCount READ subSegmentCount WRITE setSubSegmentCount NOTIFY subSegmentCountChanged)
     Q_PROPERTY(QString labelFormat READ labelFormat WRITE setLabelFormat NOTIFY labelFormatChanged)
+    Q_PROPERTY(QValue3DAxisFormatter* formatter READ formatter WRITE setFormatter NOTIFY formatterChanged REVISION 1)
 
 public:
     explicit QValue3DAxis(QObject *parent = 0);
@@ -45,10 +47,14 @@ public:
     void setLabelFormat(const QString &format);
     QString labelFormat() const;
 
+    void setFormatter(QValue3DAxisFormatter *formatter);
+    QValue3DAxisFormatter *formatter() const;
+
 signals:
     void segmentCountChanged(int count);
     void subSegmentCountChanged(int count);
     void labelFormatChanged(const QString &format);
+    void formatterChanged(QValue3DAxisFormatter *formatter);
 
 protected:
     QValue3DAxisPrivate *dptr();
@@ -59,6 +65,7 @@ private:
     friend class Bars3DController;
     friend class Scatter3DController;
     friend class Surface3DController;
+    friend class QValue3DAxisFormatter;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

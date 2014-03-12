@@ -326,6 +326,31 @@ void Abstract3DController::synchDataToRenderer()
         }
     }
 
+    if (m_changeTracker.axisXFormatterChanged) {
+        m_changeTracker.axisXFormatterChanged = false;
+        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationX,
+                                            valueAxisX->formatter());
+        }
+    }
+    if (m_changeTracker.axisYFormatterChanged) {
+        m_changeTracker.axisYFormatterChanged = false;
+        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationY,
+                                            valueAxisY->formatter());
+        }
+    }
+    if (m_changeTracker.axisZFormatterChanged) {
+        m_changeTracker.axisZFormatterChanged = false;
+        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationZ,
+                                            valueAxisZ->formatter());
+        }
+    }
+
     if (m_isSeriesVisibilityDirty || m_isSeriesVisualsDirty) {
         m_renderer->updateSeries(m_seriesList, m_isSeriesVisibilityDirty);
         m_isSeriesVisibilityDirty = false;
@@ -888,6 +913,11 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
     handleAxisLabelFormatChangedBySender(sender());
 }
 
+void Abstract3DController::handleAxisFormatterDirty()
+{
+    handleAxisFormatterDirtyBySender(sender());
+}
+
 void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::InputView view)
 {
     // When in automatic slicing mode, input view change to primary disables slice mode
@@ -896,15 +926,12 @@ void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::Input
         setSlicingActive(false);
     }
 
-    m_changeTracker.inputViewChanged = true;
     emitNeedRender();
 }
 
 void Abstract3DController::handleInputPositionChanged(const QPoint &position)
 {
     Q_UNUSED(position)
-
-    m_changeTracker.inputPositionChanged = true;
     emitNeedRender();
 }
 
@@ -932,6 +959,23 @@ void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
     } else if (sender == m_axisZ) {
         m_isDataDirty = true;
         m_changeTracker.axisZLabelFormatChanged = true;
+    } else {
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    }
+    emitNeedRender();
+}
+
+void Abstract3DController::handleAxisFormatterDirtyBySender(QObject *sender)
+{
+    if (sender == m_axisX) {
+        m_isDataDirty = true;
+        m_changeTracker.axisXFormatterChanged = true;
+    } else if (sender == m_axisY) {
+        m_isDataDirty = true;
+        m_changeTracker.axisYFormatterChanged = true;
+    } else if (sender == m_axisZ) {
+        m_isDataDirty = true;
+        m_changeTracker.axisZFormatterChanged = true;
     } else {
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
     }

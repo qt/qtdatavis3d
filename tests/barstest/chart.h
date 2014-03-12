@@ -85,6 +85,7 @@ public:
     void primarySeriesTest();
     void insertRemoveTestToggle();
     void toggleRotation();
+    void useLogAxis();
 
 public slots:
     void flipViews();

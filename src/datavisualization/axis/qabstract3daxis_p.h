@@ -53,6 +53,9 @@ public:
 
 protected:
     virtual void updateLabels();
+    virtual bool allowZero() = 0;
+    virtual bool allowNegatives() = 0;
+    virtual bool allowMinMaxSame() = 0;
 
     QAbstract3DAxis *q_ptr;
 
@@ -64,8 +67,6 @@ protected:
     float m_min;
     float m_max;
     bool m_autoAdjust;
-    bool m_onlyPositiveValues;
-    bool m_allowMinMaxSame;
 
     friend class QAbstract3DAxis;
     friend class QValue3DAxis;

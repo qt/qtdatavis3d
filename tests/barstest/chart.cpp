@@ -20,6 +20,7 @@
 #include "custominputhandler.h"
 #include <QtDataVisualization/qcategory3daxis.h>
 #include <QtDataVisualization/qvalue3daxis.h>
+#include <QtDataVisualization/qvalue3daxisformatter.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
@@ -1042,6 +1043,19 @@ void GraphModifier::toggleRotation()
         m_rotationTimer.stop();
     else
         m_rotationTimer.start(20);
+}
+
+void GraphModifier::useLogAxis()
+{
+    // TODO proper log axis test
+
+
+//    // Change y-axis to log axis
+//    QValue3DAxis *logAxis = new QValue3DAxis;
+//    logAxis->formatter()->setBase(10);
+//    logAxis->setSegmentCount(5);
+//    logAxis->setRange(1, 100000);
+//    m_graph->setValueAxis(logAxis);
 }
 
 void GraphModifier::insertRemoveTimerTimeout()

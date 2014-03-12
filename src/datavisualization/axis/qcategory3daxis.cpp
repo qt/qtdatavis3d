@@ -121,8 +121,6 @@ QCategory3DAxisPrivate::QCategory3DAxisPrivate(QCategory3DAxis *q)
     : QAbstract3DAxisPrivate(q, QAbstract3DAxis::AxisTypeCategory),
       m_labelsExplicitlySet(false)
 {
-    m_onlyPositiveValues = true;
-    m_allowMinMaxSame = true;
 }
 
 QCategory3DAxisPrivate::~QCategory3DAxisPrivate()
@@ -140,6 +138,21 @@ void QCategory3DAxisPrivate::setDataLabels(const QStringList &labels)
         m_labels = labels;
         emit qptr()->labelsChanged();
     }
+}
+
+bool QCategory3DAxisPrivate::allowZero()
+{
+    return true;
+}
+
+bool QCategory3DAxisPrivate::allowNegatives()
+{
+    return false;
+}
+
+bool QCategory3DAxisPrivate::allowMinMaxSame()
+{
+    return true;
 }
 
 QCategory3DAxis *QCategory3DAxisPrivate::qptr()

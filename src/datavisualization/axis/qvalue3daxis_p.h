@@ -46,14 +46,22 @@ public:
     virtual void setMin(float min);
     virtual void setMax (float max);
 
+signals:
+    void formatterDirty();
+
 protected:
     void emitLabelsChanged();
     virtual void updateLabels();
+
+    virtual bool allowZero();
+    virtual bool allowNegatives();
+    virtual bool allowMinMaxSame();
 
     int m_segmentCount;
     int m_subSegmentCount;
     QString m_labelFormat;
     bool m_labelsDirty;
+    QValue3DAxisFormatter *m_formatter;
 
 private:
     QValue3DAxis *qptr();

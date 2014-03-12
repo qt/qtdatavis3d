@@ -26,35 +26,58 @@
 //
 // We mean it.
 
-#include "qcategory3daxis.h"
-#include "qabstract3daxis_p.h"
-#include "qbardataitem.h"
+#include "datavisualizationglobal_p.h"
+#include "qvalue3daxisformatter.h"
+#include "utils_p.h"
+#include <QtCore/QVector>
 
-#ifndef QCATEGORY3DAXIS_P_H
-#define QCATEGORY3DAXIS_P_H
+#ifndef QVALUE3DAXISFORMATTER_P_H
+#define QVALUE3DAXISFORMATTER_P_H
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class QCategory3DAxisPrivate : public QAbstract3DAxisPrivate
+class QValue3DAxis;
+
+class QValue3DAxisFormatterPrivate : public QObject
 {
     Q_OBJECT
 
 public:
-    QCategory3DAxisPrivate(QCategory3DAxis *q);
-    virtual ~QCategory3DAxisPrivate();
+    QValue3DAxisFormatterPrivate(QValue3DAxisFormatter *q);
+    virtual ~QValue3DAxisFormatterPrivate();
 
-    void setDataLabels(const QStringList &labels);
+    void recalculate();
+    void doRecalculate();
+
+    QString stringForValue(float value, const QString &format);
+    float positionAt(float value) const;
+    float valueAt(float position) const;
+
+    void setAxis(QValue3DAxis *axis);
+
+public slots:
+    void setNeedsRecalculate();
 
 protected:
-    virtual bool allowZero();
-    virtual bool allowNegatives();
-    virtual bool allowMinMaxSame();
+    QValue3DAxisFormatter *q_ptr;
 
-private:
-    QCategory3DAxis *qptr();
+    bool m_needsRecalculate;
 
-    bool m_labelsExplicitlySet;
-    friend class QCategory3DAxis;
+    float m_min;
+    float m_max;
+    float m_rangeNormalizer;
+
+    QVector<float> m_gridPositions;
+    QVector<QVector<float> > m_subGridPositions;
+    QVector<float> m_labelPositions;
+
+    QValue3DAxis *m_axis;
+
+    QString m_previousLabelFormat;
+    QByteArray m_labelFormatArray;
+    Utils::ParamType m_preparsedParamType;
+
+    friend class QValue3DAxisFormatter;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -30,6 +30,8 @@ AxisRenderCache::AxisRenderCache()
       m_segmentCount(5),
       m_subSegmentCount(1),
       m_font(QFont(QStringLiteral("Arial"))),
+      m_formatter(0),
+      m_ctrlFormatter(0),
       m_drawer(0),
       m_segmentStep(10.0f),
       m_subSegmentStep(10.0f)
@@ -40,6 +42,8 @@ AxisRenderCache::~AxisRenderCache()
 {
     foreach (LabelItem *label, m_labelItems)
         delete label;
+
+    delete m_formatter;
 }
 
 void AxisRenderCache::setDrawer(Drawer *drawer)

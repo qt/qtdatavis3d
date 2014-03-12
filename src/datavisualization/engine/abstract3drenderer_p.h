@@ -84,14 +84,23 @@ public:
     virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
-    virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis::AxisType type);
-    virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation, const QString &title);
-    virtual void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation, const QStringList &labels);
-    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
+    virtual void initBackgroundShaders(const QString &vertexShader,
+                                       const QString &fragmentShader) = 0;
+    virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
+                                QAbstract3DAxis::AxisType type);
+    virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation,
+                                 const QString &title);
+    virtual void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                                  const QStringList &labels);
+    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
+                                 float max);
     virtual void updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation, const QString &format);
+    virtual void updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
+                                           int count);
+    virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation,
+                                       const QString &format);
+    virtual void updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
+                                     QValue3DAxisFormatter *formatter);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
     void generateBaseColorTexture(const QColor &color, GLuint *texture);

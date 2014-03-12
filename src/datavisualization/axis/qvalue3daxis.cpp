@@ -18,7 +18,7 @@
 
 #include "qvalue3daxis.h"
 #include "qvalue3daxis_p.h"
-#include "utils_p.h"
+#include "qvalue3daxisformatter_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -79,6 +79,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 QValue3DAxis::QValue3DAxis(QObject *parent) :
     QAbstract3DAxis(new QValue3DAxisPrivate(this), parent)
 {
+    setFormatter(new QValue3DAxisFormatter);
 }
 
 /*!
@@ -87,7 +88,6 @@ QValue3DAxis::QValue3DAxis(QObject *parent) :
 QValue3DAxis::~QValue3DAxis()
 {
 }
-
 
 /*!
  * \property QValue3DAxis::segmentCount
@@ -169,6 +169,31 @@ QString QValue3DAxis::labelFormat() const
 }
 
 /*!
+ * \property QValue3DAxis::formatter
+ *
+ * Defines the axis \a formatter to be used. Any existing formatter is deleted when a new formatter
+ * is set.
+ */
+void QValue3DAxis::setFormatter(QValue3DAxisFormatter *formatter)
+{
+    Q_ASSERT(formatter);
+
+    if (formatter != dptr()->m_formatter) {
+        delete dptr()->m_formatter;
+        dptr()->m_formatter = formatter;
+        formatter->setParent(this);
+        formatter->d_ptr->setAxis(this);
+        emit formatterChanged(formatter);
+        emit dptr()->formatterDirty();
+    }
+}
+
+QValue3DAxisFormatter *QValue3DAxis::formatter() const
+{
+    return dptrc()->m_formatter;
+}
+
+/*!
  * \internal
  */
 QValue3DAxisPrivate *QValue3DAxis::dptr()
@@ -189,7 +214,8 @@ QValue3DAxisPrivate::QValue3DAxisPrivate(QValue3DAxis *q)
       m_segmentCount(5),
       m_subSegmentCount(1),
       m_labelFormat(Utils::defaultLabelFormat()),
-      m_labelsDirty(true)
+      m_labelsDirty(true),
+      m_formatter(0)
 {
 }
 
@@ -243,23 +269,28 @@ void QValue3DAxisPrivate::updateLabels()
     QStringList newLabels;
     newLabels.reserve(m_segmentCount + 1);
 
-    // First label is at axis min, which is an extra segment
-    float segmentStep = (m_max - m_min) / m_segmentCount;
-
-    QString formatString(m_labelFormat);
-    Utils::ParamType paramType = Utils::findFormatParamType(formatString);
-    QByteArray formatArray = formatString.toUtf8();
-
-    for (int i = 0; i < m_segmentCount; i++) {
-        float value = m_min + (segmentStep * i);
-        newLabels.append(Utils::formatLabel(formatArray, paramType, value));
+    for (int i = 0; i <= m_segmentCount; i++) {
+        float value = m_formatter->valueAt(m_formatter->gridPosition(i));
+        newLabels.append(m_formatter->stringForValue(value, m_labelFormat));
     }
-
-    // Ensure max label doesn't suffer from any rounding errors
-    newLabels.append(Utils::formatLabel(formatArray, paramType, m_max));
 
     if (m_labels != newLabels)
         m_labels = newLabels;
+}
+
+bool QValue3DAxisPrivate::allowZero()
+{
+    return m_formatter->allowZero();
+}
+
+bool QValue3DAxisPrivate::allowNegatives()
+{
+    return m_formatter->allowNegatives();
+}
+
+bool QValue3DAxisPrivate::allowMinMaxSame()
+{
+    return false;
 }
 
 QValue3DAxis *QValue3DAxisPrivate::qptr()

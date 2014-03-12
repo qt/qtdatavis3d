@@ -265,9 +265,7 @@ QAbstract3DAxisPrivate::QAbstract3DAxisPrivate(QAbstract3DAxis *q, QAbstract3DAx
       m_isDefaultAxis(false),
       m_min(0.0f),
       m_max(10.0f),
-      m_autoAdjust(true),
-      m_onlyPositiveValues(false),
-      m_allowMinMaxSame(false)
+      m_autoAdjust(true)
 {
 }
 
@@ -293,14 +291,25 @@ void QAbstract3DAxisPrivate::updateLabels()
 void QAbstract3DAxisPrivate::setRange(float min, float max)
 {
     bool adjusted = false;
-    if (m_onlyPositiveValues) {
-        if (min < 0.0f) {
-            min = 0.0f;
-            adjusted = true;
-        }
-        if (max < 0.0f) {
-            max = 0.0f;
-            adjusted = true;
+    if (!allowNegatives()) {
+        if (allowZero()) {
+            if (min < 0.0f) {
+                min = 0.0f;
+                adjusted = true;
+            }
+            if (max < 0.0f) {
+                max = 0.0f;
+                adjusted = true;
+            }
+        } else {
+            if (min <= 0.0f) {
+                min = 1.0f;
+                adjusted = true;
+            }
+            if (max <= 0.0f) {
+                max = 1.0f;
+                adjusted = true;
+            }
         }
     }
     // If min >= max, we adjust ranges so that
@@ -312,8 +321,8 @@ void QAbstract3DAxisPrivate::setRange(float min, float max)
         m_min = min;
         minDirty = true;
     }
-    if (m_max != max || min > max || (!m_allowMinMaxSame && min == max)) {
-        if (min > max || (!m_allowMinMaxSame && min == max)) {
+    if (m_max != max || min > max || (!allowMinMaxSame() && min == max)) {
+        if (min > max || (!allowMinMaxSame() && min == max)) {
             m_max = min + 1.0f;
             adjusted = true;
         } else {
@@ -339,17 +348,25 @@ void QAbstract3DAxisPrivate::setRange(float min, float max)
 
 void QAbstract3DAxisPrivate::setMin(float min)
 {
-    if (m_onlyPositiveValues) {
-        if (min < 0.0f) {
-            min = 0.0f;
-            qWarning() << "Warning: Tried to set negative minimum for an axis that only supports"
-                          " positive values:" << min;
+    if (!allowNegatives()) {
+        if (allowZero()) {
+            if (min < 0.0f) {
+                min = 0.0f;
+                qWarning() << "Warning: Tried to set negative minimum for an axis that only"
+                              "supports positive values and zero:" << min;
+            }
+        } else {
+            if (min <= 0.0f) {
+                min = 1.0f;
+                qWarning() << "Warning: Tried to set negative or zero minimum for an axis that only"
+                              "supports positive values:" << min;
+            }
         }
     }
 
     if (m_min != min) {
         bool maxChanged = false;
-        if (min > m_max || (!m_allowMinMaxSame && min == m_max)) {
+        if (min > m_max || (!allowMinMaxSame() && min == m_max)) {
             float oldMax = m_max;
             m_max = min + 1.0f;
             qWarning() << "Warning: Tried to set minimum to equal or larger than maximum for"
@@ -368,22 +385,34 @@ void QAbstract3DAxisPrivate::setMin(float min)
 
 void QAbstract3DAxisPrivate::setMax(float max)
 {
-    if (m_onlyPositiveValues) {
-        if (max < 0.0f) {
-            max = 0.0f;
-            qWarning() << "Warning: Tried to set negative maximum for an axis that only supports"
-                          " positive values:" << max;
+    if (!allowNegatives()) {
+        if (allowZero()) {
+            if (max < 0.0f) {
+                max = 0.0f;
+                qWarning() << "Warning: Tried to set negative maximum for an axis that only"
+                              "supports positive values and zero:" << max;
+            }
+        } else {
+            if (max <= 0.0f) {
+                max = 1.0f;
+                qWarning() << "Warning: Tried to set negative or zero maximum for an axis that only"
+                              "supports positive values:" << max;
+            }
         }
     }
 
     if (m_max != max) {
         bool minChanged = false;
-        if (m_min > max || (!m_allowMinMaxSame && m_min == max)) {
+        if (m_min > max || (!allowMinMaxSame() && m_min == max)) {
             float oldMin = m_min;
             m_min = max - 1.0f;
-            if (m_onlyPositiveValues && m_min < 0.0f) {
-                m_min = 0.0f;
-                if (!m_allowMinMaxSame && max == 0.0f) {
+            if (!allowNegatives() && m_min < 0.0f) {
+                if (allowZero()) {
+                    m_min = 0.0f;
+                } else {
+                    m_min = max / 2.0f; // Need some positive value smaller than max
+                }
+                if (!allowMinMaxSame() && max == 0.0f) {
                     m_min = oldMin;
                     qWarning() << "Unable to set maximum value to zero.";
                     return;

@@ -26,6 +26,7 @@
 #include "qabstract3dseries_p.h"
 #include "q3dtheme_p.h"
 #include "objecthelper_p.h"
+#include "qvalue3daxisformatter_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -330,6 +331,18 @@ void Abstract3DRenderer::updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation 
                                                const QString &format)
 {
     axisCacheForOrientation(orientation).setLabelFormat(format);
+}
+
+void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
+                                             QValue3DAxisFormatter *formatter)
+{
+    AxisRenderCache &cache = axisCacheForOrientation(orientation);
+    if (cache.ctrlFormatter() != formatter) {
+        delete cache.formatter();
+        cache.setFormatter(formatter->createNewInstance());
+        cache.setCtrlFormatter(formatter);
+    }
+    formatter->populateCopy(*(cache.formatter()));
 }
 
 void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)

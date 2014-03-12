@@ -48,19 +48,23 @@ public:
     void setType(QAbstract3DAxis::AxisType type);
     inline QAbstract3DAxis::AxisType type() const { return m_type; }
     void setTitle(const QString &title);
-    inline const QString &title() { return m_title; }
+    inline const QString &title() const { return m_title; }
     void setLabels(const QStringList &labels);
-    inline const QStringList &labels() { return m_labels; }
+    inline const QStringList &labels() const { return m_labels; }
     void setMin(float min);
-    inline float min() { return m_min; }
+    inline float min() const { return m_min; }
     void setMax(float max);
-    inline float max() { return m_max; }
+    inline float max() const { return m_max; }
     void setSegmentCount(int count);
     inline int segmentCount() const { return m_segmentCount; }
     void setSubSegmentCount(int count);
     inline int subSegmentCount() const { return m_subSegmentCount; }
     inline void setLabelFormat(const QString &format) { m_labelFormat = format; }
-    inline const QString &labelFormat() { return m_labelFormat; }
+    inline const QString &labelFormat() const { return m_labelFormat; }
+    inline void setFormatter(QValue3DAxisFormatter *formatter) { m_formatter = formatter; }
+    inline QValue3DAxisFormatter *formatter() const { return m_formatter; }
+    inline void setCtrlFormatter(const QValue3DAxisFormatter *formatter) { m_ctrlFormatter = formatter; }
+    inline const QValue3DAxisFormatter *ctrlFormatter() const { return m_ctrlFormatter; }
 
     inline LabelItem &titleItem() { return m_titleItem; }
     inline QList<LabelItem *> &labelItems() { return m_labelItems; }
@@ -85,6 +89,8 @@ private:
     int m_subSegmentCount;
     QString m_labelFormat;
     QFont m_font;
+    QValue3DAxisFormatter *m_formatter;
+    const QValue3DAxisFormatter *m_ctrlFormatter;
 
     // Renderer items
     Drawer *m_drawer; // Not owned
