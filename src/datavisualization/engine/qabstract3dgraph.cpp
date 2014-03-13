@@ -27,6 +27,8 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLPaintDevice>
 #include <QtGui/QPainter>
+#include <QtGui/QOpenGLFramebufferObject>
+#include <QtGui/QOffscreenSurface>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -358,6 +360,22 @@ void QAbstract3DGraph::clearSelection()
 }
 
 /*!
+ * Renders current frame to an image of \a imageSize. Default size is the window size. Image is
+ * rendered with antialiasing level given in \a msaaSamples. Default level is \c{0}.
+ *
+ * \since Qt Data Visualization 1.1
+ *
+ * \return rendered image.
+ */
+QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
+{
+    QSize renderSize = imageSize;
+    if (renderSize.isEmpty())
+        renderSize = size();
+    return d_ptr->renderToImage(msaaSamples, renderSize);
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)
@@ -453,12 +471,17 @@ QAbstract3DGraphPrivate::QAbstract3DGraphPrivate(QAbstract3DGraph *q)
       q_ptr(q),
       m_updatePending(false),
       m_visualController(0),
-      m_devicePixelRatio(1.f)
+      m_devicePixelRatio(1.f),
+      m_offscreenSurface(0)
 {
 }
 
 QAbstract3DGraphPrivate::~QAbstract3DGraphPrivate()
 {
+    if (m_offscreenSurface) {
+        m_offscreenSurface->destroy();
+        delete m_offscreenSurface;
+    }
     if (m_context)
         m_context->makeCurrent(q_ptr);
 
@@ -524,6 +547,44 @@ void QAbstract3DGraphPrivate::renderNow()
     render();
 
     m_context->swapBuffers(q_ptr);
+}
+
+QImage QAbstract3DGraphPrivate::renderToImage(int msaaSamples, const QSize &imageSize)
+{
+    QImage image;
+    QOpenGLFramebufferObject *fbo;
+    QOpenGLFramebufferObjectFormat fboFormat;
+    if (!m_offscreenSurface) {
+        // Create an offscreen surface for rendering to images without rendering on screen
+        m_offscreenSurface = new QOffscreenSurface(q_ptr->screen());
+        m_offscreenSurface->setFormat(q_ptr->requestedFormat());
+        m_offscreenSurface->create();
+    }
+    // Render the wanted frame offscreen
+    m_context->makeCurrent(m_offscreenSurface);
+    fboFormat.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+    fboFormat.setInternalTextureFormat(GL_RGB);
+    fboFormat.setSamples(msaaSamples);
+    fbo = new QOpenGLFramebufferObject(imageSize, fboFormat);
+    if (fbo->isValid()) {
+        QRect originalViewport = m_visualController->m_scene->viewport();
+        m_visualController->m_scene->d_ptr->setWindowSize(imageSize);
+        m_visualController->m_scene->d_ptr->setViewport(QRect(0, 0,
+                                                              imageSize.width(),
+                                                              imageSize.height()));
+        m_visualController->synchDataToRenderer();
+        fbo->bind();
+        m_context->swapBuffers(m_offscreenSurface);
+        m_visualController->requestRender(fbo);
+        image = fbo->toImage();
+        fbo->release();
+        m_visualController->m_scene->d_ptr->setWindowSize(originalViewport.size());
+        m_visualController->m_scene->d_ptr->setViewport(originalViewport);
+    }
+    delete fbo;
+    m_context->makeCurrent(q_ptr);
+
+    return image;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

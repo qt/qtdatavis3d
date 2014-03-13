@@ -33,6 +33,7 @@
 #include "q3dscene_p.h"
 #include "q3dscene.h"
 #include <QtCore/QThread>
+#include <QtGui/QOpenGLFramebufferObject>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -765,6 +766,11 @@ void Abstract3DController::markSeriesVisualsDirty()
 {
     m_isSeriesVisualsDirty = true;
     emitNeedRender();
+}
+
+void Abstract3DController::requestRender(QOpenGLFramebufferObject *fbo)
+{
+    m_renderer->render(fbo->handle());
 }
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)

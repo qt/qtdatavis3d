@@ -554,7 +554,6 @@ void Q3DScenePrivate::setWindowSize(const QSize &size)
         m_windowSize = size;
         updateGLViewport();
         m_changeTracker.windowSizeChanged = true;
-        m_sceneDirty = true;
         emit needRender();
     }
 }

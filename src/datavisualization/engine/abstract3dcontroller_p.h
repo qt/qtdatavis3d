@@ -212,6 +212,8 @@ public:
     void markDataDirty();
     void markSeriesVisualsDirty();
 
+    void requestRender(QOpenGLFramebufferObject *fbo);
+
     void emitNeedRender();
 
     virtual void clearSelection() = 0;
@@ -279,6 +281,7 @@ private:
                        QAbstract3DAxis **axisPtr);
 
     friend class Bars3DController;
+    friend class QAbstract3DGraphPrivate;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

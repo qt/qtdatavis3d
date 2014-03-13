@@ -42,7 +42,8 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(Q3DScene* scene READ scene)
 
 protected:
-    explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format, QWindow *parent = 0);
+    explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
+                              QWindow *parent = 0);
 
 public:
     enum SelectionFlag {
@@ -94,6 +95,8 @@ public:
     Q3DScene *scene() const;
 
     void clearSelection();
+
+    QImage renderToImage(int msaaSamples = 0, const QSize &imageSize = QSize());
 
 protected:
     bool event(QEvent *event);
