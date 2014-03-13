@@ -37,6 +37,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \typedef QtDataVisualization::QScatterDataArray
+ * \relates QScatterDataProxy
  *
  * A vector of \l {QScatterDataItem}s.
  */

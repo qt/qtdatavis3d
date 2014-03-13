@@ -125,18 +125,19 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty bool Surface3DSeries::surfaceGridEnabled
- *
- * Sets surface grid to \a enabled. It is preset to \c true by default.
- */
-
-/*!
  * \qmlproperty bool Surface3DSeries::flatShadingSupported
  *
  * Flat shading for surfaces requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
  * If true, flat shading for surfaces is supported by current system.
  * \note This read-only property is set to its correct value after first render pass.
  * Before then it is always true.
+ */
+
+/*!
+ * \qmlproperty DrawFlag Surface3DSeries::drawMode
+ *
+ * Sets the drawing \a mode to one of \l{QSurface3DSeries::DrawFlag}{Surface3DSeries.DrawFlag}.
+ * Clearing all flags is not allowed.
  */
 
 /*!
@@ -283,9 +284,9 @@ bool QSurface3DSeries::isFlatShadingSupported() const
 /*!
  * \property QSurface3DSeries::drawMode
  *
- * Sets the drawing \a mode to one of QSurface3DSeries::DrawFlag.
+ * Sets the drawing \a mode to one of DrawFlag. Clearing all flags is not allowed.
  */
-void QSurface3DSeries::setDrawMode(QSurface3DSeries::DrawFlags mode)
+void QSurface3DSeries::setDrawMode(DrawFlags mode)
 {
     if (dptr()->m_drawMode != mode) {
         dptr()->setDrawMode(mode);
@@ -389,9 +390,14 @@ void QSurface3DSeriesPrivate::setFlatShadingEnabled(bool enabled)
 
 void QSurface3DSeriesPrivate::setDrawMode(QSurface3DSeries::DrawFlags mode)
 {
-    m_drawMode = mode;
-    if (m_controller)
-        m_controller->markSeriesVisualsDirty();
+    if (mode.testFlag(QSurface3DSeries::DrawWireframe)
+            || mode.testFlag(QSurface3DSeries::DrawSurface)) {
+        m_drawMode = mode;
+        if (m_controller)
+            m_controller->markSeriesVisualsDirty();
+    } else {
+        qWarning("You may not clear all draw flags. Mode not changed.");
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

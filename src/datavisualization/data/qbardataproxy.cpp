@@ -49,12 +49,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \typedef QtDataVisualization::QBarDataRow
+ * \relates QBarDataProxy
  *
  * A vector of \l {QBarDataItem}s.
  */
 
 /*!
  * \typedef QtDataVisualization::QBarDataArray
+ * \relates QBarDataProxy
  *
  * A list of pointers to \l {QBarDataRow}s.
  */
@@ -358,7 +360,7 @@ void QBarDataProxy::removeRows(int rowIndex, int removeCount, bool removeLabels)
 /*!
  * \property QBarDataProxy::rowCount
  *
- * Row count in the array.
+ * Row \a count in the array.
  */
 int QBarDataProxy::rowCount() const
 {
@@ -368,7 +370,7 @@ int QBarDataProxy::rowCount() const
 /*!
  * \property QBarDataProxy::rowLabels
  *
- * Optional row labels for the array. Indexes in this array match row indexes in data array.
+ * Optional row \a labels for the array. Indexes in this array match row indexes in data array.
  * If the list is shorter than row count, all rows will not get labels.
  */
 QStringList QBarDataProxy::rowLabels() const
@@ -387,7 +389,7 @@ void QBarDataProxy::setRowLabels(const QStringList &labels)
 /*!
  * \property QBarDataProxy::columnLabels
  *
- * Optional column labels for the array. Indexes in this array match column indexes in rows.
+ * Optional column \a labels for the array. Indexes in this array match column indexes in rows.
  * If the list is shorter than the longest row, all columns will not get labels.
  */
 QStringList QBarDataProxy::columnLabels() const

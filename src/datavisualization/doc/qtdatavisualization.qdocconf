@@ -16,40 +16,42 @@ imagedirs  += ../images \
               images
 sourcedirs += ..
 
+examplesinstallpath = datavisualization
+
 indexes +=  $QT_INSTALL_DOCS/qtcore/qtcore.index \
             $QT_INSTALL_DOCS/qtgui/qtgui.index \
             $QT_INSTALL_DOCS/qtqml/qtqml.index \
             $QT_INSTALL_DOCS/qtquick/qtquick.index \
             $QT_INSTALL_DOCS/qtmultimedia/qtmultimedia.index
 
-qhp.projects                            = qtdatavisualization
+qhp.projects                            = QtDataVisualization
 
-qhp.qtdatavisualization.file            = qtdatavisualization.qhp
-qhp.qtdatavisualization.namespace       = com.digia.qtdatavisualization.100
-qhp.qtdatavisualization.virtualFolder   = qtdatavisualization
-qhp.qtdatavisualization.indexTitle      = Qt Data Visualization
-qhp.qtdatavisualization.indexRoot       =
+qhp.QtDataVisualization.file            = qtdatavisualization.qhp
+qhp.QtDataVisualization.namespace       = com.digia.qtdatavisualization.100
+qhp.QtDataVisualization.virtualFolder   = qtdatavisualization
+qhp.QtDataVisualization.indexTitle      = Qt Data Visualization
+qhp.QtDataVisualization.indexRoot       =
 
-qhp.qtdatavisualization.filterAttributes                        = qtdatavisualization 1.0.0 qtrefdoc
-qhp.qtdatavisualization.customFilters.Qt.name                   = QtDataVisualization 1.0.0
-qhp.qtdatavisualization.customFilters.Qt.filterAttributes       = qtdatavisualization 1.0.0
-qhp.qtdatavisualization.subprojects                             = gettingstarted examples classes types
-qhp.qtdatavisualization.subprojects.gettingstarted.title        = Getting Started
-qhp.qtdatavisualization.subprojects.gettingstarted.indexTitle   = Qt Data Visualization Getting Started
-qhp.qtdatavisualization.subprojects.gettingstarted.selectors    = fake:page
-qhp.qtdatavisualization.subprojects.gettingstarted.sortPages    = true
-qhp.qtdatavisualization.subprojects.examples.title              = Examples
-qhp.qtdatavisualization.subprojects.examples.indexTitle         = Qt Data Visualization Examples
-qhp.qtdatavisualization.subprojects.examples.selectors          = fake:example
-qhp.qtdatavisualization.subprojects.examples.sortPages          = true
-qhp.qtdatavisualization.subprojects.classes.title               = C++ Classes
-qhp.qtdatavisualization.subprojects.classes.indexTitle          = Qt Data Visualization C++ Classes
-qhp.qtdatavisualization.subprojects.classes.selectors           = class
-qhp.qtdatavisualization.subprojects.classes.sortPages           = true
-qhp.qtdatavisualization.subprojects.types.title                 = QML Types
-qhp.qtdatavisualization.subprojects.types.indexTitle            = Qt Data Visualization QML Types
-qhp.qtdatavisualization.subprojects.types.selectors             = fake:qmlclass
-qhp.qtdatavisualization.subprojects.types.sortPages             = true
+qhp.QtDataVisualization.filterAttributes                        = qtdatavisualization 1.0.0 qtrefdoc
+qhp.QtDataVisualization.customFilters.Qt.name                   = QtDataVisualization 1.0.0
+qhp.QtDataVisualization.customFilters.Qt.filterAttributes       = qtdatavisualization 1.0.0
+qhp.QtDataVisualization.subprojects                             = gettingstarted examples classes types
+qhp.QtDataVisualization.subprojects.gettingstarted.title        = Getting Started
+qhp.QtDataVisualization.subprojects.gettingstarted.indexTitle   = Qt Data Visualization Getting Started
+qhp.QtDataVisualization.subprojects.gettingstarted.selectors    = fake:page
+qhp.QtDataVisualization.subprojects.gettingstarted.sortPages    = true
+qhp.QtDataVisualization.subprojects.examples.title              = Examples
+qhp.QtDataVisualization.subprojects.examples.indexTitle         = Qt Data Visualization Examples
+qhp.QtDataVisualization.subprojects.examples.selectors          = fake:example
+qhp.QtDataVisualization.subprojects.examples.sortPages          = true
+qhp.QtDataVisualization.subprojects.classes.title               = C++ Classes
+qhp.QtDataVisualization.subprojects.classes.indexTitle          = Qt Data Visualization C++ Classes
+qhp.QtDataVisualization.subprojects.classes.selectors           = class
+qhp.QtDataVisualization.subprojects.classes.sortPages           = true
+qhp.QtDataVisualization.subprojects.types.title                 = QML Types
+qhp.QtDataVisualization.subprojects.types.indexTitle            = Qt Data Visualization QML Types
+qhp.QtDataVisualization.subprojects.types.selectors             = fake:qmlclass
+qhp.QtDataVisualization.subprojects.types.sortPages             = true
 
 navigation.landingpage = Qt Data Visualization
 navigation.cppclassespage = Qt Data Visualization C++ Classes

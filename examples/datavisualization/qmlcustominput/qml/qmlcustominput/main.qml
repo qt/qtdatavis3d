@@ -190,7 +190,8 @@ Rectangle {
             id: shadowToggle
             Layout.fillHeight: true
             Layout.minimumWidth: parent.width / 3 // 3 buttons divided equally in the layout
-            text: "Hide Shadows"
+            text: scatterGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
+            enabled: scatterGraph.shadowsSupported
 
             onClicked: {
                 if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {

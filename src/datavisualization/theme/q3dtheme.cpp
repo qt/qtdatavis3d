@@ -56,20 +56,21 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *     \li List of colors for the objects in the graph. Colors are applied to series one by one.
  *         If there are more series than colors, the color list is reused from the start.
  *         The colors in this property are used if colorStyle is ColorStyleUniform. This can be
- *         overridden by setting the baseColor explicitly in series.
+ *         overridden by setting the \l{QAbstract3DSeries::baseColor}{baseColor} explicitly in series.
  *     \li Qt::black
  *   \row
  *     \li baseGradients
  *     \li List of gradients for the objects in the graph. Gradients are applied to series one by
  *         one. If there are more series than gradients, the gradient list is reused from the start.
  *         The gradients in this property are used if colorStyle is ColorStyleObjectGradient or
- *         ColorStyleRangeGradient. This can be overridden by setting the baseGradient explicitly
- *         in series.
+ *         ColorStyleRangeGradient. This can be overridden by setting the
+ *         \l{QAbstract3DSeries::baseGradient}{baseGradient} explicitly in series.
  *     \li QLinearGradient(). Essentially fully black.
  *   \row
  *     \li colorStyle
  *     \li The color style of the objects in the graph. See ColorStyle for detailed description of
- *         the styles. This can be overridden by setting the colorStyle explicitly in series.
+ *         the styles. This can be overridden by setting the
+ *         \l{QAbstract3DSeries::colorStyle}{colorStyle} explicitly in series.
  *     \li ColorStyleUniform
  *   \row
  *     \li \l font
@@ -170,15 +171,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Color styles.
  *
  * \value ColorStyleUniform
- *        Objects are rendered in a single color. The color used is specified in baseColor,
+ *        Objects are rendered in a single color. The color used is specified in baseColors,
  *        singleHighlightColor and multiHighlightColor properties.
  * \value ColorStyleObjectGradient
  *        Objects are colored using a full gradient for each object regardless of object height. The
- *        gradient used is specified in baseGradient, singleHighlightGradient and
+ *        gradient used is specified in baseGradients, singleHighlightGradient and
  *        multiHighlightGradient properties.
  * \value ColorStyleRangeGradient
  *        Objects are colored using a portion of the full gradient determined by the object's
- *        height and its position on the Y-axis. The gradient used is specified in baseGradient,
+ *        height and its position on the Y-axis. The gradient used is specified in baseGradients,
  *        singleHighlightGradient and multiHighlightGradient properties.
  */
 

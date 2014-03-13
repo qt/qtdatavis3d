@@ -27,7 +27,7 @@ int main(int argc, char **argv)
 
     Q3DBars *rainfall = new Q3DBars;
     rainfall->setFlags(rainfall->flags() ^ Qt::FramelessWindowHint);
-    rainfall->resize(1280, 800);
+    rainfall->resize(1000, 800);
     rainfall->setPosition(QPoint(10, 30));
     rainfall->show();
 

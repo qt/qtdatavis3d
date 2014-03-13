@@ -239,7 +239,7 @@ Item {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
 
-                    text: "Show Flat"
+                    text: surfaceSeries.flatShadingSupported ? "Show Flat" : "Flat not supported"
                     enabled: surfaceSeries.flatShadingSupported
 
                     onClicked: {

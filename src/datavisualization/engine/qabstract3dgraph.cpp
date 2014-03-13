@@ -317,7 +317,7 @@ QAbstract3DGraph::SelectionFlags QAbstract3DGraph::selectionMode() const
  * \c ShadowQualityMedium by default.
  *
  * \note If setting ShadowQuality of a certain level fails, a level is lowered
- * until it is successful and shadowQualityChanged signal is emitted for each time the change is
+ * until it is successful and \c shadowQualityChanged signal is emitted for each time the change is
  * done.
  */
 void QAbstract3DGraph::setShadowQuality(ShadowQuality quality)
@@ -331,9 +331,18 @@ QAbstract3DGraph::ShadowQuality QAbstract3DGraph::shadowQuality() const
 }
 
 /*!
+ * \return true if shadows are supported with the current configuration.
+ * OpenGL ES2 configurations do not support shadows.
+ */
+bool QAbstract3DGraph::shadowsSupported() const
+{
+    return d_ptr->m_visualController->shadowsSupported();
+}
+
+/*!
  * \property QAbstract3DGraph::scene
  *
- * This property contains the read only Q3DScene that can be used to access for example a camera object.
+ * This property contains the read only Q3DScene that can be used to access, for example, a camera object.
  */
 Q3DScene *QAbstract3DGraph::scene() const
 {
@@ -450,6 +459,9 @@ QAbstract3DGraphPrivate::QAbstract3DGraphPrivate(QAbstract3DGraph *q)
 
 QAbstract3DGraphPrivate::~QAbstract3DGraphPrivate()
 {
+    if (m_context)
+        m_context->makeCurrent(q_ptr);
+
     delete m_visualController;
 }
 

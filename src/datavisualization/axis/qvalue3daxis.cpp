@@ -147,7 +147,7 @@ int QValue3DAxis::subSegmentCount() const
 /*!
  * \property QValue3DAxis::labelFormat
  *
- * Defines the label format to be used for the labels on this axis. Supported specifiers are:
+ * Defines the label \a format to be used for the labels on this axis. Supported specifiers are:
  * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
  *
  * Usage example:

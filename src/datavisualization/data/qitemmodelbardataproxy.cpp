@@ -84,7 +84,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::itemModel
+ * \qmlproperty model ItemModelBarDataProxy::itemModel
  * The item model.
  */
 
@@ -110,36 +110,36 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::rowCategories
+ * \qmlproperty list<String> ItemModelBarDataProxy::rowCategories
  * The row categories of the mapping. Only items with row roles that are found in this list are
  * included when the data is resolved. The rows are ordered in the same order as they are in this list.
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::columnCategories
+ * \qmlproperty list<String> ItemModelBarDataProxy::columnCategories
  * The column categories of the mapping. Only items with column roles that are found in this list are
  * included when the data is resolved. The columns are ordered in the same order as they are in this list.
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::useModelCategories
+ * \qmlproperty bool ItemModelBarDataProxy::useModelCategories
  * When set to true, the mapping ignores row and column roles and categories, and uses
  * the rows and columns from the model instead. Row and column headers are used for row and column
- * labels. Defaults to false.
+ * labels. Defaults to \c{false}.
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::autoRowCategories
+ * \qmlproperty bool ItemModelBarDataProxy::autoRowCategories
  * When set to true, the mapping ignores any explicitly set row categories
  * and overwrites them with automatically generated ones whenever the
- * data from the model is resolved. Defaults to true.
+ * data from the model is resolved. Defaults to \c{true}.
  */
 
 /*!
- * \qmlproperty list ItemModelBarDataProxy::autoColumnCategories
+ * \qmlproperty bool ItemModelBarDataProxy::autoColumnCategories
  * When set to true, the mapping ignores any explicitly set column categories
  * and overwrites them with automatically generated ones whenever the
- * data from model is resolved. Defaults to true.
+ * data from model is resolved. Defaults to \c{true}.
  */
 
 /*!
@@ -300,7 +300,7 @@ const QAbstractItemModel *QItemModelBarDataProxy::itemModel() const
 /*!
  * \property QItemModelBarDataProxy::rowRole
  *
- * Defines the row role for the mapping.
+ * Defines the row \a role for the mapping.
  */
 void QItemModelBarDataProxy::setRowRole(const QString &role)
 {
@@ -318,7 +318,7 @@ QString QItemModelBarDataProxy::rowRole() const
 /*!
  * \property QItemModelBarDataProxy::columnRole
  *
- * Defines the column role for the mapping.
+ * Defines the column \a role for the mapping.
  */
 void QItemModelBarDataProxy::setColumnRole(const QString &role)
 {
@@ -336,7 +336,7 @@ QString QItemModelBarDataProxy::columnRole() const
 /*!
  * \property QItemModelBarDataProxy::valueRole
  *
- * Defines the value role for the mapping.
+ * Defines the value \a role for the mapping.
  */
 void QItemModelBarDataProxy::setValueRole(const QString &role)
 {
@@ -354,7 +354,7 @@ QString QItemModelBarDataProxy::valueRole() const
 /*!
  * \property QItemModelBarDataProxy::rotationRole
  *
- * Defines the rotation role for the mapping.
+ * Defines the rotation \a role for the mapping.
  */
 void QItemModelBarDataProxy::setRotationRole(const QString &role)
 {
@@ -372,7 +372,7 @@ QString QItemModelBarDataProxy::rotationRole() const
 /*!
  * \property QItemModelBarDataProxy::rowCategories
  *
- * Defines the row categories for the mapping.
+ * Defines the row \a categories for the mapping.
  */
 void QItemModelBarDataProxy::setRowCategories(const QStringList &categories)
 {
@@ -390,7 +390,7 @@ QStringList QItemModelBarDataProxy::rowCategories() const
 /*!
  * \property QItemModelBarDataProxy::columnCategories
  *
- * Defines the column categories for the mapping.
+ * Defines the column \a categories for the mapping.
  */
 void QItemModelBarDataProxy::setColumnCategories(const QStringList &categories)
 {
@@ -409,7 +409,7 @@ QStringList QItemModelBarDataProxy::columnCategories() const
  * \property QItemModelBarDataProxy::useModelCategories
  *
  * When set to true, the mapping ignores row and column roles and categories, and uses
- * the rows and columns from the model instead. Defaults to false.
+ * the rows and columns from the model instead. Defaults to \c{false}.
  */
 void QItemModelBarDataProxy::setUseModelCategories(bool enable)
 {
@@ -429,7 +429,7 @@ bool QItemModelBarDataProxy::useModelCategories() const
  *
  * When set to true, the mapping ignores any explicitly set row categories
  * and overwrites them with automatically generated ones whenever the
- * data from model is resolved. Defaults to true.
+ * data from model is resolved. Defaults to \c{true}.
  */
 void QItemModelBarDataProxy::setAutoRowCategories(bool enable)
 {
@@ -449,7 +449,7 @@ bool QItemModelBarDataProxy::autoRowCategories() const
  *
  * When set to true, the mapping ignores any explicitly set column categories
  * and overwrites them with automatically generated ones whenever the
- * data from model is resolved. Defaults to true.
+ * data from model is resolved. Defaults to \c{true}.
  */
 void QItemModelBarDataProxy::setAutoColumnCategories(bool enable)
 {

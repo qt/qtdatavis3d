@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const float maxTapAndHoldJitter = 20.0f;
 const int maxPinchJitter = 10;
-#if defined (Q_OS_ANDROID)
+#if defined (Q_OS_ANDROID) || defined(Q_OS_IOS)
 const int maxSelectionJitter = 10;
 #else
 const int maxSelectionJitter = 5;
@@ -102,6 +102,8 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
     } else if (points.count() == 1) {
         QPointF pointerPos = points.at(0).pos();
         if (event->type() == QEvent::TouchBegin) {
+            // Flush input state
+            d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateNone;
             if (scene()->isSlicingActive()) {
                 if (scene()->isPointInPrimarySubView(pointerPos.toPoint()))
                     setInputView(InputViewOnPrimary);
@@ -123,7 +125,8 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
             setInputView(InputViewNone);
             d_ptr->m_holdTimer->stop();
             // Handle possible selection
-            if (QAbstract3DInputHandlerPrivate::InputStatePinching != d_ptr->m_inputState)
+            if (!scene()->isSlicingActive()
+                    && QAbstract3DInputHandlerPrivate::InputStatePinching != d_ptr->m_inputState)
                 d_ptr->handleSelection(pointerPos);
         } else if (event->type() == QEvent::TouchUpdate) {
             if (!scene()->isSlicingActive()) {

@@ -38,6 +38,15 @@
 #include <QtQuick/QQuickItem>
 #include <QtQuick/QQuickWindow>
 #include <QtCore/QPointer>
+#include <QtCore/QThread>
+
+#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID)
+#define USE_SHARED_CONTEXT
+#endif
+
+#ifndef USE_SHARED_CONTEXT
+#include "glstatestore_p.h"
+#endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -51,6 +60,7 @@ class AbstractDeclarative : public QQuickItem
     Q_FLAGS(SelectionFlag SelectionFlags)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(bool shadowsSupported READ shadowsSupported NOTIFY shadowsSupportedChanged)
     Q_PROPERTY(int msaaSamples READ msaaSamples WRITE setMsaaSamples NOTIFY msaaSamplesChanged)
     Q_PROPERTY(Declarative3DScene* scene READ scene NOTIFY sceneChanged)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
@@ -101,6 +111,8 @@ public:
     virtual void setShadowQuality(ShadowQuality quality);
     virtual AbstractDeclarative::ShadowQuality shadowQuality() const;
 
+    virtual bool shadowsSupported() const;
+
     virtual void setMsaaSamples(int samples);
     virtual int msaaSamples() const;
 
@@ -149,6 +161,7 @@ protected:
 signals:
     void selectionModeChanged(SelectionFlags mode);
     void shadowQualityChanged(ShadowQuality quality);
+    void shadowsSupportedChanged(bool supported);
     void msaaSamplesChanged(int samples);
     void sceneChanged(Q3DScene *scene);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
@@ -158,13 +171,20 @@ signals:
 private:
     QPointer<Abstract3DController> m_controller;
     QRectF m_cachedGeometry;
-    QOpenGLContext *m_context;
-    QOpenGLContext *m_qtContext;
-    QQuickWindow *m_contextWindow;
+    QPointer<QQuickWindow> m_contextWindow;
     AbstractDeclarative::RenderingMode m_renderMode;
     int m_samples;
     int m_windowSamples;
     QSize m_initialisedSize;
+#ifdef USE_SHARED_CONTEXT
+    QOpenGLContext *m_context;
+#else
+    GLStateStore *m_stateStore;
+#endif
+    QPointer<QOpenGLContext> m_qtContext;
+    QThread *m_mainThread;
+    QThread *m_contextThread;
+    bool m_runningInDesigner;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
 

@@ -50,6 +50,7 @@
 
 /*!
     \group datavisualization_examples
+    \ingroup all-examples
     \title Qt Data Visualization Examples
 
     \brief Examples for the Qt Data Visualization.
@@ -138,7 +139,7 @@
     \section1 Running examples
 
     Qt Data Visualization examples are found under the \c examples subdirectory. To build and run a
-    single example, for example, the qmlsurface example, navigate to the example directory and enter the
+    single example, in this case qmlsurface, navigate to the example directory and enter the
     following commands:
 
     \snippet doc_src_qtdatavisualization.cpp 8

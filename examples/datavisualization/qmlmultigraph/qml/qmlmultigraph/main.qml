@@ -190,9 +190,9 @@ Rectangle {
         surfaceGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
         scatterGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
         barGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
-        surfaceGraph.scene.activeCamera.zoomLevel = 100
-        scatterGraph.scene.activeCamera.zoomLevel = 100
-        barGraph.scene.activeCamera.zoomLevel = 100
+        surfaceGraph.scene.activeCamera.zoomLevel = 100.0
+        scatterGraph.scene.activeCamera.zoomLevel = 100.0
+        barGraph.scene.activeCamera.zoomLevel = 100.0
     }
 
     function toggleMeshStyle() {

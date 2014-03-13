@@ -72,7 +72,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty list ItemModelScatterDataProxy::itemModel
+ * \qmlproperty model ItemModelScatterDataProxy::itemModel
  * The item model.
  */
 
@@ -190,7 +190,7 @@ const QAbstractItemModel *QItemModelScatterDataProxy::itemModel() const
 /*!
  * \property QItemModelScatterDataProxy::xPosRole
  *
- * Defines the X position role for the mapping.
+ * Defines the X position \a role for the mapping.
  */
 void QItemModelScatterDataProxy::setXPosRole(const QString &role)
 {
@@ -208,7 +208,7 @@ QString QItemModelScatterDataProxy::xPosRole() const
 /*!
  * \property QItemModelScatterDataProxy::yPosRole
  *
- * Defines the Y position role for the mapping.
+ * Defines the Y position \a role for the mapping.
  */
 void QItemModelScatterDataProxy::setYPosRole(const QString &role)
 {
@@ -226,7 +226,7 @@ QString QItemModelScatterDataProxy::yPosRole() const
 /*!
  * \property QItemModelScatterDataProxy::zPosRole
  *
- * Defines the Z position role for the mapping.
+ * Defines the Z position \a role for the mapping.
  */
 void QItemModelScatterDataProxy::setZPosRole(const QString &role)
 {
@@ -244,12 +244,12 @@ QString QItemModelScatterDataProxy::zPosRole() const
 /*!
  * \property QItemModelScatterDataProxy::rotationRole
  *
- * Defines the rotation role for the mapping.
+ * Defines the rotation \a role for the mapping.
  *
  * The model may supply the value for rotation as either variant that is directly convertible
- * to QQuartenion, or as one of the string representations: \c{"scalar,x,y,z"} or \c{"@angle,x,y,z"}. The first
- * will construct the quaternion directly with given values, and the second one will construct
- * the quaternion using QQuaternion::fromAxisAndAngle() method.
+ * to QQuaternion, or as one of the string representations: \c{"scalar,x,y,z"} or \c{"@angle,x,y,z"}.
+ * The first will construct the quaternion directly with given values, and the second one will
+ * construct the quaternion using QQuaternion::fromAxisAndAngle() method.
  */
 void QItemModelScatterDataProxy::setRotationRole(const QString &role)
 {

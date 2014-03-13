@@ -31,7 +31,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
     Q_ENUMS(CameraPreset)
     Q_PROPERTY(float xRotation READ xRotation WRITE setXRotation NOTIFY xRotationChanged)
     Q_PROPERTY(float yRotation READ yRotation WRITE setYRotation NOTIFY yRotationChanged)
-    Q_PROPERTY(int zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
+    Q_PROPERTY(float zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
     Q_PROPERTY(CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset NOTIFY cameraPresetChanged)
     Q_PROPERTY(bool wrapXRotation READ wrapXRotation WRITE setWrapXRotation NOTIFY wrapXRotationChanged)
     Q_PROPERTY(bool wrapYRotation READ wrapYRotation WRITE setWrapYRotation NOTIFY wrapYRotationChanged)
@@ -84,15 +84,15 @@ public:
     CameraPreset cameraPreset() const;
     void setCameraPreset(CameraPreset preset);
 
-    int zoomLevel() const;
-    void setZoomLevel(int zoomLevel);
+    float zoomLevel() const;
+    void setZoomLevel(float zoomLevel);
 
-    void setCameraPosition(float horizontal, float vertical, float distance = 100.0f);
+    void setCameraPosition(float horizontal, float vertical, float zoom = 100.0f);
 
 signals:
     void xRotationChanged(float rotation);
     void yRotationChanged(float rotation);
-    void zoomLevelChanged(int zoomLevel);
+    void zoomLevelChanged(float zoomLevel);
     void cameraPresetChanged(CameraPreset preset);
     void wrapXRotationChanged(bool isEnabled);
     void wrapYRotationChanged(bool isEnabled);

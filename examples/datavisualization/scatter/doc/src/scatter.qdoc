@@ -43,7 +43,7 @@
 
     \snippet scatter/main.cpp 0
 
-    The call to QWidget::createWindowContainer is required, as all data visualization types
+    The call to QWidget::createWindowContainer is required, as all data visualization graph classes
     (Q3DBars, Q3DScatter, and Q3DSurface) inherit QWindow. Any class inheriting QWindow cannot be used
     as a widget any other way.
 

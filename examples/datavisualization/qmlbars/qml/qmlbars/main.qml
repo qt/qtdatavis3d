@@ -210,8 +210,9 @@ Rectangle {
             id: shadowToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: "Hide Shadows"
+            text: barGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
             clip: true
+            enabled: barGraph.shadowsSupported
             onClicked: {
                 if (barGraph.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
                     barGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;

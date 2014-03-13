@@ -33,7 +33,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 */
 
 /*!
- * Constructs a new 3D object with position set to origo by default. An
+ * Constructs a new 3D object with position set to origin by default. An
  * optional \a parent parameter can be given and is then passed to QObject constructor.
  */
 Q3DObject::Q3DObject(QObject *parent) :

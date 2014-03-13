@@ -1,3 +1,7 @@
+android|ios {
+    error( "This example is not supported for android or ios." )
+}
+
 !include( ../examples.pri ) {
     error( "Couldn't find the examples.pri file!" )
 }

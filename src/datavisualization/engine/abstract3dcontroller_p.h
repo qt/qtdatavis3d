@@ -161,6 +161,7 @@ public:
     virtual ~Abstract3DController();
 
     inline bool isInitialized() { return (m_renderer != 0); }
+    virtual void destroyRenderer();
     virtual void synchDataToRenderer();
     virtual void render(const GLuint defaultFboHandle = 0);
     virtual void initializeOpenGL() = 0;
@@ -201,6 +202,7 @@ public:
 
     virtual void setShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual QAbstract3DGraph::ShadowQuality shadowQuality() const;
+    virtual bool shadowsSupported() const;
 
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
