@@ -122,7 +122,7 @@ public:
 signals:
     void itemLabelFormatChanged(const QString &format);
     void visibilityChanged(bool visible);
-    void meshChanged(Mesh mesh);
+    void meshChanged(QAbstract3DSeries::Mesh mesh);
     void meshSmoothChanged(bool enabled);
     void meshRotationChanged(const QQuaternion &rotation);
     void userDefinedMeshChanged(const QString &fileName);

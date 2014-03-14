@@ -84,7 +84,7 @@ public:
 signals:
     void titleChanged(const QString &newTitle);
     void labelsChanged();
-    void orientationChanged(AxisOrientation orientation);
+    void orientationChanged(QAbstract3DAxis::AxisOrientation orientation);
     void minChanged(float value);
     void maxChanged(float value);
     void rangeChanged(float min, float max);

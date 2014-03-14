@@ -159,14 +159,14 @@ protected:
     virtual QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
 signals:
-    void selectionModeChanged(SelectionFlags mode);
-    void shadowQualityChanged(ShadowQuality quality);
+    void selectionModeChanged(AbstractDeclarative::SelectionFlags mode);
+    void shadowQualityChanged(AbstractDeclarative::ShadowQuality quality);
     void shadowsSupportedChanged(bool supported);
     void msaaSamplesChanged(int samples);
     void sceneChanged(Q3DScene *scene);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
-    void renderingModeChanged(RenderingMode mode);
+    void renderingModeChanged(AbstractDeclarative::RenderingMode mode);
 
 private:
     QPointer<Abstract3DController> m_controller;

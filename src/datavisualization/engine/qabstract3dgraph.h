@@ -111,8 +111,8 @@ protected:
 signals:
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *theme);
-    void selectionModeChanged(SelectionFlags mode);
-    void shadowQualityChanged(ShadowQuality quality);
+    void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);
+    void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)
