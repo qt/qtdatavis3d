@@ -102,7 +102,7 @@ Rectangle {
                 Surface3DSeries {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     ItemModelSurfaceDataProxy {
-                        itemModel: data.data
+                        itemModel: data.myData
                         // The surface data points are not neatly lined up in rows and columns,
                         // so we define explicit row and column roles.
                         rowRole: "row"
@@ -184,7 +184,7 @@ Rectangle {
                 Scatter3DSeries {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     ItemModelScatterDataProxy {
-                        itemModel: data.data
+                        itemModel: data.myData
                         // Mapping model roles to scatter series item coordinates.
                         xPosRole: "latitude"
                         zPosRole: "longitude"
@@ -216,7 +216,7 @@ Rectangle {
                     name: "Population density"
 
                     ItemModelBarDataProxy {
-                        itemModel: data.data
+                        itemModel: data.myData
                         // Mapping model roles to bar series rows, columns, and values.
                         rowRole: "row"
                         columnRole: "col"
