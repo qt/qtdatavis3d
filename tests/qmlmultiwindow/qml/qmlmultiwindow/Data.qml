@@ -19,7 +19,7 @@
 import QtQuick 2.1
 
 Item {
-    property alias data: dataModel
+    property alias myData: dataModel
 
     ListModel {
         id: dataModel
