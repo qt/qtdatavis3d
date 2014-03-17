@@ -60,11 +60,13 @@ The same as above applies, you will just have to add static to the CONFIG:
 
 Documentation
 =============
-Pregenerated documentation can be found from doc folder for both Qt Assistant
-(qtdatavisualization.qch) and in HTML format (qtdatavisualization subfolder).
 
-The documentation can also be generated with:
+The documentation can be generated with:
     make docs
+
+The documentation is generated into the doc folder under the build folder.
+Both Qt Assistant (qtdatavisualization.qch) and in HTML format
+(qtdatavisualization subfolder) documentation is generated.
 
 Please refer to the generated documentation for more information:
     doc/qtdatavisualization/index.html

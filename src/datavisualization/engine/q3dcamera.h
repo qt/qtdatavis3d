@@ -93,7 +93,7 @@ signals:
     void xRotationChanged(float rotation);
     void yRotationChanged(float rotation);
     void zoomLevelChanged(float zoomLevel);
-    void cameraPresetChanged(CameraPreset preset);
+    void cameraPresetChanged(Q3DCamera::CameraPreset preset);
     void wrapXRotationChanged(bool isEnabled);
     void wrapYRotationChanged(bool isEnabled);
 

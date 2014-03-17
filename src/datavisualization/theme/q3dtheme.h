@@ -148,7 +148,7 @@ public:
     ColorStyle colorStyle() const;
 
 signals:
-    void typeChanged(Theme themeType);
+    void typeChanged(Q3DTheme::Theme themeType);
     void baseColorsChanged(const QList<QColor> &colors);
     void backgroundColorChanged(const QColor &color);
     void windowColorChanged(const QColor &color);
@@ -169,7 +169,7 @@ signals:
     void backgroundEnabledChanged(bool enabled);
     void gridEnabledChanged(bool enabled);
     void labelBackgroundEnabledChanged(bool enabled);
-    void colorStyleChanged(ColorStyle style);
+    void colorStyleChanged(Q3DTheme::ColorStyle style);
 
 protected:
     explicit Q3DTheme(Q3DThemePrivate *d, Theme themeType, QObject *parent = 0);

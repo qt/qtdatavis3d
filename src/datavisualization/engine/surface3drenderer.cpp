@@ -55,6 +55,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_surfaceFlatShader(0),
       m_surfaceSmoothShader(0),
       m_surfaceGridShader(0),
+      m_surfaceSliceFlatShader(0),
+      m_surfaceSliceSmoothShader(0),
       m_selectionShader(0),
       m_labelShader(0),
       m_heightNormalizer(0.0f),
@@ -126,6 +128,8 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_surfaceFlatShader;
     delete m_surfaceSmoothShader;
     delete m_surfaceGridShader;
+    delete m_surfaceSliceFlatShader;
+    delete m_surfaceSliceSmoothShader;
     delete m_labelShader;
 
     delete m_backgroundObj;
@@ -795,7 +799,10 @@ void Surface3DRenderer::drawSlicedScene()
                 cache->setMVPMatrix(MVPMatrix);
 
                 if (cache->surfaceVisible()) {
-                    ShaderHelper *surfaceShader = m_surfaceFlatShader;
+                    ShaderHelper *surfaceShader = m_surfaceSliceSmoothShader;
+                    if (cache->isFlatShadingEnabled())
+                        surfaceShader = m_surfaceSliceFlatShader;
+
                     surfaceShader->bind();
 
                     GLuint colorTexture = cache->baseUniformTexture();;
@@ -2388,6 +2395,10 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         delete m_surfaceFlatShader;
     if (m_surfaceSmoothShader)
         delete m_surfaceSmoothShader;
+    if (m_surfaceSliceFlatShader)
+        delete m_surfaceSliceFlatShader;
+    if (m_surfaceSliceSmoothShader)
+        delete m_surfaceSliceSmoothShader;
 
 #if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
@@ -2404,14 +2415,24 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
                                                QStringLiteral(":/shaders/fragmentSurfaceFlat"));
     }
+    m_surfaceSliceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                                  QStringLiteral(":/shaders/fragmentSurface"));
+    m_surfaceSliceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
+                                           QStringLiteral(":/shaders/fragmentSurfaceFlat"));
 #else
     m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                              QStringLiteral(":/shaders/fragmentSurfaceES2"));
     m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                            QStringLiteral(":/shaders/fragmentSurfaceES2"));
+    m_surfaceSliceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                                  QStringLiteral(":/shaders/fragmentSurfaceES2"));
+    m_surfaceSliceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                                QStringLiteral(":/shaders/fragmentSurfaceES2"));
 #endif
     m_surfaceSmoothShader->initialize();
     m_surfaceFlatShader->initialize();
+    m_surfaceSliceSmoothShader->initialize();
+    m_surfaceSliceFlatShader->initialize();
 }
 
 void Surface3DRenderer::initBackgroundShaders(const QString &vertexShader,

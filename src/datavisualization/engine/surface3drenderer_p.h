@@ -57,6 +57,8 @@ private:
     ShaderHelper *m_surfaceFlatShader;
     ShaderHelper *m_surfaceSmoothShader;
     ShaderHelper *m_surfaceGridShader;
+    ShaderHelper *m_surfaceSliceFlatShader;
+    ShaderHelper *m_surfaceSliceSmoothShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_labelShader;
     GLfloat m_heightNormalizer;

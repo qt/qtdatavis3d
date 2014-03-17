@@ -70,7 +70,7 @@ public:
 
 signals:
     void positionChanged(const QPoint &position);
-    void inputViewChanged(InputView view);
+    void inputViewChanged(QAbstract3DInputHandler::InputView view);
     void sceneChanged(Q3DScene *scene);
 
 protected:
