@@ -45,18 +45,27 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
 
+// Vertex array buffer for line
+const GLfloat line_data[] = {
+    -1.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+};
+
 Drawer::Drawer(Q3DTheme *theme)
     : m_theme(theme),
       m_textureHelper(0),
-      m_pointbuffer(0)
+      m_pointbuffer(0),
+      m_linebuffer(0)
 {
 }
 
 Drawer::~Drawer()
 {
     delete m_textureHelper;
-    if (QOpenGLContext::currentContext())
+    if (QOpenGLContext::currentContext()) {
         glDeleteBuffers(1, &m_pointbuffer);
+        glDeleteBuffers(1, &m_linebuffer);
+    }
 }
 
 void Drawer::initializeOpenGL()
@@ -162,6 +171,8 @@ void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
 
 void Drawer::drawPoint(ShaderHelper *shader)
 {
+    // Draw a single point
+
     // Generate vertex buffer for point if it does not exist
     if (!m_pointbuffer) {
         glGenBuffers(1, &m_pointbuffer);
@@ -176,6 +187,31 @@ void Drawer::drawPoint(ShaderHelper *shader)
 
     // Draw the point
     glDrawArrays(GL_POINTS, 0, 1);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
+void Drawer::drawLine(ShaderHelper *shader)
+{
+    // Draw a single line
+
+    // Generate vertex buffer for line if it does not exist
+    if (!m_linebuffer) {
+        glGenBuffers(1, &m_linebuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_linebuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(line_data), line_data, GL_STATIC_DRAW);
+    }
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, m_linebuffer);
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Draw the line
+    glDrawArrays(GL_LINES, 0, 2);
 
     // Free buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);

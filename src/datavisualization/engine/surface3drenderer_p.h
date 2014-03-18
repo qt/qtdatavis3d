@@ -74,7 +74,9 @@ private:
     GLfloat m_visibleColumnRange;
     GLfloat m_visibleRowRange;
     ObjectHelper *m_backgroundObj;
+#if !(defined QT_OPENGL_ES_2)
     ObjectHelper *m_gridLineObj;
+#endif
     ObjectHelper *m_labelObj;
     GLuint m_depthTexture;
     GLuint m_depthModelTexture;
@@ -138,7 +140,6 @@ private:
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
     QRect calculateSampleRect(SurfaceSeriesRenderCache *cache, const QSurfaceDataArray &array);
     void loadBackgroundMesh();
-    void loadGridLineMesh();
     void loadLabelMesh();
     void drawScene(GLuint defaultFboHandle);
     void calculateSceneScalingFactors();
@@ -157,6 +158,7 @@ private:
     QPoint selectionIdToSurfacePoint(uint id);
     QString createSelectionLabel(SurfaceSeriesRenderCache *cache, float value, int column, int row);
 #if !defined(QT_OPENGL_ES_2)
+    void loadGridLineMesh();
     void updateDepthBuffer();
 #endif
     void emitSelectedPointChanged(QPoint position);

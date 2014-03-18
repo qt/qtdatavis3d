@@ -69,7 +69,9 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_backgroundShader(0),
       m_labelShader(0),
       m_backgroundObj(0),
+      #if !defined(QT_OPENGL_ES_2)
       m_gridLineObj(0),
+      #endif
       m_labelObj(0),
       m_bgrTexture(0),
       m_depthTexture(0),
@@ -112,7 +114,9 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_backgroundShader;
     delete m_labelShader;
     delete m_backgroundObj;
+#if !defined(QT_OPENGL_ES_2)
     delete m_gridLineObj;
+#endif
     delete m_labelObj;
 }
 
@@ -135,8 +139,10 @@ void Scatter3DRenderer::initializeOpenGL()
     // Init selection shader
     initSelectionShader();
 
+#if !defined(QT_OPENGL_ES_2)
     // Load grid line mesh
     loadGridLineMesh();
+#endif
 
     // Load label mesh
     loadLabelMesh();
@@ -848,7 +854,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
 
     if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
+#if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
+#else
+        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
+#endif
 
         // Bind line shader
         lineShader->bind();
@@ -942,12 +952,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos -= lineStep;
             }
 
@@ -976,8 +987,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
 
+#if !defined(QT_OPENGL_ES_2)
                 modelMatrix.rotate(lineYRotation);
                 itModelMatrix.rotate(lineYRotation);
+#else
+                modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+                itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+#endif
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -994,18 +1010,22 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos -= lineStep;
             }
         }
 
         // Columns (= X)
         if (m_axisCacheX.segmentCount() > 0) {
+#if defined(QT_OPENGL_ES_2)
+            lineXRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+#endif
             // Floor lines
 #ifndef USE_UNIFORM_SCALING
             GLfloat lineStep = aspectRatio * m_axisCacheX.subSegmentStep();
@@ -1051,12 +1071,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos += lineStep;
             }
 
@@ -1086,10 +1107,15 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
 
+#if !defined(QT_OPENGL_ES_2)
                 if (m_zFlipped) {
                     modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                     itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                 }
+#else
+                modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+                itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+#endif
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1106,12 +1132,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos += lineStep;
             }
         }
@@ -1170,12 +1197,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos += lineStep;
             }
 
@@ -1228,12 +1256,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos += lineStep;
             }
         }
@@ -1604,6 +1633,7 @@ void Scatter3DRenderer::loadBackgroundMesh()
     m_backgroundObj->load();
 }
 
+#if !(defined QT_OPENGL_ES_2)
 void Scatter3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
@@ -1611,6 +1641,7 @@ void Scatter3DRenderer::loadGridLineMesh()
     m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_gridLineObj->load();
 }
+#endif
 
 void Scatter3DRenderer::loadLabelMesh()
 {

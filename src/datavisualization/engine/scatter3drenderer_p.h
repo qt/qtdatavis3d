@@ -68,7 +68,9 @@ private:
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
     ObjectHelper *m_backgroundObj;
+#if !(defined QT_OPENGL_ES_2)
     ObjectHelper *m_gridLineObj;
+#endif
     ObjectHelper *m_labelObj;
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
@@ -121,13 +123,13 @@ private:
     void drawScene(GLuint defaultFboHandle);
 
     void loadBackgroundMesh();
-    void loadGridLineMesh();
     void loadLabelMesh();
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
 #if !defined(QT_OPENGL_ES_2)
+    void loadGridLineMesh();
     void initDepthShader();
     void updateDepthBuffer();
 #else

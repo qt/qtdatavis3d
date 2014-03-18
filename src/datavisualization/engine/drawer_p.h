@@ -76,6 +76,7 @@ public:
                     GLuint depthTextureId = 0);
     void drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object);
     void drawPoint(ShaderHelper *shader);
+    void drawLine(ShaderHelper *shader);
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
                    const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
@@ -94,6 +95,7 @@ private:
     Q3DTheme *m_theme;
     TextureHelper *m_textureHelper;
     GLuint m_pointbuffer;
+    GLuint m_linebuffer;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

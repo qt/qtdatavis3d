@@ -72,7 +72,9 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_visibleColumnRange(0.0f),
       m_visibleRowRange(0.0f),
       m_backgroundObj(0),
+      #if !defined(QT_OPENGL_ES_2)
       m_gridLineObj(0),
+      #endif
       m_labelObj(0),
       m_depthTexture(0),
       m_depthModelTexture(0),
@@ -133,7 +135,9 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_labelShader;
 
     delete m_backgroundObj;
+#if !defined(QT_OPENGL_ES_2)
     delete m_gridLineObj;
+#endif
     delete m_labelObj;
 
     foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
@@ -160,8 +164,10 @@ void Surface3DRenderer::initializeOpenGL()
     // Init selection shader
     initSelectionShaders();
 
+#if !(defined QT_OPENGL_ES_2)
     // Load grid line mesh
     loadGridLineMesh();
+#endif
 
     // Load label mesh
     loadLabelMesh();
@@ -415,7 +421,7 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
     if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)) {
         // Find axis coordinates for the selected point
         SurfaceSeriesRenderCache *selectedCache =
-            m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+                m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
         QSurfaceDataArray &dataArray = selectedCache->dataArray();
         QSurfaceDataItem item = dataArray.at(point.x())->at(point.y());
         QPointF coords(item.x(), item.z());
@@ -536,7 +542,7 @@ void Surface3DRenderer::updateSliceObject(SurfaceSeriesRenderCache *cache, const
     int row = point.x();
 
     if ((m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow) && row == -1) ||
-        (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn) && column == -1)) {
+            (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn) && column == -1)) {
         cache->sliceSurfaceObject()->clear();
         return;
     }
@@ -847,7 +853,11 @@ void Surface3DRenderer::drawSlicedScene()
 
     // Grid lines
     if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
+#if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
+#else
+        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
+#endif
         // Bind line shader
         lineShader->bind();
 
@@ -888,7 +898,11 @@ void Surface3DRenderer::drawSlicedScene()
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
                 // Draw the object
+#if !(defined QT_OPENGL_ES_2)
                 m_drawer->drawObject(lineShader, m_gridLineObj);
+#else
+                m_drawer->drawLine(lineShader);
+#endif
 
                 linePos += lineStep;
             }
@@ -918,6 +932,10 @@ void Surface3DRenderer::drawSlicedScene()
             modelMatrix.translate(linePos, 0.0f, -sliceZScale);
             modelMatrix.scale(gridLineScaleY);
             itModelMatrix.scale(gridLineScaleY);
+#if (defined QT_OPENGL_ES_2)
+            modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+            itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+#endif
 
             MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -928,7 +946,11 @@ void Surface3DRenderer::drawSlicedScene()
             lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
             // Draw the object
+#if !(defined QT_OPENGL_ES_2)
             m_drawer->drawObject(lineShader, m_gridLineObj);
+#else
+            m_drawer->drawLine(lineShader);
+#endif
 
             linePos += lineStep;
         }
@@ -1436,7 +1458,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
 
     if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
+#if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
+#else
+        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
+#endif
 
         // Bind line shader
         lineShader->bind();
@@ -1514,12 +1540,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos -= lineStep;
             }
 
@@ -1540,8 +1567,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 modelMatrix.scale(gridLineScaleY);
                 itModelMatrix.scale(gridLineScaleY);
 
+#if !defined(QT_OPENGL_ES_2)
                 modelMatrix.rotate(lineYRotation);
                 itModelMatrix.rotate(lineYRotation);
+#else
+                modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+                itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+#endif
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1558,18 +1590,22 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos -= lineStep;
             }
         }
 
         // Columns (= X)
         if (m_axisCacheX.segmentCount() > 0) {
+#if defined(QT_OPENGL_ES_2)
+            lineXRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+#endif
             // Floor lines
             GLfloat lineStep = -2.0f * aspectRatio * m_axisCacheX.subSegmentStep() / m_scaleFactor;
             GLfloat linePos = m_scaleX;
@@ -1603,12 +1639,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos += lineStep;
             }
 
@@ -1629,10 +1666,15 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 modelMatrix.scale(gridLineScaleY);
                 itModelMatrix.scale(gridLineScaleY);
 
+#if !defined(QT_OPENGL_ES_2)
                 if (m_zFlipped) {
                     modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                     itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
                 }
+#else
+                modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+                itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+#endif
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1649,12 +1691,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos += lineStep;
             }
         }
@@ -1701,12 +1744,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos += lineStep;
             }
 
@@ -1746,12 +1790,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 linePos += lineStep;
             }
         }
@@ -2129,6 +2174,7 @@ void Surface3DRenderer::loadBackgroundMesh()
     m_backgroundObj->load();
 }
 
+#if !(defined QT_OPENGL_ES_2)
 void Surface3DRenderer::loadGridLineMesh()
 {
     if (m_gridLineObj)
@@ -2136,6 +2182,7 @@ void Surface3DRenderer::loadGridLineMesh()
     m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
     m_gridLineObj->load();
 }
+#endif
 
 void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 {
@@ -2147,7 +2194,7 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
     if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)) {
         // Find axis coordinates for the selected point
         SurfaceSeriesRenderCache *selectedCache =
-            m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+                m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
         QSurfaceDataArray &dataArray = selectedCache->dataArray();
         QSurfaceDataItem item = dataArray.at(point.x())->at(point.y());
         QPointF coords(item.x(), item.z());

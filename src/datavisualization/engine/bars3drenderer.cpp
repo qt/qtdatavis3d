@@ -338,7 +338,11 @@ void Bars3DRenderer::drawSlicedScene()
     // Draw grid lines
     if (m_cachedTheme->isGridEnabled()) {
         glDisable(GL_DEPTH_TEST);
+#if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
+#else
+        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
+#endif
         // Bind line shader
         lineShader->bind();
 
@@ -378,7 +382,11 @@ void Bars3DRenderer::drawSlicedScene()
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
                 // Draw the object
+#if !(defined QT_OPENGL_ES_2)
                 m_drawer->drawObject(lineShader, m_gridLineObj);
+#else
+                m_drawer->drawLine(lineShader);
+#endif
 
                 // Check if we have a line at zero position already
                 if (gridPos == (barPosYAdjustment + zeroPosAdjustment))
@@ -386,6 +394,7 @@ void Bars3DRenderer::drawSlicedScene()
 
                 gridPos += gridStep;
             }
+
             // Draw a line at zero, if none exists
             if (!m_noZeroInRange && noZero) {
                 QMatrix4x4 modelMatrix;
@@ -400,10 +409,14 @@ void Bars3DRenderer::drawSlicedScene()
                                             itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
                 lineShader->setUniformValue(lineShader->color(),
-                                            Utils::vectorFromColor(m_cachedTheme->backgroundColor()));
+                                            Utils::vectorFromColor(m_cachedTheme->labelTextColor()));
 
                 // Draw the object
+#if !(defined QT_OPENGL_ES_2)
                 m_drawer->drawObject(lineShader, m_gridLineObj);
+#else
+                m_drawer->drawLine(lineShader);
+#endif
             }
         }
 
@@ -633,7 +646,7 @@ void Bars3DRenderer::drawSlicedScene()
                 // Create label texture if we need it
                 if (item.sliceLabel().isNull() || m_updateLabels) {
                     item.setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(),
-                                                           item.value()));
+                                                          item.value()));
                     m_drawer->generateLabelItem(item.sliceLabelItem(), item.sliceLabel());
                     m_updateLabels = false;
                 }
@@ -658,7 +671,7 @@ void Bars3DRenderer::drawSlicedScene()
                 // Create label texture if we need it
                 if (item.sliceLabel().isNull() || m_updateLabels) {
                     item.setSliceLabel(generateValueLabel(m_axisCacheY.labelFormat(),
-                                                           item.value()));
+                                                          item.value()));
                     m_drawer->generateLabelItem(item.sliceLabelItem(), item.sliceLabel());
                     m_updateLabels = false;
                 }
@@ -1073,7 +1086,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 
     // Draw bars
-
     GLfloat adjustedLightStrength = m_cachedTheme->lightStrength() / 10.0f;
     GLfloat adjustedHighlightStrength = m_cachedTheme->highlightLightStrength() / 10.0f;
 
@@ -1419,7 +1431,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw grid lines
     if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
+#if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
+#else
+        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
+#endif
         QQuaternion lineRotation;
 
         // Bind bar shader
@@ -1446,11 +1462,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                         m_cachedTheme->lightStrength() / 2.5f);
         }
 
-        GLfloat yFloorLinePosition = 0.0f;
+        GLfloat yFloorLinePosition = gridLineOffset;
         if (m_yFlipped)
-            yFloorLinePosition -= gridLineOffset;
-        else
-            yFloorLinePosition += gridLineOffset;
+            yFloorLinePosition = -yFloorLinePosition;
 
         QVector3D gridLineScaler(rowScaleFactor, gridLineWidth, gridLineWidth);
 
@@ -1488,15 +1502,19 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-            } else
-#endif
-            {
+            } else {
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj);
             }
+#else
+            m_drawer->drawLine(lineShader);
+#endif
         }
 
         // Floor lines: columns
+#if defined(QT_OPENGL_ES_2)
+        lineRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+#endif
         gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, columnScaleFactor);
         for (GLfloat bar = 0.0f; bar <= m_cachedColumnCount; bar++) {
             QMatrix4x4 modelMatrix;
@@ -1526,12 +1544,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-            } else
-#endif
-            {
+            } else {
                 // Draw the object
                 m_drawer->drawObject(lineShader, m_gridLineObj);
             }
+#else
+            m_drawer->drawLine(lineShader);
+#endif
         }
 
         if (m_axisCacheY.segmentCount() > 0) {
@@ -1583,12 +1602,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 lineHeight += heightStep;
             }
 
@@ -1632,12 +1652,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else
-#endif
-                {
+                } else {
                     // Draw the object
                     m_drawer->drawObject(lineShader, m_gridLineObj);
                 }
+#else
+                m_drawer->drawLine(lineShader);
+#endif
                 lineHeight += heightStep;
             }
         }
