@@ -38,33 +38,22 @@ public:
     explicit QValue3DAxisFormatter(QObject *parent = 0);
     virtual ~QValue3DAxisFormatter();
 
+protected:
     virtual bool allowNegatives() const;
     virtual bool allowZero() const;
+    virtual QValue3DAxisFormatter *createNewInstance() const;
+    virtual void recalculate();
+    virtual QString stringForValue(float value, const QString &format) const;
+    virtual float positionAt(float value) const;
+    virtual float valueAt(float position) const;
+    virtual void populateCopy(QValue3DAxisFormatter &copy) const;
 
-    // Getters not const as they can trigger recalculate
-    float gridPosition(int index);
-    float subGridPosition(int subGridIndex, int segmentIndex);
-    float labelPosition(int index);
-    QString stringForValue(float value, const QString &format);
-    float positionAt(float value);
-    float valueAt(float position);
-
-    virtual QValue3DAxisFormatter *createNewInstance();
-    void populateCopy(QValue3DAxisFormatter &copy);
-
-protected:
     void markDirty();
     QValue3DAxis *axis() const;
 
-    virtual void doRecalculate();
-    virtual QString doStringForValue(float value, const QString &format);
-    virtual float doPositionAt(float value);
-    virtual float doValueAt(float position);
-    virtual void doPopulateCopy(QValue3DAxisFormatter &copy);
-
-    QVector<float> &gridPositions();
-    QVector<QVector<float> > &subGridPositions();
-    QVector<float> &labelPositions();
+    QVector<float> &gridPositions() const;
+    QVector<QVector<float> > &subGridPositions() const;
+    QVector<float> &labelPositions() const;
 
     QScopedPointer<QValue3DAxisFormatterPrivate> d_ptr;
 
@@ -72,8 +61,15 @@ private:
     Q_DISABLE_COPY(QValue3DAxisFormatter)
 
     friend class Abstract3DController;
+    friend class Abstract3DRenderer;
+    friend class Bars3DRenderer;
+    friend class Scatter3DRenderer;
+    friend class Surface3DRenderer;
+    friend class SurfaceObject;
     friend class QValue3DAxisFormatterPrivate;
     friend class QValue3DAxis;
+    friend class QValue3DAxisPrivate;
+    friend class AxisRenderCache;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

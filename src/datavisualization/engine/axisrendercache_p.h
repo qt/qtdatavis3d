@@ -51,32 +51,48 @@ public:
     inline const QString &title() const { return m_title; }
     void setLabels(const QStringList &labels);
     inline const QStringList &labels() const { return m_labels; }
-    void setMin(float min);
+    inline void setMin(float min) { m_min = min; }
     inline float min() const { return m_min; }
-    void setMax(float max);
+    inline void setMax(float max) { m_max = max; }
     inline float max() const { return m_max; }
-    void setSegmentCount(int count);
+    inline void setSegmentCount(int count) { m_segmentCount = count; m_positionsDirty = true; }
     inline int segmentCount() const { return m_segmentCount; }
-    void setSubSegmentCount(int count);
+    inline void setSubSegmentCount(int count) { m_subSegmentCount = count; m_positionsDirty = true; }
     inline int subSegmentCount() const { return m_subSegmentCount; }
     inline void setLabelFormat(const QString &format) { m_labelFormat = format; }
     inline const QString &labelFormat() const { return m_labelFormat; }
-    inline void setFormatter(QValue3DAxisFormatter *formatter) { m_formatter = formatter; }
+    inline void setFormatter(QValue3DAxisFormatter *formatter)
+    {
+        m_formatter = formatter; m_positionsDirty = true;
+    }
     inline QValue3DAxisFormatter *formatter() const { return m_formatter; }
-    inline void setCtrlFormatter(const QValue3DAxisFormatter *formatter) { m_ctrlFormatter = formatter; }
+    inline void setCtrlFormatter(const QValue3DAxisFormatter *formatter)
+    {
+        m_ctrlFormatter = formatter;
+    }
     inline const QValue3DAxisFormatter *ctrlFormatter() const { return m_ctrlFormatter; }
 
     inline LabelItem &titleItem() { return m_titleItem; }
     inline QList<LabelItem *> &labelItems() { return m_labelItems; }
-    inline GLfloat segmentStep() const { return m_segmentStep; }
-    inline GLfloat subSegmentStep() const { return m_subSegmentStep; }
+    inline float gridLinePosition(int index) { return m_adjustedGridLinePositions.at(index); }
+    inline int gridLineCount() { return m_adjustedGridLinePositions.size(); }
+    inline float labelPosition(int index) { return m_adjustedLabelPositions.at(index); }
+    inline int labelCount() { return m_adjustedLabelPositions.size(); }
+    void updateAllPositions();
+    inline bool positionsDirty() const { return m_positionsDirty; }
+    inline void setTranslate(float translate) { m_translate = translate; m_positionsDirty = true; }
+    inline float translate() { return m_translate; }
+    inline void setScale(float scale) { m_scale = scale; m_positionsDirty = true; }
+    inline float scale() { return m_scale; }
+    inline float positionAt(float value)
+    {
+        return m_formatter->positionAt(value) * m_scale + m_translate;
+    }
 
 public slots:
     void updateTextures();
 
 private:
-    void updateSegmentStep();
-    void updateSubSegmentStep();
     int maxLabelWidth(const QStringList &labels) const;
 
     // Cached axis values
@@ -96,8 +112,11 @@ private:
     Drawer *m_drawer; // Not owned
     LabelItem m_titleItem;
     QList<LabelItem *> m_labelItems;
-    GLfloat m_segmentStep;
-    GLfloat m_subSegmentStep;
+    QVector<float> m_adjustedGridLinePositions;
+    QVector<float> m_adjustedLabelPositions;
+    bool m_positionsDirty;
+    float m_translate;
+    float m_scale;
 
     Q_DISABLE_COPY(AxisRenderCache)
 };

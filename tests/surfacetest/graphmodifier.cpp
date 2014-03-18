@@ -49,8 +49,10 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_activeSample(0),
       m_fontSize(40),
       m_rangeX(16.0),
+      m_rangeY(16.0),
       m_rangeZ(16.0),
       m_minX(-8.0),
+      m_minY(-8.0),
       m_minZ(-8.0),
       m_addRowCounter(m_zCount),
       m_insertTestZPos(0),
@@ -85,14 +87,15 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
     m_multiSampleOffsetX[3] = m_offset;
     m_multiSampleOffsetZ[3] = m_offset;
 
-    m_graph->axisX()->setRange(-m_limitX - m_offset, m_limitX + m_offset);
-    m_graph->axisY()->setRange(-1.0f, 4.5f);
-    m_graph->axisZ()->setRange(-m_limitZ - m_offset, m_limitZ + m_offset);
+//    m_graph->axisX()->setRange(-m_limitX - m_offset, m_limitX + m_offset);
+//    m_graph->axisY()->setRange(-1.0f, 4.5f);
+//    m_graph->axisZ()->setRange(-m_limitZ - m_offset, m_limitZ + m_offset);
 #else
-    m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
-    m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
     m_graph->addSeries(m_theSeries);
 #endif
+    m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
+    m_graph->axisY()->setRange(m_minY, m_minY + m_rangeY);
+    m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
 
     for (int i = 0; i < 4; i++) {
         m_multiseries[i] = new QSurface3DSeries;
@@ -134,18 +137,27 @@ void GraphModifier::fillSeries()
     QSurfaceDataArray *dataArray4 = new QSurfaceDataArray;
     dataArray4->reserve(m_zCount);
 
+
     for (int i = 0; i < m_zCount; i++) {
         QSurfaceDataRow *newRow[4];
+        float zAdjust = 0.0f;
+        if (i == 3)
+            zAdjust = 0.7f;
+
         for (int s = 0; s < 4; s++) {
             newRow[s] = new QSurfaceDataRow(m_xCount);
-            float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[s];
+            float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[s] + zAdjust;
             for (int j = 0; j < m_xCount; j++) {
-                float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[s];
+                float xAdjust = 0.0f;
+                if (j == 3)
+                    xAdjust = 0.7f;
+                float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[s] + xAdjust;
                 float angle = (z * x) / full * 1.57f;
-                float y = qSin(angle * float(qPow(1.3f, s))) + 1.1f * s;
+                float y = (qSin(angle * float(qPow(1.3f, s))) + 1.1f * s) * 3.0f - 5.0f + xAdjust + zAdjust;
                 (*newRow[s])[j].setPosition(QVector3D(x, y, z));
             }
         }
+        qDebug() << newRow[0]->at(0).z();
         *dataArray1 << newRow[0];
         *dataArray2 << newRow[1];
         *dataArray3 << newRow[2];
@@ -550,6 +562,14 @@ void GraphModifier::adjustXRange(int range)
     qDebug() << "X Range =" << range;
 }
 
+void GraphModifier::adjustYRange(int range)
+{
+    m_rangeY = range;
+    m_graph->axisY()->setRange(m_minY, m_minY + m_rangeY);
+
+    qDebug() << "Y Range =" << range;
+}
+
 void GraphModifier::adjustZRange(int range)
 {
     m_rangeZ = range;
@@ -564,6 +584,14 @@ void GraphModifier::adjustXMin(int min)
     m_graph->axisX()->setRange(m_minX, m_minX + m_rangeX);
 
     qDebug() << "X Minimum =" << min;
+}
+
+void GraphModifier::adjustYMin(int min)
+{
+    m_minY = min;
+    m_graph->axisY()->setRange(m_minY, m_minY + m_rangeY);
+
+    qDebug() << "Y Minimum =" << min;
 }
 
 void GraphModifier::adjustZMin(int min)

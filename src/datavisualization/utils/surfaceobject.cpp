@@ -18,16 +18,21 @@
 
 #include "surfaceobject_p.h"
 #include "abstractobjecthelper_p.h"
+#include "surface3drenderer_p.h"
 
 #include <QtGui/QVector2D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-SurfaceObject::SurfaceObject()
+SurfaceObject::SurfaceObject(Surface3DRenderer *renderer)
     : m_surfaceType(Undefined),
       m_columns(0),
       m_rows(0),
-      m_gridIndexCount(0)
+      m_gridIndexCount(0),
+      m_axisCacheX(renderer->m_axisCacheX),
+      m_axisCacheY(renderer->m_axisCacheY),
+      m_axisCacheZ(renderer->m_axisCacheZ)
+
 {
     m_indicesType = GL_UNSIGNED_INT;
     initializeOpenGLFunctions();
@@ -45,16 +50,11 @@ SurfaceObject::~SurfaceObject()
 }
 
 void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
-                                    GLfloat yRange, GLfloat yMin, bool changeGeometry)
+                                    bool changeGeometry, bool flipXZ)
 {
     m_columns = space.width();
     m_rows = space.height();
     int totalSize = m_rows * m_columns;
-    GLfloat xMin = dataArray.at(0)->at(0).x();
-    GLfloat zMin = dataArray.at(0)->at(0).z();
-    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
-    GLfloat yNormalizer = yRange / 2.0f;
-    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
     GLfloat uvX = 1.0f / GLfloat(m_columns - 1);
     GLfloat uvY = 1.0f / GLfloat(m_rows - 1);
 
@@ -68,18 +68,28 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     if (changeGeometry)
         uvs.resize(totalSize);
     int totalIndex = 0;
+
+    AxisRenderCache &xCache = flipXZ ? m_axisCacheZ : m_axisCacheX;
+    AxisRenderCache &zCache = flipXZ ? m_axisCacheX : m_axisCacheZ;
+
     for (int i = 0; i < m_rows; i++) {
         const QSurfaceDataRow &p = *dataArray.at(i);
         for (int j = 0; j < m_columns; j++) {
             const QSurfaceDataItem &data = p.at(j);
-            float normalizedX = ((data.x() - xMin) / xNormalizer);
-            float normalizedY = ((data.y() - yMin) / yNormalizer);
-            float normalizedZ = ((data.z() - zMin) / zNormalizer);
-            m_vertices[totalIndex] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f,
-                                               normalizedZ + 1.0f);
+            float normalizedX = xCache.positionAt(data.x());
+            float normalizedY = m_axisCacheY.positionAt(data.y());
+            float normalizedZ = zCache.positionAt(data.z());
+            m_vertices[totalIndex] = QVector3D(normalizedX, normalizedY, normalizedZ);
             if (changeGeometry)
                 uvs[totalIndex] = QVector2D(GLfloat(j) * uvX, GLfloat(i) * uvY);
             totalIndex++;
+        }
+    }
+
+    if (flipXZ) {
+        for (int i = 0; i < m_vertices.size(); i++) {
+            m_vertices[i].setX(-m_vertices.at(i).x());
+            m_vertices[i].setZ(-m_vertices.at(i).z());
         }
     }
 
@@ -123,24 +133,18 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     createBuffers(m_vertices, uvs, m_normals, 0, changeGeometry);
 }
 
-void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowIndex,
-                                    GLfloat yRange, GLfloat yMin)
+void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowIndex)
 {
-    GLfloat xMin = dataArray.at(0)->at(0).x();
-    GLfloat zMin = dataArray.at(0)->at(0).z();
-    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
-    GLfloat yNormalizer = yRange / 2.0f;
-    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
-
     // Update vertices
     int p = rowIndex * m_columns;
     const QSurfaceDataRow &dataRow = *dataArray.at(rowIndex);
+
     for (int j = 0; j < m_columns; j++) {
         const QSurfaceDataItem &data = dataRow.at(j);
-        float normalizedX = ((data.x() - xMin) / xNormalizer);
-        float normalizedY = ((data.y() - yMin) / yNormalizer);
-        float normalizedZ = ((data.z() - zMin) / zNormalizer);
-        m_vertices[p++] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+        float normalizedX = m_axisCacheX.positionAt(data.x());
+        float normalizedY = m_axisCacheY.positionAt(data.y());
+        float normalizedZ = m_axisCacheZ.positionAt(data.z());
+        m_vertices[p++] = QVector3D(normalizedX, normalizedY, normalizedZ);
     }
 
     // Create normals
@@ -183,22 +187,14 @@ void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowI
     }
 }
 
-void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row,
-                                     int column, GLfloat yRange, GLfloat yMin)
+void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row, int column)
 {
-    GLfloat xMin = dataArray.at(0)->at(0).x();
-    GLfloat zMin = dataArray.at(0)->at(0).z();
-    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
-    GLfloat yNormalizer = yRange / 2.0f;
-    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
-
     // Update a vertice
     const QSurfaceDataItem &data = dataArray.at(row)->at(column);
-    float normalizedX = ((data.x() - xMin) / xNormalizer);
-    float normalizedY = ((data.y() - yMin) / yNormalizer);
-    float normalizedZ = ((data.z() - zMin) / zNormalizer);
-    m_vertices[row * m_columns + column] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f,
-                                                     normalizedZ + 1.0f);
+    float normalizedX = m_axisCacheX.positionAt(data.x());
+    float normalizedY = m_axisCacheY.positionAt(data.y());
+    float normalizedZ = m_axisCacheZ.positionAt(data.z());
+    m_vertices[row * m_columns + column] = QVector3D(normalizedX, normalizedY, normalizedZ);
 
     // Create normals
     int startRow = row;
@@ -321,16 +317,11 @@ void SurfaceObject::createSmoothGridlineIndices(int x, int y, int endX, int endY
 }
 
 void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
-                              GLfloat yRange, GLfloat yMin, bool changeGeometry)
+                              bool changeGeometry, bool flipXZ)
 {
     m_columns = space.width();
     m_rows = space.height();
     int totalSize = m_rows * m_columns * 2;
-    GLfloat xMin = dataArray.at(0)->at(0).x();
-    GLfloat zMin = dataArray.at(0)->at(0).z();
-    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
-    GLfloat yNormalizer = yRange / 2.0f;
-    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
     GLfloat uvX = 1.0f / GLfloat(m_columns - 1);
     GLfloat uvY = 1.0f / GLfloat(m_rows - 1);
 
@@ -350,15 +341,17 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     int doubleColumns = m_columns * 2 - 2;
     int rowColLimit = rowLimit * doubleColumns;
 
+    AxisRenderCache &xCache = flipXZ ? m_axisCacheZ : m_axisCacheX;
+    AxisRenderCache &zCache = flipXZ ? m_axisCacheX : m_axisCacheZ;
+
     for (int i = 0; i < m_rows; i++) {
         const QSurfaceDataRow &row = *dataArray.at(i);
         for (int j = 0; j < m_columns; j++) {
             const QSurfaceDataItem &data = row.at(j);
-            float normalizedX = ((data.x() - xMin) / xNormalizer);
-            float normalizedY = ((data.y() - yMin) / yNormalizer);
-            float normalizedZ = ((data.z() - zMin) / zNormalizer);
-            m_vertices[totalIndex] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f,
-                                               normalizedZ + 1.0f);
+            float normalizedX = xCache.positionAt(data.x());
+            float normalizedY = m_axisCacheY.positionAt(data.y());
+            float normalizedZ = zCache.positionAt(data.z());
+            m_vertices[totalIndex] = QVector3D(normalizedX, normalizedY, normalizedZ);
             if (changeGeometry)
                 uvs[totalIndex] = QVector2D(GLfloat(j) * uvX, GLfloat(i) * uvY);
 
@@ -370,6 +363,13 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
                     uvs[totalIndex] = uvs[totalIndex - 1];
                 totalIndex++;
             }
+        }
+    }
+
+    if (flipXZ) {
+        for (int i = 0; i < m_vertices.size(); i++) {
+            m_vertices[i].setX(-m_vertices.at(i).x());
+            m_vertices[i].setZ(-m_vertices.at(i).z());
         }
     }
 
@@ -421,26 +421,20 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     delete[] indices;
 }
 
-void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex,
-                                    GLfloat yRange, GLfloat yMin)
+void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex)
 {
-    GLfloat xMin = dataArray.at(0)->at(0).x();
-    GLfloat zMin = dataArray.at(0)->at(0).z();
-    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
-    GLfloat yNormalizer = yRange / 2.0f;
-    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
-
     int colLimit = m_columns - 1;
     int doubleColumns = m_columns * 2 - 2;
 
     int p = rowIndex * doubleColumns;
     const QSurfaceDataRow &dataRow = *dataArray.at(rowIndex);
+
     for (int j = 0; j < m_columns; j++) {
         const QSurfaceDataItem &data = dataRow.at(j);
-        float normalizedX = ((data.x() - xMin) / xNormalizer);
-        float normalizedY = ((data.y() - yMin) / yNormalizer);
-        float normalizedZ = ((data.z() - zMin) / zNormalizer);
-        m_vertices[p++] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+        float normalizedX = m_axisCacheX.positionAt(data.x());
+        float normalizedY = m_axisCacheY.positionAt(data.y());
+        float normalizedZ = m_axisCacheZ.positionAt(data.z());
+        m_vertices[p++] = QVector3D(normalizedX, normalizedY, normalizedZ);
 
         if (j > 0 && j < colLimit) {
             m_vertices[p] = m_vertices[p - 1];
@@ -472,25 +466,18 @@ void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowI
     }
 }
 
-void SurfaceObject::updateCoarseItem(const QSurfaceDataArray &dataArray, int row,
-                                     int column, GLfloat yRange, GLfloat yMin)
+void SurfaceObject::updateCoarseItem(const QSurfaceDataArray &dataArray, int row, int column)
 {
-    GLfloat xMin = dataArray.at(0)->at(0).x();
-    GLfloat zMin = dataArray.at(0)->at(0).z();
-    GLfloat xNormalizer = (dataArray.at(0)->last().x() - xMin) / 2.0f;
-    GLfloat yNormalizer = yRange / 2.0f;
-    GLfloat zNormalizer = (dataArray.last()->at(0).z() - zMin) / -2.0f;
-
     int colLimit = m_columns - 1;
     int doubleColumns = m_columns * 2 - 2;
 
     // Update a vertice
     int p = row * doubleColumns + column * 2 - (column > 0);
     const QSurfaceDataItem &data = dataArray.at(row)->at(column);
-    float normalizedX = ((data.x() - xMin) / xNormalizer);
-    float normalizedY = ((data.y() - yMin) / yNormalizer);
-    float normalizedZ = ((data.z() - zMin) / zNormalizer);
-    m_vertices[p] = QVector3D(normalizedX - 1.0f, normalizedY - 1.0f, normalizedZ + 1.0f);
+    float normalizedX = m_axisCacheX.positionAt(data.x());
+    float normalizedY = m_axisCacheY.positionAt(data.y());
+    float normalizedZ = m_axisCacheZ.positionAt(data.z());
+    m_vertices[p] = QVector3D(normalizedX, normalizedY, normalizedZ);
     p++;
 
     if (column > 0 && column < colLimit)

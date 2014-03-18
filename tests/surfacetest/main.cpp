@@ -182,28 +182,40 @@ int main(int argc, char *argv[])
 
     QSlider *axisRangeSliderX = new QSlider(Qt::Horizontal, widget);
     axisRangeSliderX->setTickInterval(1);
-    axisRangeSliderX->setMinimum(2);
+    axisRangeSliderX->setMinimum(1);
     axisRangeSliderX->setValue(16);
     axisRangeSliderX->setMaximum(100);
     axisRangeSliderX->setEnabled(true);
+    QSlider *axisRangeSliderY = new QSlider(Qt::Horizontal, widget);
+    axisRangeSliderY->setTickInterval(1);
+    axisRangeSliderY->setMinimum(1);
+    axisRangeSliderY->setValue(16);
+    axisRangeSliderY->setMaximum(100);
+    axisRangeSliderY->setEnabled(true);
     QSlider *axisRangeSliderZ = new QSlider(Qt::Horizontal, widget);
     axisRangeSliderZ->setTickInterval(1);
-    axisRangeSliderZ->setMinimum(2);
+    axisRangeSliderZ->setMinimum(1);
     axisRangeSliderZ->setValue(16);
     axisRangeSliderZ->setMaximum(100);
     axisRangeSliderZ->setEnabled(true);
 
     QSlider *axisMinSliderX = new QSlider(Qt::Horizontal, widget);
     axisMinSliderX->setTickInterval(1);
-    axisMinSliderX->setMinimum(-50);
+    axisMinSliderX->setMinimum(-100);
     axisMinSliderX->setValue(-8);
-    axisMinSliderX->setMaximum(50);
+    axisMinSliderX->setMaximum(100);
     axisMinSliderX->setEnabled(true);
+    QSlider *axisMinSliderY = new QSlider(Qt::Horizontal, widget);
+    axisMinSliderY->setTickInterval(1);
+    axisMinSliderY->setMinimum(-100);
+    axisMinSliderY->setValue(-8);
+    axisMinSliderY->setMaximum(100);
+    axisMinSliderY->setEnabled(true);
     QSlider *axisMinSliderZ = new QSlider(Qt::Horizontal, widget);
     axisMinSliderZ->setTickInterval(1);
-    axisMinSliderZ->setMinimum(-50);
+    axisMinSliderZ->setMinimum(-100);
     axisMinSliderZ->setValue(-8);
-    axisMinSliderZ->setMaximum(50);
+    axisMinSliderZ->setMaximum(100);
     axisMinSliderZ->setEnabled(true);
 
     QLinearGradient gr(0, 0, 100, 1);
@@ -378,9 +390,11 @@ int main(int argc, char *argv[])
 #endif
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis range")));
     vLayout->addWidget(axisRangeSliderX);
+    vLayout->addWidget(axisRangeSliderY);
     vLayout->addWidget(axisRangeSliderZ);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis minimum")));
     vLayout->addWidget(axisMinSliderX);
+    vLayout->addWidget(axisMinSliderY);
     vLayout->addWidget(axisMinSliderZ);
     vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout2->addWidget(fontList);
@@ -510,10 +524,14 @@ int main(int argc, char *argv[])
 #endif
     QObject::connect(axisRangeSliderX, &QSlider::valueChanged,
                      modifier, &GraphModifier::adjustXRange);
+    QObject::connect(axisRangeSliderY, &QSlider::valueChanged,
+                     modifier, &GraphModifier::adjustYRange);
     QObject::connect(axisRangeSliderZ, &QSlider::valueChanged,
                      modifier, &GraphModifier::adjustZRange);
     QObject::connect(axisMinSliderX, &QSlider::valueChanged,
                      modifier, &GraphModifier::adjustXMin);
+    QObject::connect(axisMinSliderY, &QSlider::valueChanged,
+                     modifier, &GraphModifier::adjustYMin);
     QObject::connect(axisMinSliderZ, &QSlider::valueChanged,
                      modifier, &GraphModifier::adjustZMin);
     QObject::connect(colorPB, &QPushButton::pressed,

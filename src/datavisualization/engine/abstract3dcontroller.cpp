@@ -19,7 +19,7 @@
 #include "abstract3dcontroller_p.h"
 #include "camerahelper_p.h"
 #include "qabstract3daxis_p.h"
-#include "qvalue3daxis.h"
+#include "qvalue3daxis_p.h"
 #include "qcategory3daxis.h"
 #include "abstract3drenderer_p.h"
 #include "q3dcamera.h"
@@ -967,13 +967,15 @@ void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
 
 void Abstract3DController::handleAxisFormatterDirtyBySender(QObject *sender)
 {
-    if (sender == m_axisX) {
+    // Sender is QValue3DAxisPrivate
+    QValue3DAxis *valueAxis = static_cast<QValue3DAxisPrivate *>(sender)->qptr();
+    if (valueAxis == m_axisX) {
         m_isDataDirty = true;
         m_changeTracker.axisXFormatterChanged = true;
-    } else if (sender == m_axisY) {
+    } else if (valueAxis == m_axisY) {
         m_isDataDirty = true;
         m_changeTracker.axisYFormatterChanged = true;
-    } else if (sender == m_axisZ) {
+    } else if (valueAxis == m_axisZ) {
         m_isDataDirty = true;
         m_changeTracker.axisZFormatterChanged = true;
     } else {
@@ -1050,10 +1052,13 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
                          this, &Abstract3DController::handleAxisSubSegmentCountChanged);
         QObject::connect(valueAxis, &QValue3DAxis::labelFormatChanged,
                          this, &Abstract3DController::handleAxisLabelFormatChanged);
+        QObject::connect(valueAxis->dptr(), &QValue3DAxisPrivate::formatterDirty,
+                         this, &Abstract3DController::handleAxisFormatterDirty);
 
         handleAxisSegmentCountChangedBySender(valueAxis);
         handleAxisSubSegmentCountChangedBySender(valueAxis);
         handleAxisLabelFormatChangedBySender(valueAxis);
+        handleAxisFormatterDirtyBySender(valueAxis->dptr());
     }
 }
 

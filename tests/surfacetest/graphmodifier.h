@@ -82,8 +82,10 @@ public:
     void adjustXCount(int count);
     void adjustZCount(int count);
     void adjustXRange(int range);
+    void adjustYRange(int range);
     void adjustZRange(int range);
     void adjustXMin(int min);
+    void adjustYMin(int min);
     void adjustZMin(int min);
     void updateSamples();
     void gradientPressed();
@@ -143,8 +145,10 @@ private:
     int m_activeSample;
     int m_fontSize;
     float m_rangeX;
+    float m_rangeY;
     float m_rangeZ;
     float m_minX;
+    float m_minY;
     float m_minZ;
     int m_addRowCounter;
     int m_insertTestZPos;

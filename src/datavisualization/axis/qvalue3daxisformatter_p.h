@@ -48,6 +48,8 @@ public:
 
     void recalculate();
     void doRecalculate();
+    void populateCopy(QValue3DAxisFormatter &copy);
+    void doPopulateCopy(QValue3DAxisFormatterPrivate &copy);
 
     QString stringForValue(float value, const QString &format);
     float positionAt(float value) const;
@@ -56,7 +58,7 @@ public:
     void setAxis(QValue3DAxis *axis);
 
 public slots:
-    void setNeedsRecalculate();
+    void markDirty();
 
 protected:
     QValue3DAxisFormatter *q_ptr;

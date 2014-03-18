@@ -25,20 +25,18 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-SurfaceSeriesRenderCache::SurfaceSeriesRenderCache()
+SurfaceSeriesRenderCache::SurfaceSeriesRenderCache(Surface3DRenderer *renderer)
     : m_surfaceVisible(false),
       m_surfaceGridVisible(false),
       m_surfaceFlatShading(true),
-      m_surfaceObj(new SurfaceObject),
-      m_sliceSurfaceObj(new SurfaceObject),
+      m_surfaceObj(new SurfaceObject(renderer)),
+      m_sliceSurfaceObj(new SurfaceObject(renderer)),
       m_sampleSpace(QRect(0, 0, 0 , 0)),
       m_selectionTexture(0),
       m_selectionIdStart(0),
       m_selectionIdEnd(0),
       m_flatChangeAllowed(true),
       m_flatStatusDirty(false),
-      m_scale(QVector3D(1.0f, 1.0f, 1.0f)),
-      m_offset(QVector3D(0.0f, 0.0f, 0.0f)),
       m_sliceSelectionPointer(0),
       m_mainSelectionPointer(0),
       m_slicePointerActive(false),

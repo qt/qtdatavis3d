@@ -144,7 +144,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_dummyData4->setName("Dummy 4");
     m_dummyData5->setName("Dummy 5");
 
-    m_temperatureData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
+    m_temperatureData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel ~ %.4f"));
     m_temperatureData2->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_genericData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
 
@@ -1055,7 +1055,12 @@ void GraphModifier::useLogAxis()
 //    logAxis->formatter()->setBase(10);
 //    logAxis->setSegmentCount(5);
 //    logAxis->setRange(1, 100000);
-//    m_graph->setValueAxis(logAxis);
+    //    m_graph->setValueAxis(logAxis);
+}
+
+void GraphModifier::changeValueAxisFormat(const QString & text)
+{
+    m_graph->valueAxis()->setLabelFormat(text);
 }
 
 void GraphModifier::insertRemoveTimerTimeout()

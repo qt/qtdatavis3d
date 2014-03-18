@@ -41,13 +41,14 @@
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Abstract3DRenderer;
+class Surface3DRenderer;
 class ObjectHelper;
 class TextureHelper;
 
 class SurfaceSeriesRenderCache : public SeriesRenderCache
 {
 public:
-    SurfaceSeriesRenderCache();
+    SurfaceSeriesRenderCache(Surface3DRenderer *renderer);
     virtual ~SurfaceSeriesRenderCache();
 
     void populate(QSurface3DSeries *series, Abstract3DRenderer *renderer);
@@ -81,10 +82,6 @@ public:
                                                         selection <= m_selectionIdEnd; }
     inline bool isFlatStatusDirty() const { return m_flatStatusDirty; }
     inline void setFlatStatusDirty(bool status) { m_flatStatusDirty = status; }
-    inline void setScale(const QVector3D &scale) { m_scale = scale; }
-    inline const QVector3D &scale() const { return m_scale; }
-    inline void setOffset(const QVector3D &offset) { m_offset = offset; }
-    inline const QVector3D &offset() const { return m_offset; }
     // m_MVPMatrix is volatile, used only for optimizing rendering a bit
     inline void setMVPMatrix(const QMatrix4x4 &matrix) { m_MVPMatrix = matrix; }
     inline const QMatrix4x4 &MVPMatrix() { return m_MVPMatrix; }
@@ -113,8 +110,6 @@ protected:
     uint m_selectionIdEnd;
     bool m_flatChangeAllowed;
     bool m_flatStatusDirty;
-    QVector3D m_scale;
-    QVector3D m_offset;
     QMatrix4x4 m_MVPMatrix;
     SelectionPointer *m_sliceSelectionPointer;
     SelectionPointer *m_mainSelectionPointer;

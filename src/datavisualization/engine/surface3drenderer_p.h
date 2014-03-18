@@ -112,6 +112,8 @@ public:
     void updateRows(const QVector<Surface3DController::ChangeRow> &rows);
     void updateItem(const QVector<Surface3DController::ChangeItem> &points);
     void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
+    void updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
+                             QValue3DAxisFormatter *formatter);
     void updateScene(Q3DScene *scene);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);
@@ -138,7 +140,7 @@ private:
     void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     void updateTextures();
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    QRect calculateSampleRect(SurfaceSeriesRenderCache *cache, const QSurfaceDataArray &array);
+    QRect calculateSampleRect(const QSurfaceDataArray &array);
     void loadBackgroundMesh();
     void loadLabelMesh();
     void drawScene(GLuint defaultFboHandle);
@@ -156,7 +158,7 @@ private:
     void surfacePointSelected(const QPoint &point);
     void updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point, bool label);
     QPoint selectionIdToSurfacePoint(uint id);
-    QString createSelectionLabel(SurfaceSeriesRenderCache *cache, float value, int column, int row);
+    QString createSelectionLabel(SurfaceSeriesRenderCache *cache, int column, int row);
 #if !defined(QT_OPENGL_ES_2)
     void loadGridLineMesh();
     void updateDepthBuffer();
@@ -164,6 +166,8 @@ private:
     void emitSelectedPointChanged(QPoint position);
 
     Q_DISABLE_COPY(Surface3DRenderer)
+
+    friend class SurfaceObject;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

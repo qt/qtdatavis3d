@@ -67,6 +67,7 @@ private:
     QValue3DAxis *qptr();
 
     friend class QValue3DAxis;
+    friend class Abstract3DController;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

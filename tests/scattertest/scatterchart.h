@@ -45,6 +45,12 @@ public:
     void changePointSize(int pointSize);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
+    void setMinX(int min);
+    void setMinY(int min);
+    void setMinZ(int min);
+    void setMaxX(int max);
+    void setMaxY(int max);
+    void setMaxZ(int max);
     void start();
 
 public slots:

@@ -83,6 +83,12 @@ void ScatterDataModifier::addData()
     m_chart->axisX()->setRange(-50.0f, 50.0f);
     m_chart->axisY()->setRange(-1.0f, 1.2f);
     m_chart->axisZ()->setRange(-50.0f, 50.0f);
+    m_chart->axisX()->setSegmentCount(6);
+    m_chart->axisY()->setSegmentCount(4);
+    m_chart->axisZ()->setSegmentCount(9);
+    m_chart->axisX()->setSubSegmentCount(2);
+    m_chart->axisY()->setSubSegmentCount(3);
+    m_chart->axisZ()->setSubSegmentCount(1);
 
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(numberOfItems);
@@ -229,9 +235,12 @@ void ScatterDataModifier::resetAxes()
     m_chart->setAxisX(new QValue3DAxis);
     m_chart->setAxisY(new QValue3DAxis);
     m_chart->setAxisZ(new QValue3DAxis);
-    m_chart->axisX()->setSegmentCount(5);
-    m_chart->axisY()->setSegmentCount(5);
-    m_chart->axisZ()->setSegmentCount(5);
+    m_chart->axisX()->setSegmentCount(6);
+    m_chart->axisY()->setSegmentCount(4);
+    m_chart->axisZ()->setSegmentCount(9);
+    m_chart->axisX()->setSubSegmentCount(2);
+    m_chart->axisY()->setSubSegmentCount(3);
+    m_chart->axisZ()->setSubSegmentCount(1);
     m_chart->axisX()->setTitle("X");
     m_chart->axisY()->setTitle("Y");
     m_chart->axisZ()->setTitle("Z");
@@ -516,12 +525,46 @@ void ScatterDataModifier::setGridEnabled(int enabled)
     m_chart->activeTheme()->setGridEnabled((bool)enabled);
 }
 
+void ScatterDataModifier::setMinX(int min)
+{
+    m_chart->axisX()->setMin(min);
+}
+
+void ScatterDataModifier::setMinY(int min)
+{
+    m_chart->axisY()->setMin(float(min) / 100.0f);
+}
+
+void ScatterDataModifier::setMinZ(int min)
+{
+    m_chart->axisZ()->setMin(min);
+}
+
+void ScatterDataModifier::setMaxX(int max)
+{
+    m_chart->axisX()->setMax(max);
+}
+
+void ScatterDataModifier::setMaxY(int max)
+{
+    m_chart->axisY()->setMax(float(max) / 100.0f);
+}
+
+void ScatterDataModifier::setMaxZ(int max)
+{
+    m_chart->axisZ()->setMax(max);
+}
+
 QVector3D ScatterDataModifier::randVector()
 {
-    return QVector3D(
+    QVector3D retvec = QVector3D(
         (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f,
         (float)(rand() % 100) / 100.0f - (float)(rand() % 100) / 100.0f,
         (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f);
+
+    qDebug() << __FUNCTION__ << retvec;
+
+    return retvec;
 }
 
 QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
@@ -535,7 +578,7 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
 
     m_chart->addSeries(series);
     series->setName(QString("Series %1").arg(counter++));
-    series->setItemLabelFormat(QStringLiteral("@seriesName: @xLabel - @yLabel - @zLabel"));
+    series->setItemLabelFormat(QStringLiteral("@seriesName: (X:@xLabel / Z:@zLabel) Y:@yLabel"));
     series->setMesh(QAbstract3DSeries::MeshSphere);
     series->setMeshSmooth(true);
     series->setBaseColor(QColor(rand() % 256, rand() % 256, rand() % 256));

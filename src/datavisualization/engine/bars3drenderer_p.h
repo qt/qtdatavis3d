@@ -96,7 +96,7 @@ private:
     GLfloat m_maxSceneSize;
     QPoint m_visualSelectedBarPos;
     int m_visualSelectedBarSeriesIndex;
-    bool m_hasHeightAdjustmentChanged;
+    bool m_resetCameraBaseOrientation;
     QPoint m_selectedBarPos;
     const QBar3DSeries *m_selectedBarSeries;
     BarRenderItem m_dummyBarRenderItem;

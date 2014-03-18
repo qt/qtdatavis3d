@@ -60,7 +60,7 @@ protected:
         SelectOnSlice
     };
 
-    QString generateValueLabel(const QString &format, float value);
+//    QString generateValueLabel(const QString &format, float value);
 
 public:
     virtual ~Abstract3DRenderer();

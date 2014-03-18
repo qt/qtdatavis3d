@@ -32,6 +32,7 @@
 #include <QLinearGradient>
 #include <QPainter>
 #include <QColorDialog>
+#include <QLineEdit>
 
 int main(int argc, char **argv)
 {
@@ -290,6 +291,8 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("High Soft"));
     shadowQuality->setCurrentIndex(5);
 
+    QLineEdit *valueAxisFormatEdit = new QLineEdit(widget);
+
     vLayout->addWidget(addDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addMultiDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(insertDataButton, 0, Qt::AlignTop);
@@ -344,7 +347,9 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Change font")), 0, Qt::AlignTop);
     vLayout2->addWidget(fontList, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")), 0, Qt::AlignTop);
-    vLayout2->addWidget(fontSizeSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(fontSizeSlider, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Value axis format")), 0, Qt::AlignTop);
+    vLayout2->addWidget(valueAxisFormatEdit, 1, Qt::AlignTop);
     // TODO: Add example for setMeshFileName
 
     widget->show();
@@ -380,6 +385,8 @@ int main(int argc, char **argv)
                      &QComboBox::setCurrentIndex);
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::changeFontSize);
+    QObject::connect(valueAxisFormatEdit, &QLineEdit::textEdited, modifier,
+                     &GraphModifier::changeValueAxisFormat);
 
     QObject::connect(multiScaleButton, &QPushButton::clicked, modifier,
                      &GraphModifier::toggleMultiseriesScaling);

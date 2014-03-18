@@ -33,8 +33,9 @@ AxisRenderCache::AxisRenderCache()
       m_formatter(0),
       m_ctrlFormatter(0),
       m_drawer(0),
-      m_segmentStep(10.0f),
-      m_subSegmentStep(10.0f)
+      m_positionsDirty(true),
+      m_translate(0.0f),
+      m_scale(1.0f)
 {
 }
 
@@ -73,8 +74,6 @@ void AxisRenderCache::setType(QAbstract3DAxis::AxisType type)
     foreach (LabelItem *label, m_labelItems)
         delete label;
     m_labelItems.clear();
-    m_segmentStep = 10.0f;
-    m_subSegmentStep = 10.0f;
 }
 
 void AxisRenderCache::setTitle(const QString &title)
@@ -114,28 +113,38 @@ void AxisRenderCache::setLabels(const QStringList &labels)
     }
 }
 
-void AxisRenderCache::setMin(float min)
+void AxisRenderCache::updateAllPositions()
 {
-    m_min = min;
-    updateSegmentStep();
-}
+    // As long as grid and subgrid lines are drawn identically, we can further optimize
+    // by caching all grid and subgrid positions into a single vector.
+    // If subgrid lines are ever themed separately, this array will probably become obsolete.
+    if (m_formatter) {
+        int subGridCount = m_subSegmentCount - 1;
+        int fullSize = m_segmentCount + 1 + (m_segmentCount * subGridCount);
+        m_adjustedGridLinePositions.resize(fullSize);
+        m_adjustedLabelPositions.resize(m_segmentCount + 1);
+        int index = 0;
+        int segment = 0;
+        for (; segment < m_segmentCount; segment++) {
+            m_adjustedLabelPositions[segment] =
+                    m_formatter->labelPositions().at(segment) * m_scale + m_translate;
+            m_adjustedGridLinePositions[index++] =
+                    m_formatter->gridPositions().at(segment) * m_scale + m_translate;
+            if (subGridCount > 0) {
+                for (int subGrid = 0; subGrid < subGridCount; subGrid++) {
+                    m_adjustedGridLinePositions[index++] =
+                            m_formatter->subGridPositions().at(segment).at(subGrid) * m_scale + m_translate;
+                }
+            }
+        }
+        // Last gridline
+        m_adjustedLabelPositions[segment] =
+                m_formatter->labelPositions().at(segment) * m_scale + m_translate;
+        m_adjustedGridLinePositions[index] =
+                m_formatter->gridPositions().at(segment) * m_scale + m_translate;
 
-void AxisRenderCache::setMax(float max)
-{
-    m_max = max;
-    updateSegmentStep();
-}
-
-void AxisRenderCache::setSegmentCount(int count)
-{
-    m_segmentCount = count;
-    updateSegmentStep();
-}
-
-void AxisRenderCache::setSubSegmentCount(int count)
-{
-    m_subSegmentCount = count;
-    updateSubSegmentStep();
+        m_positionsDirty = false;
+    }
 }
 
 void AxisRenderCache::updateTextures()
@@ -155,23 +164,6 @@ void AxisRenderCache::updateTextures()
         else
             m_drawer->generateLabelItem(*m_labelItems[i], m_labels.at(i), widest);
     }
-}
-
-void AxisRenderCache::updateSegmentStep()
-{
-    if (m_segmentCount > 0)
-        m_segmentStep = qFabs((m_max - m_min) / m_segmentCount);
-    else
-        m_segmentStep = 0.0f; // Irrelevant
-    updateSubSegmentStep();
-}
-
-void AxisRenderCache::updateSubSegmentStep()
-{
-    if (m_subSegmentCount > 1)
-        m_subSegmentStep = m_segmentStep / m_subSegmentCount;
-    else
-        m_subSegmentStep = m_segmentStep;
 }
 
 int AxisRenderCache::maxLabelWidth(const QStringList &labels) const

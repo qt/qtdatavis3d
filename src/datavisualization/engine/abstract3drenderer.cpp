@@ -138,13 +138,13 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
     glDisable(GL_SCISSOR_TEST);
 }
 
-QString Abstract3DRenderer::generateValueLabel(const QString &format, float value)
-{
-    QString valueLabelFormat = format;
-    Utils::ParamType valueParamType = Utils::findFormatParamType(valueLabelFormat);
-    QByteArray valueFormatArray = valueLabelFormat.toUtf8();
-    return Utils::formatLabel(valueFormatArray, valueParamType, value);
-}
+//QString Abstract3DRenderer::generateValueLabel(const QString &format, float value)
+//{
+//    QString valueLabelFormat = format;
+//    Utils::ParamType valueParamType = Utils::findFormatParamType(valueLabelFormat);
+//    QByteArray valueFormatArray = valueLabelFormat.toUtf8();
+//    return Utils::formatLabel(valueFormatArray, valueParamType, value);
+//}
 
 void Abstract3DRenderer::updateSelectionState(SelectionState state)
 {
@@ -318,13 +318,15 @@ void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orient
 void Abstract3DRenderer::updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
                                                 int count)
 {
-    axisCacheForOrientation(orientation).setSegmentCount(count);
+    AxisRenderCache &cache = axisCacheForOrientation(orientation);
+    cache.setSegmentCount(count);
 }
 
 void Abstract3DRenderer::updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
                                                    int count)
 {
-    axisCacheForOrientation(orientation).setSubSegmentCount(count);
+    AxisRenderCache &cache = axisCacheForOrientation(orientation);
+    cache.setSubSegmentCount(count);
 }
 
 void Abstract3DRenderer::updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation,
@@ -342,7 +344,7 @@ void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation or
         cache.setFormatter(formatter->createNewInstance());
         cache.setCtrlFormatter(formatter);
     }
-    formatter->populateCopy(*(cache.formatter()));
+    formatter->d_ptr->populateCopy(*(cache.formatter()));
 }
 
 void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)

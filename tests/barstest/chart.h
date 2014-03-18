@@ -86,6 +86,7 @@ public:
     void insertRemoveTestToggle();
     void toggleRotation();
     void useLogAxis();
+    void changeValueAxisFormat(const QString & text);
 
 public slots:
     void flipViews();

@@ -269,8 +269,9 @@ void QValue3DAxisPrivate::updateLabels()
     QStringList newLabels;
     newLabels.reserve(m_segmentCount + 1);
 
+    m_formatter->d_ptr->recalculate();
     for (int i = 0; i <= m_segmentCount; i++) {
-        float value = m_formatter->valueAt(m_formatter->gridPosition(i));
+        float value = m_formatter->valueAt(m_formatter->gridPositions().at(i));
         newLabels.append(m_formatter->stringForValue(value, m_labelFormat));
     }
 

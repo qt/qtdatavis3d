@@ -62,10 +62,11 @@ protected:
 
 private:
     Q_DISABLE_COPY(QValue3DAxis)
+    friend class Abstract3DController;
     friend class Bars3DController;
     friend class Scatter3DController;
     friend class Surface3DController;
-    friend class QValue3DAxisFormatter;
+    friend class QValue3DAxisFormatterPrivate;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

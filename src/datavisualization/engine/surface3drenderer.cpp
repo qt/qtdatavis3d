@@ -41,7 +41,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
-const GLfloat backgroundMargin = 1.1f; // Margin for background (1.1f = make it 10% larger to avoid items being drawn inside background)
+const GLfloat backgroundMargin = 1.1f; // Margin for background (1.10 make it 10% larger to avoid
+                                        // selection ball being drawn inside background)
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
@@ -96,6 +97,9 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionTexturesDirty(false),
       m_noShadowTexture(0)
 {
+    m_axisCacheY.setScale(2.0f);
+    m_axisCacheY.setTranslate(-1.0f);
+
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
                         QStringLiteral(":/shaders/fragmentSurfaceFlat"));
@@ -196,7 +200,7 @@ void Surface3DRenderer::updateData()
 
         // Need minimum of 2x2 array to draw a surface
         if (array.size() >= 2 && array.at(0)->size() >= 2) {
-            QRect sampleSpace = calculateSampleRect(cache, array);
+            QRect sampleSpace = calculateSampleRect(array);
 
             QSurfaceDataArray &dataArray = cache->dataArray();
             bool dimensionChanged = false;
@@ -259,7 +263,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
         SurfaceSeriesRenderCache *cache = m_renderCacheList.value(surfaceSeries);
         if (!cache) {
-            cache = new SurfaceSeriesRenderCache;
+            cache = new SurfaceSeriesRenderCache(this);
             m_renderCacheList[surfaceSeries] = cache;
 
             m_selectionTexturesDirty = true;
@@ -341,15 +345,10 @@ void Surface3DRenderer::updateRows(const QVector<Surface3DController::ChangeRow>
                             srcArray->at(row)->at(j + sampleSpace.x());
                 }
 
-                if (cache->isFlatShadingEnabled()) {
-                    cache->surfaceObject()->updateCoarseRow(dstArray, row - sampleSpace.y(),
-                                                            m_heightNormalizer,
-                                                            m_axisCacheY.min());
-                } else {
-                    cache->surfaceObject()->updateSmoothRow(dstArray, row - sampleSpace.y(),
-                                                            m_heightNormalizer,
-                                                            m_axisCacheY.min());
-                }
+                if (cache->isFlatShadingEnabled())
+                    cache->surfaceObject()->updateCoarseRow(dstArray, row - sampleSpace.y());
+                else
+                    cache->surfaceObject()->updateSmoothRow(dstArray, row - sampleSpace.y());
             }
             if (updateBuffers)
                 cache->surfaceObject()->uploadBuffers();
@@ -385,13 +384,10 @@ void Surface3DRenderer::updateItem(const QVector<Surface3DController::ChangeItem
                 int y = point.y() - sampleSpace.y();
                 (*(dstArray.at(y)))[x] = srcArray->at(point.y())->at(point.x());
 
-                if (cache->isFlatShadingEnabled()) {
-                    cache->surfaceObject()->updateCoarseItem(dstArray, y, x, m_heightNormalizer,
-                                                             m_axisCacheY.min());
-                } else {
-                    cache->surfaceObject()->updateSmoothItem(dstArray, y, x, m_heightNormalizer,
-                                                             m_axisCacheY.min());
-                }
+                if (cache->isFlatShadingEnabled())
+                    cache->surfaceObject()->updateCoarseItem(dstArray, y, x);
+                else
+                    cache->surfaceObject()->updateSmoothItem(dstArray, y, x);
             }
             if (updateBuffers)
                 cache->surfaceObject()->uploadBuffers();
@@ -407,10 +403,17 @@ void Surface3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orienta
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
 
-    if (orientation == QAbstract3DAxis::AxisOrientationY) {
-        foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
-            cache->setObjectDirty(true);
-    }
+    foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
+        cache->setObjectDirty(true);
+}
+
+void Surface3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
+                                            QValue3DAxisFormatter *formatter)
+{
+    Abstract3DRenderer::updateAxisFormatter(orientation, formatter);
+
+    foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
+        cache->setObjectDirty(true);
 }
 
 void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
@@ -556,19 +559,27 @@ void Surface3DRenderer::updateSliceObject(SurfaceSeriesRenderCache *cache, const
     QSurfaceDataRow *sliceRow;
     QSurfaceDataArray &dataArray = cache->dataArray();
     float adjust = (0.025f * m_heightNormalizer) / 2.0f;
-    float stepDown = 2.0f * adjust;
+    float doubleAdjust = 2.0f * adjust;
+    bool flipZX = false;
+    float zBack;
+    float zFront;
     if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
         QSurfaceDataRow *src = dataArray.at(row);
         sliceRow = new QSurfaceDataRow(src->size());
+        zBack = m_axisCacheZ.min();
+        zFront = m_axisCacheZ.max();
         for (int i = 0; i < sliceRow->size(); i++)
-            (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y() + adjust, -1.0f));
+            (*sliceRow)[i].setPosition(QVector3D(src->at(i).x(), src->at(i).y() + adjust, zFront));
     } else {
+        flipZX = true;
         const QRect &sampleSpace = cache->sampleSpace();
         sliceRow = new QSurfaceDataRow(sampleSpace.height());
+        zBack = m_axisCacheX.min();
+        zFront = m_axisCacheX.max();
         for (int i = 0; i < sampleSpace.height(); i++) {
             (*sliceRow)[i].setPosition(QVector3D(dataArray.at(i)->at(column).z(),
                                                  dataArray.at(i)->at(column).y() + adjust,
-                                                 -1.0f));
+                                                 zFront));
         }
     }
     sliceDataArray << sliceRow;
@@ -577,27 +588,21 @@ void Surface3DRenderer::updateSliceObject(SurfaceSeriesRenderCache *cache, const
     QSurfaceDataRow *duplicateRow = new QSurfaceDataRow(*sliceRow);
     for (int i = 0; i < sliceRow->size(); i++) {
         (*sliceRow)[i].setPosition(QVector3D(sliceRow->at(i).x(),
-                                             sliceRow->at(i).y() - stepDown,
-                                             1.0f));
+                                             sliceRow->at(i).y() - doubleAdjust,
+                                             zBack));
     }
     sliceDataArray << duplicateRow;
 
     QRect sliceRect(0, 0, sliceRow->size(), 2);
     if (sliceRow->size() > 0) {
-        if (cache->isFlatShadingEnabled()) {
-            cache->sliceSurfaceObject()->setUpData(sliceDataArray, sliceRect,
-                                                   m_heightNormalizer,
-                                                   m_axisCacheY.min(), true);
-        } else {
-            cache->sliceSurfaceObject()->setUpSmoothData(sliceDataArray, sliceRect,
-                                                         m_heightNormalizer,
-                                                         m_axisCacheY.min(), true);
-        }
+        if (cache->isFlatShadingEnabled())
+            cache->sliceSurfaceObject()->setUpData(sliceDataArray, sliceRect, true, flipZX);
+        else
+            cache->sliceSurfaceObject()->setUpSmoothData(sliceDataArray, sliceRect, true, flipZX);
     }
 }
 
-QRect Surface3DRenderer::calculateSampleRect(SurfaceSeriesRenderCache *cache,
-                                             const QSurfaceDataArray &array)
+QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
 {
     QRect sampleSpace;
 
@@ -673,17 +678,6 @@ QRect Surface3DRenderer::calculateSampleRect(SurfaceSeriesRenderCache *cache,
 
     m_visibleColumnRange = m_maxVisibleColumnValue - m_minVisibleColumnValue;
     m_visibleRowRange = m_maxVisibleRowValue - m_minVisibleRowValue;
-    GLfloat surfaceScaleX = m_scaleX * m_visibleColumnRange / m_areaSize.width();
-    GLfloat surfaceScaleZ = m_scaleZ * m_visibleRowRange / m_areaSize.height();
-    GLfloat axis2XCenterX = axisMinX + axisMaxX;
-    GLfloat axis2XCenterZ = axisMinZ + axisMaxZ;
-    GLfloat data2XCenterX = GLfloat(m_minVisibleColumnValue + m_maxVisibleColumnValue);
-    GLfloat data2XCenterZ = GLfloat(m_minVisibleRowValue + m_maxVisibleRowValue);
-    GLfloat surfaceOffsetX = m_scaleX * (data2XCenterX - axis2XCenterX) / m_areaSize.width();
-    GLfloat surfaceOffsetZ = -m_scaleZ * (data2XCenterZ - axis2XCenterZ) / m_areaSize.height();
-
-    cache->setScale(QVector3D(surfaceScaleX, 1.0f, surfaceScaleZ));
-    cache->setOffset(QVector3D(surfaceOffsetX, 0.0f, surfaceOffsetZ));
 
     return sampleSpace;
 }
@@ -713,6 +707,13 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
 {
     // Handle GL state setup for FBO buffers and clearing of the render surface
     Abstract3DRenderer::render(defaultFboHandle);
+
+    if (m_axisCacheX.positionsDirty())
+        m_axisCacheX.updateAllPositions();
+    if (m_axisCacheY.positionsDirty())
+        m_axisCacheY.updateAllPositions();
+    if (m_axisCacheZ.positionsDirty())
+        m_axisCacheZ.updateAllPositions();
 
     drawScene(defaultFboHandle);
     if (m_cachedIsSlicingActivated)
@@ -766,6 +767,7 @@ void Surface3DRenderer::drawSlicedScene()
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
     bool rowMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow);
+    AxisRenderCache &sliceCache = rowMode ? m_axisCacheX : m_axisCacheZ;
 
     GLfloat scaleXBackground = 0.0f;
 
@@ -780,24 +782,16 @@ void Surface3DRenderer::drawSlicedScene()
                     drawGrid = true;
                 }
 
-                GLfloat scaleX = 0.0f;
-                GLfloat offset = 0.0f;
-                if (rowMode) {
-                    scaleX = cache->scale().x();
+                if (rowMode)
                     scaleXBackground = m_scaleXWithBackground;
-                    offset = cache->offset().x();
-                } else {
-                    scaleX = cache->scale().z();
+                else
                     scaleXBackground = m_scaleZWithBackground;
-                    offset = -cache->offset().z();
-                }
 
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(offset, 0.0f, 0.0f);
-                QVector3D scaling(scaleX, 1.0f, sliceZScale);
+                QVector3D scaling(1.0f, 1.0f, sliceZScale);
                 modelMatrix.scale(scaling);
                 itModelMatrix.scale(scaling);
 
@@ -872,19 +866,16 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 
         // Horizontal lines
+        int gridLineCount = m_axisCacheY.gridLineCount();
         if (m_axisCacheY.segmentCount() > 0) {
             QVector3D gridLineScaleX(scaleXBackground, gridLineWidth, gridLineWidth);
 
-            GLfloat lineStep = 2.0f * m_axisCacheY.subSegmentStep() / m_heightNormalizer;
-            GLfloat linePos = -1.0f;
-            int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
-
-            for (int segment = 0; segment <= lastSegment; segment++) {
+            for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(0.0f, linePos, -sliceZScale);
+                modelMatrix.translate(0.0f, m_axisCacheY.gridLinePosition(line), -1.0f);
 
                 modelMatrix.scale(gridLineScaleX);
                 itModelMatrix.scale(gridLineScaleX);
@@ -903,33 +894,18 @@ void Surface3DRenderer::drawSlicedScene()
 #else
                 m_drawer->drawLine(lineShader);
 #endif
-
-                linePos += lineStep;
             }
         }
 
         // Vertical lines
         QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
 
-        int lastSegment;
-        GLfloat lineStep;
-        GLfloat linePos;
-        if (rowMode) {
-            lineStep = -2.0f * aspectRatio * m_axisCacheX.subSegmentStep() / m_scaleFactor;
-            lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
-            linePos = m_scaleX;
-        } else {
-            lineStep = -2.0f * aspectRatio * m_axisCacheZ.subSegmentStep() / m_scaleFactor;
-            lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
-            linePos = m_scaleZ;
-        }
-
-        for (int segment = 0; segment <= lastSegment; segment++) {
+        for (int line = 0; line < gridLineCount; line++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            modelMatrix.translate(linePos, 0.0f, -sliceZScale);
+            modelMatrix.translate(sliceCache.gridLinePosition(line), 0.0f, -1.0f);
             modelMatrix.scale(gridLineScaleY);
             itModelMatrix.scale(gridLineScaleY);
 #if (defined QT_OPENGL_ES_2)
@@ -951,8 +927,6 @@ void Surface3DRenderer::drawSlicedScene()
 #else
             m_drawer->drawLine(lineShader);
 #endif
-
-            linePos += lineStep;
         }
     }
 
@@ -965,16 +939,15 @@ void Surface3DRenderer::drawSlicedScene()
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     // Y Labels to back wall
-    GLfloat posStep = 2.0f * m_axisCacheY.segmentStep() / m_heightNormalizer;
-    GLfloat labelPos = -1.0f;
     int labelNbr = 0;
 
     QVector3D positionComp(0.0f, 0.0f, 0.0f);
     QVector3D rotation(0.0f, 0.0f, 0.0f);
-    QVector3D labelTrans = QVector3D(scaleXBackground + labelMargin, labelPos, 0.0f);
-    for (int segment = 0; segment <= m_axisCacheY.segmentCount(); segment++) {
+    QVector3D labelTrans = QVector3D(scaleXBackground + labelMargin, 0.0f, 0.0f);
+    int labelCount = m_axisCacheY.labelCount();
+    for (int label = 0; label < labelCount; label++) {
         if (m_axisCacheY.labelItems().size() > labelNbr) {
-            labelTrans.setY(labelPos);
+            labelTrans.setY(m_axisCacheY.labelPosition(label));
             const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
 
             // Draw the label here
@@ -985,40 +958,25 @@ void Surface3DRenderer::drawSlicedScene()
                                 true, true, Drawer::LabelMid, Qt::AlignRight, true);
         }
         labelNbr++;
-        labelPos += posStep;
     }
 
     // X Labels to ground
-    int countLabelItems;
-    int lastSegment;
-    if (rowMode) {
-        posStep = 2.0f * aspectRatio * m_axisCacheX.segmentStep() / m_scaleFactor;
-        labelPos = -m_scaleX;
-        lastSegment = m_axisCacheX.segmentCount();
-        countLabelItems = m_axisCacheX.labelItems().size();
-    } else {
-        posStep = 2.0f * aspectRatio * m_axisCacheZ.segmentStep() / m_scaleFactor;
-        labelPos = -m_scaleZ;
-        lastSegment = m_axisCacheZ.segmentCount();
-        countLabelItems = m_axisCacheZ.labelItems().size();
-    }
+    int countLabelItems = sliceCache.labelItems().size();
 
     labelNbr = 0;
     positionComp.setY(-0.1f);
     rotation.setZ(-45.0f);
     labelTrans.setY(-backgroundMargin);
-    for (int segment = 0; segment <= lastSegment; segment++) {
+    labelCount = sliceCache.labelCount();
+    for (int label = 0; label < labelCount; label++) {
         if (countLabelItems > labelNbr) {
             // Draw the label here
-            labelTrans.setX(labelPos);
+            labelTrans.setX(sliceCache.labelPosition(label));
 
             m_dummyRenderItem.setTranslation(labelTrans);
 
             LabelItem *axisLabelItem;
-            if (rowMode)
-                axisLabelItem = m_axisCacheX.labelItems().at(labelNbr);
-            else
-                axisLabelItem = m_axisCacheZ.labelItems().at(labelNbr);
+            axisLabelItem = sliceCache.labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
                                 positionComp, rotation, 0, QAbstract3DGraph::SelectionRow,
@@ -1026,23 +984,16 @@ void Surface3DRenderer::drawSlicedScene()
                                 false, false, Drawer::LabelBelow, Qt::AlignBottom, true);
         }
         labelNbr++;
-        labelPos += posStep;
     }
 
     // Draw labels for axes
     AbstractRenderItem *dummyItem(0);
     positionComp.setY(m_autoScaleAdjustment);
-    if (rowMode) {
-        m_drawer->drawLabel(*dummyItem, m_axisCacheX.titleItem(), viewMatrix, projectionMatrix,
-                            positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
-                            Qt::AlignCenter, true);
-    } else {
-        m_drawer->drawLabel(*dummyItem, m_axisCacheZ.titleItem(), viewMatrix, projectionMatrix,
-                            positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
-                            Qt::AlignCenter, true);
-    }
+    m_drawer->drawLabel(*dummyItem, sliceCache.titleItem(), viewMatrix, projectionMatrix,
+                        positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
+                        m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
+                        Qt::AlignCenter, true);
+
     // Y-axis label
     labelTrans = QVector3D(-scaleXBackground - labelMargin, 0.0f, 0.0f);
     m_dummyRenderItem.setTranslation(labelTrans);
@@ -1150,8 +1101,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
-                modelMatrix.translate(cache->offset());
-                modelMatrix.scale(cache->scale());
                 MVPMatrix = depthProjectionViewMatrix * modelMatrix;
                 cache->setMVPMatrix(MVPMatrix);
                 m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
@@ -1244,9 +1193,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
 
-                modelMatrix.translate(cache->offset());
-                modelMatrix.scale(cache->scale());
-
                 MVPMatrix = projectionViewMatrix * modelMatrix;
                 m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
 
@@ -1292,10 +1238,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 itModelMatrix;
-
-            modelMatrix.translate(cache->offset());
-            modelMatrix.scale(cache->scale());
-            itModelMatrix.scale(cache->scale());
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
             MVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -1508,16 +1450,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
             // Floor lines
-            GLfloat lineStep = 2.0f * aspectRatio * m_axisCacheZ.subSegmentStep() / m_scaleFactor;
-            GLfloat linePos = m_scaleZ; // Start line
-            int lastSegment = m_axisCacheZ.subSegmentCount() * m_axisCacheZ.segmentCount();
+            int gridLineCount = m_axisCacheZ.gridLineCount();
 
-            for (int segment = 0; segment <= lastSegment; segment++) {
+            for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(0.0f, yFloorLinePosition, linePos);
+                modelMatrix.translate(0.0f, yFloorLinePosition, m_axisCacheZ.gridLinePosition(line));
 
                 modelMatrix.scale(gridLineScaleX);
                 itModelMatrix.scale(gridLineScaleX);
@@ -1547,22 +1487,20 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
                 m_drawer->drawLine(lineShader);
 #endif
-                linePos -= lineStep;
             }
 
             // Side wall lines
             GLfloat lineXTrans = m_scaleXWithBackground - gridLineOffset;
-            linePos = m_scaleZ; // Start line
 
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
 
-            for (int segment = 0; segment <= lastSegment; segment++) {
+            for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(lineXTrans, 0.0f, linePos);
+                modelMatrix.translate(lineXTrans, 0.0f, m_axisCacheZ.gridLinePosition(line));
 
                 modelMatrix.scale(gridLineScaleY);
                 itModelMatrix.scale(gridLineScaleY);
@@ -1597,7 +1535,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
                 m_drawer->drawLine(lineShader);
 #endif
-                linePos -= lineStep;
             }
         }
 
@@ -1607,16 +1544,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             lineXRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
 #endif
             // Floor lines
-            GLfloat lineStep = -2.0f * aspectRatio * m_axisCacheX.subSegmentStep() / m_scaleFactor;
-            GLfloat linePos = m_scaleX;
-            int lastSegment = m_axisCacheX.subSegmentCount() * m_axisCacheX.segmentCount();
+            int gridLineCount = m_axisCacheX.gridLineCount();
 
-            for (int segment = 0; segment <= lastSegment; segment++) {
+            for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(linePos, yFloorLinePosition, 0.0f);
+                modelMatrix.translate(m_axisCacheX.gridLinePosition(line), yFloorLinePosition, 0.0f);
 
                 modelMatrix.scale(gridLineScaleZ);
                 itModelMatrix.scale(gridLineScaleZ);
@@ -1646,22 +1581,20 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
                 m_drawer->drawLine(lineShader);
 #endif
-                linePos += lineStep;
             }
 
             // Back wall lines
             GLfloat lineZTrans = m_scaleZWithBackground - gridLineOffset;
-            linePos = m_scaleX;
 
             if (!m_zFlipped)
                 lineZTrans = -lineZTrans;
 
-            for (int segment = 0; segment <= lastSegment; segment++) {
+            for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(linePos, 0.0f, lineZTrans);
+                modelMatrix.translate(m_axisCacheX.gridLinePosition(line), 0.0f, lineZTrans);
 
                 modelMatrix.scale(gridLineScaleY);
                 itModelMatrix.scale(gridLineScaleY);
@@ -1698,28 +1631,25 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
                 m_drawer->drawLine(lineShader);
 #endif
-                linePos += lineStep;
             }
         }
 
         // Horizontal wall lines
         if (m_axisCacheY.segmentCount() > 0) {
             // Back wall
-            GLfloat lineStep = 2.0f * m_axisCacheY.subSegmentStep() / m_heightNormalizer;
-            GLfloat linePos = -1.0f;
-            int lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
+            int gridLineCount = m_axisCacheY.gridLineCount();
 
             GLfloat lineZTrans = m_scaleZWithBackground - gridLineOffset;
 
             if (!m_zFlipped)
                 lineZTrans = -lineZTrans;
 
-            for (int segment = 0; segment <= lastSegment; segment++) {
+            for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(0.0f, linePos, lineZTrans);
+                modelMatrix.translate(0.0f, m_axisCacheY.gridLinePosition(line), lineZTrans);
 
                 modelMatrix.scale(gridLineScaleX);
                 itModelMatrix.scale(gridLineScaleX);
@@ -1751,23 +1681,20 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
                 m_drawer->drawLine(lineShader);
 #endif
-                linePos += lineStep;
             }
 
             // Side wall
-            linePos = -1.0f;
-            lastSegment = m_axisCacheY.subSegmentCount() * m_axisCacheY.segmentCount();
             GLfloat lineXTrans = m_scaleXWithBackground - gridLineOffset;
 
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
 
-            for (int segment = 0; segment <= lastSegment; segment++) {
+            for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(lineXTrans, linePos, 0.0f);
+                modelMatrix.translate(lineXTrans, m_axisCacheY.gridLinePosition(line), 0.0f);
 
                 modelMatrix.scale(gridLineScaleZ);
                 itModelMatrix.scale(gridLineScaleZ);
@@ -1797,7 +1724,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
                 m_drawer->drawLine(lineShader);
 #endif
-                linePos += lineStep;
             }
         }
     }
@@ -1812,9 +1738,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Z Labels
     QVector3D positionZComp(0.0f, 0.0f, 0.0f);
     if (m_axisCacheZ.segmentCount() > 0) {
-        GLfloat posStep = 2.0f * aspectRatio * m_axisCacheZ.segmentStep() / m_scaleFactor;
-        GLfloat labelPos = m_scaleZ;
-        int lastSegment = m_axisCacheZ.segmentCount();
+        int labelCount = m_axisCacheZ.labelItems().size();
         int labelNbr = 0;
         GLfloat labelXTrans = m_scaleXWithBackground + labelMargin;
         GLfloat labelYTrans = -backgroundMargin;
@@ -1835,14 +1759,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         }
         QVector3D labelTrans = QVector3D(labelXTrans,
                                          labelYTrans,
-                                         labelPos);
+                                         0.0f);
         QVector3D rotation(rotLabelX, rotLabelY, rotLabelZ);
 
-        for (int segment = 0; segment <= lastSegment; segment++) {
+        for (int label = 0; label < labelCount; label++) {
             if (m_axisCacheZ.labelItems().size() > labelNbr) {
-                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
+                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
                 // Draw the label here
-                labelTrans.setZ(labelPos);
+                labelTrans.setZ(m_axisCacheZ.labelPosition(label));
                 m_dummyRenderItem.setTranslation(labelTrans);
                 const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(labelNbr);
 
@@ -1852,14 +1776,11 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                     true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
-            labelPos -= posStep;
         }
     }
     // X Labels
     if (m_axisCacheX.segmentCount() > 0) {
-        GLfloat posStep = 2.0f * aspectRatio * m_axisCacheX.segmentStep() / m_scaleFactor;
-        GLfloat labelPos = -m_scaleX;
-        int lastSegment = m_axisCacheX.segmentCount();
+        int labelCount = m_axisCacheX.labelItems().size();
 
         int labelNbr = 0;
         GLfloat labelZTrans = m_scaleZWithBackground + labelMargin;
@@ -1879,16 +1800,16 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             rotLabelY += 180.0f;
             labelYTrans = -labelYTrans;
         }
-        QVector3D labelTrans = QVector3D(labelPos,
+        QVector3D labelTrans = QVector3D(0.0f,
                                          labelYTrans,
                                          labelZTrans);
         QVector3D rotation(rotLabelX, rotLabelY, rotLabelZ);
 
-        for (int segment = 0; segment <= lastSegment; segment++) {
+        for (int label = 0; label < labelCount; label++) {
             if (m_axisCacheX.labelItems().size() > labelNbr) {
-                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
+                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
                 // Draw the label here
-                labelTrans.setX(labelPos);
+                labelTrans.setX(m_axisCacheX.labelPosition(label));
                 m_dummyRenderItem.setTranslation(labelTrans);
                 const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(labelNbr);
 
@@ -1898,13 +1819,12 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                     true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
-            labelPos += posStep;
         }
     }
     // Y Labels
     if (m_axisCacheY.segmentCount() > 0) {
-        GLfloat posStep = 2.0f * m_axisCacheY.segmentStep() / m_heightNormalizer;
-        GLfloat labelPos = -1.0f;
+        int labelCount = m_axisCacheY.labelItems().size();
+
         int labelNbr = 0;
         GLfloat labelXTrans = m_scaleXWithBackground;
         GLfloat labelZTrans = m_scaleZWithBackground;
@@ -1943,14 +1863,15 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         QVector3D labelRotateVectorSide(rotLabelX, rotLabelY, rotLabelZ);
         QVector3D labelTransSide(-labelXTrans - labelMarginXTrans, 0.0f, -labelZTrans);
 
-        for (int segment = 0; segment <= m_axisCacheY.segmentCount(); segment++) {
+        for (int label = 0; label < labelCount; label++) {
             if (m_axisCacheY.labelItems().size() > labelNbr) {
                 const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
+                const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
 
-                glPolygonOffset(GLfloat(segment) / -10.0f, 1.0f);
+                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
 
                 // Back wall
-                labelTransBack.setY(labelPos);
+                labelTransBack.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransBack);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, labelRotateVectorBack, 0, m_cachedSelectionMode,
@@ -1958,7 +1879,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                     true, true, Drawer::LabelMid, alignmentBack);
 
                 // Side wall
-                labelTransSide.setY(labelPos);
+                labelTransSide.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransSide);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, labelRotateVectorSide, 0, m_cachedSelectionMode,
@@ -1966,7 +1887,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                     true, true, Drawer::LabelMid, alignmentSide);
             }
             labelNbr++;
-            labelPos += posStep;
         }
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -2123,8 +2043,14 @@ void Surface3DRenderer::calculateSceneScalingFactors()
     m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
     m_scaleX = aspectRatio * m_areaSize.width() / m_scaleFactor;
     m_scaleZ = aspectRatio * m_areaSize.height() / m_scaleFactor;
-    m_scaleXWithBackground = m_scaleX * backgroundMargin;
-    m_scaleZWithBackground = m_scaleZ * backgroundMargin;
+    m_scaleXWithBackground = m_scaleX + backgroundMargin - 1.0f;
+    m_scaleZWithBackground = m_scaleZ + backgroundMargin - 1.0f;
+
+    float factorScaler = 2.0f * aspectRatio / m_scaleFactor;
+    m_axisCacheX.setScale(factorScaler * m_areaSize.width());
+    m_axisCacheZ.setScale(-factorScaler * m_areaSize.height());
+    m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
+    m_axisCacheZ.setTranslate(-m_axisCacheZ.scale() / 2.0f);
 }
 
 void Surface3DRenderer::checkFlatSupport(SurfaceSeriesRenderCache *cache)
@@ -2144,13 +2070,10 @@ void Surface3DRenderer::updateObjects(SurfaceSeriesRenderCache *cache, bool dime
     const QRect &sampleSpace = cache->sampleSpace();
 
 
-    if (cache->isFlatShadingEnabled()) {
-        cache->surfaceObject()->setUpData(dataArray, sampleSpace, m_heightNormalizer,
-                                          m_axisCacheY.min(), dimensionChanged);
-    } else {
-        cache->surfaceObject()->setUpSmoothData(dataArray, sampleSpace, m_heightNormalizer,
-                                                m_axisCacheY.min(), dimensionChanged);
-    }
+    if (cache->isFlatShadingEnabled())
+        cache->surfaceObject()->setUpData(dataArray, sampleSpace, dimensionChanged);
+    else
+        cache->surfaceObject()->setUpSmoothData(dataArray, sampleSpace, dimensionChanged);
 }
 
 void Surface3DRenderer::updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series)
@@ -2226,9 +2149,6 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
     if (column < 0 || row < 0)
         return;
 
-    QSurfaceDataArray &dataArray = cache->dataArray();
-    float value = dataArray.at(row)->at(column).y();
-
     SelectionPointer *slicePointer = cache->sliceSelectionPointer();
     if (!slicePointer && m_cachedIsSlicingActivated) {
         slicePointer = new SelectionPointer(m_drawer);
@@ -2240,26 +2160,23 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
         cache->setMainSelectionPointer(mainPointer);
     }
 
-    const QVector3D &scale = cache->scale();
-    const QVector3D &offset = cache->offset();
     QString selectionLabel;
     if (label)
-        selectionLabel = createSelectionLabel(cache, value, column, row);
+        selectionLabel = createSelectionLabel(cache, column, row);
 
     if (m_cachedIsSlicingActivated) {
-        QVector3D subPos;
+        QVector3D subPosFront;
+        QVector3D subPosBack;
         if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
-            subPos = cache->sliceSurfaceObject()->vertexAt(column, 0);
-            subPos *= QVector3D(scale.x(), 1.0f, 0.0f);
-            subPos += QVector3D(offset.x(), 0.0f, 0.0f);
+            subPosFront = cache->sliceSurfaceObject()->vertexAt(column, 0);
+            subPosBack = cache->sliceSurfaceObject()->vertexAt(column, 1);
         } else if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
-            subPos = cache->sliceSurfaceObject()->vertexAt(row, 0);
-            subPos *= QVector3D(scale.z(), 1.0f, 0.0f);
-            subPos += QVector3D(-offset.z(), 0.0f, 0.0f);
+            subPosFront = cache->sliceSurfaceObject()->vertexAt(row, 0);
+            subPosBack = cache->sliceSurfaceObject()->vertexAt(row, 1);
         }
         slicePointer->updateBoundingRect(m_secondarySubViewport);
         slicePointer->updateSliceData(true, m_autoScaleAdjustment);
-        slicePointer->setPosition(subPos);
+        slicePointer->setPosition((subPosFront + subPosBack) / 2.0f);
         slicePointer->setLabel(selectionLabel);
         slicePointer->setPointerObject(cache->object());
         slicePointer->setHighlightColor(cache->singleHighlightColor());
@@ -2270,8 +2187,6 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
 
     QVector3D mainPos;
     mainPos = cache->surfaceObject()->vertexAt(column, row);
-    mainPos *= scale;
-    mainPos += offset;
     mainPointer->updateBoundingRect(m_primarySubViewport);
     mainPointer->updateSliceData(false, m_autoScaleAdjustment);
     mainPointer->setPosition(mainPos);
@@ -2307,7 +2222,7 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
     return QPoint(row, column);
 }
 
-QString Surface3DRenderer::createSelectionLabel(SurfaceSeriesRenderCache *cache, float value,
+QString Surface3DRenderer::createSelectionLabel(SurfaceSeriesRenderCache *cache,
                                                 int column, int row)
 {
     QSurfaceDataArray &dataArray = cache->dataArray();
@@ -2325,26 +2240,18 @@ QString Surface3DRenderer::createSelectionLabel(SurfaceSeriesRenderCache *cache,
     labelText.replace(zTitleTag, m_axisCacheZ.title());
 
     if (labelText.contains(xLabelTag)) {
-        QString labelFormat = m_axisCacheX.labelFormat();
-        if (labelFormat.isEmpty())
-            labelFormat = Utils::defaultLabelFormat();
-        QString valueLabelText = generateValueLabel(labelFormat,
-                                                    dataArray.at(row)->at(column).x());
+        QString valueLabelText = m_axisCacheX.formatter()->stringForValue(
+                    dataArray.at(row)->at(column).x(), m_axisCacheX.labelFormat());
         labelText.replace(xLabelTag, valueLabelText);
     }
     if (labelText.contains(yLabelTag)) {
-        QString labelFormat = m_axisCacheY.labelFormat();
-        if (labelFormat.isEmpty())
-            labelFormat = Utils::defaultLabelFormat();
-        QString valueLabelText = generateValueLabel(labelFormat, value);
+        QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
+                    dataArray.at(row)->at(column).y(), m_axisCacheY.labelFormat());
         labelText.replace(yLabelTag, valueLabelText);
     }
     if (labelText.contains(zLabelTag)) {
-        QString labelFormat = m_axisCacheZ.labelFormat();
-        if (labelFormat.isEmpty())
-            labelFormat = Utils::defaultLabelFormat();
-        QString valueLabelText = generateValueLabel(labelFormat,
-                                                    dataArray.at(row)->at(column).z());
+        QString valueLabelText = m_axisCacheZ.formatter()->stringForValue(
+                    dataArray.at(row)->at(column).z(), m_axisCacheZ.labelFormat());
         labelText.replace(zLabelTag, valueLabelText);
     }
 

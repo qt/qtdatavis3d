@@ -407,11 +407,11 @@ void QAbstract3DAxisPrivate::setMax(float max)
             float oldMin = m_min;
             m_min = max - 1.0f;
             if (!allowNegatives() && m_min < 0.0f) {
-                if (allowZero()) {
+                if (allowZero())
                     m_min = 0.0f;
-                } else {
+                else
                     m_min = max / 2.0f; // Need some positive value smaller than max
-                }
+
                 if (!allowMinMaxSame() && max == 0.0f) {
                     m_min = oldMin;
                     qWarning() << "Unable to set maximum value to zero.";

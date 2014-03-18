@@ -40,6 +40,7 @@ int main(int argc, char **argv)
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
+    QVBoxLayout *vLayout2 = new QVBoxLayout();
 
     Q3DScatter *chart = new Q3DScatter();
     QSize screenSize = chart->screen()->size();
@@ -54,6 +55,7 @@ int main(int argc, char **argv)
 
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    hLayout->addLayout(vLayout2);
 
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
@@ -161,6 +163,48 @@ int main(int argc, char **argv)
     pointSizeSlider->setValue(30);
     pointSizeSlider->setMaximum(100);
 
+    QSlider *minSliderX = new QSlider(Qt::Horizontal, widget);
+    minSliderX->setTickInterval(1);
+    minSliderX->setTickPosition(QSlider::TicksBelow);
+    minSliderX->setMinimum(-100);
+    minSliderX->setValue(-50);
+    minSliderX->setMaximum(100);
+
+    QSlider *minSliderY = new QSlider(Qt::Horizontal, widget);
+    minSliderY->setTickInterval(1);
+    minSliderY->setTickPosition(QSlider::TicksBelow);
+    minSliderY->setMinimum(-200);
+    minSliderY->setValue(-100);
+    minSliderY->setMaximum(200);
+
+    QSlider *minSliderZ = new QSlider(Qt::Horizontal, widget);
+    minSliderZ->setTickInterval(1);
+    minSliderZ->setTickPosition(QSlider::TicksBelow);
+    minSliderZ->setMinimum(-100);
+    minSliderZ->setValue(-50);
+    minSliderZ->setMaximum(100);
+
+    QSlider *maxSliderX = new QSlider(Qt::Horizontal, widget);
+    maxSliderX->setTickInterval(1);
+    maxSliderX->setTickPosition(QSlider::TicksAbove);
+    maxSliderX->setMinimum(-100);
+    maxSliderX->setValue(50);
+    maxSliderX->setMaximum(100);
+
+    QSlider *maxSliderY = new QSlider(Qt::Horizontal, widget);
+    maxSliderY->setTickInterval(1);
+    maxSliderY->setTickPosition(QSlider::TicksAbove);
+    maxSliderY->setMinimum(-200);
+    maxSliderY->setValue(120);
+    maxSliderY->setMaximum(200);
+
+    QSlider *maxSliderZ = new QSlider(Qt::Horizontal, widget);
+    maxSliderZ->setTickInterval(1);
+    maxSliderZ->setTickPosition(QSlider::TicksAbove);
+    maxSliderZ->setMinimum(-100);
+    maxSliderZ->setValue(50);
+    maxSliderZ->setMaximum(100);
+
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -185,13 +229,21 @@ int main(int argc, char **argv)
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
-    vLayout->addWidget(shadowQuality);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
-    vLayout->addWidget(fontList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
-    vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust point size")));
-    vLayout->addWidget(pointSizeSlider, 1, Qt::AlignTop);
+    vLayout->addWidget(shadowQuality, 1, Qt::AlignTop);
+
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust point size")));
+    vLayout2->addWidget(pointSizeSlider, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust data window")));
+    vLayout2->addWidget(minSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(maxSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(minSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(maxSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(minSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(maxSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
+    vLayout2->addWidget(fontList);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")));
+    vLayout2->addWidget(fontSizeSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -256,6 +308,20 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::setGridEnabled);
+
+    QObject::connect(minSliderX, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMinX);
+    QObject::connect(minSliderY, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMinY);
+    QObject::connect(minSliderZ, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMinZ);
+    QObject::connect(maxSliderX, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMaxX);
+    QObject::connect(maxSliderY, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMaxY);
+    QObject::connect(maxSliderZ, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMaxZ);
+
 
     modifier->start();
 
