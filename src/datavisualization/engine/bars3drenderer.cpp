@@ -324,6 +324,10 @@ void Bars3DRenderer::drawSlicedScene()
 
     GLfloat barPosYAdjustment = -0.8f; // Translate to -1.0 + 0.2 for row/column labels
     GLfloat scaleFactor = 0.0f;
+    if (rowMode)
+        scaleFactor = (1.1f * m_rowWidth) / m_scaleFactor;
+    else
+        scaleFactor = (1.1f * m_columnDepth) / m_scaleFactor;
     GLfloat barLabelYPos = barPosYAdjustment - 0.4f - labelMargin; // 0.4 for labels
     GLfloat zeroPosAdjustment = 0.0f;
     if (!m_noZeroInRange)
@@ -347,11 +351,6 @@ void Bars3DRenderer::drawSlicedScene()
                                     m_cachedTheme->ambientLightStrength() * 2.3f);
         lineShader->setUniformValue(lineShader->lightS(), 0.0f);
         lineShader->setUniformValue(lineShader->lightColor(), lightColor);
-
-        if (rowMode)
-            scaleFactor = (1.1f * m_rowWidth) / m_scaleFactor;
-        else
-            scaleFactor = (1.1f * m_columnDepth) / m_scaleFactor;
 
         GLfloat gridStep = (2.0f * m_axisCacheY.subSegmentStep()) / m_heightNormalizer;
         GLfloat gridPos = barPosYAdjustment;
