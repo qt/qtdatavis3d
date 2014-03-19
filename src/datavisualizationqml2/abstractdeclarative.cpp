@@ -22,6 +22,9 @@
 #include "declarativerendernode_p.h"
 
 #include <QtGui/QGuiApplication>
+#if defined(Q_OS_IOS)
+#include <QtCore/QTimer>
+#endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -365,6 +368,13 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     connect(m_controller.data(), &Abstract3DController::needRender, window, &QQuickWindow::update);
 
     updateWindowParameters();
+
+#if defined(Q_OS_IOS)
+    // Scenegraph render cycle in iOS sometimes misses update after beforeSynchronizing signal.
+    // This ensures we don't end up displaying the graph without any data, in case update is
+    // skipped after synchDataToRenderer.
+    QTimer::singleShot(0, window, SLOT(update()));
+#endif
 }
 
 void AbstractDeclarative::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
