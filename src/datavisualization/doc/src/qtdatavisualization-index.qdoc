@@ -62,6 +62,7 @@
     \list
         \li \l{Qt Data Visualization Data Handling}{Data Handling}
         \li \l{Qt Data Visualization Interacting with Data}{Interacting with Data}
+        \li \l{Qt Data Visualization Known Issues}{Known Issues}
     \endlist
 
     \section1 References

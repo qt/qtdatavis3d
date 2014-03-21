@@ -66,11 +66,23 @@
     \group qtdatavisualization_getting_started
     \title Qt Data Visualization Getting Started
 
+    \section1 Installing the Qt Data Visualization module
+
+    Use the \c {Package Manager} in \c {Maintenance Tool} or the \c {Online installer} to install
+    the Qt Data Visualization module. The module can be found under \c {Qt Enterprise Add-Ons}
+    in the package manager.
+
+    After installation Qt Data Visualization documentation and examples are available in Qt Creator.
+    You can find all Qt Data Visualization examples by typing \c visualization in the
+    \c {Search in Examples...} field.
+
+    The source code is installed into the QtDataVisualization folder under EnterpriseAddOns.
+
     \section1 Building Qt Data Visualization
 
-    To build the Qt Data Visualization module, set up a command prompt with an environment for
-    building Qt applications, navigate to the directory containing \c qtdatavisualization.pro, and
-    configure the project with qmake:
+    To build the Qt Data Visualization module from source code yourself, set up a command prompt
+    with an environment for building Qt applications, navigate to the directory containing
+    \c {qtdatavisualization.pro}, and configure the project with qmake:
     \code
     qmake
     \endcode
@@ -296,6 +308,26 @@
 
     When multiple series are added to a graph, selecting an item in one of them will clear the selection
     on other series.
+*/
+
+/*!
+    \page qtdatavisualization_known_issues.html
+    \title Qt Data Visualization Known Issues
+
+    \list
+        \li Android doesn't support both widgets and OpenGL simultaneously, so only
+            the Qt Quick 2 API is usable in practice in Android.
+        \li Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
+        \li Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
+        \li Surfaces with non-straight rows and columns do not always render properly.
+        \li Q3DLight class (and Light3D QML item) are currently not usable for anything.
+        \li Changing any of Q3DScene properties affecting subviewports currently has no effect.
+        \li The color style Q3DTheme::ColorStyleObjectGradient doesn't work for surface graphs.
+        \li Scatter "point" meshes (QAbstract3DSeries::MeshPoint) do not support gradients, they
+            always use the base color.
+        \li Widget based examples layout incorrectly in iOS.
+        \li Reparenting a graph to an item in another QQuickWindow is not supported.
+    \endlist
 */
 
 /*!
