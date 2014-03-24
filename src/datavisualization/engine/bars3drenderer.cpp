@@ -1086,6 +1086,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 
     // Draw bars
+    glEnable(GL_POLYGON_OFFSET_FILL);
+    glPolygonOffset(0.5f, 1.0f);
+
     GLfloat adjustedLightStrength = m_cachedTheme->lightStrength() / 10.0f;
     GLfloat adjustedHighlightStrength = m_cachedTheme->highlightLightStrength() / 10.0f;
 
@@ -1315,6 +1318,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
         seriesPos += m_seriesStep;
     }
+    glDisable(GL_POLYGON_OFFSET_FILL);
 
     // Bind background shader
     m_backgroundShader->bind();
