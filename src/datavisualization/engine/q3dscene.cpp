@@ -411,6 +411,7 @@ void Q3DScene::setActiveLight(Q3DLight *light)
         d_ptr->m_sceneDirty = true;
 
         emit activeLightChanged(light);
+        emit d_ptr->needRender();
     }
 }
 

@@ -773,7 +773,6 @@ bool Abstract3DController::isSlicingActive() const
 void Abstract3DController::setSlicingActive(bool isSlicing)
 {
     m_scene->setSlicingActive(isSlicing);
-    emitNeedRender();
 }
 
 Q3DScene *Abstract3DController::scene()
