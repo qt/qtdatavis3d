@@ -345,6 +345,7 @@ void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation or
         cache.setCtrlFormatter(formatter);
     }
     formatter->d_ptr->populateCopy(*(cache.formatter()));
+    cache.markPositionsDirty();
 }
 
 void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)

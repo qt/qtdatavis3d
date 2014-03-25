@@ -27,62 +27,45 @@
 // We mean it.
 
 #include "datavisualizationglobal_p.h"
-#include "qvalue3daxisformatter.h"
-#include "utils_p.h"
-#include <QtCore/QVector>
+#include "qlogvalue3daxisformatter.h"
+#include "qvalue3daxisformatter_p.h"
 
-#ifndef QVALUE3DAXISFORMATTER_P_H
-#define QVALUE3DAXISFORMATTER_P_H
+#ifndef QLOGVALUE3DAXISFORMATTER_P_H
+#define QLOGVALUE3DAXISFORMATTER_P_H
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class QValue3DAxis;
+class QLogValue3DAxis;
 
-class QValue3DAxisFormatterPrivate : public QObject
+class QLogValue3DAxisFormatterPrivate : public QValue3DAxisFormatterPrivate
 {
     Q_OBJECT
 
 public:
-    QValue3DAxisFormatterPrivate(QValue3DAxisFormatter *q);
-    virtual ~QValue3DAxisFormatterPrivate();
+    QLogValue3DAxisFormatterPrivate(QLogValue3DAxisFormatter *q);
+    virtual ~QLogValue3DAxisFormatterPrivate();
 
     void recalculate();
-    void doRecalculate();
-    void populateCopy(QValue3DAxisFormatter &copy);
-    void doPopulateCopy(QValue3DAxisFormatterPrivate &copy);
+    void populateCopy(QValue3DAxisFormatter &copy) const;
 
-    QString labelForIndex(int index) const;
-    QString stringForValue(float value, const QString &format);
     float positionAt(float value) const;
     float valueAt(float position) const;
-
-    void setAxis(QValue3DAxis *axis);
-    void resetPositionArrays();
-    void markDirty(bool labelsChange);
-
-public slots:
-    void markDirtyNoLabelChange();
+    QString labelForIndex(int index) const;
 
 protected:
-    QValue3DAxisFormatter *q_ptr;
+    QLogValue3DAxisFormatter *qptr();
 
-    bool m_needsRecalculate;
+    qreal m_base;
+    qreal m_logMin;
+    qreal m_logMax;
+    qreal m_logRangeNormalizer;
+    bool m_autoSubGrid;
+    bool m_showMaxLabel;
 
-    float m_min;
-    float m_max;
-    float m_rangeNormalizer;
+private:
+    bool m_evenSegments;
 
-    QVector<float> m_gridPositions;
-    QVector<QVector<float> > m_subGridPositions;
-    QVector<float> m_labelPositions;
-
-    QValue3DAxis *m_axis;
-
-    QString m_previousLabelFormat;
-    QByteArray m_labelFormatArray;
-    Utils::ParamType m_preparsedParamType;
-
-    friend class QValue3DAxisFormatter;
+    friend class QLogValue3DAxisFormatter;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

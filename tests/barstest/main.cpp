@@ -33,6 +33,7 @@
 #include <QPainter>
 #include <QColorDialog>
 #include <QLineEdit>
+#include <QSpinBox>
 
 int main(int argc, char **argv)
 {
@@ -292,6 +293,11 @@ int main(int argc, char **argv)
     shadowQuality->setCurrentIndex(5);
 
     QLineEdit *valueAxisFormatEdit = new QLineEdit(widget);
+    QLineEdit *logBaseEdit = new QLineEdit(widget);
+    QSpinBox *valueAxisSegmentsSpin = new QSpinBox(widget);
+    valueAxisSegmentsSpin->setMinimum(1);
+    valueAxisSegmentsSpin->setMaximum(100);
+    valueAxisSegmentsSpin->setValue(10);
 
     vLayout->addWidget(addDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addMultiDataButton, 0, Qt::AlignTop);
@@ -320,7 +326,6 @@ int main(int argc, char **argv)
     vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
     vLayout->addWidget(primarySeriesTestsButton, 0, Qt::AlignTop);
     vLayout->addWidget(toggleRotationButton, 0, Qt::AlignTop);
-    vLayout->addWidget(logAxisButton, 0, Qt::AlignTop);
     vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
@@ -349,7 +354,12 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")), 0, Qt::AlignTop);
     vLayout2->addWidget(fontSizeSlider, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Value axis format")), 0, Qt::AlignTop);
-    vLayout2->addWidget(valueAxisFormatEdit, 1, Qt::AlignTop);
+    vLayout2->addWidget(valueAxisFormatEdit, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Log axis base")), 0, Qt::AlignTop);
+    vLayout2->addWidget(logBaseEdit, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Value axis segments")), 0, Qt::AlignTop);
+    vLayout2->addWidget(valueAxisSegmentsSpin, 0, Qt::AlignTop);
+    vLayout->addWidget(logAxisButton, 1, Qt::AlignTop);
     // TODO: Add example for setMeshFileName
 
     widget->show();
@@ -387,6 +397,10 @@ int main(int argc, char **argv)
                      &GraphModifier::changeFontSize);
     QObject::connect(valueAxisFormatEdit, &QLineEdit::textEdited, modifier,
                      &GraphModifier::changeValueAxisFormat);
+    QObject::connect(logBaseEdit, &QLineEdit::textEdited, modifier,
+                     &GraphModifier::changeLogBase);
+    QObject::connect(valueAxisSegmentsSpin, SIGNAL(valueChanged(int)), modifier,
+                     SLOT(changeValueAxisSegments(int)));
 
     QObject::connect(multiScaleButton, &QPushButton::clicked, modifier,
                      &GraphModifier::toggleMultiseriesScaling);

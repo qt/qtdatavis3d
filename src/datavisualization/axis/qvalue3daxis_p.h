@@ -46,11 +46,12 @@ public:
     virtual void setMin(float min);
     virtual void setMax (float max);
 
+    void emitLabelsChanged();
+
 signals:
     void formatterDirty();
 
 protected:
-    void emitLabelsChanged();
     virtual void updateLabels();
 
     virtual bool allowZero();

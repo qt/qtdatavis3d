@@ -105,7 +105,7 @@ void QValue3DAxis::setSegmentCount(int count)
                    << count << "-> 1";
         count = 1;
     }
-    if (dptr()->m_segmentCount != count){
+    if (dptr()->m_segmentCount != count) {
         dptr()->m_segmentCount = count;
         dptr()->emitLabelsChanged();
         emit segmentCountChanged(count);
@@ -270,10 +270,8 @@ void QValue3DAxisPrivate::updateLabels()
     newLabels.reserve(m_segmentCount + 1);
 
     m_formatter->d_ptr->recalculate();
-    for (int i = 0; i <= m_segmentCount; i++) {
-        float value = m_formatter->valueAt(m_formatter->gridPositions().at(i));
-        newLabels.append(m_formatter->stringForValue(value, m_labelFormat));
-    }
+    for (int i = 0; i <= m_segmentCount; i++)
+        newLabels.append(m_formatter->labelForIndex(i));
 
     if (m_labels != newLabels)
         m_labels = newLabels;

@@ -20,13 +20,14 @@
 #include "custominputhandler.h"
 #include <QtDataVisualization/qcategory3daxis.h>
 #include <QtDataVisualization/qvalue3daxis.h>
-#include <QtDataVisualization/qvalue3daxisformatter.h>
+#include <QtDataVisualization/qlogvalue3daxisformatter.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/q3dinputhandler.h>
-#include <QTime>
+#include <QtCore/QTime>
+#include <QtCore/qmath.h>
 
 using namespace QtDataVisualization;
 
@@ -43,7 +44,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_barSpacingX(0.1f),
       m_barSpacingZ(0.1f),
       m_fontSize(20),
-      m_segments(4),
+      m_segments(10),
       m_subSegments(3),
       m_minval(-16.0f),
       m_maxval(20.0f),
@@ -222,6 +223,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
                      &GraphModifier::handleValueAxisChanged);
     QObject::connect(m_graph, &Q3DBars::primarySeriesChanged, this,
                      &GraphModifier::handlePrimarySeriesChanged);
+    QObject::connect(m_temperatureAxis, &QAbstract3DAxis::labelsChanged, this,
+                     &GraphModifier::handleValueAxisLabelsChanged);
 
     QObject::connect(&m_insertRemoveTimer, &QTimer::timeout, this,
                      &GraphModifier::insertRemoveTimerTimeout);
@@ -1047,20 +1050,105 @@ void GraphModifier::toggleRotation()
 
 void GraphModifier::useLogAxis()
 {
-    // TODO proper log axis test
+    static int counter = -1;
+    static QLogValue3DAxisFormatter *logFormatter = new QLogValue3DAxisFormatter;
+
+    counter++;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << "Case" << counter << ": Default log axis";
+        logFormatter = new QLogValue3DAxisFormatter;
+        m_graph->valueAxis()->setFormatter(logFormatter);
+        m_graph->valueAxis()->setRange(1.0f, 1200.0f);
+        m_graph->valueAxis()->setLabelFormat(QStringLiteral("%.3f"));
+        break;
+    }
+    case 1: {
+        qDebug() << "Case" << counter << ": Hide max label";
+        logFormatter->setShowMaxLabel(false);
+        break;
+    }
+    case 2: {
+        qDebug() << "Case" << counter << ": Try to hide subgrid unsuccessfully";
+        m_graph->valueAxis()->setSubSegmentCount(1);
+        break;
+    }
+    case 3: {
+        qDebug() << "Case" << counter << ": Hide subgrid property";
+        logFormatter->setAutoSubGrid(false);
+        m_graph->valueAxis()->setSubSegmentCount(1);
+        break;
+    }
+    case 4: {
+        qDebug() << "Case" << counter << ": Different base: 2";
+        logFormatter->setBase(2.0f);
+        logFormatter->setAutoSubGrid(true);
+        break;
+    }
+    case 5: {
+        qDebug() << "Case" << counter << ": Different base: 16";
+        logFormatter->setBase(16.0f);
+        break;
+    }
+    case 6: {
+        qDebug() << "Case" << counter << ": Invalid bases";
+        logFormatter->setBase(-1.0f);
+        logFormatter->setBase(1.0f);
+        break;
+    }
+    case 7: {
+        qDebug() << "Case" << counter << ": Zero base";
+        logFormatter->setBase(0.0f);
+        break;
+    }
+    case 8: {
+        qDebug() << "Case" << counter << ": Explicit ranges and segments";
+        int segmentCount = 6;
+        int base = 4;
+        m_graph->valueAxis()->setSegmentCount(segmentCount);
+        m_graph->valueAxis()->setSubSegmentCount(base - 1);
+        m_graph->valueAxis()->setRange(1.0f / float(base * base), qPow(base, segmentCount - 2));
+        break;
+    }
+    case 9: {
+        qDebug() << "Case" << counter << ": Negative range";
+        m_graph->valueAxis()->setRange(-20.0f, 50.0f);
+        break;
+    }
+    case 10: {
+        qDebug() << "Case" << counter << ": Non-integer base";
+        logFormatter->setBase(3.3f);
+        logFormatter->setAutoSubGrid(true);
+        break;
+    }
+    default:
+        qDebug() << "Resetting logaxis test";
+        counter = -1;
+        break;
+    }
 
 
-//    // Change y-axis to log axis
-//    QValue3DAxis *logAxis = new QValue3DAxis;
-//    logAxis->formatter()->setBase(10);
-//    logAxis->setSegmentCount(5);
-//    logAxis->setRange(1, 100000);
-    //    m_graph->setValueAxis(logAxis);
 }
 
 void GraphModifier::changeValueAxisFormat(const QString & text)
 {
     m_graph->valueAxis()->setLabelFormat(text);
+}
+
+void GraphModifier::changeLogBase(const QString &text)
+{
+    QLogValue3DAxisFormatter *formatter =
+        qobject_cast<QLogValue3DAxisFormatter *>(m_graph->valueAxis()->formatter());
+    if (formatter)
+        formatter->setBase(qreal(text.toDouble()));
+}
+
+void GraphModifier::changeValueAxisSegments(int value)
+{
+    qDebug() << __FUNCTION__ << value;
+    m_segments = value;
+    m_graph->valueAxis()->setSegmentCount(m_segments);
 }
 
 void GraphModifier::insertRemoveTimerTimeout()
@@ -1117,6 +1205,11 @@ void GraphModifier::triggerRotation()
         if (m_graph->seriesList().size())
             m_graph->seriesList().at(0)->setMeshAngle(seriesAngle++);
     }
+}
+
+void GraphModifier::handleValueAxisLabelsChanged()
+{
+    qDebug() << __FUNCTION__;
 }
 
 void GraphModifier::setBackgroundEnabled(int enabled)

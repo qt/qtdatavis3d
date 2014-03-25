@@ -33,6 +33,7 @@
 #include "labelitem_p.h"
 #include "qabstract3daxis_p.h"
 #include "drawer_p.h"
+#include <QtCore/QPointer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -66,11 +67,11 @@ public:
         m_formatter = formatter; m_positionsDirty = true;
     }
     inline QValue3DAxisFormatter *formatter() const { return m_formatter; }
-    inline void setCtrlFormatter(const QValue3DAxisFormatter *formatter)
+    inline void setCtrlFormatter(QValue3DAxisFormatter *formatter)
     {
         m_ctrlFormatter = formatter;
     }
-    inline const QValue3DAxisFormatter *ctrlFormatter() const { return m_ctrlFormatter; }
+    inline QValue3DAxisFormatter *ctrlFormatter() const { return m_ctrlFormatter; }
 
     inline LabelItem &titleItem() { return m_titleItem; }
     inline QList<LabelItem *> &labelItems() { return m_labelItems; }
@@ -80,6 +81,7 @@ public:
     inline int labelCount() { return m_adjustedLabelPositions.size(); }
     void updateAllPositions();
     inline bool positionsDirty() const { return m_positionsDirty; }
+    inline void markPositionsDirty() { m_positionsDirty = true; }
     inline void setTranslate(float translate) { m_translate = translate; m_positionsDirty = true; }
     inline float translate() { return m_translate; }
     inline void setScale(float scale) { m_scale = scale; m_positionsDirty = true; }
@@ -106,7 +108,7 @@ private:
     QString m_labelFormat;
     QFont m_font;
     QValue3DAxisFormatter *m_formatter;
-    const QValue3DAxisFormatter *m_ctrlFormatter;
+    QPointer<QValue3DAxisFormatter> m_ctrlFormatter;
 
     // Renderer items
     Drawer *m_drawer; // Not owned

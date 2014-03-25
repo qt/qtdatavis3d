@@ -87,6 +87,7 @@ public:
     void toggleRotation();
     void useLogAxis();
     void changeValueAxisFormat(const QString & text);
+    void changeLogBase(const QString & text);
 
 public slots:
     void flipViews();
@@ -96,6 +97,7 @@ public slots:
     void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void handleSelectionChange(const QPoint &position);
     void setUseNullInputHandler(bool useNull);
+    void changeValueAxisSegments(int value);
 
     void handleRowAxisChanged(QCategory3DAxis *axis);
     void handleColumnAxisChanged(QCategory3DAxis *axis);
@@ -105,6 +107,7 @@ public slots:
     void insertRemoveTimerTimeout();
     void triggerSelection();
     void triggerRotation();
+    void handleValueAxisLabelsChanged();
 
 signals:
     void shadowQualityChanged(int quality);

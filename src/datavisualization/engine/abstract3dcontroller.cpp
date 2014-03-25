@@ -183,6 +183,31 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.selectionModeChanged = false;
     }
 
+    if (m_changeTracker.axisXFormatterChanged) {
+        m_changeTracker.axisXFormatterChanged = false;
+        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationX,
+                                            valueAxisX->formatter());
+        }
+    }
+    if (m_changeTracker.axisYFormatterChanged) {
+        m_changeTracker.axisYFormatterChanged = false;
+        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationY,
+                                            valueAxisY->formatter());
+        }
+    }
+    if (m_changeTracker.axisZFormatterChanged) {
+        m_changeTracker.axisZFormatterChanged = false;
+        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationZ,
+                                            valueAxisZ->formatter());
+        }
+    }
+
     if (m_changeTracker.axisXTypeChanged) {
         m_renderer->updateAxisType(QAbstract3DAxis::AxisOrientationX, m_axisX->type());
         m_changeTracker.axisXTypeChanged = false;
@@ -323,31 +348,6 @@ void Abstract3DController::synchDataToRenderer()
             QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
             m_renderer->updateAxisLabelFormat(QAbstract3DAxis::AxisOrientationZ,
                                               valueAxisZ->labelFormat());
-        }
-    }
-
-    if (m_changeTracker.axisXFormatterChanged) {
-        m_changeTracker.axisXFormatterChanged = false;
-        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
-            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationX,
-                                            valueAxisX->formatter());
-        }
-    }
-    if (m_changeTracker.axisYFormatterChanged) {
-        m_changeTracker.axisYFormatterChanged = false;
-        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
-            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationY,
-                                            valueAxisY->formatter());
-        }
-    }
-    if (m_changeTracker.axisZFormatterChanged) {
-        m_changeTracker.axisZFormatterChanged = false;
-        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
-            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationZ,
-                                            valueAxisZ->formatter());
         }
     }
 

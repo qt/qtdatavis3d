@@ -43,12 +43,14 @@ protected:
     virtual bool allowZero() const;
     virtual QValue3DAxisFormatter *createNewInstance() const;
     virtual void recalculate();
+    virtual QString labelForIndex(int index) const;
     virtual QString stringForValue(float value, const QString &format) const;
     virtual float positionAt(float value) const;
     virtual float valueAt(float position) const;
     virtual void populateCopy(QValue3DAxisFormatter &copy) const;
 
-    void markDirty();
+    void resetPositionArrays();
+    void markDirty(bool labelsChange = false);
     QValue3DAxis *axis() const;
 
     QVector<float> &gridPositions() const;
@@ -67,6 +69,7 @@ private:
     friend class Surface3DRenderer;
     friend class SurfaceObject;
     friend class QValue3DAxisFormatterPrivate;
+    friend class QLogValue3DAxisFormatter;
     friend class QValue3DAxis;
     friend class QValue3DAxisPrivate;
     friend class AxisRenderCache;

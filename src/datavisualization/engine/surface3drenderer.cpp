@@ -900,6 +900,7 @@ void Surface3DRenderer::drawSlicedScene()
         // Vertical lines
         QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
 
+        gridLineCount = sliceCache.gridLineCount();
         for (int line = 0; line < gridLineCount; line++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
