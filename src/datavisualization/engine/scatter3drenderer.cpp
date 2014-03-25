@@ -730,7 +730,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
             if (useColor) {
-                if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
+                if (colorStyle == Q3DTheme::ColorStyleRangeGradient &&
+                        (m_selectedItemTotalIndex != dotNo)) {
                     // Drawing points with range gradient
                     // Get color from gradient based on items y position converted to percents
                     int position = int(item.translation().y() * 50.0f) + 50;
