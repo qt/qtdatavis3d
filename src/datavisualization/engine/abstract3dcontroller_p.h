@@ -38,6 +38,7 @@
 #include <QtGui/QLinearGradient>
 
 class QFont;
+class QOpenGLFramebufferObject;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
