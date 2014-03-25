@@ -138,6 +138,16 @@ QVector3D Utils::getSelection(QPoint mousepos, int height)
     return selectedColor;
 }
 
+QImage Utils::getGradientImage(const QLinearGradient &gradient)
+{
+    QImage image(QSize(1, 101), QImage::Format_RGB32);
+    QPainter pmp(&image);
+    pmp.setBrush(QBrush(gradient));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 1, 101);
+    return image;
+}
+
 Utils::ParamType Utils::mapFormatCharToParamType(const QChar &formatChar)
 {
     ParamType retVal = ParamTypeUnknown;

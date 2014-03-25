@@ -37,6 +37,7 @@ class QPainter;
 class QString;
 class QPoint;
 class QImage;
+class QLinearGradient;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -63,6 +64,7 @@ public:
                                    bool borders = false,
                                    int maxLabelWidth = 0);
     static QVector3D getSelection(QPoint mousepos, int height);
+    static QImage getGradientImage(const QLinearGradient &gradient);
 
     static ParamType findFormatParamType(const QString &format);
     static QString formatLabel(const QByteArray &format, ParamType paramType, float value);

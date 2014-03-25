@@ -323,8 +323,6 @@
         \li Q3DLight class (and Light3D QML item) are currently not usable for anything.
         \li Changing any of Q3DScene properties affecting subviewports currently has no effect.
         \li The color style Q3DTheme::ColorStyleObjectGradient doesn't work for surface graphs.
-        \li Scatter "point" meshes (QAbstract3DSeries::MeshPoint) do not support gradients, they
-            always use the base color.
         \li Widget based examples layout incorrectly in iOS.
         \li Reparenting a graph to an item in another QQuickWindow is not supported.
     \endlist

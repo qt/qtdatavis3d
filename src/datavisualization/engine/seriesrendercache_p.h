@@ -60,6 +60,7 @@ public:
     inline const QVector3D &baseColor() const { return m_baseColor; }
     inline const GLuint &baseUniformTexture() const { return m_baseUniformTexture; }
     inline const GLuint &baseGradientTexture() const { return m_baseGradientTexture; }
+    inline const QImage &gradientImage() const { return m_gradientImage; }
     inline const QVector3D &singleHighlightColor() const { return m_singleHighlightColor; }
     inline const GLuint &singleHighlightGradientTexture() const { return m_singleHighlightGradientTexture; }
     inline const QVector3D &multiHighlightColor() const { return m_multiHighlightColor; }
@@ -77,6 +78,7 @@ protected:
     QVector3D m_baseColor;
     GLuint m_baseUniformTexture;
     GLuint m_baseGradientTexture;
+    QImage m_gradientImage;
     QVector3D m_singleHighlightColor;
     GLuint m_singleHighlightGradientTexture;
     QVector3D m_multiHighlightColor;

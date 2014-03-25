@@ -32,6 +32,7 @@ SeriesRenderCache::SeriesRenderCache()
       m_mesh(QAbstract3DSeries::MeshCube),
       m_baseUniformTexture(0),
       m_baseGradientTexture(0),
+      m_gradientImage(0),
       m_singleHighlightGradientTexture(0),
       m_multiHighlightGradientTexture(0)
 {
@@ -150,6 +151,7 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
 
     if (seriesChanged || changeTracker.baseGradientChanged) {
         QLinearGradient gradient = series->baseGradient();
+        m_gradientImage = Utils::getGradientImage(gradient);
         renderer->fixGradientAndGenerateTexture(&gradient, &m_baseGradientTexture);
         changeTracker.baseGradientChanged = false;
     }

@@ -102,7 +102,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *         Arrow pointing upwards.
  *  \value MeshPoint
  *         2D point. Usable only with Q3DScatter.
- *         \b Note: Shadows and color gradients do not affect this style.
+ *         \b Note: Shadows do not affect this style. Color style Q3DTheme::ColorStyleObjectGradient
+ *         is not supported by this style.
  */
 
 /*!
