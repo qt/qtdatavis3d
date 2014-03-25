@@ -195,8 +195,7 @@
     Series is combination of logically connected set of data items (handled by a data proxy)
     and visual properties that describe how the data items should be rendered, such as item
     meshes and colors. Each visualization type has its own series type. For example, bar graphs
-    use QBar3DSeries. Bar and scatter graphs can have multiple series added simultaneously.
-    Surface graphs support only a single series at a time.
+    use QBar3DSeries. All graphs can have multiple series added simultaneously.
 
     This code snippet shows how to use QBar3DSeries to render bars as cylinders and with a
     gradient instead of a uniform color:
