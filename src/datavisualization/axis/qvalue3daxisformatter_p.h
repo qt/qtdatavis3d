@@ -52,12 +52,12 @@ public:
     void doPopulateCopy(QValue3DAxisFormatterPrivate &copy);
 
     QString labelForIndex(int index) const;
-    QString stringForValue(float value, const QString &format);
+    QString stringForValue(qreal value, const QString &format);
     float positionAt(float value) const;
     float valueAt(float position) const;
 
     void setAxis(QValue3DAxis *axis);
-    void resetPositionArrays();
+    void resetArrays();
     void markDirty(bool labelsChange);
 
 public slots:
@@ -73,8 +73,9 @@ protected:
     float m_rangeNormalizer;
 
     QVector<float> m_gridPositions;
-    QVector<QVector<float> > m_subGridPositions;
+    QVector<float> m_subGridPositions;
     QVector<float> m_labelPositions;
+    QVector<qreal> m_labelValues;
 
     QValue3DAxis *m_axis;
 

@@ -648,7 +648,7 @@ void Bars3DRenderer::drawSlicedScene()
                 // Create label texture if we need it
                 if (item.sliceLabel().isNull() || m_updateLabels) {
                     QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
-                                item.value(), m_axisCacheY.labelFormat());
+                                qreal(item.value()), m_axisCacheY.labelFormat());
                     item.setSliceLabel(valueLabelText);
                     m_drawer->generateLabelItem(item.sliceLabelItem(), item.sliceLabel());
                     m_updateLabels = false;
@@ -674,7 +674,7 @@ void Bars3DRenderer::drawSlicedScene()
                 // Create label texture if we need it
                 if (item.sliceLabel().isNull() || m_updateLabels) {
                     QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
-                                item.value(), m_axisCacheY.labelFormat());
+                                qreal(item.value()), m_axisCacheY.labelFormat());
                     item.setSliceLabel(valueLabelText);
                     m_drawer->generateLabelItem(item.sliceLabelItem(), item.sliceLabel());
                     m_updateLabels = false;
@@ -1822,7 +1822,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 // Custom format expects printf format specifier. There is no tag for it.
                 labelText = m_axisCacheY.formatter()->stringForValue(
-                            selectedBar->value(),
+                            qreal(selectedBar->value()),
                             m_visibleSeriesList[m_visualSelectedBarSeriesIndex].itemLabelFormat());
 
                 int selBarPosRow = selectedBar->position().x();
@@ -1843,7 +1843,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 if (labelText.contains(valueLabelTag)) {
                     QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
-                                selectedBar->value(), m_axisCacheY.labelFormat());
+                                qreal(selectedBar->value()), m_axisCacheY.labelFormat());
                     labelText.replace(valueLabelTag, valueLabelText);
                 }
 

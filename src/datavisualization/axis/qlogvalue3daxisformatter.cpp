@@ -293,6 +293,11 @@ QLogValue3DAxisFormatterPrivate::~QLogValue3DAxisFormatterPrivate()
 
 void QLogValue3DAxisFormatterPrivate::recalculate()
 {
+    // When doing position/value mappings, base doesn't matter, so just use natural logarithm
+    m_logMin = qLn(qreal(m_min));
+    m_logMax = qLn(qreal(m_max));
+    m_logRangeNormalizer = m_logMax - m_logMin;
+
     if (m_base > 0.0) {
         // Update parent axis segment counts
         qreal logMin = qLn(qreal(m_min)) / qLn(m_base);
@@ -309,17 +314,19 @@ void QLogValue3DAxisFormatterPrivate::recalculate()
             m_axis->setSubSegmentCount(subSegmentCount);
         }
 
-        resetPositionArrays();
+        resetArrays();
 
         // Calculate segment positions
         for (int i = 0; i < segmentCount; i++) {
-            float gridValue = float(qreal(i) / logRangeNormalizer);
+            float gridValue = float(i) / float(logRangeNormalizer);
             m_gridPositions[i] = gridValue;
             m_labelPositions[i] = gridValue;
+            m_labelValues[i] = qPow(m_base, qreal(i) + logMin);
         }
         // Ensure max value doesn't suffer from any rounding errors
         m_gridPositions[segmentCount] = 1.0f;
         m_labelPositions[segmentCount] = 1.0f;
+        m_labelValues[segmentCount] = qreal(m_max);
         float lastDiff = 1.0f - m_labelPositions.at(segmentCount - 1);
         float firstDiff = m_labelPositions.at(1) - m_labelPositions.at(0);
         m_evenSegments = qFuzzyCompare(lastDiff, firstDiff);
@@ -327,13 +334,15 @@ void QLogValue3DAxisFormatterPrivate::recalculate()
         // Grid lines and label positions are the same as the parent class, so call parent impl
         // first to populate those
         QValue3DAxisFormatterPrivate::doRecalculate();
+
+        // Label value array needs to be repopulated
+        qreal segmentStep = 1.0 / qreal(m_axis->segmentCount());
+        for (int i = 0; i < m_labelPositions.size(); i++)
+            m_labelValues[i] = qExp(segmentStep * qreal(i) * m_logRangeNormalizer + m_logMin);
+
         m_evenSegments = true;
     }
 
-    // When doing position/value mappings, base doesn't matter, so just use natural logarithm
-    m_logMin = qLn(qreal(m_min));
-    m_logMax = qLn(qreal(m_max));
-    m_logRangeNormalizer = m_logMax - m_logMin;
 
     // Subgrid line positions are logarithmically spaced
     int subGridCount = m_axis->subSegmentCount() - 1;
@@ -355,8 +364,8 @@ void QLogValue3DAxisFormatterPrivate::recalculate()
             for (int j = 0; j < subGridCount; j++) {
                 float position = m_gridPositions.at(i) + actualSubSegmentSteps.at(j);
                 if (position > 1.0f)
-                    position  = 1.0f;
-                m_subGridPositions[i][j] = position;
+                    position = 1.0f;
+                m_subGridPositions[i * subGridCount + j] = position;
             }
         }
     }

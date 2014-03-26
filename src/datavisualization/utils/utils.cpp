@@ -187,7 +187,7 @@ Utils::ParamType Utils::findFormatParamType(const QString &format)
     return ParamTypeUnknown;
 }
 
-QString Utils::formatLabel(const QByteArray &format, ParamType paramType, float value)
+QString Utils::formatLabel(const QByteArray &format, ParamType paramType, qreal value)
 {
     switch (paramType) {
     case ParamTypeInt:

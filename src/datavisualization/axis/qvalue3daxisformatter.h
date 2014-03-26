@@ -44,18 +44,19 @@ protected:
     virtual QValue3DAxisFormatter *createNewInstance() const;
     virtual void recalculate();
     virtual QString labelForIndex(int index) const;
-    virtual QString stringForValue(float value, const QString &format) const;
+    virtual QString stringForValue(qreal value, const QString &format) const;
     virtual float positionAt(float value) const;
     virtual float valueAt(float position) const;
     virtual void populateCopy(QValue3DAxisFormatter &copy) const;
 
-    void resetPositionArrays();
+    void resetArrays();
     void markDirty(bool labelsChange = false);
     QValue3DAxis *axis() const;
 
     QVector<float> &gridPositions() const;
-    QVector<QVector<float> > &subGridPositions() const;
+    QVector<float> &subGridPositions() const;
     QVector<float> &labelPositions() const;
+    QVector<qreal> &labelValues() const;
 
     QScopedPointer<QValue3DAxisFormatterPrivate> d_ptr;
 

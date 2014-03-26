@@ -119,29 +119,28 @@ void AxisRenderCache::updateAllPositions()
     // by caching all grid and subgrid positions into a single vector.
     // If subgrid lines are ever themed separately, this array will probably become obsolete.
     if (m_formatter) {
-        int subGridCount = m_subSegmentCount - 1;
-        int fullSize = m_segmentCount + 1 + (m_segmentCount * subGridCount);
+        int gridCount = m_formatter->gridPositions().size();
+        int subGridCount = m_formatter->subGridPositions().size();
+        int labelCount = m_formatter->labelPositions().size();
+        int fullSize = gridCount + subGridCount;
+
         m_adjustedGridLinePositions.resize(fullSize);
-        m_adjustedLabelPositions.resize(m_segmentCount + 1);
+        m_adjustedLabelPositions.resize(labelCount);
         int index = 0;
-        int segment = 0;
-        for (; segment < m_segmentCount; segment++) {
-            m_adjustedLabelPositions[segment] =
-                    m_formatter->labelPositions().at(segment) * m_scale + m_translate;
-            m_adjustedGridLinePositions[index++] =
-                    m_formatter->gridPositions().at(segment) * m_scale + m_translate;
-            if (subGridCount > 0) {
-                for (int subGrid = 0; subGrid < subGridCount; subGrid++) {
-                    m_adjustedGridLinePositions[index++] =
-                            m_formatter->subGridPositions().at(segment).at(subGrid) * m_scale + m_translate;
-                }
-            }
+        int grid = 0;
+        int label = 0;
+        for (; label < labelCount; label++) {
+            m_adjustedLabelPositions[label] =
+                    m_formatter->labelPositions().at(label) * m_scale + m_translate;
         }
-        // Last gridline
-        m_adjustedLabelPositions[segment] =
-                m_formatter->labelPositions().at(segment) * m_scale + m_translate;
-        m_adjustedGridLinePositions[index] =
-                m_formatter->gridPositions().at(segment) * m_scale + m_translate;
+        for (; grid < gridCount; grid++) {
+            m_adjustedGridLinePositions[index++] =
+                    m_formatter->gridPositions().at(grid) * m_scale + m_translate;
+        }
+        for (int subGrid = 0; subGrid < subGridCount; subGrid++) {
+            m_adjustedGridLinePositions[index++] =
+                    m_formatter->subGridPositions().at(subGrid) * m_scale + m_translate;
+        }
 
         m_positionsDirty = false;
     }

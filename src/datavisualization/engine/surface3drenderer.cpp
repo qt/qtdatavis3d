@@ -2242,17 +2242,17 @@ QString Surface3DRenderer::createSelectionLabel(SurfaceSeriesRenderCache *cache,
 
     if (labelText.contains(xLabelTag)) {
         QString valueLabelText = m_axisCacheX.formatter()->stringForValue(
-                    dataArray.at(row)->at(column).x(), m_axisCacheX.labelFormat());
+                    qreal(dataArray.at(row)->at(column).x()), m_axisCacheX.labelFormat());
         labelText.replace(xLabelTag, valueLabelText);
     }
     if (labelText.contains(yLabelTag)) {
         QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
-                    dataArray.at(row)->at(column).y(), m_axisCacheY.labelFormat());
+                    qreal(dataArray.at(row)->at(column).y()), m_axisCacheY.labelFormat());
         labelText.replace(yLabelTag, valueLabelText);
     }
     if (labelText.contains(zLabelTag)) {
         QString valueLabelText = m_axisCacheZ.formatter()->stringForValue(
-                    dataArray.at(row)->at(column).z(), m_axisCacheZ.labelFormat());
+                    qreal(dataArray.at(row)->at(column).z()), m_axisCacheZ.labelFormat());
         labelText.replace(zLabelTag, valueLabelText);
     }
 

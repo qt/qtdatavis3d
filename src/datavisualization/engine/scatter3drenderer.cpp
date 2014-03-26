@@ -1463,17 +1463,17 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 if (labelText.contains(xLabelTag)) {
                     QString valueLabelText = m_axisCacheX.formatter()->stringForValue(
-                                selectedItem->position().x(), m_axisCacheX.labelFormat());
+                                qreal(selectedItem->position().x()), m_axisCacheX.labelFormat());
                     labelText.replace(xLabelTag, valueLabelText);
                 }
                 if (labelText.contains(yLabelTag)) {
                     QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
-                                selectedItem->position().y(), m_axisCacheY.labelFormat());
+                                qreal(selectedItem->position().y()), m_axisCacheY.labelFormat());
                     labelText.replace(yLabelTag, valueLabelText);
                 }
                 if (labelText.contains(zLabelTag)) {
                     QString valueLabelText = m_axisCacheZ.formatter()->stringForValue(
-                                selectedItem->position().z(), m_axisCacheZ.labelFormat());
+                                qreal(selectedItem->position().z()), m_axisCacheZ.labelFormat());
                     labelText.replace(zLabelTag, valueLabelText);
                 }
                 labelText.replace(seriesNameTag,
