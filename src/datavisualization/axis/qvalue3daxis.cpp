@@ -266,11 +266,13 @@ void QValue3DAxisPrivate::updateLabels()
 
     m_labelsDirty = false;
 
+    int labelCount = m_formatter->labelPositions().size();
+
     QStringList newLabels;
-    newLabels.reserve(m_segmentCount + 1);
+    newLabels.reserve(labelCount);
 
     m_formatter->d_ptr->recalculate();
-    for (int i = 0; i <= m_segmentCount; i++)
+    for (int i = 0; i < labelCount; i++)
         newLabels.append(m_formatter->labelForIndex(i));
 
     if (m_labels != newLabels)

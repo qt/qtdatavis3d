@@ -49,7 +49,6 @@ protected:
     virtual float valueAt(float position) const;
     virtual void populateCopy(QValue3DAxisFormatter &copy) const;
 
-    void resetArrays();
     void markDirty(bool labelsChange = false);
     QValue3DAxis *axis() const;
 

@@ -434,7 +434,7 @@ void Bars3DRenderer::drawSlicedScene()
 
             // Draw grid labels
             int labelNbr = 0;
-            int labelCount = m_axisCacheY.labels().size();
+            int labelCount = m_axisCacheY.labelCount();
             QVector3D backLabelRotation(0.0f, 0.0f, 0.0f);
             QVector3D labelTrans = QVector3D(scaleFactor + labelMargin, 0.0f, 0.0f);
 
@@ -1665,7 +1665,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Y Labels
     int labelNbr = 0;
-    int labelCount = m_axisCacheY.labels().size();
+    int labelCount = m_axisCacheY.labelCount();
     GLfloat labelMarginXTrans = labelMargin;
     GLfloat labelMarginZTrans = labelMargin;
     GLfloat labelXTrans = rowScaleFactor;

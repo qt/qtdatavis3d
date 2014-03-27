@@ -57,7 +57,6 @@ public:
     float valueAt(float position) const;
 
     void setAxis(QValue3DAxis *axis);
-    void resetArrays();
     void markDirty(bool labelsChange);
 
 public slots:

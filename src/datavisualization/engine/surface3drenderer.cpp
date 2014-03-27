@@ -1739,7 +1739,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Z Labels
     QVector3D positionZComp(0.0f, 0.0f, 0.0f);
     if (m_axisCacheZ.segmentCount() > 0) {
-        int labelCount = m_axisCacheZ.labelItems().size();
+        int labelCount = m_axisCacheZ.labelCount();
         int labelNbr = 0;
         GLfloat labelXTrans = m_scaleXWithBackground + labelMargin;
         GLfloat labelYTrans = -backgroundMargin;
@@ -1781,7 +1781,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     }
     // X Labels
     if (m_axisCacheX.segmentCount() > 0) {
-        int labelCount = m_axisCacheX.labelItems().size();
+        int labelCount = m_axisCacheX.labelCount();
 
         int labelNbr = 0;
         GLfloat labelZTrans = m_scaleZWithBackground + labelMargin;
@@ -1824,7 +1824,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     }
     // Y Labels
     if (m_axisCacheY.segmentCount() > 0) {
-        int labelCount = m_axisCacheY.labelItems().size();
+        int labelCount = m_axisCacheY.labelCount();
 
         int labelNbr = 0;
         GLfloat labelXTrans = m_scaleXWithBackground;

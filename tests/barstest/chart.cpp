@@ -1052,7 +1052,7 @@ void GraphModifier::useLogAxis()
 {
     static int counter = -1;
     static QLogValue3DAxisFormatter *logFormatter = new QLogValue3DAxisFormatter;
-
+    static float minRange = 1.0f;
     counter++;
 
     switch (counter) {
@@ -1060,13 +1060,13 @@ void GraphModifier::useLogAxis()
         qDebug() << "Case" << counter << ": Default log axis";
         logFormatter = new QLogValue3DAxisFormatter;
         m_graph->valueAxis()->setFormatter(logFormatter);
-        m_graph->valueAxis()->setRange(1.0f, 1200.0f);
+        m_graph->valueAxis()->setRange(minRange, 1200.0f);
         m_graph->valueAxis()->setLabelFormat(QStringLiteral("%.3f"));
         break;
     }
     case 1: {
         qDebug() << "Case" << counter << ": Hide max label";
-        logFormatter->setShowMaxLabel(false);
+        logFormatter->setShowEdgeLabels(false);
         break;
     }
     case 2: {
@@ -1124,6 +1124,7 @@ void GraphModifier::useLogAxis()
     }
     default:
         qDebug() << "Resetting logaxis test";
+        minRange++;
         counter = -1;
         break;
     }

@@ -1262,7 +1262,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Z Labels
     if (m_axisCacheZ.segmentCount() > 0) {
-        int labelCount = m_axisCacheZ.labelItems().size();
+        int labelCount = m_axisCacheZ.labelCount();
 #ifndef USE_UNIFORM_SCALING
         GLfloat labelXTrans = (aspectRatio * m_areaSize.width())
                 / m_scaleFactor + labelMargin + m_backgroundMargin;
@@ -1310,7 +1310,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     }
     // X Labels
     if (m_axisCacheX.segmentCount() > 0) {
-        int labelCount = m_axisCacheX.labelItems().size();
+        int labelCount = m_axisCacheX.labelCount();
 #ifndef USE_UNIFORM_SCALING
         GLfloat labelZTrans = (aspectRatio * m_areaSize.height())
                 / m_scaleFactor + labelMargin + m_backgroundMargin;
@@ -1358,7 +1358,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     }
     // Y Labels
     if (m_axisCacheY.segmentCount() > 0) {
-        int labelCount = m_axisCacheY.labelItems().size();
+        int labelCount = m_axisCacheY.labelCount();
         int labelNbr = 0;
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
         GLfloat labelXTrans = (aspectRatio* m_areaSize.width())

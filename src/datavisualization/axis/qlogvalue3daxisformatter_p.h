@@ -60,10 +60,11 @@ protected:
     qreal m_logMax;
     qreal m_logRangeNormalizer;
     bool m_autoSubGrid;
-    bool m_showMaxLabel;
+    bool m_showEdgeLabels;
 
 private:
-    bool m_evenSegments;
+    bool m_evenMinSegment;
+    bool m_evenMaxSegment;
 
     friend class QLogValue3DAxisFormatter;
 };

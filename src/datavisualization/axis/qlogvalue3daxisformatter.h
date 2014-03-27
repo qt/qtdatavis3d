@@ -31,7 +31,7 @@ class QT_DATAVISUALIZATION_EXPORT QLogValue3DAxisFormatter : public QValue3DAxis
 
     Q_PROPERTY(qreal base READ base WRITE setBase NOTIFY baseChanged)
     Q_PROPERTY(bool autoSubGrid READ autoSubGrid WRITE setAutoSubGrid NOTIFY autoSubGridChanged)
-    Q_PROPERTY(bool showMaxLabel READ showMaxLabel WRITE setShowMaxLabel NOTIFY showMaxLabelChanged)
+    Q_PROPERTY(bool showEdgeLabels READ showEdgeLabels WRITE setShowEdgeLabels NOTIFY showEdgeLabelsChanged)
 
 protected:
     explicit QLogValue3DAxisFormatter(QLogValue3DAxisFormatterPrivate *d, QObject *parent = 0);
@@ -43,13 +43,13 @@ public:
     qreal base() const;
     void setAutoSubGrid(bool enabled);
     bool autoSubGrid() const;
-    void setShowMaxLabel(bool enabled);
-    bool showMaxLabel() const;
+    void setShowEdgeLabels(bool enabled);
+    bool showEdgeLabels() const;
 
 signals:
     void baseChanged(qreal base);
     void autoSubGridChanged(bool enabled);
-    void showMaxLabelChanged(bool enabled);
+    void showEdgeLabelsChanged(bool enabled);
 
 protected:
     virtual bool allowNegatives() const;
