@@ -288,7 +288,7 @@ void QAbstract3DAxisPrivate::updateLabels()
     // Default implementation does nothing
 }
 
-void QAbstract3DAxisPrivate::setRange(float min, float max)
+void QAbstract3DAxisPrivate::setRange(float min, float max, bool suppressWarnings)
 {
     bool adjusted = false;
     if (!allowNegatives()) {
@@ -332,7 +332,7 @@ void QAbstract3DAxisPrivate::setRange(float min, float max)
     }
 
     if (minDirty || maxDirty) {
-        if (adjusted) {
+        if (adjusted && !suppressWarnings) {
             qWarning() << "Warning: Tried to set invalid range for axis."
                           " Range automatically adjusted to a valid one:"
                        << min << "-" << max << "-->" << m_min << "-" << m_max;

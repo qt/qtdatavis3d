@@ -75,12 +75,28 @@ QValue3DAxisFormatter::~QValue3DAxisFormatter()
 }
 
 /*!
+ * Allow the parent axis to have negative values if \a allow is true.
+ */
+void QValue3DAxisFormatter::setAllowNegatives(bool allow)
+{
+    d_ptr->m_allowNegatives = allow;
+}
+
+/*!
  * \return \c true if negative values are valid values for parent axis.
  * The default implementation always returns true.
  */
 bool QValue3DAxisFormatter::allowNegatives() const
 {
-    return true;
+    return d_ptr->m_allowNegatives;
+}
+
+/*!
+ * Allow the parent axis to have zero value if \a allow is true.
+ */
+void QValue3DAxisFormatter::setAllowZero(bool allow)
+{
+    d_ptr->m_allowZero = allow;
 }
 
 /*!
@@ -89,7 +105,7 @@ bool QValue3DAxisFormatter::allowNegatives() const
  */
 bool QValue3DAxisFormatter::allowZero() const
 {
-    return true;
+    return d_ptr->m_allowZero;
 }
 
 /*!
@@ -104,16 +120,16 @@ QValue3DAxisFormatter *QValue3DAxisFormatter::createNewInstance() const
 }
 
 /*!
- * This method resizes and populates the label and grid line position arrays and the label value
+ * This method resizes and populates the label and grid line position arrays and the label strings
  * array, as well as calculates any values needed for mapping between value and position.
  * It is allowed to access the parent axis from inside this function.
  *
- * This method must be reimplemented in a subclass.
+ * This method must be reimplemented in a subclass if the default array contents are not suitable.
  *
- * See gridPositions(), subGridPositions(), labelPositions(), and labelValues() methods for
+ * See gridPositions(), subGridPositions(), labelPositions(), and labelStrings() methods for
  * documentation about the arrays that need to be resized and populated.
  *
- * \sa gridPositions(), subGridPositions(), labelPositions(), labelValues(), axis()
+ * \sa gridPositions(), subGridPositions(), labelPositions(), labelStrings(), axis()
  */
 void QValue3DAxisFormatter::recalculate()
 {
@@ -121,28 +137,14 @@ void QValue3DAxisFormatter::recalculate()
 }
 
 /*!
- * The parent axis uses this method to request axis label strings for label \a index,
- * using the value stored in label values array and QValue3DAxis::labelFormat property.
- * Reimplement this method in a subclass if the default labeling is not sufficient.
- * If an empty string is returned, the label is not shown.
- *
- * \return A string formatted using axis label formatter.
- *
- * \sa stringForValue(), labelValues(), QValue3DAxis::labelFormat
- */
-QString QValue3DAxisFormatter::labelForIndex(int index) const
-{
-    return d_ptr->labelForIndex(index);
-}
-
-/*!
+ * This method is used to format a string using the specified value and the specified format.
  * Reimplement this method in a subclass to resolve the formatted string for a given \a value
  * if the default formatting rules specified for QValue3DAxis::labelFormat property are not
  * sufficient.
  *
- * \return the formatted label string using \a value and \a format.
+ * \return the formatted label string using a \a value and a \a format.
  *
- * \sa recalculate(), labelForIndex(), QValue3DAxis::labelFormat
+ * \sa recalculate(), labelStrings(), QValue3DAxis::labelFormat
  */
 QString QValue3DAxisFormatter::stringForValue(qreal value, const QString &format) const
 {
@@ -257,15 +259,15 @@ QVector<float> &QValue3DAxisFormatter::labelPositions() const
 }
 
 /*!
- * \return a reference to the array of values used to generate label strings.
+ * \return a reference to the string list containing formatter label strings.
  * The array size must be equal to the size of the label positions array and
  * the indexes correspond to that array as well.
  *
  * \sa labelPositions()
  */
-QVector<qreal> &QValue3DAxisFormatter::labelValues() const
+QStringList &QValue3DAxisFormatter::labelStrings() const
 {
-    return d_ptr->m_labelValues;
+    return d_ptr->m_labelStrings;
 }
 
 // QValue3DAxisFormatterPrivate
@@ -277,7 +279,9 @@ QValue3DAxisFormatterPrivate::QValue3DAxisFormatterPrivate(QValue3DAxisFormatter
       m_max(0.0f),
       m_rangeNormalizer(0.0f),
       m_axis(0),
-      m_preparsedParamType(Utils::ParamTypeUnknown)
+      m_preparsedParamType(Utils::ParamTypeUnknown),
+      m_allowNegatives(true),
+      m_allowZero(true)
 {
 }
 
@@ -303,12 +307,14 @@ void QValue3DAxisFormatterPrivate::doRecalculate()
 {
     int segmentCount = m_axis->segmentCount();
     int subGridCount = m_axis->subSegmentCount() - 1;
+    QString labelFormat =  m_axis->labelFormat();
 
     m_gridPositions.resize(segmentCount + 1);
     m_subGridPositions.resize(segmentCount * subGridCount);
 
     m_labelPositions.resize(segmentCount + 1);
-    m_labelValues.resize(segmentCount + 1);
+    m_labelStrings.clear();
+    m_labelStrings.reserve(segmentCount + 1);
 
     // Use qreals for intermediate calculations for better accuracy on label values
     qreal segmentStep = 1.0 / qreal(segmentCount);
@@ -322,7 +328,8 @@ void QValue3DAxisFormatterPrivate::doRecalculate()
         qreal gridValue = segmentStep * qreal(i);
         m_gridPositions[i] = float(gridValue);
         m_labelPositions[i] = float(gridValue);
-        m_labelValues[i] = gridValue * rangeNormalizer + qreal(m_min);
+        m_labelStrings << q_ptr->stringForValue(gridValue * rangeNormalizer + qreal(m_min),
+                                                labelFormat);
         if (m_subGridPositions.size()) {
             for (int j = 0; j < subGridCount; j++)
                 m_subGridPositions[i * subGridCount + j] = gridValue + subSegmentStep * (j + 1);
@@ -332,6 +339,7 @@ void QValue3DAxisFormatterPrivate::doRecalculate()
     // Ensure max value doesn't suffer from any rounding errors
     m_gridPositions[segmentCount] = 1.0f;
     m_labelPositions[segmentCount] = 1.0f;
+    m_labelStrings << q_ptr->stringForValue(qreal(m_max), labelFormat);
 }
 
 void QValue3DAxisFormatterPrivate::populateCopy(QValue3DAxisFormatter &copy)
@@ -349,12 +357,6 @@ void QValue3DAxisFormatterPrivate::doPopulateCopy(QValue3DAxisFormatterPrivate &
     copy.m_gridPositions = m_gridPositions;
     copy.m_labelPositions = m_labelPositions;
     copy.m_subGridPositions = m_subGridPositions;
-}
-
-QString QValue3DAxisFormatterPrivate::labelForIndex(int index) const
-{
-    Q_ASSERT(index < m_labelValues.size());
-    return q_ptr->stringForValue(m_labelValues.at(index), m_axis->labelFormat());
 }
 
 QString QValue3DAxisFormatterPrivate::stringForValue(qreal value, const QString &format)
@@ -383,9 +385,14 @@ void QValue3DAxisFormatterPrivate::setAxis(QValue3DAxis *axis)
 {
     Q_ASSERT(axis);
 
+    // These signals are all connected to markDirtyNoLabelChange slot, even though most of them
+    // do require labels to be regenerated. This is because the label regeneration is triggered
+    // elsewhere in these cases.
     connect(axis, &QValue3DAxis::segmentCountChanged,
             this, &QValue3DAxisFormatterPrivate::markDirtyNoLabelChange);
     connect(axis, &QValue3DAxis::subSegmentCountChanged,
+            this, &QValue3DAxisFormatterPrivate::markDirtyNoLabelChange);
+    connect(axis, &QValue3DAxis::labelFormatChanged,
             this, &QValue3DAxisFormatterPrivate::markDirtyNoLabelChange);
     connect(axis, &QAbstract3DAxis::rangeChanged,
             this, &QValue3DAxisFormatterPrivate::markDirtyNoLabelChange);
@@ -396,10 +403,12 @@ void QValue3DAxisFormatterPrivate::setAxis(QValue3DAxis *axis)
 void QValue3DAxisFormatterPrivate::markDirty(bool labelsChange)
 {
     m_needsRecalculate = true;
-    if (labelsChange)
-        m_axis->dptr()->emitLabelsChanged();
-    if (m_axis && m_axis->orientation() != QAbstract3DAxis::AxisOrientationNone)
-        emit m_axis->dptr()->formatterDirty();
+    if (m_axis) {
+        if (labelsChange)
+            m_axis->dptr()->emitLabelsChanged();
+        if (m_axis && m_axis->orientation() != QAbstract3DAxis::AxisOrientationNone)
+            emit m_axis->dptr()->formatterDirty();
+    }
 }
 
 void QValue3DAxisFormatterPrivate::markDirtyNoLabelChange()

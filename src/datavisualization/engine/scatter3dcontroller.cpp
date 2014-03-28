@@ -407,7 +407,7 @@ void Scatter3DController::adjustValueAxisRange()
                         adjustment = defaultAdjustment;
                 }
             }
-            valueAxisX->dptr()->setRange(minValueX - adjustment, maxValueX + adjustment);
+            valueAxisX->dptr()->setRange(minValueX - adjustment, maxValueX + adjustment, true);
         }
         if (adjustY) {
             // If all points at same coordinate, need to default to some valid range
@@ -415,7 +415,7 @@ void Scatter3DController::adjustValueAxisRange()
             float adjustment = 0.0f;
             if (minValueY == maxValueY)
                 adjustment = defaultAdjustment;
-            valueAxisY->dptr()->setRange(minValueY - adjustment, maxValueY + adjustment);
+            valueAxisY->dptr()->setRange(minValueY - adjustment, maxValueY + adjustment, true);
         }
         if (adjustZ) {
             // If all points at same coordinate, need to default to some valid range
@@ -434,7 +434,7 @@ void Scatter3DController::adjustValueAxisRange()
                         adjustment = defaultAdjustment;
                 }
             }
-            valueAxisZ->dptr()->setRange(minValueZ - adjustment, maxValueZ + adjustment);
+            valueAxisZ->dptr()->setRange(minValueZ - adjustment, maxValueZ + adjustment, true);
         }
     }
 }

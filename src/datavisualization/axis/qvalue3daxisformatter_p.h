@@ -29,7 +29,6 @@
 #include "datavisualizationglobal_p.h"
 #include "qvalue3daxisformatter.h"
 #include "utils_p.h"
-#include <QtCore/QVector>
 
 #ifndef QVALUE3DAXISFORMATTER_P_H
 #define QVALUE3DAXISFORMATTER_P_H
@@ -51,7 +50,6 @@ public:
     void populateCopy(QValue3DAxisFormatter &copy);
     void doPopulateCopy(QValue3DAxisFormatterPrivate &copy);
 
-    QString labelForIndex(int index) const;
     QString stringForValue(qreal value, const QString &format);
     float positionAt(float value) const;
     float valueAt(float position) const;
@@ -74,13 +72,16 @@ protected:
     QVector<float> m_gridPositions;
     QVector<float> m_subGridPositions;
     QVector<float> m_labelPositions;
-    QVector<qreal> m_labelValues;
+    QStringList m_labelStrings;
 
     QValue3DAxis *m_axis;
 
     QString m_previousLabelFormat;
     QByteArray m_labelFormatArray;
     Utils::ParamType m_preparsedParamType;
+
+    bool m_allowNegatives;
+    bool m_allowZero;
 
     friend class QValue3DAxisFormatter;
 };

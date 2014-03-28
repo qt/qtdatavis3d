@@ -24,7 +24,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 {
-    // @uri QtDataVisualization
+    // QtDataVisualization 1.0
+
     qmlRegisterUncreatableType<const QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
                                                          QLatin1String("Trying to create uncreatable: AbstractItemModel."));
     qmlRegisterUncreatableType<QAbstract3DAxis>(uri, 1, 0, "AbstractAxis3D",
@@ -80,6 +81,15 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<DeclarativeSurface3DSeries>(uri, 1, 0, "Surface3DSeries");
 
     qRegisterMetaType<QAbstract3DGraph::ShadowQuality>("QAbstract3DGraph::ShadowQuality");
+
+    // QtDataVisualization 1.1
+
+    // New revisions
+    qmlRegisterType<QValue3DAxis, 1>(uri, 1, 1, "ValueAxis3D");
+
+    // New types
+    qmlRegisterType<QValue3DAxisFormatter>(uri, 1, 1, "ValueAxis3DFormatter");
+    qmlRegisterType<QLogValue3DAxisFormatter>(uri, 1, 1, "LogValueAxis3DFormatter");
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

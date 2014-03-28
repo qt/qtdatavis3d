@@ -52,14 +52,11 @@ signals:
     void showEdgeLabelsChanged(bool enabled);
 
 protected:
-    virtual bool allowNegatives() const;
-    virtual bool allowZero() const;
     virtual QValue3DAxisFormatter *createNewInstance() const;
     virtual void recalculate();
     virtual float positionAt(float value) const;
     virtual float valueAt(float position) const;
     virtual void populateCopy(QValue3DAxisFormatter &copy) const;
-    virtual QString labelForIndex(int index) const;
 
     QLogValue3DAxisFormatterPrivate *dptr();
     const QLogValue3DAxisFormatterPrivate *dptrc() const;

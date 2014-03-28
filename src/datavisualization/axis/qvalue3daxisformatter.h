@@ -22,6 +22,8 @@
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
+#include <QtCore/QVector>
+#include <QtCore/QStringList>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -31,7 +33,6 @@ class QValue3DAxis;
 class QT_DATAVISUALIZATION_EXPORT QValue3DAxisFormatter : public QObject
 {
     Q_OBJECT
-
 protected:
     explicit QValue3DAxisFormatter(QValue3DAxisFormatterPrivate *d, QObject *parent = 0);
 public:
@@ -39,11 +40,13 @@ public:
     virtual ~QValue3DAxisFormatter();
 
 protected:
-    virtual bool allowNegatives() const;
-    virtual bool allowZero() const;
+    void setAllowNegatives(bool allow);
+    bool allowNegatives() const;
+    void setAllowZero(bool allow);
+    bool allowZero() const;
+
     virtual QValue3DAxisFormatter *createNewInstance() const;
     virtual void recalculate();
-    virtual QString labelForIndex(int index) const;
     virtual QString stringForValue(qreal value, const QString &format) const;
     virtual float positionAt(float value) const;
     virtual float valueAt(float position) const;
@@ -55,7 +58,7 @@ protected:
     QVector<float> &gridPositions() const;
     QVector<float> &subGridPositions() const;
     QVector<float> &labelPositions() const;
-    QVector<qreal> &labelValues() const;
+    QStringList &labelStrings() const;
 
     QScopedPointer<QValue3DAxisFormatterPrivate> d_ptr;
 

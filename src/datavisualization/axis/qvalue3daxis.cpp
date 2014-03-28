@@ -223,11 +223,11 @@ QValue3DAxisPrivate::~QValue3DAxisPrivate()
 {
 }
 
-void QValue3DAxisPrivate::setRange(float min, float max)
+void QValue3DAxisPrivate::setRange(float min, float max, bool suppressWarnings)
 {
     bool dirty = (min != m_min || max != m_max);
 
-    QAbstract3DAxisPrivate::setRange(min, max);
+    QAbstract3DAxisPrivate::setRange(min, max, suppressWarnings);
 
     if (dirty)
         emitLabelsChanged();
@@ -266,17 +266,9 @@ void QValue3DAxisPrivate::updateLabels()
 
     m_labelsDirty = false;
 
-    int labelCount = m_formatter->labelPositions().size();
-
-    QStringList newLabels;
-    newLabels.reserve(labelCount);
-
     m_formatter->d_ptr->recalculate();
-    for (int i = 0; i < labelCount; i++)
-        newLabels.append(m_formatter->labelForIndex(i));
 
-    if (m_labels != newLabels)
-        m_labels = newLabels;
+    m_labels = m_formatter->labelStrings();
 }
 
 bool QValue3DAxisPrivate::allowZero()

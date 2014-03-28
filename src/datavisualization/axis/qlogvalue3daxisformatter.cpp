@@ -96,6 +96,8 @@ QLogValue3DAxisFormatter::QLogValue3DAxisFormatter(QLogValue3DAxisFormatterPriva
                                                    QObject *parent) :
     QValue3DAxisFormatter(d, parent)
 {
+    setAllowNegatives(false);
+    setAllowZero(false);
 }
 
 /*!
@@ -104,6 +106,8 @@ QLogValue3DAxisFormatter::QLogValue3DAxisFormatter(QLogValue3DAxisFormatterPriva
 QLogValue3DAxisFormatter::QLogValue3DAxisFormatter(QObject *parent) :
     QValue3DAxisFormatter(new QLogValue3DAxisFormatterPrivate(this), parent)
 {
+    setAllowNegatives(false);
+    setAllowZero(false);
 }
 
 /*!
@@ -200,22 +204,6 @@ bool QLogValue3DAxisFormatter::showEdgeLabels() const
 /*!
  * \internal
  */
-bool QLogValue3DAxisFormatter::allowNegatives() const
-{
-    return false;
-}
-
-/*!
- * \internal
- */
-bool QLogValue3DAxisFormatter::allowZero() const
-{
-    return false;
-}
-
-/*!
- * \internal
- */
 QValue3DAxisFormatter *QLogValue3DAxisFormatter::createNewInstance() const
 {
     return new QLogValue3DAxisFormatter();
@@ -252,14 +240,6 @@ void QLogValue3DAxisFormatter::populateCopy(QValue3DAxisFormatter &copy) const
 {
     QValue3DAxisFormatter::populateCopy(copy);
     dptrc()->populateCopy(copy);
-}
-
-/*!
- * \internal
- */
-QString QLogValue3DAxisFormatter::labelForIndex(int index) const
-{
-    return dptrc()->labelForIndex(index);
 }
 
 /*!
@@ -305,6 +285,7 @@ void QLogValue3DAxisFormatterPrivate::recalculate()
 
     int subGridCount = m_axis->subSegmentCount() - 1;
     int segmentCount = m_axis->segmentCount();
+    QString labelFormat =  m_axis->labelFormat();
     qreal segmentStep;
     if (m_base > 0.0) {
         // Update parent axis segment counts
@@ -336,36 +317,53 @@ void QLogValue3DAxisFormatterPrivate::recalculate()
         m_gridPositions.resize(segmentCount + 1);
         m_subGridPositions.resize(segmentCount * subGridCount);
         m_labelPositions.resize(segmentCount + 1);
-        m_labelValues.resize(segmentCount + 1);
+        m_labelStrings.clear();
+        m_labelStrings.reserve(segmentCount + 1);
 
         // Calculate segment positions
         int index = 0;
         if (!m_evenMinSegment) {
             m_gridPositions[0] = 0.0f;
             m_labelPositions[0] = 0.0f;
-            m_labelValues[0] = qreal(m_min);
+            if (m_showEdgeLabels)
+                m_labelStrings << qptr()->stringForValue(qreal(m_min), labelFormat);
+            else
+                m_labelStrings << QString();
             index++;
         }
         for (int i = 0; i < segmentCount; i++) {
             float gridValue = float((minDiff + qreal(i)) / qreal(logRangeNormalizer));
             m_gridPositions[index] = gridValue;
             m_labelPositions[index] = gridValue;
-            m_labelValues[index] = qPow(m_base, minDiff + qreal(i) + logMin);
+            m_labelStrings << qptr()->stringForValue(qPow(m_base, minDiff + qreal(i) + logMin),
+                                                    labelFormat);
             index++;
         }
         // Ensure max value doesn't suffer from any rounding errors
         m_gridPositions[segmentCount] = 1.0f;
         m_labelPositions[segmentCount] = 1.0f;
-        m_labelValues[segmentCount] = qreal(m_max);
+        QString finalLabel;
+        if (m_showEdgeLabels || m_evenMaxSegment)
+            finalLabel = qptr()->stringForValue(qreal(m_max), labelFormat);
+
+        if (m_labelStrings.size() > segmentCount)
+            m_labelStrings.replace(segmentCount, finalLabel);
+        else
+            m_labelStrings << finalLabel;
     } else {
         // Grid lines and label positions are the same as the parent class, so call parent impl
         // first to populate those
         QValue3DAxisFormatterPrivate::doRecalculate();
 
-        // Label value array needs to be repopulated
+        // Label string list needs to be repopulated
         segmentStep = 1.0 / qreal(segmentCount);
-        for (int i = 0; i < m_labelPositions.size(); i++)
-            m_labelValues[i] = qExp(segmentStep * qreal(i) * m_logRangeNormalizer + m_logMin);
+
+        m_labelStrings << qptr()->stringForValue(qreal(m_min), labelFormat);
+        for (int i = 1; i < m_labelPositions.size() - 1; i++)
+            m_labelStrings[i] = qptr()->stringForValue(qExp(segmentStep * qreal(i)
+                                                           * m_logRangeNormalizer + m_logMin),
+                                                      labelFormat);
+        m_labelStrings << qptr()->stringForValue(qreal(m_max), labelFormat);
 
         m_evenMaxSegment = true;
         m_evenMinSegment = true;
@@ -426,15 +424,9 @@ float QLogValue3DAxisFormatterPrivate::valueAt(float position) const
     return float(qExp(logValue));
 }
 
-QString QLogValue3DAxisFormatterPrivate::labelForIndex(int index) const
+QLogValue3DAxisFormatter *QLogValue3DAxisFormatterPrivate::qptr()
 {
-    if (((index == m_gridPositions.size() - 1 && !m_evenMaxSegment)
-            || (index == 0 && !m_evenMinSegment))
-            && !m_showEdgeLabels) {
-        return QString();
-    } else {
-        return QValue3DAxisFormatterPrivate::labelForIndex(index);
-    }
+    return static_cast<QLogValue3DAxisFormatter *>(q_ptr);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

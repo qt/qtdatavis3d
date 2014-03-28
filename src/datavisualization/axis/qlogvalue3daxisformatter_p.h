@@ -50,7 +50,6 @@ public:
 
     float positionAt(float value) const;
     float valueAt(float position) const;
-    QString labelForIndex(int index) const;
 
 protected:
     QLogValue3DAxisFormatter *qptr();

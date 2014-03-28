@@ -42,7 +42,7 @@ public:
     QValue3DAxisPrivate(QValue3DAxis *q);
     virtual ~QValue3DAxisPrivate();
 
-    virtual void setRange(float min, float max);
+    virtual void setRange(float min, float max, bool suppressWarnings = false);
     virtual void setMin(float min);
     virtual void setMax (float max);
 

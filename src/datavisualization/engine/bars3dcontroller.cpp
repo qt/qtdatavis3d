@@ -545,9 +545,9 @@ void Bars3DController::adjustAxisRanges()
             }
             // Call private implementations of setRange to avoid unsetting auto adjust flag
             if (adjustZ)
-                categoryAxisZ->dptr()->setRange(0.0f, float(maxRowCount));
+                categoryAxisZ->dptr()->setRange(0.0f, float(maxRowCount), true);
             if (adjustX)
-                categoryAxisX->dptr()->setRange(0.0f, float(maxColumnCount));
+                categoryAxisX->dptr()->setRange(0.0f, float(maxColumnCount), true);
         }
 
         // Now that we know the row and column ranges, figure out the value axis range
@@ -582,7 +582,7 @@ void Bars3DController::adjustAxisRanges()
                 minValue = 0.0f;
                 maxValue = 1.0f;
             }
-            valueAxis->dptr()->setRange(minValue, maxValue);
+            valueAxis->dptr()->setRange(minValue, maxValue, true);
         }
     }
 }
