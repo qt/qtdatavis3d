@@ -57,8 +57,11 @@ static const QVector3D cameraDistanceVector = QVector3D(0.0f, 0.0f, cameraDistan
 static const QQuaternion identityQuaternion;
 
 // Skip color == selection texture's background color
-static const QVector3D selectionSkipColor = QVector3D(255.0f, 255.0f, 255.0f);
-static const QVector3D invalidColorVector = QVector3D(-1.0f, -1.0f, -1.0f);
+static const QVector4D selectionSkipColor = QVector4D(255.0f, 255.0f, 255.0f, 255.0f);
+static const QVector4D invalidColorVector = QVector4D(-1.0f, -1.0f, -1.0f, -1.0f);
+static const GLfloat itemAlpha = 0.0f;
+static const GLfloat labelRowAlpha = 254.0f;
+static const GLfloat labelColumnAlpha = 255.0f;
 static const GLfloat gradientTextureHeight = 1024.0f;
 static const GLfloat gradientTextureWidth = 2.0f;
 static const GLfloat uniformTextureHeight = 64.0f;

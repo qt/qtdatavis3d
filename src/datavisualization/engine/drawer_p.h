@@ -74,6 +74,7 @@ public:
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
                     GLuint depthTextureId = 0);
+    void drawSelectionObject(ShaderHelper *shader, AbstractObjectHelper *object);
     void drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object);
     void drawPoint(ShaderHelper *shader);
     void drawLine(ShaderHelper *shader);
@@ -83,7 +84,8 @@ public:
                    QAbstract3DGraph::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
                    const Q3DCamera *camera, bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,
-                   Qt::AlignmentFlag alignment = Qt::AlignCenter, bool isSlicing = false);
+                   Qt::AlignmentFlag alignment = Qt::AlignCenter, bool isSlicing = false,
+                   bool isSelecting = false);
 
     void generateSelectionLabelTexture(Abstract3DRenderer *item);
     void generateLabelItem(LabelItem &item, const QString &text, int widestLabel = 0);

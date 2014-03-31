@@ -143,6 +143,10 @@ private:
 
     void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
+    void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
+                    const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
+                    GLfloat rowScaleFactor, GLfloat columnScaleFactor,
+                    bool barSelectionFound, BarRenderItem *selectedBar);
 
     void loadBackgroundMesh();
     void loadGridLineMesh();
@@ -158,8 +162,8 @@ private:
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
     Abstract3DController::SelectionType isSelected(int row, int bar, int seriesIndex);
-    QPoint selectionColorToArrayPosition(const QVector3D &selectionColor);
-    QBar3DSeries *selectionColorToSeries(const QVector3D &selectionColor);
+    QPoint selectionColorToArrayPosition(const QVector4D &selectionColor);
+    QBar3DSeries *selectionColorToSeries(const QVector4D &selectionColor);
 
     Q_DISABLE_COPY(Bars3DRenderer)
 

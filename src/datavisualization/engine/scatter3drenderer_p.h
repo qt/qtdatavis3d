@@ -146,8 +146,8 @@ public slots:
     void updateSelectedItem(int index, const QScatter3DSeries *series);
 
 private:
-    QVector3D indexToSelectionColor(GLint index);
-    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index,
+    QVector4D indexToSelectionColor(GLint index);
+    void selectionColorToSeriesAndIndex(const QVector4D &color, int &index,
                                         QAbstract3DSeries *&series);
 };
 

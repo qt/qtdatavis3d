@@ -126,15 +126,14 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     return image;
 }
 
-QVector3D Utils::getSelection(QPoint mousepos, int height)
+QVector4D Utils::getSelection(QPoint mousepos, int height)
 {
     // This is the only one that works with OpenGL ES 2.0, so we're forced to use it
     // Item count will be limited to 256*256*256
-    GLubyte pixel[4] = {255, 255, 255, 0};
+    GLubyte pixel[4] = {255, 255, 255, 255};
     glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE,
                  (void *)pixel);
-    QVector3D selectedColor(pixel[0], pixel[1], pixel[2]);
-
+    QVector4D selectedColor(pixel[0], pixel[1], pixel[2], pixel[3]);
     return selectedColor;
 }
 

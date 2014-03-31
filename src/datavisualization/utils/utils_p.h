@@ -63,7 +63,7 @@ public:
                                    bool labelBackground,
                                    bool borders = false,
                                    int maxLabelWidth = 0);
-    static QVector3D getSelection(QPoint mousepos, int height);
+    static QVector4D getSelection(QPoint mousepos, int height);
     static QImage getGradientImage(const QLinearGradient &gradient);
 
     static ParamType findFormatParamType(const QString &format);

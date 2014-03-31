@@ -534,41 +534,23 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                QVector3D dotColor = indexToSelectionColor(dotNo);
+                QVector4D dotColor = indexToSelectionColor(dotNo);
                 dotColor /= 255.0f;
 
                 selectionShader->setUniformValue(selectionShader->MVP(), MVPMatrix);
                 selectionShader->setUniformValue(selectionShader->color(), dotColor);
 
-                if (drawingPoints) {
+                if (drawingPoints)
                     m_drawer->drawPoint(selectionShader);
-                } else {
-                    // 1st attribute buffer : vertices
-                    glEnableVertexAttribArray(selectionShader->posAtt());
-                    glBindBuffer(GL_ARRAY_BUFFER, dotObj->vertexBuf());
-                    glVertexAttribPointer(selectionShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
-                                          (void *)0);
-
-                    // Index buffer
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dotObj->elementBuf());
-
-                    // Draw the triangles
-                    glDrawElements(GL_TRIANGLES, dotObj->indexCount(), GL_UNSIGNED_SHORT,
-                                   (void *)0);
-
-                    // Free buffers
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                    glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-                    glDisableVertexAttribArray(selectionShader->posAtt());
-                }
+                else
+                    m_drawer->drawSelectionObject(selectionShader, dotObj);
                 dotNo++;
             }
         }
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        QVector3D clickedColor = Utils::getSelection(m_inputPosition,
+        QVector4D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_viewport.height());
         selectionColorToSeriesAndIndex(clickedColor, m_clickedIndex, m_clickedSeries);
 
@@ -1739,16 +1721,16 @@ void Scatter3DRenderer::initLabelShaders(const QString &vertexShader, const QStr
     m_labelShader->initialize();
 }
 
-QVector3D Scatter3DRenderer::indexToSelectionColor(GLint index)
+QVector4D Scatter3DRenderer::indexToSelectionColor(GLint index)
 {
     GLubyte dotIdxRed = index & 0xff;
     GLubyte dotIdxGreen = (index & 0xff00) >> 8;
     GLubyte dotIdxBlue = (index & 0xff0000) >> 16;
 
-    return QVector3D(dotIdxRed, dotIdxGreen, dotIdxBlue);
+    return QVector4D(dotIdxRed, dotIdxGreen, dotIdxBlue, 0);
 }
 
-void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector3D &color,
+void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
                                                        int &index,
                                                        QAbstract3DSeries *&series)
 {

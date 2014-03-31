@@ -94,13 +94,12 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
 #else
     if (Qt::LeftButton == event->button()) {
         if (scene()->isSlicingActive()) {
-            if (scene()->isPointInPrimarySubView(mousePos)) {
+            if (scene()->isPointInPrimarySubView(mousePos))
                 setInputView(InputViewOnPrimary);
-            } else if (scene()->isPointInSecondarySubView(mousePos)) {
+            else if (scene()->isPointInSecondarySubView(mousePos))
                 setInputView(InputViewOnSecondary);
-            } else {
+            else
                 setInputView(InputViewNone);
-            }
         } else {
             // update mouse positions to prevent jumping when releasing or repressing a button
             setInputPosition(mousePos);

@@ -108,13 +108,8 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindTexture(GL_TEXTURE_2D, textureid);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if !defined(QT_OPENGL_ES_2)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, NULL);
-#else
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, NULL);
-#endif
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create render buffer

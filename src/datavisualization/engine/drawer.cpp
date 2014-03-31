@@ -149,6 +149,18 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     }
 }
 
+void Drawer::drawSelectionObject(ShaderHelper *shader, AbstractObjectHelper *object)
+{
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
+    glDrawElements(GL_TRIANGLES, object->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
 void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
 {
     // 1st attribute buffer : vertices
@@ -225,7 +237,8 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
                        GLfloat itemHeight, QAbstract3DGraph::SelectionFlags mode,
                        ShaderHelper *shader, ObjectHelper *object,
                        const Q3DCamera *camera, bool useDepth, bool rotateAlong,
-                       LabelPosition position, Qt::AlignmentFlag alignment, bool isSlicing)
+                       LabelPosition position, Qt::AlignmentFlag alignment, bool isSlicing,
+                       bool isSelecting)
 {
     // Draw label
     if (!labelItem.textureId())
@@ -379,11 +392,15 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     MVPMatrix = projectionmatrix * viewmatrix * modelMatrix;
 
-    // Set shader bindings
     shader->setUniformValue(shader->MVP(), MVPMatrix);
 
-    // Draw the object
-    drawObject(shader, object, labelItem.textureId());
+    if (isSelecting) {
+        // Draw the selection object
+        drawSelectionObject(shader, object);
+    } else {
+        // Draw the object
+        drawObject(shader, object, labelItem.textureId());
+    }
 }
 
 void Drawer::generateSelectionLabelTexture(Abstract3DRenderer *renderer)
