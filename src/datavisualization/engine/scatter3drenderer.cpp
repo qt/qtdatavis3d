@@ -547,6 +547,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 dotNo++;
             }
         }
+
+        drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
+
         glEnable(GL_DITHER);
 
         // Read color under cursor
@@ -1234,188 +1237,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         }
     }
 
-    // Draw axis labels
-    m_labelShader->bind();
-
-    glEnable(GL_TEXTURE_2D);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    glEnable(GL_POLYGON_OFFSET_FILL);
-
-    // Z Labels
-    if (m_axisCacheZ.segmentCount() > 0) {
-        int labelCount = m_axisCacheZ.labelCount();
-#ifndef USE_UNIFORM_SCALING
-        GLfloat labelXTrans = (aspectRatio * m_areaSize.width())
-                / m_scaleFactor + labelMargin + m_backgroundMargin;
-        if (m_maxItemSize > labelXTrans)
-            labelXTrans = m_maxItemSize + labelMargin;
-#else
-        GLfloat labelXTrans = aspectRatio + m_backgroundMargin + labelMargin;
-#endif
-        int labelNbr = 0;
-        GLfloat labelYTrans = -1.0f - m_backgroundMargin;
-        GLfloat rotLabelX = -90.0f;
-        GLfloat rotLabelY = 0.0f;
-        GLfloat rotLabelZ = 0.0f;
-        Qt::AlignmentFlag alignment = Qt::AlignRight;
-        if (m_zFlipped)
-            rotLabelY = 180.0f;
-        if (m_xFlipped) {
-            labelXTrans = -labelXTrans;
-            alignment = Qt::AlignLeft;
-        }
-        if (m_yFlipped) {
-            rotLabelZ += 180.0f;
-            rotLabelY += 180.0f;
-            labelYTrans = -labelYTrans;
-        }
-        QVector3D labelRotateVector(rotLabelX, rotLabelY, rotLabelZ);
-        QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, 0.0f);
-        for (int label = 0; label < labelCount; label++) {
-            if (m_axisCacheZ.labelItems().size() > labelNbr) {
-                labelTrans.setZ(m_axisCacheZ.labelPosition(label));
-
-                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
-
-                // Draw the label here
-                m_dummyRenderItem.setTranslation(labelTrans);
-                const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(labelNbr);
-
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, labelRotateVector, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, alignment);
-            }
-            labelNbr++;
-        }
-    }
-    // X Labels
-    if (m_axisCacheX.segmentCount() > 0) {
-        int labelCount = m_axisCacheX.labelCount();
-#ifndef USE_UNIFORM_SCALING
-        GLfloat labelZTrans = (aspectRatio * m_areaSize.height())
-                / m_scaleFactor + labelMargin + m_backgroundMargin;
-        if (m_maxItemSize > labelZTrans)
-            labelZTrans = m_maxItemSize + labelMargin;
-#else
-        GLfloat labelZTrans = aspectRatio + m_backgroundMargin + labelMargin;
-#endif
-        int labelNbr = 0;
-        GLfloat labelYTrans = -1.0f - m_backgroundMargin;
-        GLfloat rotLabelX = -90.0f;
-        GLfloat rotLabelY = 90.0f;
-        GLfloat rotLabelZ = 0.0f;
-        Qt::AlignmentFlag alignment = Qt::AlignLeft;
-        if (m_xFlipped)
-            rotLabelY = -90.0f;
-        if (m_zFlipped) {
-            labelZTrans = -labelZTrans;
-            alignment = Qt::AlignRight;
-        }
-        if (m_yFlipped) {
-            rotLabelZ += 180.0f;
-            rotLabelY += 180.0f;
-            labelYTrans = -labelYTrans;
-        }
-        QVector3D labelRotateVector(rotLabelX, rotLabelY, rotLabelZ);
-        QVector3D labelTrans = QVector3D(0.0f, labelYTrans, labelZTrans);
-        for (int label = 0; label < labelCount; label++) {
-            if (m_axisCacheX.labelItems().size() > labelNbr) {
-                labelTrans.setX(m_axisCacheX.labelPosition(label));
-
-                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
-
-                // Draw the label here
-                m_dummyRenderItem.setTranslation(labelTrans);
-                const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(labelNbr);
-
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, labelRotateVector, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, alignment);
-            }
-            labelNbr++;
-        }
-    }
-    // Y Labels
-    if (m_axisCacheY.segmentCount() > 0) {
-        int labelCount = m_axisCacheY.labelCount();
-        int labelNbr = 0;
-#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        GLfloat labelXTrans = (aspectRatio* m_areaSize.width())
-                / m_scaleFactor + m_backgroundMargin;
-        GLfloat labelZTrans = (aspectRatio * m_areaSize.height())
-                / m_scaleFactor + m_backgroundMargin;
-        if (m_maxItemSize > labelXTrans)
-            labelXTrans = m_maxItemSize;
-        if (m_maxItemSize > labelZTrans)
-            labelZTrans = m_maxItemSize;
-#else // ..and this if we want uniform scaling based on largest dimension
-        GLfloat labelXTrans = aspectRatio + m_backgroundMargin;
-        GLfloat labelZTrans = labelXTrans;
-#endif
-        // Back wall init
-        GLfloat labelMarginXTrans = labelMargin;
-        GLfloat labelMarginZTrans = labelMargin;
-        GLfloat rotLabelX = 0.0f;
-        GLfloat rotLabelY = -90.0f;
-        GLfloat rotLabelZ = 0.0f;
-        Qt::AlignmentFlag alignmentBack = Qt::AlignLeft;
-        if (!m_xFlipped) {
-            labelXTrans = -labelXTrans;
-            labelMarginXTrans = -labelMargin;
-            rotLabelY = 90.0f;
-        }
-        if (m_zFlipped) {
-            labelZTrans = -labelZTrans;
-            labelMarginZTrans = -labelMargin;
-            alignmentBack = Qt::AlignRight;
-        }
-        QVector3D labelRotateVectorBack(rotLabelX, rotLabelY, rotLabelZ);
-        QVector3D labelTransBack = QVector3D(labelXTrans, 0.0f, labelZTrans + labelMarginZTrans);
-
-        // Side wall init
-        Qt::AlignmentFlag alignmentSide = Qt::AlignLeft;
-        if (m_xFlipped)
-            alignmentSide = Qt::AlignLeft;
-        else
-            alignmentSide = Qt::AlignRight;
-        if (m_zFlipped)
-            rotLabelY = 180.0f;
-        else
-            rotLabelY = 0.0f;
-
-        QVector3D labelRotateVectorSide(rotLabelX, rotLabelY, rotLabelZ);
-        QVector3D labelTransSide(-labelXTrans - labelMarginXTrans, 0.0f, -labelZTrans);
-
-        for (int label = 0; label < labelCount; label++) {
-            if (m_axisCacheY.labelItems().size() > labelNbr) {
-                const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
-                const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
-
-                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
-
-                // Back wall
-                labelTransBack.setY(labelYTrans);
-                m_dummyRenderItem.setTranslation(labelTransBack);
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, labelRotateVectorBack, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, alignmentBack);
-
-                // Side wall
-                labelTransSide.setY(labelYTrans);
-                m_dummyRenderItem.setTranslation(labelTransSide);
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, labelRotateVectorSide, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, alignmentSide);
-            }
-            labelNbr++;
-        }
-    }
-    glDisable(GL_POLYGON_OFFSET_FILL);
+    drawLabels(false, activeCamera, viewMatrix, projectionMatrix);
 
     // Handle selection clearing and selection label drawing
     if (!dotSelectionFound) {
@@ -1485,6 +1307,221 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     glUseProgram(0);
 
     m_selectionDirty = false;
+}
+
+void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
+                                   const QMatrix4x4 &viewMatrix,
+                                   const QMatrix4x4 &projectionMatrix) {
+    ShaderHelper *shader = 0;
+    GLfloat alphaForValueSelection = labelValueAlpha / 255.0f;
+    GLfloat alphaForRowSelection = labelRowAlpha / 255.0f;
+    GLfloat alphaForColumnSelection = labelColumnAlpha / 255.0f;
+    if (drawSelection) {
+        shader = m_selectionShader;
+        // m_selectionShader is already bound
+    } else {
+        shader = m_labelShader;
+        shader->bind();
+
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    glEnable(GL_POLYGON_OFFSET_FILL);
+
+    // Z Labels
+    if (m_axisCacheZ.segmentCount() > 0) {
+        int labelCount = m_axisCacheZ.labelCount();
+#ifndef USE_UNIFORM_SCALING
+        GLfloat labelXTrans = (aspectRatio * m_areaSize.width())
+                / m_scaleFactor + labelMargin + m_backgroundMargin;
+        if (m_maxItemSize > labelXTrans)
+            labelXTrans = m_maxItemSize + labelMargin;
+#else
+        GLfloat labelXTrans = aspectRatio + m_backgroundMargin + labelMargin;
+#endif
+        int labelNbr = 0;
+        GLfloat labelYTrans = -1.0f - m_backgroundMargin;
+        GLfloat rotLabelX = -90.0f;
+        GLfloat rotLabelY = 0.0f;
+        GLfloat rotLabelZ = 0.0f;
+        Qt::AlignmentFlag alignment = Qt::AlignRight;
+        if (m_zFlipped)
+            rotLabelY = 180.0f;
+        if (m_xFlipped) {
+            labelXTrans = -labelXTrans;
+            alignment = Qt::AlignLeft;
+        }
+        if (m_yFlipped) {
+            rotLabelZ += 180.0f;
+            rotLabelY += 180.0f;
+            labelYTrans = -labelYTrans;
+        }
+        QVector3D labelRotateVector(rotLabelX, rotLabelY, rotLabelZ);
+        QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, 0.0f);
+        for (int label = 0; label < labelCount; label++) {
+            if (m_axisCacheZ.labelItems().size() > labelNbr) {
+                labelTrans.setZ(m_axisCacheZ.labelPosition(label));
+
+                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+
+                // Draw the label here
+                m_dummyRenderItem.setTranslation(labelTrans);
+                const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(labelNbr);
+
+                if (drawSelection) {
+                    QVector4D labelColor = QVector4D(label / 255.0f, 0.0f, 0.0f,
+                                                     alphaForRowSelection);
+                    shader->setUniformValue(shader->color(), labelColor);
+                }
+
+                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                    zeroVector, labelRotateVector, 0, m_cachedSelectionMode,
+                                    m_labelShader, m_labelObj, activeCamera, true, true,
+                                    Drawer::LabelMid, alignment);
+            }
+            labelNbr++;
+        }
+    }
+    // X Labels
+    if (m_axisCacheX.segmentCount() > 0) {
+        int labelCount = m_axisCacheX.labelCount();
+#ifndef USE_UNIFORM_SCALING
+        GLfloat labelZTrans = (aspectRatio * m_areaSize.height())
+                / m_scaleFactor + labelMargin + m_backgroundMargin;
+        if (m_maxItemSize > labelZTrans)
+            labelZTrans = m_maxItemSize + labelMargin;
+#else
+        GLfloat labelZTrans = aspectRatio + m_backgroundMargin + labelMargin;
+#endif
+        int labelNbr = 0;
+        GLfloat labelYTrans = -1.0f - m_backgroundMargin;
+        GLfloat rotLabelX = -90.0f;
+        GLfloat rotLabelY = 90.0f;
+        GLfloat rotLabelZ = 0.0f;
+        Qt::AlignmentFlag alignment = Qt::AlignLeft;
+        if (m_xFlipped)
+            rotLabelY = -90.0f;
+        if (m_zFlipped) {
+            labelZTrans = -labelZTrans;
+            alignment = Qt::AlignRight;
+        }
+        if (m_yFlipped) {
+            rotLabelZ += 180.0f;
+            rotLabelY += 180.0f;
+            labelYTrans = -labelYTrans;
+        }
+        QVector3D labelRotateVector(rotLabelX, rotLabelY, rotLabelZ);
+        QVector3D labelTrans = QVector3D(0.0f, labelYTrans, labelZTrans);
+        for (int label = 0; label < labelCount; label++) {
+            if (m_axisCacheX.labelItems().size() > labelNbr) {
+                labelTrans.setX(m_axisCacheX.labelPosition(label));
+
+                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+
+                // Draw the label here
+                m_dummyRenderItem.setTranslation(labelTrans);
+                const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(labelNbr);
+
+                if (drawSelection) {
+                    QVector4D labelColor = QVector4D(0.0f, label / 255.0f, 0.0f,
+                                                     alphaForColumnSelection);
+                    shader->setUniformValue(shader->color(), labelColor);
+                }
+
+                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                    zeroVector, labelRotateVector, 0, m_cachedSelectionMode,
+                                    m_labelShader, m_labelObj, activeCamera, true, true,
+                                    Drawer::LabelMid, alignment);
+            }
+            labelNbr++;
+        }
+    }
+    // Y Labels
+    if (m_axisCacheY.segmentCount() > 0) {
+        int labelCount = m_axisCacheY.labelCount();
+        int labelNbr = 0;
+#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
+        GLfloat labelXTrans = (aspectRatio* m_areaSize.width())
+                / m_scaleFactor + m_backgroundMargin;
+        GLfloat labelZTrans = (aspectRatio * m_areaSize.height())
+                / m_scaleFactor + m_backgroundMargin;
+        if (m_maxItemSize > labelXTrans)
+            labelXTrans = m_maxItemSize;
+        if (m_maxItemSize > labelZTrans)
+            labelZTrans = m_maxItemSize;
+#else // ..and this if we want uniform scaling based on largest dimension
+        GLfloat labelXTrans = aspectRatio + m_backgroundMargin;
+        GLfloat labelZTrans = labelXTrans;
+#endif
+        // Back wall init
+        GLfloat labelMarginXTrans = labelMargin;
+        GLfloat labelMarginZTrans = labelMargin;
+        GLfloat rotLabelX = 0.0f;
+        GLfloat rotLabelY = -90.0f;
+        GLfloat rotLabelZ = 0.0f;
+        Qt::AlignmentFlag alignmentBack = Qt::AlignLeft;
+        if (!m_xFlipped) {
+            labelXTrans = -labelXTrans;
+            labelMarginXTrans = -labelMargin;
+            rotLabelY = 90.0f;
+        }
+        if (m_zFlipped) {
+            labelZTrans = -labelZTrans;
+            labelMarginZTrans = -labelMargin;
+            alignmentBack = Qt::AlignRight;
+        }
+        QVector3D labelRotateVectorBack(rotLabelX, rotLabelY, rotLabelZ);
+        QVector3D labelTransBack = QVector3D(labelXTrans, 0.0f, labelZTrans + labelMarginZTrans);
+
+        // Side wall init
+        Qt::AlignmentFlag alignmentSide = Qt::AlignLeft;
+        if (m_xFlipped)
+            alignmentSide = Qt::AlignLeft;
+        else
+            alignmentSide = Qt::AlignRight;
+        if (m_zFlipped)
+            rotLabelY = 180.0f;
+        else
+            rotLabelY = 0.0f;
+
+        QVector3D labelRotateVectorSide(rotLabelX, rotLabelY, rotLabelZ);
+        QVector3D labelTransSide(-labelXTrans - labelMarginXTrans, 0.0f, -labelZTrans);
+
+        for (int label = 0; label < labelCount; label++) {
+            if (m_axisCacheY.labelItems().size() > labelNbr) {
+                const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
+                const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
+
+                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+
+                if (drawSelection) {
+                    QVector4D labelColor = QVector4D(0.0f, 0.0f, label / 255.0f,
+                                                     alphaForValueSelection);
+                    shader->setUniformValue(shader->color(), labelColor);
+                }
+
+                // Back wall
+                labelTransBack.setY(labelYTrans);
+                m_dummyRenderItem.setTranslation(labelTransBack);
+                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                    zeroVector, labelRotateVectorBack, 0, m_cachedSelectionMode,
+                                    m_labelShader, m_labelObj, activeCamera, true, true,
+                                    Drawer::LabelMid, alignmentBack);
+
+                // Side wall
+                labelTransSide.setY(labelYTrans);
+                m_dummyRenderItem.setTranslation(labelTransSide);
+                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                    zeroVector, labelRotateVectorSide, 0, m_cachedSelectionMode,
+                                    m_labelShader, m_labelObj, activeCamera, true, true,
+                                    Drawer::LabelMid, alignmentSide);
+            }
+            labelNbr++;
+        }
+    }
+    glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
 void Scatter3DRenderer::updateSelectedItem(int index, const QScatter3DSeries *series)
@@ -1735,16 +1772,30 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
                                                        QAbstract3DSeries *&series)
 {
     if (color != selectionSkipColor) {
-        index = int(color.x())
-                + (int(color.y()) << 8)
-                + (int(color.z()) << 16);
-        // Find the series and adjust the index accordingly
-        for (int i = 0; i < m_renderingArrays.size(); i++) {
-            if (index < m_renderingArrays.at(i).size()) {
-                series = m_visibleSeriesList.at(i).series();
-                return; // Valid found and already set to return parameters, so we can return
-            } else {
-                index -= m_renderingArrays.at(i).size();
+        if (color.w() == labelRowAlpha) {
+            // Row selection
+            index = Scatter3DController::invalidSelectionIndex();
+            // TODO: Pass label clicked info to input handler (implement in part 2)
+        } else if (color.w() == labelColumnAlpha) {
+            // Column selection
+            index = Scatter3DController::invalidSelectionIndex();
+            // TODO: Pass label clicked info to input handler (implement in part 2)
+        } else if (color.w() == labelValueAlpha) {
+            // Value selection
+            index = Scatter3DController::invalidSelectionIndex();
+            // TODO: Pass label clicked info to input handler (implement in part 2)
+        } else {
+            index = int(color.x())
+                    + (int(color.y()) << 8)
+                    + (int(color.z()) << 16);
+            // Find the series and adjust the index accordingly
+            for (int i = 0; i < m_renderingArrays.size(); i++) {
+                if (index < m_renderingArrays.at(i).size()) {
+                    series = m_visibleSeriesList.at(i).series();
+                    return; // Valid found and already set to return parameters, so we can return
+                } else {
+                    index -= m_renderingArrays.at(i).size();
+                }
             }
         }
     }

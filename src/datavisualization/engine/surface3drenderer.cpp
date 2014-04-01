@@ -42,11 +42,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 const GLfloat backgroundMargin = 1.1f; // Margin for background (1.10 make it 10% larger to avoid
-                                        // selection ball being drawn inside background)
+                                       // selection ball being drawn inside background)
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
 const GLfloat sliceUnits = 2.5f;
+const uint alphaMultiplier = 16777216;
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
     : Abstract3DRenderer(controller),
@@ -1201,6 +1202,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                      cache->selectionTexture());
             }
         }
+        drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
 
         glEnable(GL_DITHER);
 
@@ -1212,7 +1214,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // Put the RGBA value back to uint
 #if !defined(QT_OPENGL_ES_2)
-        uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * 16777216;
+        uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * alphaMultiplier;
 #else
         uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
 #endif
@@ -1729,11 +1731,61 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         }
     }
 
-    // Draw axis labels
-    m_labelShader->bind();
+    drawLabels(false, activeCamera, viewMatrix, projectionMatrix);
 
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    // Release shader
+    glUseProgram(0);
+
+    // Selection handling
+    if (m_selectionDirty || m_selectionLabelDirty) {
+        QPoint visiblePoint = Surface3DController::invalidSelectionPosition();
+        if (m_selectedSeries) {
+            SurfaceSeriesRenderCache *cache =
+                    m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
+            if (cache && m_selectedPoint != Surface3DController::invalidSelectionPosition()) {
+                const QRect &sampleSpace = cache->sampleSpace();
+                int x = m_selectedPoint.x() - sampleSpace.y();
+                int y = m_selectedPoint.y() - sampleSpace.x();
+                if (x >= 0 && y >= 0 && x < sampleSpace.height() && y < sampleSpace.width()
+                        && cache->dataArray().size()) {
+                    visiblePoint = QPoint(x, y);
+                }
+            }
+        }
+
+        if (m_cachedSelectionMode == QAbstract3DGraph::SelectionNone
+                || visiblePoint == Surface3DController::invalidSelectionPosition()) {
+            m_selectionActive = false;
+        } else {
+            if (m_cachedIsSlicingActivated)
+                updateSliceDataModel(visiblePoint);
+            if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem))
+                surfacePointSelected(visiblePoint);
+            m_selectionActive = true;
+        }
+
+        m_selectionDirty = false;
+    }
+}
+
+void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
+                                   const QMatrix4x4 &viewMatrix,
+                                   const QMatrix4x4 &projectionMatrix) {
+    ShaderHelper *shader = 0;
+    GLfloat alphaForValueSelection = labelValueAlpha / 255.0f;
+    GLfloat alphaForRowSelection = labelRowAlpha / 255.0f;
+    GLfloat alphaForColumnSelection = labelColumnAlpha / 255.0f;
+    if (drawSelection) {
+        shader = m_surfaceGridShader;
+    } else {
+        shader = m_labelShader;
+
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+    shader->bind();
+
     glEnable(GL_POLYGON_OFFSET_FILL);
 
     // Z Labels
@@ -1771,9 +1823,15 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_dummyRenderItem.setTranslation(labelTrans);
                 const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(labelNbr);
 
+                if (drawSelection) {
+                    QVector4D labelColor = QVector4D(label / 255.0f, 0.0f, 0.0f,
+                                                     alphaForRowSelection);
+                    shader->setUniformValue(shader->color(), labelColor);
+                }
+
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera,
+                                    shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
@@ -1814,9 +1872,15 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_dummyRenderItem.setTranslation(labelTrans);
                 const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(labelNbr);
 
+                if (drawSelection) {
+                    QVector4D labelColor = QVector4D(0.0f, label / 255.0f, 0.0f,
+                                                     alphaForColumnSelection);
+                    shader->setUniformValue(shader->color(), labelColor);
+                }
+
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, rotation, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera,
+                                    shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignment);
             }
             labelNbr++;
@@ -1871,12 +1935,18 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
 
+                if (drawSelection) {
+                    QVector4D labelColor = QVector4D(0.0f, 0.0f, label / 255.0f,
+                                                     alphaForValueSelection);
+                    shader->setUniformValue(shader->color(), labelColor);
+                }
+
                 // Back wall
                 labelTransBack.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransBack);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, labelRotateVectorBack, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera,
+                                    shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignmentBack);
 
                 // Side wall
@@ -1884,7 +1954,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 m_dummyRenderItem.setTranslation(labelTransSide);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, labelRotateVectorSide, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera,
+                                    shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignmentSide);
             }
             labelNbr++;
@@ -1892,41 +1962,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_BLEND);
-
-    // Release shader
-    glUseProgram(0);
-
-    // Selection handling
-    if (m_selectionDirty || m_selectionLabelDirty) {
-        QPoint visiblePoint = Surface3DController::invalidSelectionPosition();
-        if (m_selectedSeries) {
-            SurfaceSeriesRenderCache *cache =
-                    m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries));
-            if (cache && m_selectedPoint != Surface3DController::invalidSelectionPosition()) {
-                const QRect &sampleSpace = cache->sampleSpace();
-                int x = m_selectedPoint.x() - sampleSpace.y();
-                int y = m_selectedPoint.y() - sampleSpace.x();
-                if (x >= 0 && y >= 0 && x < sampleSpace.height() && y < sampleSpace.width()
-                        && cache->dataArray().size()) {
-                    visiblePoint = QPoint(x, y);
-                }
-            }
-        }
-
-        if (m_cachedSelectionMode == QAbstract3DGraph::SelectionNone
-                || visiblePoint == Surface3DController::invalidSelectionPosition()) {
-            m_selectionActive = false;
-        } else {
-            if (m_cachedIsSlicingActivated)
-                updateSliceDataModel(visiblePoint);
-            if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem))
-                surfacePointSelected(visiblePoint);
-            m_selectionActive = true;
-        }
-
-        m_selectionDirty = false;
+    if (!drawSelection) {
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
     }
 }
 
@@ -2202,6 +2240,27 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
 // Maps selection Id to surface point in data array
 QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
 {
+#if 0 // TODO: Implement fully in part 2
+    // Check for label selection
+    if (id / alphaMultiplier == labelRowAlpha) {
+        int row = id - (labelRowAlpha * alphaMultiplier);
+        qDebug() << "row label" << row;
+        // TODO: Pass label clicked info to input handler
+        return Surface3DController::invalidSelectionPosition();
+    } else if (id / alphaMultiplier == labelColumnAlpha) {
+        int column = (id - (labelColumnAlpha * alphaMultiplier)) / 256;
+        qDebug() << "column label" << column;
+        // TODO: Pass label clicked info to input handler
+        return Surface3DController::invalidSelectionPosition();
+    } else if (id / alphaMultiplier == labelValueAlpha) {
+        int value = (id - (labelValueAlpha * alphaMultiplier)) / 65536;
+        qDebug() << "value label" << value;
+        // TODO: Pass label clicked info to input handler
+        return Surface3DController::invalidSelectionPosition();
+    }
+#endif
+
+    // Not a label selection
     SurfaceSeriesRenderCache *selectedCache = 0;
     foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
         if (cache->isWithinIdRange(id)) {
@@ -2373,7 +2432,7 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
     m_surfaceSliceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                                   QStringLiteral(":/shaders/fragmentSurface"));
     m_surfaceSliceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
-                                           QStringLiteral(":/shaders/fragmentSurfaceFlat"));
+                                                QStringLiteral(":/shaders/fragmentSurfaceFlat"));
 #else
     m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                              QStringLiteral(":/shaders/fragmentSurfaceES2"));

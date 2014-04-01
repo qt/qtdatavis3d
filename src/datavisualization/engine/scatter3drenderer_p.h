@@ -121,6 +121,8 @@ private:
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
     void drawScene(GLuint defaultFboHandle);
+    void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
+                    const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
 
     void loadBackgroundMesh();
     void loadLabelMesh();

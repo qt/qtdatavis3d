@@ -144,6 +144,8 @@ private:
     void loadBackgroundMesh();
     void loadLabelMesh();
     void drawScene(GLuint defaultFboHandle);
+    void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
+                    const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);

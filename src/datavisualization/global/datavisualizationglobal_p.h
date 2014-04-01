@@ -60,6 +60,7 @@ static const QQuaternion identityQuaternion;
 static const QVector4D selectionSkipColor = QVector4D(255.0f, 255.0f, 255.0f, 255.0f);
 static const QVector4D invalidColorVector = QVector4D(-1.0f, -1.0f, -1.0f, -1.0f);
 static const GLfloat itemAlpha = 0.0f;
+static const GLfloat labelValueAlpha = 253.0f;
 static const GLfloat labelRowAlpha = 254.0f;
 static const GLfloat labelColumnAlpha = 255.0f;
 static const GLfloat gradientTextureHeight = 1024.0f;
