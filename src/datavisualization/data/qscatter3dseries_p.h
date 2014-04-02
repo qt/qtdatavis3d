@@ -43,6 +43,7 @@ public:
 
     virtual void setDataProxy(QAbstractDataProxy *proxy);
     virtual void connectControllerAndProxy(Abstract3DController *newController);
+    virtual void createItemLabel();
 
     void setSelectedItem(int index);
     void setItemSize(float size);

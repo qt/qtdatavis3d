@@ -171,18 +171,30 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     if (m_cachedItemSize.size() != seriesCount)
         m_cachedItemSize.resize(seriesCount);
 
+    bool noSelection = true;
     for (int series = 0; series < seriesCount; series++) {
-        itemSize = static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->itemSize();
+        QScatter3DSeries *scatterSeries =
+                static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series());
+        itemSize = scatterSeries->itemSize();
         if (maxItemSize < itemSize)
             maxItemSize = itemSize;
         if (m_cachedItemSize.at(series) != itemSize)
             m_cachedItemSize[series] = itemSize;
+        if (noSelection
+                && scatterSeries->selectedItem() != QScatter3DSeries::invalidSelectionIndex()
+                && m_selectionLabel != m_visibleSeriesList.at(series).itemLabel()) {
+            m_selectionLabelDirty = true;
+            noSelection = false;
+        }
     }
     m_maxItemSize = maxItemSize;
     if (maxItemSize > defaultMaxSize)
         m_backgroundMargin = maxItemSize / itemScaler;
     else
         m_backgroundMargin = defaultMaxSize;
+
+    if (noSelection && !selectionLabel().isEmpty())
+        m_selectionLabelDirty = true;
 }
 
 void Scatter3DRenderer::updateData()
@@ -1251,38 +1263,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 || !labelItem.textureId() || m_selectionLabelDirty) {
             QString labelText = selectionLabel();
             if (labelText.isNull() || m_selectionLabelDirty) {
-                static const QString xTitleTag(QStringLiteral("@xTitle"));
-                static const QString yTitleTag(QStringLiteral("@yTitle"));
-                static const QString zTitleTag(QStringLiteral("@zTitle"));
-                static const QString xLabelTag(QStringLiteral("@xLabel"));
-                static const QString yLabelTag(QStringLiteral("@yLabel"));
-                static const QString zLabelTag(QStringLiteral("@zLabel"));
-                static const QString seriesNameTag(QStringLiteral("@seriesName"));
-
-                labelText = m_visibleSeriesList[m_selectedItemSeriesIndex].itemLabelFormat();
-
-                labelText.replace(xTitleTag, m_axisCacheX.title());
-                labelText.replace(yTitleTag, m_axisCacheY.title());
-                labelText.replace(zTitleTag, m_axisCacheZ.title());
-
-                if (labelText.contains(xLabelTag)) {
-                    QString valueLabelText = m_axisCacheX.formatter()->stringForValue(
-                                qreal(selectedItem->position().x()), m_axisCacheX.labelFormat());
-                    labelText.replace(xLabelTag, valueLabelText);
-                }
-                if (labelText.contains(yLabelTag)) {
-                    QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
-                                qreal(selectedItem->position().y()), m_axisCacheY.labelFormat());
-                    labelText.replace(yLabelTag, valueLabelText);
-                }
-                if (labelText.contains(zLabelTag)) {
-                    QString valueLabelText = m_axisCacheZ.formatter()->stringForValue(
-                                qreal(selectedItem->position().z()), m_axisCacheZ.labelFormat());
-                    labelText.replace(zLabelTag, valueLabelText);
-                }
-                labelText.replace(seriesNameTag,
-                                  m_visibleSeriesList[m_selectedItemSeriesIndex].name());
-
+                labelText = m_visibleSeriesList[m_selectedItemSeriesIndex].itemLabel();
                 setSelectionLabel(labelText);
                 m_selectionLabelDirty = false;
             }

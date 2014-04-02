@@ -254,29 +254,34 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList)
         cache->setValid(false);
 
+    bool noSelection = true;
     foreach (QAbstract3DSeries *series, seriesList) {
-        // Item selection label may need update
-        if (series->d_ptr->m_changeTracker.nameChanged
-                || series->d_ptr->m_changeTracker.itemLabelFormatChanged) {
-            m_selectionLabelDirty = true;
-        }
-
         QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
         SurfaceSeriesRenderCache *cache = m_renderCacheList.value(surfaceSeries);
         if (!cache) {
             cache = new SurfaceSeriesRenderCache(this);
             m_renderCacheList[surfaceSeries] = cache;
-
             m_selectionTexturesDirty = true;
         }
         cache->setValid(true);
         cache->populate(surfaceSeries, this);
+
+        if (noSelection
+                && surfaceSeries->selectedPoint() != QSurface3DSeries::invalidSelectionPosition()
+                && selectionLabel() != cache->itemLabel()) {
+            m_selectionLabelDirty = true;
+            noSelection = false;
+        }
+
         if (cache->isFlatStatusDirty() && cache->sampleSpace().width()) {
             checkFlatSupport(cache);
             updateObjects(cache, true);
             cache->setFlatStatusDirty(false);
         }
     }
+
+    if (noSelection && !selectionLabel().isEmpty())
+        m_selectionLabelDirty = true;
 
     // Remove non-valid objects from the cache list
     foreach (SurfaceSeriesRenderCache *cache, m_renderCacheList) {
@@ -2200,8 +2205,10 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
     }
 
     QString selectionLabel;
-    if (label)
-        selectionLabel = createSelectionLabel(cache, column, row);
+    if (label) {
+        m_selectionLabelDirty = false;
+        selectionLabel = cache->itemLabel();
+    }
 
     if (m_cachedIsSlicingActivated) {
         QVector3D subPosFront;
@@ -2280,46 +2287,6 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
 
     m_clickedSeries = selectedCache->series();
     return QPoint(row, column);
-}
-
-QString Surface3DRenderer::createSelectionLabel(SurfaceSeriesRenderCache *cache,
-                                                int column, int row)
-{
-    QSurfaceDataArray &dataArray = cache->dataArray();
-    QString labelText = cache->itemLabelFormat();
-    static const QString xTitleTag(QStringLiteral("@xTitle"));
-    static const QString yTitleTag(QStringLiteral("@yTitle"));
-    static const QString zTitleTag(QStringLiteral("@zTitle"));
-    static const QString xLabelTag(QStringLiteral("@xLabel"));
-    static const QString yLabelTag(QStringLiteral("@yLabel"));
-    static const QString zLabelTag(QStringLiteral("@zLabel"));
-    static const QString seriesNameTag(QStringLiteral("@seriesName"));
-
-    labelText.replace(xTitleTag, m_axisCacheX.title());
-    labelText.replace(yTitleTag, m_axisCacheY.title());
-    labelText.replace(zTitleTag, m_axisCacheZ.title());
-
-    if (labelText.contains(xLabelTag)) {
-        QString valueLabelText = m_axisCacheX.formatter()->stringForValue(
-                    qreal(dataArray.at(row)->at(column).x()), m_axisCacheX.labelFormat());
-        labelText.replace(xLabelTag, valueLabelText);
-    }
-    if (labelText.contains(yLabelTag)) {
-        QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
-                    qreal(dataArray.at(row)->at(column).y()), m_axisCacheY.labelFormat());
-        labelText.replace(yLabelTag, valueLabelText);
-    }
-    if (labelText.contains(zLabelTag)) {
-        QString valueLabelText = m_axisCacheZ.formatter()->stringForValue(
-                    qreal(dataArray.at(row)->at(column).z()), m_axisCacheZ.labelFormat());
-        labelText.replace(zLabelTag, valueLabelText);
-    }
-
-    labelText.replace(seriesNameTag, cache->name());
-
-    m_selectionLabelDirty = false;
-
-    return labelText;
 }
 
 void Surface3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality)

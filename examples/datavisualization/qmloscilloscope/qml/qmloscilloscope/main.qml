@@ -19,7 +19,7 @@
 import QtQuick 2.1
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.0
-import QtDataVisualization 1.0
+import QtDataVisualization 1.1
 import "."
 
 Item {
@@ -72,9 +72,8 @@ Item {
                 drawMode: Surface3DSeries.DrawSurface;
                 flatShadingEnabled: false;
                 meshSmooth: true
-                itemLabelFormat: ""
-
-                onSelectedPointChanged: mainView.updateSelectionLabel()
+                itemLabelFormat: "@xLabel, @zLabel: @yLabel"
+                itemLabelVisible: false
             }
             //! [0]
 
@@ -90,10 +89,7 @@ Item {
         interval: 1000 / frequencySlider.value
         running: true
         repeat: true
-        onTriggered: {
-            dataSource.update(surfaceSeries)
-            mainView.updateSelectionLabel()
-        }
+        onTriggered: dataSource.update(surfaceSeries)
     }
     //! [3]
 
@@ -218,10 +214,18 @@ Item {
 
                     Text {
                         id: selectionText
-                        text: "No selection"
                         anchors.fill: parent
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
+
+                        Binding on text {
+                            when: surfaceSeries.itemLabel.length
+                            value: surfaceSeries.itemLabel
+                        }
+                        Binding on text {
+                            when: !surfaceSeries.itemLabel.length
+                            value: "No selection"
+                        }
                     }
                 }
             }
@@ -284,15 +288,6 @@ Item {
         }
 
     }
-
-    //! [1]
-    function updateSelectionLabel() {
-        selectionText.text = dataSource.selectionLabel(surfaceSeries,
-                                                       surfaceGraph.axisX,
-                                                       surfaceGraph.axisY,
-                                                       surfaceGraph.axisZ)
-    }
-    //! [1]
 
     //! [4]
     function generateData() {

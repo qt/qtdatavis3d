@@ -114,6 +114,7 @@ public:
     ~Bars3DRenderer();
 
     void updateData();
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 
@@ -145,8 +146,7 @@ private:
     void drawScene(GLuint defaultFboHandle);
     void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                     const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
-                    GLfloat rowScaleFactor, GLfloat columnScaleFactor,
-                    bool barSelectionFound, BarRenderItem *selectedBar);
+                    GLfloat rowScaleFactor, GLfloat columnScaleFactor);
 
     void loadBackgroundMesh();
     void loadGridLineMesh();

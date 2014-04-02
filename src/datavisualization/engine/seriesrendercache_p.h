@@ -51,7 +51,6 @@ public:
     // It is not guaranteed to be valid while rendering and should only be used as an identifier.
     inline QAbstract3DSeries *series() const { return m_series; }
 
-    inline const QString &itemLabelFormat() const { return m_itemLabelFormat; }
     inline const QAbstract3DSeries::Mesh &mesh() const { return m_mesh; }
     inline const QQuaternion &meshRotation() const { return m_meshRotation; }
     inline void setMeshRotation(const QQuaternion &rotation) { m_meshRotation = rotation; }
@@ -66,10 +65,10 @@ public:
     inline const QVector3D &multiHighlightColor() const { return m_multiHighlightColor; }
     inline const GLuint &multiHighlightGradientTexture() const { return m_multiHighlightGradientTexture; }
     inline const QString &name() const { return m_name; }
+    inline const QString &itemLabel() const { return m_itemLabel; }
 
 protected:
     QAbstract3DSeries *m_series;
-    QString m_itemLabelFormat;
     ObjectHelper *m_object;
     QAbstract3DSeries::Mesh m_mesh;
     QQuaternion m_meshRotation;
@@ -85,6 +84,7 @@ protected:
     GLuint m_multiHighlightGradientTexture;
 
     QString m_name;
+    QString m_itemLabel;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

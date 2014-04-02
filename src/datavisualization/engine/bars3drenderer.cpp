@@ -260,6 +260,26 @@ void Bars3DRenderer::updateData()
     updateSelectedBar(m_selectedBarPos, m_selectedBarSeries);
 }
 
+void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList,
+                                  bool updateVisibility)
+{
+    Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
+
+    bool noSelection = true;
+    int seriesCount = m_visibleSeriesList.size();
+    for (int i = 0; i < seriesCount; i++) {
+        QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_visibleSeriesList.at(i).series());
+        if (noSelection
+                && barSeries->selectedBar() != QBar3DSeries::invalidSelectionPosition()
+                && selectionLabel() != m_visibleSeriesList.at(i).itemLabel()) {
+            m_selectionLabelDirty = true;
+            noSelection = false;
+        }
+    }
+    if (noSelection && !selectionLabel().isEmpty())
+        m_selectionLabelDirty = true;
+}
+
 void Bars3DRenderer::updateScene(Q3DScene *scene)
 {
     if (m_hasNegativeValues)
@@ -1002,7 +1022,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
         glCullFace(GL_BACK);
         drawLabels(true, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
-                   columnScaleFactor, false, selectedBar);
+                   columnScaleFactor);
         glEnable(GL_DITHER);
 
         // Read color under cursor
@@ -1643,7 +1663,41 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
     }
     drawLabels(false, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
-               columnScaleFactor, barSelectionFound, selectedBar);
+               columnScaleFactor);
+
+    // Handle selected bar label generation
+    if (barSelectionFound) {
+        // Print value of selected bar
+        glDisable(GL_DEPTH_TEST);
+        // Draw the selection label
+        LabelItem &labelItem = selectionLabelItem();
+        if (m_selectedBar != selectedBar || m_updateLabels || !labelItem.textureId()
+                || m_selectionLabelDirty) {
+            QString labelText = selectionLabel();
+            if (labelText.isNull() || m_selectionLabelDirty) {
+                labelText = m_visibleSeriesList[m_visualSelectedBarSeriesIndex].itemLabel();
+                setSelectionLabel(labelText);
+                m_selectionLabelDirty = false;
+            }
+            m_drawer->generateLabelItem(labelItem, labelText);
+            m_selectedBar = selectedBar;
+        }
+
+        m_drawer->drawLabel(*selectedBar, labelItem, viewMatrix, projectionMatrix,
+                            zeroVector, zeroVector, selectedBar->height(),
+                            m_cachedSelectionMode, m_labelShader,
+                            m_labelObj, activeCamera, true, false);
+
+        // Reset label update flag; they should have been updated when we get here
+        m_updateLabels = false;
+
+        glEnable(GL_DEPTH_TEST);
+    } else {
+        m_selectedBar = 0;
+    }
+
+    glDisable(GL_TEXTURE_2D);
+    glDisable(GL_BLEND);
 
     // Release shader
     glUseProgram(0);
@@ -1652,8 +1706,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
 void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                                 const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
-                                GLfloat rowScaleFactor, GLfloat columnScaleFactor,
-                                bool barSelectionFound, BarRenderItem *selectedBar) {
+                                GLfloat rowScaleFactor, GLfloat columnScaleFactor) {
     ShaderHelper *shader = 0;
     GLfloat alphaForValueSelection = labelValueAlpha / 255.0f;
     GLfloat alphaForRowSelection = labelRowAlpha / 255.0f;
@@ -1830,81 +1883,6 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
-
-    // Handle selected bar label generation
-    if (barSelectionFound) {
-        // Print value of selected bar
-        glDisable(GL_DEPTH_TEST);
-        // Draw the selection label
-        LabelItem &labelItem = selectionLabelItem();
-        if (m_selectedBar != selectedBar || m_updateLabels || !labelItem.textureId()
-                || m_selectionLabelDirty) {
-            QString labelText = selectionLabel();
-            if (labelText.isNull() || m_selectionLabelDirty) {
-                static const QString rowIndexTag(QStringLiteral("@rowIdx"));
-                static const QString rowLabelTag(QStringLiteral("@rowLabel"));
-                static const QString rowTitleTag(QStringLiteral("@rowTitle"));
-                static const QString colIndexTag(QStringLiteral("@colIdx"));
-                static const QString colLabelTag(QStringLiteral("@colLabel"));
-                static const QString colTitleTag(QStringLiteral("@colTitle"));
-                static const QString valueTitleTag(QStringLiteral("@valueTitle"));
-                static const QString valueLabelTag(QStringLiteral("@valueLabel"));
-                static const QString seriesNameTag(QStringLiteral("@seriesName"));
-
-                // Custom format expects printf format specifier. There is no tag for it.
-                labelText = m_axisCacheY.formatter()->stringForValue(
-                            qreal(selectedBar->value()),
-                            m_visibleSeriesList[m_visualSelectedBarSeriesIndex].itemLabelFormat());
-
-                int selBarPosRow = selectedBar->position().x();
-                int selBarPosCol = selectedBar->position().y();
-                labelText.replace(rowIndexTag, QString::number(selBarPosRow));
-                if (m_axisCacheZ.labels().size() > selBarPosRow)
-                    labelText.replace(rowLabelTag, m_axisCacheZ.labels().at(selBarPosRow));
-                else
-                    labelText.replace(rowLabelTag, QString());
-                labelText.replace(rowTitleTag, m_axisCacheZ.title());
-                labelText.replace(colIndexTag, QString::number(selBarPosCol));
-                if (m_axisCacheX.labels().size() > selBarPosCol)
-                    labelText.replace(colLabelTag, m_axisCacheX.labels().at(selBarPosCol));
-                else
-                    labelText.replace(colLabelTag, QString());
-                labelText.replace(colTitleTag, m_axisCacheX.title());
-                labelText.replace(valueTitleTag, m_axisCacheY.title());
-
-                if (labelText.contains(valueLabelTag)) {
-                    QString valueLabelText = m_axisCacheY.formatter()->stringForValue(
-                                qreal(selectedBar->value()), m_axisCacheY.labelFormat());
-                    labelText.replace(valueLabelTag, valueLabelText);
-                }
-
-                labelText.replace(seriesNameTag,
-                                  m_visibleSeriesList[m_visualSelectedBarSeriesIndex].name());
-
-                setSelectionLabel(labelText);
-                m_selectionLabelDirty = false;
-            }
-            m_drawer->generateLabelItem(labelItem, labelText);
-            m_selectedBar = selectedBar;
-        }
-
-        m_drawer->drawLabel(*selectedBar, labelItem, viewMatrix, projectionMatrix,
-                            zeroVector, zeroVector, selectedBar->height(),
-                            m_cachedSelectionMode, shader,
-                            m_labelObj, activeCamera, true, false);
-
-        // Reset label update flag; they should have been updated when we get here
-        m_updateLabels = false;
-
-        glEnable(GL_DEPTH_TEST);
-    } else {
-        m_selectedBar = 0;
-    }
-
-    if (!drawSelection) {
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_BLEND);
-    }
 }
 
 void Bars3DRenderer::updateMultiSeriesScaling(bool uniform)

@@ -43,6 +43,7 @@ public:
 
     virtual void setDataProxy(QAbstractDataProxy *proxy);
     virtual void connectControllerAndProxy(Abstract3DController *newController);
+    virtual void createItemLabel();
 
     void setSelectedPoint(const QPoint &position);
     void setFlatShadingEnabled(bool enabled);

@@ -76,6 +76,9 @@ private:
     friend class QValue3DAxis;
     friend class QValue3DAxisPrivate;
     friend class AxisRenderCache;
+    friend class QBar3DSeriesPrivate;
+    friend class QScatter3DSeriesPrivate;
+    friend class QSurface3DSeriesPrivate;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

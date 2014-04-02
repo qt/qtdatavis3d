@@ -55,7 +55,7 @@ int main(int argc, char **argv)
     QSize screenSize = widgetchart->screen()->size();
 
     QWidget *container = QWidget::createWindowContainer(widgetchart);
-    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
+    container->setMinimumSize(QSize(screenSize.width() / 3, screenSize.height() / 3));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);

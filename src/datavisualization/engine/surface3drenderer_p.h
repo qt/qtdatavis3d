@@ -160,7 +160,6 @@ private:
     void surfacePointSelected(const QPoint &point);
     void updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point, bool label);
     QPoint selectionIdToSurfacePoint(uint id);
-    QString createSelectionLabel(SurfaceSeriesRenderCache *cache, int column, int row);
 #if !defined(QT_OPENGL_ES_2)
     void loadGridLineMesh();
     void updateDepthBuffer();

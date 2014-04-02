@@ -783,6 +783,8 @@ Q3DScene *Abstract3DController::scene()
 void Abstract3DController::markDataDirty()
 {
     m_isDataDirty = true;
+
+    markSeriesItemLabelsDirty();
     emitNeedRender();
 }
 
@@ -813,6 +815,8 @@ void Abstract3DController::handleAxisTitleChangedBySender(QObject *sender)
         m_changeTracker.axisZTitleChanged = true;
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+
+    markSeriesItemLabelsDirty();
     emitNeedRender();
 }
 
@@ -831,6 +835,8 @@ void Abstract3DController::handleAxisLabelsChangedBySender(QObject *sender)
         m_changeTracker.axisZLabelsChanged = true;
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+
+    markSeriesItemLabelsDirty();
     emitNeedRender();
 }
 
@@ -990,6 +996,12 @@ void Abstract3DController::handleSeriesVisibilityChangedBySender(QObject *sender
     m_isDataDirty = true;
     m_isSeriesVisibilityDirty = true;
     emitNeedRender();
+}
+
+void Abstract3DController::markSeriesItemLabelsDirty()
+{
+    for (int i = 0; i < m_seriesList.size(); i++)
+        m_seriesList.at(i)->d_ptr->markItemLabelDirty();
 }
 
 void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orientation,

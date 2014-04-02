@@ -106,6 +106,7 @@ void Bars3DController::handleArrayReset()
     if (series->isVisible()) {
         adjustAxisRanges();
         m_isDataDirty = true;
+        series->d_ptr->markItemLabelDirty();
     }
     // Clear selection unless still valid
     setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
@@ -132,6 +133,7 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
     if (series->isVisible()) {
         adjustAxisRanges();
         m_isDataDirty = true;
+        series->d_ptr->markItemLabelDirty();
     }
     emitNeedRender();
 }
@@ -193,6 +195,7 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
     if (series->isVisible()) {
         adjustAxisRanges();
         m_isDataDirty = true;
+        series->d_ptr->markItemLabelDirty();
     }
     emitNeedRender();
 }

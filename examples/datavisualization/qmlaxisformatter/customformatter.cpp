@@ -142,6 +142,7 @@ void CustomFormatter::setSelectionFormat(const QString &format)
 {
     if (m_selectionFormat != format) {
         m_selectionFormat = format;
+        markDirty(true); // Necessary to regenerate already visible selection label
         emit selectionFormatChanged(format);
     }
 }

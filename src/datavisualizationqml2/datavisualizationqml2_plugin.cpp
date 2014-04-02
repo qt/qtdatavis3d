@@ -24,6 +24,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 {
+    // @uri QtDataVisualization
+
     // QtDataVisualization 1.0
 
     qmlRegisterUncreatableType<const QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
@@ -86,6 +88,8 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 
     // New revisions
     qmlRegisterType<QValue3DAxis, 1>(uri, 1, 1, "ValueAxis3D");
+    qmlRegisterUncreatableType<QAbstract3DSeries, 1>(uri, 1, 1, "Abstract3DSeries",
+                                                  QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
 
     // New types
     qmlRegisterType<QValue3DAxisFormatter>(uri, 1, 1, "ValueAxis3DFormatter");

@@ -55,11 +55,6 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
 
     QAbstract3DSeriesChangeBitField &changeTracker = series->d_ptr->m_changeTracker;
 
-    if (seriesChanged || changeTracker.itemLabelFormatChanged) {
-        m_itemLabelFormat = series->itemLabelFormat();
-        changeTracker.itemLabelFormatChanged = false;
-    }
-
     if (seriesChanged || changeTracker.meshChanged  || changeTracker.meshSmoothChanged
             || changeTracker.userDefinedMeshChanged) {
         m_mesh = series->mesh();
@@ -181,6 +176,18 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
     if (seriesChanged || changeTracker.nameChanged) {
         m_name = series->name();
         changeTracker.nameChanged = false;
+    }
+
+    if (seriesChanged || changeTracker.itemLabelChanged
+            || changeTracker.itemLabelVisibilityChanged) {
+        changeTracker.itemLabelChanged = false;
+        changeTracker.itemLabelVisibilityChanged = false;
+        // series->itemLabel() call resolves the item label and emits the changed signal
+        // if it is dirty, so we need to call it even if m_itemLabel is eventually set
+        // to an empty string.
+        m_itemLabel = series->itemLabel();
+        if (!series->isItemLabelVisible())
+            m_itemLabel = QString();
     }
 }
 

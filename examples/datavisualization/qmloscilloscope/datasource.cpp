@@ -138,29 +138,6 @@ void DataSource::update(QSurface3DSeries *series)
 }
 //! [1]
 
-//! [2]
-QString DataSource::selectionLabel(QSurface3DSeries *series, QValue3DAxis *axisX,
-                                   QValue3DAxis *axisY, QValue3DAxis *axisZ)
-{
-    QString label;
-
-    if (series && series->selectedPoint() != QSurface3DSeries::invalidSelectionPosition()) {
-        const QSurfaceDataItem *item = series->dataProxy()->itemAt(series->selectedPoint());
-        QString x;
-        QString y;
-        QString z;
-        x.sprintf(axisX->labelFormat().toUtf8().constData(), int(item->x()));
-        y.sprintf(axisY->labelFormat().toUtf8().constData(), int(item->y()));
-        z.sprintf(axisZ->labelFormat().toUtf8().constData(), int(item->z()));
-        label = QStringLiteral("%1, %3: %2").arg(x).arg(y).arg(z);
-    } else {
-        label = QStringLiteral("No selection");
-    }
-
-    return label;
-}
-//! [2]
-
 void DataSource::clearData()
 {
     for (int i(0); i < m_data.size(); i++) {

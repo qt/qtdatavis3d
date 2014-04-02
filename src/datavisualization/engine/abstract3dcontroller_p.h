@@ -242,6 +242,8 @@ public:
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick() = 0;
 
+    void markSeriesItemLabelsDirty();
+
 public slots:
     void handleAxisTitleChanged(const QString &title);
     void handleAxisLabelsChanged();

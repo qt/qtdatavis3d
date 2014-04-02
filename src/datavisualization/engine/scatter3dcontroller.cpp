@@ -125,6 +125,7 @@ void Scatter3DController::handleArrayReset()
         m_isDataDirty = true;
     }
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
+    series->d_ptr->markItemLabelDirty();
     emitNeedRender();
 }
 
@@ -148,6 +149,7 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
     if (series->isVisible()) {
         adjustValueAxisRange();
         m_isDataDirty = true;
+        series->d_ptr->markItemLabelDirty();
     }
     emitNeedRender();
 }

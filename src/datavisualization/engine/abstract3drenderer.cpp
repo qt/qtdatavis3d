@@ -379,14 +379,8 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
         visibleCount = 0;
     }
     foreach (QAbstract3DSeries *current, seriesList) {
-        if (current->isVisible()) {
-            // Item selection label may need update
-            if (current->d_ptr->m_changeTracker.nameChanged
-                    || current->d_ptr->m_changeTracker.itemLabelFormatChanged) {
-                m_selectionLabelDirty = true;
-            }
+        if (current->isVisible())
             m_visibleSeriesList[visibleCount++].populate(current, this);
-        }
     }
 }
 
