@@ -120,6 +120,24 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 */
 
 /*!
+    \enum QAbstract3DGraph::ElementType
+    \since Qt Data Visualization 1.1
+
+    Type of an element in the graph.
+
+    \value ElementNone
+           No defined element.
+    \value ElementSeries
+           A series (i.e. an item in a series).
+    \value ElementAxisXLabel
+           X axis label.
+    \value ElementAxisZLabel
+           Z axis label.
+    \value ElementAxisYLabel
+           Y axis label.
+*/
+
+/*!
  * \internal
  */
 QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -128,6 +146,7 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
       d_ptr(d)
 {
     qRegisterMetaType<QAbstract3DGraph::ShadowQuality>("QAbstract3DGraph::ShadowQuality");
+    qRegisterMetaType<QAbstract3DGraph::ElementType>("QAbstract3DGraph::ElementType");
 
     // Default to frameless window, as typically graphs are not toplevel
     setFlags(flags() | Qt::FramelessWindowHint);
@@ -375,6 +394,15 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
     return d_ptr->renderToImage(msaaSamples, renderSize);
 }
 
+/*! \fn QAbstract3DGraph::elementSelected(ElementType type)
+ * \since Qt Data Visualization 1.1
+ *
+ * Emits selection \a type when a selection is made in the graph.
+ *
+ * Signal can be used for example for implementing custom input handlers, as demonstrated in this
+ * \l {Axis Range Dragging With Labels Example}{example}.
+ */
+
 /*!
  * \internal
  */
@@ -500,6 +528,9 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::selectionModeChanged);
     QObject::connect(m_visualController, &Abstract3DController::shadowQualityChanged, q_ptr,
                      &QAbstract3DGraph::shadowQualityChanged);
+    QObject::connect(m_visualController, &Abstract3DController::elementSelected, q_ptr,
+                     &QAbstract3DGraph::elementSelected);
+
     QObject::connect(m_visualController, &Abstract3DController::needRender, this,
                      &QAbstract3DGraphPrivate::renderLater);
 

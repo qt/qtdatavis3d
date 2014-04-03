@@ -109,6 +109,7 @@ public:
     inline bool isClickPending() { return m_clickPending; }
     inline void clearClickPending() { m_clickPending = false; }
     inline QAbstract3DSeries *clickedSeries() const { return m_clickedSeries; }
+    inline QAbstract3DGraph::ElementType clickedType() { return m_clickedType; }
 
     LabelItem &selectionLabelItem();
     void setSelectionLabel(const QString &label);
@@ -158,6 +159,7 @@ protected:
     bool m_selectionLabelDirty;
     bool m_clickPending;
     QAbstract3DSeries *m_clickedSeries;
+    QAbstract3DGraph::ElementType m_clickedType;
 
     QString m_selectionLabel;
     LabelItem *m_selectionLabelItem;

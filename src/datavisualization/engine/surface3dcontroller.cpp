@@ -126,6 +126,8 @@ void Surface3DController::handlePendingClick()
     QPoint position = m_renderer->clickedPosition();
     QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_renderer->clickedSeries());
 
+    Abstract3DController::handlePendingClick();
+
     setSelectedPoint(position, series, true);
 
     m_renderer->resetClickedStatus();

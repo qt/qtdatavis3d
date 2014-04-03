@@ -1752,19 +1752,20 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
                                                        int &index,
                                                        QAbstract3DSeries *&series)
 {
+    m_clickedType = QAbstract3DGraph::ElementNone;
     if (color != selectionSkipColor) {
         if (color.w() == labelRowAlpha) {
             // Row selection
             index = Scatter3DController::invalidSelectionIndex();
-            // TODO: Pass label clicked info to input handler (implement in part 2)
+            m_clickedType = QAbstract3DGraph::ElementAxisZLabel;
         } else if (color.w() == labelColumnAlpha) {
             // Column selection
             index = Scatter3DController::invalidSelectionIndex();
-            // TODO: Pass label clicked info to input handler (implement in part 2)
+            m_clickedType = QAbstract3DGraph::ElementAxisXLabel;
         } else if (color.w() == labelValueAlpha) {
             // Value selection
             index = Scatter3DController::invalidSelectionIndex();
-            // TODO: Pass label clicked info to input handler (implement in part 2)
+            m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
         } else {
             index = int(color.x())
                     + (int(color.y()) << 8)
@@ -1773,6 +1774,7 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
             for (int i = 0; i < m_renderingArrays.size(); i++) {
                 if (index < m_renderingArrays.at(i).size()) {
                     series = m_visibleSeriesList.at(i).series();
+                    m_clickedType = QAbstract3DGraph::ElementSeries;
                     return; // Valid found and already set to return parameters, so we can return
                 } else {
                     index -= m_renderingArrays.at(i).size();

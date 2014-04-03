@@ -2137,33 +2137,37 @@ Bars3DController::SelectionType Bars3DRenderer::isSelected(int row, int bar, int
 
 QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector4D &selectionColor)
 {
-    QPoint position;
-    if (selectionColor == selectionSkipColor
-            || (selectionColor.w() == labelRowAlpha
-                && !m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow))
-            || (selectionColor.w() == labelColumnAlpha
-                && !m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn))) {
-        position = Bars3DController::invalidSelectionPosition();
-    } else if (selectionColor.w() == itemAlpha) {
+    QPoint position = Bars3DController::invalidSelectionPosition();
+    m_clickedType = QAbstract3DGraph::ElementNone;
+    if (selectionColor.w() == itemAlpha) {
         // Normal selection item
         position = QPoint(int(selectionColor.x() + int(m_axisCacheZ.min())),
                           int(selectionColor.y()) + int(m_axisCacheX.min()));
+        // Pass item clicked info to input handler
+        m_clickedType = QAbstract3DGraph::ElementSeries;
     } else if (selectionColor.w() == labelRowAlpha) {
         // Row selection
-        // Use column from previous selection in case we have row + column mode
-        GLint previousCol = qMax(0, m_selectedBarPos.y()); // Use 0 if previous is invalid
-        position = QPoint(int(selectionColor.x() + int(m_axisCacheZ.min())), previousCol);
-        // TODO: Pass label clicked info to input handler (implement in part 2)
+        if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
+            // Use column from previous selection in case we have row + column mode
+            GLint previousCol = qMax(0, m_selectedBarPos.y()); // Use 0 if previous is invalid
+            position = QPoint(int(selectionColor.x() + int(m_axisCacheZ.min())), previousCol);
+        }
+        // Pass label clicked info to input handler
+        m_clickedType = QAbstract3DGraph::ElementAxisZLabel;
     } else if (selectionColor.w() == labelColumnAlpha) {
         // Column selection
-        // Use row from previous selection in case we have row + column mode
-        GLint previousRow = qMax(0, m_selectedBarPos.x()); // Use 0 if previous is invalid
-        position = QPoint(previousRow, int(selectionColor.y()) + int(m_axisCacheX.min()));
-        // TODO: Pass label clicked info to input handler (implement in part 2)
+        if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
+            // Use row from previous selection in case we have row + column mode
+            GLint previousRow = qMax(0, m_selectedBarPos.x()); // Use 0 if previous is invalid
+            position = QPoint(previousRow, int(selectionColor.y()) + int(m_axisCacheX.min()));
+        }
+        // Pass label clicked info to input handler
+        m_clickedType = QAbstract3DGraph::ElementAxisXLabel;
     } else if (selectionColor.w() == labelValueAlpha) {
         // Value selection
         position = Bars3DController::invalidSelectionPosition();
-        // TODO: Pass label clicked info to input handler (implement in part 2)
+        // Pass label clicked info to input handler
+        m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
     }
     return position;
 }

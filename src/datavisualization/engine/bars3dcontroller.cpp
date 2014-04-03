@@ -253,6 +253,8 @@ void Bars3DController::handlePendingClick()
     QPoint position = m_renderer->clickedPosition();
     QBar3DSeries *series = static_cast<QBar3DSeries *>(m_renderer->clickedSeries());
 
+    Abstract3DController::handlePendingClick();
+
     setSelectedBar(position, series, true);
 
     m_renderer->resetClickedStatus();

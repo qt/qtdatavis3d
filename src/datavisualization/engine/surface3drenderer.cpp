@@ -2247,25 +2247,18 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
 // Maps selection Id to surface point in data array
 QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
 {
-#if 0 // TODO: Implement fully in part 2
+    m_clickedType = QAbstract3DGraph::ElementNone;
     // Check for label selection
     if (id / alphaMultiplier == labelRowAlpha) {
-        int row = id - (labelRowAlpha * alphaMultiplier);
-        qDebug() << "row label" << row;
-        // TODO: Pass label clicked info to input handler
+        m_clickedType = QAbstract3DGraph::ElementAxisZLabel;
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == labelColumnAlpha) {
-        int column = (id - (labelColumnAlpha * alphaMultiplier)) / 256;
-        qDebug() << "column label" << column;
-        // TODO: Pass label clicked info to input handler
+        m_clickedType = QAbstract3DGraph::ElementAxisXLabel;
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == labelValueAlpha) {
-        int value = (id - (labelValueAlpha * alphaMultiplier)) / 65536;
-        qDebug() << "value label" << value;
-        // TODO: Pass label clicked info to input handler
+        m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
         return Surface3DController::invalidSelectionPosition();
     }
-#endif
 
     // Not a label selection
     SurfaceSeriesRenderCache *selectedCache = 0;
@@ -2286,6 +2279,7 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
     int row = ((idInSeries - 1) / sampleSpace.width()) +  sampleSpace.y();
 
     m_clickedSeries = selectedCache->series();
+    m_clickedType = QAbstract3DGraph::ElementSeries;
     return QPoint(row, column);
 }
 

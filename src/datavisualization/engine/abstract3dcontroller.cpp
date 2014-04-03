@@ -1113,4 +1113,10 @@ void Abstract3DController::emitNeedRender()
     }
 }
 
+void Abstract3DController::handlePendingClick()
+{
+    QAbstract3DGraph::ElementType type = m_renderer->clickedType();
+    emit elementSelected(type);
+    // TODO: Consider adding type specific signals
+}
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -46,6 +46,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_selectionLabelDirty(true),
       m_clickPending(false),
       m_clickedSeries(0),
+      m_clickedType(QAbstract3DGraph::ElementNone),
       m_selectionLabelItem(0)
 #ifdef DISPLAY_RENDER_SPEED
     , m_isFirstFrame(true),

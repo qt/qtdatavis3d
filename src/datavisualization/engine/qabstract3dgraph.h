@@ -70,6 +70,14 @@ public:
         ShadowQualitySoftHigh
     };
 
+    enum ElementType {
+        ElementNone = 0,
+        ElementSeries,
+        ElementAxisXLabel,
+        ElementAxisZLabel,
+        ElementAxisYLabel
+    };
+
 public:
     virtual ~QAbstract3DGraph();
 
@@ -116,6 +124,7 @@ signals:
     void activeThemeChanged(Q3DTheme *theme);
     void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
+    void elementSelected(QAbstract3DGraph::ElementType type);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)
