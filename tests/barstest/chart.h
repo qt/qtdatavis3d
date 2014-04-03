@@ -29,6 +29,7 @@
 #include <QPointer>
 #include <QColorDialog>
 #include <QTimer>
+#include <QLabel>
 
 using namespace QtDataVisualization;
 
@@ -58,6 +59,7 @@ public:
     void changeFontSize(int fontsize);
     void rotateX(int rotation);
     void rotateY(int rotation);
+    void setFpsMeasurement(bool enable);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void setSpecsRatio(int barwidth);
@@ -88,6 +90,7 @@ public:
     void useLogAxis();
     void changeValueAxisFormat(const QString & text);
     void changeLogBase(const QString & text);
+    void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
 
 public slots:
     void flipViews();
@@ -108,6 +111,7 @@ public slots:
     void triggerSelection();
     void triggerRotation();
     void handleValueAxisLabelsChanged();
+    void handleFpsChange(qreal fps);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -157,6 +161,7 @@ private:
     QAbstract3DInputHandler *m_customInputHandler;
     QTimer m_selectionTimer;
     QTimer m_rotationTimer;
+    QLabel *m_fpsLabel;
 };
 
 #endif

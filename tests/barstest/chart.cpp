@@ -237,6 +237,10 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     QObject::connect(&m_rotationTimer, &QTimer::timeout, this,
                      &GraphModifier::triggerRotation);
 
+    QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
+                     &GraphModifier::handleFpsChange);
+
+
     resetTemperatureData();
 }
 
@@ -1213,6 +1217,12 @@ void GraphModifier::handleValueAxisLabelsChanged()
     qDebug() << __FUNCTION__;
 }
 
+void GraphModifier::handleFpsChange(qreal fps)
+{
+    static const QString fpsPrefix(QStringLiteral("FPS: "));
+    m_fpsLabel->setText(fpsPrefix + QString::number(qRound(fps)));
+}
+
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
     m_graph->activeTheme()->setBackgroundEnabled(bool(enabled));
@@ -1233,6 +1243,11 @@ void GraphModifier::rotateY(int rotation)
 {
     m_yRotation = rotation;
     m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
+}
+
+void GraphModifier::setFpsMeasurement(bool enable)
+{
+    m_graph->setMeasureFps(enable);
 }
 
 void GraphModifier::setSpecsRatio(int barwidth)

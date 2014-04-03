@@ -65,6 +65,14 @@ Item {
             axisX.segmentCount: 4
             axisY.segmentCount: 4
             axisZ.segmentCount: 4
+            measureFps: true
+
+            onCurrentFpsChanged: {
+                if (fps > 10)
+                    fpsText.text = "FPS: " + Math.round(surfaceGraph.currentFps)
+                else
+                    fpsText.text = "FPS: " + Math.round(surfaceGraph.currentFps * 10.0) / 10.0
+            }
 
             //! [0]
             Surface3DSeries {
@@ -199,6 +207,25 @@ Item {
                                 horizontalAlignment: Text.AlignHCenter
                             }
                         }
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
+                    Layout.minimumWidth: fpsText.implicitWidth + 10
+                    Layout.maximumWidth: fpsText.implicitWidth + 10
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                    border.color: "gray"
+                    border.width: 1
+                    radius: 4
+
+                    Text {
+                        id: fpsText
+                        anchors.fill: parent
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignHCenter
                     }
                 }
 

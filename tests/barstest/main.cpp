@@ -187,6 +187,12 @@ int main(int argc, char **argv)
     gradientBtoYPB->setIcon(QIcon(pm));
     gradientBtoYPB->setIconSize(QSize(100, 24));
 
+    QLabel *fpsLabel = new QLabel(QStringLiteral(""));
+
+    QCheckBox *fpsCheckBox = new QCheckBox(widget);
+    fpsCheckBox->setText(QStringLiteral("Measure Fps"));
+    fpsCheckBox->setChecked(false);
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -345,6 +351,8 @@ int main(int argc, char **argv)
     vLayout2->addWidget(minSliderZ, 0, Qt::AlignTop);
     vLayout2->addWidget(minSliderY, 0, Qt::AlignTop);
     vLayout2->addWidget(maxSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(fpsLabel, 0, Qt::AlignTop);
+    vLayout2->addWidget(fpsCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(gridCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
@@ -454,6 +462,8 @@ int main(int argc, char **argv)
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &GraphModifier::changeFont);
 
+    QObject::connect(fpsCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setFpsMeasurement);
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
@@ -506,6 +516,8 @@ int main(int argc, char **argv)
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, swapAxisButton,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, modifier, &GraphModifier::restart);
+
+    modifier->setFpsLabel(fpsLabel);
 
     modifier->start();
 

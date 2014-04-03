@@ -74,6 +74,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty ValueAxis3DFormatter ValueAxis3D::formatter
+ * \since QtDataVisualization 1.1
+ *
+ * Defines the axis \a formatter to be used. Any existing formatter is deleted when a new formatter
+ * is set.
+ *
+ */
+
+/*!
  * Constructs QValue3DAxis with the given \a parent.
  */
 QValue3DAxis::QValue3DAxis(QObject *parent) :
@@ -170,6 +179,7 @@ QString QValue3DAxis::labelFormat() const
 
 /*!
  * \property QValue3DAxis::formatter
+ * \since Qt Data Visualization 1.1
  *
  * Defines the axis \a formatter to be used. Any existing formatter is deleted when a new formatter
  * is set.

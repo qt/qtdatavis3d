@@ -237,6 +237,11 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::handleAxisYChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::axisZChanged, this,
                      &AbstractDeclarative::handleAxisZChanged);
+
+    QObject::connect(m_controller.data(), &Abstract3DController::measureFpsChanged, this,
+                     &AbstractDeclarative::measureFpsChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::currentFpsChanged, this,
+                     &AbstractDeclarative::currentFpsChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -567,6 +572,21 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
         // Disable clearing of the window as we render underneath
         window->setClearBeforeRendering(false);
     }
+}
+
+void AbstractDeclarative::setMeasureFps(bool enable)
+{
+    m_controller->setMeasureFps(enable);
+}
+
+bool AbstractDeclarative::measureFps() const
+{
+    return m_controller->measureFps();
+}
+
+qreal AbstractDeclarative::currentFps() const
+{
+    return m_controller->currentFps();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

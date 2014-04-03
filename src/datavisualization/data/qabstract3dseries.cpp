@@ -242,6 +242,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty string Abstract3DSeries::itemLabel
+ * \since QtDataVisualization 1.1
  *
  * Contains the formatted item label. If there is no selected item or the selected item is not
  * visible, returns an empty string.
@@ -251,6 +252,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty bool Abstract3DSeries::itemLabelVisible
+ * \since QtDataVisualization 1.1
  *
  * If \c true, item labels are drawn as floating labels in the graph. Otherwise item labels are not
  * drawn. If you prefer to show the item label in an external control, set this property to
@@ -608,6 +610,7 @@ QString QAbstract3DSeries::name() const
 
 /*!
  * \property QAbstract3DSeries::itemLabel
+ * \since Qt Data Visualization 1.1
  *
  * Contains the formatted item label. If there is no selected item or the selected item is not
  * visible, returns an empty string.
@@ -621,6 +624,7 @@ QString QAbstract3DSeries::itemLabel() const
 
 /*!
  * \property QAbstract3DSeries::itemLabelVisible
+ * \since Qt Data Visualization 1.1
  *
  * If \c true, item labels are drawn as floating labels in the graph. Otherwise item labels are not
  * drawn. If you prefer to show the item label in an external control, set this property to

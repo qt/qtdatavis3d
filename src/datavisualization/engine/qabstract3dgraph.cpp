@@ -363,7 +363,8 @@ bool QAbstract3DGraph::shadowsSupported() const
 /*!
  * \property QAbstract3DGraph::scene
  *
- * This property contains the read only Q3DScene that can be used to access, for example, a camera object.
+ * This property contains the read only Q3DScene that can be used to access, for example, a camera
+ * object.
  */
 Q3DScene *QAbstract3DGraph::scene() const
 {
@@ -402,6 +403,39 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
  * Signal can be used for example for implementing custom input handlers, as demonstrated in this
  * \l {Axis Range Dragging With Labels Example}{example}.
  */
+
+/*!
+ * \property QAbstract3DGraph::measureFps
+ * \since Qt Data Visualization 1.1
+ *
+ * If \c true, the rendering is done continuously instead of on demand, and currentFps property
+ * is updated. Defaults to false.
+ *
+ * \sa currentFps
+ */
+void QAbstract3DGraph::setMeasureFps(bool enable)
+{
+    d_ptr->m_visualController->setMeasureFps(enable);
+}
+
+bool QAbstract3DGraph::measureFps() const
+{
+    return d_ptr->m_visualController->measureFps();
+}
+
+/*!
+ * \property QAbstract3DGraph::currentFps
+ * \since Qt Data Visualization 1.1
+ *
+ * When fps measuring is enabled, the results for the last second are stored in this read-only
+ * property. It takes at least a second before this value updates after measurement is activated.
+ *
+ * \sa measureFps
+ */
+qreal QAbstract3DGraph::currentFps() const
+{
+    return d_ptr->m_visualController->currentFps();
+}
 
 /*!
  * \internal
@@ -540,6 +574,11 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraphPrivate::handleAxisYChanged);
     QObject::connect(m_visualController, &Abstract3DController::axisZChanged, this,
                      &QAbstract3DGraphPrivate::handleAxisZChanged);
+
+    QObject::connect(m_visualController, &Abstract3DController::measureFpsChanged, q_ptr,
+                     &QAbstract3DGraph::measureFpsChanged);
+    QObject::connect(m_visualController, &Abstract3DController::currentFpsChanged, q_ptr,
+                     &QAbstract3DGraph::currentFpsChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

@@ -40,6 +40,8 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
+    Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged)
+    Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -106,6 +108,10 @@ public:
 
     QImage renderToImage(int msaaSamples = 0, const QSize &imageSize = QSize());
 
+    void setMeasureFps(bool enable);
+    bool measureFps() const;
+    qreal currentFps() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -118,13 +124,14 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
 
-
 signals:
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *theme);
     void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
     void elementSelected(QAbstract3DGraph::ElementType type);
+    void measureFpsChanged(bool enabled);
+    void currentFpsChanged(qreal fps);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)

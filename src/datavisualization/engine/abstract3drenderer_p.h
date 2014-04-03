@@ -29,12 +29,7 @@
 #ifndef ABSTRACT3DRENDERER_P_H
 #define ABSTRACT3DRENDERER_P_H
 
-//#define DISPLAY_RENDER_SPEED
-
 #include <QtGui/QOpenGLFunctions>
-#ifdef DISPLAY_RENDER_SPEED
-#include <QtCore/QTime>
-#endif
 
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
@@ -163,12 +158,6 @@ protected:
 
     QString m_selectionLabel;
     LabelItem *m_selectionLabelItem;
-
-#ifdef DISPLAY_RENDER_SPEED
-    bool m_isFirstFrame;
-    QTime m_lastFrameTime;
-    GLint m_numFrames;
-#endif
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -48,10 +48,6 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_clickedSeries(0),
       m_clickedType(QAbstract3DGraph::ElementNone),
       m_selectionLabelItem(0)
-#ifdef DISPLAY_RENDER_SPEED
-    , m_isFirstFrame(true),
-      m_numFrames(0)
-#endif
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
@@ -97,23 +93,6 @@ void Abstract3DRenderer::initializeOpenGL()
 
 void Abstract3DRenderer::render(const GLuint defaultFboHandle)
 {
-#ifdef DISPLAY_RENDER_SPEED
-    // For speed computation
-    if (m_isFirstFrame) {
-        m_lastFrameTime.start();
-        m_isFirstFrame = false;
-    }
-
-    // Measure speed (as milliseconds per frame)
-    m_numFrames++;
-    if (m_lastFrameTime.elapsed() >= 1000) { // print only if last measurement was more than 1s ago
-        qDebug() << float(m_lastFrameTime.elapsed()) / float(m_numFrames) << "ms/frame (="
-                 << float(m_numFrames) << "fps)";
-        m_numFrames = 0;
-        m_lastFrameTime.restart();
-    }
-#endif
-
     if (defaultFboHandle) {
         glDepthMask(true);
         glEnable(GL_DEPTH_TEST);
@@ -138,14 +117,6 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glDisable(GL_SCISSOR_TEST);
 }
-
-//QString Abstract3DRenderer::generateValueLabel(const QString &format, float value)
-//{
-//    QString valueLabelFormat = format;
-//    Utils::ParamType valueParamType = Utils::findFormatParamType(valueLabelFormat);
-//    QByteArray valueFormatArray = valueLabelFormat.toUtf8();
-//    return Utils::formatLabel(valueFormatArray, valueParamType, value);
-//}
 
 void Abstract3DRenderer::updateSelectionState(SelectionState state)
 {

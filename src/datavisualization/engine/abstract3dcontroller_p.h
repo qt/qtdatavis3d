@@ -36,6 +36,7 @@
 #include "qabstractdataproxy.h"
 #include "q3dscene_p.h"
 #include <QtGui/QLinearGradient>
+#include <QtCore/QTime>
 
 class QFont;
 class QOpenGLFramebufferObject;
@@ -160,6 +161,11 @@ protected:
 
     QList<QAbstract3DSeries *> m_seriesList;
 
+    bool m_measureFps;
+    QTime m_frameTimer;
+    int m_numFrames;
+    qreal m_currentFps;
+
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
 public:
@@ -269,6 +275,10 @@ public slots:
     // Renderer callback handlers
     void handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality);
 
+    void setMeasureFps(bool enable);
+    inline bool measureFps() const { return m_measureFps; }
+    inline qreal currentFps() const { return m_currentFps; }
+
 signals:
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
@@ -279,6 +289,8 @@ signals:
     void axisYChanged(QAbstract3DAxis *axis);
     void axisZChanged(QAbstract3DAxis *axis);
     void elementSelected(QAbstract3DGraph::ElementType type);
+    void measureFpsChanged(bool enabled);
+    void currentFpsChanged(qreal fps);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

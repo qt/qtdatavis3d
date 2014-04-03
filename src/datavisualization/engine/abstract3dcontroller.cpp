@@ -52,7 +52,10 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_isDataDirty(true),
     m_isSeriesVisibilityDirty(true),
     m_isSeriesVisualsDirty(true),
-    m_renderPending(false)
+    m_renderPending(false),
+    m_measureFps(false),
+    m_numFrames(0),
+    m_currentFps(0.0)
 {
     if (!m_scene)
         m_scene = new Q3DScene;
@@ -373,12 +376,21 @@ void Abstract3DController::render(const GLuint defaultFboHandle)
     if (!m_renderer)
         return;
 
-    m_renderer->render(defaultFboHandle);
+    if (m_measureFps) {
+        // Measure speed (as milliseconds per frame)
+        m_numFrames++;
+        int elapsed = m_frameTimer.elapsed();
+        if (elapsed >= 1000) {
+            m_currentFps = qreal(m_numFrames) * 1000.0 / qreal(elapsed);
+            emit currentFpsChanged(m_currentFps);
+            m_numFrames = 0;
+            m_frameTimer.restart();
+        }
+        // To get meaningful framerate, don't just do render on demand.
+        emitNeedRender();
+    }
 
-#ifdef DISPLAY_RENDER_SPEED
-    // To get meaningful framerate, don't just do render on demand.
-    emitNeedRender();
-#endif
+    m_renderer->render(defaultFboHandle);
 }
 
 void Abstract3DController::mouseDoubleClickEvent(QMouseEvent *event)
@@ -950,6 +962,21 @@ void Abstract3DController::handleSeriesVisibilityChanged(bool visible)
 void Abstract3DController::handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     setShadowQuality(quality);
+}
+
+void Abstract3DController::setMeasureFps(bool enable)
+{
+    if (m_measureFps != enable) {
+        m_measureFps = enable;
+        m_currentFps = 0.0;
+
+        if (enable) {
+             m_frameTimer.start();
+             m_numFrames = -1;
+             emitNeedRender();
+        }
+        emit measureFpsChanged(enable);
+    }
 }
 
 void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)

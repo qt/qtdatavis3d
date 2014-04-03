@@ -90,6 +90,8 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<QValue3DAxis, 1>(uri, 1, 1, "ValueAxis3D");
     qmlRegisterUncreatableType<QAbstract3DSeries, 1>(uri, 1, 1, "Abstract3DSeries",
                                                   QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
+    qmlRegisterUncreatableType<AbstractDeclarative, 1>(uri, 1, 1, "AbstractGraph3D",
+                                                    QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
 
     // New types
     qmlRegisterType<QValue3DAxisFormatter>(uri, 1, 1, "ValueAxis3DFormatter");

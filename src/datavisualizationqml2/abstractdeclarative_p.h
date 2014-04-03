@@ -66,6 +66,8 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
+    Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged REVISION 1)
+    Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged REVISION 1)
 
 public:
     enum SelectionFlag {
@@ -138,6 +140,10 @@ public:
 
     void checkWindowList(QQuickWindow *window);
 
+    void setMeasureFps(bool enable);
+    bool measureFps() const;
+    qreal currentFps() const;
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -167,6 +173,8 @@ signals:
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
     void renderingModeChanged(AbstractDeclarative::RenderingMode mode);
+    void measureFpsChanged(bool enabled);
+    void currentFpsChanged(qreal fps);
 
 private:
     QPointer<Abstract3DController> m_controller;

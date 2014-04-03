@@ -125,6 +125,26 @@
  */
 
 /*!
+ * \qmlproperty bool AbstractGraph3D::measureFps
+ * \since QtDataVisualization 1.1
+ *
+ * If \c true, the rendering is done continuously instead of on demand, and currentFps property
+ * is updated. Defaults to false.
+ *
+ * \sa currentFps
+ */
+
+/*!
+ * \qmlproperty int AbstractGraph3D::currentFps
+ * \since QtDataVisualization 1.1
+ *
+ * When fps measuring is enabled, the results for the last second are stored in this read-only
+ * property. It takes at least a second before this value updates after measurement is activated.
+ *
+ * \sa measureFps
+ */
+
+/*!
  * \qmlmethod void AbstractGraph3D::clearSelection()
  * Clears selection from all attached series.
  */
