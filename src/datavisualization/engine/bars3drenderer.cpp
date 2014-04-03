@@ -96,6 +96,7 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_keepSeriesUniform(false)
 {
     m_axisCacheY.setScale(2.0f);
+    m_axisCacheY.setTranslate(-1.0f);
 
     initializeOpenGLFunctions();
     initializeOpenGL();
