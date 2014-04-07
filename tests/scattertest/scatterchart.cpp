@@ -459,6 +459,12 @@ void ScatterDataModifier::setGradient()
     }
 }
 
+void ScatterDataModifier::clearSeriesData()
+{
+    if (m_targetSeries)
+        m_targetSeries->dataProxy()->resetArray(0);
+}
+
 void ScatterDataModifier::addSeries()
 {
     QScatter3DSeries *series = createAndAddSeries();

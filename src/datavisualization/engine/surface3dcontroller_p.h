@@ -77,7 +77,6 @@ private:
     bool m_flatShadingSupported;
     QVector<ChangeItem> m_changedItems;
     QVector<ChangeRow> m_changedRows;
-    QVector<QSurface3DSeries *> m_changedSeriesList;
 
 public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
@@ -97,6 +96,7 @@ public:
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick();
+    virtual void adjustAxisRanges();
 
     static QPoint invalidSelectionPosition();
     bool isFlatShadingSupported();
@@ -119,8 +119,6 @@ signals:
     void selectedSeriesChanged(QSurface3DSeries *series);
 
 private:
-    void adjustValueAxisRange();
-
     Q_DISABLE_COPY(Surface3DController)
 };
 

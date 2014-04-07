@@ -102,6 +102,9 @@ int main(int argc, char **argv)
     QPushButton *setSelectedItemButton = new QPushButton(widget);
     setSelectedItemButton->setText(QStringLiteral("Select/deselect item 3"));
 
+    QPushButton *clearSeriesDataButton = new QPushButton(widget);
+    clearSeriesDataButton->setText(QStringLiteral("Clear series data"));
+
     QPushButton *addSeriesButton = new QPushButton(widget);
     addSeriesButton->setText(QStringLiteral("Add Series"));
 
@@ -220,6 +223,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(removeOneButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedItemButton, 0, Qt::AlignTop);
+    vLayout->addWidget(clearSeriesDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(toggleSeriesVisibilityButton, 0, Qt::AlignTop);
@@ -280,6 +284,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::removeBunch);
     QObject::connect(setSelectedItemButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::selectItem);
+    QObject::connect(clearSeriesDataButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::clearSeriesData);
     QObject::connect(addSeriesButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::addSeries);
     QObject::connect(removeSeriesButton, &QPushButton::clicked, modifier,

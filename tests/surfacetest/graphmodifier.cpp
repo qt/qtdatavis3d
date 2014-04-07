@@ -1093,6 +1093,44 @@ void GraphModifier::removeRow()
     m_zCount--;
 }
 
+void GraphModifier::resetArray()
+{
+    qDebug() << "Reset series data array";
+    int rows = 10;
+    int columns = 10;
+    float randFactor = float(rand() % 100) / 100.0f;
+    QSurfaceDataArray *planeArray = new QSurfaceDataArray;
+    planeArray->reserve(rows);
+
+    for (int i = 0; i < rows; i++) {
+        planeArray->append(new QSurfaceDataRow);
+        (*planeArray)[i]->resize(columns);
+        for (int j = 0; j < columns; j++) {
+            (*planeArray->at(i))[j].setX(float(j) * randFactor);
+            (*planeArray->at(i))[j].setY(float(i - j) * randFactor);
+            (*planeArray->at(i))[j].setZ(float(i));
+        }
+    }
+
+#ifdef MULTI_SERIES
+    int series = rand() % 4;
+    m_multiseries[series]->dataProxy()->resetArray(planeArray);
+#else
+    m_theSeries->dataProxy()->resetArray(planeArray);
+#endif
+}
+
+void GraphModifier::resetArrayEmpty()
+{
+    QSurfaceDataArray *emptryArray = new QSurfaceDataArray;
+#ifdef MULTI_SERIES
+    int series = rand() % 4;
+    m_multiseries[series]->dataProxy()->resetArray(emptryArray);
+#else
+    m_theSeries->dataProxy()->resetArray(emptryArray);
+#endif
+}
+
 void GraphModifier::changeMesh()
 {
     static int model = 0;

@@ -108,6 +108,8 @@ void Bars3DController::handleArrayReset()
         m_isDataDirty = true;
         series->d_ptr->markItemLabelDirty();
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     // Clear selection unless still valid
     setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
     emitNeedRender();
@@ -122,6 +124,8 @@ void Bars3DController::handleRowsAdded(int startIndex, int count)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     emitNeedRender();
 }
 
@@ -135,6 +139,8 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
         m_isDataDirty = true;
         series->d_ptr->markItemLabelDirty();
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     emitNeedRender();
 }
 
@@ -161,6 +167,8 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
 
     emitNeedRender();
 }
@@ -183,6 +191,8 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
 
     emitNeedRender();
 }
@@ -197,6 +207,8 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
         m_isDataDirty = true;
         series->d_ptr->markItemLabelDirty();
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     emitNeedRender();
 }
 
@@ -239,8 +251,6 @@ void Bars3DController::handleAxisAutoAdjustRangeChangedInOrientation(
 void Bars3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
     Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
-
-    adjustAxisRanges();
 
     // Visibility changes may require disabling slicing,
     // so just reset selection to ensure everything is still valid.
@@ -341,9 +351,6 @@ void Bars3DController::insertSeries(int index, QAbstract3DSeries *series)
     Abstract3DController::insertSeries(index, series);
 
     if (oldSize != m_seriesList.size())  {
-        if (series->isVisible())
-            adjustAxisRanges();
-
         QBar3DSeries *barSeries =  static_cast<QBar3DSeries *>(series);
         if (!oldSize) {
             m_primarySeries = barSeries;

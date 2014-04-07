@@ -16,27 +16,28 @@
 **
 ****************************************************************************/
 
-#include "scatterrenderitem_p.h"
-#include "scatter3drenderer_p.h"
-#include "qscatterdataproxy.h"
+#include "barseriesrendercache_p.h"
+#include "bars3drenderer_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-ScatterRenderItem::ScatterRenderItem()
-    : AbstractRenderItem(),
-      m_visible(false)
+BarSeriesRenderCache::BarSeriesRenderCache(QAbstract3DSeries *series,
+                                           Abstract3DRenderer *renderer)
+    : SeriesRenderCache(series, renderer),
+      m_visualIndex(-1)
 {
 }
 
-ScatterRenderItem::ScatterRenderItem(const ScatterRenderItem &other)
-    : AbstractRenderItem(other)
+BarSeriesRenderCache::~BarSeriesRenderCache()
 {
-    m_position = other.m_position;
-    m_visible = other.m_visible;
 }
 
-ScatterRenderItem::~ScatterRenderItem()
+void BarSeriesRenderCache::cleanup(TextureHelper *texHelper)
 {
+    m_renderArray.clear();
+    m_sliceArray.clear();
+
+    SeriesRenderCache::cleanup(texHelper);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

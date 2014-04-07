@@ -338,6 +338,12 @@ int main(int argc, char *argv[])
     QPushButton *removeRowButton = new QPushButton(widget);
     removeRowButton->setText(QStringLiteral("Remove a row"));
 
+    QPushButton *resetArrayButton = new QPushButton(widget);
+    resetArrayButton->setText(QStringLiteral("Reset Series Array to plane"));
+
+    QPushButton *resetArrayEmptyButton = new QPushButton(widget);
+    resetArrayEmptyButton->setText(QStringLiteral("Reset Series Array to empty"));
+
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
@@ -423,6 +429,8 @@ int main(int argc, char *argv[])
     vLayout2->addWidget(insertRowButton);
     vLayout2->addWidget(insertRowsButton);
     vLayout2->addWidget(removeRowButton);
+    vLayout2->addWidget(resetArrayButton);
+    vLayout2->addWidget(resetArrayEmptyButton);
 
     widget->show();
 
@@ -574,6 +582,10 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::insertRows);
     QObject::connect(removeRowButton,&QPushButton::clicked,
                      modifier, &GraphModifier::removeRow);
+    QObject::connect(resetArrayButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::resetArray);
+    QObject::connect(resetArrayEmptyButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::resetArrayEmpty);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

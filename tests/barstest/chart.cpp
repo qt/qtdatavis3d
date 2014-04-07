@@ -71,7 +71,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_defaultInputHandler(0),
       m_ownTheme(0),
       m_builtinTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss)),
-      m_customInputHandler(new CustomInputHandler)
+      m_customInputHandler(new CustomInputHandler),
+      m_extraSeries(0)
 {
     m_temperatureData->setObjectName("m_temperatureData");
     m_temperatureData2->setObjectName("m_temperatureData2");
@@ -1147,6 +1148,67 @@ void GraphModifier::changeLogBase(const QString &text)
         qobject_cast<QLogValue3DAxisFormatter *>(m_graph->valueAxis()->formatter());
     if (formatter)
         formatter->setBase(qreal(text.toDouble()));
+}
+
+void GraphModifier::addRemoveSeries()
+{
+    static int counter = 0;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "New series";
+        m_extraSeries = new QBar3DSeries;
+        m_graph->addSeries(m_extraSeries);
+        QObject::connect(m_extraSeries, &QBar3DSeries::selectedBarChanged, this,
+                         &GraphModifier::handleSelectionChange);
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Add data to series";
+        QBarDataArray *array = new QBarDataArray;
+        array->reserve(5);
+        for (int i = 0; i < 5; i++) {
+            array->append(new QBarDataRow(10));
+            for (int j = 0; j < 10; j++)
+                (*array->at(i))[j].setValue(i * j);
+        }
+        m_extraSeries->dataProxy()->resetArray(array);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Hide series";
+        m_extraSeries->setVisible(false);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Modify data when hidden";
+        QBarDataArray array;
+        array.reserve(5);
+        for (int i = 0; i < 5; i++) {
+            array.append(new QBarDataRow(10));
+            for (int j = 0; j < 10; j++)
+                (*array.at(i))[j].setValue(2 * i * j);
+        }
+        m_extraSeries->dataProxy()->addRows(array);
+    }
+        break;
+    case 4: {
+        qDebug() << __FUNCTION__ << counter << "Show series again";
+        m_extraSeries->setVisible(true);
+    }
+        break;
+    case 5: {
+        qDebug() << __FUNCTION__ << counter << "Remove series";
+        m_graph->removeSeries(m_extraSeries);
+        delete m_extraSeries;
+        m_extraSeries = 0;
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
 }
 
 void GraphModifier::changeValueAxisSegments(int value)

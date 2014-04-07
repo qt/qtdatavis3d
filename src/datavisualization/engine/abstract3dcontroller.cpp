@@ -50,7 +50,6 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_axisZ(0),
     m_renderer(0),
     m_isDataDirty(true),
-    m_isSeriesVisibilityDirty(true),
     m_isSeriesVisualsDirty(true),
     m_renderPending(false),
     m_measureFps(false),
@@ -146,7 +145,7 @@ void Abstract3DController::removeSeries(QAbstract3DSeries *series)
                             this, &Abstract3DController::handleSeriesVisibilityChanged);
         series->d_ptr->setController(0);
         m_isDataDirty = true;
-        m_isSeriesVisibilityDirty = true;
+        m_isSeriesVisualsDirty = true;
         emitNeedRender();
     }
 }
@@ -354,9 +353,13 @@ void Abstract3DController::synchDataToRenderer()
         }
     }
 
-    if (m_isSeriesVisibilityDirty || m_isSeriesVisualsDirty) {
-        m_renderer->updateSeries(m_seriesList, m_isSeriesVisibilityDirty);
-        m_isSeriesVisibilityDirty = false;
+    if (m_changedSeriesList.size()) {
+        m_renderer->modifiedSeriesList(m_changedSeriesList);
+        m_changedSeriesList.clear();
+    }
+
+    if (m_isSeriesVisualsDirty) {
+        m_renderer->updateSeries(m_seriesList);
         m_isSeriesVisualsDirty = false;
     }
 
@@ -1018,10 +1021,14 @@ void Abstract3DController::handleAxisFormatterDirtyBySender(QObject *sender)
 
 void Abstract3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
-    Q_UNUSED(sender)
+    QAbstract3DSeries *series = static_cast<QAbstract3DSeries *>(sender);
+    series->d_ptr->m_changeTracker.visibilityChanged = true;
 
     m_isDataDirty = true;
-    m_isSeriesVisibilityDirty = true;
+    m_isSeriesVisualsDirty = true;
+
+    adjustAxisRanges();
+
     emitNeedRender();
 }
 

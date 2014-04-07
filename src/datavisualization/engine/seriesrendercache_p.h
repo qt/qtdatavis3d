@@ -41,10 +41,10 @@ class TextureHelper;
 class SeriesRenderCache
 {
 public:
-    SeriesRenderCache();
+    SeriesRenderCache(QAbstract3DSeries *series, Abstract3DRenderer *renderer);
     virtual ~SeriesRenderCache();
 
-    void populate(QAbstract3DSeries *series, Abstract3DRenderer *renderer);
+    virtual void populate(bool newSeries);
     virtual void cleanup(TextureHelper *texHelper);
 
     // NOTE: Series pointer can only be used to access the series when syncing with controller.
@@ -66,6 +66,11 @@ public:
     inline const GLuint &multiHighlightGradientTexture() const { return m_multiHighlightGradientTexture; }
     inline const QString &name() const { return m_name; }
     inline const QString &itemLabel() const { return m_itemLabel; }
+    inline void setValid(bool valid) { m_valid = valid; }
+    inline bool isValid() const { return m_valid; }
+    inline bool isVisible() const { return m_visible; }
+    inline void setDataDirty(bool state) { m_objectDirty = state; }
+    inline bool dataDirty() const { return m_objectDirty; }
 
 protected:
     QAbstract3DSeries *m_series;
@@ -85,6 +90,10 @@ protected:
 
     QString m_name;
     QString m_itemLabel;
+    bool m_valid;
+    bool m_visible;
+    Abstract3DRenderer *m_renderer;
+    bool m_objectDirty;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -48,10 +48,10 @@ class TextureHelper;
 class SurfaceSeriesRenderCache : public SeriesRenderCache
 {
 public:
-    SurfaceSeriesRenderCache(Surface3DRenderer *renderer);
+    SurfaceSeriesRenderCache(QAbstract3DSeries *series, Surface3DRenderer *renderer);
     virtual ~SurfaceSeriesRenderCache();
 
-    void populate(QSurface3DSeries *series, Abstract3DRenderer *renderer);
+    virtual void populate(bool newSeries);
     virtual void cleanup(TextureHelper *texHelper);
 
     inline bool surfaceVisible() const { return m_surfaceVisible; }
@@ -59,8 +59,6 @@ public:
     inline bool isFlatShadingEnabled() const { return m_surfaceFlatShading; }
     inline void setFlatShadingEnabled(bool enabled) { m_surfaceFlatShading = enabled; }
     inline void setFlatChangeAllowed(bool allowed) { m_flatChangeAllowed = allowed; }
-    inline void setValid(bool valid) { m_valid = valid; }
-    inline bool isValid() const { return m_valid; }
     inline SurfaceObject *surfaceObject() { return m_surfaceObj; }
     inline SurfaceObject *sliceSurfaceObject() { return m_sliceSurfaceObj; }
     inline const QRect &sampleSpace() const { return m_sampleSpace; }
@@ -68,11 +66,8 @@ public:
     inline QSurface3DSeries *series() const { return static_cast<QSurface3DSeries *>(m_series); }
     inline QSurfaceDataArray &dataArray() { return m_dataArray; }
     inline QSurfaceDataArray &sliceDataArray() { return m_sliceDataArray; }
-    inline bool isSeriesVisible() const { return m_series->isVisible(); }
-    inline bool renderable() const { return m_series->isVisible() && (m_surfaceVisible ||
-                                                                      m_surfaceGridVisible); }
-    inline void setObjectDirty(bool state) { m_objectDirty = state; }
-    inline bool objectDirty() const { return m_objectDirty; }
+    inline bool renderable() const { return m_visible && (m_surfaceVisible ||
+                                                          m_surfaceGridVisible); }
     inline void setSelectionTexture(GLuint texture) { m_selectionTexture = texture; }
     inline GLuint selectionTexture() const { return m_selectionTexture; }
     inline void setSelectionIdRange(uint start, uint end) { m_selectionIdStart = start;
@@ -82,7 +77,6 @@ public:
                                                         selection <= m_selectionIdEnd; }
     inline bool isFlatStatusDirty() const { return m_flatStatusDirty; }
     inline void setFlatStatusDirty(bool status) { m_flatStatusDirty = status; }
-    // m_MVPMatrix is volatile, used only for optimizing rendering a bit
     inline void setMVPMatrix(const QMatrix4x4 &matrix) { m_MVPMatrix = matrix; }
     inline const QMatrix4x4 &MVPMatrix() { return m_MVPMatrix; }
 
@@ -115,9 +109,6 @@ protected:
     SelectionPointer *m_mainSelectionPointer;
     bool m_slicePointerActive;
     bool m_mainPointerActive;
-
-    bool m_valid;
-    bool m_objectDirty;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

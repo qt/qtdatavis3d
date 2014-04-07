@@ -105,6 +105,8 @@ public:
     void insertRow();
     void insertRows();
     void removeRow();
+    void resetArray();
+    void resetArrayEmpty();
 
 public slots:
     void changeShadowQuality(int quality);

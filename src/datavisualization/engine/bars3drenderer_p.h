@@ -45,6 +45,7 @@ class ShaderHelper;
 class ObjectHelper;
 class LabelItem;
 class Q3DScene;
+class BarSeriesRenderCache;
 
 class QT_DATAVISUALIZATION_EXPORT Bars3DRenderer : public Abstract3DRenderer
 {
@@ -60,7 +61,6 @@ private:
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
-    QVector<BarRenderSliceItem> m_sliceSelection;
     AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
     bool m_xFlipped;
@@ -95,12 +95,10 @@ private:
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
     QPoint m_visualSelectedBarPos;
-    int m_visualSelectedBarSeriesIndex;
     bool m_resetCameraBaseOrientation;
     QPoint m_selectedBarPos;
-    const QBar3DSeries *m_selectedBarSeries;
+    BarSeriesRenderCache *m_selectedSeriesCache;
     BarRenderItem m_dummyBarRenderItem;
-    QVector<BarRenderItemArray> m_renderingArrays;
     bool m_noZeroInRange;
     float m_seriesScaleX;
     float m_seriesScaleZ;
@@ -108,13 +106,16 @@ private:
     float m_seriesStart;
     QPoint m_clickedPosition;
     bool m_keepSeriesUniform;
+    bool m_haveUniformColorSeries;
+    bool m_haveGradientSeries;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
     ~Bars3DRenderer();
 
     void updateData();
-    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 
@@ -127,7 +128,7 @@ public slots:
                         const QSizeF &spacing = QSizeF(1.0, 1.0),
                         bool relative = true);
     void updateSlicingActive(bool isSlicing);
-    void updateSelectedBar(const QPoint &position, const QBar3DSeries *series);
+    void updateSelectedBar(const QPoint &position, QBar3DSeries *series);
     inline QPoint clickedPosition() const { return m_clickedPosition; }
     void resetClickedStatus();
 
@@ -161,7 +162,8 @@ private:
 #endif
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
-    Abstract3DController::SelectionType isSelected(int row, int bar, int seriesIndex);
+    Abstract3DController::SelectionType isSelected(int row, int bar,
+                                                   const BarSeriesRenderCache *cache);
     QPoint selectionColorToArrayPosition(const QVector4D &selectionColor);
     QBar3DSeries *selectionColorToSeries(const QVector4D &selectionColor);
 

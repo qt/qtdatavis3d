@@ -71,6 +71,7 @@ public slots:
     void selectItem();
     void handleSelectionChange(int index);
     void setGradient();
+    void clearSeriesData();
     void addSeries();
     void removeSeries();
     void toggleSeriesVisibility();

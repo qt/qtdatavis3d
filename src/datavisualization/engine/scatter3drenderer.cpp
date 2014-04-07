@@ -26,6 +26,7 @@
 #include "utils_p.h"
 #include "q3dlight.h"
 #include "qscatter3dseries_p.h"
+#include "scatterseriesrendercache_p.h"
 
 #include <QtGui/QMatrix4x4>
 #include <QtGui/QMouseEvent>
@@ -83,15 +84,17 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_heightNormalizer(1.0f),
       m_scaleFactor(0),
       m_selectedItemIndex(Scatter3DController::invalidSelectionIndex()),
-      m_selectedItemTotalIndex(Scatter3DController::invalidSelectionIndex()),
-      m_selectedItemSeriesIndex(Scatter3DController::invalidSelectionIndex()),
-      m_selectedSeries(0),
+      m_selectedSeriesCache(0),
       m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true),
       m_backgroundMargin(defaultMaxSize),
       m_maxItemSize(0.0f),
-      m_clickedIndex(Scatter3DController::invalidSelectionIndex())
+      m_clickedIndex(Scatter3DController::invalidSelectionIndex()),
+      m_havePointSeries(false),
+      m_haveMeshSeries(false),
+      m_haveUniformColorMeshSeries(false),
+      m_haveGradientMeshSeries(false)
 {
     m_axisCacheY.setScale(2.0f);
     m_axisCacheY.setTranslate(-1.0f);
@@ -159,32 +162,99 @@ void Scatter3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
-void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList,
-                                     bool updateVisibility)
+void Scatter3DRenderer::updateData()
 {
-    Abstract3DRenderer::updateSeries(seriesList, updateVisibility);
+    calculateSceneScalingFactors();
+    float minX = float(m_axisCacheX.min());
+    float maxX = float(m_axisCacheX.max());
+    float minY = float(m_axisCacheY.min());
+    float maxY = float(m_axisCacheY.max());
+    float minZ = float(m_axisCacheZ.min());
+    float maxZ = float(m_axisCacheZ.max());
+    int totalDataSize = 0;
 
-    int seriesCount = m_visibleSeriesList.size();
+    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        ScatterSeriesRenderCache *cache = static_cast<ScatterSeriesRenderCache *>(baseCache);
+        if (cache->isVisible() && cache->dataDirty()) {
+            const QScatter3DSeries *currentSeries = cache->series();
+            ScatterRenderItemArray &renderArray = cache->renderArray();
+            QScatterDataProxy *dataProxy = currentSeries->dataProxy();
+            const QScatterDataArray &dataArray = *dataProxy->array();
+            int dataSize = dataArray.size();
+            totalDataSize += dataSize;
+            if (dataSize != renderArray.size())
+                renderArray.resize(dataSize);
+
+            for (int i = 0; i < dataSize; i++) {
+                QVector3D dotPos = dataArray.at(i).position();
+                ScatterRenderItem &renderItem = renderArray[i];
+                if ((dotPos.x() >= minX && dotPos.x() <= maxX )
+                        && (dotPos.y() >= minY && dotPos.y() <= maxY)
+                        && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
+                    renderItem.setPosition(dotPos);
+                    renderItem.setVisible(true);
+                    if (!dataArray.at(i).rotation().isIdentity())
+                        renderItem.setRotation(dataArray.at(i).rotation().normalized());
+                    else
+                        renderItem.setRotation(identityQuaternion);
+                    calculateTranslation(renderItem);
+                } else {
+                    renderItem.setVisible(false);
+                }
+            }
+            cache->setDataDirty(false);
+        }
+    }
+
+    if (totalDataSize) {
+        m_dotSizeScale = GLfloat(qBound(defaultMinSize, 2.0f / float(qSqrt(qreal(totalDataSize))),
+                                        defaultMaxSize));
+    }
+
+    updateSelectedItem(m_selectedItemIndex,
+                       m_selectedSeriesCache ? m_selectedSeriesCache->series() : 0);
+}
+
+void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
+{
+    Abstract3DRenderer::updateSeries(seriesList);
+
+    int seriesCount = seriesList.size();
     float maxItemSize = 0.0f;
     float itemSize = 0.0f;
-
-    if (m_cachedItemSize.size() != seriesCount)
-        m_cachedItemSize.resize(seriesCount);
-
     bool noSelection = true;
-    for (int series = 0; series < seriesCount; series++) {
-        QScatter3DSeries *scatterSeries =
-                static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series());
-        itemSize = scatterSeries->itemSize();
-        if (maxItemSize < itemSize)
-            maxItemSize = itemSize;
-        if (m_cachedItemSize.at(series) != itemSize)
-            m_cachedItemSize[series] = itemSize;
-        if (noSelection
-                && scatterSeries->selectedItem() != QScatter3DSeries::invalidSelectionIndex()
-                && m_selectionLabel != m_visibleSeriesList.at(series).itemLabel()) {
-            m_selectionLabelDirty = true;
-            noSelection = false;
+
+    m_havePointSeries = false;
+    m_haveMeshSeries = false;
+    m_haveUniformColorMeshSeries = false;
+    m_haveGradientMeshSeries = false;
+
+    for (int i = 0; i < seriesCount; i++) {
+        QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(seriesList[i]);
+        if (scatterSeries->isVisible()) {
+            ScatterSeriesRenderCache *cache =
+                    static_cast<ScatterSeriesRenderCache *>(m_renderCacheList.value(scatterSeries));
+            itemSize = scatterSeries->itemSize();
+            if (maxItemSize < itemSize)
+                maxItemSize = itemSize;
+            if (cache->itemSize() != itemSize)
+                cache->setItemSize(itemSize);
+            if (noSelection
+                    && scatterSeries->selectedItem() != QScatter3DSeries::invalidSelectionIndex()
+                    && m_selectionLabel != cache->itemLabel()) {
+                m_selectionLabelDirty = true;
+                noSelection = false;
+            }
+
+            if (cache->mesh() == QAbstract3DSeries::MeshPoint) {
+                m_havePointSeries = true;
+            } else {
+                m_haveMeshSeries = true;
+                if (cache->colorStyle() == Q3DTheme::ColorStyleUniform)
+                    m_haveUniformColorMeshSeries = true;
+                else
+                    m_haveGradientMeshSeries = true;
+            }
         }
     }
     m_maxItemSize = maxItemSize;
@@ -197,53 +267,9 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         m_selectionLabelDirty = true;
 }
 
-void Scatter3DRenderer::updateData()
+SeriesRenderCache *Scatter3DRenderer::createNewCache(QAbstract3DSeries *series)
 {
-    int seriesCount = m_visibleSeriesList.size();
-    calculateSceneScalingFactors();
-    float minX = float(m_axisCacheX.min());
-    float maxX = float(m_axisCacheX.max());
-    float minY = float(m_axisCacheY.min());
-    float maxY = float(m_axisCacheY.max());
-    float minZ = float(m_axisCacheZ.min());
-    float maxZ = float(m_axisCacheZ.max());
-    int totalDataSize = 0;
-
-    if (m_renderingArrays.size() != seriesCount)
-        m_renderingArrays.resize(seriesCount);
-
-    for (int series = 0; series < seriesCount; series++) {
-        QScatterDataProxy *dataProxy =
-                static_cast<QScatter3DSeries *>(m_visibleSeriesList.at(series).series())->dataProxy();
-        const QScatterDataArray &dataArray = *dataProxy->array();
-        int dataSize = dataArray.size();
-        totalDataSize += dataSize;
-
-        if (dataSize != m_renderingArrays.at(series).size())
-            m_renderingArrays[series].resize(dataSize);
-
-        for (int i = 0; i < dataSize; i++) {
-            QVector3D dotPos = dataArray.at(i).position();
-            ScatterRenderItem &renderItem = m_renderingArrays[series][i];
-            if ((dotPos.x() >= minX && dotPos.x() <= maxX )
-                    && (dotPos.y() >= minY && dotPos.y() <= maxY)
-                    && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
-                renderItem.setPosition(dotPos);
-                renderItem.setVisible(true);
-                if (!dataArray.at(i).rotation().isIdentity())
-                    renderItem.setRotation(dataArray.at(i).rotation().normalized());
-                else
-                    renderItem.setRotation(identityQuaternion);
-                calculateTranslation(renderItem);
-            } else {
-                renderItem.setVisible(false);
-            }
-        }
-    }
-    m_dotSizeScale = GLfloat(qBound(defaultMinSize, 2.0f / float(qSqrt(qreal(totalDataSize))),
-                                    defaultMaxSize));
-
-    updateSelectedItem(m_selectedItemIndex, m_selectedSeries);
+    return new ScatterSeriesRenderCache(series, this);
 }
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
@@ -306,8 +332,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     QMatrix4x4 viewMatrix = activeCamera->d_ptr->viewMatrix();
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
-    int seriesCount = m_visibleSeriesList.size();
-
     // Calculate label flipping
     if (viewMatrix.row(0).x() > 0)
         m_zFlipped = false;
@@ -342,25 +366,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     QMatrix4x4 depthProjectionMatrix;
     QMatrix4x4 depthProjectionViewMatrix;
 
-    // Check if we have any series with points
-    bool havePointSeries = false;
-    bool haveMeshSeries = false;
-    bool haveUniformColorMeshSeries = false;
-    bool haveGradientMeshSeries = false;
-    for (int i = 0; i < seriesCount; i++) {
-        if (m_visibleSeriesList.at(i).mesh() == QAbstract3DSeries::MeshPoint) {
-            havePointSeries = true;
-        } else {
-            haveMeshSeries = true;
-            if (m_visibleSeriesList.at(i).colorStyle() == Q3DTheme::ColorStyleUniform)
-                haveUniformColorMeshSeries = true;
-            else
-                haveGradientMeshSeries = true;
-        }
-    }
-
 #if !defined(QT_OPENGL_ES_2)
-    if (havePointSeries) {
+    if (m_havePointSeries) {
         glEnable(GL_POINT_SMOOTH);
         glEnable(GL_PROGRAM_POINT_SIZE);
     }
@@ -401,60 +408,63 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
         // Draw dots to depth buffer
-        for (int series = 0; series < seriesCount; series++) {
-            ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
-            QQuaternion seriesRotation = m_visibleSeriesList.at(series).meshRotation();
-            bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
-
-            float itemSize = m_cachedItemSize.at(series) / itemScaler;
-            if (itemSize == 0.0f)
-                itemSize = m_dotSizeScale;
-            if (drawingPoints) {
-                // Scale points based on shadow quality for shadows, not by zoom level
-                glPointSize(itemSize * 100.0f * m_shadowQualityMultiplier);
-            }
-            QVector3D modelScaler(itemSize, itemSize, itemSize);
-
-            for (int dot = 0; dot < m_renderingArrays.at(series).size(); dot++) {
-                const ScatterRenderItem &item = m_renderingArrays.at(series).at(dot);
-                if (!item.isVisible())
-                    continue;
-
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-
-                modelMatrix.translate(item.translation());
-                if (!drawingPoints) {
-                    if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
-                        modelMatrix.rotate(seriesRotation * item.rotation());
-                    modelMatrix.scale(modelScaler);
-                }
-
-                MVPMatrix = depthProjectionViewMatrix * modelMatrix;
-
-                m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
-
+        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+            if (baseCache->isVisible()) {
+                ScatterSeriesRenderCache *cache = static_cast<ScatterSeriesRenderCache *>(baseCache);
+                ObjectHelper *dotObj = cache->object();
+                QQuaternion seriesRotation(cache->meshRotation());
+                const ScatterRenderItemArray &renderArray = cache->renderArray();
+                const int renderArraySize = renderArray.size();
+                bool drawingPoints = (cache->mesh() == QAbstract3DSeries::MeshPoint);
+                float itemSize = cache->itemSize() / itemScaler;
+                if (itemSize == 0.0f)
+                    itemSize = m_dotSizeScale;
                 if (drawingPoints) {
-                    m_drawer->drawPoint(m_depthShader);
-                } else {
-                    // 1st attribute buffer : vertices
-                    glEnableVertexAttribArray(m_depthShader->posAtt());
-                    glBindBuffer(GL_ARRAY_BUFFER, dotObj->vertexBuf());
-                    glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
-                                          (void *)0);
+                    // Scale points based on shadow quality for shadows, not by zoom level
+                    glPointSize(itemSize * 100.0f * m_shadowQualityMultiplier);
+                }
+                QVector3D modelScaler(itemSize, itemSize, itemSize);
+                for (int dot = 0; dot < renderArraySize; dot++) {
+                    const ScatterRenderItem &item = renderArray.at(dot);
+                    if (!item.isVisible())
+                        continue;
 
-                    // Index buffer
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dotObj->elementBuf());
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
 
-                    // Draw the triangles
-                    glDrawElements(GL_TRIANGLES, dotObj->indexCount(), GL_UNSIGNED_SHORT,
-                                   (void *)0);
+                    modelMatrix.translate(item.translation());
+                    if (!drawingPoints) {
+                        if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
+                            modelMatrix.rotate(seriesRotation * item.rotation());
+                        modelMatrix.scale(modelScaler);
+                    }
 
-                    // Free buffers
-                    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                    glBindBuffer(GL_ARRAY_BUFFER, 0);
+                    MVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
-                    glDisableVertexAttribArray(m_depthShader->posAtt());
+                    m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
+
+                    if (drawingPoints) {
+                        m_drawer->drawPoint(m_depthShader);
+                    } else {
+                        // 1st attribute buffer : vertices
+                        glEnableVertexAttribArray(m_depthShader->posAtt());
+                        glBindBuffer(GL_ARRAY_BUFFER, dotObj->vertexBuf());
+                        glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
+                                              (void *)0);
+
+                        // Index buffer
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dotObj->elementBuf());
+
+                        // Draw the triangles
+                        glDrawElements(GL_TRIANGLES, dotObj->indexCount(), GL_UNSIGNED_SHORT,
+                                       (void *)0);
+
+                        // Free buffers
+                        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                        glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                        glDisableVertexAttribArray(m_depthShader->posAtt());
+                    }
                 }
             }
         }
@@ -481,7 +491,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Skip selection mode drawing if we have no selection mode
     if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
-            && SelectOnScene == m_selectionState && seriesCount > 0) {
+            && SelectOnScene == m_selectionState && m_visibleSeriesCount > 0) {
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glViewport(0, 0,
@@ -493,70 +503,67 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
 
-        int arraySize = 0;
-        int totalArraySize = 0;
-        int dotNo = 0;
-
-        // Init previous to opposite of first to ensure we change binding for first series
-        bool previousDrawingPoints = (m_visibleSeriesList.at(0).mesh() != QAbstract3DSeries::MeshPoint);
-        for (int series = 0; series < seriesCount; series++) {
-            ObjectHelper *dotObj = m_visibleSeriesList.at(series).object();
-            QQuaternion seriesRotation = m_visibleSeriesList.at(series).meshRotation();
-            bool drawingPoints = (m_visibleSeriesList.at(series).mesh() == QAbstract3DSeries::MeshPoint);
-
-            float itemSize = m_cachedItemSize.at(series) / itemScaler;
-            if (itemSize == 0.0f)
-                itemSize = m_dotSizeScale;
+        bool previousDrawingPoints = false;
+        int totalIndex = 0;
+        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+            if (baseCache->isVisible()) {
+                ScatterSeriesRenderCache *cache =
+                        static_cast<ScatterSeriesRenderCache *>(baseCache);
+                ObjectHelper *dotObj = cache->object();
+                QQuaternion seriesRotation(cache->meshRotation());
+                const ScatterRenderItemArray &renderArray = cache->renderArray();
+                const int renderArraySize = renderArray.size();
+                bool drawingPoints = (cache->mesh() == QAbstract3DSeries::MeshPoint);
+                float itemSize = cache->itemSize() / itemScaler;
+                if (itemSize == 0.0f)
+                    itemSize = m_dotSizeScale;
 #if !defined(QT_OPENGL_ES_2)
-            if (drawingPoints)
-                glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+                if (drawingPoints)
+                    glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
 #endif
-            QVector3D modelScaler(itemSize, itemSize, itemSize);
+                QVector3D modelScaler(itemSize, itemSize, itemSize);
 
-            // Rebind selection shader if it has changed
-            if (drawingPoints != previousDrawingPoints) {
-                previousDrawingPoints = drawingPoints;
-                if (drawingPoints)
-                    selectionShader = pointSelectionShader;
-                else
-                    selectionShader = m_selectionShader;
+                // Rebind selection shader if it has changed
+                if (!totalIndex || drawingPoints != previousDrawingPoints) {
+                    previousDrawingPoints = drawingPoints;
+                    if (drawingPoints)
+                        selectionShader = pointSelectionShader;
+                    else
+                        selectionShader = m_selectionShader;
 
-                selectionShader->bind();
-            }
-            arraySize = m_renderingArrays.at(series).size();
-            totalArraySize += arraySize;
-
-            if (totalArraySize > 0xfffffe) // Max possible different selection colors, 0xffffff being skipColor
-                qFatal("Too many objects");
-
-            for (int dot = 0; dot < arraySize; dot++) {
-                const ScatterRenderItem &item = m_renderingArrays.at(series).at(dot);
-                if (!item.isVisible())
-                    continue;
-
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-
-                modelMatrix.translate(item.translation());
-                if (!drawingPoints) {
-                    if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
-                        modelMatrix.rotate(seriesRotation * item.rotation());
-                    modelMatrix.scale(modelScaler);
+                    selectionShader->bind();
                 }
+                cache->setSelectionIndexOffset(totalIndex);
+                for (int dot = 0; dot < renderArraySize; dot++) {
+                    const ScatterRenderItem &item = renderArray.at(dot);
+                    if (!item.isVisible()) {
+                        totalIndex++;
+                        continue;
+                    }
 
-                MVPMatrix = projectionViewMatrix * modelMatrix;
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
 
-                QVector4D dotColor = indexToSelectionColor(dotNo);
-                dotColor /= 255.0f;
+                    modelMatrix.translate(item.translation());
+                    if (!drawingPoints) {
+                        if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
+                            modelMatrix.rotate(seriesRotation * item.rotation());
+                        modelMatrix.scale(modelScaler);
+                    }
 
-                selectionShader->setUniformValue(selectionShader->MVP(), MVPMatrix);
-                selectionShader->setUniformValue(selectionShader->color(), dotColor);
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                if (drawingPoints)
-                    m_drawer->drawPoint(selectionShader);
-                else
-                    m_drawer->drawSelectionObject(selectionShader, dotObj);
-                dotNo++;
+                    QVector4D dotColor = indexToSelectionColor(totalIndex++);
+                    dotColor /= 255.0f;
+
+                    selectionShader->setUniformValue(selectionShader->MVP(), MVPMatrix);
+                    selectionShader->setUniformValue(selectionShader->color(), dotColor);
+
+                    if (drawingPoints)
+                        m_drawer->drawPoint(selectionShader);
+                    else
+                        m_drawer->drawSelectionObject(selectionShader, dotObj);
+                }
             }
         }
 
@@ -584,15 +591,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     GLuint gradientTexture = 0;
     bool dotSelectionFound = false;
     ScatterRenderItem *selectedItem(0);
-    int dotNo = 0;
     QVector3D baseColor;
     QVector3D dotColor;
 
     bool previousDrawingPoints = false;
     Q3DTheme::ColorStyle previousMeshColorStyle = Q3DTheme::ColorStyleUniform;
-    if (haveMeshSeries) {
+    if (m_haveMeshSeries) {
         // Set unchanging shader bindings
-        if (haveGradientMeshSeries) {
+        if (m_haveGradientMeshSeries) {
             m_dotGradientShader->bind();
             m_dotGradientShader->setUniformValue(m_dotGradientShader->lightP(), lightPos);
             m_dotGradientShader->setUniformValue(m_dotGradientShader->view(), viewMatrix);
@@ -600,7 +606,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                  m_cachedTheme->ambientLightStrength());
             m_dotGradientShader->setUniformValue(m_dotGradientShader->lightColor(), lightColor);
         }
-        if (haveUniformColorMeshSeries) {
+        if (m_haveUniformColorMeshSeries) {
             m_dotShader->bind();
             m_dotShader->setUniformValue(m_dotShader->lightP(), lightPos);
             m_dotShader->setUniformValue(m_dotShader->view(), viewMatrix);
@@ -620,160 +626,170 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         dotShader->bind();
     }
 
-    for (int series = 0; series < seriesCount; series++) {
-        const SeriesRenderCache &currentSeries = m_visibleSeriesList.at(series);
-        QQuaternion seriesRotation = currentSeries.meshRotation();
-        ObjectHelper *dotObj = currentSeries.object();
-        bool drawingPoints = (currentSeries.mesh() == QAbstract3DSeries::MeshPoint);
-        Q3DTheme::ColorStyle colorStyle = currentSeries.colorStyle();
-        bool colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
-        bool useColor = colorStyleIsUniform || drawingPoints;
-
-        float itemSize = m_cachedItemSize.at(series) / itemScaler;
-        if (itemSize == 0.0f)
-            itemSize = m_dotSizeScale;
+    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        if (baseCache->isVisible()) {
+            ScatterSeriesRenderCache *cache =
+                    static_cast<ScatterSeriesRenderCache *>(baseCache);
+            ObjectHelper *dotObj = cache->object();
+            QQuaternion seriesRotation(cache->meshRotation());
+            ScatterRenderItemArray &renderArray = cache->renderArray();
+            const int renderArraySize = renderArray.size();
+            bool selectedSeries = m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
+                    && (m_selectedSeriesCache == cache);
+            bool drawingPoints = (cache->mesh() == QAbstract3DSeries::MeshPoint);
+            Q3DTheme::ColorStyle colorStyle = cache->colorStyle();
+            bool colorStyleIsUniform = (colorStyle == Q3DTheme::ColorStyleUniform);
+            bool useColor = colorStyleIsUniform || drawingPoints;
+            bool rangeGradientPoints = drawingPoints
+                    && (colorStyle == Q3DTheme::ColorStyleRangeGradient);
+            float itemSize = cache->itemSize() / itemScaler;
+            if (itemSize == 0.0f)
+                itemSize = m_dotSizeScale;
 #if !defined(QT_OPENGL_ES_2)
-        if (drawingPoints)
-            glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+            if (drawingPoints)
+                glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
 #endif
-        QVector3D modelScaler(itemSize, itemSize, itemSize);
+            QVector3D modelScaler(itemSize, itemSize, itemSize);
 
-        // Rebind shader if it has changed
-        if (drawingPoints != previousDrawingPoints
-                || (!drawingPoints &&
-                    (colorStyleIsUniform != (previousMeshColorStyle == Q3DTheme::ColorStyleUniform)))) {
-            previousDrawingPoints = drawingPoints;
-            if (drawingPoints) {
-                dotShader = pointSelectionShader;
-            } else {
-                if (colorStyleIsUniform)
-                    dotShader = m_dotShader;
-                else
-                    dotShader = m_dotGradientShader;
-            }
-            dotShader->bind();
-        }
-
-        if (!drawingPoints && !colorStyleIsUniform && previousMeshColorStyle != colorStyle) {
-            if (colorStyle == Q3DTheme::ColorStyleObjectGradient) {
-                m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientMin(), 0.0f);
-                m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(), 0.5f);
-            } else {
-                // Each ball is of uniform color according to its Y-coordinate
-                m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(), 0.0f);
-            }
-        }
-
-        if (!drawingPoints)
-            previousMeshColorStyle = colorStyle;
-
-        if (useColor) {
-            baseColor = currentSeries.baseColor();
-            dotColor = baseColor;
-        }
-
-        int seriesSize = m_renderingArrays.at(series).size();
-        for (int dot = 0; dot < seriesSize; dot++) {
-            ScatterRenderItem &item = m_renderingArrays[series][dot];
-            if (!item.isVisible())
-                continue;
-
-            QMatrix4x4 modelMatrix;
-            QMatrix4x4 MVPMatrix;
-            QMatrix4x4 itModelMatrix;
-
-            modelMatrix.translate(item.translation());
-            if (!drawingPoints) {
-                if (!seriesRotation.isIdentity() || !item.rotation().isIdentity()) {
-                    QQuaternion totalRotation = seriesRotation * item.rotation();
-                    modelMatrix.rotate(totalRotation);
-                    itModelMatrix.rotate(totalRotation);
+            // Rebind shader if it has changed
+            if (drawingPoints != previousDrawingPoints
+                    || (!drawingPoints &&
+                        (colorStyleIsUniform != (previousMeshColorStyle
+                                                 == Q3DTheme::ColorStyleUniform)))) {
+                previousDrawingPoints = drawingPoints;
+                if (drawingPoints) {
+                    dotShader = pointSelectionShader;
+                } else {
+                    if (colorStyleIsUniform)
+                        dotShader = m_dotShader;
+                    else
+                        dotShader = m_dotGradientShader;
                 }
-                modelMatrix.scale(modelScaler);
-                itModelMatrix.scale(modelScaler);
-            }
-#ifdef SHOW_DEPTH_TEXTURE_SCENE
-            MVPMatrix = depthProjectionViewMatrix * modelMatrix;
-#else
-            MVPMatrix = projectionViewMatrix * modelMatrix;
-#endif
-
-            if (useColor)
-                dotColor = baseColor;
-            else
-                gradientTexture = currentSeries.baseGradientTexture();
-
-            GLfloat lightStrength = m_cachedTheme->lightStrength();
-            if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
-                    && (m_selectedItemTotalIndex == dotNo)) {
-                if (useColor)
-                    dotColor = currentSeries.singleHighlightColor();
-                else
-                    gradientTexture = currentSeries.singleHighlightGradientTexture();
-                lightStrength = m_cachedTheme->highlightLightStrength();
-                // Insert data to ScatterRenderItem. We have no ownership, don't delete the previous one
-                selectedItem = &item;
-                dotSelectionFound = true;
-                // Save selected item size (adjusted with font size) for selection label positioning
-                selectedItemSize = itemSize + (m_cachedTheme->font().pointSizeF() / 500.0f);
+                dotShader->bind();
             }
 
-            if (!drawingPoints) {
-                // Set shader bindings
-                dotShader->setUniformValue(dotShader->model(), modelMatrix);
-                dotShader->setUniformValue(dotShader->nModel(),
-                                           itModelMatrix.inverted().transposed());
+            if (!drawingPoints && !colorStyleIsUniform && previousMeshColorStyle != colorStyle) {
+                if (colorStyle == Q3DTheme::ColorStyleObjectGradient) {
+                    m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientMin(), 0.0f);
+                    m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(),
+                                                         0.5f);
+                } else {
+                    // Each dot is of uniform color according to its Y-coordinate
+                    m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(),
+                                                         0.0f);
+                }
             }
 
-            dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
+            if (!drawingPoints)
+                previousMeshColorStyle = colorStyle;
+
             if (useColor) {
-                if (colorStyle == Q3DTheme::ColorStyleRangeGradient &&
-                        (m_selectedItemTotalIndex != dotNo)) {
-                    // Drawing points with range gradient
-                    // Get color from gradient based on items y position converted to percents
-                    int position = int(item.translation().y() * 50.0f) + 50;
-                    dotColor = Utils::vectorFromColor(
-                                currentSeries.gradientImage().pixel(0, position));
-                }
-                dotShader->setUniformValue(dotShader->color(), dotColor);
-            } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
-                dotShader->setUniformValue(dotShader->gradientMin(),
-                                           (item.translation().y() + 1.0f) / 2.0f);
+                baseColor = cache->baseColor();
+                dotColor = baseColor;
             }
-#if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                if (!drawingPoints) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    dotShader->setUniformValue(dotShader->shadowQ(), m_shadowQualityToShader);
-                    dotShader->setUniformValue(dotShader->depth(), depthMVPMatrix);
-                    dotShader->setUniformValue(dotShader->lightS(), lightStrength / 10.0f);
+            for (int i = 0; i < renderArraySize; i++) {
+                ScatterRenderItem &item = renderArray[i];
+                if (!item.isVisible())
+                    continue;
 
-                    // Draw the object
-                    m_drawer->drawObject(dotShader, dotObj, gradientTexture, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawPoint(dotShader);
-                }
-            } else
-#endif
-            {
+                QMatrix4x4 modelMatrix;
+                QMatrix4x4 MVPMatrix;
+                QMatrix4x4 itModelMatrix;
+
+                modelMatrix.translate(item.translation());
                 if (!drawingPoints) {
-                    // Set shadowless shader bindings
-                    dotShader->setUniformValue(dotShader->lightS(), lightStrength);
-                    // Draw the object
-                    m_drawer->drawObject(dotShader, dotObj, gradientTexture);
+                    if (!seriesRotation.isIdentity() || !item.rotation().isIdentity()) {
+                        QQuaternion totalRotation = seriesRotation * item.rotation();
+                        modelMatrix.rotate(totalRotation);
+                        itModelMatrix.rotate(totalRotation);
+                    }
+                    modelMatrix.scale(modelScaler);
+                    itModelMatrix.scale(modelScaler);
+                }
+#ifdef SHOW_DEPTH_TEXTURE_SCENE
+                MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+#else
+                MVPMatrix = projectionViewMatrix * modelMatrix;
+#endif
+
+                if (useColor) {
+                    if (rangeGradientPoints) {
+                        // Drawing points with range gradient
+                        // Get color from gradient based on items y position converted to percent
+                        int position = int(item.translation().y() * 50.0f) + 50;
+                        dotColor = Utils::vectorFromColor(
+                                    cache->gradientImage().pixel(0, position));
+                    } else {
+                        dotColor = baseColor;
+                    }
                 } else {
-                    // Draw the object
-                    m_drawer->drawPoint(dotShader);
+                    gradientTexture = cache->baseGradientTexture();
+                }
+
+                GLfloat lightStrength = m_cachedTheme->lightStrength();
+                if (selectedSeries && (m_selectedItemIndex == i)) {
+                    if (useColor)
+                        dotColor = cache->singleHighlightColor();
+                    else
+                        gradientTexture = cache->singleHighlightGradientTexture();
+                    lightStrength = m_cachedTheme->highlightLightStrength();
+                    // Insert data to ScatterRenderItem
+                    // We don't have ownership, so don't delete the previous one
+                    selectedItem = &item;
+                    dotSelectionFound = true;
+                    // Save selected item size (adjusted with font size) for selection label
+                    // positioning
+                    selectedItemSize = itemSize + (m_cachedTheme->font().pointSizeF() / 500.0f);
+                }
+
+                if (!drawingPoints) {
+                    // Set shader bindings
+                    dotShader->setUniformValue(dotShader->model(), modelMatrix);
+                    dotShader->setUniformValue(dotShader->nModel(),
+                                               itModelMatrix.inverted().transposed());
+                }
+
+                dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
+                if (useColor) {
+                    dotShader->setUniformValue(dotShader->color(), dotColor);
+                } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
+                    dotShader->setUniformValue(dotShader->gradientMin(),
+                                               (item.translation().y() + 1.0f) / 2.0f);
+                }
+#if !defined(QT_OPENGL_ES_2)
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                    if (!drawingPoints) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        dotShader->setUniformValue(dotShader->shadowQ(), m_shadowQualityToShader);
+                        dotShader->setUniformValue(dotShader->depth(), depthMVPMatrix);
+                        dotShader->setUniformValue(dotShader->lightS(), lightStrength / 10.0f);
+
+                        // Draw the object
+                        m_drawer->drawObject(dotShader, dotObj, gradientTexture, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawPoint(dotShader);
+                    }
+                } else
+#endif
+                {
+                    if (!drawingPoints) {
+                        // Set shadowless shader bindings
+                        dotShader->setUniformValue(dotShader->lightS(), lightStrength);
+                        // Draw the object
+                        m_drawer->drawObject(dotShader, dotObj, gradientTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawPoint(dotShader);
+                    }
                 }
             }
-            dotNo++;
         }
     }
 
 #if !defined(QT_OPENGL_ES_2)
-    if (havePointSeries) {
+    if (m_havePointSeries) {
         glDisable(GL_POINT_SMOOTH);
         glDisable(GL_PROGRAM_POINT_SIZE);
     }
@@ -1263,7 +1279,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 || !labelItem.textureId() || m_selectionLabelDirty) {
             QString labelText = selectionLabel();
             if (labelText.isNull() || m_selectionLabelDirty) {
-                labelText = m_visibleSeriesList[m_selectedItemSeriesIndex].itemLabel();
+                labelText = m_selectedSeriesCache->itemLabel();
                 setSelectionLabel(labelText);
                 m_selectionLabelDirty = false;
             }
@@ -1505,26 +1521,18 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     glDisable(GL_POLYGON_OFFSET_FILL);
 }
 
-void Scatter3DRenderer::updateSelectedItem(int index, const QScatter3DSeries *series)
+void Scatter3DRenderer::updateSelectedItem(int index, QScatter3DSeries *series)
 {
     m_selectionDirty = true;
     m_selectionLabelDirty = true;
-    m_selectedSeries = series;
+    m_selectedSeriesCache =
+            static_cast<ScatterSeriesRenderCache *>(m_renderCacheList.value(series, 0));
     m_selectedItemIndex = Scatter3DController::invalidSelectionIndex();
-    m_selectedItemTotalIndex = Scatter3DController::invalidSelectionIndex();
-    m_selectedItemSeriesIndex = Scatter3DController::invalidSelectionIndex();
 
-    if (!m_renderingArrays.isEmpty() && index != Scatter3DController::invalidSelectionIndex()) {
-        int totalIndex = 0;
-        for (int i = 0; i < m_visibleSeriesList.size(); i++) {
-            if (m_visibleSeriesList.at(i).series() == series) {
-                m_selectedItemSeriesIndex = i;
-                m_selectedItemIndex = index;
-                m_selectedItemTotalIndex = index + totalIndex;
-                break;
-            }
-            totalIndex += m_renderingArrays.at(i).size();
-        }
+    if (m_selectedSeriesCache) {
+        const ScatterRenderItemArray &renderArray = m_selectedSeriesCache->renderArray();
+        if (index < renderArray.size() && index >= 0)
+            m_selectedItemIndex = index;
     }
 }
 
@@ -1767,17 +1775,22 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
             index = Scatter3DController::invalidSelectionIndex();
             m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
         } else {
-            index = int(color.x())
+            int totalIndex = int(color.x())
                     + (int(color.y()) << 8)
                     + (int(color.z()) << 16);
             // Find the series and adjust the index accordingly
-            for (int i = 0; i < m_renderingArrays.size(); i++) {
-                if (index < m_renderingArrays.at(i).size()) {
-                    series = m_visibleSeriesList.at(i).series();
-                    m_clickedType = QAbstract3DGraph::ElementSeries;
-                    return; // Valid found and already set to return parameters, so we can return
-                } else {
-                    index -= m_renderingArrays.at(i).size();
+            foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+                if (baseCache->isVisible()) {
+                    ScatterSeriesRenderCache *cache =
+                            static_cast<ScatterSeriesRenderCache *>(baseCache);
+                    int offset = cache->selectionIndexOffset();
+                    if (totalIndex >= offset
+                            && totalIndex < (offset + cache->renderArray().size())) {
+                        index = totalIndex - offset;
+                        series = cache->series();
+                        m_clickedType = QAbstract3DGraph::ElementSeries;
+                        return;
+                    }
                 }
             }
         }

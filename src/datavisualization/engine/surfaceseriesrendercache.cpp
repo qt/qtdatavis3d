@@ -19,16 +19,18 @@
 #include "seriesrendercache_p.h"
 #include "surfaceseriesrendercache_p.h"
 #include "objecthelper_p.h"
-#include "abstract3drenderer_p.h"
+#include "surface3drenderer_p.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-SurfaceSeriesRenderCache::SurfaceSeriesRenderCache(Surface3DRenderer *renderer)
-    : m_surfaceVisible(false),
+SurfaceSeriesRenderCache::SurfaceSeriesRenderCache(QAbstract3DSeries *series,
+                                                   Surface3DRenderer *renderer)
+    : SeriesRenderCache(series, renderer),
+      m_surfaceVisible(false),
       m_surfaceGridVisible(false),
-      m_surfaceFlatShading(true),
+      m_surfaceFlatShading(false),
       m_surfaceObj(new SurfaceObject(renderer)),
       m_sliceSurfaceObj(new SurfaceObject(renderer)),
       m_sampleSpace(QRect(0, 0, 0 , 0)),
@@ -36,13 +38,11 @@ SurfaceSeriesRenderCache::SurfaceSeriesRenderCache(Surface3DRenderer *renderer)
       m_selectionIdStart(0),
       m_selectionIdEnd(0),
       m_flatChangeAllowed(true),
-      m_flatStatusDirty(false),
+      m_flatStatusDirty(true),
       m_sliceSelectionPointer(0),
       m_mainSelectionPointer(0),
       m_slicePointerActive(false),
-      m_mainPointerActive(false),
-      m_valid(false),
-      m_objectDirty(true)
+      m_mainPointerActive(false)
 {
 }
 
@@ -50,17 +50,15 @@ SurfaceSeriesRenderCache::~SurfaceSeriesRenderCache()
 {
 }
 
-void SurfaceSeriesRenderCache::populate(QSurface3DSeries *series, Abstract3DRenderer *renderer)
+void SurfaceSeriesRenderCache::populate(bool newSeries)
 {
-    Q_ASSERT(series);
+    SeriesRenderCache::populate(newSeries);
 
-    SeriesRenderCache::populate(series, renderer);
-
-    QSurface3DSeries::DrawFlags drawMode = series->drawMode();
+    QSurface3DSeries::DrawFlags drawMode = series()->drawMode();
     m_surfaceVisible = drawMode.testFlag(QSurface3DSeries::DrawSurface);
     m_surfaceGridVisible = drawMode.testFlag(QSurface3DSeries::DrawWireframe);
-    if (m_flatChangeAllowed && m_surfaceFlatShading != series->isFlatShadingEnabled()) {
-        m_surfaceFlatShading = series->isFlatShadingEnabled();
+    if (m_flatChangeAllowed && m_surfaceFlatShading != series()->isFlatShadingEnabled()) {
+        m_surfaceFlatShading = series()->isFlatShadingEnabled();
         m_flatStatusDirty = true;
     }
 }

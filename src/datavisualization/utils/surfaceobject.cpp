@@ -673,6 +673,8 @@ void SurfaceObject::clear()
     m_gridIndexCount = 0;
     m_indexCount = 0;
     m_surfaceType = Undefined;
+    m_vertices.clear();
+    m_normals.clear();
 }
 
 QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QVector3D &c)

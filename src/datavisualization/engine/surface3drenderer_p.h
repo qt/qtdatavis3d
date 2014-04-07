@@ -95,9 +95,8 @@ private:
     QSizeF m_areaSize;
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedPoint;
-    const QSurface3DSeries *m_selectedSeries;
+    QSurface3DSeries *m_selectedSeries;
     QPoint m_clickedPosition;
-    QHash<QSurface3DSeries *, SurfaceSeriesRenderCache *> m_renderCacheList;
     bool m_selectionTexturesDirty;
     GLuint m_noShadowTexture;
 
@@ -106,17 +105,15 @@ public:
     ~Surface3DRenderer();
 
     void updateData();
-    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
+    void cleanCache(SeriesRenderCache *cache);
     void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode);
-    void modifiedSeriesList(const QVector<QSurface3DSeries *> &seriesList);
     void updateRows(const QVector<Surface3DController::ChangeRow> &rows);
     void updateItem(const QVector<Surface3DController::ChangeItem> &points);
-    void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
-    void updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
-                             QValue3DAxisFormatter *formatter);
     void updateScene(Q3DScene *scene);
     void updateSlicingActive(bool isSlicing);
-    void updateSelectedPoint(const QPoint &position, const QSurface3DSeries *series);
+    void updateSelectedPoint(const QPoint &position, QSurface3DSeries *series);
     inline QPoint clickedPosition() const { return m_clickedPosition; }
     void resetClickedStatus();
 

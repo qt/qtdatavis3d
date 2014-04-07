@@ -91,6 +91,7 @@ public:
     void changeValueAxisFormat(const QString & text);
     void changeLogBase(const QString & text);
     void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
+    void addRemoveSeries();
 
 public slots:
     void flipViews();
@@ -162,6 +163,7 @@ private:
     QTimer m_selectionTimer;
     QTimer m_rotationTimer;
     QLabel *m_fpsLabel;
+    QBar3DSeries *m_extraSeries;
 };
 
 #endif

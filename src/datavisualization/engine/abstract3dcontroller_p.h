@@ -155,7 +155,6 @@ protected:
     QList<QAbstract3DAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
-    bool m_isSeriesVisibilityDirty;
     bool m_isSeriesVisualsDirty;
     bool m_renderPending;
 
@@ -165,6 +164,8 @@ protected:
     QTime m_frameTimer;
     int m_numFrames;
     qreal m_currentFps;
+
+    QVector<QAbstract3DSeries *> m_changedSeriesList;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
@@ -247,6 +248,7 @@ public:
     virtual void handleAxisFormatterDirtyBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick() = 0;
+    virtual void adjustAxisRanges() = 0;
 
     void markSeriesItemLabelsDirty();
 

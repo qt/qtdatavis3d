@@ -118,6 +118,7 @@ public:
     virtual QList<QBar3DSeries *> barSeriesList();
 
     virtual void handleAxisRangeChangedBySender(QObject *sender);
+    virtual void adjustAxisRanges();
 
 public slots:
     void handleArrayReset();
@@ -137,11 +138,9 @@ protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);
 
 private:
-    void adjustAxisRanges();
     void adjustSelectionPosition(QPoint &pos, const QBar3DSeries *series);
 
     Q_DISABLE_COPY(Bars3DController)
-
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

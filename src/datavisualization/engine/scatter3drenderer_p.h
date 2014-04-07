@@ -46,6 +46,7 @@ class ObjectHelper;
 class LabelItem;
 class Q3DScene;
 class QAbstractAxisPrivate;
+class ScatterSeriesRenderCache;
 
 class QT_DATAVISUALIZATION_EXPORT Scatter3DRenderer : public Abstract3DRenderer
 {
@@ -83,26 +84,27 @@ private:
     GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
     int m_selectedItemIndex;
-    int m_selectedItemTotalIndex;
-    int m_selectedItemSeriesIndex;
-    const QScatter3DSeries *m_selectedSeries;
+    ScatterSeriesRenderCache *m_selectedSeriesCache;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
     QVector3D m_translationOffset;
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
-    QVector<ScatterRenderItemArray> m_renderingArrays;
     GLfloat m_backgroundMargin;
     GLfloat m_maxItemSize;
-    QVector<float> m_cachedItemSize;
     int m_clickedIndex;
+    bool m_havePointSeries;
+    bool m_haveMeshSeries;
+    bool m_haveUniformColorMeshSeries;
+    bool m_haveGradientMeshSeries;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
-    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateData();
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void updateScene(Q3DScene *scene);
 
     inline int clickedIndex() const { return m_clickedIndex; }
@@ -145,7 +147,7 @@ private:
     friend class ScatterRenderItem;
 
 public slots:
-    void updateSelectedItem(int index, const QScatter3DSeries *series);
+    void updateSelectedItem(int index, QScatter3DSeries *series);
 
 private:
     QVector4D indexToSelectionColor(GLint index);

@@ -108,8 +108,8 @@ public:
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
-    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick();
+    virtual void adjustAxisRanges();
 
 public slots:
     void handleArrayReset();
@@ -125,7 +125,6 @@ protected:
     virtual void startRecordingRemovesAndInserts();
 
 private:
-    void adjustValueAxisRange();
 
     Q_DISABLE_COPY(Scatter3DController)
 };

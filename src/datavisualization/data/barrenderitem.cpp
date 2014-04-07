@@ -24,8 +24,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
       m_value(0),
-      m_height(0.0f),
-      m_seriesIndex(0)
+      m_height(0.0f)
 {
 }
 
@@ -35,7 +34,6 @@ BarRenderItem::BarRenderItem(const BarRenderItem &other)
     m_value = other.m_value;
     m_position = other.m_position;
     m_height = other.m_height;
-    m_seriesIndex = other.m_seriesIndex;
 }
 
 BarRenderItem::~BarRenderItem()
@@ -67,7 +65,6 @@ void BarRenderSliceItem::setItem(const BarRenderItem &renderItem)
     m_value = renderItem.value();
     m_position = renderItem.position();
     m_height = renderItem.height();
-    m_seriesIndex = renderItem.seriesIndex();
     m_sliceLabel = QString();
     m_sliceLabelItem = 0;
 }

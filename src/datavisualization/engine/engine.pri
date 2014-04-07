@@ -26,7 +26,9 @@ HEADERS += $$PWD/qabstract3dgraph_p.h \
            $$PWD/q3dobject.h \
            $$PWD/q3dobject_p.h \
            $$PWD/q3dscene_p.h \
-           $$PWD/surfaceseriesrendercache_p.h
+           $$PWD/surfaceseriesrendercache_p.h \
+           $$PWD/barseriesrendercache_p.h \
+           $$PWD/scatterseriesrendercache_p.h
 
 SOURCES += $$PWD/qabstract3dgraph.cpp \
            $$PWD/q3dbars.cpp \
@@ -48,7 +50,9 @@ SOURCES += $$PWD/qabstract3dgraph.cpp \
            $$PWD/q3dlight.cpp \
            $$PWD/q3dobject.cpp \
            $$PWD/q3dscene.cpp \
-           $$PWD/surfaceseriesrendercache.cpp
+           $$PWD/surfaceseriesrendercache.cpp \
+           $$PWD/barseriesrendercache.cpp \
+           $$PWD/scatterseriesrendercache.cpp
 
 RESOURCES += engine/engine.qrc
 

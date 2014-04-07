@@ -52,6 +52,7 @@ struct QAbstract3DSeriesChangeBitField {
     bool nameChanged                    : 1;
     bool itemLabelChanged               : 1;
     bool itemLabelVisibilityChanged     : 1;
+    bool visibilityChanged              : 1;
 
     QAbstract3DSeriesChangeBitField()
         : meshChanged(true),
@@ -67,7 +68,8 @@ struct QAbstract3DSeriesChangeBitField {
           multiHighlightGradientChanged(true),
           nameChanged(true),
           itemLabelChanged(true),
-          itemLabelVisibilityChanged(true)
+          itemLabelVisibilityChanged(true),
+          visibilityChanged(true)
     {
     }
 };

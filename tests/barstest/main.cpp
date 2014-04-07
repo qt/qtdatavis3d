@@ -66,6 +66,10 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
 
+    QPushButton *addSeriesButton = new QPushButton(widget);
+    addSeriesButton->setText(QStringLiteral("Add / Remove a series"));
+    addSeriesButton->setEnabled(true);
+
     QPushButton *addDataButton = new QPushButton(widget);
     addDataButton->setText(QStringLiteral("Add a row of data"));
     addDataButton->setEnabled(false);
@@ -305,6 +309,7 @@ int main(int argc, char **argv)
     valueAxisSegmentsSpin->setMaximum(100);
     valueAxisSegmentsSpin->setValue(10);
 
+    vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(addDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addMultiDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(insertDataButton, 0, Qt::AlignTop);
@@ -419,6 +424,7 @@ int main(int argc, char **argv)
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changeLabelStyle);
     QObject::connect(addDataButton, &QPushButton::clicked, modifier, &GraphModifier::addRow);
+    QObject::connect(addSeriesButton, &QPushButton::clicked, modifier, &GraphModifier::addRemoveSeries);
     QObject::connect(addMultiDataButton, &QPushButton::clicked, modifier, &GraphModifier::addRows);
     QObject::connect(insertDataButton, &QPushButton::clicked, modifier, &GraphModifier::insertRow);
     QObject::connect(insertMultiDataButton, &QPushButton::clicked, modifier, &GraphModifier::insertRows);

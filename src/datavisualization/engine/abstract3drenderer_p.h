@@ -61,8 +61,9 @@ public:
     virtual ~Abstract3DRenderer();
 
     virtual void updateData() = 0;
-    virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
-
+    virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    virtual SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
+    virtual void cleanCache(SeriesRenderCache *cache);
     virtual void render(GLuint defaultFboHandle);
 
     virtual void updateTheme(Q3DTheme *theme);
@@ -96,6 +97,7 @@ public:
                                        const QString &format);
     virtual void updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
                                      QValue3DAxisFormatter *formatter);
+    virtual void modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
     void generateBaseColorTexture(const QColor &color, GLuint *texture);
@@ -147,7 +149,7 @@ protected:
     bool m_selectionDirty;
     SelectionState m_selectionState;
     QPoint m_inputPosition;
-    QVector<SeriesRenderCache> m_visibleSeriesList;
+    QHash<QAbstract3DSeries *, SeriesRenderCache *> m_renderCacheList;
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
     float m_devicePixelRatio;
@@ -158,6 +160,7 @@ protected:
 
     QString m_selectionLabel;
     LabelItem *m_selectionLabelItem;
+    int m_visibleSeriesCount;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

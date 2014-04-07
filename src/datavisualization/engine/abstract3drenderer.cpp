@@ -47,7 +47,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_clickPending(false),
       m_clickedSeries(0),
       m_clickedType(QAbstract3DGraph::ElementNone),
-      m_selectionLabelItem(0)
+      m_selectionLabelItem(0),
+      m_visibleSeriesCount(0)
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
@@ -59,14 +60,17 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
 
 Abstract3DRenderer::~Abstract3DRenderer()
 {
-    for (int i = 0; i < m_visibleSeriesList.size(); i++)
-        m_visibleSeriesList[i].cleanup(m_textureHelper);
-
     delete m_drawer;
     delete m_textureHelper;
     delete m_cachedScene;
     delete m_cachedTheme;
     delete m_selectionLabelItem;
+
+    foreach (SeriesRenderCache *cache, m_renderCacheList) {
+        cache->cleanup(m_textureHelper);
+        delete cache;
+    }
+    m_renderCacheList.clear();
 }
 
 void Abstract3DRenderer::initializeOpenGL()
@@ -285,6 +289,9 @@ void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orient
     AxisRenderCache &cache = axisCacheForOrientation(orientation);
     cache.setMin(min);
     cache.setMax(max);
+
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
 }
 
 void Abstract3DRenderer::updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
@@ -318,6 +325,18 @@ void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation or
     }
     formatter->d_ptr->populateCopy(*(cache.formatter()));
     cache.markPositionsDirty();
+
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
+}
+
+void Abstract3DRenderer::modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList)
+{
+    foreach (QAbstract3DSeries *series, seriesList) {
+        SeriesRenderCache *cache = m_renderCacheList.value(series, 0);
+        if (cache)
+            cache->setDataDirty(true);
+    }
 }
 
 void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)
@@ -327,33 +346,45 @@ void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::M
     Q_UNUSED(mesh)
 }
 
-void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList,
-                                      bool updateVisibility)
+void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
 {
-    int visibleCount = 0;
-    if (updateVisibility) {
-        int oldSize = m_visibleSeriesList.size();
-        foreach (QAbstract3DSeries *current, seriesList) {
-            if (current->isVisible())
-                visibleCount++;
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setValid(false);
+
+    m_visibleSeriesCount = 0;
+    int seriesCount = seriesList.size();
+    for (int i = 0; i < seriesCount; i++) {
+        QAbstract3DSeries *series = seriesList.at(i);
+        SeriesRenderCache *cache = m_renderCacheList.value(series);
+        bool newSeries = false;
+        if (!cache) {
+            cache = createNewCache(series);
+            m_renderCacheList[series] = cache;
+            newSeries = true;
         }
-
-        // Clean up series caches that are about to be permanently deleted.
-        // Can't just use cache destructor, as resize will call that to all items.
-        if (visibleCount < oldSize) {
-            for (int i = visibleCount; i < oldSize; i++)
-                m_visibleSeriesList[i].cleanup(m_textureHelper);
-        }
-
-        if (visibleCount != oldSize)
-            m_visibleSeriesList.resize(visibleCount);
-
-        visibleCount = 0;
+        cache->setValid(true);
+        cache->populate(newSeries);
+        if (cache->isVisible())
+            m_visibleSeriesCount++;
     }
-    foreach (QAbstract3DSeries *current, seriesList) {
-        if (current->isVisible())
-            m_visibleSeriesList[visibleCount++].populate(current, this);
+
+    // Remove non-valid objects from the cache list
+    foreach (SeriesRenderCache *cache, m_renderCacheList) {
+        if (!cache->isValid())
+            cleanCache(cache);
     }
+}
+
+SeriesRenderCache *Abstract3DRenderer::createNewCache(QAbstract3DSeries *series)
+{
+    return new SeriesRenderCache(series, this);
+}
+
+void Abstract3DRenderer::cleanCache(SeriesRenderCache *cache)
+{
+    m_renderCacheList.remove(cache->series());
+    cache->cleanup(m_textureHelper);
+    delete cache;
 }
 
 AxisRenderCache &Abstract3DRenderer::axisCacheForOrientation(

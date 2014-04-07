@@ -83,9 +83,6 @@ void Scatter3DController::addSeries(QAbstract3DSeries *series)
 
     Abstract3DController::addSeries(series);
 
-    if (series->isVisible())
-        adjustValueAxisRange();
-
     QScatter3DSeries *scatterSeries =  static_cast<QScatter3DSeries *>(series);
     if (scatterSeries->selectedItem() != invalidSelectionIndex())
         setSelectedItem(scatterSeries->selectedItem(), scatterSeries);
@@ -101,7 +98,7 @@ void Scatter3DController::removeSeries(QAbstract3DSeries *series)
         setSelectedItem(invalidSelectionIndex(), 0);
 
     if (wasVisible)
-        adjustValueAxisRange();
+        adjustAxisRanges();
 }
 
 QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
@@ -121,9 +118,11 @@ void Scatter3DController::handleArrayReset()
 {
     QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
     if (series->isVisible()) {
-        adjustValueAxisRange();
+        adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
     series->d_ptr->markItemLabelDirty();
     emitNeedRender();
@@ -135,9 +134,11 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
     Q_UNUSED(count)
     QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
     if (series->isVisible()) {
-        adjustValueAxisRange();
+        adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     emitNeedRender();
 }
 
@@ -147,10 +148,12 @@ void Scatter3DController::handleItemsChanged(int startIndex, int count)
     Q_UNUSED(count)
     QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
     if (series->isVisible()) {
-        adjustValueAxisRange();
+        adjustAxisRanges();
         m_isDataDirty = true;
         series->d_ptr->markItemLabelDirty();
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     emitNeedRender();
 }
 
@@ -173,9 +176,11 @@ void Scatter3DController::handleItemsRemoved(int startIndex, int count)
     }
 
     if (series->isVisible()) {
-        adjustValueAxisRange();
+        adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
 
     if (m_recordInsertsAndRemoves) {
         InsertRemoveRecord record(false, startIndex, count, series);
@@ -200,9 +205,11 @@ void Scatter3DController::handleItemsInserted(int startIndex, int count)
     }
 
     if (series->isVisible()) {
-        adjustValueAxisRange();
+        adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
 
     if (m_recordInsertsAndRemoves) {
         InsertRemoveRecord record(true, startIndex, count, series);
@@ -231,7 +238,7 @@ void Scatter3DController::handleAxisAutoAdjustRangeChangedInOrientation(
 {
     Q_UNUSED(orientation)
     Q_UNUSED(autoAdjust)
-    adjustValueAxisRange();
+    adjustAxisRanges();
 }
 
 void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
@@ -240,13 +247,6 @@ void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
 
     // Update selected index - may be moved offscreen
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
-}
-
-void Scatter3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
-{
-    Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
-
-    adjustValueAxisRange();
 }
 
 void Scatter3DController::handlePendingClick()
@@ -333,7 +333,7 @@ void Scatter3DController::clearSelection()
     setSelectedItem(invalidSelectionIndex(), 0);
 }
 
-void Scatter3DController::adjustValueAxisRange()
+void Scatter3DController::adjustAxisRanges()
 {
     QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
     QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
