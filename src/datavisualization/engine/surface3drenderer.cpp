@@ -2372,17 +2372,22 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                                  QStringLiteral(":/shaders/fragmentSurface"));
     }
-    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-        m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceShadowFlat"),
-                                               QStringLiteral(":/shaders/fragmentSurfaceShadowFlat"));
-    } else {
-        m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
-                                               QStringLiteral(":/shaders/fragmentSurfaceFlat"));
-    }
     m_surfaceSliceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                                   QStringLiteral(":/shaders/fragmentSurface"));
-    m_surfaceSliceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
-                                                QStringLiteral(":/shaders/fragmentSurfaceFlat"));
+    if (m_flatSupported) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceShadowFlat"),
+                                                   QStringLiteral(":/shaders/fragmentSurfaceShadowFlat"));
+        } else {
+            m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
+                                                   QStringLiteral(":/shaders/fragmentSurfaceFlat"));
+        }
+        m_surfaceSliceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
+                                                    QStringLiteral(":/shaders/fragmentSurfaceFlat"));
+    } else {
+        m_surfaceFlatShader = 0;
+        m_surfaceSliceFlatShader = 0;
+    }
 #else
     m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                              QStringLiteral(":/shaders/fragmentSurfaceES2"));
@@ -2394,9 +2399,11 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
                                                 QStringLiteral(":/shaders/fragmentSurfaceES2"));
 #endif
     m_surfaceSmoothShader->initialize();
-    m_surfaceFlatShader->initialize();
     m_surfaceSliceSmoothShader->initialize();
-    m_surfaceSliceFlatShader->initialize();
+    if (m_flatSupported) {
+        m_surfaceFlatShader->initialize();
+        m_surfaceSliceFlatShader->initialize();
+    }
 }
 
 void Surface3DRenderer::initBackgroundShaders(const QString &vertexShader,
