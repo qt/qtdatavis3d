@@ -277,7 +277,7 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
     int visualIndex = 0;
     m_haveUniformColorSeries = false;
     m_haveGradientSeries = false;
-    for (int i = 0 ; i < seriesCount; i++) {
+    for (int i = 0; i < seriesCount; i++) {
         QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(seriesList[i]);
         if (barSeries->isVisible()) {
             BarSeriesRenderCache *cache =
