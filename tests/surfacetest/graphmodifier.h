@@ -107,6 +107,9 @@ public:
     void removeRow();
     void resetArray();
     void resetArrayEmpty();
+    void massiveDataTest();
+    void massiveTestScroll();
+    void massiveTestAppendAndScroll();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -118,6 +121,7 @@ public slots:
     void handleAxisXChanged(QValue3DAxis *axis);
     void handleAxisYChanged(QValue3DAxis *axis);
     void handleAxisZChanged(QValue3DAxis *axis);
+    void handleFpsChange(qreal fps);
 
 private:
     void fillSeries();
@@ -168,6 +172,7 @@ private:
     float m_offset;
     float m_multiSampleOffsetX[4];
     float m_multiSampleOffsetZ[4];
+    QSurfaceDataArray m_massiveTestCacheArray;
 };
 
 #endif

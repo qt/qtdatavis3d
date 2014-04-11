@@ -117,6 +117,8 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
                      &GraphModifier::handleAxisYChanged);
     QObject::connect(m_graph, &Q3DSurface::axisZChanged, this,
                      &GraphModifier::handleAxisZChanged);
+    QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
+                     &GraphModifier::handleFpsChange);
 }
 
 GraphModifier::~GraphModifier()
@@ -693,6 +695,11 @@ void GraphModifier::handleAxisZChanged(QValue3DAxis *axis)
     qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->axisZ());
 }
 
+void GraphModifier::handleFpsChange(qreal fps)
+{
+    qDebug() << "FPS:" << fps;
+}
+
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);
@@ -1129,6 +1136,146 @@ void GraphModifier::resetArrayEmpty()
 #else
     m_theSeries->dataProxy()->resetArray(emptryArray);
 #endif
+}
+
+void GraphModifier::massiveDataTest()
+{
+    static int testPhase = 0;
+    static const int cacheSize = 1000;
+    const int columns = 200;
+    const int rows = 200000;
+    const int visibleRows = 200;
+    const float yRangeMin = 0.0f;
+    const float yRangeMax = 1.0f;
+    const float yRangeMargin = 0.05f;
+    static QTimer *massiveTestTimer = 0;
+
+    // To speed up massive array creation, we generate a smaller cache array
+    // and copy rows from that to our main array
+    if (!m_massiveTestCacheArray.size()) {
+        m_massiveTestCacheArray.reserve(cacheSize);
+        float minY = yRangeMin + yRangeMargin;
+        float maxY = yRangeMax - yRangeMargin;
+        float rowBase = minY;
+        float direction = 1.0f;
+        for (int i = 0; i < cacheSize; i++) {
+            m_massiveTestCacheArray.append(new QSurfaceDataRow);
+            m_massiveTestCacheArray[i]->resize(columns);
+            rowBase += direction * (float(rand() % 3) / 100.0f);
+            if (rowBase > maxY) {
+                rowBase = maxY;
+                direction = -1.0f;
+            } else if (rowBase < minY) {
+                rowBase = minY;
+                direction = 1.0f;
+            }
+            for (int j = 0; j < columns; j++) {
+                float randFactor = float(rand() % 100) / (100 / yRangeMargin);
+                (*m_massiveTestCacheArray.at(i))[j].setX(float(j));
+                (*m_massiveTestCacheArray.at(i))[j].setY(rowBase + randFactor);
+                // Z value is irrelevant, we replace it anyway when we take row to use
+            }
+        }
+        massiveTestTimer = new QTimer;
+    }
+
+    switch (testPhase) {
+    case 0: {
+        qDebug() << __FUNCTION__ << testPhase << ": Setting the graph up...";
+        QValue3DAxis *xAxis = new QValue3DAxis();
+        QValue3DAxis *yAxis = new QValue3DAxis();
+        QValue3DAxis *zAxis = new QValue3DAxis();
+        xAxis->setRange(0.0f, float(columns));
+        yAxis->setRange(yRangeMin, yRangeMax);
+        zAxis->setRange(0.0f, float(visibleRows));
+        xAxis->setSegmentCount(1);
+        yAxis->setSegmentCount(1);
+        zAxis->setSegmentCount(1);
+        m_graph->setMeasureFps(true);
+        m_graph->setAxisX(xAxis);
+        m_graph->setAxisY(yAxis);
+        m_graph->setAxisZ(zAxis);
+        m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetRight);
+        m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+        foreach (QAbstract3DSeries *series, m_graph->seriesList())
+            m_graph->removeSeries(static_cast<QSurface3DSeries *>(series));
+
+        qDebug() << __FUNCTION__ << testPhase << ": Creating massive array..."
+                 << rows << "x" << columns;
+        QSurfaceDataArray *massiveArray = new QSurfaceDataArray;
+        massiveArray->reserve(rows);
+
+        for (int i = 0; i < rows; i++) {
+            QSurfaceDataRow *newRow = new QSurfaceDataRow(*m_massiveTestCacheArray.at(i % cacheSize));
+            for (int j = 0; j < columns; j++)
+                (*newRow)[j].setZ(float(i));
+            massiveArray->append(newRow);
+        }
+        qDebug() << __FUNCTION__ << testPhase << ": Massive array creation finished!";
+
+        QSurface3DSeries *series =  new QSurface3DSeries;
+        series->dataProxy()->resetArray(massiveArray);
+        m_graph->addSeries(series);
+        break;
+    }
+    case 1: {
+        qDebug() << __FUNCTION__ << testPhase << ": Scroll";
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        QObject::connect(massiveTestTimer, &QTimer::timeout, this,
+                         &GraphModifier::massiveTestScroll);
+        massiveTestTimer->start(16);
+        break;
+    }
+    case 2: {
+        qDebug() << __FUNCTION__ << testPhase << ": Append and scroll";
+        massiveTestTimer->stop();
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        QObject::connect(massiveTestTimer, &QTimer::timeout, this,
+                         &GraphModifier::massiveTestAppendAndScroll);
+        m_graph->axisZ()->setRange(rows - visibleRows, rows);
+        massiveTestTimer->start(16);
+        break;
+    }
+    default:
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        massiveTestTimer->stop();
+        qDebug() << __FUNCTION__ << testPhase << ": Resetting the test";
+        testPhase = -1;
+    }
+    testPhase++;
+}
+
+void GraphModifier::massiveTestScroll()
+{
+    const int scrollAmount = 20;
+    int maxRows = m_graph->seriesList().at(0)->dataProxy()->rowCount();
+    int min = m_graph->axisZ()->min() + scrollAmount;
+    int max = m_graph->axisZ()->max() + scrollAmount;
+    if (max >= maxRows) {
+        max = max - min;
+        min = 0;
+    }
+    m_graph->axisZ()->setRange(min, max);
+}
+
+void GraphModifier::massiveTestAppendAndScroll()
+{
+    const int addedRows = 50;
+    int maxRows = m_graph->seriesList().at(0)->dataProxy()->rowCount();
+    int columns = m_graph->seriesList().at(0)->dataProxy()->columnCount();
+
+    QSurfaceDataArray appendArray;
+    appendArray.reserve(addedRows);
+    for (int i = 0; i < addedRows; i++) {
+        QSurfaceDataRow *newRow = new QSurfaceDataRow(*m_massiveTestCacheArray.at((i + maxRows) % 1000));
+        for (int j = 0; j < columns; j++)
+            (*newRow)[j].setZ(float(maxRows + i));
+        appendArray.append(newRow);
+    }
+    m_graph->seriesList().at(0)->dataProxy()->addRows(appendArray);
+    int min = m_graph->axisZ()->min() + addedRows;
+    int max = m_graph->axisZ()->max() + addedRows;
+    m_graph->axisZ()->setRange(min, max);
 }
 
 void GraphModifier::changeMesh()

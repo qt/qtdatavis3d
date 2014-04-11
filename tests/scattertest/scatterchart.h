@@ -52,6 +52,9 @@ public:
     void setMaxY(int max);
     void setMaxZ(int max);
     void start();
+    void massiveDataTest();
+    void massiveTestScroll();
+    void massiveTestAppendAndScroll();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -80,6 +83,7 @@ public slots:
     void handleAxisXChanged(QValue3DAxis *axis);
     void handleAxisYChanged(QValue3DAxis *axis);
     void handleAxisZChanged(QValue3DAxis *axis);
+    void handleFpsChange(qreal fps);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -94,6 +98,7 @@ private:
     int m_loopCounter;
     int m_selectedItem;
     QScatter3DSeries *m_targetSeries;
+    QScatterDataArray m_massiveTestCacheArray;
 };
 
 #endif

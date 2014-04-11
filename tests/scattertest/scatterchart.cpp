@@ -62,6 +62,8 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
                      &ScatterDataModifier::handleAxisYChanged);
     QObject::connect(m_chart, &Q3DScatter::axisZChanged, this,
                      &ScatterDataModifier::handleAxisZChanged);
+    QObject::connect(m_chart, &QAbstract3DGraph::currentFpsChanged, this,
+                     &ScatterDataModifier::handleFpsChange);
 }
 
 ScatterDataModifier::~ScatterDataModifier()
@@ -72,6 +74,161 @@ ScatterDataModifier::~ScatterDataModifier()
 void ScatterDataModifier::start()
 {
     addData();
+}
+
+static const int itemsPerUnit = 100; // "unit" is one unit range along Z-axis
+
+void ScatterDataModifier::massiveDataTest()
+{
+    static int testPhase = 0;
+    static QTimer *massiveTestTimer = 0;
+
+    if (!massiveTestTimer)
+        massiveTestTimer = new QTimer;
+
+    int items = 1000000;
+    int visibleRange = 200;
+    int unitCount = items / itemsPerUnit;
+    int cacheSize = visibleRange * itemsPerUnit * 5;
+
+    switch (testPhase) {
+    case 0: {
+        float yRangeMin = 0.0f;
+        float yRangeMax = 1.0f;
+        float yRangeMargin = 0.05f;
+        float minY = yRangeMin + yRangeMargin;
+        float maxY = yRangeMax - yRangeMargin;
+        float unitBase = minY;
+        float direction = 1.0f;
+
+        if (!m_massiveTestCacheArray.size()) {
+            m_massiveTestCacheArray.resize(cacheSize);
+            int totalIndex = 0;
+            for (int i = 0; i < unitCount && totalIndex < cacheSize; i++) {
+                unitBase += direction * (float(rand() % 3) / 100.0f);
+                if (unitBase > maxY) {
+                    unitBase = maxY;
+                    direction = -1.0f;
+                } else if (unitBase < minY) {
+                    unitBase = minY;
+                    direction = 1.0f;
+                }
+                for (int j = 0; j < itemsPerUnit && totalIndex < cacheSize; j++) {
+                    float randFactor = float(rand() % 100) / (100 / yRangeMargin);
+                    m_massiveTestCacheArray[totalIndex].setPosition(
+                                QVector3D(float(qrand() % itemsPerUnit),
+                                          unitBase + randFactor, 0.0f));
+                    // Z value is irrelevant, we replace it anyway when we take item to use
+                    totalIndex++;
+                }
+            }
+        }
+
+        qDebug() << __FUNCTION__ << testPhase << ": Setting the graph up...";
+        QValue3DAxis *xAxis = new QValue3DAxis();
+        QValue3DAxis *yAxis = new QValue3DAxis();
+        QValue3DAxis *zAxis = new QValue3DAxis();
+        xAxis->setRange(0.0f, float(itemsPerUnit - 1));
+        yAxis->setRange(yRangeMin, yRangeMax);
+        zAxis->setRange(0.0f, float(visibleRange - 1));
+        xAxis->setSegmentCount(1);
+        yAxis->setSegmentCount(1);
+        zAxis->setSegmentCount(1);
+        m_chart->setMeasureFps(true);
+        m_chart->setAxisX(xAxis);
+        m_chart->setAxisY(yAxis);
+        m_chart->setAxisZ(zAxis);
+        m_chart->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetRight);
+        m_chart->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+        foreach (QAbstract3DSeries *series, m_chart->seriesList())
+            m_chart->removeSeries(static_cast<QScatter3DSeries *>(series));
+
+        qDebug() << __FUNCTION__ << testPhase << ": Creating massive array..." << items;
+        QScatterDataArray *massiveArray = new QScatterDataArray;
+        massiveArray->resize(items);
+
+        int cacheIndex = 0;
+        for (int i = 0; i < items; i++) {
+            // Use qreals for precicion as the numbers can overflow int
+            float currentZ = float(qreal(i) * qreal(unitCount) / qreal(items));
+            (*massiveArray)[i] = m_massiveTestCacheArray.at(cacheIndex++);
+            (*massiveArray)[i].setZ(currentZ);
+            if (cacheIndex >= cacheSize)
+                cacheIndex = 0;
+        }
+        qDebug() << __FUNCTION__ << testPhase << ": Massive array creation finished!";
+
+        QScatter3DSeries *series =  new QScatter3DSeries;
+        series->dataProxy()->resetArray(massiveArray);
+        series->setMesh(QAbstract3DSeries::MeshPoint);
+        m_chart->addSeries(series);
+        break;
+    }
+    case 1: {
+        qDebug() << __FUNCTION__ << testPhase << ": Scroll";
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        QObject::connect(massiveTestTimer, &QTimer::timeout, this,
+                         &ScatterDataModifier::massiveTestScroll);
+        massiveTestTimer->start(16);
+        break;
+    }
+    case 2: {
+        qDebug() << __FUNCTION__ << testPhase << ": Append and scroll";
+        massiveTestTimer->stop();
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        QObject::connect(massiveTestTimer, &QTimer::timeout, this,
+                         &ScatterDataModifier::massiveTestAppendAndScroll);
+        m_chart->axisZ()->setRange(unitCount - visibleRange, unitCount);
+        massiveTestTimer->start(16);
+        break;
+    }
+    default:
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        massiveTestTimer->stop();
+        qDebug() << __FUNCTION__ << testPhase << ": Resetting the test";
+        testPhase = -1;
+    }
+    testPhase++;
+}
+
+void ScatterDataModifier::massiveTestScroll()
+{
+    const int scrollAmount = 20;
+    int itemCount = m_chart->seriesList().at(0)->dataProxy()->itemCount();
+    int min = m_chart->axisZ()->min() + scrollAmount;
+    int max = m_chart->axisZ()->max() + scrollAmount;
+    if (max >= itemCount / itemsPerUnit) {
+        max = max - min - 1;
+        min = 0;
+    }
+    m_chart->axisZ()->setRange(min, max);
+}
+
+void ScatterDataModifier::massiveTestAppendAndScroll()
+{
+    const int addedUnits = 50;
+    const int addedItems = itemsPerUnit * addedUnits;
+    int cacheSize = m_massiveTestCacheArray.size();
+    int itemCount = m_chart->seriesList().at(0)->dataProxy()->itemCount();
+    static int cacheIndex = 0;
+
+    // Copy items from cache
+    QScatterDataArray appendArray;
+    appendArray.resize(addedItems);
+
+    float zOffset = m_chart->seriesList().at(0)->dataProxy()->itemAt(itemCount - 1)->z();
+    for (int i = 0; i < addedItems; i++) {
+        float currentZ = zOffset + float(qreal(i) * qreal(addedUnits) / qreal(addedItems));
+        appendArray[i] = m_massiveTestCacheArray.at(cacheIndex++);
+        appendArray[i].setZ(currentZ);
+        if (cacheIndex >= cacheSize)
+            cacheIndex = 0;
+    }
+
+    m_chart->seriesList().at(0)->dataProxy()->addItems(appendArray);
+    int min = m_chart->axisZ()->min() + addedUnits;
+    int max = m_chart->axisZ()->max() + addedUnits;
+    m_chart->axisZ()->setRange(min, max);
 }
 
 void ScatterDataModifier::addData()
@@ -512,6 +669,11 @@ void ScatterDataModifier::handleAxisYChanged(QValue3DAxis *axis)
 void ScatterDataModifier::handleAxisZChanged(QValue3DAxis *axis)
 {
     qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisZ());
+}
+
+void ScatterDataModifier::handleFpsChange(qreal fps)
+{
+    qDebug() << "FPS:" << fps;
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)

@@ -344,6 +344,9 @@ int main(int argc, char *argv[])
     QPushButton *resetArrayEmptyButton = new QPushButton(widget);
     resetArrayEmptyButton->setText(QStringLiteral("Reset Series Array to empty"));
 
+    QPushButton *massiveDataTestButton = new QPushButton(widget);
+    massiveDataTestButton->setText(QStringLiteral("Massive data test"));
+
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
@@ -431,6 +434,7 @@ int main(int argc, char *argv[])
     vLayout2->addWidget(removeRowButton);
     vLayout2->addWidget(resetArrayButton);
     vLayout2->addWidget(resetArrayEmptyButton);
+    vLayout2->addWidget(massiveDataTestButton);
 
     widget->show();
 
@@ -586,6 +590,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::resetArray);
     QObject::connect(resetArrayEmptyButton,&QPushButton::clicked,
                      modifier, &GraphModifier::resetArrayEmpty);
+    QObject::connect(massiveDataTestButton,&QPushButton::clicked,
+                     modifier, &GraphModifier::massiveDataTest);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

@@ -120,6 +120,9 @@ int main(int argc, char **argv)
     QPushButton *startTimerButton = new QPushButton(widget);
     startTimerButton->setText(QStringLiteral("Start/stop timer"));
 
+    QPushButton *massiveDataTestButton = new QPushButton(widget);
+    massiveDataTestButton->setText(QStringLiteral("Massive data test"));
+
     QLinearGradient grBtoY(0, 0, 100, 0);
     grBtoY.setColorAt(1.0, Qt::black);
     grBtoY.setColorAt(0.67, Qt::blue);
@@ -229,12 +232,13 @@ int main(int argc, char **argv)
     vLayout->addWidget(toggleSeriesVisibilityButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeSeriesNameButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
-    vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
-    vLayout->addWidget(backgroundCheckBox);
-    vLayout->addWidget(gridCheckBox);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
-    vLayout->addWidget(shadowQuality, 1, Qt::AlignTop);
+    vLayout->addWidget(massiveDataTestButton, 1, Qt::AlignTop);
 
+    vLayout2->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
+    vLayout2->addWidget(backgroundCheckBox);
+    vLayout2->addWidget(gridCheckBox);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout2->addWidget(shadowQuality, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust point size")));
     vLayout2->addWidget(pointSizeSlider, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust data window")));
@@ -296,6 +300,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changeSeriesName);
     QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::startStopTimer);
+    QObject::connect(massiveDataTestButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::massiveDataTest);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::setGradient);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
