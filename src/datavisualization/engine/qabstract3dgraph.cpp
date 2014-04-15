@@ -135,6 +135,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
            Z axis label.
     \value ElementAxisYLabel
            Y axis label.
+    \value ElementCustomItem
+           Custom item.
 */
 
 /*!
@@ -377,6 +379,36 @@ Q3DScene *QAbstract3DGraph::scene() const
 void QAbstract3DGraph::clearSelection()
 {
     d_ptr->m_visualController->clearSelection();
+}
+
+/*!
+ * Adds a custom mesh item located in \a meshFile to a graph at \a position with \a {scaling},
+ * \a rotation and optional \a textureImage. Item must be in Wavefront obj format and include
+ * vertices, normals and UVs. It also needs to be in triangles. Item position is given in data
+ * coordinates.
+ *
+ * \return index to the added item.
+ *
+ * \sa removeCustomItemAt()
+ *
+ * \since Qt Data Visualization 1.1
+ */
+int QAbstract3DGraph::addCustomItem(const QString &meshFile, const QVector3D &position,
+                                    const QVector3D &scaling, const QQuaternion &rotation,
+                                    const QImage &textureImage)
+{
+    return d_ptr->m_visualController->addCustomItem(meshFile, position, scaling, rotation,
+                                                    textureImage);
+}
+
+/*!
+ * Removes the custom item at \a {index}. Deletes the resource allocated to it.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+void QAbstract3DGraph::removeCustomItemAt(int index)
+{
+    d_ptr->m_visualController->deleteCustomItem(index);
 }
 
 /*!

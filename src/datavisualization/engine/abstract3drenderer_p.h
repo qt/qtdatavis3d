@@ -36,6 +36,7 @@
 #include "axisrendercache_p.h"
 #include "qabstractdataproxy.h"
 #include "seriesrendercache_p.h"
+#include "customrenderitem_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -55,13 +56,20 @@ protected:
         SelectOnSlice
     };
 
-//    QString generateValueLabel(const QString &format, float value);
+    enum RenderingState {
+        RenderingNormal = 0,
+        RenderingSelection,
+        RenderingDepth
+    };
+
+    //    QString generateValueLabel(const QString &format, float value);
 
 public:
     virtual ~Abstract3DRenderer();
 
     virtual void updateData() = 0;
     virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    virtual void updateCustomData(const QList<CustomDataItem *> &customItems) = 0;
     virtual SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     virtual void cleanCache(SeriesRenderCache *cache);
     virtual void render(GLuint defaultFboHandle);
@@ -82,6 +90,8 @@ public:
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initBackgroundShaders(const QString &vertexShader,
                                        const QString &fragmentShader) = 0;
+    virtual void initCustomItemShaders(const QString &vertexShader,
+                                       const QString &fragmentShader);
     virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
                                 QAbstract3DAxis::AxisType type);
     virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation,
@@ -150,6 +160,7 @@ protected:
     SelectionState m_selectionState;
     QPoint m_inputPosition;
     QHash<QAbstract3DSeries *, SeriesRenderCache *> m_renderCacheList;
+    CustomRenderItemArray m_customRenderCache;
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
     float m_devicePixelRatio;
@@ -161,6 +172,8 @@ protected:
     QString m_selectionLabel;
     LabelItem *m_selectionLabelItem;
     int m_visibleSeriesCount;
+
+    ShaderHelper *m_customItemShader;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

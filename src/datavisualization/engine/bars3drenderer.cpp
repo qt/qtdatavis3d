@@ -299,6 +299,11 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
         m_selectionLabelDirty = true;
 }
 
+void Bars3DRenderer::updateCustomData(const QList<CustomDataItem *> &customItems)
+{
+    // TODO
+}
+
 SeriesRenderCache *Bars3DRenderer::createNewCache(QAbstract3DSeries *series)
 {
     return new BarSeriesRenderCache(series, this);
@@ -987,6 +992,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
 
+        drawCustomItems(RenderingDepth, m_depthShader, activeCamera, projectionMatrix,
+                        depthProjectionMatrix);
+
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
@@ -1067,6 +1075,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
         glCullFace(GL_BACK);
+        drawCustomItems(RenderingSelection, m_selectionShader, activeCamera, projectionMatrix,
+                        depthProjectionMatrix);
         drawLabels(true, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
                    columnScaleFactor);
         glEnable(GL_DITHER);
@@ -1362,6 +1372,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 
     glDisable(GL_POLYGON_OFFSET_FILL);
+
+    drawCustomItems(RenderingNormal, m_customItemShader, activeCamera, projectionMatrix,
+                    depthProjectionMatrix);
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -1730,6 +1743,14 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // Release shader
     glUseProgram(0);
     m_selectionDirty = false;
+}
+
+void Bars3DRenderer::drawCustomItems(RenderingState state, ShaderHelper *shader,
+                                     const Q3DCamera *activeCamera,
+                                     const QMatrix4x4 &projectionMatrix,
+                                     const QMatrix4x4 &depthProjectionMatrix)
+{
+    // TODO
 }
 
 void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
@@ -2189,6 +2210,10 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector4D &selectionC
         position = Bars3DController::invalidSelectionPosition();
         // Pass label clicked info to input handler
         m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
+    } else if (selectionColor.w() == customItemAlpha) {
+        // Custom item selection
+        position = Bars3DController::invalidSelectionPosition();
+        m_clickedType = QAbstract3DGraph::ElementCustomItem;
     }
     return position;
 }

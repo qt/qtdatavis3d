@@ -54,5 +54,7 @@
         <file alias="fragmentSurfaceShadowNoTex">shaders/surfaceShadowNoTex.frag</file>
         <file alias="fragmentSurfaceShadowFlat">shaders/surfaceShadowFlat.frag</file>
         <file alias="vertexSurfaceShadowFlat">shaders/surfaceShadowFlat.vert</file>
+        <file alias="fragmentTexture">shaders/texture.frag</file>
+        <file alias="fragmentTextureES2">shaders/texture_ES2.frag</file>
     </qresource>
 </RCC>

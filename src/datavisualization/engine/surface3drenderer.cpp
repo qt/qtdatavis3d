@@ -41,8 +41,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
 const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
-const GLfloat backgroundMargin = 1.1f; // Margin for background (1.10 make it 10% larger to avoid
-                                       // selection ball being drawn inside background)
+// Margin for background (1.10 make it 10% larger to avoid
+// selection ball being drawn inside background)
+const GLfloat backgroundMargin = 1.1f;
 const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
@@ -291,6 +292,11 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
             }
         }
     }
+}
+
+void Surface3DRenderer::updateCustomData(const QList<CustomDataItem *> &customItems)
+{
+    // TODO
 }
 
 SeriesRenderCache *Surface3DRenderer::createNewCache(QAbstract3DSeries *series)
@@ -1133,6 +1139,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         glDisableVertexAttribArray(m_depthShader->posAtt());
 
+        drawCustomItems(RenderingDepth, m_depthShader, activeCamera, projectionMatrix,
+                        depthProjectionMatrix);
+
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
@@ -1180,6 +1189,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                      cache->selectionTexture());
             }
         }
+        drawCustomItems(RenderingSelection, m_selectionShader, activeCamera, projectionMatrix,
+                        depthProjectionMatrix);
         drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
 
         glEnable(GL_DITHER);
@@ -1309,6 +1320,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
     }
+
+    drawCustomItems(RenderingNormal, m_customItemShader, activeCamera, projectionMatrix,
+                    depthProjectionMatrix);
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -1751,6 +1765,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         m_selectionDirty = false;
     }
+}
+
+void Surface3DRenderer::drawCustomItems(RenderingState state, ShaderHelper *shader,
+                                        const Q3DCamera *activeCamera,
+                                        const QMatrix4x4 &projectionMatrix,
+                                        const QMatrix4x4 &depthProjectionMatrix)
+{
+    // TODO
 }
 
 void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
@@ -2235,7 +2257,7 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
 QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
 {
     m_clickedType = QAbstract3DGraph::ElementNone;
-    // Check for label selection
+    // Check for label and custom item selection
     if (id / alphaMultiplier == labelRowAlpha) {
         m_clickedType = QAbstract3DGraph::ElementAxisZLabel;
         return Surface3DController::invalidSelectionPosition();
@@ -2244,6 +2266,10 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == labelValueAlpha) {
         m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
+        return Surface3DController::invalidSelectionPosition();
+    } else if (id / alphaMultiplier == customItemAlpha) {
+        // Custom item selection
+        m_clickedType = QAbstract3DGraph::ElementCustomItem;
         return Surface3DController::invalidSelectionPosition();
     }
 

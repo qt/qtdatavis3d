@@ -50,6 +50,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_axisZ(0),
     m_renderer(0),
     m_isDataDirty(true),
+    m_isCustomDataDirty(true),
     m_isSeriesVisualsDirty(true),
     m_renderPending(false),
     m_measureFps(false),
@@ -87,6 +88,9 @@ Abstract3DController::~Abstract3DController()
     destroyRenderer();
     delete m_scene;
     delete m_themeManager;
+    foreach (CustomDataItem *item, m_customItems)
+        delete item;
+    m_customItems.clear();
 }
 
 void Abstract3DController::destroyRenderer()
@@ -368,6 +372,11 @@ void Abstract3DController::synchDataToRenderer()
         // so no data needs to be passed in updateData()
         m_renderer->updateData();
         m_isDataDirty = false;
+    }
+
+    if (m_isCustomDataDirty) {
+        m_renderer->updateCustomData(m_customItems);
+        m_isCustomDataDirty = false;
     }
 }
 
@@ -814,6 +823,30 @@ void Abstract3DController::requestRender(QOpenGLFramebufferObject *fbo)
     m_renderer->render(fbo->handle());
 }
 
+int Abstract3DController::addCustomItem(const QString &meshFile, const QVector3D &position,
+                                        const QVector3D &scaling, const QQuaternion &rotation,
+                                        const QImage &textureImage)
+{
+    CustomDataItem *newItem = new CustomDataItem();
+    newItem->setMeshFile(meshFile);
+    newItem->setPosition(position);
+    newItem->setScaling(scaling);
+    newItem->setRotation(rotation);
+    newItem->setTextureImage(textureImage);
+    m_customItems.append(newItem);
+    m_isCustomDataDirty = true;
+    emitNeedRender();
+    return m_customItems.count() - 1;
+}
+
+void Abstract3DController::deleteCustomItem(int index)
+{
+    delete m_customItems[index];
+    m_customItems.removeAt(index);
+    m_isCustomDataDirty = true;
+    emitNeedRender();
+}
+
 void Abstract3DController::handleAxisTitleChanged(const QString &title)
 {
     Q_UNUSED(title)
@@ -974,9 +1007,9 @@ void Abstract3DController::setMeasureFps(bool enable)
         m_currentFps = 0.0;
 
         if (enable) {
-             m_frameTimer.start();
-             m_numFrames = -1;
-             emitNeedRender();
+            m_frameTimer.start();
+            m_numFrames = -1;
+            emitNeedRender();
         }
         emit measureFpsChanged(enable);
     }

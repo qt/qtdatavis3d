@@ -77,7 +77,8 @@ public:
         ElementSeries,
         ElementAxisXLabel,
         ElementAxisZLabel,
-        ElementAxisYLabel
+        ElementAxisYLabel,
+        ElementCustomItem
     };
 
 public:
@@ -105,6 +106,11 @@ public:
     Q3DScene *scene() const;
 
     void clearSelection();
+
+    int addCustomItem(const QString &meshFile, const QVector3D &position,
+                      const QVector3D &scaling, const QQuaternion &rotation,
+                      const QImage &textureImage = QImage());
+    void removeCustomItemAt(int index);
 
     QImage renderToImage(int msaaSamples = 0, const QSize &imageSize = QSize());
 

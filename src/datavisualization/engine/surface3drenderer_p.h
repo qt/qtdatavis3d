@@ -106,6 +106,7 @@ public:
 
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    void updateCustomData(const QList<CustomDataItem *> &customItems);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void cleanCache(SeriesRenderCache *cache);
     void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode);
@@ -141,6 +142,9 @@ private:
     void loadBackgroundMesh();
     void loadLabelMesh();
     void drawScene(GLuint defaultFboHandle);
+    void drawCustomItems(RenderingState state, ShaderHelper *shader, const Q3DCamera *activeCamera,
+                         const QMatrix4x4 &projectionMatrix,
+                         const QMatrix4x4 &depthProjectionMatrix);
     void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                     const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
     void calculateSceneScalingFactors();

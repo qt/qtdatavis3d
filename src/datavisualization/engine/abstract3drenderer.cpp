@@ -27,6 +27,7 @@
 #include "q3dtheme_p.h"
 #include "objecthelper_p.h"
 #include "qvalue3daxisformatter_p.h"
+#include "shaderhelper_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -48,7 +49,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_clickedSeries(0),
       m_clickedType(QAbstract3DGraph::ElementNone),
       m_selectionLabelItem(0),
-      m_visibleSeriesCount(0)
+      m_visibleSeriesCount(0),
+      m_customItemShader(0)
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
@@ -65,6 +67,7 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_cachedScene;
     delete m_cachedTheme;
     delete m_selectionLabelItem;
+    delete m_customItemShader;
 
     foreach (SeriesRenderCache *cache, m_renderCacheList) {
         cache->cleanup(m_textureHelper);
@@ -140,6 +143,15 @@ void Abstract3DRenderer::initGradientShaders(const QString &vertexShader,
     Q_UNUSED(fragmentShader)
 }
 
+void Abstract3DRenderer::initCustomItemShaders(const QString &vertexShader,
+                                               const QString &fragmentShader)
+{
+    if (m_customItemShader)
+        delete m_customItemShader;
+    m_customItemShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_customItemShader->initialize();
+}
+
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 {
     // Synchronize the controller theme with renderer
@@ -206,6 +218,8 @@ void Abstract3DRenderer::reInitShaders()
                     QStringLiteral(":/shaders/fragmentShadowNoTex"));
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        initCustomItemShaders(QStringLiteral(":/shaders/vertexShadow"),
+                              QStringLiteral(":/shaders/fragmentShadow"));
     } else {
         initGradientShaders(QStringLiteral(":/shaders/vertex"),
                             QStringLiteral(":/shaders/fragmentColorOnY"));
@@ -213,6 +227,8 @@ void Abstract3DRenderer::reInitShaders()
                     QStringLiteral(":/shaders/fragment"));
         initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                               QStringLiteral(":/shaders/fragment"));
+        initCustomItemShaders(QStringLiteral(":/shaders/vertexShadow"),
+                              QStringLiteral(":/shaders/fragmentTexture"));
     }
 #else
     initGradientShaders(QStringLiteral(":/shaders/vertex"),
@@ -221,6 +237,8 @@ void Abstract3DRenderer::reInitShaders()
                 QStringLiteral(":/shaders/fragmentES2"));
     initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                           QStringLiteral(":/shaders/fragmentES2"));
+    initCustomItemShaders(QStringLiteral(":/shaders/vertex"), // TODO: Need new shader? At least this one doesn't work
+                          QStringLiteral(":/shaders/fragmentTextureES2"));
 #endif
 }
 

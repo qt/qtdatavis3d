@@ -35,6 +35,7 @@
 #include "qabstract3dinputhandler.h"
 #include "qabstractdataproxy.h"
 #include "q3dscene_p.h"
+#include "customdataitem_p.h"
 #include <QtGui/QLinearGradient>
 #include <QtCore/QTime>
 
@@ -155,6 +156,7 @@ protected:
     QList<QAbstract3DAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
+    bool m_isCustomDataDirty;
     bool m_isSeriesVisualsDirty;
     bool m_renderPending;
 
@@ -166,6 +168,8 @@ protected:
     qreal m_currentFps;
 
     QVector<QAbstract3DSeries *> m_changedSeriesList;
+
+    QList<CustomDataItem *> m_customItems;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
@@ -225,6 +229,10 @@ public:
     void markSeriesVisualsDirty();
 
     void requestRender(QOpenGLFramebufferObject *fbo);
+
+    int addCustomItem(const QString &meshFile, const QVector3D &position, const QVector3D &scaling,
+                      const QQuaternion &rotation, const QImage &textureImage);
+    void deleteCustomItem(int index);
 
     void emitNeedRender();
 

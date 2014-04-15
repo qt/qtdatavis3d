@@ -115,6 +115,7 @@ public:
 
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    void updateCustomData(const QList<CustomDataItem *> &customItems);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
@@ -145,6 +146,9 @@ private:
 
     void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
+    void drawCustomItems(RenderingState state, ShaderHelper *shader, const Q3DCamera *activeCamera,
+                         const QMatrix4x4 &projectionMatrix,
+                         const QMatrix4x4 &depthProjectionMatrix);
     void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                     const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
                     GLfloat rowScaleFactor, GLfloat columnScaleFactor);
