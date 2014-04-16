@@ -841,10 +841,28 @@ int Abstract3DController::addCustomItem(const QString &meshFile, const QVector3D
 
 void Abstract3DController::deleteCustomItem(int index)
 {
-    delete m_customItems[index];
-    m_customItems.removeAt(index);
-    m_isCustomDataDirty = true;
-    emitNeedRender();
+    if (m_customItems.size() > index) {
+        delete m_customItems[index];
+        m_customItems.removeAt(index);
+        m_isCustomDataDirty = true;
+        emitNeedRender();
+    }
+}
+
+void Abstract3DController::deleteCustomItem(const QVector3D &position)
+{
+    int index = -1;
+    int counter = 0;
+    // Get the index for the item at position
+    foreach (CustomDataItem *item, m_customItems) {
+        if (item->position() == position) {
+            index = counter;
+            break;
+        }
+        counter++;
+    }
+    if (index >= 0)
+        deleteCustomItem(index);
 }
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)

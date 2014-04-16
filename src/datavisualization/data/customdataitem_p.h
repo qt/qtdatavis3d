@@ -42,10 +42,15 @@ public:
     virtual ~CustomDataItem();
 
     inline void setMeshFile(const QString &meshFile) { m_meshFile = meshFile; }
+    inline QString meshFile() { return m_meshFile;}
     void setTextureImage(const QImage &textureImage);
+    inline GLuint texture() { return m_texture; }
     inline void setPosition(const QVector3D &position) { m_position = position; }
+    inline QVector3D position() { return m_position; }
     inline void setScaling(const QVector3D &scaling) { m_scaling = scaling; }
+    inline QVector3D scaling() { return m_scaling; }
     inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
+    inline QQuaternion rotation() { return m_rotation; }
 
 private:
     TextureHelper *m_textureHelper;
@@ -54,10 +59,6 @@ private:
     QVector3D m_position;
     QVector3D m_scaling;
     QQuaternion m_rotation;
-
-    friend class Bars3DRenderer;
-    friend class Scatter3DRenderer;
-    friend class Surface3DRenderer;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

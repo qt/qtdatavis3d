@@ -111,6 +111,7 @@ public:
                       const QVector3D &scaling, const QQuaternion &rotation,
                       const QImage &textureImage = QImage());
     void removeCustomItemAt(int index);
+    void removeCustomItemAt(const QVector3D &position);
 
     QImage renderToImage(int msaaSamples = 0, const QSize &imageSize = QSize());
 

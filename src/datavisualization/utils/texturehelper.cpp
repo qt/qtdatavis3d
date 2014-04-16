@@ -193,7 +193,8 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint textureSize)
 #endif
 
 #if !defined(QT_OPENGL_ES_2)
-GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize)
+GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer,
+                                                    GLuint textureSize)
 {
     GLuint depthtextureid = createDepthTexture(size, textureSize);
 
@@ -223,7 +224,8 @@ GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &f
 #endif
 
 #if !defined(QT_OPENGL_ES_2)
-void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint textureSize, GLfloat value)
+void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint textureSize,
+                                     GLfloat value)
 {
     int nItems = size.width() * textureSize * size.height() * textureSize;
     GLfloat *bits = new GLfloat[nItems];

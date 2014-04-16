@@ -48,6 +48,8 @@ const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
 const GLfloat sliceUnits = 2.5f;
+const uint greenMultiplier = 256;
+const uint blueMultiplier = 65536;
 const uint alphaMultiplier = 16777216;
 
 Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
@@ -292,11 +294,6 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
             }
         }
     }
-}
-
-void Surface3DRenderer::updateCustomData(const QList<CustomDataItem *> &customItems)
-{
-    // TODO
 }
 
 SeriesRenderCache *Surface3DRenderer::createNewCache(QAbstract3DSeries *series)
@@ -749,7 +746,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     GLfloat scaleXBackground = 0.0f;
 
-    if (m_renderCacheList.size()) {
+    if (!m_renderCacheList.isEmpty()) {
         bool drawGrid = false;
 
         foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
@@ -1045,8 +1042,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw depth buffer
 #if !defined(QT_OPENGL_ES_2)
-    GLfloat adjustedLightStrength =  m_cachedTheme->lightStrength() / 10.0f;
-    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && m_renderCacheList.size()) {
+    GLfloat adjustedLightStrength = m_cachedTheme->lightStrength() / 10.0f;
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone &&
+            (!m_renderCacheList.isEmpty() || !m_customRenderCache.isEmpty())) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -1107,6 +1105,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glEnable(GL_CULL_FACE);
         glCullFace(GL_FRONT);
 
+        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
+                                            projectionViewMatrix, depthProjectionViewMatrix,
+                                            m_depthTexture, m_shadowQualityToShader);
+
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
                                m_depthModelTexture, 0);
         glClear(GL_DEPTH_BUFFER_BIT);
@@ -1139,8 +1141,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         glDisableVertexAttribArray(m_depthShader->posAtt());
 
-        drawCustomItems(RenderingDepth, m_depthShader, activeCamera, projectionMatrix,
-                        depthProjectionMatrix);
+        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
+                                            projectionViewMatrix, depthProjectionViewMatrix,
+                                            m_depthTexture, m_shadowQualityToShader);
 
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -1160,7 +1163,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (!m_cachedIsSlicingActivated && m_renderCacheList.size() && m_selectionState == SelectOnScene
+    if (!m_cachedIsSlicingActivated && !m_renderCacheList.isEmpty()
+            && !m_customRenderCache.isEmpty()
+            && m_selectionState == SelectOnScene
             && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
@@ -1189,24 +1194,23 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                      cache->selectionTexture());
             }
         }
-        drawCustomItems(RenderingSelection, m_selectionShader, activeCamera, projectionMatrix,
-                        depthProjectionMatrix);
+        m_surfaceGridShader->bind();
+        Abstract3DRenderer::drawCustomItems(RenderingSelection, m_surfaceGridShader, viewMatrix,
+                                            projectionViewMatrix, depthProjectionViewMatrix,
+                                            m_depthTexture, m_shadowQualityToShader);
         drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
 
         glEnable(GL_DITHER);
 
-        GLubyte pixel[4] = {0, 0, 0, 0};
-        glReadPixels(m_inputPosition.x(), m_viewport.height() - m_inputPosition.y(),
-                     1, 1, GL_RGBA, GL_UNSIGNED_BYTE, (void *)pixel);
+        QVector4D clickedColor = Utils::getSelection(m_inputPosition, m_viewport.height());
 
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
         // Put the RGBA value back to uint
-#if !defined(QT_OPENGL_ES_2)
-        uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536 + pixel[3] * alphaMultiplier;
-#else
-        uint selectionId = pixel[0] + pixel[1] * 256 + pixel[2] * 65536;
-#endif
+        uint selectionId = clickedColor.x()
+                + clickedColor.y() * greenMultiplier
+                + clickedColor.z() * blueMultiplier
+                + clickedColor.w() * alphaMultiplier;
 
         m_clickedPosition = selectionIdToSurfacePoint(selectionId);
 
@@ -1220,7 +1224,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 
     // Draw the surface
-    if (m_renderCacheList.size()) {
+    if (!m_renderCacheList.isEmpty()) {
         // For surface we can see climpses from underneath
         glDisable(GL_CULL_FACE);
 
@@ -1321,8 +1325,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         }
     }
 
-    drawCustomItems(RenderingNormal, m_customItemShader, activeCamera, projectionMatrix,
-                    depthProjectionMatrix);
+    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
+                                        projectionViewMatrix, depthProjectionViewMatrix,
+                                        m_depthTexture, m_shadowQualityToShader);
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -1377,7 +1382,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
                                                 adjustedLightStrength);
             // Draw the object
-            if (noShadows)
+            if (noShadows && m_customRenderCache.isEmpty())
                 m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_noShadowTexture);
             else
                 m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
@@ -1767,14 +1772,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     }
 }
 
-void Surface3DRenderer::drawCustomItems(RenderingState state, ShaderHelper *shader,
-                                        const Q3DCamera *activeCamera,
-                                        const QMatrix4x4 &projectionMatrix,
-                                        const QMatrix4x4 &depthProjectionMatrix)
-{
-    // TODO
-}
-
 void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                                    const QMatrix4x4 &viewMatrix,
                                    const QMatrix4x4 &projectionMatrix) {
@@ -1786,12 +1783,11 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         shader = m_surfaceGridShader;
     } else {
         shader = m_labelShader;
-
+        shader->bind();
         glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
-    shader->bind();
 
     glEnable(GL_POLYGON_OFFSET_FILL);
 
@@ -2508,5 +2504,12 @@ void Surface3DRenderer::updateDepthBuffer()
     }
 }
 #endif
+
+QVector3D Surface3DRenderer::convertPositionToTranslation(const QVector3D &position) {
+    float xTrans = m_axisCacheX.positionAt(position.x());
+    float yTrans = m_axisCacheY.positionAt(position.y());
+    float zTrans = m_axisCacheZ.positionAt(position.z());
+    return QVector3D(xTrans, yTrans, zTrans);
+}
 
 QT_END_NAMESPACE_DATAVISUALIZATION

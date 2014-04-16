@@ -227,7 +227,7 @@ void Abstract3DRenderer::reInitShaders()
                     QStringLiteral(":/shaders/fragment"));
         initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                               QStringLiteral(":/shaders/fragment"));
-        initCustomItemShaders(QStringLiteral(":/shaders/vertexShadow"),
+        initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
                               QStringLiteral(":/shaders/fragmentTexture"));
     }
 #else
@@ -237,7 +237,7 @@ void Abstract3DRenderer::reInitShaders()
                 QStringLiteral(":/shaders/fragmentES2"));
     initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                           QStringLiteral(":/shaders/fragmentES2"));
-    initCustomItemShaders(QStringLiteral(":/shaders/vertex"), // TODO: Need new shader? At least this one doesn't work
+    initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
                           QStringLiteral(":/shaders/fragmentTextureES2"));
 #endif
 }
@@ -393,6 +393,19 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
     }
 }
 
+void Abstract3DRenderer::updateCustomData(const QList<CustomDataItem *> &customItems)
+{
+    if (customItems.isEmpty() && m_customRenderCache.isEmpty())
+        return;
+
+    // There are probably not too many custom items, just recreate the array if something changes
+    foreach (CustomRenderItem *item, m_customRenderCache)
+        delete item;
+    m_customRenderCache.clear();
+    foreach (CustomDataItem *item, customItems)
+        addCustomItem(item);
+}
+
 SeriesRenderCache *Abstract3DRenderer::createNewCache(QAbstract3DSeries *series)
 {
     return new SeriesRenderCache(series, this);
@@ -500,6 +513,109 @@ void Abstract3DRenderer::setSelectionLabel(const QString &label)
 QString &Abstract3DRenderer::selectionLabel()
 {
     return m_selectionLabel;
+}
+
+QVector4D Abstract3DRenderer::indexToSelectionColor(GLint index)
+{
+    GLubyte idxRed = index & 0xff;
+    GLubyte idxGreen = (index & 0xff00) >> 8;
+    GLubyte idxBlue = (index & 0xff0000) >> 16;
+
+    return QVector4D(idxRed, idxGreen, idxBlue, 0);
+}
+
+void Abstract3DRenderer::addCustomItem(CustomDataItem *item) {
+    CustomRenderItem *newItem = new CustomRenderItem();
+    newItem->setMesh(item->meshFile());
+    newItem->setScaling(item->scaling());
+    newItem->setRotation(item->rotation());
+    newItem->setTexture(item->texture());
+    QVector3D translation = convertPositionToTranslation(item->position());
+    newItem->setTranslation(translation);
+    m_customRenderCache.append(newItem);
+}
+
+void Abstract3DRenderer::drawCustomItems(RenderingState state,
+                                         ShaderHelper *shader,
+                                         const QMatrix4x4 &viewMatrix,
+                                         const QMatrix4x4 &projectionViewMatrix,
+                                         const QMatrix4x4 &depthProjectionViewMatrix,
+                                         GLuint depthTexture,
+                                         GLfloat shadowQuality)
+{
+    if (m_customRenderCache.isEmpty())
+        return;
+
+    int itemIndex = 0;
+
+    if (RenderingNormal == state) {
+        shader->bind();
+        shader->setUniformValue(shader->lightP(), m_cachedScene->activeLight()->position());
+        shader->setUniformValue(shader->ambientS(), m_cachedTheme->ambientLightStrength());
+        shader->setUniformValue(shader->lightColor(),
+                                Utils::vectorFromColor(m_cachedTheme->lightColor()));
+        shader->setUniformValue(shader->view(), viewMatrix);
+
+        glEnable(GL_TEXTURE_2D);
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    }
+
+    // Draw custom items
+    foreach (CustomRenderItem *item, m_customRenderCache) {
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 itModelMatrix;
+        QMatrix4x4 MVPMatrix;
+
+        modelMatrix.translate(item->translation());
+        modelMatrix.rotate(item->rotation());
+        modelMatrix.scale(item->scaling());
+        itModelMatrix.rotate(item->rotation());
+        itModelMatrix.scale(item->scaling());
+        MVPMatrix = projectionViewMatrix * modelMatrix;
+
+        if (RenderingNormal == state) {
+            // Normal render
+            shader->setUniformValue(shader->model(), modelMatrix);
+            shader->setUniformValue(shader->MVP(), MVPMatrix);
+            shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+
+#if !defined(QT_OPENGL_ES_2)
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                // Set shadow shader bindings
+                shader->setUniformValue(shader->shadowQ(), shadowQuality);
+                shader->setUniformValue(shader->depth(), depthProjectionViewMatrix * modelMatrix);
+                shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength() / 10.0f);
+                m_drawer->drawObject(shader, item->mesh(), item->texture(), depthTexture);
+            } else
+#else
+            Q_UNUSED(depthTexture)
+            Q_UNUSED(shadowQuality)
+#endif
+            {
+                // Set shadowless shader bindings
+                shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
+                m_drawer->drawObject(shader, item->mesh(), item->texture());
+            }
+        } else if (RenderingSelection == state) {
+            // Selection render
+            shader->setUniformValue(shader->MVP(), MVPMatrix);
+            QVector4D itemColor = indexToSelectionColor(itemIndex++);
+            itemColor.setW(customItemAlpha);
+            itemColor /= 255.0f;
+            shader->setUniformValue(shader->color(), itemColor);
+            m_drawer->drawObject(shader, item->mesh());
+        } else {
+            // Depth render
+            shader->setUniformValue(shader->MVP(), depthProjectionViewMatrix * modelMatrix);
+            m_drawer->drawObject(shader, item->mesh());
+        }
+    }
+
+    if (RenderingNormal == state) {
+        glDisable(GL_TEXTURE_2D);
+        glDisable(GL_BLEND);
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

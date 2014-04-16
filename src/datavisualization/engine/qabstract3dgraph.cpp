@@ -389,6 +389,9 @@ void QAbstract3DGraph::clearSelection()
  *
  * \return index to the added item.
  *
+ * \note No validity checks are made for the position of the item, so it is up to the user to
+ * provide a valid position. Items positioned outside axis ranges are still rendered.
+ *
  * \sa removeCustomItemAt()
  *
  * \since Qt Data Visualization 1.1
@@ -404,11 +407,27 @@ int QAbstract3DGraph::addCustomItem(const QString &meshFile, const QVector3D &po
 /*!
  * Removes the custom item at \a {index}. Deletes the resource allocated to it.
  *
+ * \note The index of the remaining items will change if the item removed is other than
+ * the last.
+ *
  * \since Qt Data Visualization 1.1
  */
 void QAbstract3DGraph::removeCustomItemAt(int index)
 {
     d_ptr->m_visualController->deleteCustomItem(index);
+}
+
+/*!
+ * Removes the custom item at \a {position}. Deletes the resource allocated to it.
+ *
+ * \note The index of the remaining items will change if an item is removed from a position that
+ * is not at the last index.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
+{
+    d_ptr->m_visualController->deleteCustomItem(position);
 }
 
 /*!

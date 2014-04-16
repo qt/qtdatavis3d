@@ -267,19 +267,6 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         m_selectionLabelDirty = true;
 }
 
-void Scatter3DRenderer::updateCustomData(const QList<CustomDataItem *> &customItems)
-{
-    if (customItems.isEmpty() && m_customRenderCache.isEmpty())
-        return;
-
-    // There are probably not too many custom items, just recreate the array if something changes
-    foreach (CustomRenderItem *item, m_customRenderCache)
-        delete item;
-    m_customRenderCache.clear();
-    foreach (CustomDataItem *item, customItems)
-        addCustomItem(item);
-}
-
 SeriesRenderCache *Scatter3DRenderer::createNewCache(QAbstract3DSeries *series)
 {
     return new ScatterSeriesRenderCache(series, this);
@@ -482,8 +469,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             }
         }
 
-        drawCustomItems(RenderingDepth, m_depthShader, activeCamera, projectionMatrix,
-                        depthProjectionMatrix);
+        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
+                                            projectionViewMatrix, depthProjectionViewMatrix,
+                                            m_depthTexture, m_shadowQualityToShader);
 
         // Disable drawing to framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -506,7 +494,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     // Skip selection mode drawing if we have no selection mode
     if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
-            && SelectOnScene == m_selectionState && m_visibleSeriesCount > 0) {
+            && SelectOnScene == m_selectionState
+            && (m_visibleSeriesCount > 0 || !m_customRenderCache.isEmpty())) {
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glViewport(0, 0,
@@ -582,8 +571,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             }
         }
 
-        drawCustomItems(RenderingSelection, m_selectionShader, activeCamera, projectionMatrix,
-                        depthProjectionMatrix);
+        Abstract3DRenderer::drawCustomItems(RenderingSelection, m_selectionShader, viewMatrix,
+                                            projectionViewMatrix, depthProjectionViewMatrix,
+                                            m_depthTexture, m_shadowQualityToShader);
 
         drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
 
@@ -813,8 +803,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     }
 #endif
 
-    drawCustomItems(RenderingNormal, m_customItemShader, activeCamera, projectionMatrix,
-                    depthProjectionMatrix);
+    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
+                                        projectionViewMatrix, depthProjectionViewMatrix,
+                                        m_depthTexture, m_shadowQualityToShader);
 
     // Bind background shader
     m_backgroundShader->bind();
@@ -1327,87 +1318,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     m_selectionDirty = false;
 }
 
-void Scatter3DRenderer::drawCustomItems(RenderingState state, ShaderHelper *shader,
-                                        const Q3DCamera *activeCamera,
-                                        const QMatrix4x4 &projectionMatrix,
-                                        const QMatrix4x4 &depthProjectionMatrix)
-{
-    if (m_customRenderCache.isEmpty())
-        return;
-
-    int itemIndex = 0;
-    QMatrix4x4 viewMatrix = activeCamera->d_ptr->viewMatrix();
-    QMatrix4x4 depthViewMatrix;
-    QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
-    QVector3D depthLightPos = activeCamera->d_ptr->calculatePositionRelativeToCamera(
-                zeroVector, 0.0f, 2.5f / m_autoScaleAdjustment);
-    depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
-    QMatrix4x4 depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
-
-    if (RenderingNormal == state) {
-        shader->bind();
-        shader->setUniformValue(shader->lightP(), m_cachedScene->activeLight()->position());
-        shader->setUniformValue(shader->ambientS(), m_cachedTheme->ambientLightStrength());
-        shader->setUniformValue(shader->lightColor(),
-                                Utils::vectorFromColor(m_cachedTheme->lightColor()));
-        shader->setUniformValue(shader->view(), viewMatrix);
-
-        glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    }
-
-    // Draw custom items
-    foreach (CustomRenderItem *item, m_customRenderCache) {
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 itModelMatrix;
-
-        modelMatrix.translate(item->translation());
-        modelMatrix.rotate(item->rotation());
-        modelMatrix.scale(item->scaling());
-        itModelMatrix.rotate(item->rotation());
-        itModelMatrix.scale(item->scaling());
-
-        if (RenderingNormal == state) {
-            // Normal render
-            shader->setUniformValue(shader->model(), modelMatrix);
-            shader->setUniformValue(shader->MVP(), projectionViewMatrix * modelMatrix);
-            shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
-
-#if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                // Set shadow shader bindings
-                shader->setUniformValue(shader->shadowQ(), m_shadowQualityToShader);
-                shader->setUniformValue(shader->depth(), depthProjectionViewMatrix * modelMatrix);
-                shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength() / 10.0f);
-                m_drawer->drawObject(shader, item->mesh(), item->texture(), m_depthTexture);
-            } else
-#endif
-            {
-                // Set shadowless shader bindings
-                shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
-                m_drawer->drawObject(shader, item->mesh(), item->texture());
-            }
-        } else if (RenderingSelection == state) {
-            // Selection render
-            QVector4D itemColor = indexToSelectionColor(itemIndex++);
-            itemColor.setW(customItemAlpha);
-            itemColor /= 255.0f;
-            shader->setUniformValue(shader->color(), itemColor);
-            m_drawer->drawObject(shader, item->mesh());
-        } else {
-            // Depth render
-            shader->setUniformValue(shader->MVP(), depthProjectionViewMatrix * modelMatrix);
-            m_drawer->drawObject(shader, item->mesh());
-        }
-    }
-
-    if (RenderingNormal == state) {
-        glDisable(GL_TEXTURE_2D);
-        glDisable(GL_BLEND);
-    }
-}
-
 void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                                    const QMatrix4x4 &viewMatrix,
                                    const QMatrix4x4 &projectionMatrix) {
@@ -1849,22 +1759,12 @@ void Scatter3DRenderer::initLabelShaders(const QString &vertexShader, const QStr
     m_labelShader->initialize();
 }
 
-QVector4D Scatter3DRenderer::indexToSelectionColor(GLint index)
-{
-    GLubyte dotIdxRed = index & 0xff;
-    GLubyte dotIdxGreen = (index & 0xff00) >> 8;
-    GLubyte dotIdxBlue = (index & 0xff0000) >> 16;
-
-    return QVector4D(dotIdxRed, dotIdxGreen, dotIdxBlue, 0);
-}
-
 void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
                                                        int &index,
                                                        QAbstract3DSeries *&series)
 {
     m_clickedType = QAbstract3DGraph::ElementNone;
     if (color != selectionSkipColor) {
-        qDebug() << __FUNCTION__ << color.w();
         if (color.w() == labelRowAlpha) {
             // Row selection
             index = Scatter3DController::invalidSelectionIndex();
@@ -1881,7 +1781,6 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
             // Custom item selection
             index = Scatter3DController::invalidSelectionIndex();
             m_clickedType = QAbstract3DGraph::ElementCustomItem;
-            qDebug() << "custom item selected";
         } else {
             int totalIndex = int(color.x())
                     + (int(color.y()) << 8)
@@ -1909,19 +1808,11 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
     series = 0;
 }
 
-void Scatter3DRenderer::addCustomItem(CustomDataItem *item) {
-    CustomRenderItem *newItem = new CustomRenderItem();
-    newItem->setMesh(item->m_meshFile);
-    newItem->setScaling(item->m_scaling);
-    newItem->setRotation(item->m_rotation);
-    newItem->setTexture(item->m_texture);
-    const QVector3D &pos = item->m_position;
-    float xTrans = m_axisCacheX.positionAt(pos.x());
-    float yTrans = m_axisCacheY.positionAt(pos.y());
-    float zTrans = m_axisCacheZ.positionAt(pos.z());
-    newItem->setTranslation(QVector3D(xTrans, yTrans, zTrans));
-    m_customRenderCache.append(newItem);
-    qDebug() << __FUNCTION__ << item->m_meshFile << newItem->rotation() << newItem->scaling() << newItem->translation();
+QVector3D Scatter3DRenderer::convertPositionToTranslation(const QVector3D &position) {
+    float xTrans = m_axisCacheX.positionAt(position.x());
+    float yTrans = m_axisCacheY.positionAt(position.y());
+    float zTrans = m_axisCacheZ.positionAt(position.z());
+    return QVector3D(xTrans, yTrans, zTrans);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

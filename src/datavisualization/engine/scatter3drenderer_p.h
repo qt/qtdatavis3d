@@ -104,9 +104,10 @@ public:
 
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
-    void updateCustomData(const QList<CustomDataItem *> &customItems);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void updateScene(Q3DScene *scene);
+
+    QVector3D convertPositionToTranslation(const QVector3D &position);
 
     inline int clickedIndex() const { return m_clickedIndex; }
     void resetClickedStatus();
@@ -124,9 +125,6 @@ private:
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
     void drawScene(GLuint defaultFboHandle);
-    void drawCustomItems(RenderingState state, ShaderHelper *shader, const Q3DCamera *activeCamera,
-                         const QMatrix4x4 &projectionMatrix,
-                         const QMatrix4x4 &depthProjectionMatrix);
     void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                     const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
 
@@ -146,8 +144,6 @@ private:
     void calculateTranslation(ScatterRenderItem &item);
     void calculateSceneScalingFactors();
 
-    void addCustomItem(CustomDataItem *item);
-
     Q_DISABLE_COPY(Scatter3DRenderer)
 
     friend class ScatterRenderItem;
@@ -156,7 +152,6 @@ public slots:
     void updateSelectedItem(int index, QScatter3DSeries *series);
 
 private:
-    QVector4D indexToSelectionColor(GLint index);
     void selectionColorToSeriesAndIndex(const QVector4D &color, int &index,
                                         QAbstract3DSeries *&series);
 };

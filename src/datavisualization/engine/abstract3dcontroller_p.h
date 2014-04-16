@@ -233,6 +233,7 @@ public:
     int addCustomItem(const QString &meshFile, const QVector3D &position, const QVector3D &scaling,
                       const QQuaternion &rotation, const QImage &textureImage);
     void deleteCustomItem(int index);
+    void deleteCustomItem(const QVector3D &position);
 
     void emitNeedRender();
 

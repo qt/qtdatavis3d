@@ -69,7 +69,7 @@ public:
 
     virtual void updateData() = 0;
     virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
-    virtual void updateCustomData(const QList<CustomDataItem *> &customItems) = 0;
+    virtual void updateCustomData(const QList<CustomDataItem *> &customItems);
     virtual SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     virtual void cleanCache(SeriesRenderCache *cache);
     virtual void render(GLuint defaultFboHandle);
@@ -110,6 +110,11 @@ public:
     virtual void modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
+
+    virtual void addCustomItem(CustomDataItem *item);
+
+    virtual QVector3D convertPositionToTranslation(const QVector3D &position) = 0;
+
     void generateBaseColorTexture(const QColor &color, GLuint *texture);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
 
@@ -121,6 +126,13 @@ public:
     LabelItem &selectionLabelItem();
     void setSelectionLabel(const QString &label);
     QString &selectionLabel();
+
+    void drawCustomItems(RenderingState state, ShaderHelper *shader,
+                         const QMatrix4x4 &viewMatrix,
+                         const QMatrix4x4 &projectionViewMatrix,
+                         const QMatrix4x4 &depthProjectionViewMatrix,
+                         GLuint depthTexture, GLfloat shadowQuality);
+    QVector4D indexToSelectionColor(GLint index);
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.

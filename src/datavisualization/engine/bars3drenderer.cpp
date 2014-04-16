@@ -299,11 +299,6 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
         m_selectionLabelDirty = true;
 }
 
-void Bars3DRenderer::updateCustomData(const QList<CustomDataItem *> &customItems)
-{
-    // TODO
-}
-
 SeriesRenderCache *Bars3DRenderer::createNewCache(QAbstract3DSeries *series)
 {
     return new BarSeriesRenderCache(series, this);
@@ -575,7 +570,6 @@ void Bars3DRenderer::drawSlicedScene()
                 else
                     barShader = m_barGradientShader;
                 barShader->bind();
-
             }
 
             if (!colorStyleIsUniform && (previousColorStyle != colorStyle)
@@ -992,8 +986,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
 
-        drawCustomItems(RenderingDepth, m_depthShader, activeCamera, projectionMatrix,
-                        depthProjectionMatrix);
+        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
+                                            projectionViewMatrix, depthProjectionViewMatrix,
+                                            m_depthTexture, m_shadowQualityToShader);
 
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -1011,7 +1006,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Skip selection mode drawing if we're slicing or have no selection mode
     if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
-            && m_selectionState == SelectOnScene && m_visibleSeriesCount > 0) {
+            && m_selectionState == SelectOnScene
+            && (m_visibleSeriesCount > 0 || !m_customRenderCache.isEmpty())) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -1075,8 +1071,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
         glCullFace(GL_BACK);
-        drawCustomItems(RenderingSelection, m_selectionShader, activeCamera, projectionMatrix,
-                        depthProjectionMatrix);
+        Abstract3DRenderer::drawCustomItems(RenderingSelection, m_selectionShader, viewMatrix,
+                                            projectionViewMatrix, depthProjectionViewMatrix,
+                                            m_depthTexture, m_shadowQualityToShader);
         drawLabels(true, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
                    columnScaleFactor);
         glEnable(GL_DITHER);
@@ -1373,14 +1370,15 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    drawCustomItems(RenderingNormal, m_customItemShader, activeCamera, projectionMatrix,
-                    depthProjectionMatrix);
+    // Reset culling
+    glCullFace(GL_BACK);
+
+    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
+                                        projectionViewMatrix, depthProjectionViewMatrix,
+                                        m_depthTexture, m_shadowQualityToShader);
 
     // Bind background shader
     m_backgroundShader->bind();
-
-    // Reset culling
-    glCullFace(GL_BACK);
 
     // Draw background
     if (m_cachedTheme->isBackgroundEnabled() && m_backgroundObj) {
@@ -1743,14 +1741,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // Release shader
     glUseProgram(0);
     m_selectionDirty = false;
-}
-
-void Bars3DRenderer::drawCustomItems(RenderingState state, ShaderHelper *shader,
-                                     const Q3DCamera *activeCamera,
-                                     const QMatrix4x4 &projectionMatrix,
-                                     const QMatrix4x4 &depthProjectionMatrix)
-{
-    // TODO
 }
 
 void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
@@ -2335,6 +2325,16 @@ void Bars3DRenderer::initLabelShaders(const QString &vertexShader, const QString
         delete m_labelShader;
     m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_labelShader->initialize();
+}
+
+QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position) {
+    // Convert row and column to translation on graph
+    float xTrans = (((position.x() + 0.5f) * m_cachedBarSpacing.width()) - m_rowWidth)
+            / m_scaleFactor;
+    float zTrans = (m_columnDepth - ((position.z() + 0.5f) * m_cachedBarSpacing.height()))
+            / m_scaleFactor;
+    float yTrans = m_axisCacheY.positionAt(position.y());
+    return QVector3D(xTrans, yTrans, zTrans);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
