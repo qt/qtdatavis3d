@@ -1163,8 +1163,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     glEnable(GL_TEXTURE_2D);
 
     // Draw selection buffer
-    if (!m_cachedIsSlicingActivated && !m_renderCacheList.isEmpty()
-            && !m_customRenderCache.isEmpty()
+    if (!m_cachedIsSlicingActivated && (!m_renderCacheList.isEmpty()
+            || !m_customRenderCache.isEmpty())
             && m_selectionState == SelectOnScene
             && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone) {
         m_selectionShader->bind();
@@ -1774,7 +1774,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
 void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                                    const QMatrix4x4 &viewMatrix,
-                                   const QMatrix4x4 &projectionMatrix) {
+                                   const QMatrix4x4 &projectionMatrix)
+{
     ShaderHelper *shader = 0;
     GLfloat alphaForValueSelection = labelValueAlpha / 255.0f;
     GLfloat alphaForRowSelection = labelRowAlpha / 255.0f;
