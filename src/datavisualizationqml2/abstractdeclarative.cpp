@@ -37,18 +37,18 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_controller(0),
     m_contextWindow(0),
     m_renderMode(RenderIndirect),
-#if defined(QT_OPENGL_ES_2)
+    #if defined(QT_OPENGL_ES_2)
     m_samples(0),
-#else
+    #else
     m_samples(4),
-#endif
+    #endif
     m_windowSamples(0),
     m_initialisedSize(0, 0),
-#ifdef USE_SHARED_CONTEXT
+    #ifdef USE_SHARED_CONTEXT
     m_context(0),
-#else
+    #else
     m_stateStore(0),
-#endif
+    #endif
     m_qtContext(0),
     m_mainThread(QThread::currentThread()),
     m_contextThread(0)
@@ -209,6 +209,26 @@ AbstractDeclarative::ShadowQuality AbstractDeclarative::shadowQuality() const
 bool AbstractDeclarative::shadowsSupported() const
 {
     return m_controller->shadowsSupported();
+}
+
+int AbstractDeclarative::addCustomItem(const QString &meshFile, const QVector3D &position,
+                                       const QVector3D &scaling, const QQuaternion &rotation,
+                                       const QString &textureFile)
+{
+    QImage textureImage;
+    if (!textureFile.isNull())
+        textureImage = QImage(textureFile);
+    return m_controller->addCustomItem(meshFile, position, scaling, rotation, textureImage);
+}
+
+void AbstractDeclarative::removeCustomItemAt(int index)
+{
+    m_controller->deleteCustomItem(index);
+}
+
+void AbstractDeclarative::removeCustomItemAt(const QVector3D &position)
+{
+    m_controller->deleteCustomItem(position);
 }
 
 void AbstractDeclarative::setSharedController(Abstract3DController *controller)

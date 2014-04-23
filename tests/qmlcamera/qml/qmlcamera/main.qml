@@ -75,9 +75,10 @@ Rectangle {
             property bool selectionOn: false
 
             onPressed: {
-                if (mouse.button == Qt.LeftButton)
+                if (mouse.button == Qt.LeftButton) {
                     selectionOn = true;
                     testChart.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
+                }
             }
 
             onReleased: {
@@ -162,4 +163,28 @@ Rectangle {
             }
         }
     }
+
+    Button {
+        id: shuttleAdd
+        anchors.bottom: dataToggle.top
+        width: camControlArea.width
+        text: "Add Shuttle"
+        property bool addObject: true
+        onClicked: {
+            if (addObject === true) {
+                testChart.addCustomItem(":/items/shuttle.obj",
+                                        Qt.vector3d(5.0,35.0,3.0),
+                                        Qt.vector3d(0.2,0.2,0.2),
+                                        Qt.quaternion(0.0,0.0,0.0,0.0),
+                                        ":/items/shuttle.png")
+                text = "Remove Shuttle"
+                addObject = false
+            } else {
+                testChart.removeCustomItemAt(Qt.vector3d(5.0,35.0,3.0))
+                text = "Add Shuttle"
+                addObject = true
+            }
+        }
+    }
+
 }

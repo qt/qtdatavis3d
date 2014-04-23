@@ -149,3 +149,43 @@
  * Clears selection from all attached series.
  */
 
+/*!
+ * \qmlmethod int AbstractGraph3D::addCustomItem(string meshFile, vector3d position, vector3d scaling, quaternion rotation, string textureFile)
+ *
+ * Adds a custom mesh item located in \a meshFile to a graph at \a position with \a {scaling},
+ * \a rotation and optional image for a texture located at \a textureFile. Item must be in
+ * Wavefront obj format and include vertices, normals and UVs. It also needs to be in triangles.
+ * Item position is given in data coordinates.
+ *
+ * \return index to the added item.
+ *
+ * \note No validity checks are made for the position of the item, so it is up to the user to
+ * provide a valid position. Items positioned outside axis ranges are still rendered.
+ *
+ * \sa removeCustomItemAt()
+ *
+ * \since Qt Data Visualization 1.1
+ */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::removeCustomItemAt(int index)
+ *
+ * Removes the custom item at \a {index}. Deletes the resources allocated to it.
+ *
+ * \note The index of the remaining items will change if the item removed is other than
+ * the last.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::removeCustomItemAt(vector3d position)
+ *
+ * Removes the custom item at \a {position}. Deletes the resources allocated to it.
+ *
+ * \note The index of the remaining items will change if an item is removed from a position that
+ * is not at the last index.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+

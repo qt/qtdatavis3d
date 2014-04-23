@@ -128,7 +128,13 @@ public:
 
     Q_INVOKABLE virtual void clearSelection();
 
-    virtual void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry);
+    Q_INVOKABLE virtual int addCustomItem(const QString &meshFile, const QVector3D &position,
+                                          const QVector3D &scaling, const QQuaternion &rotation,
+                                          const QString &textureFile = 0);
+    Q_INVOKABLE virtual void removeCustomItemAt(int index);
+    Q_INVOKABLE virtual void removeCustomItemAt(const QVector3D &position);
+
+    virtual void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
     void setSharedController(Abstract3DController *controller);
     // Used to synch up data model from controller to renderer while main thread is locked

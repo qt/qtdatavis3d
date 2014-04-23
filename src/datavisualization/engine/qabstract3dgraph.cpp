@@ -405,7 +405,7 @@ int QAbstract3DGraph::addCustomItem(const QString &meshFile, const QVector3D &po
 }
 
 /*!
- * Removes the custom item at \a {index}. Deletes the resource allocated to it.
+ * Removes the custom item at \a {index}. Deletes the resources allocated to it.
  *
  * \note The index of the remaining items will change if the item removed is other than
  * the last.
@@ -418,7 +418,7 @@ void QAbstract3DGraph::removeCustomItemAt(int index)
 }
 
 /*!
- * Removes the custom item at \a {position}. Deletes the resource allocated to it.
+ * Removes the custom item at \a {position}. Deletes the resources allocated to it.
  *
  * \note The index of the remaining items will change if an item is removed from a position that
  * is not at the last index.
