@@ -9,12 +9,12 @@ uniform highp vec3 lightPosition_wrld;
 uniform highp sampler2D textureSampler;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
-uniform highp vec3 lightColor;
+uniform highp vec4 lightColor;
 
 void main() {
     highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
-    highp vec3 materialAmbientColor = lightColor * ambientStrength * materialDiffuseColor;
-    highp vec3 materialSpecularColor = lightColor;
+    highp vec3 materialAmbientColor = lightColor.rgb * ambientStrength * materialDiffuseColor;
+    highp vec3 materialSpecularColor = lightColor.rgb;
 
     highp float distance = length(lightPosition_wrld - position_wrld);
 

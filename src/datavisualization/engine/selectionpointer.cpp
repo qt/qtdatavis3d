@@ -209,7 +209,7 @@ void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdj
     m_autoScaleAdjustment = autoScaleAdjustment;
 }
 
-void SelectionPointer::setHighlightColor(const QVector3D &colorVector)
+void SelectionPointer::setHighlightColor(const QVector4D &colorVector)
 {
     m_highlightColor = colorVector;
 }

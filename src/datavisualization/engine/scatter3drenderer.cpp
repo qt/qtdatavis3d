@@ -314,7 +314,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
-    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
     // Specify viewport
     glViewport(m_primarySubViewport.x(),
@@ -599,8 +599,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     GLuint gradientTexture = 0;
     bool dotSelectionFound = false;
     ScatterRenderItem *selectedItem(0);
-    QVector3D baseColor;
-    QVector3D dotColor;
+    QVector4D baseColor;
+    QVector4D dotColor;
 
     bool previousDrawingPoints = false;
     Q3DTheme::ColorStyle previousMeshColorStyle = Q3DTheme::ColorStyleUniform;
@@ -846,7 +846,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
+        QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -899,7 +899,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
+        QVector4D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);

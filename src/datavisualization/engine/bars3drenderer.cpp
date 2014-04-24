@@ -341,7 +341,7 @@ void Bars3DRenderer::drawSlicedScene()
 {
     GLfloat barPosX = 0;
     QVector3D lightPos;
-    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
     static QQuaternion ninetyDegreeRotation = QQuaternion::fromAxisAndAngle(upVector, 90.0f);
 
     // Specify viewport
@@ -399,7 +399,7 @@ void Bars3DRenderer::drawSlicedScene()
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
+        QVector4D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
@@ -532,8 +532,8 @@ void Bars3DRenderer::drawSlicedScene()
     Q3DTheme::ColorStyle previousColorStyle = Q3DTheme::ColorStyleUniform;
     Q3DTheme::ColorStyle colorStyle = Q3DTheme::ColorStyleUniform;
     ObjectHelper *barObj = 0;
-    QVector3D highlightColor;
-    QVector3D baseColor;
+    QVector4D highlightColor;
+    QVector4D baseColor;
     GLuint highlightGradientTexture = 0;
     GLuint baseGradientTexture = 0;
     bool colorStyleIsUniform = true;
@@ -625,7 +625,7 @@ void Bars3DRenderer::drawSlicedScene()
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                QVector3D barColor;
+                QVector4D barColor;
                 GLuint gradientTexture = 0;
 
                 if (itemMode && m_visualSelectedBarPos.x() == item.position().x()
@@ -809,7 +809,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     GLfloat colPos = 0;
     GLfloat rowPos = 0;
 
-    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
@@ -1150,8 +1150,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     bool barSelectionFound = false;
 
-    QVector3D baseColor;
-    QVector3D barColor;
+    QVector4D baseColor;
+    QVector4D barColor;
     QVector3D modelScaler(m_scaleX * m_seriesScaleX, 0.0f, m_scaleZ * m_seriesScaleZ);
     bool somethingSelected = (m_visualSelectedBarPos != Bars3DController::invalidSelectionPosition());
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
@@ -1399,7 +1399,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
+        QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -1493,7 +1493,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D barColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
+        QVector4D barColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), barColor);

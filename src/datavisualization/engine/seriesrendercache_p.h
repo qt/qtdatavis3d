@@ -56,13 +56,13 @@ public:
     inline void setMeshRotation(const QQuaternion &rotation) { m_meshRotation = rotation; }
     inline ObjectHelper *object() const { return m_object; }
     inline const Q3DTheme::ColorStyle &colorStyle() const { return m_colorStyle; }
-    inline const QVector3D &baseColor() const { return m_baseColor; }
+    inline const QVector4D &baseColor() const { return m_baseColor; }
     inline const GLuint &baseUniformTexture() const { return m_baseUniformTexture; }
     inline const GLuint &baseGradientTexture() const { return m_baseGradientTexture; }
     inline const QImage &gradientImage() const { return m_gradientImage; }
-    inline const QVector3D &singleHighlightColor() const { return m_singleHighlightColor; }
+    inline const QVector4D &singleHighlightColor() const { return m_singleHighlightColor; }
     inline const GLuint &singleHighlightGradientTexture() const { return m_singleHighlightGradientTexture; }
-    inline const QVector3D &multiHighlightColor() const { return m_multiHighlightColor; }
+    inline const QVector4D &multiHighlightColor() const { return m_multiHighlightColor; }
     inline const GLuint &multiHighlightGradientTexture() const { return m_multiHighlightGradientTexture; }
     inline const QString &name() const { return m_name; }
     inline const QString &itemLabel() const { return m_itemLabel; }
@@ -79,13 +79,13 @@ protected:
     QQuaternion m_meshRotation;
 
     Q3DTheme::ColorStyle m_colorStyle;
-    QVector3D m_baseColor;
+    QVector4D m_baseColor;
     GLuint m_baseUniformTexture;
     GLuint m_baseGradientTexture;
     QImage m_gradientImage;
-    QVector3D m_singleHighlightColor;
+    QVector4D m_singleHighlightColor;
     GLuint m_singleHighlightGradientTexture;
-    QVector3D m_multiHighlightColor;
+    QVector4D m_multiHighlightColor;
     GLuint m_multiHighlightGradientTexture;
 
     QString m_name;

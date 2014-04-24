@@ -278,7 +278,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     if (m_selectedSeries) {
         foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
             SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
-            QVector3D highlightColor =
+            QVector4D highlightColor =
                     Utils::vectorFromColor(cache->series()->singleHighlightColor());
             SelectionPointer *slicePointer = cache->sliceSelectionPointer();
             if (slicePointer) {
@@ -712,7 +712,7 @@ void Surface3DRenderer::drawSlicedScene()
 {
     QVector3D lightPos;
 
-    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
     // Specify viewport
     glViewport(m_secondarySubViewport.x(),
@@ -835,7 +835,7 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
+        QVector4D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
@@ -995,7 +995,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     bool noShadows = true;
 
     GLfloat backgroundRotation = 0;
-    QVector3D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
     glViewport(m_primarySubViewport.x(),
                m_primarySubViewport.y(),
@@ -1358,7 +1358,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
 
-        QVector3D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
+        QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -1416,7 +1416,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->bind();
 
         // Set unchanging shader bindings
-        QVector3D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
+        QVector4D lineColor = Utils::vectorFromColor(m_cachedTheme->gridLineColor());
         lineShader->setUniformValue(lineShader->lightP(), lightPos);
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);

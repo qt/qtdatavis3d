@@ -38,14 +38,21 @@ GLuint Utils::getNearestPowerOfTwo(GLuint value, GLuint &padding)
     return powOfTwoValue;
 }
 
-QVector3D Utils::vectorFromColor(const QColor &color)
+QVector4D Utils::vectorFromColor(const QColor &color)
 {
-    return QVector3D(color.redF(), color.greenF(), color.blueF());
+    return QVector4D(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
 QColor Utils::colorFromVector(const QVector3D &colorVector)
 {
-    return QColor(colorVector.x() * 255.0f, colorVector.y() * 255.0f, colorVector.z() * 255.0f);
+    return QColor(colorVector.x() * 255.0f, colorVector.y() * 255.0f,
+                  colorVector.z() * 255.0f, 255.0f);
+}
+
+QColor Utils::colorFromVector(const QVector4D &colorVector)
+{
+    return QColor(colorVector.x() * 255.0f, colorVector.y() * 255.0f,
+                  colorVector.z() * 255.0f, colorVector.w() * 255.0f);
 }
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,

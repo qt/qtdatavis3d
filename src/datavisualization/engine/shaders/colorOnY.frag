@@ -6,7 +6,7 @@ uniform highp float ambientStrength;
 uniform sampler2D textureSampler;
 uniform highp float gradMin;
 uniform highp float gradHeight;
-uniform highp vec3 lightColor;
+uniform highp vec4 lightColor;
 
 varying highp vec3 position_wrld;
 varying highp vec3 normal_cmr;
@@ -17,8 +17,8 @@ varying highp vec2 coords_mdl;
 void main() {
     highp vec2 gradientUV = vec2(0.0, gradMin + ((coords_mdl.y + 1.0) * gradHeight));
     highp vec3 materialDiffuseColor = texture2D(textureSampler, gradientUV).xyz;
-    highp vec3 materialAmbientColor = lightColor * ambientStrength * materialDiffuseColor;
-    highp vec3 materialSpecularColor = lightColor;
+    highp vec3 materialAmbientColor = lightColor.rgb * ambientStrength * materialDiffuseColor;
+    highp vec3 materialSpecularColor = lightColor.rgb;
 
     highp float distance = length(lightPosition_wrld - position_wrld);
     highp vec3 n = normalize(normal_cmr);
