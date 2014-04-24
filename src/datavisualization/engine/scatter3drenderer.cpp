@@ -1387,7 +1387,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     zeroVector, labelRotateVector, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera, true, true,
+                                    shader, m_labelObj, activeCamera, true, true,
                                     Drawer::LabelMid, alignment);
             }
             labelNbr++;
@@ -1441,7 +1441,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     zeroVector, labelRotateVector, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera, true, true,
+                                    shader, m_labelObj, activeCamera, true, true,
                                     Drawer::LabelMid, alignment);
             }
             labelNbr++;
@@ -1516,7 +1516,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_dummyRenderItem.setTranslation(labelTransBack);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     zeroVector, labelRotateVectorBack, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera, true, true,
+                                    shader, m_labelObj, activeCamera, true, true,
                                     Drawer::LabelMid, alignmentBack);
 
                 // Side wall
@@ -1524,7 +1524,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_dummyRenderItem.setTranslation(labelTransSide);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     zeroVector, labelRotateVectorSide, 0, m_cachedSelectionMode,
-                                    m_labelShader, m_labelObj, activeCamera, true, true,
+                                    shader, m_labelObj, activeCamera, true, true,
                                     Drawer::LabelMid, alignmentSide);
             }
             labelNbr++;
