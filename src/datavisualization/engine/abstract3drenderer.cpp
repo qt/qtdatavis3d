@@ -63,7 +63,6 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
 Abstract3DRenderer::~Abstract3DRenderer()
 {
     delete m_drawer;
-    delete m_textureHelper;
     delete m_cachedScene;
     delete m_cachedTheme;
     delete m_selectionLabelItem;
@@ -74,6 +73,8 @@ Abstract3DRenderer::~Abstract3DRenderer()
         delete cache;
     }
     m_renderCacheList.clear();
+
+    delete m_textureHelper;
 }
 
 void Abstract3DRenderer::initializeOpenGL()
