@@ -303,7 +303,8 @@
     a single row or column.
 
     Bar graph additionally supports simply highlighting the whole row and/or column of the selected bar
-    without opening the slice view.
+    without opening the slice view. Bar graph also supports selecting/slicing a whole row and/or
+    column by clicking the axis label, based on selection mode.
 
     When multiple series are added to a graph, selecting an item in one of them will clear the selection
     on other series.
