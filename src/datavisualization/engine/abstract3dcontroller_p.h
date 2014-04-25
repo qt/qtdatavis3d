@@ -209,7 +209,7 @@ public:
 
     virtual void addTheme(Q3DTheme *theme);
     virtual void releaseTheme(Q3DTheme *theme);
-    virtual void setActiveTheme(Q3DTheme *theme);
+    virtual void setActiveTheme(Q3DTheme *theme, bool force = true);
     virtual Q3DTheme *activeTheme() const;
     virtual QList<Q3DTheme *> themes() const;
 

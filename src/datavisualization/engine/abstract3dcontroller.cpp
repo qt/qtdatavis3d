@@ -725,12 +725,13 @@ void Abstract3DController::releaseTheme(Q3DTheme *theme)
     if (oldTheme != m_themeManager->activeTheme())
         emit activeThemeChanged(m_themeManager->activeTheme());
 }
+
 QList<Q3DTheme *> Abstract3DController::themes() const
 {
     return m_themeManager->themes();
 }
 
-void Abstract3DController::setActiveTheme(Q3DTheme *theme)
+void Abstract3DController::setActiveTheme(Q3DTheme *theme, bool force)
 {
     if (theme != m_themeManager->activeTheme()) {
         m_themeManager->setActiveTheme(theme);
@@ -739,7 +740,7 @@ void Abstract3DController::setActiveTheme(Q3DTheme *theme)
         Q3DTheme *newActiveTheme = m_themeManager->activeTheme();
         // Reset all attached series to the new theme
         for (int i = 0; i < m_seriesList.size(); i++)
-            m_seriesList.at(i)->d_ptr->resetToTheme(*newActiveTheme, i, true);
+            m_seriesList.at(i)->d_ptr->resetToTheme(*newActiveTheme, i, force);
         markSeriesVisualsDirty();
         emit activeThemeChanged(newActiveTheme);
     }
