@@ -138,7 +138,7 @@ void CustomItemGraph::toggleItemThree(bool show)
         QImage color = QImage(2, 2, QImage::Format_ARGB32);
         color.fill(Qt::darkMagenta);
         m_graph->addCustomItem(":/items/refinery.obj", positionThree,
-                               QVector3D(0.066f, 0.066f, 0.066f),
+                               QVector3D(0.04f, 0.04f, 0.04f),
                                QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 75.0f),
                                color);
     } else {
