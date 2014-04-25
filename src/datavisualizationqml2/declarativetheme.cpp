@@ -236,6 +236,10 @@ ColorGradient *DeclarativeTheme3D::convertGradient(const QLinearGradient &gradie
 
 void DeclarativeTheme3D::addColor(DeclarativeColor *color)
 {
+    if (!color) {
+        qWarning("Color is invalid, use ThemeColor");
+        return;
+    }
     clearDummyColors();
     m_colors.append(color);
     connect(color, &DeclarativeColor::colorChanged,
@@ -283,6 +287,10 @@ void DeclarativeTheme3D::clearDummyColors()
 
 void DeclarativeTheme3D::addGradient(ColorGradient *gradient)
 {
+    if (!gradient) {
+        qWarning("Gradient is invalid, use ColorGradient");
+        return;
+    }
     clearDummyGradients();
     m_gradients.append(gradient);
     connect(gradient, &ColorGradient::updated,
