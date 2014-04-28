@@ -241,9 +241,12 @@ void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint te
 }
 #endif
 
-void TextureHelper::deleteTexture(const GLuint *texture)
+void TextureHelper::deleteTexture(GLuint *texture)
 {
-    glDeleteTextures(1, texture);
+    if (texture && *texture) {
+        glDeleteTextures(1, texture);
+        *texture = 0;
+    }
 }
 
 QImage TextureHelper::convertToGLFormat(const QImage &srcImage)

@@ -2267,10 +2267,7 @@ void Bars3DRenderer::initSelectionShader()
 
 void Bars3DRenderer::initSelectionBuffer()
 {
-    if (m_selectionTexture) {
-        m_textureHelper->deleteTexture(&m_selectionTexture);
-        m_selectionTexture = 0;
-    }
+    m_textureHelper->deleteTexture(&m_selectionTexture);
 
     if (m_cachedIsSlicingActivated || m_primarySubViewport.size().isEmpty())
         return;
@@ -2292,10 +2289,7 @@ void Bars3DRenderer::initDepthShader()
 
 void Bars3DRenderer::updateDepthBuffer()
 {
-    if (m_depthTexture) {
-        m_textureHelper->deleteTexture(&m_depthTexture);
-        m_depthTexture = 0;
-    }
+    m_textureHelper->deleteTexture(&m_depthTexture);
 
     if (m_primarySubViewport.size().isEmpty())
         return;

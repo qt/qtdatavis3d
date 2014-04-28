@@ -31,15 +31,14 @@ CustomDataItem::CustomDataItem() :
 
 CustomDataItem::~CustomDataItem()
 {
-    if (m_texture)
-        m_textureHelper->deleteTexture(&m_texture);
+    m_textureHelper->deleteTexture(&m_texture);
     delete m_textureHelper;
 }
 
 void CustomDataItem::setTextureImage(const QImage &textureImage)
 {
-    if (m_texture)
-        m_textureHelper->deleteTexture(&m_texture);
+    m_textureHelper->deleteTexture(&m_texture);
+
     // Make a texture out of the image
     if (!textureImage.isNull())
         m_texture = m_textureHelper->create2DTexture(textureImage, true, true, true);

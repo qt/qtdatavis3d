@@ -56,7 +56,7 @@ class TextureHelper : protected QOpenGLFunctions
     GLuint createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize);
     void fillDepthTexture(GLuint texture, const QSize &size, GLuint textureSize, GLfloat value);
 #endif
-    void deleteTexture(const GLuint *texture);
+    void deleteTexture(GLuint *texture);
 
     private:
     QImage convertToGLFormat(const QImage &srcImage);

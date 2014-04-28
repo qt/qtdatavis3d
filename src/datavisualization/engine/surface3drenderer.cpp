@@ -2041,10 +2041,7 @@ void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
 void Surface3DRenderer::initSelectionBuffer()
 {
     // Create the result selection texture and buffers
-    if (m_selectionResultTexture) {
-        m_textureHelper->deleteTexture(&m_selectionResultTexture);
-        m_selectionResultTexture = 0;
-    }
+    m_textureHelper->deleteTexture(&m_selectionResultTexture);
 
     m_selectionResultTexture = m_textureHelper->createSelectionTexture(m_primarySubViewport.size(),
                                                                        m_selectionFrameBuffer,
@@ -2480,14 +2477,8 @@ void Surface3DRenderer::initDepthShader()
 
 void Surface3DRenderer::updateDepthBuffer()
 {
-    if (m_depthTexture) {
-        m_textureHelper->deleteTexture(&m_depthTexture);
-        m_depthTexture = 0;
-    }
-    if (m_depthModelTexture) {
-        m_textureHelper->deleteTexture(&m_depthModelTexture);
-        m_depthModelTexture = 0;
-    }
+    m_textureHelper->deleteTexture(&m_depthTexture);
+    m_textureHelper->deleteTexture(&m_depthModelTexture);
 
     if (m_primarySubViewport.size().isEmpty())
         return;

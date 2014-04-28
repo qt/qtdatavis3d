@@ -1690,10 +1690,7 @@ void Scatter3DRenderer::initSelectionShader()
 
 void Scatter3DRenderer::initSelectionBuffer()
 {
-    if (m_selectionTexture) {
-        m_textureHelper->deleteTexture(&m_selectionTexture);
-        m_selectionTexture = 0;
-    }
+    m_textureHelper->deleteTexture(&m_selectionTexture);
 
     if (m_primarySubViewport.size().isEmpty())
         return;
@@ -1715,10 +1712,7 @@ void Scatter3DRenderer::initDepthShader()
 
 void Scatter3DRenderer::updateDepthBuffer()
 {
-    if (m_depthTexture) {
-        m_textureHelper->deleteTexture(&m_depthTexture);
-        m_depthTexture = 0;
-    }
+    m_textureHelper->deleteTexture(&m_depthTexture);
 
     if (m_primarySubViewport.size().isEmpty())
         return;
