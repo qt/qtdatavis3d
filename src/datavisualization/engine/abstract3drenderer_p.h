@@ -62,8 +62,6 @@ protected:
         RenderingDepth
     };
 
-    //    QString generateValueLabel(const QString &format, float value);
-
 public:
     virtual ~Abstract3DRenderer();
 

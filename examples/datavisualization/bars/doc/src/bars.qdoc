@@ -171,7 +171,7 @@
     \section1 Selecting a row/column by clicking an axis label
 
     Selection by axis label is default functionality for bar graphs. As an example, you can select
-    rows by clicking an axis label in the following way:"
+    rows by clicking an axis label in the following way:
 
     \list
         \li Change selection mode to \c SelectionRow
