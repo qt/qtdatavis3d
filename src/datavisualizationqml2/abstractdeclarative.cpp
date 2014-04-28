@@ -171,7 +171,7 @@ Declarative3DScene* AbstractDeclarative::scene() const
 
 void AbstractDeclarative::setTheme(Q3DTheme *theme)
 {
-    m_controller->setActiveTheme(theme, false);
+    m_controller->setActiveTheme(theme, isComponentComplete());
 }
 
 Q3DTheme *AbstractDeclarative::theme() const
