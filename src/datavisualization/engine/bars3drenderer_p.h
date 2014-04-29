@@ -108,6 +108,7 @@ private:
     bool m_keepSeriesUniform;
     bool m_haveUniformColorSeries;
     bool m_haveGradientSeries;
+    float m_zeroPosition;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
@@ -116,6 +117,8 @@ public:
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
+    void updateRows(const QVector<Bars3DController::ChangeRow> &rows);
+    void updateItems(const QVector<Bars3DController::ChangeItem> &points);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 
@@ -168,6 +171,9 @@ private:
                                                    const BarSeriesRenderCache *cache);
     QPoint selectionColorToArrayPosition(const QVector4D &selectionColor);
     QBar3DSeries *selectionColorToSeries(const QVector4D &selectionColor);
+
+    inline void updateRenderRow(const QBarDataRow *dataRow, BarRenderItemRow &renderRow);
+    inline void updateRenderItem(const QBarDataItem &dataItem, BarRenderItem &renderItem);
 
     Q_DISABLE_COPY(Bars3DRenderer)
 

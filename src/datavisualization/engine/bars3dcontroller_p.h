@@ -42,12 +42,16 @@ struct Bars3DChangeBitField {
     bool multiSeriesScalingChanged  : 1;
     bool barSpecsChanged            : 1;
     bool selectedBarChanged         : 1;
+    bool rowsChanged                : 1;
+    bool itemChanged                : 1;
 
     Bars3DChangeBitField() :
         slicingActiveChanged(true),
         multiSeriesScalingChanged(true),
         barSpecsChanged(true),
-        selectedBarChanged(true)
+        selectedBarChanged(true),
+        rowsChanged(false),
+        itemChanged(false)
     {
     }
 };
@@ -56,8 +60,20 @@ class QT_DATAVISUALIZATION_EXPORT Bars3DController : public Abstract3DController
 {
     Q_OBJECT
 
+public:
+    struct ChangeItem {
+        QBar3DSeries *series;
+        QPoint point;
+    };
+    struct ChangeRow {
+        QBar3DSeries *series;
+        int row;
+    };
+
 private:
     Bars3DChangeBitField m_changeTracker;
+    QVector<ChangeItem> m_changedItems;
+    QVector<ChangeRow> m_changedRows;
 
     // Interaction
     QPoint m_selectedBar;     // Points to row & column in data window.

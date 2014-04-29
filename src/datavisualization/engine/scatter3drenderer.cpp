@@ -240,9 +240,9 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
             if (cache->itemSize() != itemSize)
                 cache->setItemSize(itemSize);
             if (noSelection
-                    && scatterSeries->selectedItem() != QScatter3DSeries::invalidSelectionIndex()
-                    && m_selectionLabel != cache->itemLabel()) {
-                m_selectionLabelDirty = true;
+                    && scatterSeries->selectedItem() != QScatter3DSeries::invalidSelectionIndex()) {
+                if (m_selectionLabel != cache->itemLabel())
+                    m_selectionLabelDirty = true;
                 noSelection = false;
             }
 

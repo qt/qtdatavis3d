@@ -143,7 +143,7 @@ void GraphModifier::fillSeries()
     for (int i = 0; i < m_zCount; i++) {
         QSurfaceDataRow *newRow[4];
         float zAdjust = 0.0f;
-        if (i == 3)
+        if (i == 2)
             zAdjust = 0.7f;
 
         for (int s = 0; s < 4; s++) {
@@ -151,7 +151,7 @@ void GraphModifier::fillSeries()
             float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[s] + zAdjust;
             for (int j = 0; j < m_xCount; j++) {
                 float xAdjust = 0.0f;
-                if (j == 3)
+                if (j == 4)
                     xAdjust = 0.7f;
                 float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[s] + xAdjust;
                 float angle = (z * x) / full * 1.57f;

@@ -95,7 +95,8 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_clickedPosition(Bars3DController::invalidSelectionPosition()),
       m_keepSeriesUniform(false),
       m_haveUniformColorSeries(false),
-      m_haveGradientSeries(false)
+      m_haveGradientSeries(false),
+      m_zeroPosition(0.0f)
 {
     m_axisCacheY.setScale(2.0f);
     m_axisCacheY.setTranslate(-1.0f);
@@ -159,7 +160,6 @@ void Bars3DRenderer::updateData()
     int maxCol = m_axisCacheX.max();
     int newRows = maxRow - minRow + 1;
     int newColumns = maxCol - minCol + 1;
-    int updateSize = 0;
     int dataRowCount = 0;
     int maxDataRowCount = 0;
 
@@ -187,8 +187,7 @@ void Bars3DRenderer::updateData()
         calculateSceneScalingFactors();
     }
 
-    const QValue3DAxisFormatter *axisFormatter = m_axisCacheY.formatter();
-    float zeroPosition = axisFormatter->positionAt(0.0f);
+    m_zeroPosition = m_axisCacheY.formatter()->positionAt(0.0f);
 
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
         BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
@@ -212,50 +211,12 @@ void Bars3DRenderer::updateData()
                 if (maxDataRowCount < dataRowCount)
                     maxDataRowCount = qMin(dataRowCount, newRows);
                 int dataRowIndex = minRow;
-                GLfloat heightValue = 0.0f;
                 for (int i = 0; i < newRows; i++) {
-                    int j = 0;
                     BarRenderItemRow &renderRow = renderArray[i];
-                    if (dataRowIndex < dataRowCount) {
-                        const QBarDataRow *dataRow = dataProxy->rowAt(dataRowIndex);
-                        updateSize = qMin((dataRow->size() - minCol), renderRow.size());
-                        if (dataRow) {
-                            int dataColIndex = minCol;
-                            for (; j < updateSize ; j++) {
-                                float value = dataRow->at(dataColIndex).value();
-                                heightValue = axisFormatter->positionAt(value);
-                                if (m_noZeroInRange) {
-                                    if (m_hasNegativeValues) {
-                                        heightValue = -1.0f + heightValue;
-                                        if (heightValue > 0.0f)
-                                            heightValue = 0.0f;
-                                    } else {
-                                        if (heightValue < 0.0f)
-                                            heightValue = 0.0f;
-                                    }
-                                } else {
-                                    heightValue -= zeroPosition;
-                                }
-                                renderRow[j].setValue(value);
-                                renderRow[j].setHeight(heightValue);
-
-                                float angle = dataRow->at(dataColIndex).rotation();
-                                if (angle) {
-                                    renderRow[j].setRotation(
-                                                QQuaternion::fromAxisAndAngle(
-                                                    upVector, angle));
-                                } else {
-                                    renderRow[j].setRotation(identityQuaternion);
-                                }
-                                dataColIndex++;
-                            }
-                        }
-                    }
-                    for (; j < newColumns; j++) {
-                        renderRow[j].setValue(0.0f);
-                        renderRow[j].setHeight(0.0f);
-                        renderRow[j].setRotation(identityQuaternion);
-                    }
+                    const QBarDataRow *dataRow = 0;
+                    if (dataRowIndex < dataRowCount)
+                        dataRow = dataProxy->rowAt(dataRowIndex);
+                    updateRenderRow(dataRow, renderRow);
                     dataRowIndex++;
                 }
                 cache->setDataDirty(false);
@@ -266,6 +227,56 @@ void Bars3DRenderer::updateData()
     // Reset selected bar to update selection
     updateSelectedBar(m_selectedBarPos,
                       m_selectedSeriesCache ? m_selectedSeriesCache->series() : 0);
+}
+
+void Bars3DRenderer::updateRenderRow(const QBarDataRow *dataRow, BarRenderItemRow &renderRow)
+{
+    int j = 0;
+    int renderRowSize = renderRow.size();
+    int startIndex = m_axisCacheX.min();
+
+    if (dataRow) {
+        int updateSize = qMin((dataRow->size() - startIndex), renderRowSize);
+        int dataColIndex = startIndex;
+        for (; j < updateSize ; j++) {
+            updateRenderItem(dataRow->at(dataColIndex), renderRow[j]);
+            dataColIndex++;
+        }
+    }
+    for (; j < renderRowSize; j++) {
+        renderRow[j].setValue(0.0f);
+        renderRow[j].setHeight(0.0f);
+        renderRow[j].setRotation(identityQuaternion);
+    }
+}
+
+void Bars3DRenderer::updateRenderItem(const QBarDataItem &dataItem, BarRenderItem &renderItem)
+{
+    float value = dataItem.value();
+    float heightValue = m_axisCacheY.formatter()->positionAt(value);
+    if (m_noZeroInRange) {
+        if (m_hasNegativeValues) {
+            heightValue = -1.0f + heightValue;
+            if (heightValue > 0.0f)
+                heightValue = 0.0f;
+        } else {
+            if (heightValue < 0.0f)
+                heightValue = 0.0f;
+        }
+    } else {
+        heightValue -= m_zeroPosition;
+    }
+    renderItem.setValue(value);
+    renderItem.setHeight(heightValue);
+
+    float angle = dataItem.rotation();
+    if (angle) {
+        renderItem.setRotation(
+                    QQuaternion::fromAxisAndAngle(
+                        upVector, angle));
+    } else {
+        renderItem.setRotation(identityQuaternion);
+    }
 }
 
 void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
@@ -283,9 +294,9 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
             BarSeriesRenderCache *cache =
                     static_cast<BarSeriesRenderCache *>(m_renderCacheList.value(barSeries));
             if (noSelection
-                    && barSeries->selectedBar() != QBar3DSeries::invalidSelectionPosition()
-                    && selectionLabel() != cache->itemLabel()) {
-                m_selectionLabelDirty = true;
+                    && barSeries->selectedBar() != QBar3DSeries::invalidSelectionPosition()) {
+                if (selectionLabel() != cache->itemLabel())
+                    m_selectionLabelDirty = true;
                 noSelection = false;
             }
             cache->setVisualIndex(visualIndex++);
@@ -302,6 +313,65 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
 SeriesRenderCache *Bars3DRenderer::createNewCache(QAbstract3DSeries *series)
 {
     return new BarSeriesRenderCache(series, this);
+}
+
+void Bars3DRenderer::updateRows(const QVector<Bars3DController::ChangeRow> &rows)
+{
+    int minRow = m_axisCacheZ.min();
+    int maxRow = m_axisCacheZ.max();
+    BarSeriesRenderCache *cache = 0;
+    const QBar3DSeries *prevSeries = 0;
+    const QBarDataArray *dataArray = 0;
+
+    foreach (Bars3DController::ChangeRow item, rows) {
+        const int row = item.row;
+        if (row < minRow || row > maxRow)
+            continue;
+        QBar3DSeries *currentSeries = item.series;
+        if (currentSeries != prevSeries) {
+            cache = static_cast<BarSeriesRenderCache *>(m_renderCacheList.value(currentSeries));
+            prevSeries = currentSeries;
+            dataArray = item.series->dataProxy()->array();
+            // Invisible series render caches are not updated, but instead just marked dirty, so that
+            // they can be completely recalculated when they are turned visible.
+            if (!cache->isVisible() && !cache->dataDirty())
+                cache->setDataDirty(true);
+        }
+        if (cache->isVisible())
+            updateRenderRow(dataArray->at(row), cache->renderArray()[row - minRow]);
+    }
+}
+
+void Bars3DRenderer::updateItems(const QVector<Bars3DController::ChangeItem> &points)
+{
+    int minRow = m_axisCacheZ.min();
+    int maxRow = m_axisCacheZ.max();
+    int minCol = m_axisCacheX.min();
+    int maxCol = m_axisCacheX.max();
+    BarSeriesRenderCache *cache = 0;
+    const QBar3DSeries *prevSeries = 0;
+    const QBarDataArray *dataArray = 0;
+
+    foreach (Bars3DController::ChangeItem item, points) {
+        const int row = item.point.x();
+        const int col = item.point.y();
+        if (row < minRow || row > maxRow || col < minCol || col > maxCol)
+            continue;
+        QBar3DSeries *currentSeries = item.series;
+        if (currentSeries != prevSeries) {
+            cache = static_cast<BarSeriesRenderCache *>(m_renderCacheList.value(currentSeries));
+            prevSeries = currentSeries;
+            dataArray = item.series->dataProxy()->array();
+            // Invisible series render caches are not updated, but instead just marked dirty, so that
+            // they can be completely recalculated when they are turned visible.
+            if (!cache->isVisible() && !cache->dataDirty())
+                cache->setDataDirty(true);
+        }
+        if (cache->isVisible()) {
+            updateRenderItem(dataArray->at(row)->at(col),
+                             cache->renderArray()[row - minRow][col - minCol]);
+        }
+    }
 }
 
 void Bars3DRenderer::updateScene(Q3DScene *scene)

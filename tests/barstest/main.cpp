@@ -175,6 +175,10 @@ int main(int argc, char **argv)
     logAxisButton->setText(QStringLiteral("Use Log Axis"));
     logAxisButton->setEnabled(true);
 
+    QPushButton *testItemAndRowChangesButton = new QPushButton(widget);
+    testItemAndRowChangesButton->setText(QStringLiteral("Test Item/Row changing"));
+    testItemAndRowChangesButton->setEnabled(true);
+
     QColorDialog *colorDialog = new QColorDialog(widget);
 
     QLinearGradient grBtoY(0, 0, 100, 0);
@@ -337,7 +341,9 @@ int main(int argc, char **argv)
     vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
     vLayout->addWidget(primarySeriesTestsButton, 0, Qt::AlignTop);
     vLayout->addWidget(toggleRotationButton, 0, Qt::AlignTop);
-    vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
+    vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
+    vLayout->addWidget(logAxisButton, 0, Qt::AlignTop);
+    vLayout->addWidget(testItemAndRowChangesButton, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(rotationCheckBox, 0, Qt::AlignTop);
@@ -372,7 +378,6 @@ int main(int argc, char **argv)
     vLayout2->addWidget(logBaseEdit, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Value axis segments")), 0, Qt::AlignTop);
     vLayout2->addWidget(valueAxisSegmentsSpin, 0, Qt::AlignTop);
-    vLayout->addWidget(logAxisButton, 1, Qt::AlignTop);
     // TODO: Add example for setMeshFileName
 
     widget->show();
@@ -446,7 +451,7 @@ int main(int argc, char **argv)
     QObject::connect(releaseAxesButton, &QPushButton::clicked, modifier,
                      &GraphModifier::releaseAxes);
     QObject::connect(releaseProxiesButton, &QPushButton::clicked, modifier,
-                     &GraphModifier::releaseProxies);
+                     &GraphModifier::releaseSeries);
 
     QObject::connect(flipViewsButton, &QPushButton::clicked, modifier,
                      &GraphModifier::flipViews);
@@ -460,6 +465,8 @@ int main(int argc, char **argv)
                      &GraphModifier::toggleRotation);
     QObject::connect(logAxisButton, &QPushButton::clicked, modifier,
                      &GraphModifier::useLogAxis);
+    QObject::connect(testItemAndRowChangesButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::testItemAndRowChanges);
     QObject::connect(colorDialog, &QColorDialog::currentColorChanged, modifier,
                      &GraphModifier::changeBaseColor);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,

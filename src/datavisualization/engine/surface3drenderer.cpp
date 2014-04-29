@@ -256,9 +256,9 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         SurfaceSeriesRenderCache *cache =
                 static_cast<SurfaceSeriesRenderCache *>( m_renderCacheList.value(series));
         if (noSelection
-                && surfaceSeries->selectedPoint() != QSurface3DSeries::invalidSelectionPosition()
-                && selectionLabel() != cache->itemLabel()) {
-            m_selectionLabelDirty = true;
+                && surfaceSeries->selectedPoint() != QSurface3DSeries::invalidSelectionPosition()) {
+            if (selectionLabel() != cache->itemLabel())
+                m_selectionLabelDirty = true;
             noSelection = false;
         }
 
@@ -346,7 +346,7 @@ void Surface3DRenderer::updateRows(const QVector<Surface3DController::ChangeRow>
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
-void Surface3DRenderer::updateItem(const QVector<Surface3DController::ChangeItem> &points)
+void Surface3DRenderer::updateItems(const QVector<Surface3DController::ChangeItem> &points)
 {
     foreach (Surface3DController::ChangeItem item, points) {
         SurfaceSeriesRenderCache *cache =
@@ -364,14 +364,15 @@ void Surface3DRenderer::updateItem(const QVector<Surface3DController::ChangeItem
             int sampleSpaceTop = sampleSpace.y() + sampleSpace.height();
             int sampleSpaceRight = sampleSpace.x() + sampleSpace.width();
             bool updateBuffers = false;
+            // Note: Point is (row, column), samplespace is (columns x rows)
             QPoint point = item.point;
 
-            if (point.y() <= sampleSpaceTop && point.y() >= sampleSpace.y() &&
-                    point.x() <= sampleSpaceRight && point.x() >= sampleSpace.x()) {
+            if (point.x() <= sampleSpaceTop && point.x() >= sampleSpace.y() &&
+                    point.y() <= sampleSpaceRight && point.y() >= sampleSpace.x()) {
                 updateBuffers = true;
-                int x = point.x() - sampleSpace.x();
-                int y = point.y() - sampleSpace.y();
-                (*(dstArray.at(y)))[x] = srcArray->at(point.y())->at(point.x());
+                int x = point.y() - sampleSpace.x();
+                int y = point.x() - sampleSpace.y();
+                (*(dstArray.at(y)))[x] = srcArray->at(point.x())->at(point.y());
 
                 if (cache->isFlatShadingEnabled())
                     cache->surfaceObject()->updateCoarseItem(dstArray, y, x);

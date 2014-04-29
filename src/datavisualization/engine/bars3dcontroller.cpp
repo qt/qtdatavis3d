@@ -83,6 +83,18 @@ void Bars3DController::synchDataToRenderer()
     Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
+    if (m_changeTracker.rowsChanged) {
+        m_renderer->updateRows(m_changedRows);
+        m_changeTracker.rowsChanged = false;
+        m_changedRows.clear();
+    }
+
+    if (m_changeTracker.itemChanged) {
+        m_renderer->updateItems(m_changedItems);
+        m_changeTracker.itemChanged = false;
+        m_changedItems.clear();
+    }
+
     if (m_changeTracker.multiSeriesScalingChanged) {
         m_renderer->updateMultiSeriesScaling(m_isMultiSeriesUniform);
         m_changeTracker.multiSeriesScalingChanged = false;
@@ -131,17 +143,39 @@ void Bars3DController::handleRowsAdded(int startIndex, int count)
 
 void Bars3DController::handleRowsChanged(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
     QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_isDataDirty = true;
-        series->d_ptr->markItemLabelDirty();
+    int oldChangeCount = m_changedRows.size();
+    if (!oldChangeCount)
+        m_changedRows.reserve(count);
+
+    int selectedRow = m_selectedBar.x();
+    for (int i = 0; i < count; i++) {
+        bool newItem = true;
+        int candidate = startIndex + i;
+        for (int j = 0; j < oldChangeCount; j++) {
+            const ChangeRow &oldChangeItem = m_changedRows.at(j);
+            if (oldChangeItem.row == candidate && series == oldChangeItem.series) {
+                newItem = false;
+                break;
+            }
+        }
+        if (newItem) {
+            ChangeRow newChangeItem = {series, candidate};
+            m_changedRows.append(newChangeItem);
+            if (series == m_selectedBarSeries && selectedRow == candidate)
+                series->d_ptr->markItemLabelDirty();
+        }
     }
-    if (!m_changedSeriesList.contains(series))
-        m_changedSeriesList.append(series);
-    emitNeedRender();
+    if (count) {
+        m_changeTracker.rowsChanged = true;
+
+        if (series->isVisible())
+            adjustAxisRanges();
+
+        // Clear selection unless still valid (row length might have changed)
+        setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
+        emitNeedRender();
+    }
 }
 
 void Bars3DController::handleRowsRemoved(int startIndex, int count)
@@ -199,17 +233,28 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
 
 void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
 {
-    Q_UNUSED(rowIndex)
-    Q_UNUSED(columnIndex)
     QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_isDataDirty = true;
-        series->d_ptr->markItemLabelDirty();
+
+    bool newItem = true;
+    QPoint candidate(rowIndex, columnIndex);
+    foreach (ChangeItem item, m_changedItems) {
+        if (item.point == candidate && item.series == series) {
+            newItem = false;
+            break;
+        }
     }
-    if (!m_changedSeriesList.contains(series))
-        m_changedSeriesList.append(series);
-    emitNeedRender();
+
+    if (newItem) {
+        ChangeItem newItem = {series, candidate};
+        m_changedItems.append(newItem);
+        m_changeTracker.itemChanged = true;
+
+        if (series == m_selectedBarSeries && m_selectedBar == candidate)
+            series->d_ptr->markItemLabelDirty();
+        if (series->isVisible())
+            adjustAxisRanges();
+        emitNeedRender();
+    }
 }
 
 void Bars3DController::handleDataRowLabelsChanged()

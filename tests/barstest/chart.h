@@ -77,7 +77,7 @@ public:
     void selectBar();
     void swapAxis();
     void releaseAxes();
-    void releaseProxies();
+    void releaseSeries();
     void createMassiveArray();
     void useOwnTheme();
     void changeBaseColor(const QColor &color);
@@ -92,6 +92,7 @@ public:
     void changeLogBase(const QString & text);
     void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
     void addRemoveSeries();
+    void testItemAndRowChanges();
 
 public slots:
     void flipViews();
@@ -118,6 +119,9 @@ signals:
     void shadowQualityChanged(int quality);
 
 private:
+    void populateFlatSeries(QBar3DSeries *series, int rows, int columns, float value);
+    QBarDataRow *createFlatRow(int columns, float value);
+
     Q3DBars *m_graph;
     QColorDialog *m_colorDialog;
     int m_columnCount;

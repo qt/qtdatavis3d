@@ -110,7 +110,7 @@ public:
     void cleanCache(SeriesRenderCache *cache);
     void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode);
     void updateRows(const QVector<Surface3DController::ChangeRow> &rows);
-    void updateItem(const QVector<Surface3DController::ChangeItem> &points);
+    void updateItems(const QVector<Surface3DController::ChangeItem> &points);
     void updateScene(Q3DScene *scene);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, QSurface3DSeries *series);

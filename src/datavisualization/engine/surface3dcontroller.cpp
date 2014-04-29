@@ -76,7 +76,7 @@ void Surface3DController::synchDataToRenderer()
     }
 
     if (m_changeTracker.itemChanged) {
-        m_renderer->updateItem(m_changedItems);
+        m_renderer->updateItems(m_changedItems);
         m_changeTracker.itemChanged = false;
         m_changedItems.clear();
     }
@@ -309,36 +309,34 @@ void Surface3DController::handleFlatShadingSupportedChange(bool supported)
 
 void Surface3DController::handleRowsChanged(int startIndex, int count)
 {
-    QSurfaceDataProxy *sender = static_cast<QSurfaceDataProxy *>(QObject::sender());
-    if (m_changedRows.size() == 0)
-        m_changedRows.reserve(sender->rowCount());
-
-    QSurface3DSeries *series = sender->series();
+    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(QObject::sender())->series();
     int oldChangeCount = m_changedRows.size();
+    if (!oldChangeCount)
+        m_changedRows.reserve(count);
+
     int selectedRow = m_selectedPoint.x();
     for (int i = 0; i < count; i++) {
         bool newItem = true;
         int candidate = startIndex + i;
-        for (int i = 0; i < oldChangeCount; i++) {
-            if (m_changedRows.at(i).row == candidate &&
-                series == m_changedRows.at(i).series) {
+        for (int j = 0; j < oldChangeCount; j++) {
+            const ChangeRow &oldChangeItem = m_changedRows.at(j);
+            if (oldChangeItem.row == candidate && series == oldChangeItem.series) {
                 newItem = false;
                 break;
             }
         }
         if (newItem) {
-            ChangeRow newItem = {series, candidate};
-            m_changedRows.append(newItem);
+            ChangeRow newChangeItem = {series, candidate};
+            m_changedRows.append(newChangeItem);
             if (series == m_selectedSeries && selectedRow == candidate)
                 series->d_ptr->markItemLabelDirty();
         }
     }
-    if (m_changedRows.size()) {
+    if (count) {
         m_changeTracker.rowsChanged = true;
 
-        adjustAxisRanges();
-        // Clear selection unless still valid
-        setSelectedPoint(m_selectedPoint, m_selectedSeries, false);
+        if (series->isVisible())
+            adjustAxisRanges();
         emitNeedRender();
     }
 }
@@ -349,7 +347,7 @@ void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
     QSurface3DSeries *series = sender->series();
 
     bool newItem = true;
-    QPoint candidate(columnIndex, rowIndex);
+    QPoint candidate(rowIndex, columnIndex);
     foreach (ChangeItem item, m_changedItems) {
         if (item.point == candidate && item.series == series) {
             newItem = false;
@@ -364,9 +362,8 @@ void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
         if (series == m_selectedSeries && m_selectedPoint == candidate)
             series->d_ptr->markItemLabelDirty();
 
-        adjustAxisRanges();
-        // Clear selection unless still valid
-        setSelectedPoint(m_selectedPoint, m_selectedSeries, false);
+        if (series->isVisible())
+            adjustAxisRanges();
         emitNeedRender();
     }
 }
