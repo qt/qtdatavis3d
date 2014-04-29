@@ -4,8 +4,8 @@ varying highp vec3 position_wrld;
 varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
+varying highp vec3 lightPosition_wrld_frag;
 
-uniform highp vec3 lightPosition_wrld;
 uniform highp vec4 color_mdl;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
@@ -16,7 +16,7 @@ void main() {
     highp vec3 materialAmbientColor = lightColor.rgb * ambientStrength * materialDiffuseColor;
     highp vec3 materialSpecularColor = lightColor.rgb;
 
-    highp float distance = length(lightPosition_wrld - position_wrld);
+    highp float distance = length(lightPosition_wrld_frag - position_wrld);
 
     highp vec3 n = normalize(normal_cmr);
     highp vec3 l = normalize(lightDirection_cmr);

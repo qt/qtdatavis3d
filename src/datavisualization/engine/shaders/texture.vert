@@ -8,6 +8,7 @@ attribute highp vec3 vertexPosition_mdl;
 attribute highp vec2 vertexUV;
 attribute highp vec3 vertexNormal_mdl;
 
+varying highp vec3 lightPosition_wrld_frag;
 varying highp vec2 UV;
 varying highp vec3 position_wrld;
 varying highp vec3 normal_cmr;
@@ -23,4 +24,5 @@ void main() {
     lightDirection_cmr = lightPosition_cmr + eyeDirection_cmr;
     normal_cmr = vec4(V * itM * vec4(vertexNormal_mdl, 0.0)).xyz;
     UV = vertexUV;
+    lightPosition_wrld_frag = lightPosition_wrld;
 }
