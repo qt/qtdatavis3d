@@ -128,11 +128,13 @@ public:
 
     Q_INVOKABLE virtual void clearSelection();
 
-    Q_INVOKABLE virtual int addCustomItem(const QString &meshFile, const QVector3D &position,
-                                          const QVector3D &scaling, const QQuaternion &rotation,
-                                          const QString &textureFile = 0);
-    Q_INVOKABLE virtual void removeCustomItemAt(int index);
-    Q_INVOKABLE virtual void removeCustomItemAt(const QVector3D &position);
+    Q_REVISION(1) Q_INVOKABLE virtual int addCustomItem(const QString &meshFile,
+                                                        const QVector3D &position,
+                                                        const QVector3D &scaling,
+                                                        const QQuaternion &rotation,
+                                                        const QString &textureFile = 0);
+    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItemAt(int index);
+    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItemAt(const QVector3D &position);
 
     virtual void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
