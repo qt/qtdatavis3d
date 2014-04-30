@@ -105,6 +105,7 @@ public:
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
+    void updateItems(const QVector<Scatter3DController::ChangeItem> &items);
     void updateScene(Q3DScene *scene);
 
     QVector3D convertPositionToTranslation(const QVector3D &position);
@@ -154,6 +155,7 @@ public slots:
 private:
     void selectionColorToSeriesAndIndex(const QVector4D &color, int &index,
                                         QAbstract3DSeries *&series);
+    inline void updateRenderItem(const QScatterDataItem &dataItem, ScatterRenderItem &renderItem);
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

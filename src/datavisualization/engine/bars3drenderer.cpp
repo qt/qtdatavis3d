@@ -342,7 +342,7 @@ void Bars3DRenderer::updateRows(const QVector<Bars3DController::ChangeRow> &rows
     }
 }
 
-void Bars3DRenderer::updateItems(const QVector<Bars3DController::ChangeItem> &points)
+void Bars3DRenderer::updateItems(const QVector<Bars3DController::ChangeItem> &items)
 {
     int minRow = m_axisCacheZ.min();
     int maxRow = m_axisCacheZ.max();
@@ -352,7 +352,7 @@ void Bars3DRenderer::updateItems(const QVector<Bars3DController::ChangeItem> &po
     const QBar3DSeries *prevSeries = 0;
     const QBarDataArray *dataArray = 0;
 
-    foreach (Bars3DController::ChangeItem item, points) {
+    foreach (Bars3DController::ChangeItem item, items) {
         const int row = item.point.x();
         const int col = item.point.y();
         if (row < minRow || row > maxRow || col < minCol || col > maxCol)

@@ -25,6 +25,7 @@
 #include <QFont>
 #include <QDebug>
 #include <QTimer>
+#include <QLabel>
 
 using namespace QtDataVisualization;
 
@@ -55,6 +56,9 @@ public:
     void massiveDataTest();
     void massiveTestScroll();
     void massiveTestAppendAndScroll();
+    void setFpsMeasurement(bool enable);
+    void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
+    void testItemChanges();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -91,6 +95,7 @@ signals:
 private:
     QVector3D randVector();
     QScatter3DSeries *createAndAddSeries();
+    void populateFlatSeries(QScatter3DSeries *series, int rows, int columns, float value);
 
     Q3DScatter *m_chart;
     int m_fontSize;
@@ -99,6 +104,7 @@ private:
     int m_selectedItem;
     QScatter3DSeries *m_targetSeries;
     QScatterDataArray m_massiveTestCacheArray;
+    QLabel *m_fpsLabel;
 };
 
 #endif

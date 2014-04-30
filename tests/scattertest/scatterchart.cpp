@@ -134,7 +134,6 @@ void ScatterDataModifier::massiveDataTest()
         xAxis->setSegmentCount(1);
         yAxis->setSegmentCount(1);
         zAxis->setSegmentCount(1);
-        m_chart->setMeasureFps(true);
         m_chart->setAxisX(xAxis);
         m_chart->setAxisY(yAxis);
         m_chart->setAxisZ(zAxis);
@@ -229,6 +228,187 @@ void ScatterDataModifier::massiveTestAppendAndScroll()
     int min = m_chart->axisZ()->min() + addedUnits;
     int max = m_chart->axisZ()->max() + addedUnits;
     m_chart->axisZ()->setRange(min, max);
+}
+
+void ScatterDataModifier::setFpsMeasurement(bool enable)
+{
+    m_chart->setMeasureFps(enable);
+}
+
+void ScatterDataModifier::testItemChanges()
+{
+    static int counter = 0;
+    const int rowCount = 12;
+    const int colCount = 10;
+    static QScatter3DSeries *series0 = 0;
+    static QScatter3DSeries *series1 = 0;
+    static QScatter3DSeries *series2 = 0;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "Setup test";
+        foreach (QScatter3DSeries *series, m_chart->seriesList())
+            m_chart->removeSeries(series);
+        foreach (QValue3DAxis *axis, m_chart->axes())
+            m_chart->releaseAxis(axis);
+        delete series0;
+        delete series1;
+        delete series2;
+        series0 = new QScatter3DSeries;
+        series1 = new QScatter3DSeries;
+        series2 = new QScatter3DSeries;
+        populateFlatSeries(series0, rowCount, colCount, 10.0f);
+        populateFlatSeries(series1, rowCount, colCount, 30.0f);
+        populateFlatSeries(series2, rowCount, colCount, 50.0f);
+        m_chart->axisX()->setRange(3.0f, 6.0f);
+        m_chart->axisY()->setRange(0.0f, 100.0f);
+        m_chart->axisZ()->setRange(4.0f, 8.0f);
+        m_chart->addSeries(series0);
+        m_chart->addSeries(series1);
+        m_chart->addSeries(series2);
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Change single item, unselected";
+        int itemIndex = 3 * colCount + 5;
+        QScatterDataItem item = *series0->dataProxy()->itemAt(itemIndex);
+        item.setY(75.0f);
+        series0->dataProxy()->setItem(itemIndex, item);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Change single item, selected";
+        int itemIndex = 4 * colCount + 4;
+        series1->setSelectedItem(itemIndex);
+        QScatterDataItem item = *series1->dataProxy()->itemAt(itemIndex);
+        item.setY(75.0f);
+        series1->dataProxy()->setItem(itemIndex, item);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Change item outside visible area";
+        int itemIndex = 2;
+        QScatterDataItem item = *series1->dataProxy()->itemAt(itemIndex);
+        item.setY(75.0f);
+        series1->dataProxy()->setItem(itemIndex, item);
+    }
+        break;
+    case 4: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, unselected";
+        int itemIndex = 4 * colCount + 6;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex);
+        item0.setY(65.0f);
+        item1.setY(85.0f);
+        series0->dataProxy()->setItem(itemIndex, item0);
+        series1->dataProxy()->setItem(itemIndex, item1);
+    }
+        break;
+    case 5: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, one selected";
+        int itemIndex0 = 5 * colCount + 5;
+        int itemIndex1 = 4 * colCount + 4;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex1);
+        item0.setY(65.0f);
+        item1.setY(85.0f);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series1->dataProxy()->setItem(itemIndex1, item1);
+    }
+        break;
+    case 6: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, one outside range";
+        int itemIndex0 = 6 * colCount + 6;
+        int itemIndex1 = 9 * colCount + 2;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex1);
+        item0.setY(65.0f);
+        item1.setY(85.0f);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series1->dataProxy()->setItem(itemIndex1, item1);
+    }
+        break;
+    case 7: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, both outside range";
+        int itemIndex0 = 1 * colCount + 3;
+        int itemIndex1 = 9 * colCount + 2;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex1);
+        item0.setY(65.0f);
+        item1.setY(85.0f);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series1->dataProxy()->setItem(itemIndex1, item1);
+    }
+        break;
+    case 8: {
+        qDebug() << __FUNCTION__ << counter << "Change item to same value as previously";
+        int itemIndex0 = 5 * colCount + 7;
+        int itemIndex1 = 4 * colCount + 7;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex1);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series1->dataProxy()->setItem(itemIndex1, item1);
+    }
+        break;
+    case 9: {
+        qDebug() << __FUNCTION__ << counter << "Change 3 items on each series";
+        int itemIndex0 = 5 * colCount + 6;
+        int itemIndex1 = 4 * colCount + 6;
+        QScatterDataItem item00 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item01 = *series0->dataProxy()->itemAt(itemIndex0 + 1);
+        QScatterDataItem item02 = *series0->dataProxy()->itemAt(itemIndex0 + 2);
+        QScatterDataItem item10 = *series1->dataProxy()->itemAt(itemIndex1);
+        QScatterDataItem item11 = *series1->dataProxy()->itemAt(itemIndex1 + 1);
+        QScatterDataItem item12 = *series1->dataProxy()->itemAt(itemIndex1 + 2);
+        item00.setY(65.0f);
+        item01.setY(70.0f);
+        item02.setY(75.0f);
+        item10.setY(80.0f);
+        item11.setY(85.0f);
+        item12.setY(90.0f);
+        series0->dataProxy()->setItem(itemIndex0, item00);
+        series0->dataProxy()->setItem(itemIndex0 + 1, item01);
+        series0->dataProxy()->setItem(itemIndex0 + 2, item02);
+        series1->dataProxy()->setItem(itemIndex1, item10);
+        series1->dataProxy()->setItem(itemIndex1 + 1, item11);
+        series1->dataProxy()->setItem(itemIndex1 + 2, item12);
+    }
+        break;
+    case 10: {
+        qDebug() << __FUNCTION__ << counter << "Level the field single item at a time";
+        QScatterDataItem item;
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < colCount; j++) {
+                int itemIndex = i * colCount + j;
+                QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex);
+                QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex);
+                QScatterDataItem item2 = *series2->dataProxy()->itemAt(itemIndex);
+                item0.setY(10.0f);
+                item1.setY(15.0f);
+                item2.setY(20.0f);
+                series0->dataProxy()->setItem(itemIndex, item0);
+                series1->dataProxy()->setItem(itemIndex, item1);
+                series2->dataProxy()->setItem(itemIndex, item2);
+            }
+        }
+    }
+        break;
+    case 11: {
+        qDebug() << __FUNCTION__ << counter << "Change same items multiple times";
+        int itemIndex0 = 6 * colCount + 6;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        item0.setY(90.0f);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
 }
 
 void ScatterDataModifier::addData()
@@ -673,7 +853,8 @@ void ScatterDataModifier::handleAxisZChanged(QValue3DAxis *axis)
 
 void ScatterDataModifier::handleFpsChange(qreal fps)
 {
-    qDebug() << "FPS:" << fps;
+    static const QString fpsPrefix(QStringLiteral("FPS: "));
+    m_fpsLabel->setText(fpsPrefix + QString::number(qRound(fps)));
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)
@@ -756,4 +937,16 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
                      &ScatterDataModifier::handleSelectionChange);
 
     return series;
+}
+
+void ScatterDataModifier::populateFlatSeries(QScatter3DSeries *series, int rows, int columns,
+                                             float value)
+{
+    QScatterDataArray *dataArray = new QScatterDataArray;
+    dataArray->resize(rows * columns);
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++)
+            (*dataArray)[i * columns + j].setPosition(QVector3D(float(i), value, float(j)));
+    }
+    series->dataProxy()->resetArray(dataArray);
 }

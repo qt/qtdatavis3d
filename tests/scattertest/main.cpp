@@ -123,6 +123,9 @@ int main(int argc, char **argv)
     QPushButton *massiveDataTestButton = new QPushButton(widget);
     massiveDataTestButton->setText(QStringLiteral("Massive data test"));
 
+    QPushButton *testItemChangesButton = new QPushButton(widget);
+    testItemChangesButton->setText(QStringLiteral("Test Item changing"));
+
     QLinearGradient grBtoY(0, 0, 100, 0);
     grBtoY.setColorAt(1.0, Qt::black);
     grBtoY.setColorAt(0.67, Qt::blue);
@@ -136,6 +139,12 @@ int main(int argc, char **argv)
     QPushButton *gradientBtoYPB = new QPushButton(widget);
     gradientBtoYPB->setIcon(QIcon(pm));
     gradientBtoYPB->setIconSize(QSize(100, 24));
+
+    QLabel *fpsLabel = new QLabel(QStringLiteral(""));
+
+    QCheckBox *fpsCheckBox = new QCheckBox(widget);
+    fpsCheckBox->setText(QStringLiteral("Measure Fps"));
+    fpsCheckBox->setChecked(false);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
@@ -232,9 +241,12 @@ int main(int argc, char **argv)
     vLayout->addWidget(toggleSeriesVisibilityButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeSeriesNameButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
-    vLayout->addWidget(massiveDataTestButton, 1, Qt::AlignTop);
+    vLayout->addWidget(massiveDataTestButton, 0, Qt::AlignTop);
+    vLayout->addWidget(testItemChangesButton, 1, Qt::AlignTop);
 
     vLayout2->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
+    vLayout2->addWidget(fpsLabel, 0, Qt::AlignTop);
+    vLayout2->addWidget(fpsCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(backgroundCheckBox);
     vLayout2->addWidget(gridCheckBox);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
@@ -302,6 +314,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::startStopTimer);
     QObject::connect(massiveDataTestButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::massiveDataTest);
+    QObject::connect(testItemChangesButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::testItemChanges);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::setGradient);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
@@ -316,6 +330,8 @@ int main(int argc, char **argv)
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);
 
+    QObject::connect(fpsCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::setFpsMeasurement);
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
@@ -334,6 +350,8 @@ int main(int argc, char **argv)
     QObject::connect(maxSliderZ, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setMaxZ);
 
+
+    modifier->setFpsLabel(fpsLabel);
 
     modifier->start();
 

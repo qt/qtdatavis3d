@@ -71,6 +71,12 @@ void Scatter3DController::synchDataToRenderer()
     Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
+    if (m_changeTracker.itemChanged) {
+        m_renderer->updateItems(m_changedItems);
+        m_changeTracker.itemChanged = false;
+        m_changedItems.clear();
+    }
+
     if (m_changeTracker.selectedItemChanged) {
         m_renderer->updateSelectedItem(m_selectedItem, m_selectedItemSeries);
         m_changeTracker.selectedItemChanged = false;
@@ -144,17 +150,35 @@ void Scatter3DController::handleItemsAdded(int startIndex, int count)
 
 void Scatter3DController::handleItemsChanged(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
     QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_isDataDirty = true;
-        series->d_ptr->markItemLabelDirty();
+    int oldChangeCount = m_changedItems.size();
+    if (!oldChangeCount)
+        m_changedItems.reserve(count);
+
+    for (int i = 0; i < count; i++) {
+        bool newItem = true;
+        int candidate = startIndex + i;
+        for (int j = 0; j < oldChangeCount; j++) {
+            const ChangeItem &oldChangeItem = m_changedItems.at(j);
+            if (oldChangeItem.index == candidate && series == oldChangeItem.series) {
+                newItem = false;
+                break;
+            }
+        }
+        if (newItem) {
+            ChangeItem newChangeItem = {series, candidate};
+            m_changedItems.append(newChangeItem);
+            if (series == m_selectedItemSeries && m_selectedItem == candidate)
+                series->d_ptr->markItemLabelDirty();
+        }
     }
-    if (!m_changedSeriesList.contains(series))
-        m_changedSeriesList.append(series);
-    emitNeedRender();
+
+    if (count) {
+        m_changeTracker.itemChanged = true;
+        if (series->isVisible())
+            adjustAxisRanges();
+        emitNeedRender();
+    }
 }
 
 void Scatter3DController::handleItemsRemoved(int startIndex, int count)

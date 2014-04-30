@@ -165,12 +165,6 @@ void Scatter3DRenderer::initializeOpenGL()
 void Scatter3DRenderer::updateData()
 {
     calculateSceneScalingFactors();
-    float minX = float(m_axisCacheX.min());
-    float maxX = float(m_axisCacheX.max());
-    float minY = float(m_axisCacheY.min());
-    float maxY = float(m_axisCacheY.max());
-    float minZ = float(m_axisCacheZ.min());
-    float maxZ = float(m_axisCacheZ.max());
     int totalDataSize = 0;
 
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
@@ -185,23 +179,8 @@ void Scatter3DRenderer::updateData()
             if (dataSize != renderArray.size())
                 renderArray.resize(dataSize);
 
-            for (int i = 0; i < dataSize; i++) {
-                QVector3D dotPos = dataArray.at(i).position();
-                ScatterRenderItem &renderItem = renderArray[i];
-                if ((dotPos.x() >= minX && dotPos.x() <= maxX )
-                        && (dotPos.y() >= minY && dotPos.y() <= maxY)
-                        && (dotPos.z() >= minZ && dotPos.z() <= maxZ)) {
-                    renderItem.setPosition(dotPos);
-                    renderItem.setVisible(true);
-                    if (!dataArray.at(i).rotation().isIdentity())
-                        renderItem.setRotation(dataArray.at(i).rotation().normalized());
-                    else
-                        renderItem.setRotation(identityQuaternion);
-                    calculateTranslation(renderItem);
-                } else {
-                    renderItem.setVisible(false);
-                }
-            }
+            for (int i = 0; i < dataSize; i++)
+                updateRenderItem(dataArray.at(i), renderArray[i]);
             cache->setDataDirty(false);
         }
     }
@@ -270,6 +249,30 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
 SeriesRenderCache *Scatter3DRenderer::createNewCache(QAbstract3DSeries *series)
 {
     return new ScatterSeriesRenderCache(series, this);
+}
+
+void Scatter3DRenderer::updateItems(const QVector<Scatter3DController::ChangeItem> &items)
+{
+    ScatterSeriesRenderCache *cache = 0;
+    const QScatter3DSeries *prevSeries = 0;
+    const QScatterDataArray *dataArray = 0;
+
+    foreach (Scatter3DController::ChangeItem item, items) {
+        QScatter3DSeries *currentSeries = item.series;
+        if (currentSeries != prevSeries) {
+            cache = static_cast<ScatterSeriesRenderCache *>(m_renderCacheList.value(currentSeries));
+            prevSeries = currentSeries;
+            dataArray = item.series->dataProxy()->array();
+            // Invisible series render caches are not updated, but instead just marked dirty, so that
+            // they can be completely recalculated when they are turned visible.
+            if (!cache->isVisible() && !cache->dataDirty())
+                cache->setDataDirty(true);
+        }
+        if (cache->isVisible()) {
+            const int index = item.index;
+            updateRenderItem(dataArray->at(index), cache->renderArray()[index]);
+        }
+    }
 }
 
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
@@ -1800,6 +1803,24 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
     // No valid match found
     index = Scatter3DController::invalidSelectionIndex();
     series = 0;
+}
+
+void Scatter3DRenderer::updateRenderItem(const QScatterDataItem &dataItem, ScatterRenderItem &renderItem)
+{
+    QVector3D dotPos = dataItem.position();
+    if ((dotPos.x() >= m_axisCacheX.min() && dotPos.x() <= m_axisCacheX.max() )
+            && (dotPos.y() >= m_axisCacheY.min() && dotPos.y() <= m_axisCacheY.max())
+            && (dotPos.z() >= m_axisCacheZ.min() && dotPos.z() <= m_axisCacheZ.max())) {
+        renderItem.setPosition(dotPos);
+        renderItem.setVisible(true);
+        if (!dataItem.rotation().isIdentity())
+            renderItem.setRotation(dataItem.rotation().normalized());
+        else
+            renderItem.setRotation(identityQuaternion);
+        calculateTranslation(renderItem);
+    } else {
+        renderItem.setVisible(false);
+    }
 }
 
 QVector3D Scatter3DRenderer::convertPositionToTranslation(const QVector3D &position) {
