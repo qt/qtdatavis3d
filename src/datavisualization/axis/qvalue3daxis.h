@@ -54,7 +54,7 @@ signals:
     void segmentCountChanged(int count);
     void subSegmentCountChanged(int count);
     void labelFormatChanged(const QString &format);
-    void formatterChanged(QValue3DAxisFormatter *formatter);
+    Q_REVISION(1) void formatterChanged(QValue3DAxisFormatter *formatter);
 
 protected:
     QValue3DAxisPrivate *dptr();

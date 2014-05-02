@@ -181,8 +181,8 @@ signals:
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
     void renderingModeChanged(AbstractDeclarative::RenderingMode mode);
-    void measureFpsChanged(bool enabled);
-    void currentFpsChanged(qreal fps);
+    Q_REVISION(1) void measureFpsChanged(bool enabled);
+    Q_REVISION(1) void currentFpsChanged(qreal fps);
 
 private:
     QPointer<Abstract3DController> m_controller;

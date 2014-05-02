@@ -140,8 +140,8 @@ signals:
     void multiHighlightColorChanged(const QColor &color);
     void multiHighlightGradientChanged(const QLinearGradient &gradient);
     void nameChanged(const QString &name);
-    void itemLabelChanged(const QString &label);
-    void itemLabelVisibilityChanged(bool visible);
+    Q_REVISION(1) void itemLabelChanged(const QString &label);
+    Q_REVISION(1) void itemLabelVisibilityChanged(bool visible);
 
 protected:
     QScopedPointer<QAbstract3DSeriesPrivate> d_ptr;
