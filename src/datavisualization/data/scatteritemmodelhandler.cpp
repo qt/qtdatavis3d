@@ -25,7 +25,11 @@ static const int noRoleIndex = -1;
 ScatterItemModelHandler::ScatterItemModelHandler(QItemModelScatterDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
       m_proxy(proxy),
-      m_proxyArray(0)
+      m_proxyArray(0),
+      m_xPosRole(noRoleIndex),
+      m_yPosRole(noRoleIndex),
+      m_zPosRole(noRoleIndex),
+      m_rotationRole(noRoleIndex)
 {
 }
 

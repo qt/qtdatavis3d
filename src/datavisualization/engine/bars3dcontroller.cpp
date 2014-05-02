@@ -148,7 +148,6 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
     if (!oldChangeCount)
         m_changedRows.reserve(count);
 
-    int selectedRow = m_selectedBar.x();
     for (int i = 0; i < count; i++) {
         bool newItem = true;
         int candidate = startIndex + i;
@@ -162,7 +161,7 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
         if (newItem) {
             ChangeRow newChangeItem = {series, candidate};
             m_changedRows.append(newChangeItem);
-            if (series == m_selectedBarSeries && selectedRow == candidate)
+            if (series == m_selectedBarSeries && m_selectedBar.x() == candidate)
                 series->d_ptr->markItemLabelDirty();
         }
     }
@@ -516,7 +515,8 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
     adjustSelectionPosition(pos, series);
 
     if (selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
-        // If the selected bar is outside data window, or there is no visible selected bar, disable slicing
+        // If the selected bar is outside data window, or there is no visible selected bar,
+        // disable slicing.
         if (pos.x() < m_axisZ->min() || pos.x() > m_axisZ->max()
                 || pos.y() < m_axisX->min() || pos.y() > m_axisX->max()
                 || !series->isVisible()) {

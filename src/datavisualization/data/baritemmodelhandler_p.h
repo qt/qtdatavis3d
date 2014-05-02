@@ -41,12 +41,18 @@ public:
     BarItemModelHandler(QItemModelBarDataProxy *proxy, QObject *parent = 0);
     virtual ~BarItemModelHandler();
 
+public slots:
+    virtual void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+                                   const QVector<int> &roles = QVector<int> ());
+
 protected:
     void virtual resolveModel();
 
     QItemModelBarDataProxy *m_proxy; // Not owned
     QBarDataArray *m_proxyArray; // Not owned
     int m_columnCount;
+    int m_valueRole;
+    int m_rotationRole;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

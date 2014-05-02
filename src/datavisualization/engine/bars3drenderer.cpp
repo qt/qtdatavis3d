@@ -337,8 +337,14 @@ void Bars3DRenderer::updateRows(const QVector<Bars3DController::ChangeRow> &rows
             if (!cache->isVisible() && !cache->dataDirty())
                 cache->setDataDirty(true);
         }
-        if (cache->isVisible())
+        if (cache->isVisible()) {
             updateRenderRow(dataArray->at(row), cache->renderArray()[row - minRow]);
+            if (m_cachedIsSlicingActivated
+                    && cache == m_selectedSeriesCache
+                    && m_selectedBarPos.x() == row) {
+                m_selectionDirty = true; // Need to update slice view
+            }
+        }
     }
 }
 
@@ -370,6 +376,11 @@ void Bars3DRenderer::updateItems(const QVector<Bars3DController::ChangeItem> &it
         if (cache->isVisible()) {
             updateRenderItem(dataArray->at(row)->at(col),
                              cache->renderArray()[row - minRow][col - minCol]);
+            if (m_cachedIsSlicingActivated
+                    && cache == m_selectedSeriesCache
+                    && m_selectedBarPos == QPoint(row, col)) {
+                m_selectionDirty = true; // Need to update slice view
+            }
         }
     }
 }
