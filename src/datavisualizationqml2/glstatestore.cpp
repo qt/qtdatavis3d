@@ -50,13 +50,13 @@ GLStateStore::GLStateStore(QOpenGLContext *context, QObject *parent) :
 #endif
 
     m_maxVertexAttribs = qMin(maxVertexAttribs, 2); // Datavis only uses 2 attribs max
-    m_vertexAttribArrayEnabledStates = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayBoundBuffers = new GLint[maxVertexAttribs];
-    m_vertexAttribArraySizes = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayTypes = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayNormalized = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayStrides = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayOffsets = new GLint[maxVertexAttribs];
+    m_vertexAttribArrayEnabledStates.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayBoundBuffers.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArraySizes.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayTypes.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayNormalized.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayStrides.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayOffsets.reset(new GLint[maxVertexAttribs]);
 
     initGLDefaultState();
 }
@@ -67,8 +67,6 @@ GLStateStore::~GLStateStore()
     EnumToStringMap::deleteInstance();
     m_map = 0;
 #endif
-    delete m_vertexAttribArrayEnabledStates;
-    delete m_vertexAttribArrayBoundBuffers;
 }
 
 void GLStateStore::storeGLState()
