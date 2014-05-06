@@ -62,6 +62,8 @@ public:
     inline int subSegmentCount() const { return m_subSegmentCount; }
     inline void setLabelFormat(const QString &format) { m_labelFormat = format; }
     inline const QString &labelFormat() const { return m_labelFormat; }
+    inline void setReversed(bool enable) { m_reversed = enable; m_positionsDirty = true; }
+    inline bool reversed() const { return m_reversed; }
     inline void setFormatter(QValue3DAxisFormatter *formatter)
     {
         m_formatter = formatter; m_positionsDirty = true;
@@ -88,7 +90,10 @@ public:
     inline float scale() { return m_scale; }
     inline float positionAt(float value)
     {
-        return m_formatter->positionAt(value) * m_scale + m_translate;
+        if (m_reversed)
+            return (1.0f - m_formatter->positionAt(value)) * m_scale + m_translate;
+        else
+            return m_formatter->positionAt(value) * m_scale + m_translate;
     }
 
 public slots:
@@ -106,6 +111,7 @@ private:
     int m_segmentCount;
     int m_subSegmentCount;
     QString m_labelFormat;
+    bool m_reversed;
     QFont m_font;
     QValue3DAxisFormatter *m_formatter;
     QPointer<QValue3DAxisFormatter> m_ctrlFormatter;

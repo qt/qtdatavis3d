@@ -333,6 +333,14 @@ void Abstract3DRenderer::updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation 
     axisCacheForOrientation(orientation).setLabelFormat(format);
 }
 
+void Abstract3DRenderer::updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation,
+                                            bool enable)
+{
+    axisCacheForOrientation(orientation).setReversed(enable);
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
+}
+
 void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
                                              QValue3DAxisFormatter *formatter)
 {

@@ -126,6 +126,9 @@ int main(int argc, char **argv)
     QPushButton *testItemChangesButton = new QPushButton(widget);
     testItemChangesButton->setText(QStringLiteral("Test Item changing"));
 
+    QPushButton *testReverseButton = new QPushButton(widget);
+    testReverseButton->setText(QStringLiteral("Test Axis Reversing"));
+
     QLinearGradient grBtoY(0, 0, 100, 0);
     grBtoY.setColorAt(1.0, Qt::black);
     grBtoY.setColorAt(0.67, Qt::blue);
@@ -242,7 +245,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(changeSeriesNameButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
     vLayout->addWidget(massiveDataTestButton, 0, Qt::AlignTop);
-    vLayout->addWidget(testItemChangesButton, 1, Qt::AlignTop);
+    vLayout->addWidget(testItemChangesButton, 0, Qt::AlignTop);
+    vLayout->addWidget(testReverseButton, 1, Qt::AlignTop);
 
     vLayout2->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
     vLayout2->addWidget(fpsLabel, 0, Qt::AlignTop);
@@ -316,6 +320,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::massiveDataTest);
     QObject::connect(testItemChangesButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::testItemChanges);
+    QObject::connect(testReverseButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::testAxisReverse);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::setGradient);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,

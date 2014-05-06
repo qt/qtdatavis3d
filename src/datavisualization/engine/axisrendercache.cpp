@@ -29,6 +29,7 @@ AxisRenderCache::AxisRenderCache()
       m_max(10.0f),
       m_segmentCount(5),
       m_subSegmentCount(1),
+      m_reversed(false),
       m_font(QFont(QStringLiteral("Arial"))),
       m_formatter(0),
       m_ctrlFormatter(0),
@@ -129,17 +130,24 @@ void AxisRenderCache::updateAllPositions()
         int index = 0;
         int grid = 0;
         int label = 0;
+        float position = 0.0f;
         for (; label < labelCount; label++) {
-            m_adjustedLabelPositions[label] =
-                    m_formatter->labelPositions().at(label) * m_scale + m_translate;
+            position = m_formatter->labelPositions().at(label);
+            if (m_reversed)
+                position = 1.0f - position;
+            m_adjustedLabelPositions[label] = position * m_scale + m_translate;
         }
         for (; grid < gridCount; grid++) {
-            m_adjustedGridLinePositions[index++] =
-                    m_formatter->gridPositions().at(grid) * m_scale + m_translate;
+            position = m_formatter->gridPositions().at(grid);
+            if (m_reversed)
+                position = 1.0f - position;
+            m_adjustedGridLinePositions[index++] = position * m_scale + m_translate;
         }
         for (int subGrid = 0; subGrid < subGridCount; subGrid++) {
-            m_adjustedGridLinePositions[index++] =
-                    m_formatter->subGridPositions().at(subGrid) * m_scale + m_translate;
+            position = m_formatter->subGridPositions().at(subGrid);
+            if (m_reversed)
+                position = 1.0f - position;
+            m_adjustedGridLinePositions[index++] = position * m_scale + m_translate;
         }
 
         m_positionsDirty = false;

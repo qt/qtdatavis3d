@@ -93,6 +93,7 @@ public:
     void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
     void addRemoveSeries();
     void testItemAndRowChanges();
+    void reverseValueAxis(int enabled);
 
 public slots:
     void flipViews();

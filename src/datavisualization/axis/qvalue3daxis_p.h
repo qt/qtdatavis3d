@@ -63,6 +63,7 @@ protected:
     QString m_labelFormat;
     bool m_labelsDirty;
     QValue3DAxisFormatter *m_formatter;
+    bool m_reversed;
 
 private:
     QValue3DAxis *qptr();

@@ -781,6 +781,25 @@ QSurfaceDataRow *GraphModifier::createMultiRow(int row, int series, bool change)
     return newRow;
 }
 
+void GraphModifier::populateRisingSeries(QSurface3DSeries *series, int rows, int columns,
+                                         float minValue, float maxValue)
+{
+    QSurfaceDataArray *dataArray = new QSurfaceDataArray;
+    dataArray->reserve(rows);
+    float range = maxValue - minValue;
+    int arraySize = rows * columns;
+    for (int i = 0; i < rows; i++) {
+        QSurfaceDataRow *dataRow = new QSurfaceDataRow(columns);
+        for (int j = 0; j < columns; j++) {
+            float yValue = minValue + (range * i * j / arraySize);
+            (*dataRow)[j].setPosition(QVector3D(float(j), yValue, float(i)));
+        }
+        dataArray->append(dataRow);
+    }
+    series->dataProxy()->resetArray(dataArray);
+
+}
+
 void GraphModifier::changeRows()
 {
     if (m_activeSample == GraphModifier::SqrtSin) {
@@ -1276,6 +1295,70 @@ void GraphModifier::massiveTestAppendAndScroll()
     int min = m_graph->axisZ()->min() + addedRows;
     int max = m_graph->axisZ()->max() + addedRows;
     m_graph->axisZ()->setRange(min, max);
+}
+
+void GraphModifier::testAxisReverse()
+{
+    static int counter = 0;
+    const int rowCount = 16;
+    const int colCount = 16;
+    static QSurface3DSeries *series0 = 0;
+    static QSurface3DSeries *series1 = 0;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "Setup test";
+        foreach (QSurface3DSeries *series, m_graph->seriesList())
+            m_graph->removeSeries(series);
+        foreach (QValue3DAxis *axis, m_graph->axes())
+            m_graph->releaseAxis(axis);
+        delete series0;
+        delete series1;
+        series0 = new QSurface3DSeries;
+        series1 = new QSurface3DSeries;
+        populateRisingSeries(series0, rowCount, colCount, 0.0f, 50.0f);
+        populateRisingSeries(series1, rowCount, colCount, -20.0f, 30.0f);
+        m_graph->axisX()->setRange(0.0f, 10.0f);
+        m_graph->axisY()->setRange(-20.0f, 50.0f);
+        m_graph->axisZ()->setRange(5.0f, 15.0f);
+        m_graph->addSeries(series0);
+        m_graph->addSeries(series1);
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Reverse X axis";
+        m_graph->axisX()->setReversed(true);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Reverse Y axis";
+        m_graph->axisY()->setReversed(true);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Reverse Z axis";
+        m_graph->axisZ()->setReversed(true);
+    }
+        break;
+    case 4: {
+        qDebug() << __FUNCTION__ << counter << "Return all axes to normal";
+        m_graph->axisX()->setReversed(false);
+        m_graph->axisY()->setReversed(false);
+        m_graph->axisZ()->setReversed(false);
+    }
+        break;
+    case 5: {
+        qDebug() << __FUNCTION__ << counter << "Reverse all axes";
+        m_graph->axisX()->setReversed(true);
+        m_graph->axisY()->setReversed(true);
+        m_graph->axisZ()->setReversed(true);
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
 }
 
 void GraphModifier::changeMesh()

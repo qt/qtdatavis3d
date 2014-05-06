@@ -201,6 +201,10 @@ int main(int argc, char **argv)
     fpsCheckBox->setText(QStringLiteral("Measure Fps"));
     fpsCheckBox->setChecked(false);
 
+    QCheckBox *reverseValueAxisCheckBox = new QCheckBox(widget);
+    reverseValueAxisCheckBox->setText(QStringLiteral("Reverse value axis"));
+    reverseValueAxisCheckBox->setChecked(false);
+
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
@@ -364,6 +368,7 @@ int main(int argc, char **argv)
     vLayout2->addWidget(maxSliderY, 0, Qt::AlignTop);
     vLayout2->addWidget(fpsLabel, 0, Qt::AlignTop);
     vLayout2->addWidget(fpsCheckBox, 0, Qt::AlignTop);
+    vLayout2->addWidget(reverseValueAxisCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(gridCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
@@ -477,6 +482,8 @@ int main(int argc, char **argv)
 
     QObject::connect(fpsCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setFpsMeasurement);
+    QObject::connect(reverseValueAxisCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::reverseValueAxis);
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,

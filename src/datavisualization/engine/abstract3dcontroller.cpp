@@ -357,6 +357,33 @@ void Abstract3DController::synchDataToRenderer()
         }
     }
 
+    if (m_changeTracker.axisXReversedChanged) {
+        m_changeTracker.axisXReversedChanged = false;
+        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationX,
+                                           valueAxisX->reversed());
+        }
+    }
+
+    if (m_changeTracker.axisYReversedChanged) {
+        m_changeTracker.axisYReversedChanged = false;
+        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationY,
+                                           valueAxisY->reversed());
+        }
+    }
+
+    if (m_changeTracker.axisZReversedChanged) {
+        m_changeTracker.axisZReversedChanged = false;
+        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
+            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationZ,
+                                           valueAxisZ->reversed());
+        }
+    }
+
     if (m_changedSeriesList.size()) {
         m_renderer->modifiedSeriesList(m_changedSeriesList);
         m_changedSeriesList.clear();
@@ -985,6 +1012,12 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
     handleAxisLabelFormatChangedBySender(sender());
 }
 
+void Abstract3DController::handleAxisReversedChanged(bool enable)
+{
+    Q_UNUSED(enable)
+    handleAxisReversedChangedBySender(sender());
+}
+
 void Abstract3DController::handleAxisFormatterDirty()
 {
     handleAxisFormatterDirtyBySender(sender());
@@ -1046,6 +1079,24 @@ void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
     } else if (sender == m_axisZ) {
         m_isDataDirty = true;
         m_changeTracker.axisZLabelFormatChanged = true;
+    } else {
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    }
+    emitNeedRender();
+}
+
+void Abstract3DController::handleAxisReversedChangedBySender(QObject *sender)
+{
+    // Reversing change needs to dirty the data so item positions are recalculated
+    if (sender == m_axisX) {
+        m_isDataDirty = true;
+        m_changeTracker.axisXReversedChanged = true;
+    } else if (sender == m_axisY) {
+        m_isDataDirty = true;
+        m_changeTracker.axisYReversedChanged = true;
+    } else if (sender == m_axisZ) {
+        m_isDataDirty = true;
+        m_changeTracker.axisZReversedChanged = true;
     } else {
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
     }
@@ -1149,12 +1200,15 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
                          this, &Abstract3DController::handleAxisSubSegmentCountChanged);
         QObject::connect(valueAxis, &QValue3DAxis::labelFormatChanged,
                          this, &Abstract3DController::handleAxisLabelFormatChanged);
+        QObject::connect(valueAxis, &QValue3DAxis::reversedChanged,
+                         this, &Abstract3DController::handleAxisReversedChanged);
         QObject::connect(valueAxis->dptr(), &QValue3DAxisPrivate::formatterDirty,
                          this, &Abstract3DController::handleAxisFormatterDirty);
 
         handleAxisSegmentCountChangedBySender(valueAxis);
         handleAxisSubSegmentCountChangedBySender(valueAxis);
         handleAxisLabelFormatChangedBySender(valueAxis);
+        handleAxisReversedChangedBySender(valueAxis);
         handleAxisFormatterDirtyBySender(valueAxis->dptr());
     }
 }

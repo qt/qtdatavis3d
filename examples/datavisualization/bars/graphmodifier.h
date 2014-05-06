@@ -48,6 +48,7 @@ public:
     void setGridEnabled(int enabled);
     void setSmoothBars(int smooth);
     void setSeriesVisibility(int enabled);
+    void setReverseValueAxis(int enabled);
 
 public slots:
     void changeRange(int range);

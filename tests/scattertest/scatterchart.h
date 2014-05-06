@@ -59,6 +59,7 @@ public:
     void setFpsMeasurement(bool enable);
     void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
     void testItemChanges();
+    void testAxisReverse();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -96,6 +97,8 @@ private:
     QVector3D randVector();
     QScatter3DSeries *createAndAddSeries();
     void populateFlatSeries(QScatter3DSeries *series, int rows, int columns, float value);
+    void populateRisingSeries(QScatter3DSeries *series, int rows, int columns, float minValue,
+                              float maxValue);
 
     Q3DScatter *m_chart;
     int m_fontSize;

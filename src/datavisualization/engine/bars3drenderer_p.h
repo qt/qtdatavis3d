@@ -86,7 +86,7 @@ private:
     GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
     GLfloat m_gradientFraction;
-    GLfloat m_negativeBackgroundAdjustment;
+    GLfloat m_backgroundAdjustment;
     GLfloat m_rowWidth;
     GLfloat m_columnDepth;
     GLfloat m_maxDimension;
@@ -140,6 +140,8 @@ public slots:
     // Overloaded from abstract renderer
     virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
                                  float max);
+    virtual void updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation,
+                                    bool enable);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);

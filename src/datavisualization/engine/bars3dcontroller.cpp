@@ -80,6 +80,13 @@ void Bars3DController::synchDataToRenderer()
             series->d_ptr->m_changeTracker.meshChanged = true;
     }
 
+    // If y range or reverse changed, scene needs to be updated to update camera limits
+    bool needSceneUpdate = false;
+    if (Abstract3DController::m_changeTracker.axisYRangeChanged
+            || Abstract3DController::m_changeTracker.axisYReversedChanged) {
+        needSceneUpdate = true;
+    }
+
     Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
@@ -109,6 +116,13 @@ void Bars3DController::synchDataToRenderer()
     if (m_changeTracker.selectedBarChanged) {
         m_renderer->updateSelectedBar(m_selectedBar, m_selectedBarSeries);
         m_changeTracker.selectedBarChanged = false;
+    }
+
+    if (needSceneUpdate) {
+        // Since scene is updated before axis updates are handled,
+        // do another render pass for scene update
+        m_scene->d_ptr->m_sceneDirty = true;
+        emitNeedRender();
     }
 }
 

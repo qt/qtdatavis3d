@@ -747,6 +747,9 @@ void Surface3DRenderer::drawSlicedScene()
 
     GLfloat scaleXBackground = 0.0f;
 
+    // Disable culling to avoid ugly conditionals with reversed axes and data
+    glDisable(GL_CULL_FACE);
+
     if (!m_renderCacheList.isEmpty()) {
         bool drawGrid = false;
 
@@ -824,6 +827,9 @@ void Surface3DRenderer::drawSlicedScene()
 
     // Disable textures
     glDisable(GL_TEXTURE_2D);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
 
     // Grid lines
     if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {

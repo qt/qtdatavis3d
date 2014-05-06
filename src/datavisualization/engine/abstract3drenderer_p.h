@@ -103,6 +103,8 @@ public:
                                            int count);
     virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation,
                                        const QString &format);
+    virtual void updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation,
+                                    bool enable);
     virtual void updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
                                      QValue3DAxisFormatter *formatter);
     virtual void modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList);

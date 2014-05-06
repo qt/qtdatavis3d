@@ -75,7 +75,7 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_shadowQualityToShader(100.0f),
       m_shadowQualityMultiplier(3),
       m_heightNormalizer(1.0f),
-      m_negativeBackgroundAdjustment(0.0f),
+      m_backgroundAdjustment(0.0f),
       m_rowWidth(0),
       m_columnDepth(0),
       m_maxDimension(0),
@@ -266,6 +266,9 @@ void Bars3DRenderer::updateRenderItem(const QBarDataItem &dataItem, BarRenderIte
     } else {
         heightValue -= m_zeroPosition;
     }
+    if (m_axisCacheY.reversed())
+        heightValue = -heightValue;
+
     renderItem.setValue(value);
     renderItem.setHeight(heightValue);
 
@@ -387,10 +390,19 @@ void Bars3DRenderer::updateItems(const QVector<Bars3DController::ChangeItem> &it
 
 void Bars3DRenderer::updateScene(Q3DScene *scene)
 {
-    if (m_hasNegativeValues)
+    if (!m_noZeroInRange) {
         scene->activeCamera()->d_ptr->setMinYRotation(-90.0);
-    else
-        scene->activeCamera()->d_ptr->setMinYRotation(0.0f);
+        scene->activeCamera()->d_ptr->setMaxYRotation(90.0);
+    } else {
+        if ((m_hasNegativeValues && !m_axisCacheY.reversed())
+                || (!m_hasNegativeValues && m_axisCacheY.reversed())) {
+            scene->activeCamera()->d_ptr->setMinYRotation(-90.0f);
+            scene->activeCamera()->d_ptr->setMaxYRotation(0.0);
+        } else {
+            scene->activeCamera()->d_ptr->setMinYRotation(0.0f);
+            scene->activeCamera()->d_ptr->setMaxYRotation(90.0);
+        }
+    }
 
     if (m_resetCameraBaseOrientation) {
         // Set initial camera position. Also update if height adjustment has changed.
@@ -455,7 +467,7 @@ void Bars3DRenderer::drawSlicedScene()
     bool itemMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem);
 
     GLfloat barPosYAdjustment = -0.8f; // Translate to -1.0 + 0.2 for row/column labels
-    GLfloat gridAdjustment = 1.0f + barPosYAdjustment - m_negativeBackgroundAdjustment;
+    GLfloat gridAdjustment = 1.0f + barPosYAdjustment - m_backgroundAdjustment;
     GLfloat scaleFactor = 0.0f;
     if (rowMode)
         scaleFactor = (1.1f * m_rowWidth) / m_scaleFactor;
@@ -463,10 +475,15 @@ void Bars3DRenderer::drawSlicedScene()
         scaleFactor = (1.1f * m_columnDepth) / m_scaleFactor;
     GLfloat barLabelYPos = barPosYAdjustment - 0.4f - labelMargin; // 0.4 for labels
     GLfloat zeroPosAdjustment = 0.0f;
-    if (!m_noZeroInRange)
-        zeroPosAdjustment = 2.0f * m_axisCacheY.min() / m_heightNormalizer;
-    else if (m_hasNegativeValues)
-        zeroPosAdjustment = -2.0f;
+    GLfloat directionMultiplier = 2.0f;
+    GLfloat directionBase = 0.0f;
+    if (m_axisCacheY.reversed()) {
+        directionMultiplier = -2.0f;
+        directionBase = -2.0f;
+    }
+    zeroPosAdjustment = directionBase +
+            directionMultiplier * m_axisCacheY.min() / m_heightNormalizer;
+    zeroPosAdjustment = qBound(-2.0f, zeroPosAdjustment, 0.0f);
 
     // Draw grid lines
     if (m_cachedTheme->isGridEnabled()) {
@@ -624,7 +641,9 @@ void Bars3DRenderer::drawSlicedScene()
 
     QQuaternion seriesRotation;
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
-        if (baseCache->isVisible()) {
+        if (baseCache->isVisible()
+                && (baseCache == m_selectedSeriesCache
+                    || m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries))) {
             BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
             QVector<BarRenderSliceItem> &sliceArray = cache->sliceArray();
             int sliceCount = sliceArray.size();
@@ -768,6 +787,7 @@ void Bars3DRenderer::drawSlicedScene()
         m_dummyBarRenderItem.setTranslation(QVector3D(item.translation().x(),
                                                       barLabelYPos,
                                                       item.translation().z()));
+
         // Draw labels
         m_drawer->drawLabel(m_dummyBarRenderItem, *m_sliceCache->labelItems().at(labelNo),
                             viewMatrix, projectionMatrix, positionComp, sliceLabelRotation,
@@ -811,7 +831,7 @@ void Bars3DRenderer::drawSlicedScene()
                 }
             }
         }
-    } else {
+    } else if (selectedItem) {
         // Only draw value for selected item when grid labels are on
         // Create label texture if we need it
         if (selectedItem->sliceLabel().isNull() || m_updateLabels) {
@@ -1468,7 +1488,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         QMatrix4x4 itModelMatrix;
 
         QVector3D backgroundScaler(rowScaleFactor, 1.0f, columnScaleFactor);
-        modelMatrix.translate(0.0f, m_negativeBackgroundAdjustment, 0.0f);
+        modelMatrix.translate(0.0f, m_backgroundAdjustment, 0.0f);
 
         modelMatrix.scale(backgroundScaler);
         itModelMatrix.scale(backgroundScaler);
@@ -1517,44 +1537,42 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
         }
 
-        // Draw floor for graph with negatives
-        if (m_hasNegativeValues) {
-            modelMatrix = QMatrix4x4();
-            itModelMatrix = QMatrix4x4();
+        // Draw floor
+        modelMatrix = QMatrix4x4();
+        itModelMatrix = QMatrix4x4();
 
-            modelMatrix.scale(backgroundScaler);
+        modelMatrix.scale(backgroundScaler);
 
-            if (m_yFlipped)
-                modelMatrix.rotate(90.0f, 1.0f, 0.0f, 0.0f);
-            else
-                modelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
+        if (m_yFlipped)
+            modelMatrix.rotate(90.0f, 1.0f, 0.0f, 0.0f);
+        else
+            modelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
 
-            itModelMatrix = modelMatrix;
+        itModelMatrix = modelMatrix;
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
-            MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+        MVPMatrix = depthProjectionViewMatrix * modelMatrix;
 #else
-            MVPMatrix = projectionViewMatrix * modelMatrix;
+        MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-            // Set changed shader bindings
-            m_backgroundShader->setUniformValue(m_backgroundShader->model(), modelMatrix);
-            m_backgroundShader->setUniformValue(m_backgroundShader->nModel(),
-                                                itModelMatrix.inverted().transposed());
-            m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
+        // Set changed shader bindings
+        m_backgroundShader->setUniformValue(m_backgroundShader->model(), modelMatrix);
+        m_backgroundShader->setUniformValue(m_backgroundShader->nModel(),
+                                            itModelMatrix.inverted().transposed());
+        m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                // Set shadow shader bindings
-                QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
-                // Draw the object
-                m_drawer->drawObject(m_backgroundShader, m_gridLineObj, 0, m_depthTexture);
-            } else
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            // Set shadow shader bindings
+            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+            m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
+            // Draw the object
+            m_drawer->drawObject(m_backgroundShader, m_gridLineObj, 0, m_depthTexture);
+        } else
 #endif
-            {
-                // Draw the object
-                m_drawer->drawObject(m_backgroundShader, m_gridLineObj);
-            }
+        {
+            // Draw the object
+            m_drawer->drawObject(m_backgroundShader, m_gridLineObj);
         }
     }
 
@@ -2047,20 +2065,21 @@ void Bars3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientatio
 
     if (orientation == QAbstract3DAxis::AxisOrientationY) {
         // Check if we have negative values
-        if (min < 0 && !m_hasNegativeValues) {
+        if (min < 0)
             m_hasNegativeValues = true;
-            // Reload background
-            loadBackgroundMesh();
-            emit needRender();
-        } else if (min >= 0 && m_hasNegativeValues) {
+        else if (min >= 0)
             m_hasNegativeValues = false;
-            // Reload background
-            loadBackgroundMesh();
-            emit needRender();
-        }
         calculateHeightAdjustment();
     }
 }
+
+void Bars3DRenderer::updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation, bool enable)
+{
+    Abstract3DRenderer::updateAxisReversed(orientation, enable);
+    if (orientation == QAbstract3DAxis::AxisOrientationY)
+        calculateHeightAdjustment();
+}
+
 
 void Bars3DRenderer::updateSelectedBar(const QPoint &position, QBar3DSeries *series)
 {
@@ -2142,10 +2161,7 @@ void Bars3DRenderer::loadBackgroundMesh()
 {
     if (m_backgroundObj)
         delete m_backgroundObj;
-    if (m_hasNegativeValues)
-        m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/negativeBackground"));
-    else
-        m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
+    m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/negativeBackground"));
     m_backgroundObj->load();
 }
 
@@ -2216,13 +2232,14 @@ void Bars3DRenderer::calculateHeightAdjustment()
         m_gradientFraction = qMax(minAbs, maxAbs) / m_heightNormalizer * 2.0f;
     }
 
-    // Calculate translation adjustment for negative background
-    if (m_hasNegativeValues)
-        newAdjustment = (qBound(0.0f, (maxAbs / m_heightNormalizer), 1.0f) - 0.5f) * 2.0f;
+    // Calculate translation adjustment for background floor
+    newAdjustment = (qBound(0.0f, (maxAbs / m_heightNormalizer), 1.0f) - 0.5f) * 2.0f;
+    if (m_axisCacheY.reversed())
+        newAdjustment = -newAdjustment;
 
-    if (newAdjustment != m_negativeBackgroundAdjustment) {
-        m_negativeBackgroundAdjustment = newAdjustment;
-        m_axisCacheY.setTranslate(m_negativeBackgroundAdjustment - 1.0f);
+    if (newAdjustment != m_backgroundAdjustment) {
+        m_backgroundAdjustment = newAdjustment;
+        m_axisCacheY.setTranslate(m_backgroundAdjustment - 1.0f);
     }
 }
 

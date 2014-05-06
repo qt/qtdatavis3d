@@ -411,6 +411,70 @@ void ScatterDataModifier::testItemChanges()
     counter++;
 }
 
+void ScatterDataModifier::testAxisReverse()
+{
+    static int counter = 0;
+    const int rowCount = 16;
+    const int colCount = 16;
+    static QScatter3DSeries *series0 = 0;
+    static QScatter3DSeries *series1 = 0;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "Setup test";
+        foreach (QScatter3DSeries *series, m_chart->seriesList())
+            m_chart->removeSeries(series);
+        foreach (QValue3DAxis *axis, m_chart->axes())
+            m_chart->releaseAxis(axis);
+        delete series0;
+        delete series1;
+        series0 = new QScatter3DSeries;
+        series1 = new QScatter3DSeries;
+        populateRisingSeries(series0, rowCount, colCount, 0.0f, 50.0f);
+        populateRisingSeries(series1, rowCount, colCount, -20.0f, 30.0f);
+        m_chart->axisX()->setRange(0.0f, 10.0f);
+        m_chart->axisY()->setRange(-20.0f, 50.0f);
+        m_chart->axisZ()->setRange(5.0f, 15.0f);
+        m_chart->addSeries(series0);
+        m_chart->addSeries(series1);
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Reverse X axis";
+        m_chart->axisX()->setReversed(true);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Reverse Y axis";
+        m_chart->axisY()->setReversed(true);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Reverse Z axis";
+        m_chart->axisZ()->setReversed(true);
+    }
+        break;
+    case 4: {
+        qDebug() << __FUNCTION__ << counter << "Return all axes to normal";
+        m_chart->axisX()->setReversed(false);
+        m_chart->axisY()->setReversed(false);
+        m_chart->axisZ()->setReversed(false);
+    }
+        break;
+    case 5: {
+        qDebug() << __FUNCTION__ << counter << "Reverse all axes";
+        m_chart->axisX()->setReversed(true);
+        m_chart->axisY()->setReversed(true);
+        m_chart->axisZ()->setReversed(true);
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
+}
+
 void ScatterDataModifier::addData()
 {
     // Add labels
@@ -947,6 +1011,22 @@ void ScatterDataModifier::populateFlatSeries(QScatter3DSeries *series, int rows,
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++)
             (*dataArray)[i * columns + j].setPosition(QVector3D(float(i), value, float(j)));
+    }
+    series->dataProxy()->resetArray(dataArray);
+}
+
+void ScatterDataModifier::populateRisingSeries(QScatter3DSeries *series, int rows, int columns,
+                                               float minValue, float maxValue)
+{
+    QScatterDataArray *dataArray = new QScatterDataArray;
+    int arraySize = rows * columns;
+    dataArray->resize(arraySize);
+    float range = maxValue - minValue;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            float yValue = minValue + (range * i * j / arraySize);
+            (*dataArray)[i * columns + j].setPosition(QVector3D(float(i), yValue, float(j)));
+        }
     }
     series->dataProxy()->resetArray(dataArray);
 }

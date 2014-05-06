@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     surfaceGraph->activeTheme()->setType(Q3DTheme::Theme(initialTheme));
 
     QWidget *container = QWidget::createWindowContainer(surfaceGraph);
-    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
+    container->setMinimumSize(QSize(screenSize.width() / 4, screenSize.height() / 4));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
@@ -347,6 +347,9 @@ int main(int argc, char *argv[])
     QPushButton *massiveDataTestButton = new QPushButton(widget);
     massiveDataTestButton->setText(QStringLiteral("Massive data test"));
 
+    QPushButton *testReverseButton = new QPushButton(widget);
+    testReverseButton->setText(QStringLiteral("Test Axis Reversing"));
+
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
@@ -435,6 +438,7 @@ int main(int argc, char *argv[])
     vLayout2->addWidget(resetArrayButton);
     vLayout2->addWidget(resetArrayEmptyButton);
     vLayout2->addWidget(massiveDataTestButton);
+    vLayout2->addWidget(testReverseButton);
 
     widget->show();
 
@@ -592,6 +596,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::resetArrayEmpty);
     QObject::connect(massiveDataTestButton,&QPushButton::clicked,
                      modifier, &GraphModifier::massiveDataTest);
+    QObject::connect(testReverseButton, &QPushButton::clicked,
+                     modifier, &GraphModifier::testAxisReverse);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

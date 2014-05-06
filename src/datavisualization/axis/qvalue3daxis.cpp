@@ -83,6 +83,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty bool ValueAxis3D::reversed
+ * \since QtDataVisualization 1.1
+ *
+ * If \c{true}, the axis will be rendered in reverse, i.e. the positions of minimum and maximum
+ * values are swapped when the graph is rendered. This property doesn't affect the actual
+ * minimum and maximum values of the axis.
+ */
+
+/*!
  * Constructs QValue3DAxis with the given \a parent.
  */
 QValue3DAxis::QValue3DAxis(QObject *parent) :
@@ -204,6 +213,27 @@ QValue3DAxisFormatter *QValue3DAxis::formatter() const
 }
 
 /*!
+ * \property QValue3DAxis::reversed
+ * \since Qt Data Visualization 1.1
+ *
+ * If \c{true}, the axis will be rendered in reverse, i.e. the positions of minimum and maximum
+ * values are swapped when the graph is rendered. This property doesn't affect the actual
+ * minimum and maximum values of the axis.
+ */
+void QValue3DAxis::setReversed(bool enable)
+{
+    if (dptr()->m_reversed != enable) {
+        dptr()->m_reversed = enable;
+        emit reversedChanged(enable);
+    }
+}
+
+bool QValue3DAxis::reversed() const
+{
+    return dptrc()->m_reversed;
+}
+
+/*!
  * \internal
  */
 QValue3DAxisPrivate *QValue3DAxis::dptr()
@@ -225,7 +255,8 @@ QValue3DAxisPrivate::QValue3DAxisPrivate(QValue3DAxis *q)
       m_subSegmentCount(1),
       m_labelFormat(Utils::defaultLabelFormat()),
       m_labelsDirty(true),
-      m_formatter(0)
+      m_formatter(0),
+      m_reversed(false)
 {
 }
 

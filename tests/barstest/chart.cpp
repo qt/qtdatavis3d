@@ -1400,6 +1400,11 @@ void GraphModifier::testItemAndRowChanges()
     counter++;
 }
 
+void GraphModifier::reverseValueAxis(int enabled)
+{
+    m_graph->valueAxis()->setReversed(enabled);
+}
+
 void GraphModifier::changeValueAxisSegments(int value)
 {
     qDebug() << __FUNCTION__ << value;

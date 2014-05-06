@@ -132,6 +132,10 @@ int main(int argc, char **argv)
     seriesCheckBox->setText(QStringLiteral("Show second series"));
     seriesCheckBox->setChecked(false);
 
+    QCheckBox *reverseValueAxisCheckBox = new QCheckBox(widget);
+    reverseValueAxisCheckBox->setText(QStringLiteral("Reverse value axis"));
+    reverseValueAxisCheckBox->setChecked(false);
+
     //! [4]
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
     rotationSliderX->setTickInterval(30);
@@ -191,6 +195,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(smoothCheckBox);
     vLayout->addWidget(seriesCheckBox);
+    vLayout->addWidget(reverseValueAxisCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Show year")));
     vLayout->addWidget(rangeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Change bar style")));
@@ -228,6 +233,8 @@ int main(int argc, char **argv)
                      &GraphModifier::setSmoothBars);
     QObject::connect(seriesCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setSeriesVisibility);
+    QObject::connect(reverseValueAxisCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setReverseValueAxis);
 
     QObject::connect(modifier, &GraphModifier::backgroundEnabledChanged,
                      backgroundCheckBox, &QCheckBox::setChecked);

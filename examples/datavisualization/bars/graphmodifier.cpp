@@ -278,3 +278,8 @@ void GraphModifier::setSeriesVisibility(int enabled)
 {
     m_secondarySeries->setVisible(bool(enabled));
 }
+
+void GraphModifier::setReverseValueAxis(int enabled)
+{
+    m_graph->valueAxis()->setReversed(enabled);
+}
