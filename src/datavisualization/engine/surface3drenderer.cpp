@@ -581,71 +581,100 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
 {
     QRect sampleSpace;
 
-    int rowCount = array.size();
-    int columnCount = array.at(0)->size();
+    const int rowCount = array.size();
+    const int columnCount = array.at(0)->size();
 
-    int i;
-    bool found;
-    float axisMinX = m_axisCacheX.min();
-    float axisMaxX = m_axisCacheX.max();
-    float axisMinZ = m_axisCacheZ.min();
-    float axisMaxZ = m_axisCacheZ.max();
+    const float axisMinX = m_axisCacheX.min();
+    const float axisMaxX = m_axisCacheX.max();
+    const float axisMinZ = m_axisCacheZ.min();
+    const float axisMaxZ = m_axisCacheZ.max();
 
+    // We assume data is ordered sequentially in rows for X-value and in columns for Z-value.
+    // Determine if data is ascending or descending in each case.
+    const bool ascendingX = array.at(0)->at(0).x() < array.at(0)->at(columnCount - 1).x();
+    const bool ascendingZ = array.at(0)->at(0).z() < array.at(rowCount - 1)->at(0).z();
+
+    const int minCol = ascendingX ? 0 : columnCount - 1;
+    const int maxCol = ascendingX ? columnCount - 1 : 0;
+    const int colStep = ascendingX ? 1 : -1;
+    const int minRow = ascendingZ ? 0 : rowCount - 1;
+    const int maxRow = ascendingZ ? rowCount - 1 : 0;
+    const int rowStep = ascendingZ ? 1 : -1;
+
+    bool found = false;
+    int idx = 0;
+    int i = 0;
     // m_minVisibleColumnValue
-    for (i = 0, found = false; i < columnCount; i++) {
-        if (array.at(0)->at(i).x() >= axisMinX) {
+    for (i = 0, idx = minCol, found = false; i < columnCount; i++) {
+        if (array.at(0)->at(idx).x() >= axisMinX) {
             found = true;
             break;
         }
+        idx += colStep;
     }
     if (found) {
-        m_minVisibleColumnValue = array.at(0)->at(i).x();
-        sampleSpace.setLeft(i);
+        m_minVisibleColumnValue = array.at(0)->at(idx).x();
+        if (ascendingX)
+            sampleSpace.setLeft(idx);
+        else
+            sampleSpace.setRight(idx);
     } else {
         sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
         return sampleSpace;
     }
 
     // m_maxVisibleColumnValue
-    for (i = columnCount - 1, found = false; i >= 0; i--) {
-        if (array.at(0)->at(i).x() <= axisMaxX) {
+    for (i = 0, idx = maxCol, found = false; i < columnCount; i++) {
+        if (array.at(0)->at(idx).x() <= axisMaxX) {
             found = true;
             break;
         }
+        idx -= colStep;
     }
     if (found) {
-        m_maxVisibleColumnValue = array.at(0)->at(i).x();
-        sampleSpace.setRight(i);
+        m_maxVisibleColumnValue = array.at(0)->at(idx).x();
+        if (ascendingX)
+            sampleSpace.setRight(idx);
+        else
+            sampleSpace.setLeft(idx);
     } else {
         sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
         return sampleSpace;
     }
 
     // m_minVisibleRowValue
-    for (i = 0, found = false; i < rowCount; i++) {
-        if (array.at(i)->at(0).z() >= axisMinZ) {
+    for (i = 0, idx = minRow, found = false; i < rowCount; i++) {
+        if (array.at(idx)->at(0).z() >= axisMinZ) {
             found = true;
             break;
         }
+        idx += rowStep;
     }
     if (found) {
-        m_minVisibleRowValue = array.at(i)->at(0).z();
-        sampleSpace.setTop(i);
+        m_minVisibleRowValue = array.at(idx)->at(0).z();
+        if (ascendingZ)
+            sampleSpace.setTop(idx);
+        else
+            sampleSpace.setBottom(idx);
     } else {
         sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
         return sampleSpace;
     }
 
     // m_maxVisibleRowValue
-    for (i = rowCount - 1, found = false; i >= 0; i--) {
-        if (array.at(i)->at(0).z() <= axisMaxZ) {
+    for (i = 0, idx = maxRow, found = false; i < rowCount; i++) {
+        if (array.at(idx)->at(0).z() <= axisMaxZ) {
             found = true;
             break;
         }
+        idx -= rowStep;
     }
     if (found) {
-        m_maxVisibleRowValue = array.at(i)->at(0).z();
-        sampleSpace.setBottom(i);
+        m_maxVisibleRowValue = array.at(idx)->at(0).z();
+        if (ascendingZ)
+            sampleSpace.setBottom(idx);
+        else
+            sampleSpace.setTop(idx);
     } else {
         sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
         return sampleSpace;

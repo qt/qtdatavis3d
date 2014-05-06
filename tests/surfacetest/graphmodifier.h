@@ -111,6 +111,7 @@ public:
     void massiveTestScroll();
     void massiveTestAppendAndScroll();
     void testAxisReverse();
+    void testDataOrdering();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -130,7 +131,7 @@ private:
                               float maxX);
     QSurfaceDataRow *createMultiRow(int row, int series, bool change);
     void populateRisingSeries(QSurface3DSeries *series, int rows, int columns, float minValue,
-                              float maxValue);
+                              float maxValue, bool ascendingX, bool ascendingZ);
 
     Q3DSurface *m_graph;
     QSurface3DSeries *m_multiseries[4];

@@ -350,6 +350,9 @@ int main(int argc, char *argv[])
     QPushButton *testReverseButton = new QPushButton(widget);
     testReverseButton->setText(QStringLiteral("Test Axis Reversing"));
 
+    QPushButton *testDataOrderingButton = new QPushButton(widget);
+    testDataOrderingButton->setText(QStringLiteral("Test data ordering"));
+
     QFrame* line = new QFrame();
     line->setFrameShape(QFrame::HLine);
     line->setFrameShadow(QFrame::Sunken);
@@ -439,6 +442,7 @@ int main(int argc, char *argv[])
     vLayout2->addWidget(resetArrayEmptyButton);
     vLayout2->addWidget(massiveDataTestButton);
     vLayout2->addWidget(testReverseButton);
+    vLayout2->addWidget(testDataOrderingButton);
 
     widget->show();
 
@@ -598,6 +602,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::massiveDataTest);
     QObject::connect(testReverseButton, &QPushButton::clicked,
                      modifier, &GraphModifier::testAxisReverse);
+    QObject::connect(testDataOrderingButton, &QPushButton::clicked,
+                     modifier, &GraphModifier::testDataOrdering);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

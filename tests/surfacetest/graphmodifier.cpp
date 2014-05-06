@@ -782,7 +782,8 @@ QSurfaceDataRow *GraphModifier::createMultiRow(int row, int series, bool change)
 }
 
 void GraphModifier::populateRisingSeries(QSurface3DSeries *series, int rows, int columns,
-                                         float minValue, float maxValue)
+                                         float minValue, float maxValue, bool ascendingX,
+                                         bool ascendingZ)
 {
     QSurfaceDataArray *dataArray = new QSurfaceDataArray;
     dataArray->reserve(rows);
@@ -791,8 +792,10 @@ void GraphModifier::populateRisingSeries(QSurface3DSeries *series, int rows, int
     for (int i = 0; i < rows; i++) {
         QSurfaceDataRow *dataRow = new QSurfaceDataRow(columns);
         for (int j = 0; j < columns; j++) {
+            float xValue = ascendingX ? float(j) : float(columns - j - 1);
             float yValue = minValue + (range * i * j / arraySize);
-            (*dataRow)[j].setPosition(QVector3D(float(j), yValue, float(i)));
+            float zValue = ascendingZ ? float(i) : float(rows - i - 1);
+            (*dataRow)[j].setPosition(QVector3D(xValue, yValue, zValue));
         }
         dataArray->append(dataRow);
     }
@@ -1168,6 +1171,7 @@ void GraphModifier::massiveDataTest()
     const float yRangeMax = 1.0f;
     const float yRangeMargin = 0.05f;
     static QTimer *massiveTestTimer = 0;
+    static QSurface3DSeries *series = new QSurface3DSeries;
 
     // To speed up massive array creation, we generate a smaller cache array
     // and copy rows from that to our main array
@@ -1221,6 +1225,9 @@ void GraphModifier::massiveDataTest()
 
         qDebug() << __FUNCTION__ << testPhase << ": Creating massive array..."
                  << rows << "x" << columns;
+        // Reset to zero first to avoid having memory allocated for two massive arrays at the same
+        // time on the second and subsequent runs.
+        series->dataProxy()->resetArray(0);
         QSurfaceDataArray *massiveArray = new QSurfaceDataArray;
         massiveArray->reserve(rows);
 
@@ -1232,7 +1239,6 @@ void GraphModifier::massiveDataTest()
         }
         qDebug() << __FUNCTION__ << testPhase << ": Massive array creation finished!";
 
-        QSurface3DSeries *series =  new QSurface3DSeries;
         series->dataProxy()->resetArray(massiveArray);
         m_graph->addSeries(series);
         break;
@@ -1316,8 +1322,8 @@ void GraphModifier::testAxisReverse()
         delete series1;
         series0 = new QSurface3DSeries;
         series1 = new QSurface3DSeries;
-        populateRisingSeries(series0, rowCount, colCount, 0.0f, 50.0f);
-        populateRisingSeries(series1, rowCount, colCount, -20.0f, 30.0f);
+        populateRisingSeries(series0, rowCount, colCount, 0.0f, 50.0f, true, true);
+        populateRisingSeries(series1, rowCount, colCount, -20.0f, 30.0f, true, true);
         m_graph->axisX()->setRange(0.0f, 10.0f);
         m_graph->axisY()->setRange(-20.0f, 50.0f);
         m_graph->axisZ()->setRange(5.0f, 15.0f);
@@ -1352,6 +1358,63 @@ void GraphModifier::testAxisReverse()
         m_graph->axisX()->setReversed(true);
         m_graph->axisY()->setReversed(true);
         m_graph->axisZ()->setReversed(true);
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
+}
+
+void GraphModifier::testDataOrdering()
+{
+    static int counter = 0;
+    const int rowCount = 20;
+    const int colCount = 20;
+    static QSurface3DSeries *series0 = 0;
+    static QSurface3DSeries *series1 = 0;
+    const float series0min = 0.0f;
+    const float series0max = 50.0f;
+    const float series1min = -20.0f;
+    const float series1max = 30.0f;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "Setup test - both ascending";
+        foreach (QSurface3DSeries *series, m_graph->seriesList())
+            m_graph->removeSeries(series);
+        foreach (QValue3DAxis *axis, m_graph->axes())
+            m_graph->releaseAxis(axis);
+        delete series0;
+        delete series1;
+        series0 = new QSurface3DSeries;
+        series1 = new QSurface3DSeries;
+        populateRisingSeries(series0, rowCount, colCount, series0min, series0max, true, true);
+        populateRisingSeries(series1, rowCount, colCount, series1min, series1max, true, true);
+        m_graph->axisX()->setRange(5.0f, 15.0f);
+        m_graph->axisY()->setRange(-20.0f, 50.0f);
+        m_graph->axisZ()->setRange(5.0f, 15.0f);
+        m_graph->addSeries(series0);
+        m_graph->addSeries(series1);
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Ascending X, descending Z";
+        populateRisingSeries(series0, rowCount, colCount, series0min, series0max, true, false);
+        populateRisingSeries(series1, rowCount, colCount, series1min, series1max, true, false);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Descending X, ascending Z";
+        populateRisingSeries(series0, rowCount, colCount, series0min, series0max, false, true);
+        populateRisingSeries(series1, rowCount, colCount, series1min, series1max, false, true);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Both descending";
+        populateRisingSeries(series0, rowCount, colCount, series0min, series0max, false, false);
+        populateRisingSeries(series1, rowCount, colCount, series1min, series1max, false, false);
     }
         break;
     default:
