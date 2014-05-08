@@ -149,11 +149,11 @@ void GraphDataGenerator::setupModel()
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
     // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    float hours[5][7] = {{2.0f, 1.0f, 3.0f, 0.2f, 1.0f, 5.0f, 10.0f},     // week 1
-                         {0.5f, 1.0f, 3.0f, 1.0f, 2.0f, 2.0f, 3.0f},      // week 2
-                         {1.0f, 1.0f, 2.0f, 1.0f, 4.0f, 4.0f, 4.0f},      // week 3
-                         {0.0f, 1.0f, 0.0f, 0.0f, 2.0f, 2.0f, 0.3f},      // week 4
-                         {3.0f, 3.0f, 6.0f, 2.0f, 2.0f, 1.0f, 1.0f}};     // week 5
+    const char *hours[5][7] = {{"2.0/30", "1.0/30", "3.0/30", "0.2/30", "1.0/30", "5.0/30", "10.0/30"},     // week 1
+                               {"0.5/45", "1.0/45", "3.0/45", "1.0/45", "2.0/45", "2.0/45", "3.0/45"},      // week 2
+                               {"1.0/60", "1.0/60", "2.0/60", "1.0/60", "4.0/60", "4.0/60", "4.0/60"},      // week 3
+                               {"0.0/75", "1.0/75", "0.0/75", "0.0/75", "2.0/75", "2.0/75", "0.3/75"},      // week 4
+                               {"3.0/90", "3.0/90", "6.0/90", "2.0/90", "2.0/90", "1.0/90", "1.0/90"}};     // week 5
 
     // Add labels
     m_barGraph->rowAxis()->setTitle("Week of year");
@@ -190,7 +190,8 @@ void GraphDataGenerator::addRow()
     for (int i = 0; i < m_columnCount; i++) {
         QModelIndex index = m_tableWidget->model()->index(0, i);
         m_tableWidget->model()->setData(index,
-            ((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100.0f);
+                                        ((float)i / (float)m_columnCount) / 2.0f
+                                        + (float)(rand() % 30) / 100.0f);
     }
     m_tableWidget->resizeColumnsToContents();
 }
@@ -225,8 +226,12 @@ void GraphDataGenerator::changeSelectedButtonClicked()
     // Change all selected cells to a random value 1-10
     QVariant value = QVariant::fromValue(float((rand() % 10) + 1));
     QList<QTableWidgetItem *> selectedItems = m_tableWidget->selectedItems();
-    foreach (QTableWidgetItem *item, selectedItems)
-        item->setData(Qt::DisplayRole, value);
+    foreach (QTableWidgetItem *item, selectedItems) {
+        item->setData(Qt::DisplayRole,
+                      QString::number(value.toReal())
+                      .append("/")
+                      .append(QString::number(value.toReal() * 10)));
+    }
 }
 
 int main(int argc, char **argv)
@@ -269,6 +274,12 @@ int main(int argc, char **argv)
     QItemModelSurfaceDataProxy *surfaceProxy = new QItemModelSurfaceDataProxy(tableWidget->model());
     barProxy->setUseModelCategories(true);
     surfaceProxy->setUseModelCategories(true);
+    barProxy->setRotationRole(tableWidget->model()->roleNames().value(Qt::DisplayRole));
+    barProxy->setValueRolePattern(QRegExp(QStringLiteral("^(\\d*[\\.\\,]?\\d*)\\/(\\d*[\\.\\,]?\\d*)$")));
+    barProxy->setRotationRolePattern(QRegExp(QStringLiteral("^(\\d*[\\.\\,]?\\d*)\\/(\\d*[\\.\\,]?\\d*)$")));
+    barProxy->setValueRoleReplace(QStringLiteral("\\1"));
+    barProxy->setRotationRoleReplace(QStringLiteral("\\2"));
+    // TODO surface proxy test
     QBar3DSeries *barSeries = new QBar3DSeries(barProxy);
     QSurface3DSeries *surfaceSeries = new QSurface3DSeries(surfaceProxy);
     barSeries->setMesh(QAbstract3DSeries::MeshPyramid);

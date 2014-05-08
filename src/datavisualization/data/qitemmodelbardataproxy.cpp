@@ -50,12 +50,22 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *    and in which order by defining an explicit list of categories for either or both of rows and
  *    columns.
  *
- *    For example, assume that you have a custom QAbstractItemModel for storing various monthly values
- *    related to a business.
- *    Each item in the model has the roles "year", "month", "income", and "expenses".
- *    You could do the following to display the data in a bar graph:
+ * For example, assume that you have a custom QAbstractItemModel for storing various monthly values
+ * related to a business.
+ * Each item in the model has the roles "year", "month", "income", and "expenses".
+ * You could do the following to display the data in a bar graph:
  *
- *    \snippet doc_src_qtdatavisualization.cpp 3
+ * \snippet doc_src_qtdatavisualization.cpp 3
+ *
+ * If the fields of the model do not contain the data in the exact format you need, you can specify
+ * a search pattern regular expression and a replace rule for each role to get the value in a
+ * format you need. For more information how the replace using regular expressions works, see
+ * QString::replace(const QRegExp &rx, const QString &after) function documentation. Note that
+ * using regular expressions has an impact on the performance, so it's more efficient to utilize
+ * item models where doing search and replace is not necessary to get the desired values.
+ *
+ * For example about using the search patterns in conjunction with the roles, see
+ * \l{Qt Quick 2 Bars Example}.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -90,35 +100,36 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty string ItemModelBarDataProxy::rowRole
- * The row role of the mapping.
+ * Defines the item model role to map into row category.
  */
 
 /*!
  * \qmlproperty string ItemModelBarDataProxy::columnRole
- * The column role of the mapping.
+ * Defines the item model role to map into column category.
  */
 
 /*!
  * \qmlproperty string ItemModelBarDataProxy::valueRole
- * The value role of the mapping.
+ * Defines the item model role to map into bar value.
  */
 
 /*!
  * \qmlproperty string ItemModelBarDataProxy::rotationRole
- *
- * Defines the rotation role for the mapping.
+ * Defines the item model role to map into bar rotation angle.
  */
 
 /*!
  * \qmlproperty list<String> ItemModelBarDataProxy::rowCategories
- * The row categories of the mapping. Only items with row roles that are found in this list are
- * included when the data is resolved. The rows are ordered in the same order as they are in this list.
+ * The row categories of the mapping. Only items with row role values that are found in this list
+ * are included when the data is resolved. The rows are ordered in the same order as they are in
+ * this list.
  */
 
 /*!
  * \qmlproperty list<String> ItemModelBarDataProxy::columnCategories
- * The column categories of the mapping. Only items with column roles that are found in this list are
- * included when the data is resolved. The columns are ordered in the same order as they are in this list.
+ * The column categories of the mapping. Only items with column role values that are found in this
+ * list are included when the data is resolved. The columns are ordered in the same order as they
+ * are in this list.
  */
 
 /*!
@@ -140,6 +151,86 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * When set to true, the mapping ignores any explicitly set column categories
  * and overwrites them with automatically generated ones whenever the
  * data from model is resolved. Defaults to \c{true}.
+ */
+
+/*!
+ * \qmlproperty regExp ItemModelBarDataProxy::rowRolePattern
+ * When set, a search and replace is done on the value mapped by row role before it is used as
+ * a row category. This property specifies the regular expression to find the portion of the
+ * mapped value to replace and rowRoleReplace property contains the replacement string.
+ * This is useful for example in parsing row and column categories from a single
+ * timestamp field in the item model.
+ *
+ * \sa rowRole, rowRoleReplace
+ */
+
+/*!
+ * \qmlproperty regExp ItemModelBarDataProxy::columnRolePattern
+ * When set, a search and replace is done on the value mapped by column role before it is used
+ * as a column category. This property specifies the regular expression to find the portion of the
+ * mapped value to replace and columnRoleReplace property contains the replacement string.
+ * This is useful for example in parsing row and column categories from
+ * a single timestamp field in the item model.
+ *
+ * \sa columnRole, columnRoleReplace
+ */
+
+/*!
+ * \qmlproperty regExp ItemModelBarDataProxy::valueRolePattern
+ * When set, a search and replace is done on the value mapped by value role before it is used as
+ * a bar value. This property specifies the regular expression to find the portion of the
+ * mapped value to replace and valueRoleReplace property contains the replacement string.
+ *
+ * \sa valueRole, valueRoleReplace
+ */
+
+/*!
+ * \qmlproperty regExp ItemModelBarDataProxy::rotationRolePattern
+ * When set, a search and replace is done on the value mapped by rotation role before it is used
+ * as a bar rotation angle. This property specifies the regular expression to find the portion
+ * of the mapped value to replace and rotationRoleReplace property contains the replacement string.
+ *
+ * \sa rotationRole, rotationRoleReplace
+ */
+
+/*!
+ * \qmlproperty string ItemModelBarDataProxy::rowRoleReplace
+ * This property defines the replace content to be used in conjunction with rowRolePattern.
+ * Defaults to empty string. For more information on how the search and replace using regular
+ * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * function documentation.
+ *
+ * \sa rowRole, rowRolePattern
+ */
+
+/*!
+ * \qmlproperty string ItemModelBarDataProxy::columnRoleReplace
+ * This property defines the replace content to be used in conjunction with columnRolePattern.
+ * Defaults to empty string. For more information on how the search and replace using regular
+ * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * function documentation.
+ *
+ * \sa columnRole, columnRolePattern
+ */
+
+/*!
+ * \qmlproperty string ItemModelBarDataProxy::valueRoleReplace
+ * This property defines the replace content to be used in conjunction with valueRolePattern.
+ * Defaults to empty string. For more information on how the search and replace using regular
+ * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * function documentation.
+ *
+ * \sa valueRole, valueRolePattern
+ */
+
+/*!
+ * \qmlproperty string ItemModelBarDataProxy::rotationRoleReplace
+ * This property defines the replace content to be used in conjunction with rotationRolePattern.
+ * Defaults to empty string. For more information on how the search and replace using regular
+ * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * function documentation.
+ *
+ * \sa rotationRole, rotationRolePattern
  */
 
 /*!
@@ -506,6 +597,190 @@ int QItemModelBarDataProxy::columnCategoryIndex(const QString &category)
 }
 
 /*!
+ * \property QItemModelBarDataProxy::rowRolePattern
+ *
+ * When set, a search and replace is done on the value mapped by row role before it is used as
+ * a row category. This property specifies the regular expression to find the portion of the
+ * mapped value to replace and rowRoleReplace property contains the replacement string.
+ * This is useful for example in parsing row and column categories from a single
+ * timestamp field in the item model.
+ *
+ * \sa rowRole, rowRoleReplace
+ */
+void QItemModelBarDataProxy::setRowRolePattern(const QRegExp &pattern)
+{
+    if (dptr()->m_rowRolePattern != pattern) {
+        dptr()->m_rowRolePattern = pattern;
+        emit rowRolePatternChanged(pattern);
+    }
+}
+
+QRegExp QItemModelBarDataProxy::rowRolePattern() const
+{
+    return dptrc()->m_rowRolePattern;
+}
+
+/*!
+ * \property QItemModelBarDataProxy::columnRolePattern
+ *
+ * When set, a search and replace is done on the value mapped by column role before it is used
+ * as a column category. This property specifies the regular expression to find the portion of the
+ * mapped value to replace and columnRoleReplace property contains the replacement string.
+ * This is useful for example in parsing row and column categories from
+ * a single timestamp field in the item model.
+ *
+ * \sa columnRole, columnRoleReplace
+ */
+void QItemModelBarDataProxy::setColumnRolePattern(const QRegExp &pattern)
+{
+    if (dptr()->m_columnRolePattern != pattern) {
+        dptr()->m_columnRolePattern = pattern;
+        emit columnRolePatternChanged(pattern);
+    }
+}
+
+QRegExp QItemModelBarDataProxy::columnRolePattern() const
+{
+    return dptrc()->m_columnRolePattern;
+}
+
+/*!
+ * \property QItemModelBarDataProxy::valueRolePattern
+ *
+ * When set, a search and replace is done on the value mapped by value role before it is used as
+ * a bar value. This property specifies the regular expression to find the portion of the
+ * mapped value to replace and valueRoleReplace property contains the replacement string.
+ *
+ * \sa valueRole, valueRoleReplace
+ */
+void QItemModelBarDataProxy::setValueRolePattern(const QRegExp &pattern)
+{
+    if (dptr()->m_valueRolePattern != pattern) {
+        dptr()->m_valueRolePattern = pattern;
+        emit valueRolePatternChanged(pattern);
+    }
+}
+
+QRegExp QItemModelBarDataProxy::valueRolePattern() const
+{
+    return dptrc()->m_valueRolePattern;
+}
+
+/*!
+ * \property QItemModelBarDataProxy::rotationRolePattern
+ *
+ * When set, a search and replace is done on the value mapped by rotation role before it is used
+ * as a bar rotation angle. This property specifies the regular expression to find the portion
+ * of the mapped value to replace and rotationRoleReplace property contains the replacement string.
+ *
+ * \sa rotationRole, rotationRoleReplace
+ */
+void QItemModelBarDataProxy::setRotationRolePattern(const QRegExp &pattern)
+{
+    if (dptr()->m_rotationRolePattern != pattern) {
+        dptr()->m_rotationRolePattern = pattern;
+        emit rotationRolePatternChanged(pattern);
+    }
+}
+
+QRegExp QItemModelBarDataProxy::rotationRolePattern() const
+{
+    return dptrc()->m_rotationRolePattern;
+}
+
+/*!
+ * \property QItemModelBarDataProxy::rowRoleReplace
+ *
+ * This property defines the replace content to be used in conjunction with rowRolePattern.
+ * Defaults to empty string. For more information on how the search and replace using regular
+ * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * function documentation.
+ *
+ * \sa rowRole, rowRolePattern
+ */
+void QItemModelBarDataProxy::setRowRoleReplace(const QString &replace)
+{
+    if (dptr()->m_rowRoleReplace != replace) {
+        dptr()->m_rowRoleReplace = replace;
+        emit rowRoleReplaceChanged(replace);
+    }
+}
+
+QString QItemModelBarDataProxy::rowRoleReplace() const
+{
+    return dptrc()->m_rowRoleReplace;
+}
+
+/*!
+ * \property QItemModelBarDataProxy::columnRoleReplace
+ *
+ * This property defines the replace content to be used in conjunction with columnRolePattern.
+ * Defaults to empty string. For more information on how the search and replace using regular
+ * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * function documentation.
+ *
+ * \sa columnRole, columnRolePattern
+ */
+void QItemModelBarDataProxy::setColumnRoleReplace(const QString &replace)
+{
+    if (dptr()->m_columnRoleReplace != replace) {
+        dptr()->m_columnRoleReplace = replace;
+        emit columnRoleReplaceChanged(replace);
+    }
+}
+
+QString QItemModelBarDataProxy::columnRoleReplace() const
+{
+    return dptrc()->m_columnRoleReplace;
+}
+
+/*!
+ * \property QItemModelBarDataProxy::valueRoleReplace
+ *
+ * This property defines the replace content to be used in conjunction with valueRolePattern.
+ * Defaults to empty string. For more information on how the search and replace using regular
+ * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * function documentation.
+ *
+ * \sa valueRole, valueRolePattern
+ */
+void QItemModelBarDataProxy::setValueRoleReplace(const QString &replace)
+{
+    if (dptr()->m_valueRoleReplace != replace) {
+        dptr()->m_valueRoleReplace = replace;
+        emit valueRoleReplaceChanged(replace);
+    }
+}
+
+QString QItemModelBarDataProxy::valueRoleReplace() const
+{
+    return dptrc()->m_valueRoleReplace;
+}
+
+/*!
+ * \property QItemModelBarDataProxy::rotationRoleReplace
+ *
+ * This property defines the replace content to be used in conjunction with rotationRolePattern.
+ * Defaults to empty string. For more information on how the search and replace using regular
+ * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * function documentation.
+ *
+ * \sa rotationRole, rotationRolePattern
+ */
+void QItemModelBarDataProxy::setRotationRoleReplace(const QString &replace)
+{
+    if (dptr()->m_rotationRoleReplace != replace) {
+        dptr()->m_rotationRoleReplace = replace;
+        emit rotationRoleReplaceChanged(replace);
+    }
+}
+
+QString QItemModelBarDataProxy::rotationRoleReplace() const
+{
+    return dptrc()->m_rotationRoleReplace;
+}
+
+/*!
  * \internal
  */
 QItemModelBarDataProxyPrivate *QItemModelBarDataProxy::dptr()
@@ -563,6 +838,22 @@ void QItemModelBarDataProxyPrivate::connectItemModelHandler()
     QObject::connect(qptr(), &QItemModelBarDataProxy::autoRowCategoriesChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelBarDataProxy::autoColumnCategoriesChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::rowRolePatternChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::columnRolePatternChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::valueRolePatternChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::rotationRolePatternChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::rowRoleReplaceChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::columnRoleReplaceChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::valueRoleReplaceChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::rotationRoleReplaceChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 

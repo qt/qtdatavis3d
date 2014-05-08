@@ -53,6 +53,12 @@ protected:
     int m_columnCount;
     int m_valueRole;
     int m_rotationRole;
+    QRegExp m_valuePattern;
+    QRegExp m_rotationPattern;
+    QString m_valueReplace;
+    QString m_rotationReplace;
+    bool m_haveValuePattern;
+    bool m_haveRotationPattern;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

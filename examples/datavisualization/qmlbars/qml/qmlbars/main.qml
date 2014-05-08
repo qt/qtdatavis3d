@@ -19,7 +19,7 @@
 import QtQuick 2.1
 import QtQuick.Controls 1.0
 import QtQuick.Layouts 1.0
-import QtDataVisualization 1.0
+import QtDataVisualization 1.1
 import QtQuick.Window 2.0
 import "."
 
@@ -50,14 +50,13 @@ Rectangle {
         // Set tableView current row to selected bar
         var rowRole = series.dataProxy.rowLabels[position.x];
         var colRole = series.dataProxy.columnLabels[position.y];
+        var checkTimestamp = rowRole + "-" + colRole
         var currentRow = tableView.currentRow
-        if (currentRow === -1 || rowRole !== graphData.model.get(currentRow).year
-                || colRole !== graphData.model.get(currentRow).month) {
+        if (currentRow === -1 || checkTimestamp !== graphData.model.get(currentRow).timestamp) {
             var totalRows = tableView.rowCount;
             for (var i = 0; i < totalRows; i++) {
-                var currentRowRole = graphData.model.get(i).year
-                var currentColRole = graphData.model.get(i).month
-                if (currentRowRole === rowRole && currentColRole === colRole) {
+                var modelTimestamp = graphData.model.get(i).timestamp
+                if (modelTimestamp === checkTimestamp) {
                     tableView.currentRow = i
                     // Workaround to 5.2 row selection issue
                     if (typeof tableView.selection != "undefined") {
@@ -111,9 +110,13 @@ Rectangle {
                 ItemModelBarDataProxy {
                     id: modelProxy
                     itemModel: graphData.model
-                    rowRole: "year"
-                    columnRole: "month"
+                    rowRole: "timestamp"
+                    columnRole: "timestamp"
                     valueRole: "income"
+                    rowRolePattern: /^(\d\d\d\d).*$/
+                    columnRolePattern: /^.*-(\d\d)$/
+                    rowRoleReplace: "\\1"
+                    columnRoleReplace: "\\1"
                 }
                 //! [3]
 
@@ -136,9 +139,13 @@ Rectangle {
                 ItemModelBarDataProxy {
                     id: secondaryProxy
                     itemModel: graphData.model
-                    rowRole: "year"
-                    columnRole: "month"
+                    rowRole: "timestamp"
+                    columnRole: "timestamp"
                     valueRole: "expenses"
+                    rowRolePattern: /^(\d\d\d\d).*$/
+                    columnRolePattern: /^.*-(\d\d)$/
+                    rowRoleReplace: "\\1"
+                    columnRoleReplace: "\\1"
                 }
                 //! [4]
 
@@ -157,16 +164,42 @@ Rectangle {
         id: tableView
         anchors.top: parent.top
         anchors.left: parent.left
-        TableViewColumn{ role: "year"  ; title: "Year" ; width: tableView.width / 4 }
-        TableViewColumn{ role: "month" ; title: "Month" ; width: tableView.width / 4 }
+        TableViewColumn{ role: "timestamp" ; title: "Month" ; width: tableView.width / 2 }
         TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: tableView.width / 4 }
         TableViewColumn{ role: "income" ; title: "Income" ; width: tableView.width / 4 }
+        itemDelegate: Item {
+            Text {
+                anchors.verticalCenter: parent.verticalCenter
+                width: parent.width
+                anchors.leftMargin: 4
+                anchors.left: parent.left
+                anchors.right: parent.right
+                color: styleData.textColor
+                elide: styleData.elideMode
+                text: styleData.value
+                horizontalAlignment: styleData.textAlignment
+
+                Component.onCompleted: {
+                    if (styleData.column === 0) {
+                        var pattern = /(\d\d\d\d)-(\d\d)/
+                        var matches = pattern.exec(styleData.value)
+                        var colIndex = parseInt(matches[2], 10) - 1
+                        text = matches[1] + " - " + barGraph.columnAxis.labels[colIndex]
+
+                    }
+                }
+            }
+        }
+
         model: graphData.model
 
         //! [2]
         onCurrentRowChanged: {
-            var rowIndex = modelProxy.rowCategoryIndex(graphData.model.get(currentRow).year)
-            var colIndex = modelProxy.columnCategoryIndex(graphData.model.get(currentRow).month)
+            var timestamp = graphData.model.get(currentRow).timestamp
+            var pattern = /(\d\d\d\d)-(\d\d)/
+            var matches = pattern.exec(timestamp)
+            var rowIndex = modelProxy.rowCategoryIndex(matches[1])
+            var colIndex = modelProxy.columnCategoryIndex(matches[2])
             if (selectedSeries.visible)
                 mainview.selectedSeries.selectedBar = Qt.point(rowIndex, colIndex)
             else if (barSeries.visible)

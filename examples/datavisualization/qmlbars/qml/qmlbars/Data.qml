@@ -24,96 +24,96 @@ Item {
     //! [0]
     ListModel {
         id: dataModel
-        ListElement{ year: "2006"; month: "Jan"; expenses: "4";  income: "5" }
-        ListElement{ year: "2006"; month: "Feb"; expenses: "5";  income: "6" }
-        ListElement{ year: "2006"; month: "Mar"; expenses: "7";  income: "4" }
+        ListElement{ timestamp: "2006-01"; expenses: "4";  income: "5" }
+        ListElement{ timestamp: "2006-02"; expenses: "5";  income: "6" }
+        ListElement{ timestamp: "2006-03"; expenses: "7";  income: "4" }
         //! [0]
-        ListElement{ year: "2006"; month: "Apr"; expenses: "3";  income: "2" }
-        ListElement{ year: "2006"; month: "May"; expenses: "4";  income: "1" }
-        ListElement{ year: "2006"; month: "Jun"; expenses: "2";  income: "2" }
-        ListElement{ year: "2006"; month: "Jul"; expenses: "1";  income: "3" }
-        ListElement{ year: "2006"; month: "Aug"; expenses: "5";  income: "1" }
-        ListElement{ year: "2006"; month: "Sep"; expenses: "2";  income: "3" }
-        ListElement{ year: "2006"; month: "Oct"; expenses: "5";  income: "2" }
-        ListElement{ year: "2006"; month: "Nov"; expenses: "8";  income: "5" }
-        ListElement{ year: "2006"; month: "Dec"; expenses: "3";  income: "3" }
+        ListElement{ timestamp: "2006-04"; expenses: "3";  income: "2" }
+        ListElement{ timestamp: "2006-05"; expenses: "4";  income: "1" }
+        ListElement{ timestamp: "2006-06"; expenses: "2";  income: "2" }
+        ListElement{ timestamp: "2006-07"; expenses: "1";  income: "3" }
+        ListElement{ timestamp: "2006-08"; expenses: "5";  income: "1" }
+        ListElement{ timestamp: "2006-09"; expenses: "2";  income: "3" }
+        ListElement{ timestamp: "2006-10"; expenses: "5";  income: "2" }
+        ListElement{ timestamp: "2006-11"; expenses: "8";  income: "5" }
+        ListElement{ timestamp: "2006-12"; expenses: "3";  income: "3" }
 
-        ListElement{ year: "2007"; month: "Jan"; expenses: "3";  income: "1" }
-        ListElement{ year: "2007"; month: "Feb"; expenses: "4";  income: "2" }
-        ListElement{ year: "2007"; month: "Mar"; expenses: "12"; income: "4" }
-        ListElement{ year: "2007"; month: "Apr"; expenses: "13"; income: "6" }
-        ListElement{ year: "2007"; month: "May"; expenses: "14"; income: "11" }
-        ListElement{ year: "2007"; month: "Jun"; expenses: "7";  income: "7" }
-        ListElement{ year: "2007"; month: "Jul"; expenses: "6";  income: "4" }
-        ListElement{ year: "2007"; month: "Aug"; expenses: "4";  income: "15" }
-        ListElement{ year: "2007"; month: "Sep"; expenses: "2";  income: "18" }
-        ListElement{ year: "2007"; month: "Oct"; expenses: "29"; income: "25" }
-        ListElement{ year: "2007"; month: "Nov"; expenses: "23"; income: "29" }
-        ListElement{ year: "2007"; month: "Dec"; expenses: "5";  income: "9" }
+        ListElement{ timestamp: "2007-01"; expenses: "3";  income: "1" }
+        ListElement{ timestamp: "2007-02"; expenses: "4";  income: "2" }
+        ListElement{ timestamp: "2007-03"; expenses: "12"; income: "4" }
+        ListElement{ timestamp: "2007-04"; expenses: "13"; income: "6" }
+        ListElement{ timestamp: "2007-05"; expenses: "14"; income: "11" }
+        ListElement{ timestamp: "2007-06"; expenses: "7";  income: "7" }
+        ListElement{ timestamp: "2007-07"; expenses: "6";  income: "4" }
+        ListElement{ timestamp: "2007-08"; expenses: "4";  income: "15" }
+        ListElement{ timestamp: "2007-09"; expenses: "2";  income: "18" }
+        ListElement{ timestamp: "2007-10"; expenses: "29"; income: "25" }
+        ListElement{ timestamp: "2007-11"; expenses: "23"; income: "29" }
+        ListElement{ timestamp: "2007-12"; expenses: "5";  income: "9" }
 
-        ListElement{ year: "2008"; month: "Jan"; expenses: "3";  income: "8" }
-        ListElement{ year: "2008"; month: "Feb"; expenses: "8";  income: "14" }
-        ListElement{ year: "2008"; month: "Mar"; expenses: "10"; income: "20" }
-        ListElement{ year: "2008"; month: "Apr"; expenses: "12"; income: "24" }
-        ListElement{ year: "2008"; month: "May"; expenses: "10"; income: "19" }
-        ListElement{ year: "2008"; month: "Jun"; expenses: "5";  income: "8" }
-        ListElement{ year: "2008"; month: "Jul"; expenses: "1";  income: "4" }
-        ListElement{ year: "2008"; month: "Aug"; expenses: "7";  income: "12" }
-        ListElement{ year: "2008"; month: "Sep"; expenses: "4";  income: "16" }
-        ListElement{ year: "2008"; month: "Oct"; expenses: "22"; income: "33" }
-        ListElement{ year: "2008"; month: "Nov"; expenses: "16"; income: "25" }
-        ListElement{ year: "2008"; month: "Dec"; expenses: "2";  income: "7" }
+        ListElement{ timestamp: "2008-01"; expenses: "3";  income: "8" }
+        ListElement{ timestamp: "2008-02"; expenses: "8";  income: "14" }
+        ListElement{ timestamp: "2008-03"; expenses: "10"; income: "20" }
+        ListElement{ timestamp: "2008-04"; expenses: "12"; income: "24" }
+        ListElement{ timestamp: "2008-05"; expenses: "10"; income: "19" }
+        ListElement{ timestamp: "2008-06"; expenses: "5";  income: "8" }
+        ListElement{ timestamp: "2008-07"; expenses: "1";  income: "4" }
+        ListElement{ timestamp: "2008-08"; expenses: "7";  income: "12" }
+        ListElement{ timestamp: "2008-09"; expenses: "4";  income: "16" }
+        ListElement{ timestamp: "2008-10"; expenses: "22"; income: "33" }
+        ListElement{ timestamp: "2008-11"; expenses: "16"; income: "25" }
+        ListElement{ timestamp: "2008-12"; expenses: "2";  income: "7" }
 
-        ListElement{ year: "2009"; month: "Jan"; expenses: "4";  income: "5"  }
-        ListElement{ year: "2009"; month: "Feb"; expenses: "4";  income: "7"  }
-        ListElement{ year: "2009"; month: "Mar"; expenses: "11"; income: "14"  }
-        ListElement{ year: "2009"; month: "Apr"; expenses: "16"; income: "22"  }
-        ListElement{ year: "2009"; month: "May"; expenses: "3";  income: "5"  }
-        ListElement{ year: "2009"; month: "Jun"; expenses: "4";  income: "8"  }
-        ListElement{ year: "2009"; month: "Jul"; expenses: "7";  income: "9"  }
-        ListElement{ year: "2009"; month: "Aug"; expenses: "9";  income: "13"  }
-        ListElement{ year: "2009"; month: "Sep"; expenses: "1";  income: "6"  }
-        ListElement{ year: "2009"; month: "Oct"; expenses: "14"; income: "25"  }
-        ListElement{ year: "2009"; month: "Nov"; expenses: "19"; income: "29"  }
-        ListElement{ year: "2009"; month: "Dec"; expenses: "5";  income: "7"  }
+        ListElement{ timestamp: "2009-01"; expenses: "4";  income: "5"  }
+        ListElement{ timestamp: "2009-02"; expenses: "4";  income: "7"  }
+        ListElement{ timestamp: "2009-03"; expenses: "11"; income: "14"  }
+        ListElement{ timestamp: "2009-04"; expenses: "16"; income: "22"  }
+        ListElement{ timestamp: "2009-05"; expenses: "3";  income: "5"  }
+        ListElement{ timestamp: "2009-06"; expenses: "4";  income: "8"  }
+        ListElement{ timestamp: "2009-07"; expenses: "7";  income: "9"  }
+        ListElement{ timestamp: "2009-08"; expenses: "9";  income: "13"  }
+        ListElement{ timestamp: "2009-09"; expenses: "1";  income: "6"  }
+        ListElement{ timestamp: "2009-10"; expenses: "14"; income: "25"  }
+        ListElement{ timestamp: "2009-11"; expenses: "19"; income: "29"  }
+        ListElement{ timestamp: "2009-12"; expenses: "5";  income: "7"  }
 
-        ListElement{ year: "2010"; month: "Jan"; expenses: "14"; income: "22"  }
-        ListElement{ year: "2010"; month: "Feb"; expenses: "5";  income: "7"  }
-        ListElement{ year: "2010"; month: "Mar"; expenses: "1";  income: "9"  }
-        ListElement{ year: "2010"; month: "Apr"; expenses: "1";  income: "12"  }
-        ListElement{ year: "2010"; month: "May"; expenses: "5";  income: "9"  }
-        ListElement{ year: "2010"; month: "Jun"; expenses: "5";  income: "8"  }
-        ListElement{ year: "2010"; month: "Jul"; expenses: "3";  income: "7"  }
-        ListElement{ year: "2010"; month: "Aug"; expenses: "1";  income: "5"  }
-        ListElement{ year: "2010"; month: "Sep"; expenses: "2";  income: "4"  }
-        ListElement{ year: "2010"; month: "Oct"; expenses: "10"; income: "13"  }
-        ListElement{ year: "2010"; month: "Nov"; expenses: "12"; income: "17"  }
-        ListElement{ year: "2010"; month: "Dec"; expenses: "6";  income: "9"  }
+        ListElement{ timestamp: "2010-01"; expenses: "14"; income: "22"  }
+        ListElement{ timestamp: "2010-02"; expenses: "5";  income: "7"  }
+        ListElement{ timestamp: "2010-03"; expenses: "1";  income: "9"  }
+        ListElement{ timestamp: "2010-04"; expenses: "1";  income: "12"  }
+        ListElement{ timestamp: "2010-05"; expenses: "5";  income: "9"  }
+        ListElement{ timestamp: "2010-06"; expenses: "5";  income: "8"  }
+        ListElement{ timestamp: "2010-07"; expenses: "3";  income: "7"  }
+        ListElement{ timestamp: "2010-08"; expenses: "1";  income: "5"  }
+        ListElement{ timestamp: "2010-09"; expenses: "2";  income: "4"  }
+        ListElement{ timestamp: "2010-10"; expenses: "10"; income: "13"  }
+        ListElement{ timestamp: "2010-11"; expenses: "12"; income: "17"  }
+        ListElement{ timestamp: "2010-12"; expenses: "6";  income: "9"  }
 
-        ListElement{ year: "2011"; month: "Jan"; expenses: "2";  income: "6"  }
-        ListElement{ year: "2011"; month: "Feb"; expenses: "4";  income: "8"  }
-        ListElement{ year: "2011"; month: "Mar"; expenses: "7";  income: "12"  }
-        ListElement{ year: "2011"; month: "Apr"; expenses: "9";  income: "15"  }
-        ListElement{ year: "2011"; month: "May"; expenses: "7";  income: "19"  }
-        ListElement{ year: "2011"; month: "Jun"; expenses: "9";  income: "18"  }
-        ListElement{ year: "2011"; month: "Jul"; expenses: "13"; income: "17"  }
-        ListElement{ year: "2011"; month: "Aug"; expenses: "5";  income: "9"  }
-        ListElement{ year: "2011"; month: "Sep"; expenses: "3";  income: "8"  }
-        ListElement{ year: "2011"; month: "Oct"; expenses: "13"; income: "15"  }
-        ListElement{ year: "2011"; month: "Nov"; expenses: "8";  income: "17"  }
-        ListElement{ year: "2011"; month: "Dec"; expenses: "7";  income: "10"  }
+        ListElement{ timestamp: "2011-01"; expenses: "2";  income: "6"  }
+        ListElement{ timestamp: "2011-02"; expenses: "4";  income: "8"  }
+        ListElement{ timestamp: "2011-03"; expenses: "7";  income: "12"  }
+        ListElement{ timestamp: "2011-04"; expenses: "9";  income: "15"  }
+        ListElement{ timestamp: "2011-05"; expenses: "7";  income: "19"  }
+        ListElement{ timestamp: "2011-06"; expenses: "9";  income: "18"  }
+        ListElement{ timestamp: "2011-07"; expenses: "13"; income: "17"  }
+        ListElement{ timestamp: "2011-08"; expenses: "5";  income: "9"  }
+        ListElement{ timestamp: "2011-09"; expenses: "3";  income: "8"  }
+        ListElement{ timestamp: "2011-10"; expenses: "13"; income: "15"  }
+        ListElement{ timestamp: "2011-11"; expenses: "8";  income: "17"  }
+        ListElement{ timestamp: "2011-12"; expenses: "7";  income: "10"  }
 
-        ListElement{ year: "2012"; month: "Jan"; expenses: "12";  income: "16"  }
-        ListElement{ year: "2012"; month: "Feb"; expenses: "24";  income: "28"  }
-        ListElement{ year: "2012"; month: "Mar"; expenses: "27";  income: "22"  }
-        ListElement{ year: "2012"; month: "Apr"; expenses: "29";  income: "25"  }
-        ListElement{ year: "2012"; month: "May"; expenses: "27";  income: "29"  }
-        ListElement{ year: "2012"; month: "Jun"; expenses: "19";  income: "18"  }
-        ListElement{ year: "2012"; month: "Jul"; expenses: "13";  income: "17"  }
-        ListElement{ year: "2012"; month: "Aug"; expenses: "15";  income: "19"  }
-        ListElement{ year: "2012"; month: "Sep"; expenses: "3";   income: "8"  }
-        ListElement{ year: "2012"; month: "Oct"; expenses: "3";   income: "6"  }
-        ListElement{ year: "2012"; month: "Nov"; expenses: "4";   income: "8"  }
-        ListElement{ year: "2012"; month: "Dec"; expenses: "5";   income: "9"  }
+        ListElement{ timestamp: "2012-01"; expenses: "12";  income: "16"  }
+        ListElement{ timestamp: "2012-02"; expenses: "24";  income: "28"  }
+        ListElement{ timestamp: "2012-03"; expenses: "27";  income: "22"  }
+        ListElement{ timestamp: "2012-04"; expenses: "29";  income: "25"  }
+        ListElement{ timestamp: "2012-05"; expenses: "27";  income: "29"  }
+        ListElement{ timestamp: "2012-06"; expenses: "19";  income: "18"  }
+        ListElement{ timestamp: "2012-07"; expenses: "13";  income: "17"  }
+        ListElement{ timestamp: "2012-08"; expenses: "15";  income: "19"  }
+        ListElement{ timestamp: "2012-09"; expenses: "3";   income: "8"  }
+        ListElement{ timestamp: "2012-10"; expenses: "3";   income: "6"  }
+        ListElement{ timestamp: "2012-11"; expenses: "4";   income: "8"  }
+        ListElement{ timestamp: "2012-12"; expenses: "5";   income: "9"  }
     }
 }
