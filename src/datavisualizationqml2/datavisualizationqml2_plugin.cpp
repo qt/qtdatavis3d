@@ -94,6 +94,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
                                                     QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
     qmlRegisterType<QItemModelBarDataProxy, 1>(uri, 1, 1, "ItemModelBarDataProxy");
     qmlRegisterType<QItemModelSurfaceDataProxy, 1>(uri, 1, 1, "ItemModelSurfaceDataProxy");
+    qmlRegisterType<QItemModelScatterDataProxy, 1>(uri, 1, 1, "ItemModelScatterDataProxy");
 
     // New types
     qmlRegisterType<QValue3DAxisFormatter>(uri, 1, 1, "ValueAxis3DFormatter");

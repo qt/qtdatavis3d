@@ -22,6 +22,7 @@
 #include <QtDataVisualization/qscatterdataproxy.h>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QString>
+#include <QtCore/QRegExp>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -35,6 +36,14 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelScatterDataProxy : public QScatterDa
     Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole NOTIFY yPosRoleChanged)
     Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole NOTIFY zPosRoleChanged)
     Q_PROPERTY(QString rotationRole READ rotationRole WRITE setRotationRole NOTIFY rotationRoleChanged)
+    Q_PROPERTY(QRegExp xPosRolePattern READ xPosRolePattern WRITE setXPosRolePattern NOTIFY xPosRolePatternChanged REVISION 1)
+    Q_PROPERTY(QRegExp yPosRolePattern READ yPosRolePattern WRITE setYPosRolePattern NOTIFY yPosRolePatternChanged REVISION 1)
+    Q_PROPERTY(QRegExp zPosRolePattern READ zPosRolePattern WRITE setZPosRolePattern NOTIFY zPosRolePatternChanged REVISION 1)
+    Q_PROPERTY(QRegExp rotationRolePattern READ rotationRolePattern WRITE setRotationRolePattern NOTIFY rotationRolePatternChanged REVISION 1)
+    Q_PROPERTY(QString xPosRoleReplace READ xPosRoleReplace WRITE setXPosRoleReplace NOTIFY xPosRoleReplaceChanged REVISION 1)
+    Q_PROPERTY(QString yPosRoleReplace READ yPosRoleReplace WRITE setYPosRoleReplace NOTIFY yPosRoleReplaceChanged REVISION 1)
+    Q_PROPERTY(QString zPosRoleReplace READ zPosRoleReplace WRITE setZPosRoleReplace NOTIFY zPosRoleReplaceChanged REVISION 1)
+    Q_PROPERTY(QString rotationRoleReplace READ rotationRoleReplace WRITE setRotationRoleReplace NOTIFY rotationRoleReplaceChanged REVISION 1)
 
 public:
     explicit QItemModelScatterDataProxy(QObject *parent = 0);
@@ -63,12 +72,38 @@ public:
     void remap(const QString &xPosRole, const QString &yPosRole, const QString &zPosRole,
                const QString &rotationRole);
 
+    void setXPosRolePattern(const QRegExp &pattern);
+    QRegExp xPosRolePattern() const;
+    void setYPosRolePattern(const QRegExp &pattern);
+    QRegExp yPosRolePattern() const;
+    void setZPosRolePattern(const QRegExp &pattern);
+    QRegExp zPosRolePattern() const;
+    void setRotationRolePattern(const QRegExp &pattern);
+    QRegExp rotationRolePattern() const;
+
+    void setXPosRoleReplace(const QString &replace);
+    QString xPosRoleReplace() const;
+    void setYPosRoleReplace(const QString &replace);
+    QString yPosRoleReplace() const;
+    void setZPosRoleReplace(const QString &replace);
+    QString zPosRoleReplace() const;
+    void setRotationRoleReplace(const QString &replace);
+    QString rotationRoleReplace() const;
+
 signals:
     void itemModelChanged(const QAbstractItemModel* itemModel);
     void xPosRoleChanged(const QString &role);
     void yPosRoleChanged(const QString &role);
     void zPosRoleChanged(const QString &role);
     void rotationRoleChanged(const QString &role);
+    Q_REVISION(1) void xPosRolePatternChanged(const QRegExp &pattern);
+    Q_REVISION(1) void yPosRolePatternChanged(const QRegExp &pattern);
+    Q_REVISION(1) void zPosRolePatternChanged(const QRegExp &pattern);
+    Q_REVISION(1) void rotationRolePatternChanged(const QRegExp &pattern);
+    Q_REVISION(1) void rotationRoleReplaceChanged(const QString &replace);
+    Q_REVISION(1) void xPosRoleReplaceChanged(const QString &replace);
+    Q_REVISION(1) void yPosRoleReplaceChanged(const QString &replace);
+    Q_REVISION(1) void zPosRoleReplaceChanged(const QString &replace);
 
 protected:
     QItemModelScatterDataProxyPrivate *dptr();

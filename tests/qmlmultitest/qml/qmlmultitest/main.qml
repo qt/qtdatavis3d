@@ -144,19 +144,22 @@ Rectangle {
 
                 Scatter3DSeries {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
+                    mesh: Abstract3DSeries.MeshCube
                     ItemModelScatterDataProxy {
                         itemModel: data.sharedData
                         // Mapping model roles to scatter series item coordinates.
                         xPosRole: "data"
                         zPosRole: "data"
                         yPosRole: "data"
-                        // TODO scatter test
-//                        xPosRolePattern: /^([asd]*)([fgh]*)([jkl]*)[^\/]*\/([^\/]*)\/.*$/
-//                        yPosRolePattern: /^([^\/]*)\/([^\/]*)\/(.*)$/
-//                        zPosRolePattern: /^([asd]*)([qwe]*)([tyu]*)([fgj]*)([^\/]*)\/[^\/]*\/.*$/
-//                        xPosRoleReplace: "\\4"
-//                        yPosRoleReplace: "\\3"
-//                        zPosRoleReplace: "\\5"
+                        rotationRole: "coords"
+                        xPosRolePattern: /^([asd]*)([fgh]*)([jkl]*)[^\/]*\/([^\/]*)\/.*$/
+                        yPosRolePattern: /^([^\/]*)\/([^\/]*)\/(.*)$/
+                        zPosRolePattern: /^([asd]*)([qwe]*)([tyu]*)([fgj]*)([^\/]*)\/[^\/]*\/.*$/
+                        rotationRolePattern: /(\d)\,(\d)/
+                        xPosRoleReplace: "\\4"
+                        yPosRoleReplace: "\\3"
+                        zPosRoleReplace: "\\5"
+                        rotationRoleReplace: "@\\2\\1,0,1,0"
                     }
                 }
             }

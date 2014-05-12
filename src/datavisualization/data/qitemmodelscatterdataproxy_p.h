@@ -54,6 +54,16 @@ private:
     QString m_zPosRole;
     QString m_rotationRole;
 
+    QRegExp m_xPosRolePattern;
+    QRegExp m_yPosRolePattern;
+    QRegExp m_zPosRolePattern;
+    QRegExp m_rotationRolePattern;
+
+    QString m_xPosRoleReplace;
+    QString m_yPosRoleReplace;
+    QString m_zPosRoleReplace;
+    QString m_rotationRoleReplace;
+
     friend class ScatterItemModelHandler;
     friend class QItemModelScatterDataProxy;
 };

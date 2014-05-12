@@ -29,7 +29,11 @@ ScatterItemModelHandler::ScatterItemModelHandler(QItemModelScatterDataProxy *pro
       m_xPosRole(noRoleIndex),
       m_yPosRole(noRoleIndex),
       m_zPosRole(noRoleIndex),
-      m_rotationRole(noRoleIndex)
+      m_rotationRole(noRoleIndex),
+      m_haveXPosPattern(false),
+      m_haveYPosPattern(false),
+      m_haveZPosPattern(false),
+      m_haveRotationPattern(false)
 {
 }
 
@@ -134,17 +138,48 @@ void ScatterItemModelHandler::modelPosToScatterItem(int modelRow, int modelColum
                                                     QScatterDataItem &item)
 {
     QModelIndex index = m_itemModel->index(modelRow, modelColumn);
-    float xPos(0.0f);
-    float yPos(0.0f);
-    float zPos(0.0f);
-    if (m_xPosRole != noRoleIndex)
-        xPos = index.data(m_xPosRole).toFloat();
-    if (m_yPosRole != noRoleIndex)
-        yPos = index.data(m_yPosRole).toFloat();
-    if (m_zPosRole != noRoleIndex)
-        zPos = index.data(m_zPosRole).toFloat();
-    if (m_rotationRole != noRoleIndex)
-        item.setRotation(toQuaternion(index.data(m_rotationRole)));
+    float xPos;
+    float yPos;
+    float zPos;
+    if (m_xPosRole != noRoleIndex) {
+        QVariant xValueVar = index.data(m_xPosRole);
+        if (m_haveXPosPattern)
+            xPos = xValueVar.toString().replace(m_xPosPattern, m_xPosReplace).toFloat();
+        else
+            xPos = xValueVar.toFloat();
+    } else {
+        xPos = 0.0f;
+    }
+    if (m_yPosRole != noRoleIndex) {
+        QVariant yValueVar = index.data(m_yPosRole);
+        if (m_haveYPosPattern)
+            yPos = yValueVar.toString().replace(m_yPosPattern, m_yPosReplace).toFloat();
+        else
+            yPos = yValueVar.toFloat();
+    } else {
+        yPos = 0.0f;
+    }
+    if (m_zPosRole != noRoleIndex) {
+        QVariant zValueVar = index.data(m_zPosRole);
+        if (m_haveZPosPattern)
+            zPos = zValueVar.toString().replace(m_zPosPattern, m_zPosReplace).toFloat();
+        else
+            zPos = zValueVar.toFloat();
+    } else {
+        zPos = 0.0f;
+    }
+    if (m_rotationRole != noRoleIndex) {
+        QVariant rotationVar = index.data(m_rotationRole);
+        if (m_haveRotationPattern) {
+            item.setRotation(
+                        toQuaternion(
+                            QVariant(rotationVar.toString().replace(m_rotationPattern,
+                                                                    m_rotationReplace))));
+        } else {
+            item.setRotation(toQuaternion(rotationVar));
+        }
+    }
+
     item.setPosition(QVector3D(xPos, yPos, zPos));
 }
 
@@ -156,6 +191,19 @@ void ScatterItemModelHandler::resolveModel()
         m_proxyArray = 0;
         return;
     }
+
+    m_xPosPattern = m_proxy->xPosRolePattern();
+    m_yPosPattern = m_proxy->yPosRolePattern();
+    m_zPosPattern = m_proxy->zPosRolePattern();
+    m_rotationPattern = m_proxy->rotationRolePattern();
+    m_xPosReplace = m_proxy->xPosRoleReplace();
+    m_yPosReplace = m_proxy->yPosRoleReplace();
+    m_zPosReplace = m_proxy->zPosRoleReplace();
+    m_rotationReplace = m_proxy->rotationRoleReplace();
+    m_haveXPosPattern = !m_xPosPattern.isEmpty() && m_xPosPattern.isValid();
+    m_haveYPosPattern = !m_yPosPattern.isEmpty() && m_yPosPattern.isValid();
+    m_haveZPosPattern = !m_zPosPattern.isEmpty() && m_zPosPattern.isValid();
+    m_haveRotationPattern = !m_rotationPattern.isEmpty() && m_rotationPattern.isValid();
 
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
     m_xPosRole = roleHash.key(m_proxy->xPosRole().toLatin1(), noRoleIndex);

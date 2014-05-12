@@ -33,6 +33,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * The data is resolved asynchronously whenever mappings or the model changes.
  * QBarDataProxy::arrayReset() is emitted when the data has been resolved.
+ * However, when useModelCategories property is set to true, single item changes are resolved
+ * synchronously, unless the same frame also contains a change that causes the whole model to be
+ * resolved.
  *
  * There are three ways to use mappings:
  *

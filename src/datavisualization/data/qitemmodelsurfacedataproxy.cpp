@@ -33,6 +33,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * Data is resolved asynchronously whenever the mapping or the model changes.
  * QSurfaceDataProxy::arrayReset() is emitted when the data has been resolved.
+ * However, when useModelCategories property is set to true, single item changes are resolved
+ * synchronously, unless the same frame also contains a change that causes the whole model to be
+ * resolved.
  *
  * There are three ways to use mappings:
  *
