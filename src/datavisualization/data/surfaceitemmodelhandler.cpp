@@ -28,7 +28,10 @@ SurfaceItemModelHandler::SurfaceItemModelHandler(QItemModelSurfaceDataProxy *pro
       m_proxyArray(0),
       m_xPosRole(noRoleIndex),
       m_yPosRole(noRoleIndex),
-      m_zPosRole(noRoleIndex)
+      m_zPosRole(noRoleIndex),
+      m_haveXPosPattern(false),
+      m_haveYPosPattern(false),
+      m_haveZPosPattern(false)
 {
 }
 
@@ -53,21 +56,38 @@ void SurfaceItemModelHandler::handleDataChanged(const QModelIndex &topLeft,
 
             for (int i = startRow; i <= endRow; i++) {
                 for (int j = startCol; j <= endCol; j++) {
+                    QModelIndex index = m_itemModel->index(i, j);
                     QSurfaceDataItem item;
+                    QVariant xValueVar = index.data(m_xPosRole);
+                    QVariant yValueVar = index.data(m_yPosRole);
+                    QVariant zValueVar = index.data(m_zPosRole);
                     const QSurfaceDataItem *oldItem = m_proxy->itemAt(i, j);
                     float xPos;
+                    float yPos;
                     float zPos;
-                    if (m_xPosRole != noRoleIndex)
-                        xPos = m_itemModel->index(i, j).data(m_xPosRole).toFloat();
-                    else
+                    if (m_xPosRole != noRoleIndex) {
+                        if (m_haveXPosPattern)
+                            xPos = xValueVar.toString().replace(m_xPosPattern, m_xPosReplace).toFloat();
+                        else
+                            xPos = xValueVar.toFloat();
+                    } else {
                         xPos = oldItem->x();
-                    if (m_zPosRole != noRoleIndex)
-                        zPos = m_itemModel->index(i, j).data(m_zPosRole).toFloat();
+                    }
+
+                    if (m_haveYPosPattern)
+                        yPos = yValueVar.toString().replace(m_yPosPattern, m_yPosReplace).toFloat();
                     else
+                        yPos = yValueVar.toFloat();
+
+                    if (m_zPosRole != noRoleIndex) {
+                        if (m_haveZPosPattern)
+                            zPos = zValueVar.toString().replace(m_zPosPattern, m_zPosReplace).toFloat();
+                        else
+                            zPos = zValueVar.toFloat();
+                    } else {
                         zPos = oldItem->z();
-                    item.setPosition(QVector3D(xPos,
-                                               m_itemModel->index(i, j).data(m_yPosRole).toFloat(),
-                                               zPos));
+                    }
+                    item.setPosition(QVector3D(xPos, yPos, zPos));
                     m_proxy->setItem(i, j, item);
                 }
             }
@@ -91,6 +111,23 @@ void SurfaceItemModelHandler::resolveModel()
         return;
     }
 
+    // Position patterns can be reused on single item changes, so store them to member variables.
+    QRegExp rowPattern(m_proxy->rowRolePattern());
+    QRegExp colPattern(m_proxy->columnRolePattern());
+    m_xPosPattern = m_proxy->xPosRolePattern();
+    m_yPosPattern = m_proxy->yPosRolePattern();
+    m_zPosPattern = m_proxy->zPosRolePattern();
+    QString rowReplace = m_proxy->rowRoleReplace();
+    QString colReplace = m_proxy->columnRoleReplace();
+    m_xPosReplace = m_proxy->xPosRoleReplace();
+    m_yPosReplace = m_proxy->yPosRoleReplace();
+    m_zPosReplace = m_proxy->zPosRoleReplace();
+    bool haveRowPattern = !rowPattern.isEmpty() && rowPattern.isValid();
+    bool haveColPattern = !colPattern.isEmpty() && colPattern.isValid();
+    m_haveXPosPattern = !m_xPosPattern.isEmpty() && m_xPosPattern.isValid();
+    m_haveYPosPattern = !m_yPosPattern.isEmpty() && m_yPosPattern.isValid();
+    m_haveZPosPattern = !m_zPosPattern.isEmpty() && m_zPosPattern.isValid();
+
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
     // Default to display role if no mapping
@@ -112,32 +149,49 @@ void SurfaceItemModelHandler::resolveModel()
         for (int i = 0; i < rowCount; i++) {
             QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
             for (int j = 0; j < columnCount; j++) {
-                float xPos = float(j);
-                float zPos = float(i);
+                QModelIndex index = m_itemModel->index(i, j);
+                QVariant xValueVar = index.data(m_xPosRole);
+                QVariant yValueVar = index.data(m_yPosRole);
+                QVariant zValueVar = index.data(m_zPosRole);
+                float xPos;
+                float yPos;
+                float zPos;
                 if (m_xPosRole != noRoleIndex) {
-                    xPos = m_itemModel->index(i, j).data(m_xPosRole).toFloat();
+                    if (m_haveXPosPattern)
+                        xPos = xValueVar.toString().replace(m_xPosPattern, m_xPosReplace).toFloat();
+                    else
+                        xPos = xValueVar.toFloat();
                 } else {
                     QString header = m_itemModel->headerData(j, Qt::Horizontal).toString();
                     bool ok = false;
                     float headerValue = header.toFloat(&ok);
                     if (ok)
                         xPos = headerValue;
+                    else
+                        xPos = float(j);
                 }
 
+                if (m_haveYPosPattern)
+                    yPos = yValueVar.toString().replace(m_yPosPattern, m_yPosReplace).toFloat();
+                else
+                    yPos = yValueVar.toFloat();
+
                 if (m_zPosRole != noRoleIndex) {
-                    zPos = m_itemModel->index(i, j).data(m_zPosRole).toFloat();
+                    if (m_haveZPosPattern)
+                        zPos = zValueVar.toString().replace(m_zPosPattern, m_zPosReplace).toFloat();
+                    else
+                        zPos = zValueVar.toFloat();
                 } else {
                     QString header = m_itemModel->headerData(i, Qt::Vertical).toString();
                     bool ok = false;
                     float headerValue = header.toFloat(&ok);
                     if (ok)
                         zPos = headerValue;
+                    else
+                        zPos = float(i);
                 }
 
-                newProxyRow[j].setPosition(
-                            QVector3D(xPos,
-                                      m_itemModel->index(i, j).data(m_yPosRole).toFloat(),
-                                      zPos));
+                newProxyRow[j].setPosition(QVector3D(xPos, yPos, zPos));
             }
         }
     } else {
@@ -165,10 +219,31 @@ void SurfaceItemModelHandler::resolveModel()
             for (int j = 0; j < columnCount; j++) {
                 QModelIndex index = m_itemModel->index(i, j);
                 QString rowRoleStr = index.data(rowRole).toString();
+                if (haveRowPattern)
+                    rowRoleStr.replace(rowPattern, rowReplace);
                 QString columnRoleStr = index.data(columnRole).toString();
-                QVector3D itemPos(index.data(m_xPosRole).toFloat(),
-                                  index.data(m_yPosRole).toFloat(),
-                                  index.data(m_zPosRole).toFloat());
+                if (haveColPattern)
+                    columnRoleStr.replace(colPattern, colReplace);
+                QVariant xValueVar = index.data(m_xPosRole);
+                QVariant yValueVar = index.data(m_yPosRole);
+                QVariant zValueVar = index.data(m_zPosRole);
+                float xPos;
+                float yPos;
+                float zPos;
+                if (m_haveXPosPattern)
+                    xPos = xValueVar.toString().replace(m_xPosPattern, m_xPosReplace).toFloat();
+                else
+                    xPos = xValueVar.toFloat();
+                if (m_haveYPosPattern)
+                    yPos = yValueVar.toString().replace(m_yPosPattern, m_yPosReplace).toFloat();
+                else
+                    yPos = yValueVar.toFloat();
+                if (m_haveZPosPattern)
+                    zPos = zValueVar.toString().replace(m_zPosPattern, m_zPosReplace).toFloat();
+                else
+                    zPos = zValueVar.toFloat();
+
+                QVector3D itemPos(xPos, yPos, zPos);
                 itemValueMap[rowRoleStr][columnRoleStr] = itemPos;
                 if (generateRows && !rowListHash.value(rowRoleStr, false)) {
                     rowListHash.insert(rowRoleStr, true);

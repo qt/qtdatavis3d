@@ -15,7 +15,8 @@ SUBDIRS += barstest \
            multigraphs \
            directional \
            qmlmultiwindow \
-           itemmodeltest
+           itemmodeltest \
+           qmlmultitest
 
 #SUBDIRS += kinectsurface
 

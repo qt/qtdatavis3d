@@ -49,9 +49,6 @@ public:
 
     void setupModel();
     void addRow();
-    void changeStyle();
-    void changePresetCamera();
-    void changeTheme();
     void start();
     void selectFromTable(const QPoint &selection);
     void selectedFromTable(int currentRow, int currentColumn, int previousRow, int previousColumn);
@@ -148,12 +145,14 @@ void GraphDataGenerator::setupModel()
     QStringList weeks;
     weeks << "week 1" << "week 2" << "week 3" << "week 4" << "week 5";
 
-    // Set up data         Mon  Tue  Wed  Thu  Fri  Sat  Sun
-    const char *hours[5][7] = {{"2.0/30", "1.0/30", "3.0/30", "0.2/30", "1.0/30", "5.0/30", "10.0/30"},     // week 1
-                               {"0.5/45", "1.0/45", "3.0/45", "1.0/45", "2.0/45", "2.0/45", "3.0/45"},      // week 2
-                               {"1.0/60", "1.0/60", "2.0/60", "1.0/60", "4.0/60", "4.0/60", "4.0/60"},      // week 3
-                               {"0.0/75", "1.0/75", "0.0/75", "0.0/75", "2.0/75", "2.0/75", "0.3/75"},      // week 4
-                               {"3.0/90", "3.0/90", "6.0/90", "2.0/90", "2.0/90", "1.0/90", "1.0/90"}};     // week 5
+    // Set up data
+    const char *hours[5][7] =
+    //    Mon            Tue            Wed            Thu            Fri            Sat            Sun
+        {{"9/10/2.0/30", "9/11/1.0/30", "9/12/3.0/30", "9/13/0.2/30", "9/14/1.0/30", "9/15/5.0/30", "9/16/10.0/30"},     // week 1
+         {"8/10/0.5/45", "8/11/1.0/45", "8/12/3.0/45", "8/13/1.0/45", "8/14/2.0/45", "8/15/2.0/45", "8/16/3.0/45"},      // week 2
+         {"7/10/1.0/60", "7/11/1.0/60", "7/12/2.0/60", "7/13/1.0/60", "7/14/4.0/60", "7/15/4.0/60", "7/16/4.0/60"},      // week 3
+         {"6/10/0.0/75", "6/11/1.0/75", "6/12/0.0/75", "6/13/0.0/75", "6/14/2.0/75", "6/15/2.0/75", "6/16/0.3/75"},      // week 4
+         {"5/10/3.0/90", "5/11/3.0/90", "5/12/6.0/90", "5/13/2.0/90", "5/14/2.0/90", "5/15/1.0/90", "5/16/1.0/90"}};     // week 5
 
     // Add labels
     m_barGraph->rowAxis()->setTitle("Week of year");
@@ -275,16 +274,26 @@ int main(int argc, char **argv)
     barProxy->setUseModelCategories(true);
     surfaceProxy->setUseModelCategories(true);
     barProxy->setRotationRole(tableWidget->model()->roleNames().value(Qt::DisplayRole));
-    barProxy->setValueRolePattern(QRegExp(QStringLiteral("^(\\d*[\\.\\,]?\\d*)\\/(\\d*[\\.\\,]?\\d*)$")));
-    barProxy->setRotationRolePattern(QRegExp(QStringLiteral("^(\\d*[\\.\\,]?\\d*)\\/(\\d*[\\.\\,]?\\d*)$")));
-    barProxy->setValueRoleReplace(QStringLiteral("\\1"));
-    barProxy->setRotationRoleReplace(QStringLiteral("\\2"));
-    // TODO surface proxy test
+    barProxy->setValueRolePattern(QRegExp(QStringLiteral("^(\\d*)(\\/)(\\d*)\\/(\\d*[\\.\\,]?\\d*)\\/\\d*[\\.\\,]?\\d*$")));
+    barProxy->setRotationRolePattern(QRegExp(QStringLiteral("^(\\d*)(\\/)\\d*\\/\\d*([\\.\\,]?)\\d*(\\/)(\\d*[\\.\\,]?\\d*)$")));
+    barProxy->setValueRoleReplace(QStringLiteral("\\4"));
+    barProxy->setRotationRoleReplace(QStringLiteral("\\5"));
+    surfaceProxy->setXPosRole(tableWidget->model()->roleNames().value(Qt::DisplayRole));
+    surfaceProxy->setZPosRole(tableWidget->model()->roleNames().value(Qt::DisplayRole));
+    surfaceProxy->setXPosRolePattern(QRegExp(QStringLiteral("^(\\d*)\\/(\\d*)\\/\\d*[\\.\\,]?\\d*\\/\\d*[\\.\\,]?\\d*$")));
+    surfaceProxy->setXPosRoleReplace(QStringLiteral("\\2"));
+    surfaceProxy->setYPosRolePattern(QRegExp(QStringLiteral("^\\d*(\\/)(\\d*)\\/(\\d*[\\.\\,]?\\d*)\\/\\d*[\\.\\,]?\\d*$")));
+    surfaceProxy->setYPosRoleReplace(QStringLiteral("\\3"));
+    surfaceProxy->setZPosRolePattern(QRegExp(QStringLiteral("^(\\d*)(\\/)(\\d*)\\/\\d*[\\.\\,]?\\d*\\/\\d*[\\.\\,]?\\d*$")));
+    surfaceProxy->setZPosRoleReplace(QStringLiteral("\\1"));
     QBar3DSeries *barSeries = new QBar3DSeries(barProxy);
     QSurface3DSeries *surfaceSeries = new QSurface3DSeries(surfaceProxy);
     barSeries->setMesh(QAbstract3DSeries::MeshPyramid);
     barGraph->addSeries(barSeries);
     surfaceGraph->addSeries(surfaceSeries);
+
+    barGraph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetBehind);
+    surfaceGraph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
     GraphDataGenerator generator(barGraph, surfaceGraph, tableWidget);
     QObject::connect(barSeries, &QBar3DSeries::selectedBarChanged, &generator,

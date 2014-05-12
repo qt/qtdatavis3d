@@ -55,8 +55,9 @@ void BarItemModelHandler::handleDataChanged(const QModelIndex &topLeft,
 
             for (int i = startRow; i <= endRow; i++) {
                 for (int j = startCol; j <= endCol; j++) {
+                    QModelIndex index = m_itemModel->index(i, j);
                     QBarDataItem item;
-                    QVariant valueVar = m_itemModel->index(i, j).data(m_valueRole);
+                    QVariant valueVar = index.data(m_valueRole);
                     float value;
                     if (m_haveValuePattern)
                         value = valueVar.toString().replace(m_valuePattern, m_valueReplace).toFloat();
@@ -64,7 +65,7 @@ void BarItemModelHandler::handleDataChanged(const QModelIndex &topLeft,
                         value = valueVar.toFloat();
                     item.setValue(value);
                     if (m_rotationRole != noRoleIndex) {
-                        QVariant rotationVar = m_itemModel->index(i, j).data(m_rotationRole);
+                        QVariant rotationVar = index.data(m_rotationRole);
                         float rotation;
                         if (m_haveRotationPattern) {
                             rotation = rotationVar.toString().replace(m_rotationPattern,
@@ -133,7 +134,8 @@ void BarItemModelHandler::resolveModel()
         for (int i = 0; i < rowCount; i++) {
             QBarDataRow &newProxyRow = *m_proxyArray->at(i);
             for (int j = 0; j < columnCount; j++) {
-                QVariant valueVar = m_itemModel->index(i, j).data(m_valueRole);
+                QModelIndex index = m_itemModel->index(i, j);
+                QVariant valueVar = index.data(m_valueRole);
                 float value;
                 if (m_haveValuePattern)
                     value = valueVar.toString().replace(m_valuePattern, m_valueReplace).toFloat();
@@ -141,7 +143,7 @@ void BarItemModelHandler::resolveModel()
                     value = valueVar.toFloat();
                 newProxyRow[j].setValue(value);
                 if (m_rotationRole != noRoleIndex) {
-                    QVariant rotationVar = m_itemModel->index(i, j).data(m_rotationRole);
+                    QVariant rotationVar = index.data(m_rotationRole);
                     float rotation;
                     if (m_haveRotationPattern) {
                         rotation = rotationVar.toString().replace(m_rotationPattern,

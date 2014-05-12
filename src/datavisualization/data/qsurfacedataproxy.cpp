@@ -521,10 +521,14 @@ void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
     minValues.setY(min);
     maxValues.setY(max);
     if (columns) {
-        minValues.setX(m_dataArray->at(0)->at(0).x());
-        minValues.setZ(m_dataArray->at(0)->at(0).z());
-        maxValues.setX(m_dataArray->at(0)->last().x());
-        maxValues.setZ(m_dataArray->last()->at(0).z());
+        float xLow = m_dataArray->at(0)->at(0).x();
+        float xHigh = m_dataArray->at(0)->last().x();
+        float zLow = m_dataArray->at(0)->at(0).z();
+        float zHigh = m_dataArray->last()->at(0).z();
+        minValues.setX(qMin(xLow, xHigh));
+        minValues.setZ(qMin(zLow, zHigh));
+        maxValues.setX(qMax(xLow, xHigh));
+        maxValues.setZ(qMax(zLow, zHigh));
     } else {
         minValues.setX(0.0f);
         minValues.setZ(0.0f);

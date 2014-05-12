@@ -64,6 +64,18 @@ private:
     bool m_autoRowCategories;
     bool m_autoColumnCategories;
 
+    QRegExp m_rowRolePattern;
+    QRegExp m_columnRolePattern;
+    QRegExp m_xPosRolePattern;
+    QRegExp m_yPosRolePattern;
+    QRegExp m_zPosRolePattern;
+
+    QString m_rowRoleReplace;
+    QString m_columnRoleReplace;
+    QString m_xPosRoleReplace;
+    QString m_yPosRoleReplace;
+    QString m_zPosRoleReplace;
+
     friend class SurfaceItemModelHandler;
     friend class QItemModelSurfaceDataProxy;
 };

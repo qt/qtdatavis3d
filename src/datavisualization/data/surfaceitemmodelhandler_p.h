@@ -53,6 +53,15 @@ protected:
     int m_xPosRole;
     int m_yPosRole;
     int m_zPosRole;
+    QRegExp m_xPosPattern;
+    QRegExp m_yPosPattern;
+    QRegExp m_zPosPattern;
+    QString m_xPosReplace;
+    QString m_yPosReplace;
+    QString m_zPosReplace;
+    bool m_haveXPosPattern;
+    bool m_haveYPosPattern;
+    bool m_haveZPosPattern;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION
