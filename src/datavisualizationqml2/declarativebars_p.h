@@ -88,7 +88,6 @@ public:
     Q_INVOKABLE void insertSeries(int index, QBar3DSeries *series);
     void setPrimarySeries(QBar3DSeries *series);
     QBar3DSeries *primarySeries() const;
-
     QBar3DSeries *selectedSeries() const;
 
 public slots:

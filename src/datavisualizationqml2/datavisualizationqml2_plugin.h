@@ -45,6 +45,7 @@
 #include "qabstract3dinputhandler.h"
 #include "declarativecolor_p.h"
 #include "declarativescene_p.h"
+#include "qcustom3ditem.h"
 
 #include <QtQml/QQmlExtensionPlugin>
 
@@ -95,6 +96,8 @@ QML_DECLARE_TYPE(Q3DTheme)
 QML_DECLARE_TYPE(DeclarativeTheme3D)
 
 QML_DECLARE_TYPE(QAbstract3DInputHandler)
+
+QML_DECLARE_TYPE(QCustom3DItem)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

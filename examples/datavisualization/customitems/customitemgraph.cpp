@@ -19,6 +19,7 @@
 #include "customitemgraph.h"
 
 #include <QtDataVisualization/Q3DTheme>
+#include <QtDataVisualization/QCustom3DItem>
 #include <QtGui/QImage>
 
 using namespace QtDataVisualization;
@@ -104,15 +105,18 @@ void CustomItemGraph::toggleItemOne(bool show)
         color.fill(Qt::red);
         //! [0]
         //! [2]
-        m_graph->addCustomItem(":/items/oilrig.obj", positionOne,
-                               QVector3D(0.025f, 0.025f, 0.025f),
-                               QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
-                               color);
+        QCustom3DItem *item = new QCustom3DItem(":/items/oilrig.obj", positionOne,
+                                                QVector3D(0.025f, 0.025f, 0.025f),
+                                                QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 45.0f),
+                                                color);
         //! [2]
+        //! [3]
+        m_graph->addCustomItem(item);
+        //! [3]
     } else {
-        //! [3]
+        //! [4]
         m_graph->removeCustomItemAt(positionOne);
-        //! [3]
+        //! [4]
     }
 }
 
@@ -122,10 +126,13 @@ void CustomItemGraph::toggleItemTwo(bool show)
     if (show) {
         QImage color = QImage(2, 2, QImage::Format_ARGB32);
         color.fill(Qt::red);
-        m_graph->addCustomItem(":/items/oilrig.obj", positionTwo,
-                               QVector3D(0.025f, 0.025f, 0.025f),
-                               QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 25.0f),
-                               color);
+        QCustom3DItem *item = new QCustom3DItem();
+        item->setMeshFile(":/items/oilrig.obj");
+        item->setPosition(positionTwo);
+        item->setScaling(QVector3D(0.025f, 0.025f, 0.025f));
+        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 25.0f));
+        item->setTextureImage(color);
+        m_graph->addCustomItem(item);
     } else {
         m_graph->removeCustomItemAt(positionTwo);
     }
@@ -137,10 +144,13 @@ void CustomItemGraph::toggleItemThree(bool show)
     if (show) {
         QImage color = QImage(2, 2, QImage::Format_ARGB32);
         color.fill(Qt::darkMagenta);
-        m_graph->addCustomItem(":/items/refinery.obj", positionThree,
-                               QVector3D(0.04f, 0.04f, 0.04f),
-                               QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 75.0f),
-                               color);
+        QCustom3DItem *item = new QCustom3DItem();
+        item->setMeshFile(":/items/refinery.obj");
+        item->setPosition(positionThree);
+        item->setScaling(QVector3D(0.04f, 0.04f, 0.04f));
+        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 75.0f));
+        item->setTextureImage(color);
+        m_graph->addCustomItem(item);
     } else {
         m_graph->removeCustomItemAt(positionThree);
     }

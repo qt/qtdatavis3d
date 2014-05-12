@@ -38,7 +38,8 @@ HEADERS += \
     $$PWD/qsurface3dseries.h \
     $$PWD/qsurface3dseries_p.h \
     $$PWD/customrenderitem_p.h \
-    $$PWD/customdataitem_p.h
+    $$PWD/qcustom3ditem.h \
+    $$PWD/qcustom3ditem_p.h
 
 SOURCES += \
     $$PWD/labelitem.cpp \
@@ -65,4 +66,4 @@ SOURCES += \
     $$PWD/qscatter3dseries.cpp \
     $$PWD/qsurface3dseries.cpp \
     $$PWD/customrenderitem.cpp \
-    $$PWD/customdataitem.cpp
+    $$PWD/qcustom3ditem.cpp

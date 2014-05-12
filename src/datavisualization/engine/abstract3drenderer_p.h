@@ -67,7 +67,7 @@ public:
 
     virtual void updateData() = 0;
     virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
-    virtual void updateCustomData(const QList<CustomDataItem *> &customItems);
+    virtual void updateCustomData(const QList<QCustom3DItem *> &customItems);
     virtual SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     virtual void cleanCache(SeriesRenderCache *cache);
     virtual void render(GLuint defaultFboHandle);
@@ -111,7 +111,7 @@ public:
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
-    virtual void addCustomItem(CustomDataItem *item);
+    virtual void addCustomItem(QCustom3DItem *item);
 
     virtual QVector3D convertPositionToTranslation(const QVector3D &position) = 0;
 

@@ -88,7 +88,7 @@ Abstract3DController::~Abstract3DController()
     destroyRenderer();
     delete m_scene;
     delete m_themeManager;
-    foreach (CustomDataItem *item, m_customItems)
+    foreach (QCustom3DItem *item, m_customItems)
         delete item;
     m_customItems.clear();
 }
@@ -851,46 +851,52 @@ void Abstract3DController::requestRender(QOpenGLFramebufferObject *fbo)
     m_renderer->render(fbo->handle());
 }
 
-int Abstract3DController::addCustomItem(const QString &meshFile, const QVector3D &position,
-                                        const QVector3D &scaling, const QQuaternion &rotation,
-                                        const QImage &textureImage)
+int Abstract3DController::addCustomItem(QCustom3DItem *item)
 {
-    CustomDataItem *newItem = new CustomDataItem();
-    newItem->setMeshFile(meshFile);
-    newItem->setPosition(position);
-    newItem->setScaling(scaling);
-    newItem->setRotation(rotation);
-    newItem->setTextureImage(textureImage);
-    m_customItems.append(newItem);
+    if (!item)
+        return -1;
+
+    int index = m_customItems.indexOf(item);
+
+    if (index != -1)
+        return index;
+
+    item->setParent(this);
+    m_customItems.append(item);
     m_isCustomDataDirty = true;
     emitNeedRender();
     return m_customItems.count() - 1;
 }
 
-void Abstract3DController::deleteCustomItem(int index)
+void Abstract3DController::deleteCustomItems()
 {
-    if (m_customItems.size() > index) {
-        delete m_customItems[index];
-        m_customItems.removeAt(index);
-        m_isCustomDataDirty = true;
-        emitNeedRender();
-    }
+    foreach (QCustom3DItem *item, m_customItems)
+        delete item;
+    m_customItems.clear();
+    m_isCustomDataDirty = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::deleteCustomItem(QCustom3DItem *item)
+{
+    if (!item)
+        return;
+
+    m_customItems.removeOne(item);
+    delete item;
+    item = 0;
+    m_isCustomDataDirty = true;
+    emitNeedRender();
 }
 
 void Abstract3DController::deleteCustomItem(const QVector3D &position)
 {
-    int index = -1;
-    int counter = 0;
-    // Get the index for the item at position
-    foreach (CustomDataItem *item, m_customItems) {
+    // Get the item for the position
+    foreach (QCustom3DItem *item, m_customItems) {
         if (item->position() == position) {
-            index = counter;
-            break;
+            deleteCustomItem(item);
         }
-        counter++;
     }
-    if (index >= 0)
-        deleteCustomItem(index);
 }
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)

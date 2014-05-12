@@ -26,39 +26,36 @@
 //
 // We mean it.
 
-#ifndef CUSTOMDATAITEM_P_H
-#define CUSTOMDATAITEM_P_H
+#ifndef QCUSTOM3DITEM_P_H
+#define QCUSTOM3DITEM_P_H
 
-#include "datavisualizationglobal_p.h"
+#include "qcustom3ditem.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class TextureHelper;
-
-class QT_DATAVISUALIZATION_EXPORT CustomDataItem
+class QCustom3DItemPrivate : public QObject
 {
+    Q_OBJECT
 public:
-    CustomDataItem();
-    virtual ~CustomDataItem();
+    QCustom3DItemPrivate(QCustom3DItem *q, QObject *parent);
+    QCustom3DItemPrivate(QCustom3DItem *q, const QString &meshFile, const QVector3D &position,
+                         const QVector3D &scaling, const QQuaternion &rotation, QObject *parent);
+    virtual ~QCustom3DItemPrivate();
 
-    inline void setMeshFile(const QString &meshFile) { m_meshFile = meshFile; }
-    inline QString meshFile() { return m_meshFile;}
-    void setTextureImage(const QImage &textureImage);
-    inline GLuint texture() { return m_texture; }
-    inline void setPosition(const QVector3D &position) { m_position = position; }
-    inline QVector3D position() { return m_position; }
-    inline void setScaling(const QVector3D &scaling) { m_scaling = scaling; }
-    inline QVector3D scaling() { return m_scaling; }
-    inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
-    inline QQuaternion rotation() { return m_rotation; }
+    QImage textureImage();
+    void clearTextureImage();
 
-private:
-    TextureHelper *m_textureHelper;
-    GLuint m_texture;
+public:
+    QCustom3DItem *q_ptr;
+    QImage m_textureImage;
+    QString m_textureFile;
     QString m_meshFile;
     QVector3D m_position;
     QVector3D m_scaling;
     QQuaternion m_rotation;
+
+private:
+    friend class QCustom3DItem;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

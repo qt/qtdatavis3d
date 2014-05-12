@@ -35,7 +35,7 @@
 #include "qabstract3dinputhandler.h"
 #include "qabstractdataproxy.h"
 #include "q3dscene_p.h"
-#include "customdataitem_p.h"
+#include "qcustom3ditem.h"
 #include <QtGui/QLinearGradient>
 #include <QtCore/QTime>
 
@@ -175,7 +175,7 @@ protected:
 
     QVector<QAbstract3DSeries *> m_changedSeriesList;
 
-    QList<CustomDataItem *> m_customItems;
+    QList<QCustom3DItem *> m_customItems;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
@@ -236,9 +236,9 @@ public:
 
     void requestRender(QOpenGLFramebufferObject *fbo);
 
-    int addCustomItem(const QString &meshFile, const QVector3D &position, const QVector3D &scaling,
-                      const QQuaternion &rotation, const QImage &textureImage);
-    void deleteCustomItem(int index);
+    int addCustomItem(QCustom3DItem *item);
+    void deleteCustomItems();
+    void deleteCustomItem(QCustom3DItem *item);
     void deleteCustomItem(const QVector3D &position);
 
     void emitNeedRender();
@@ -321,6 +321,7 @@ private:
     void setAxisHelper(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis *axis,
                        QAbstract3DAxis **axisPtr);
 
+    friend class AbstractDeclarative;
     friend class Bars3DController;
     friend class QAbstract3DGraphPrivate;
 };

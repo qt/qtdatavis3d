@@ -43,7 +43,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterUncreatableType<AbstractDeclarative>(uri, 1, 0, "AbstractGraph3D",
                                                     QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
     qmlRegisterUncreatableType<Declarative3DScene>(uri, 1, 0, "Scene3D",
-                                                 QLatin1String("Trying to create uncreatable: Scene3D."));
+                                                   QLatin1String("Trying to create uncreatable: Scene3D."));
     qmlRegisterUncreatableType<QAbstract3DSeries>(uri, 1, 0, "Abstract3DSeries",
                                                   QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
     qmlRegisterUncreatableType<QBar3DSeries>(uri, 1, 0, "QBar3DSeries",
@@ -89,7 +89,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     // New revisions
     qmlRegisterType<QValue3DAxis, 1>(uri, 1, 1, "ValueAxis3D");
     qmlRegisterUncreatableType<QAbstract3DSeries, 1>(uri, 1, 1, "Abstract3DSeries",
-                                                  QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
+                                                     QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
     qmlRegisterUncreatableType<AbstractDeclarative, 1>(uri, 1, 1, "AbstractGraph3D",
                                                     QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
     qmlRegisterType<QItemModelBarDataProxy, 1>(uri, 1, 1, "ItemModelBarDataProxy");
@@ -97,6 +97,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     // New types
     qmlRegisterType<QValue3DAxisFormatter>(uri, 1, 1, "ValueAxis3DFormatter");
     qmlRegisterType<QLogValue3DAxisFormatter>(uri, 1, 1, "LogValueAxis3DFormatter");
+    qmlRegisterType<QCustom3DItem>(uri, 1, 1, "Custom3DItem");
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -18,7 +18,7 @@
 
 import QtQuick 2.1
 import QtQuick.Controls 1.0
-import QtDataVisualization 1.0
+import QtDataVisualization 1.1
 import "."
 
 Rectangle {
@@ -66,6 +66,16 @@ Rectangle {
             scene.activeCamera.yRotation: camControlArea.yValue
             scene.activeCamera.zoomLevel: zoomSlider.value
             inputHandler: null
+
+            customItemList: [shuttleItem]
+        }
+
+        Custom3DItem {
+            id: shuttleItem
+            meshFile: ":/items/shuttle.obj"
+            textureFile: ":/items/shuttle.png"
+            position: Qt.vector3d(5.0,35.0,3.0)
+            scaling: Qt.vector3d(0.2,0.2,0.2)
         }
 
         MouseArea {
@@ -168,23 +178,10 @@ Rectangle {
         id: shuttleAdd
         anchors.bottom: dataToggle.top
         width: camControlArea.width
-        text: "Add Shuttle"
-        property bool addObject: true
+        text: "Remove Shuttle"
         onClicked: {
-            if (addObject === true) {
-                testChart.addCustomItem(":/items/shuttle.obj",
-                                        Qt.vector3d(5.0,35.0,3.0),
-                                        Qt.vector3d(0.2,0.2,0.2),
-                                        Qt.quaternion(0.0,0.0,0.0,0.0),
-                                        ":/items/shuttle.png")
-                text = "Remove Shuttle"
-                addObject = false
-            } else {
-                testChart.removeCustomItemAt(Qt.vector3d(5.0,35.0,3.0))
-                text = "Add Shuttle"
-                addObject = true
-            }
+            testChart.removeCustomItemAt(Qt.vector3d(5.0,35.0,3.0))
+            text = "Shuttle has been deleted"
         }
     }
-
 }

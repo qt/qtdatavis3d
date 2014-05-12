@@ -150,30 +150,30 @@
  */
 
 /*!
- * \qmlmethod int AbstractGraph3D::addCustomItem(string meshFile, vector3d position, vector3d scaling, quaternion rotation, string textureFile)
+ * \qmlmethod int AbstractGraph3D::addCustomItem(Custom3DItem item)
  *
- * Adds a custom mesh item located in \a meshFile to a graph at \a position with \a {scaling},
- * \a rotation and optional image for a texture located at \a textureFile. Item must be in
- * Wavefront obj format and include vertices, normals and UVs. It also needs to be in triangles.
- * Item position is given in data coordinates.
+ * Adds a Custom3DItem \a item to the graph. Graph takes ownership of the added item.
  *
- * \return index to the added item.
+ * \return index to the added item if add was successful, -1 if trying to add a null item, and
+ * index of the item if trying to add an already added item.
  *
- * \note No validity checks are made for the position of the item, so it is up to the user to
- * provide a valid position. Items positioned outside axis ranges are still rendered.
- *
- * \sa removeCustomItemAt()
+ * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt()
  *
  * \since Qt Data Visualization 1.1
  */
 
 /*!
- * \qmlmethod void AbstractGraph3D::removeCustomItemAt(int index)
+ * \qmlmethod void AbstractGraph3D::removeCustomItems()
  *
- * Removes the custom item at \a {index}. Deletes the resources allocated to it.
+ * Removes all custom items. Deletes the resources allocated to them.
  *
- * \note The index of the remaining items will change if the item removed is other than
- * the last.
+ * \since Qt Data Visualization 1.1
+ */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::removeCustomItem(Custom3DItem item)
+ *
+ * Removes the custom \a {item}. Deletes the resources allocated to it.
  *
  * \since Qt Data Visualization 1.1
  */
@@ -181,10 +181,7 @@
 /*!
  * \qmlmethod void AbstractGraph3D::removeCustomItemAt(vector3d position)
  *
- * Removes the custom item at \a {position}. Deletes the resources allocated to it.
- *
- * \note The index of the remaining items will change if an item is removed from a position that
- * is not at the last index.
+ * Removes all custom items at \a {position}. Deletes the resources allocated to them.
  *
  * \since Qt Data Visualization 1.1
  */

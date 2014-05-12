@@ -68,6 +68,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
     Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged REVISION 1)
     Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged REVISION 1)
+    Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList REVISION 1)
 
 public:
     enum SelectionFlag {
@@ -128,13 +129,17 @@ public:
 
     Q_INVOKABLE virtual void clearSelection();
 
-    Q_REVISION(1) Q_INVOKABLE virtual int addCustomItem(const QString &meshFile,
-                                                        const QVector3D &position,
-                                                        const QVector3D &scaling,
-                                                        const QQuaternion &rotation,
-                                                        const QString &textureFile = 0);
-    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItemAt(int index);
+    Q_REVISION(1) Q_INVOKABLE virtual int addCustomItem(QCustom3DItem *item);
+    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItems();
+    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItem(QCustom3DItem *item);
     Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItemAt(const QVector3D &position);
+
+    QQmlListProperty<QCustom3DItem> customItemList();
+    static void appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
+                                     QCustom3DItem *item);
+    static int countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list);
+    static QCustom3DItem *atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list, int index);
+    static void clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list);
 
     virtual void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 

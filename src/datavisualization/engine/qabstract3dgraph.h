@@ -29,6 +29,7 @@
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DGraphPrivate;
+class QCustom3DItem;
 
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
@@ -107,10 +108,9 @@ public:
 
     void clearSelection();
 
-    int addCustomItem(const QString &meshFile, const QVector3D &position,
-                      const QVector3D &scaling, const QQuaternion &rotation,
-                      const QImage &textureImage = QImage());
-    void removeCustomItemAt(int index);
+    int addCustomItem(QCustom3DItem *item);
+    void removeCustomItems();
+    void removeCustomItem(QCustom3DItem *item);
     void removeCustomItemAt(const QVector3D &position);
 
     QImage renderToImage(int msaaSamples = 0, const QSize &imageSize = QSize());

@@ -211,24 +211,57 @@ bool AbstractDeclarative::shadowsSupported() const
     return m_controller->shadowsSupported();
 }
 
-int AbstractDeclarative::addCustomItem(const QString &meshFile, const QVector3D &position,
-                                       const QVector3D &scaling, const QQuaternion &rotation,
-                                       const QString &textureFile)
+int AbstractDeclarative::addCustomItem(QCustom3DItem *item)
 {
-    QImage textureImage;
-    if (!textureFile.isNull())
-        textureImage = QImage(textureFile);
-    return m_controller->addCustomItem(meshFile, position, scaling, rotation, textureImage);
+    return m_controller->addCustomItem(item);
 }
 
-void AbstractDeclarative::removeCustomItemAt(int index)
+void AbstractDeclarative::removeCustomItems()
 {
-    m_controller->deleteCustomItem(index);
+    m_controller->deleteCustomItems();
+}
+
+void AbstractDeclarative::removeCustomItem(QCustom3DItem *item)
+{
+    m_controller->deleteCustomItem(item);
 }
 
 void AbstractDeclarative::removeCustomItemAt(const QVector3D &position)
 {
     m_controller->deleteCustomItem(position);
+}
+
+QQmlListProperty<QCustom3DItem> AbstractDeclarative::customItemList()
+{
+    return QQmlListProperty<QCustom3DItem>(this, this,
+                                           &AbstractDeclarative::appendCustomItemFunc,
+                                           &AbstractDeclarative::countCustomItemFunc,
+                                           &AbstractDeclarative::atCustomItemFunc,
+                                           &AbstractDeclarative::clearCustomItemFunc);
+}
+
+void AbstractDeclarative::appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
+                                               QCustom3DItem *item)
+{
+    AbstractDeclarative *decl = reinterpret_cast<AbstractDeclarative *>(list->data);
+    decl->addCustomItem(item);
+}
+
+int AbstractDeclarative::countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
+{
+    return reinterpret_cast<AbstractDeclarative *>(list->data)->m_controller->m_customItems.size();
+}
+
+QCustom3DItem *AbstractDeclarative::atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
+                                                     int index)
+{
+    return reinterpret_cast<AbstractDeclarative *>(list->data)->m_controller->m_customItems.at(index);
+}
+
+void AbstractDeclarative::clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
+{
+    AbstractDeclarative *decl = reinterpret_cast<AbstractDeclarative *>(list->data);
+    decl->removeCustomItems();
 }
 
 void AbstractDeclarative::setSharedController(Abstract3DController *controller)

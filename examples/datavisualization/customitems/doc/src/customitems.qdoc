@@ -53,16 +53,19 @@
 
     \snippet customitems/customitemgraph.cpp 1
 
-    And finally we'll just add the item to the wanted position with the scale and rotation we want:
+    Then we'll create a new QCustom3DItem with all the parameters:
 
     \snippet customitems/customitemgraph.cpp 2
 
-    \section1 Removing custom item from a graph
-
-    We'll just call \c removeCustomItemAt() with the position
-    of the item:
+    And finally we'll just add the item:
 
     \snippet customitems/customitemgraph.cpp 3
+
+    \section1 Removing custom item from a graph
+
+    We'll just call \c removeCustomItemAt() with the position of the item:
+
+    \snippet customitems/customitemgraph.cpp 4
 
     \section1 Example Contents
 */

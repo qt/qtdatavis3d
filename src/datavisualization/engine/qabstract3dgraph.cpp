@@ -382,46 +382,42 @@ void QAbstract3DGraph::clearSelection()
 }
 
 /*!
- * Adds a custom mesh item located in \a meshFile to a graph at \a position with \a {scaling},
- * \a rotation and optional \a textureImage. Item must be in Wavefront obj format and include
- * vertices, normals and UVs. It also needs to be in triangles. Item position is given in data
- * coordinates.
+ * Adds a QCustom3DItem \a item to the graph. Graph takes ownership of the added item.
  *
- * \return index to the added item.
+ * \return index to the added item if add was successful, -1 if trying to add a null item, and
+ * index of the item if trying to add an already added item.
  *
- * \note No validity checks are made for the position of the item, so it is up to the user to
- * provide a valid position. Items positioned outside axis ranges are still rendered.
- *
- * \sa removeCustomItemAt()
+ * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt()
  *
  * \since Qt Data Visualization 1.1
  */
-int QAbstract3DGraph::addCustomItem(const QString &meshFile, const QVector3D &position,
-                                    const QVector3D &scaling, const QQuaternion &rotation,
-                                    const QImage &textureImage)
+int QAbstract3DGraph::addCustomItem(QCustom3DItem *item)
 {
-    return d_ptr->m_visualController->addCustomItem(meshFile, position, scaling, rotation,
-                                                    textureImage);
+    return d_ptr->m_visualController->addCustomItem(item);
 }
 
 /*!
- * Removes the custom item at \a {index}. Deletes the resources allocated to it.
- *
- * \note The index of the remaining items will change if the item removed is other than
- * the last.
+ * Removes all custom items. Deletes the resources allocated to them.
  *
  * \since Qt Data Visualization 1.1
  */
-void QAbstract3DGraph::removeCustomItemAt(int index)
+void QAbstract3DGraph::removeCustomItems()
 {
-    d_ptr->m_visualController->deleteCustomItem(index);
+    d_ptr->m_visualController->deleteCustomItems();
 }
 
 /*!
- * Removes the custom item at \a {position}. Deletes the resources allocated to it.
+ * Removes the custom \a {item}. Deletes the resources allocated to it.
  *
- * \note The index of the remaining items will change if an item is removed from a position that
- * is not at the last index.
+ * \since Qt Data Visualization 1.1
+ */
+void QAbstract3DGraph::removeCustomItem(QCustom3DItem *item)
+{
+    d_ptr->m_visualController->deleteCustomItem(item);
+}
+
+/*!
+ * Removes all custom items at \a {position}. Deletes the resources allocated to them.
  *
  * \since Qt Data Visualization 1.1
  */

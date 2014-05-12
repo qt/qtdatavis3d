@@ -28,6 +28,7 @@
 #include "objecthelper_p.h"
 #include "qvalue3daxisformatter_p.h"
 #include "shaderhelper_p.h"
+#include "qcustom3ditem_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -73,6 +74,13 @@ Abstract3DRenderer::~Abstract3DRenderer()
         delete cache;
     }
     m_renderCacheList.clear();
+
+    foreach (CustomRenderItem *item, m_customRenderCache) {
+        GLuint texture = item->texture();
+        m_textureHelper->deleteTexture(&texture);
+        delete item;
+    }
+    m_customRenderCache.clear();
 
     delete m_textureHelper;
 }
@@ -402,16 +410,19 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
     }
 }
 
-void Abstract3DRenderer::updateCustomData(const QList<CustomDataItem *> &customItems)
+void Abstract3DRenderer::updateCustomData(const QList<QCustom3DItem *> &customItems)
 {
     if (customItems.isEmpty() && m_customRenderCache.isEmpty())
         return;
 
     // There are probably not too many custom items, just recreate the array if something changes
-    foreach (CustomRenderItem *item, m_customRenderCache)
+    foreach (CustomRenderItem *item, m_customRenderCache) {
+        GLuint texture = item->texture();
+        m_textureHelper->deleteTexture(&texture);
         delete item;
+    }
     m_customRenderCache.clear();
-    foreach (CustomDataItem *item, customItems)
+    foreach (QCustom3DItem *item, customItems)
         addCustomItem(item);
 }
 
@@ -526,12 +537,16 @@ QVector4D Abstract3DRenderer::indexToSelectionColor(GLint index)
     return QVector4D(idxRed, idxGreen, idxBlue, 0);
 }
 
-void Abstract3DRenderer::addCustomItem(CustomDataItem *item) {
+void Abstract3DRenderer::addCustomItem(QCustom3DItem *item) {
     CustomRenderItem *newItem = new CustomRenderItem();
     newItem->setMesh(item->meshFile());
     newItem->setScaling(item->scaling());
     newItem->setRotation(item->rotation());
-    newItem->setTexture(item->texture());
+    GLuint texture = m_textureHelper->create2DTexture(item->d_ptr->textureImage(),
+                                                      true, true, true);
+    newItem->setTexture(texture);
+    // TODO: Uncomment this once custom item render cache handling has been optimized
+    //item->d_ptr->clearTextureImage();
     QVector3D translation = convertPositionToTranslation(item->position());
     newItem->setTranslation(translation);
     m_customRenderCache.append(newItem);
