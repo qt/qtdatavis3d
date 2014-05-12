@@ -16,26 +16,20 @@
 **
 ****************************************************************************/
 
-#include "declarativecolor_p.h"
+/*!
+    \qmltype ThemeColor
+    \inqmlmodule QtDataVisualization
+    \since QtDataVisualization 1.0
+    \ingroup datavisualization_qml
+    \brief Defines the color in a Theme3D.
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+    Defines a color in Theme3D::baseColors property of Theme3D.
+*/
 
-DeclarativeColor::DeclarativeColor(QObject *parent)
-    : QObject(parent)
-{
-}
+/*!
+    \qmlproperty color ThemeColor::color
 
-void DeclarativeColor::setColor(const QColor &color)
-{
-    if (m_color != color) {
-        m_color = color;
-        emit colorChanged(color);
-    }
-}
+    The color property describes the color of this ThemeColor.
 
-QColor DeclarativeColor::color() const
-{
-    return m_color;
-}
-
-QT_END_NAMESPACE_DATAVISUALIZATION
+    The default color is black.
+*/
