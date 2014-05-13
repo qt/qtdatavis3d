@@ -236,7 +236,8 @@
  *
  * Emits selection \a type when a selection is made in the graph.
  *
- * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem()
+ * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
+ * Bars3D::selectedSeries, Scatter3D::selectedSeries, Surface3D::selectedSeries
  *
  * \since Qt Data Visualization 1.1
  */

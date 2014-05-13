@@ -206,7 +206,19 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
         text.append(split.last());
         m_textField->setText(text);
     } else if (type == QAbstract3DGraph::ElementSeries) {
-        m_textField->setText("Surface");
+        QString text = "Surface (";
+        QSurface3DSeries *series = m_graph->selectedSeries();
+        if (series) {
+            QPoint point = series->selectedPoint();
+            QString posStr;
+            posStr.setNum(point.x());
+            text.append(posStr);
+            text.append(", ");
+            posStr.setNum(point.y());
+            text.append(posStr);
+        }
+        text.append(")");
+        m_textField->setText(text);
     } else if (type > QAbstract3DGraph::ElementSeries
                && type < QAbstract3DGraph::ElementCustomItem) {
         m_textField->setText("Axis");

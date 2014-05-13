@@ -504,7 +504,8 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
  * Signal can be used for example for implementing custom input handlers, as demonstrated in this
  * \l {Axis Range Dragging With Labels Example}{example}.
  *
- * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem()
+ * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
+ * Q3DBars::selectedSeries(), Q3DScatter::selectedSeries(), Q3DSurface::selectedSeries()
  */
 
 /*!

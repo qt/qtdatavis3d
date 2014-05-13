@@ -298,9 +298,9 @@ void Scatter3DController::handlePendingClick()
         }
     }
 
-    Abstract3DController::handlePendingClick();
-
     setSelectedItem(index, series);
+
+    Abstract3DController::handlePendingClick();
 
     m_renderer->resetClickedStatus();
 }
