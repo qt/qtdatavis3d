@@ -21,8 +21,8 @@ import QtDataVisualization 1.0
 
 Item {
     property alias column: columnAxis
-    property alias expenses: expensesAxis
-    property alias income: incomeAxis
+    property alias value: valueAxis
+    property alias total: totalAxis
 
     // For row labels we can use row labels from data proxy, so default axis
     // suffices for rows.
@@ -35,18 +35,15 @@ Item {
             "July", "August", "September", "October", "November", "December"]
     }
     //! [0]
+    CategoryAxis3D {
+        id: totalAxis
+        labels: ["Yearly total"]
+    }
     ValueAxis3D {
-        id: incomeAxis
+        id: valueAxis
         min: 0
         max: 35
         labelFormat: "%.2f M\u20AC"
         title: "Monthly income"
-    }
-    ValueAxis3D {
-        id: expensesAxis
-        min: 0
-        max: 35
-        labelFormat: "-%.2f M\u20AC"
-        title: "Monthly expenses"
     }
 }

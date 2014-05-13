@@ -49,7 +49,11 @@ Rectangle {
 
         // Set tableView current row to selected bar
         var rowRole = series.dataProxy.rowLabels[position.x];
-        var colRole = series.dataProxy.columnLabels[position.y];
+        var colRole
+        if (barGraph.columnAxis === graphAxes.total)
+            colRole = "01";
+        else
+            colRole = series.dataProxy.columnLabels[position.y];
         var checkTimestamp = rowRole + "-" + colRole
         var currentRow = tableView.currentRow
         if (currentRow === -1 || checkTimestamp !== graphData.model.get(currentRow).timestamp) {
@@ -99,12 +103,43 @@ Rectangle {
             barSpacingRelative: false
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
             columnAxis: graphAxes.column
-            valueAxis: graphAxes.income
+            valueAxis: graphAxes.value
+
+            //! [4]
+            Bar3DSeries {
+                id: secondarySeries
+                visible: false
+                itemLabelFormat: "Expenses, @colLabel, @rowLabel: -@valueLabel"
+                baseGradient: secondaryGradient
+
+                ItemModelBarDataProxy {
+                    id: secondaryProxy
+                    itemModel: graphData.model
+                    rowRole: "timestamp"
+                    columnRole: "timestamp"
+                    valueRole: "expenses"
+                    rowRolePattern: /^(\d\d\d\d).*$/
+                    columnRolePattern: /^.*-(\d\d)$/
+                    valueRolePattern: /-/
+                    rowRoleReplace: "\\1"
+                    columnRoleReplace: "\\1"
+                    multiMatchBehavior: ItemModelBarDataProxy.MMBCumulative
+                }
+                //! [4]
+
+                ColorGradient {
+                    id: secondaryGradient
+                    ColorGradientStop { position: 1.0; color: "#FF0000" }
+                    ColorGradientStop { position: 0.0; color: "#600000" }
+                }
+
+                onSelectedBarChanged: handleSelectionChange(secondarySeries, position)
+            }
 
             //! [3]
             Bar3DSeries {
                 id: barSeries
-                itemLabelFormat: "Income for @colLabel, @rowLabel: @valueLabel"
+                itemLabelFormat: "Income, @colLabel, @rowLabel: @valueLabel"
                 baseGradient: barGradient
 
                 ItemModelBarDataProxy {
@@ -117,6 +152,7 @@ Rectangle {
                     columnRolePattern: /^.*-(\d\d)$/
                     rowRoleReplace: "\\1"
                     columnRoleReplace: "\\1"
+                    multiMatchBehavior: ItemModelBarDataProxy.MMBCumulative
                 }
                 //! [3]
 
@@ -127,35 +163,6 @@ Rectangle {
                 }
 
                 onSelectedBarChanged: handleSelectionChange(barSeries, position)
-            }
-
-            //! [4]
-            Bar3DSeries {
-                id: secondarySeries
-                visible: false
-                itemLabelFormat: "Expenses for @colLabel, @rowLabel: @valueLabel"
-                baseGradient: secondaryGradient
-
-                ItemModelBarDataProxy {
-                    id: secondaryProxy
-                    itemModel: graphData.model
-                    rowRole: "timestamp"
-                    columnRole: "timestamp"
-                    valueRole: "expenses"
-                    rowRolePattern: /^(\d\d\d\d).*$/
-                    columnRolePattern: /^.*-(\d\d)$/
-                    rowRoleReplace: "\\1"
-                    columnRoleReplace: "\\1"
-                }
-                //! [4]
-
-                ColorGradient {
-                    id: secondaryGradient
-                    ColorGradientStop { position: 1.0; color: "#FF0000" }
-                    ColorGradientStop { position: 0.0; color: "#600000" }
-                }
-
-                onSelectedBarChanged: handleSelectionChange(secondarySeries, position)
             }
         }
     }
@@ -184,7 +191,7 @@ Rectangle {
                         var pattern = /(\d\d\d\d)-(\d\d)/
                         var matches = pattern.exec(styleData.value)
                         var colIndex = parseInt(matches[2], 10) - 1
-                        text = matches[1] + " - " + barGraph.columnAxis.labels[colIndex]
+                        text = matches[1] + " - " + graphAxes.column.labels[colIndex]
 
                     }
                 }
@@ -199,7 +206,11 @@ Rectangle {
             var pattern = /(\d\d\d\d)-(\d\d)/
             var matches = pattern.exec(timestamp)
             var rowIndex = modelProxy.rowCategoryIndex(matches[1])
-            var colIndex = modelProxy.columnCategoryIndex(matches[2])
+            var colIndex
+            if (barGraph.columnAxis === graphAxes.total)
+                colIndex = 0 // Just one column when showing yearly totals
+            else
+                colIndex = modelProxy.columnCategoryIndex(matches[2])
             if (selectedSeries.visible)
                 mainview.selectedSeries.selectedBar = Qt.point(rowIndex, colIndex)
             else if (barSeries.visible)
@@ -215,25 +226,38 @@ Rectangle {
         spacing: 0
 
         Button {
-            id: dataToggle
+            id: changeDataButton
             Layout.fillWidth: true
             Layout.fillHeight: true
             text: "Show 2010 - 2012"
             clip: true
             //! [1]
             onClicked: {
-                if (barGraph.rowAxis.max !== 6) {
-                    text = "Show 2010 - 2012"
+                if (text === "Show yearly totals") {
                     modelProxy.autoRowCategories = true
                     secondaryProxy.autoRowCategories = true
-                } else {
+                    modelProxy.columnRolePattern = /^.*$/
+                    secondaryProxy.columnRolePattern = /^.*$/
+                    graphAxes.value.autoAdjustRange = true
+                    barGraph.columnAxis = graphAxes.total
                     text = "Show all years"
+                } else if (text === "Show all years") {
+                    modelProxy.autoRowCategories = true
+                    secondaryProxy.autoRowCategories = true
+                    modelProxy.columnRolePattern = /^.*-(\d\d)$/
+                    secondaryProxy.columnRolePattern = /^.*-(\d\d)$/
+                    graphAxes.value.min = 0
+                    graphAxes.value.max = 35
+                    barGraph.columnAxis = graphAxes.column
+                    text = "Show 2010 - 2012"
+                } else { // text === "Show 2010 - 2012"
                     // Explicitly defining row categories, since we do not want to show data for
                     // all years in the model, just for the selected ones.
                     modelProxy.autoRowCategories = false
                     secondaryProxy.autoRowCategories = false
                     modelProxy.rowCategories = ["2010", "2011", "2012"]
                     secondaryProxy.rowCategories = ["2010", "2011", "2012"]
+                    text = "Show yearly totals"
                 }
             }
             //! [1]
@@ -265,19 +289,20 @@ Rectangle {
             clip: true
             //! [0]
             onClicked: {
-                if (!secondarySeries.visible) {
-                    text = "Show Both"
-                    barGraph.valueAxis = graphAxes.expenses
+                if (text === "Show Expenses") {
                     barSeries.visible = false
                     secondarySeries.visible = true
-                } else if (!barSeries.visible){
+                    barGraph.valueAxis.labelFormat = "-%.2f M\u20AC"
+                    secondarySeries.itemLabelFormat = "Expenses, @colLabel, @rowLabel: @valueLabel"
+                    text = "Show Both"
+                } else if (text === "Show Both") {
                     barSeries.visible = true
+                    barGraph.valueAxis.labelFormat = "%.2f M\u20AC"
+                    secondarySeries.itemLabelFormat = "Expenses, @colLabel, @rowLabel: -@valueLabel"
                     text = "Show Income"
-                    barGraph.valueAxis = graphAxes.income
-                } else {
+                } else { // text === "Show Income"
                     secondarySeries.visible = false
                     text = "Show Expenses"
-                    barGraph.valueAxis = graphAxes.income
                 }
             }
             //! [0]
