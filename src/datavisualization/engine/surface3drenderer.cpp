@@ -2289,12 +2289,15 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
     m_clickedType = QAbstract3DGraph::ElementNone;
     // Check for label and custom item selection
     if (id / alphaMultiplier == labelRowAlpha) {
+        m_selectedLabelIndex = id - (alphaMultiplier * labelRowAlpha);
         m_clickedType = QAbstract3DGraph::ElementAxisZLabel;
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == labelColumnAlpha) {
+        m_selectedLabelIndex = (id - (alphaMultiplier * labelColumnAlpha)) / greenMultiplier;
         m_clickedType = QAbstract3DGraph::ElementAxisXLabel;
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == labelValueAlpha) {
+        m_selectedLabelIndex = (id - (alphaMultiplier * labelValueAlpha)) / blueMultiplier;
         m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == customItemAlpha) {

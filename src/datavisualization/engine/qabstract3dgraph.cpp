@@ -427,6 +427,32 @@ void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
 }
 
 /*!
+ * Can be used to query the index of the selected label after receiving elementSelected signal with
+ * any label type. Selection is valid until the next elementSelected signal.
+ *
+ * \return index of the selected label, or -1.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+int QAbstract3DGraph::selectedLabelIndex() const
+{
+    return d_ptr->m_visualController->selectedLabelIndex();
+}
+
+/*!
+ * Can be used to get the selected axis after receiving elementSelected signal with any label type.
+ * Selection is valid until the next elementSelected signal.
+ *
+ * \return pointer to the selected axis, or null.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+QAbstract3DAxis *QAbstract3DGraph::selectedAxis() const
+{
+    return d_ptr->m_visualController->selectedAxis();
+}
+
+/*!
  * Renders current frame to an image of \a imageSize. Default size is the window size. Image is
  * rendered with antialiasing level given in \a msaaSamples. Default level is \c{0}.
  *
@@ -449,6 +475,8 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
  *
  * Signal can be used for example for implementing custom input handlers, as demonstrated in this
  * \l {Axis Range Dragging With Labels Example}{example}.
+ *
+ * \sa selectedLabelIndex(), selectedAxis()
  */
 
 /*!

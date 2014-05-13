@@ -186,3 +186,24 @@
  * \since Qt Data Visualization 1.1
  */
 
+/*!
+ * \qmlmethod int AbstractGraph3D::selectedLabelIndex()
+ *
+ * Can be used to query the index of the selected label after receiving elementSelected signal with
+ * any label type. Selection is valid until the next elementSelected signal.
+ *
+ * \return index of the selected label, or -1.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+
+/*!
+ * \qmlmethod Abstract3DAxis AbstractGraph3D::selectedAxis()
+ *
+ * Can be used to get the selected axis after receiving elementSelected signal with any label type.
+ * Selection is valid until the next elementSelected signal.
+ *
+ * \return the selected axis, or null.
+ *
+ * \since Qt Data Visualization 1.1
+ */

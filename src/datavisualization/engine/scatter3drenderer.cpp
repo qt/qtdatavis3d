@@ -1761,18 +1761,22 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
                                                        QAbstract3DSeries *&series)
 {
     m_clickedType = QAbstract3DGraph::ElementNone;
+    m_selectedLabelIndex = -1;
     if (color != selectionSkipColor) {
         if (color.w() == labelRowAlpha) {
             // Row selection
             index = Scatter3DController::invalidSelectionIndex();
+            m_selectedLabelIndex = color.x();
             m_clickedType = QAbstract3DGraph::ElementAxisZLabel;
         } else if (color.w() == labelColumnAlpha) {
             // Column selection
             index = Scatter3DController::invalidSelectionIndex();
+            m_selectedLabelIndex = color.y();
             m_clickedType = QAbstract3DGraph::ElementAxisXLabel;
         } else if (color.w() == labelValueAlpha) {
             // Value selection
             index = Scatter3DController::invalidSelectionIndex();
+            m_selectedLabelIndex = color.z();
             m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
         } else if (color.w() == customItemAlpha) {
             // Custom item selection

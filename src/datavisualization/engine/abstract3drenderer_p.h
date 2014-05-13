@@ -180,12 +180,16 @@ protected:
     bool m_clickPending;
     QAbstract3DSeries *m_clickedSeries;
     QAbstract3DGraph::ElementType m_clickedType;
+    int m_selectedLabelIndex;
 
     QString m_selectionLabel;
     LabelItem *m_selectionLabelItem;
     int m_visibleSeriesCount;
 
     ShaderHelper *m_customItemShader;
+
+private:
+    friend class Abstract3DController;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

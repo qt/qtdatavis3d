@@ -30,6 +30,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DGraphPrivate;
 class QCustom3DItem;
+class QAbstract3DAxis;
 
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
@@ -112,6 +113,9 @@ public:
     void removeCustomItems();
     void removeCustomItem(QCustom3DItem *item);
     void removeCustomItemAt(const QVector3D &position);
+
+    int selectedLabelIndex() const;
+    QAbstract3DAxis *selectedAxis() const;
 
     QImage renderToImage(int msaaSamples = 0, const QSize &imageSize = QSize());
 

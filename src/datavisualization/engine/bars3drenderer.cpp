@@ -2269,6 +2269,7 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector4D &selectionC
 {
     QPoint position = Bars3DController::invalidSelectionPosition();
     m_clickedType = QAbstract3DGraph::ElementNone;
+    m_selectedLabelIndex = -1;
     if (selectionColor.w() == itemAlpha) {
         // Normal selection item
         position = QPoint(int(selectionColor.x() + int(m_axisCacheZ.min())),
@@ -2282,6 +2283,7 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector4D &selectionC
             GLint previousCol = qMax(0, m_selectedBarPos.y()); // Use 0 if previous is invalid
             position = QPoint(int(selectionColor.x() + int(m_axisCacheZ.min())), previousCol);
         }
+        m_selectedLabelIndex = selectionColor.x();
         // Pass label clicked info to input handler
         m_clickedType = QAbstract3DGraph::ElementAxisZLabel;
     } else if (selectionColor.w() == labelColumnAlpha) {
@@ -2291,11 +2293,13 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector4D &selectionC
             GLint previousRow = qMax(0, m_selectedBarPos.x()); // Use 0 if previous is invalid
             position = QPoint(previousRow, int(selectionColor.y()) + int(m_axisCacheX.min()));
         }
+        m_selectedLabelIndex = selectionColor.y();
         // Pass label clicked info to input handler
         m_clickedType = QAbstract3DGraph::ElementAxisXLabel;
     } else if (selectionColor.w() == labelValueAlpha) {
         // Value selection
         position = Bars3DController::invalidSelectionPosition();
+        m_selectedLabelIndex = selectionColor.z();
         // Pass label clicked info to input handler
         m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
     } else if (selectionColor.w() == customItemAlpha) {

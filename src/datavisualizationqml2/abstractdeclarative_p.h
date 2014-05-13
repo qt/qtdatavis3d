@@ -134,6 +134,9 @@ public:
     Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItem(QCustom3DItem *item);
     Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItemAt(const QVector3D &position);
 
+    Q_REVISION(1) Q_INVOKABLE virtual int selectedLabelIndex() const;
+    Q_REVISION(1) Q_INVOKABLE virtual QAbstract3DAxis *selectedAxis() const;
+
     QQmlListProperty<QCustom3DItem> customItemList();
     static void appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
                                      QCustom3DItem *item);

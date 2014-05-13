@@ -231,6 +231,16 @@ void AbstractDeclarative::removeCustomItemAt(const QVector3D &position)
     m_controller->deleteCustomItem(position);
 }
 
+int AbstractDeclarative::selectedLabelIndex() const
+{
+    return m_controller->selectedLabelIndex();
+}
+
+QAbstract3DAxis *AbstractDeclarative::selectedAxis() const
+{
+    return m_controller->selectedAxis();
+}
+
 QQmlListProperty<QCustom3DItem> AbstractDeclarative::customItemList()
 {
     return QQmlListProperty<QCustom3DItem>(this, this,

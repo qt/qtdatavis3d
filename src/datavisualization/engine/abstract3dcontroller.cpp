@@ -580,7 +580,7 @@ void Abstract3DController::setAxisX(QAbstract3DAxis *axis)
     }
 }
 
-QAbstract3DAxis *Abstract3DController::axisX()
+QAbstract3DAxis *Abstract3DController::axisX() const
 {
     return m_axisX;
 }
@@ -594,7 +594,7 @@ void Abstract3DController::setAxisY(QAbstract3DAxis *axis)
     }
 }
 
-QAbstract3DAxis *Abstract3DController::axisY()
+QAbstract3DAxis *Abstract3DController::axisY() const
 {
     return m_axisY;
 }
@@ -608,7 +608,7 @@ void Abstract3DController::setAxisZ(QAbstract3DAxis *axis)
     }
 }
 
-QAbstract3DAxis *Abstract3DController::axisZ()
+QAbstract3DAxis *Abstract3DController::axisZ() const
 {
     return m_axisZ;
 }
@@ -1263,6 +1263,36 @@ void Abstract3DController::handlePendingClick()
 {
     QAbstract3DGraph::ElementType type = m_renderer->clickedType();
     emit elementSelected(type);
-    // TODO: Consider adding type specific signals
 }
+
+int Abstract3DController::selectedLabelIndex() const
+{
+    int index = m_renderer->m_selectedLabelIndex;
+    if (selectedAxis()->labels().count() <= index)
+        index = -1;
+    return index;
+}
+
+QAbstract3DAxis *Abstract3DController::selectedAxis() const
+{
+    QAbstract3DAxis *axis = 0;
+    QAbstract3DGraph::ElementType type = m_renderer->clickedType();
+    switch (type) {
+    case QAbstract3DGraph::ElementAxisXLabel:
+        axis = axisX();
+        break;
+    case QAbstract3DGraph::ElementAxisYLabel:
+        axis = axisY();
+        break;
+    case QAbstract3DGraph::ElementAxisZLabel:
+        axis = axisZ();
+        break;
+    default:
+        axis = 0;
+        break;
+    }
+
+    return axis;
+}
+
 QT_END_NAMESPACE_DATAVISUALIZATION

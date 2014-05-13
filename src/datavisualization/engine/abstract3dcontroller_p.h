@@ -195,11 +195,11 @@ public:
     QList<QAbstract3DSeries *> seriesList();
 
     virtual void setAxisX(QAbstract3DAxis *axis);
-    virtual QAbstract3DAxis *axisX();
+    virtual QAbstract3DAxis *axisX() const;
     virtual void setAxisY(QAbstract3DAxis *axis);
-    virtual QAbstract3DAxis *axisY();
+    virtual QAbstract3DAxis *axisY() const;
     virtual void setAxisZ(QAbstract3DAxis *axis);
-    virtual QAbstract3DAxis *axisZ();
+    virtual QAbstract3DAxis *axisZ() const;
     virtual void addAxis(QAbstract3DAxis *axis);
     virtual void releaseAxis(QAbstract3DAxis *axis);
     virtual QList<QAbstract3DAxis *> axes() const; // Omits default axes
@@ -240,6 +240,9 @@ public:
     void deleteCustomItems();
     void deleteCustomItem(QCustom3DItem *item);
     void deleteCustomItem(const QVector3D &position);
+
+    int selectedLabelIndex() const;
+    QAbstract3DAxis *selectedAxis() const;
 
     void emitNeedRender();
 
