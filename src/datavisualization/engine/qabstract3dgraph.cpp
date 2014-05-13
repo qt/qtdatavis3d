@@ -453,6 +453,34 @@ QAbstract3DAxis *QAbstract3DGraph::selectedAxis() const
 }
 
 /*!
+ * Can be used to query the index of the selected custom item after receiving elementSelected signal
+ * with QAbstract3DGraph::ElementCustomItem type. Selection is valid until the next elementSelected
+ * signal.
+ *
+ * \return index of the selected custom item, or -1.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+int QAbstract3DGraph::selectedCustomItemIndex() const
+{
+    return d_ptr->m_visualController->selectedCustomItemIndex();
+}
+
+/*!
+ * Can be used to get the selected custom item after receiving elementSelected signal with
+ * QAbstract3DGraph::ElementCustomItem type. Ownership of the item remains with the graph.
+ * Selection is valid until the next elementSelected signal.
+ *
+ * \return pointer to the selected custom item, or null.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+QCustom3DItem *QAbstract3DGraph::selectedCustomItem() const
+{
+    return d_ptr->m_visualController->selectedCustomItem();
+}
+
+/*!
  * Renders current frame to an image of \a imageSize. Default size is the window size. Image is
  * rendered with antialiasing level given in \a msaaSamples. Default level is \c{0}.
  *
@@ -476,7 +504,7 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
  * Signal can be used for example for implementing custom input handlers, as demonstrated in this
  * \l {Axis Range Dragging With Labels Example}{example}.
  *
- * \sa selectedLabelIndex(), selectedAxis()
+ * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem()
  */
 
 /*!

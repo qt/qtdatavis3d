@@ -1762,6 +1762,7 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
 {
     m_clickedType = QAbstract3DGraph::ElementNone;
     m_selectedLabelIndex = -1;
+    m_selectedCustomItemIndex = -1;
     if (color != selectionSkipColor) {
         if (color.w() == labelRowAlpha) {
             // Row selection
@@ -1781,6 +1782,9 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
         } else if (color.w() == customItemAlpha) {
             // Custom item selection
             index = Scatter3DController::invalidSelectionIndex();
+            m_selectedCustomItemIndex = int(color.x())
+                    + (int(color.y()) << 8)
+                    + (int(color.z()) << 16);
             m_clickedType = QAbstract3DGraph::ElementCustomItem;
         } else {
             int totalIndex = int(color.x())

@@ -28,8 +28,8 @@
   Note that this type is uncreatable, but contains properties that are shared between
   the 3D visualizations.
 
-  For AbstractGraph3D enums, see \l QAbstract3DGraph::SelectionFlag and
-  \l QAbstract3DGraph::ShadowQuality
+  For AbstractGraph3D enums, see \l QAbstract3DGraph::SelectionFlag,
+  \l QAbstract3DGraph::ShadowQuality, and \l QAbstract3DGraph::ElementType
 
   \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
@@ -204,6 +204,39 @@
  * Selection is valid until the next elementSelected signal.
  *
  * \return the selected axis, or null.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+
+/*!
+ * \qmlmethod int AbstractGraph3D::selectedCustomItemIndex()
+ *
+ * Can be used to query the index of the selected custom item after receiving elementSelected signal
+ * with \l{QAbstract3DGraph::ElementCustomItem}{ElementCustomItem} type. Selection is valid until
+ * the next elementSelected signal.
+ *
+ * \return index of the selected custom item, or -1.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+
+/*!
+ * \qmlmethod Custom3DItem AbstractGraph3D::selectedCustomItem()
+ *
+ * Can be used to get the selected custom item after receiving elementSelected signal with
+ * \l{QAbstract3DGraph::ElementCustomItem}{ElementCustomItem} type. Ownership of the item remains
+ * with the graph. Selection is valid until the next elementSelected signal.
+ *
+ * \return the selected custom item, or null.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+
+/*! \qmlsignal AbstractGraph3D::elementSelected(ElementType type)
+ *
+ * Emits selection \a type when a selection is made in the graph.
+ *
+ * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem()
  *
  * \since Qt Data Visualization 1.1
  */

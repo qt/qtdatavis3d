@@ -2287,6 +2287,8 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
 QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
 {
     m_clickedType = QAbstract3DGraph::ElementNone;
+    m_selectedLabelIndex = -1;
+    m_selectedCustomItemIndex = -1;
     // Check for label and custom item selection
     if (id / alphaMultiplier == labelRowAlpha) {
         m_selectedLabelIndex = id - (alphaMultiplier * labelRowAlpha);
@@ -2303,6 +2305,7 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
     } else if (id / alphaMultiplier == customItemAlpha) {
         // Custom item selection
         m_clickedType = QAbstract3DGraph::ElementCustomItem;
+        m_selectedCustomItemIndex = id - (alphaMultiplier * customItemAlpha);
         return Surface3DController::invalidSelectionPosition();
     }
 

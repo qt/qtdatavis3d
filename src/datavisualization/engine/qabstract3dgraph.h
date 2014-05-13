@@ -117,6 +117,9 @@ public:
     int selectedLabelIndex() const;
     QAbstract3DAxis *selectedAxis() const;
 
+    int selectedCustomItemIndex() const;
+    QCustom3DItem *selectedCustomItem() const;
+
     QImage renderToImage(int msaaSamples = 0, const QSize &imageSize = QSize());
 
     void setMeasureFps(bool enable);

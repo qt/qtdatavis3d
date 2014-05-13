@@ -24,6 +24,7 @@
 #include <QtDataVisualization/QHeightMapSurfaceDataProxy>
 #include <QtDataVisualization/QSurface3DSeries>
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QLabel>
 
 using namespace QtDataVisualization;
 
@@ -31,7 +32,7 @@ class CustomItemGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit CustomItemGraph(Q3DSurface *surface);
+    explicit CustomItemGraph(Q3DSurface *surface, QLabel *label);
     ~CustomItemGraph();
 
     void toggleItemOne(bool show);
@@ -42,7 +43,11 @@ public:
     void toggleShadows(bool shadows);
 
 private:
+    void handleElementSelected(QAbstract3DGraph::ElementType type);
+
+private:
     Q3DSurface *m_graph;
+    QLabel *m_textField;
 };
 
 #endif

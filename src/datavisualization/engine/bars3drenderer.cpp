@@ -2270,6 +2270,7 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector4D &selectionC
     QPoint position = Bars3DController::invalidSelectionPosition();
     m_clickedType = QAbstract3DGraph::ElementNone;
     m_selectedLabelIndex = -1;
+    m_selectedCustomItemIndex = -1;
     if (selectionColor.w() == itemAlpha) {
         // Normal selection item
         position = QPoint(int(selectionColor.x() + int(m_axisCacheZ.min())),
@@ -2305,6 +2306,9 @@ QPoint Bars3DRenderer::selectionColorToArrayPosition(const QVector4D &selectionC
     } else if (selectionColor.w() == customItemAlpha) {
         // Custom item selection
         position = Bars3DController::invalidSelectionPosition();
+        m_selectedCustomItemIndex = int(selectionColor.x())
+                + (int(selectionColor.y()) << 8)
+                + (int(selectionColor.z()) << 16);
         m_clickedType = QAbstract3DGraph::ElementCustomItem;
     }
     return position;

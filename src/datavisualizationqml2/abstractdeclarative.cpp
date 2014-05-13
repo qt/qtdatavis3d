@@ -241,6 +241,16 @@ QAbstract3DAxis *AbstractDeclarative::selectedAxis() const
     return m_controller->selectedAxis();
 }
 
+int AbstractDeclarative::selectedCustomItemIndex() const
+{
+    return m_controller->selectedCustomItemIndex();
+}
+
+QCustom3DItem *AbstractDeclarative::selectedCustomItem() const
+{
+    return m_controller->selectedCustomItem();
+}
+
 QQmlListProperty<QCustom3DItem> AbstractDeclarative::customItemList()
 {
     return QQmlListProperty<QCustom3DItem>(this, this,
@@ -293,6 +303,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::themeChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::handleSelectionModeChange);
+    QObject::connect(m_controller.data(), &Abstract3DController::elementSelected, this,
+                     &AbstractDeclarative::elementSelected);
 
     QObject::connect(m_controller.data(), &Abstract3DController::axisXChanged, this,
                      &AbstractDeclarative::handleAxisXChanged);

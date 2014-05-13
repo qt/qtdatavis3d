@@ -1268,7 +1268,8 @@ void Abstract3DController::handlePendingClick()
 int Abstract3DController::selectedLabelIndex() const
 {
     int index = m_renderer->m_selectedLabelIndex;
-    if (selectedAxis()->labels().count() <= index)
+    QAbstract3DAxis *axis = selectedAxis();
+    if (axis && axis->labels().count() <= index)
         index = -1;
     return index;
 }
@@ -1293,6 +1294,23 @@ QAbstract3DAxis *Abstract3DController::selectedAxis() const
     }
 
     return axis;
+}
+
+int Abstract3DController::selectedCustomItemIndex() const
+{
+    int index = m_renderer->m_selectedCustomItemIndex;
+    if (m_customItems.count() <= index)
+        index = -1;
+    return index;
+}
+
+QCustom3DItem *Abstract3DController::selectedCustomItem() const
+{
+    QCustom3DItem *item = 0;
+    int index = selectedCustomItemIndex();
+    if (index >= 0)
+        item = m_customItems[index];
+    return item;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

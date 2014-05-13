@@ -181,6 +181,7 @@ protected:
     QAbstract3DSeries *m_clickedSeries;
     QAbstract3DGraph::ElementType m_clickedType;
     int m_selectedLabelIndex;
+    int m_selectedCustomItemIndex;
 
     QString m_selectionLabel;
     LabelItem *m_selectionLabelItem;

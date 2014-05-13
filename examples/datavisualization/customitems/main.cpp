@@ -65,10 +65,12 @@ int main(int argc, char **argv)
     vLayoutLeft->addWidget(checkboxThree);
 
     QLabel *label2 = new QLabel("Visuals:");
+    font.setBold(true);
     label2->setFont(font);
     vLayoutRight->addWidget(label2);
 
     QCheckBox *checkboxOneRight = new QCheckBox("See-Through");
+    font.setBold(false);
     checkboxOneRight->setFont(font);
     vLayoutRight->addWidget(checkboxOneRight);
 
@@ -81,11 +83,22 @@ int main(int argc, char **argv)
     checkboxThreeRight->setChecked(true);
     vLayoutRight->addWidget(checkboxThreeRight);
 
+    QLabel *label3 = new QLabel("Selection:");
+    font.setBold(true);
+    label3->setFont(font);
+    vLayoutRight->addWidget(label3);
+
+    QLabel *label4 = new QLabel("Nothing");
+    font.setBold(false);
+    font.setPointSize(12);
+    label4->setFont(font);
+    vLayoutRight->addWidget(label4);
+
     widget->setWindowTitle(QStringLiteral("Custom Items Example"));
 
     widget->show();
 
-    CustomItemGraph *modifier = new CustomItemGraph(graph);
+    CustomItemGraph *modifier = new CustomItemGraph(graph, label4);
 
     QObject::connect(checkboxOne, &QCheckBox::stateChanged,
                      modifier, &CustomItemGraph::toggleItemOne);

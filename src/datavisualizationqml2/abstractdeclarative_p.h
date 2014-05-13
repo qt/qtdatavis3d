@@ -137,6 +137,9 @@ public:
     Q_REVISION(1) Q_INVOKABLE virtual int selectedLabelIndex() const;
     Q_REVISION(1) Q_INVOKABLE virtual QAbstract3DAxis *selectedAxis() const;
 
+    Q_REVISION(1) Q_INVOKABLE virtual int selectedCustomItemIndex() const;
+    Q_REVISION(1) Q_INVOKABLE virtual QCustom3DItem *selectedCustomItem() const;
+
     QQmlListProperty<QCustom3DItem> customItemList();
     static void appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
                                      QCustom3DItem *item);
@@ -191,6 +194,7 @@ signals:
     void renderingModeChanged(AbstractDeclarative::RenderingMode mode);
     Q_REVISION(1) void measureFpsChanged(bool enabled);
     Q_REVISION(1) void currentFpsChanged(qreal fps);
+    Q_REVISION(1) void elementSelected(QAbstract3DGraph::ElementType type);
 
 private:
     QPointer<Abstract3DController> m_controller;

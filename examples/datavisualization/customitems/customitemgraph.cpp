@@ -24,8 +24,9 @@
 
 using namespace QtDataVisualization;
 
-CustomItemGraph::CustomItemGraph(Q3DSurface *surface)
-    : m_graph(surface)
+CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)
+    : m_graph(surface),
+      m_textField(label)
 {
     QImage layerOneHMap(":/maps/layer_1.png");
     QHeightMapSurfaceDataProxy *layerOneProxy = new QHeightMapSurfaceDataProxy(layerOneHMap);
@@ -87,6 +88,9 @@ CustomItemGraph::CustomItemGraph(Q3DSurface *surface)
     m_graph->seriesList().at(2)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
 
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
+
+    connect(m_graph, &QAbstract3DGraph::elementSelected,
+            this, &CustomItemGraph::handleElementSelected);
 }
 
 CustomItemGraph::~CustomItemGraph()
@@ -188,4 +192,25 @@ void CustomItemGraph::toggleShadows(bool shadows)
         m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
     else
         m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+}
+
+void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
+{
+    if (type == QAbstract3DGraph::ElementCustomItem) {
+        int index = m_graph->selectedCustomItemIndex();
+        QCustom3DItem *item = m_graph->selectedCustomItem();
+        QString text;
+        text.setNum(index);
+        text.append(": ");
+        QStringList split = item->meshFile().split("/");
+        text.append(split.last());
+        m_textField->setText(text);
+    } else if (type == QAbstract3DGraph::ElementSeries) {
+        m_textField->setText("Surface");
+    } else if (type > QAbstract3DGraph::ElementSeries
+               && type < QAbstract3DGraph::ElementCustomItem) {
+        m_textField->setText("Axis");
+    } else {
+        m_textField->setText("Nothing");
+    }
 }

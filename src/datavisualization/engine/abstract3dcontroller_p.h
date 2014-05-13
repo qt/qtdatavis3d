@@ -243,6 +243,8 @@ public:
 
     int selectedLabelIndex() const;
     QAbstract3DAxis *selectedAxis() const;
+    int selectedCustomItemIndex() const;
+    QCustom3DItem *selectedCustomItem() const;
 
     void emitNeedRender();
 
