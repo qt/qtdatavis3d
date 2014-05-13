@@ -30,6 +30,7 @@ class QItemModelBarDataProxyPrivate;
 class QT_DATAVISUALIZATION_EXPORT QItemModelBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
+    Q_ENUMS(MultiMatchBehavior)
     Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
     Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY rowRoleChanged)
     Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY columnRoleChanged)
@@ -48,8 +49,16 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelBarDataProxy : public QBarDataProxy
     Q_PROPERTY(QString columnRoleReplace READ columnRoleReplace WRITE setColumnRoleReplace NOTIFY columnRoleReplaceChanged REVISION 1)
     Q_PROPERTY(QString valueRoleReplace READ valueRoleReplace WRITE setValueRoleReplace NOTIFY valueRoleReplaceChanged REVISION 1)
     Q_PROPERTY(QString rotationRoleReplace READ rotationRoleReplace WRITE setRotationRoleReplace NOTIFY rotationRoleReplaceChanged REVISION 1)
+    Q_PROPERTY(MultiMatchBehavior multiMatchBehavior READ multiMatchBehavior WRITE setMultiMatchBehavior NOTIFY multiMatchBehaviorChanged REVISION 1)
 
 public:
+    enum MultiMatchBehavior {
+        MMBFirst = 0,
+        MMBLast = 1,
+        MMBAverage = 2,
+        MMBCumulative = 3
+    };
+
     explicit QItemModelBarDataProxy(QObject *parent = 0);
     QItemModelBarDataProxy(const QAbstractItemModel *itemModel, QObject *parent = 0);
     QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &valueRole,
@@ -120,6 +129,9 @@ public:
     void setRotationRoleReplace(const QString &replace);
     QString rotationRoleReplace() const;
 
+    void setMultiMatchBehavior(MultiMatchBehavior behavior);
+    MultiMatchBehavior multiMatchBehavior() const;
+
 signals:
     void itemModelChanged(const QAbstractItemModel* itemModel);
     void rowRoleChanged(const QString &role);
@@ -139,6 +151,7 @@ signals:
     Q_REVISION(1) void columnRoleReplaceChanged(const QString &replace);
     Q_REVISION(1) void valueRoleReplaceChanged(const QString &replace);
     Q_REVISION(1) void rotationRoleReplaceChanged(const QString &replace);
+    Q_REVISION(1) void multiMatchBehaviorChanged(MultiMatchBehavior behavior);
 
 protected:
     QItemModelBarDataProxyPrivate *dptr();

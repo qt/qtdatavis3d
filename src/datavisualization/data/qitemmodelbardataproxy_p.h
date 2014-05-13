@@ -73,6 +73,8 @@ private:
     QString m_valueRoleReplace;
     QString m_rotationRoleReplace;
 
+    QItemModelBarDataProxy::MultiMatchBehavior m_multiMatchBehavior;
+
     friend class BarItemModelHandler;
     friend class QItemModelBarDataProxy;
 };

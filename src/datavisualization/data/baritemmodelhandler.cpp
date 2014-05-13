@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "baritemmodelhandler_p.h"
+#include <QTime>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -176,8 +177,17 @@ void BarItemModelHandler::resolveModel()
 
         // Sort values into rows and columns
         typedef QHash<QString, float> ColumnValueMap;
-        QHash <QString, ColumnValueMap> itemValueMap;
-        QHash <QString, ColumnValueMap> itemRotationMap;
+        QHash<QString, ColumnValueMap> itemValueMap;
+        QHash<QString, ColumnValueMap> itemRotationMap;
+
+        bool cumulative = m_proxy->multiMatchBehavior() == QItemModelBarDataProxy::MMBAverage
+                || m_proxy->multiMatchBehavior() == QItemModelBarDataProxy::MMBCumulative;
+        bool countMatches = m_proxy->multiMatchBehavior() == QItemModelBarDataProxy::MMBAverage;
+        bool takeFirst = m_proxy->multiMatchBehavior() == QItemModelBarDataProxy::MMBFirst;
+        QHash<QString, QHash<QString, int> > *matchCountMap = 0;
+        if (countMatches)
+            matchCountMap = new QHash<QString, QHash<QString, int> >;
+
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
                 QModelIndex index = m_itemModel->index(i, j);
@@ -193,7 +203,19 @@ void BarItemModelHandler::resolveModel()
                     value = valueVar.toString().replace(m_valuePattern, m_valueReplace).toFloat();
                 else
                     value = valueVar.toFloat();
-                itemValueMap[rowRoleStr][columnRoleStr] = value;
+                if (countMatches)
+                    (*matchCountMap)[rowRoleStr][columnRoleStr]++;
+
+                if (cumulative) {
+                    itemValueMap[rowRoleStr][columnRoleStr] += value;
+                } else {
+                    if (takeFirst && itemValueMap.contains(rowRoleStr)) {
+                        if (itemValueMap.value(rowRoleStr).contains(columnRoleStr))
+                            continue; // We already have a value for this row/column combo
+                    }
+                    itemValueMap[rowRoleStr][columnRoleStr] = value;
+                }
+
                 if (m_rotationRole != noRoleIndex) {
                     QVariant rotationVar = index.data(m_rotationRole);
                     float rotation;
@@ -203,7 +225,13 @@ void BarItemModelHandler::resolveModel()
                     } else {
                         rotation = rotationVar.toFloat();
                     }
-                    itemRotationMap[rowRoleStr][columnRoleStr] = rotation;
+                    if (cumulative) {
+                        itemRotationMap[rowRoleStr][columnRoleStr] += rotation;
+                    } else {
+                        // We know we are in take last mode if we get here,
+                        // as take first mode skips to next loop already earlier
+                        itemRotationMap[rowRoleStr][columnRoleStr] = rotation;
+                    }
                 }
                 if (generateRows && !rowListHash.value(rowRoleStr, false)) {
                     rowListHash.insert(rowRoleStr, true);
@@ -239,9 +267,16 @@ void BarItemModelHandler::resolveModel()
             QString rowKey = rowList.at(i);
             QBarDataRow &newProxyRow = *m_proxyArray->at(i);
             for (int j = 0; j < columnList.size(); j++) {
-                newProxyRow[j].setValue(itemValueMap[rowKey][columnList.at(j)]);
-                if (m_rotationRole != noRoleIndex)
-                    newProxyRow[j].setRotation(itemRotationMap[rowKey][columnList.at(j)]);
+                float value = itemValueMap[rowKey][columnList.at(j)];
+                if (countMatches)
+                    value /= float((*matchCountMap)[rowKey][columnList.at(j)]);
+                newProxyRow[j].setValue(value);
+                if (m_rotationRole != noRoleIndex) {
+                    float angle = itemRotationMap[rowKey][columnList.at(j)];
+                    if (countMatches)
+                        angle /= float((*matchCountMap)[rowKey][columnList.at(j)]);
+                    newProxyRow[j].setRotation(angle);
+                }
             }
         }
 

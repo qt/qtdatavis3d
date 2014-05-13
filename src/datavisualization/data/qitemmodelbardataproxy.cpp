@@ -237,6 +237,37 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty ItemModelBarDataProxy.MultiMatchBehavior ItemModelBarDataProxy::multiMatchBehavior
+ * This property defines how multiple matches for each row/column combination are handled.
+ * Defaults to ItemModelBarDataProxy.MMBLast. The chosen behavior affects both bar value
+ * and rotation.
+ *
+ * For example, you might have an item model with timestamped data taken at irregular intervals
+ * and you want to visualize total value of data items on each day with a bar graph.
+ * This can be done by specifying row and column categories so that each bar represents a day,
+ * and setting multiMatchBehavior to ItemModelBarDataProxy.MMBCumulative.
+ */
+
+/*!
+ *  \enum QItemModelBarDataProxy::MultiMatchBehavior
+ *
+ *  Behavior types for QItemModelBarDataProxy::multiMatchBehavior property.
+ *
+ *  \value MMBFirst
+ *         The value is taken from the first item in the item model that matches
+ *         each row/column combination.
+ *  \value MMBLast
+ *         The value is taken from the last item in the item model that matches
+ *         each row/column combination.
+ *  \value MMBAverage
+ *         The values from all items matching each row/column combination are
+ *         averaged together and the average is used as the bar value.
+ *  \value MMBCumulative
+ *         The values from all items matching each row/column combination are
+ *         added together and the total is used as the bar value.
+ */
+
+/*!
  * Constructs QItemModelBarDataProxy with optional \a parent.
  */
 QItemModelBarDataProxy::QItemModelBarDataProxy(QObject *parent)
@@ -784,6 +815,31 @@ QString QItemModelBarDataProxy::rotationRoleReplace() const
 }
 
 /*!
+ * \property QItemModelBarDataProxy::multiMatchBehavior
+ *
+ * This property defines how multiple matches for each row/column combination are handled.
+ * Defaults to QItemModelBarDataProxy::MMBLast. The chosen behavior affects both bar value
+ * and rotation.
+ *
+ * For example, you might have an item model with timestamped data taken at irregular intervals
+ * and you want to visualize total value of data items on each day with a bar graph.
+ * This can be done by specifying row and column categories so that each bar represents a day,
+ * and setting multiMatchBehavior to QItemModelBarDataProxy::MMBCumulative.
+ */
+void QItemModelBarDataProxy::setMultiMatchBehavior(QItemModelBarDataProxy::MultiMatchBehavior behavior)
+{
+    if (dptr()->m_multiMatchBehavior != behavior) {
+        dptr()->m_multiMatchBehavior = behavior;
+        emit multiMatchBehaviorChanged(behavior);
+    }
+}
+
+QItemModelBarDataProxy::MultiMatchBehavior QItemModelBarDataProxy::multiMatchBehavior() const
+{
+    return dptrc()->m_multiMatchBehavior;
+}
+
+/*!
  * \internal
  */
 QItemModelBarDataProxyPrivate *QItemModelBarDataProxy::dptr()
@@ -806,7 +862,8 @@ QItemModelBarDataProxyPrivate::QItemModelBarDataProxyPrivate(QItemModelBarDataPr
       m_itemModelHandler(new BarItemModelHandler(q)),
       m_useModelCategories(false),
       m_autoRowCategories(true),
-      m_autoColumnCategories(true)
+      m_autoColumnCategories(true),
+      m_multiMatchBehavior(QItemModelBarDataProxy::MMBLast)
 {
 }
 
@@ -857,6 +914,8 @@ void QItemModelBarDataProxyPrivate::connectItemModelHandler()
     QObject::connect(qptr(), &QItemModelBarDataProxy::valueRoleReplaceChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelBarDataProxy::rotationRoleReplaceChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelBarDataProxy::multiMatchBehaviorChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 

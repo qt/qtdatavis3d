@@ -59,6 +59,7 @@ Rectangle {
                 Surface3DSeries {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     ItemModelSurfaceDataProxy {
+                        id: surfaceProxy
                         itemModel: data.sharedData
                         // The surface data points are not neatly lined up in rows and columns,
                         // so we define explicit row and column roles.
@@ -118,10 +119,11 @@ Rectangle {
                 }
 
                 NewButton {
+                    id: mmbButton
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: "Toggle Mesh Styles"
-                    onClicked: toggleMeshStyle() // call a helper function to keep button itself simpler
+                    text: "MMB: Last"
+                    onClicked: changeMMB() // call a helper function to keep button itself simpler
                 }
             }
         }
@@ -146,6 +148,7 @@ Rectangle {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     mesh: Abstract3DSeries.MeshCube
                     ItemModelScatterDataProxy {
+                        id: scatterProxy
                         itemModel: data.sharedData
                         // Mapping model roles to scatter series item coordinates.
                         xPosRole: "data"
@@ -187,17 +190,21 @@ Rectangle {
                     name: "Population density"
 
                     ItemModelBarDataProxy {
+                        id: barProxy
                         itemModel: data.sharedData
                         // Mapping model roles to bar series rows, columns, and values.
                         rowRole: "coords"
                         columnRole: "coords"
                         valueRole: "data"
+                        rotationRole: "coords"
                         rowRolePattern: /(\d),\d/
                         columnRolePattern: /(\d),(\d)/
                         valueRolePattern: /^([^\/]*)\/([^\/]*)\/(.*)$/
+                        rotationRolePattern: /(\d)\,(\d)/
                         rowRoleReplace: "\\1"
                         columnRoleReplace: "\\2"
                         valueRoleReplace: "\\3"
+                        rotationRoleReplace: "\\2\\1"
                     }
                 }
             }
@@ -219,16 +226,19 @@ Rectangle {
         barGraph.scene.activeCamera.zoomLevel = 100.0
     }
 
-    function toggleMeshStyle() {
-        if (barGraph.seriesList[0].meshSmooth === true) {
-            barGraph.seriesList[0].meshSmooth = false
-            if (surfaceGraph.seriesList[0].flatShadingSupported)
-                surfaceGraph.seriesList[0].flatShadingEnabled = true
-            scatterGraph.seriesList[0].meshSmooth = false
+    function changeMMB() {
+        if (barProxy.multiMatchBehavior === ItemModelBarDataProxy.MMBLast) {
+            barProxy.multiMatchBehavior = ItemModelBarDataProxy.MMBAverage
+            mmbButton.text = "MMB: Average"
+        } else if (barProxy.multiMatchBehavior === ItemModelBarDataProxy.MMBAverage) {
+            barProxy.multiMatchBehavior = ItemModelBarDataProxy.MMBCumulative
+            mmbButton.text = "MMB: Cumulative"
+        } else if (barProxy.multiMatchBehavior === ItemModelBarDataProxy.MMBCumulative) {
+            barProxy.multiMatchBehavior = ItemModelBarDataProxy.MMBFirst
+            mmbButton.text = "MMB: First"
         } else {
-            barGraph.seriesList[0].meshSmooth = true
-            surfaceGraph.seriesList[0].flatShadingEnabled = false
-            scatterGraph.seriesList[0].meshSmooth = true
+            barProxy.multiMatchBehavior = ItemModelBarDataProxy.MMBLast
+            mmbButton.text = "MMB: Last"
         }
     }
 }
