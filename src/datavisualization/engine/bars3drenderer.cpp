@@ -1474,10 +1474,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // Reset culling
     glCullFace(GL_BACK);
 
-    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
-                                        projectionViewMatrix, depthProjectionViewMatrix,
-                                        m_depthTexture, m_shadowQualityToShader);
-
     // Bind background shader
     m_backgroundShader->bind();
 
@@ -1800,6 +1796,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
     }
+
+    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
+                                        projectionViewMatrix, depthProjectionViewMatrix,
+                                        m_depthTexture, m_shadowQualityToShader);
+
     drawLabels(false, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
                columnScaleFactor);
 

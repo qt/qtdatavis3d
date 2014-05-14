@@ -542,10 +542,11 @@ void Abstract3DRenderer::addCustomItem(QCustom3DItem *item) {
     newItem->setMesh(item->meshFile());
     newItem->setScaling(item->scaling());
     newItem->setRotation(item->rotation());
-    GLuint texture = m_textureHelper->create2DTexture(item->d_ptr->textureImage(),
-                                                      true, true, true);
+    QImage textureImage = item->d_ptr->textureImage();
+    newItem->setBlendNeeded(textureImage.hasAlphaChannel());
+    GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
     newItem->setTexture(texture);
-    // TODO: Uncomment this once custom item render cache handling has been optimized
+    // TODO: Uncomment this once custom item render cache handling has been optimized (QTRD-3056)
     //item->d_ptr->clearTextureImage();
     QVector3D translation = convertPositionToTranslation(item->position());
     newItem->setTranslation(translation);
@@ -574,8 +575,6 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
         shader->setUniformValue(shader->view(), viewMatrix);
 
         glEnable(GL_TEXTURE_2D);
-        glEnable(GL_BLEND);
-        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
 
     // Draw custom items
@@ -596,6 +595,15 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
             shader->setUniformValue(shader->model(), modelMatrix);
             shader->setUniformValue(shader->MVP(), MVPMatrix);
             shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+
+            if (item->isBlendNeeded()) {
+                glEnable(GL_BLEND);
+                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+                glDisable(GL_CULL_FACE);
+            } else {
+                glDisable(GL_BLEND);
+                glEnable(GL_CULL_FACE);
+            }
 
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
@@ -632,6 +640,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
     if (RenderingNormal == state) {
         glDisable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
+        glEnable(GL_CULL_FACE);
     }
 }
 

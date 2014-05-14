@@ -47,11 +47,14 @@ public:
     inline ObjectHelper *mesh() { return m_object; }
     inline void setScaling(const QVector3D &scaling) { m_scaling = scaling; }
     inline QVector3D scaling() { return m_scaling; }
+    inline void setBlendNeeded(bool blend) { m_needBlend = blend; }
+    inline bool isBlendNeeded() { return m_needBlend; }
 
 private:
     GLuint m_texture;
     QVector3D m_scaling;
     ObjectHelper *m_object;
+    bool m_needBlend;
  };
 typedef QVector<CustomRenderItem *> CustomRenderItemArray;
 

@@ -1361,10 +1361,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         }
     }
 
-    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
-                                        projectionViewMatrix, depthProjectionViewMatrix,
-                                        m_depthTexture, m_shadowQualityToShader);
-
     // Bind background shader
     m_backgroundShader->bind();
     glCullFace(GL_BACK);
@@ -1769,6 +1765,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
     }
+
+    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
+                                        projectionViewMatrix, depthProjectionViewMatrix,
+                                        m_depthTexture, m_shadowQualityToShader);
 
     drawLabels(false, activeCamera, viewMatrix, projectionMatrix);
 

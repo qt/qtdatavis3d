@@ -92,6 +92,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 QCustom3DItem::QCustom3DItem(QObject *parent) :
     d_ptr(new QCustom3DItemPrivate(this, parent))
 {
+    setTextureImage(QImage());
 }
 
 /*!
@@ -203,7 +204,7 @@ void QCustom3DItem::setTextureImage(const QImage &textureImage)
 {
     if (textureImage.isNull()) {
         // Make a solid gray texture
-        d_ptr->m_textureImage = QImage(2, 2, QImage::Format_ARGB32);
+        d_ptr->m_textureImage = QImage(2, 2, QImage::Format_RGB32);
         d_ptr->m_textureImage.fill(Qt::gray);
     } else {
         d_ptr->m_textureImage = textureImage;
@@ -227,7 +228,7 @@ void QCustom3DItem::setTextureFile(const QString &textureFile)
         if (!textureFile.isEmpty()) {
             d_ptr->m_textureImage = QImage(textureFile);
         } else {
-            d_ptr->m_textureImage = QImage(2, 2, QImage::Format_ARGB32);
+            d_ptr->m_textureImage = QImage(2, 2, QImage::Format_RGB32);
             d_ptr->m_textureImage.fill(Qt::gray);
         }
         emit textureFileChanged(textureFile);

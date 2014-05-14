@@ -105,7 +105,7 @@ void CustomItemGraph::toggleItemOne(bool show)
     //! [1]
     if (show) {
         //! [0]
-        QImage color = QImage(2, 2, QImage::Format_ARGB32);
+        QImage color = QImage(2, 2, QImage::Format_RGB32);
         color.fill(Qt::red);
         //! [0]
         //! [2]
@@ -128,7 +128,7 @@ void CustomItemGraph::toggleItemTwo(bool show)
 {
     QVector3D positionTwo = QVector3D(34.5f, 77.0f, 23.4f);
     if (show) {
-        QImage color = QImage(2, 2, QImage::Format_ARGB32);
+        QImage color = QImage(2, 2, QImage::Format_RGB32);
         color.fill(Qt::red);
         QCustom3DItem *item = new QCustom3DItem();
         item->setMeshFile(":/items/oilrig.obj");
@@ -146,7 +146,7 @@ void CustomItemGraph::toggleItemThree(bool show)
 {
     QVector3D positionThree = QVector3D(34.5f, 86.0f, 19.1f);
     if (show) {
-        QImage color = QImage(2, 2, QImage::Format_ARGB32);
+        QImage color = QImage(2, 2, QImage::Format_RGB32);
         color.fill(Qt::darkMagenta);
         QCustom3DItem *item = new QCustom3DItem();
         item->setMeshFile(":/items/refinery.obj");
