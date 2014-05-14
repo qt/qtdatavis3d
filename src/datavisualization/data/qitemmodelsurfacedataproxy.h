@@ -31,6 +31,7 @@ class QItemModelSurfaceDataProxyPrivate;
 class QT_DATAVISUALIZATION_EXPORT QItemModelSurfaceDataProxy : public QSurfaceDataProxy
 {
     Q_OBJECT
+    Q_ENUMS(MultiMatchBehavior)
     Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
     Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY rowRoleChanged)
     Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY columnRoleChanged)
@@ -52,8 +53,16 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelSurfaceDataProxy : public QSurfaceDa
     Q_PROPERTY(QString xPosRoleReplace READ xPosRoleReplace WRITE setXPosRoleReplace NOTIFY xPosRoleReplaceChanged REVISION 1)
     Q_PROPERTY(QString yPosRoleReplace READ yPosRoleReplace WRITE setYPosRoleReplace NOTIFY yPosRoleReplaceChanged REVISION 1)
     Q_PROPERTY(QString zPosRoleReplace READ zPosRoleReplace WRITE setZPosRoleReplace NOTIFY zPosRoleReplaceChanged REVISION 1)
+    Q_PROPERTY(MultiMatchBehavior multiMatchBehavior READ multiMatchBehavior WRITE setMultiMatchBehavior NOTIFY multiMatchBehaviorChanged REVISION 1)
 
 public:
+    enum MultiMatchBehavior {
+        MMBFirst = 0,
+        MMBLast = 1,
+        MMBAverage = 2,
+        MMBCumulativeY = 3
+    };
+
     explicit QItemModelSurfaceDataProxy(QObject *parent = 0);
     QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, QObject *parent = 0);
     QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &yPosRole,
@@ -132,6 +141,9 @@ public:
     void setZPosRoleReplace(const QString &replace);
     QString zPosRoleReplace() const;
 
+    void setMultiMatchBehavior(MultiMatchBehavior behavior);
+    MultiMatchBehavior multiMatchBehavior() const;
+
 signals:
     void itemModelChanged(const QAbstractItemModel* itemModel);
     void rowRoleChanged(const QString &role);
@@ -154,6 +166,7 @@ signals:
     Q_REVISION(1) void xPosRoleReplaceChanged(const QString &replace);
     Q_REVISION(1) void yPosRoleReplaceChanged(const QString &replace);
     Q_REVISION(1) void zPosRoleReplaceChanged(const QString &replace);
+    Q_REVISION(1) void multiMatchBehaviorChanged(MultiMatchBehavior behavior);
 
 protected:
     QItemModelSurfaceDataProxyPrivate *dptr();

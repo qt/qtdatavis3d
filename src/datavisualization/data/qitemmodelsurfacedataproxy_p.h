@@ -76,6 +76,8 @@ private:
     QString m_yPosRoleReplace;
     QString m_zPosRoleReplace;
 
+    QItemModelSurfaceDataProxy::MultiMatchBehavior m_multiMatchBehavior;
+
     friend class SurfaceItemModelHandler;
     friend class QItemModelSurfaceDataProxy;
 };

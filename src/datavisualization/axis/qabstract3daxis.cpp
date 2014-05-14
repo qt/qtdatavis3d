@@ -42,7 +42,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * For AbstractAxis3D enums, see \l QAbstract3DAxis::AxisOrientation and \l QAbstract3DAxis::AxisType
+ * For AbstractAxis3D enums, see \l QAbstract3DAxis::AxisOrientation and
+ * \l{QAbstract3DAxis::AxisType}.
  */
 
 /*!

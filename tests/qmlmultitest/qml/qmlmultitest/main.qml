@@ -229,15 +229,19 @@ Rectangle {
     function changeMMB() {
         if (barProxy.multiMatchBehavior === ItemModelBarDataProxy.MMBLast) {
             barProxy.multiMatchBehavior = ItemModelBarDataProxy.MMBAverage
+            surfaceProxy.multiMatchBehavior = ItemModelSurfaceDataProxy.MMBAverage
             mmbButton.text = "MMB: Average"
         } else if (barProxy.multiMatchBehavior === ItemModelBarDataProxy.MMBAverage) {
             barProxy.multiMatchBehavior = ItemModelBarDataProxy.MMBCumulative
+            surfaceProxy.multiMatchBehavior = ItemModelSurfaceDataProxy.MMBCumulativeY
             mmbButton.text = "MMB: Cumulative"
         } else if (barProxy.multiMatchBehavior === ItemModelBarDataProxy.MMBCumulative) {
             barProxy.multiMatchBehavior = ItemModelBarDataProxy.MMBFirst
+            surfaceProxy.multiMatchBehavior = ItemModelSurfaceDataProxy.MMBFirst
             mmbButton.text = "MMB: First"
         } else {
             barProxy.multiMatchBehavior = ItemModelBarDataProxy.MMBLast
+            surfaceProxy.multiMatchBehavior = ItemModelSurfaceDataProxy.MMBLast
             mmbButton.text = "MMB: Last"
         }
     }

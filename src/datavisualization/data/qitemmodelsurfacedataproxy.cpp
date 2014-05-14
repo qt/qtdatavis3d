@@ -93,6 +93,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Data is resolved asynchronously whenever the mapping or the model changes.
  * QSurfaceDataProxy::arrayReset() is emitted when the data has been resolved.
  *
+ * For ItemModelSurfaceDataProxy enums, see \l{QItemModelSurfaceDataProxy::MultiMatchBehavior}.
+ *
  * For more details, see QItemModelSurfaceDataProxy documentation.
  *
  * Usage example:
@@ -278,6 +280,36 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * function documentation.
  *
  * \sa zPosRole, zPosRolePattern
+ */
+
+/*!
+ * \qmlproperty ItemModelSurfaceDataProxy.MultiMatchBehavior ItemModelSurfaceDataProxy::multiMatchBehavior
+ * This property defines how multiple matches for each row/column combination are handled.
+ * Defaults to ItemModelSurfaceDataProxy.MMBLast.
+ *
+ * For example, you might have an item model with timestamped data taken at irregular intervals
+ * and you want to visualize an average position of data items on each hour with a surface graph.
+ * This can be done by specifying row and column categories so that each surface point represents
+ * an hour, and setting multiMatchBehavior to ItemModelSurfaceDataProxy.MMBAverage.
+ */
+
+/*!
+ *  \enum QItemModelSurfaceDataProxy::MultiMatchBehavior
+ *
+ *  Behavior types for QItemModelSurfaceDataProxy::multiMatchBehavior property.
+ *
+ *  \value MMBFirst
+ *         The position values are taken from the first item in the item model that matches
+ *         each row/column combination.
+ *  \value MMBLast
+ *         The position values are taken from the last item in the item model that matches
+ *         each row/column combination.
+ *  \value MMBAverage
+ *         The position values from all items matching each row/column combination are
+ *         averaged together and the averages are used as the surface point position.
+ *  \value MMBCumulativeY
+ *         For X and Z values this acts just like \c{MMBAverage}, but Y values are added together
+ *         instead of averaged and the total is used as the surface point Y position.
  */
 
 /*!
@@ -912,6 +944,31 @@ QString QItemModelSurfaceDataProxy::zPosRoleReplace() const
 }
 
 /*!
+ * \property QItemModelSurfaceDataProxy::multiMatchBehavior
+ *
+ * This property defines how multiple matches for each row/column combination are handled.
+ * Defaults to QItemModelSurfaceDataProxy::MMBLast.
+ *
+ * For example, you might have an item model with timestamped data taken at irregular intervals
+ * and you want to visualize an average position of data items on each hour with a surface graph.
+ * This can be done by specifying row and column categories so that each surface point represents
+ * an hour, and setting multiMatchBehavior to QItemModelSurfaceDataProxy::MMBAverage.
+ */
+
+void QItemModelSurfaceDataProxy::setMultiMatchBehavior(QItemModelSurfaceDataProxy::MultiMatchBehavior behavior)
+{
+    if (dptr()->m_multiMatchBehavior != behavior) {
+        dptr()->m_multiMatchBehavior = behavior;
+        emit multiMatchBehaviorChanged(behavior);
+    }
+}
+
+QItemModelSurfaceDataProxy::MultiMatchBehavior QItemModelSurfaceDataProxy::multiMatchBehavior() const
+{
+    return dptrc()->m_multiMatchBehavior;
+}
+
+/*!
  * \internal
  */
 QItemModelSurfaceDataProxyPrivate *QItemModelSurfaceDataProxy::dptr()
@@ -934,7 +991,8 @@ QItemModelSurfaceDataProxyPrivate::QItemModelSurfaceDataProxyPrivate(QItemModelS
       m_itemModelHandler(new SurfaceItemModelHandler(q)),
       m_useModelCategories(false),
       m_autoRowCategories(true),
-      m_autoColumnCategories(true)
+      m_autoColumnCategories(true),
+      m_multiMatchBehavior(QItemModelSurfaceDataProxy::MMBLast)
 {
 }
 
@@ -991,6 +1049,8 @@ void QItemModelSurfaceDataProxyPrivate::connectItemModelHandler()
     QObject::connect(qptr(), &QItemModelSurfaceDataProxy::yPosRoleReplaceChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
     QObject::connect(qptr(), &QItemModelSurfaceDataProxy::zPosRoleReplaceChanged,
+                     m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
+    QObject::connect(qptr(), &QItemModelSurfaceDataProxy::multiMatchBehaviorChanged,
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 

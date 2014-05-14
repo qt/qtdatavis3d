@@ -56,7 +56,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This type is uncreatable.
  *
- * For AbstractInputHandler3D enums, see \l QAbstract3DInputHandler::InputView
+ * For AbstractInputHandler3D enums, see \l{QAbstract3DInputHandler::InputView}.
  */
 
 /*!

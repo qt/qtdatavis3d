@@ -212,6 +212,14 @@ void SurfaceItemModelHandler::resolveModel()
         QHash<QString, bool> rowListHash;
         QHash<QString, bool> columnListHash;
 
+        bool cumulative = m_proxy->multiMatchBehavior() == QItemModelSurfaceDataProxy::MMBAverage
+                || m_proxy->multiMatchBehavior() == QItemModelSurfaceDataProxy::MMBCumulativeY;
+        bool average = m_proxy->multiMatchBehavior() == QItemModelSurfaceDataProxy::MMBAverage;
+        bool takeFirst = m_proxy->multiMatchBehavior() == QItemModelSurfaceDataProxy::MMBFirst;
+        QHash<QString, QHash<QString, int> > *matchCountMap = 0;
+        if (cumulative)
+            matchCountMap = new QHash<QString, QHash<QString, int> >;
+
         // Sort values into rows and columns
         typedef QHash<QString, QVector3D> ColumnValueMap;
         QHash <QString, ColumnValueMap> itemValueMap;
@@ -244,7 +252,20 @@ void SurfaceItemModelHandler::resolveModel()
                     zPos = zValueVar.toFloat();
 
                 QVector3D itemPos(xPos, yPos, zPos);
-                itemValueMap[rowRoleStr][columnRoleStr] = itemPos;
+
+                if (cumulative)
+                    (*matchCountMap)[rowRoleStr][columnRoleStr]++;
+
+                if (cumulative) {
+                    itemValueMap[rowRoleStr][columnRoleStr] += itemPos;
+                } else {
+                    if (takeFirst && itemValueMap.contains(rowRoleStr)) {
+                        if (itemValueMap.value(rowRoleStr).contains(columnRoleStr))
+                            continue; // We already have a value for this row/column combo
+                    }
+                    itemValueMap[rowRoleStr][columnRoleStr] = itemPos;
+                }
+
                 if (generateRows && !rowListHash.value(rowRoleStr, false)) {
                     rowListHash.insert(rowRoleStr, true);
                     rowList << rowRoleStr;
@@ -278,8 +299,19 @@ void SurfaceItemModelHandler::resolveModel()
         for (int i = 0; i < rowList.size(); i++) {
             QString rowKey = rowList.at(i);
             QSurfaceDataRow &newProxyRow = *m_proxyArray->at(i);
-            for (int j = 0; j < columnList.size(); j++)
-                newProxyRow[j].setPosition(itemValueMap[rowKey][columnList.at(j)]);
+            for (int j = 0; j < columnList.size(); j++) {
+                QVector3D &itemPos = itemValueMap[rowKey][columnList.at(j)];
+                if (cumulative) {
+                    if (average) {
+                        itemPos /= float((*matchCountMap)[rowKey][columnList.at(j)]);
+                    } else { // cumulativeY
+                        float divisor = float((*matchCountMap)[rowKey][columnList.at(j)]);
+                        itemPos.setX(itemPos.x() / divisor);
+                        itemPos.setZ(itemPos.z() / divisor);
+                    }
+                }
+                newProxyRow[j].setPosition(itemPos);
+            }
         }
     }
 

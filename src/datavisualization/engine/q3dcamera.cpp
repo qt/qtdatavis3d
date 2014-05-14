@@ -85,7 +85,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * data visualization. The type offers simple methods for rotating the camera around the origin
  * and setting zoom level.
  *
- * For Camera3D enums, see \l Q3DCamera::CameraPreset
+ * For Camera3D enums, see \l{Q3DCamera::CameraPreset}.
  */
 
 /*!

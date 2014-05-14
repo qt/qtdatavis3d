@@ -87,6 +87,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Data is resolved asynchronously whenever the mapping or the model changes.
  * QBarDataProxy::arrayReset() is emitted when the data has been resolved.
  *
+ * For ItemModelBarDataProxy enums, see \l{QItemModelBarDataProxy::MultiMatchBehavior}.
+ *
  * For more details, see QItemModelBarDataProxy documentation.
  *
  * Usage example:

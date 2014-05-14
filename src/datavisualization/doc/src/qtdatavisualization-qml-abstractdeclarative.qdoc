@@ -29,7 +29,7 @@
   the 3D visualizations.
 
   For AbstractGraph3D enums, see \l QAbstract3DGraph::SelectionFlag,
-  \l QAbstract3DGraph::ShadowQuality, and \l QAbstract3DGraph::ElementType
+  \l QAbstract3DGraph::ShadowQuality, and \l{QAbstract3DGraph::ElementType}.
 
   \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */

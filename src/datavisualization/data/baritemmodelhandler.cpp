@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "baritemmodelhandler_p.h"
-#include <QTime>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -42,7 +42,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * For AbstractDataProxy enums, see \l QAbstractDataProxy::DataType
+ * For AbstractDataProxy enums, see \l{QAbstractDataProxy::DataType}.
  *
  * \sa BarDataProxy, ScatterDataProxy, SurfaceDataProxy, {Qt Data Visualization Data Handling}
  */
