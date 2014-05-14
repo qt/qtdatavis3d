@@ -43,6 +43,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_themeManager(new ThemeManager(this)),
     m_selectionMode(QAbstract3DGraph::SelectionItem),
     m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
+    m_useOrthoProjection(false),
     m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -187,6 +188,11 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.selectionModeChanged) {
         m_renderer->updateSelectionMode(m_selectionMode);
         m_changeTracker.selectionModeChanged = false;
+    }
+
+    if (m_changeTracker.projectionChanged) {
+        m_renderer->m_useOrthoProjection = m_useOrthoProjection;
+        m_changeTracker.projectionChanged = false;
     }
 
     if (m_changeTracker.axisXFormatterChanged) {
@@ -795,6 +801,12 @@ QAbstract3DGraph::SelectionFlags Abstract3DController::selectionMode() const
 
 void Abstract3DController::setShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
+    if (!m_useOrthoProjection)
+        doSetShadowQuality(quality);
+}
+
+void Abstract3DController::doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality)
+{
     if (quality != m_shadowQuality) {
         m_shadowQuality = quality;
         m_changeTracker.shadowQualityChanged = true;
@@ -1311,6 +1323,24 @@ QCustom3DItem *Abstract3DController::selectedCustomItem() const
     if (index >= 0)
         item = m_customItems[index];
     return item;
+}
+
+void Abstract3DController::setOrthoProjection(bool enable)
+{
+    if (enable != m_useOrthoProjection) {
+        m_useOrthoProjection = enable;
+        m_changeTracker.projectionChanged = true;
+        emit orthoProjectionChanged(m_useOrthoProjection);
+        // If changed to ortho, disable shadows
+        if (m_useOrthoProjection)
+            doSetShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+        emitNeedRender();
+    }
+}
+
+bool Abstract3DController::isOrthoProjection() const
+{
+    return m_useOrthoProjection;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

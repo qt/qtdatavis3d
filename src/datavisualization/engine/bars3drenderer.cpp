@@ -445,8 +445,16 @@ void Bars3DRenderer::drawSlicedScene()
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(35.0f, (GLfloat)m_secondarySubViewport.width()
-                                 / (GLfloat)m_secondarySubViewport.height(), 0.1f, 100.0f);
+    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width()
+            / (GLfloat)m_primarySubViewport.height();
+    if (m_useOrthoProjection) {
+        GLfloat orthoRatio = 2.0f / m_autoScaleAdjustment;
+        projectionMatrix.ortho(-viewPortRatio * orthoRatio, viewPortRatio * orthoRatio,
+                               -orthoRatio, orthoRatio,
+                               0.0f, 100.0f);
+    } else {
+        projectionMatrix.perspective(35.0f, viewPortRatio, 0.1f, 100.0f);
+    }
 
     // Set view matrix
     QMatrix4x4 viewMatrix;
@@ -923,7 +931,14 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     QMatrix4x4 projectionMatrix;
     GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width()
             / (GLfloat)m_primarySubViewport.height();
-    projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
+    if (m_useOrthoProjection) {
+        GLfloat orthoRatio = 2.0f;
+        projectionMatrix.ortho(-viewPortRatio * orthoRatio, viewPortRatio * orthoRatio,
+                               -orthoRatio, orthoRatio,
+                               0.0f, 100.0f);
+    } else {
+        projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
+    }
 
     // Get the view matrix
     QMatrix4x4 viewMatrix = activeCamera->d_ptr->viewMatrix();

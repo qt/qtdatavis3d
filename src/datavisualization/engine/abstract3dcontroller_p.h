@@ -82,6 +82,7 @@ struct Abstract3DChangeBitField {
     bool axisXFormatterChanged         : 1;
     bool axisYFormatterChanged         : 1;
     bool axisZFormatterChanged         : 1;
+    bool projectionChanged             : 1;
 
     Abstract3DChangeBitField() :
         zoomLevelChanged(true),
@@ -115,7 +116,8 @@ struct Abstract3DChangeBitField {
         axisZReversedChanged(true),
         axisXFormatterChanged(true),
         axisYFormatterChanged(true),
-        axisZFormatterChanged(true)
+        axisZFormatterChanged(true),
+        projectionChanged(true)
     {
     }
 };
@@ -148,6 +150,7 @@ private:
     ThemeManager *m_themeManager;
     QAbstract3DGraph::SelectionFlags m_selectionMode;
     QAbstract3DGraph::ShadowQuality m_shadowQuality;
+    bool m_useOrthoProjection;
 
 protected:
     Q3DScene *m_scene;
@@ -223,6 +226,7 @@ public:
     virtual QAbstract3DGraph::SelectionFlags selectionMode() const;
 
     virtual void setShadowQuality(QAbstract3DGraph::ShadowQuality quality);
+    virtual void doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual QAbstract3DGraph::ShadowQuality shadowQuality() const;
     virtual bool shadowsSupported() const;
 
@@ -245,6 +249,9 @@ public:
     QAbstract3DAxis *selectedAxis() const;
     int selectedCustomItemIndex() const;
     QCustom3DItem *selectedCustomItem() const;
+
+    void setOrthoProjection(bool enable);
+    bool isOrthoProjection() const;
 
     void emitNeedRender();
 
@@ -315,6 +322,7 @@ signals:
     void elementSelected(QAbstract3DGraph::ElementType type);
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
+    void orthoProjectionChanged(bool enabled);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

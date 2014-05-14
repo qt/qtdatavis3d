@@ -512,8 +512,8 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
  * \property QAbstract3DGraph::measureFps
  * \since Qt Data Visualization 1.1
  *
- * If \c true, the rendering is done continuously instead of on demand, and currentFps property
- * is updated. Defaults to false.
+ * If \c {true}, the rendering is done continuously instead of on demand, and currentFps property
+ * is updated. Defaults to \c{false}.
  *
  * \sa currentFps
  */
@@ -539,6 +539,23 @@ bool QAbstract3DGraph::measureFps() const
 qreal QAbstract3DGraph::currentFps() const
 {
     return d_ptr->m_visualController->currentFps();
+}
+
+/*!
+ * \property QAbstract3DGraph::orthoProjection
+ * \since Qt Data Visualization 1.1
+ *
+ * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
+ * \note Shadows will be disabled when set to \c{true}.
+ */
+void QAbstract3DGraph::setOrthoProjection(bool enable)
+{
+    d_ptr->m_visualController->setOrthoProjection(enable);
+}
+
+bool QAbstract3DGraph::isOrthoProjection() const
+{
+    return d_ptr->m_visualController->isOrthoProjection();
 }
 
 /*!
@@ -683,6 +700,9 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::measureFpsChanged);
     QObject::connect(m_visualController, &Abstract3DController::currentFpsChanged, q_ptr,
                      &QAbstract3DGraph::currentFpsChanged);
+
+    QObject::connect(m_visualController, &Abstract3DController::orthoProjectionChanged, q_ptr,
+                     &QAbstract3DGraph::orthoProjectionChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

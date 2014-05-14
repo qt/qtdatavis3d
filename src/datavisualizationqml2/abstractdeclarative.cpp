@@ -317,6 +317,9 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::measureFpsChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::currentFpsChanged, this,
                      &AbstractDeclarative::currentFpsChanged);
+
+    QObject::connect(m_controller.data(), &Abstract3DController::orthoProjectionChanged, this,
+                     &AbstractDeclarative::orthoProjectionChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -662,6 +665,16 @@ bool AbstractDeclarative::measureFps() const
 qreal AbstractDeclarative::currentFps() const
 {
     return m_controller->currentFps();
+}
+
+void AbstractDeclarative::setOrthoProjection(bool enable)
+{
+    m_controller->setOrthoProjection(enable);
+}
+
+bool AbstractDeclarative::isOrthoProjection() const
+{
+    return m_controller->isOrthoProjection();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

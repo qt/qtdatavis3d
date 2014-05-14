@@ -733,7 +733,7 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
                 cache->sliceSelectionPointer()->render(defaultFboHandle);
             }
             if (cache->mainPointerActive() && cache->renderable())
-                cache->mainSelectionPointer()->render(defaultFboHandle);
+                cache->mainSelectionPointer()->render(defaultFboHandle, m_useOrthoProjection);
         }
     }
 }
@@ -1040,8 +1040,16 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Set up projection matrix
     QMatrix4x4 projectionMatrix;
-    projectionMatrix.perspective(45.0f, (GLfloat)m_primarySubViewport.width()
-                                 / (GLfloat)m_primarySubViewport.height(), 0.1f, 100.0f);
+    GLfloat viewPortRatio = (GLfloat)m_primarySubViewport.width()
+            / (GLfloat)m_primarySubViewport.height();
+    if (m_useOrthoProjection) {
+        GLfloat orthoRatio = 2.0f;
+        projectionMatrix.ortho(-viewPortRatio * orthoRatio, viewPortRatio * orthoRatio,
+                               -orthoRatio, orthoRatio,
+                               0.0f, 100.0f);
+    } else {
+        projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
+    }
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 

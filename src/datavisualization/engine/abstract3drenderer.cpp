@@ -51,7 +51,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_clickedType(QAbstract3DGraph::ElementNone),
       m_selectionLabelItem(0),
       m_visibleSeriesCount(0),
-      m_customItemShader(0)
+      m_customItemShader(0),
+      m_useOrthoProjection(false)
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);

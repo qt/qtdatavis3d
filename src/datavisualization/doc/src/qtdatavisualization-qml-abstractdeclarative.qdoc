@@ -57,7 +57,7 @@
 
 /*!
   \qmlproperty AbstractInputHandler3D AbstractGraph3D::inputHandler
-  Input handler. You can disable default input handlers by setting this property to \c null.
+  Input handler. You can disable default input handlers by setting this property to \c {null}.
  */
 
 /*!
@@ -119,7 +119,7 @@
   When renderingMode is \c RenderDirectToBackground or \c RenderDirectToBackground_NoClear, this
   property value is read-only and returns the number of samples specified by the window surface
   format.
-  Defaults to 4.
+  Defaults to \c{4}.
 
   \sa renderingMode
  */
@@ -128,8 +128,8 @@
  * \qmlproperty bool AbstractGraph3D::measureFps
  * \since QtDataVisualization 1.1
  *
- * If \c true, the rendering is done continuously instead of on demand, and currentFps property
- * is updated. Defaults to false.
+ * If \c {true}, the rendering is done continuously instead of on demand, and currentFps property
+ * is updated. Defaults to \c{false}.
  *
  * \sa currentFps
  */
@@ -240,4 +240,12 @@
  * Bars3D::selectedSeries, Scatter3D::selectedSeries, Surface3D::selectedSeries
  *
  * \since Qt Data Visualization 1.1
+ */
+
+/*!
+ * \qmlproperty bool QAbstract3DGraph::orthoProjection
+ * \since Qt Data Visualization 1.1
+ *
+ * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
+ * \note Shadows will be disabled when set to \c{true}.
  */

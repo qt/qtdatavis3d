@@ -49,7 +49,7 @@ public:
     explicit SelectionPointer(Drawer *drawer);
     ~SelectionPointer();
 
-    void render(GLuint defaultFboHandle = 0);
+    void render(GLuint defaultFboHandle = 0, bool useOrtho = false);
     void setPosition(const QVector3D &position);
     void setLabel(const QString &label);
     void setPointerObject(ObjectHelper *object);

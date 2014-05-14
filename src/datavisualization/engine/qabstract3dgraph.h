@@ -44,6 +44,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(Q3DScene* scene READ scene)
     Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged)
     Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged)
+    Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -126,6 +127,9 @@ public:
     bool measureFps() const;
     qreal currentFps() const;
 
+    void setOrthoProjection(bool enable);
+    bool isOrthoProjection() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -146,6 +150,7 @@ signals:
     void elementSelected(QAbstract3DGraph::ElementType type);
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
+    void orthoProjectionChanged(bool enabled);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)

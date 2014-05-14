@@ -189,6 +189,8 @@ protected:
 
     ShaderHelper *m_customItemShader;
 
+    bool m_useOrthoProjection;
+
 private:
     friend class Abstract3DController;
 };

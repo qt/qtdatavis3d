@@ -69,6 +69,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged REVISION 1)
     Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged REVISION 1)
     Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList REVISION 1)
+    Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged REVISION 1)
 
 public:
     enum SelectionFlag {
@@ -163,6 +164,9 @@ public:
     bool measureFps() const;
     qreal currentFps() const;
 
+    void setOrthoProjection(bool enable);
+    bool isOrthoProjection() const;
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -195,6 +199,7 @@ signals:
     Q_REVISION(1) void measureFpsChanged(bool enabled);
     Q_REVISION(1) void currentFpsChanged(qreal fps);
     Q_REVISION(1) void elementSelected(QAbstract3DGraph::ElementType type);
+    Q_REVISION(1) void orthoProjectionChanged(bool enabled);
 
 private:
     QPointer<Abstract3DController> m_controller;
