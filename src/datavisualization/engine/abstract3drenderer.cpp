@@ -551,6 +551,7 @@ void Abstract3DRenderer::addCustomItem(QCustom3DItem *item) {
     //item->d_ptr->clearTextureImage();
     QVector3D translation = convertPositionToTranslation(item->position());
     newItem->setTranslation(translation);
+    newItem->setVisible(item->isVisible());
     m_customRenderCache.append(newItem);
 }
 
@@ -580,6 +581,9 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
 
     // Draw custom items
     foreach (CustomRenderItem *item, m_customRenderCache) {
+        if (!item->isVisible())
+            continue;
+
         QMatrix4x4 modelMatrix;
         QMatrix4x4 itModelMatrix;
         QMatrix4x4 MVPMatrix;

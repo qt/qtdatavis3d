@@ -49,12 +49,15 @@ public:
     inline QVector3D scaling() { return m_scaling; }
     inline void setBlendNeeded(bool blend) { m_needBlend = blend; }
     inline bool isBlendNeeded() { return m_needBlend; }
+    inline void setVisible(bool visible) { m_visible = visible; }
+    inline bool isVisible() { return m_visible; }
 
 private:
     GLuint m_texture;
     QVector3D m_scaling;
     ObjectHelper *m_object;
     bool m_needBlend;
+    bool m_visible;
  };
 typedef QVector<CustomRenderItem *> CustomRenderItemArray;
 

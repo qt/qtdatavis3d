@@ -53,6 +53,7 @@ public:
     QVector3D m_position;
     QVector3D m_scaling;
     QQuaternion m_rotation;
+    bool m_visible;
 
 private:
     friend class QCustom3DItem;

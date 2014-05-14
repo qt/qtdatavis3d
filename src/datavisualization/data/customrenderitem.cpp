@@ -23,7 +23,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 CustomRenderItem::CustomRenderItem()
     : AbstractRenderItem(),
       m_texture(0),
-      m_object(0)
+      m_object(0),
+      m_visible(true)
 {
 }
 

@@ -427,6 +427,16 @@ void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
 }
 
 /*!
+ * Gets ownership of given \a item back and removes the \a item from the graph.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+void QAbstract3DGraph::releaseCustomItem(QCustom3DItem *item)
+{
+    return d_ptr->m_visualController->releaseCustomItem(item);
+}
+
+/*!
  * Can be used to query the index of the selected label after receiving elementSelected signal with
  * any label type. Selection is valid until the next elementSelected signal.
  *

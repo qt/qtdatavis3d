@@ -187,6 +187,14 @@
  */
 
 /*!
+ * \qmlmethod void AbstractGraph3D::releaseCustomItem(Custom3DItem item)
+ *
+ * Gets ownership of \a item back and removes the \a item from the graph.
+ *
+ * \since Qt Data Visualization 1.1
+ */
+
+/*!
  * \qmlmethod int AbstractGraph3D::selectedLabelIndex()
  *
  * Can be used to query the index of the selected label after receiving elementSelected signal with

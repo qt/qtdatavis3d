@@ -114,6 +114,7 @@ public:
     void removeCustomItems();
     void removeCustomItem(QCustom3DItem *item);
     void removeCustomItemAt(const QVector3D &position);
+    void releaseCustomItem(QCustom3DItem *item);
 
     int selectedLabelIndex() const;
     QAbstract3DAxis *selectedAxis() const;

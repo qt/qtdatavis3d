@@ -187,6 +187,23 @@ QQuaternion QCustom3DItem::rotation()
     return d_ptr->m_rotation;
 }
 
+/*! \property QCustom3DItem::visible
+ *
+ * Sets the item \a visible. Defaults to \c{true}.
+ */
+void QCustom3DItem::setVisible(bool visible)
+{
+    if (d_ptr->m_visible != visible) {
+        d_ptr->m_visible = visible;
+        emit visibleChanged(visible);
+    }
+}
+
+bool QCustom3DItem::isVisible()
+{
+    return d_ptr->m_visible;
+}
+
 /*!
  * A convenience function to construct rotation quaternion from \a axis and \a angle.
  *
@@ -242,7 +259,11 @@ QString QCustom3DItem::textureFile()
 
 QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, QObject *parent) :
     QObject(parent),
-    q_ptr(q)
+    q_ptr(q),
+    m_position(QVector3D(0.0f, 0.0f, 0.0f)),
+    m_scaling(QVector3D(0.1f, 0.1f, 0.1f)),
+    m_rotation(QQuaternion(0.0f, 0.0f, 0.0f, 0.0f)),
+    m_visible(true)
 {
 }
 
@@ -254,7 +275,8 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, const QString &mesh
     m_meshFile(meshFile),
     m_position(position),
     m_scaling(scaling),
-    m_rotation(rotation)
+    m_rotation(rotation),
+    m_visible(true)
 {
 }
 

@@ -36,6 +36,7 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
     Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged)
     Q_PROPERTY(QVector3D scaling READ scaling WRITE setScaling NOTIFY scalingChanged)
     Q_PROPERTY(QQuaternion rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
+    Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
 
 public:
     explicit QCustom3DItem(QObject *parent = 0);
@@ -59,6 +60,9 @@ public:
     void setRotation(const QQuaternion &rotation);
     QQuaternion rotation();
 
+    void setVisible(bool visible);
+    bool isVisible();
+
     Q_INVOKABLE void setRotationAxisAndAngle(const QVector3D &axis, float angle);
 
     void setTextureImage(const QImage &textureImage);
@@ -69,6 +73,7 @@ signals:
     void positionChanged(const QVector3D &position);
     void scalingChanged(const QVector3D &scaling);
     void rotationChanged(const QQuaternion &rotation);
+    void visibleChanged(bool visible);
 
 protected:
     QScopedPointer<QCustom3DItemPrivate> d_ptr;

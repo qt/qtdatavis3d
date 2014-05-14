@@ -179,9 +179,17 @@ Rectangle {
         anchors.bottom: dataToggle.top
         width: camControlArea.width
         text: "Remove Shuttle"
+        property bool addObject: false
         onClicked: {
-            testChart.removeCustomItemAt(Qt.vector3d(5.0,35.0,3.0))
-            text = "Shuttle has been deleted"
+            if (addObject === true) {
+                testChart.addCustomItem(shuttleItem)
+                text = "Remove Shuttle"
+                addObject = false
+            } else {
+                testChart.releaseCustomItem(shuttleItem)
+                text = "Add Shuttle"
+                addObject = true
+            }
         }
     }
 }

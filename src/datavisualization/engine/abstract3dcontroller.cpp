@@ -911,6 +911,16 @@ void Abstract3DController::deleteCustomItem(const QVector3D &position)
     }
 }
 
+void Abstract3DController::releaseCustomItem(QCustom3DItem *item)
+{
+    if (item && m_customItems.contains(item)) {
+        m_customItems.removeOne(item);
+        item->setParent(0);
+        m_isCustomDataDirty = true;
+        emitNeedRender();
+    }
+}
+
 void Abstract3DController::handleAxisTitleChanged(const QString &title)
 {
     Q_UNUSED(title)
