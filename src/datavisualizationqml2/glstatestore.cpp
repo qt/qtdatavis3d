@@ -78,8 +78,10 @@ void GLStateStore::storeGLState()
 #if !defined(QT_OPENGL_ES_2)
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_drawFramebuffer);
     glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_readFramebuffer);
-#endif
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &m_renderbuffer);
+#else
+    glGetIntegerv(GL_RENDERBUFFER, &m_renderbuffer);
+#endif
     glGetFloatv(GL_COLOR_CLEAR_VALUE, m_clearColor);
     m_isBlendingEnabled = glIsEnabled(GL_BLEND);
     m_isDepthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
@@ -171,8 +173,10 @@ void GLStateStore::printCurrentState(bool in)
 #if !defined(QT_OPENGL_ES_2)
         glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFramebuffer);
         glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFramebuffer);
-#endif
         glGetIntegerv(GL_RENDERBUFFER_BINDING, &renderbuffer);
+#else
+        glGetIntegerv(GL_RENDERBUFFER, &renderbuffer);
+#endif
         glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColor);
         glGetFloatv(GL_DEPTH_CLEAR_VALUE, &clearDepth);
         glGetIntegerv(GL_DEPTH_FUNC, &depthFunc);
@@ -263,8 +267,10 @@ void GLStateStore::restoreGLState()
 #if !defined(QT_OPENGL_ES_2)
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_readFramebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_drawFramebuffer);
-#endif
     glBindRenderbuffer(GL_RENDERBUFFER_BINDING, m_renderbuffer);
+#else
+    glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
+#endif
 
     if (m_isScissorTestEnabled)
         glEnable(GL_SCISSOR_TEST);
