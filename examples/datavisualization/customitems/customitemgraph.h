@@ -25,6 +25,7 @@
 #include <QtDataVisualization/QSurface3DSeries>
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QLabel>
+#include <QtCore/QPropertyAnimation>
 
 using namespace QtDataVisualization;
 
@@ -44,10 +45,14 @@ public:
 
 private:
     void handleElementSelected(QAbstract3DGraph::ElementType type);
+    void resetSelection();
 
 private:
     Q3DSurface *m_graph;
     QLabel *m_textField;
+    QPropertyAnimation *m_selectionAnimation;
+    QCustom3DItem *m_previouslyAnimatedItem;
+    QVector3D m_previousScaling;
 };
 
 #endif

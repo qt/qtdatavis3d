@@ -32,6 +32,7 @@
 #include "q3dtheme_p.h"
 #include "q3dscene_p.h"
 #include "q3dscene.h"
+#include "qcustom3ditem_p.h"
 #include <QtCore/QThread>
 #include <QtGui/QOpenGLFramebufferObject>
 
@@ -52,6 +53,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_renderer(0),
     m_isDataDirty(true),
     m_isCustomDataDirty(true),
+    m_isCustomItemDirty(true),
     m_isSeriesVisualsDirty(true),
     m_renderPending(false),
     m_measureFps(false),
@@ -410,6 +412,11 @@ void Abstract3DController::synchDataToRenderer()
     if (m_isCustomDataDirty) {
         m_renderer->updateCustomData(m_customItems);
         m_isCustomDataDirty = false;
+    }
+
+    if (m_isCustomItemDirty) {
+        m_renderer->updateCustomItems();
+        m_isCustomItemDirty = false;
     }
 }
 
@@ -874,6 +881,8 @@ int Abstract3DController::addCustomItem(QCustom3DItem *item)
         return index;
 
     item->setParent(this);
+    connect(item->d_ptr.data(), &QCustom3DItemPrivate::needUpdate,
+            this, &Abstract3DController::updateCustomItem);
     m_customItems.append(item);
     m_isCustomDataDirty = true;
     emitNeedRender();
@@ -914,11 +923,19 @@ void Abstract3DController::deleteCustomItem(const QVector3D &position)
 void Abstract3DController::releaseCustomItem(QCustom3DItem *item)
 {
     if (item && m_customItems.contains(item)) {
+        disconnect(item->d_ptr.data(), &QCustom3DItemPrivate::needUpdate,
+                   this, &Abstract3DController::updateCustomItem);
         m_customItems.removeOne(item);
         item->setParent(0);
         m_isCustomDataDirty = true;
         emitNeedRender();
     }
+}
+
+void Abstract3DController::updateCustomItem()
+{
+    m_isCustomItemDirty = true;
+    emitNeedRender();
 }
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)

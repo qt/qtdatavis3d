@@ -166,6 +166,7 @@ protected:
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
     bool m_isCustomDataDirty;
+    bool m_isCustomItemDirty;
     bool m_isSeriesVisualsDirty;
     bool m_renderPending;
 
@@ -310,6 +311,8 @@ public slots:
     void setMeasureFps(bool enable);
     inline bool measureFps() const { return m_measureFps; }
     inline qreal currentFps() const { return m_currentFps; }
+
+    void updateCustomItem();
 
 signals:
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);

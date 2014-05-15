@@ -123,7 +123,9 @@ void QCustom3DItem::setMeshFile(const QString &meshFile)
 {
     if (d_ptr->m_meshFile != meshFile) {
         d_ptr->m_meshFile = meshFile;
+        d_ptr->m_dirtyBits.meshDirty = true;
         emit meshFileChanged(meshFile);
+        emit d_ptr->needUpdate();
     }
 }
 
@@ -144,7 +146,9 @@ void QCustom3DItem::setPosition(const QVector3D &position)
 {
     if (d_ptr->m_position != position) {
         d_ptr->m_position = position;
+        d_ptr->m_dirtyBits.positionDirty = true;
         emit positionChanged(position);
+        emit d_ptr->needUpdate();
     }
 }
 
@@ -161,7 +165,9 @@ void QCustom3DItem::setScaling(const QVector3D &scaling)
 {
     if (d_ptr->m_scaling != scaling) {
         d_ptr->m_scaling = scaling;
+        d_ptr->m_dirtyBits.scalingDirty = true;
         emit scalingChanged(scaling);
+        emit d_ptr->needUpdate();
     }
 }
 
@@ -178,7 +184,9 @@ void QCustom3DItem::setRotation(const QQuaternion &rotation)
 {
     if (d_ptr->m_rotation != rotation) {
         d_ptr->m_rotation = rotation;
+        d_ptr->m_dirtyBits.rotationDirty = true;
         emit rotationChanged(rotation);
+        emit d_ptr->needUpdate();
     }
 }
 
@@ -195,7 +203,9 @@ void QCustom3DItem::setVisible(bool visible)
 {
     if (d_ptr->m_visible != visible) {
         d_ptr->m_visible = visible;
+        d_ptr->m_dirtyBits.visibleDirty = true;
         emit visibleChanged(visible);
+        emit d_ptr->needUpdate();
     }
 }
 
@@ -219,17 +229,21 @@ void QCustom3DItem::setRotationAxisAndAngle(const QVector3D &axis, float angle)
  */
 void QCustom3DItem::setTextureImage(const QImage &textureImage)
 {
-    if (textureImage.isNull()) {
-        // Make a solid gray texture
-        d_ptr->m_textureImage = QImage(2, 2, QImage::Format_RGB32);
-        d_ptr->m_textureImage.fill(Qt::gray);
-    } else {
-        d_ptr->m_textureImage = textureImage;
-    }
+    if (textureImage != d_ptr->m_textureImage) {
+        if (textureImage.isNull()) {
+            // Make a solid gray texture
+            d_ptr->m_textureImage = QImage(2, 2, QImage::Format_RGB32);
+            d_ptr->m_textureImage.fill(Qt::gray);
+        } else {
+            d_ptr->m_textureImage = textureImage;
+        }
 
-    if (!d_ptr->m_textureFile.isEmpty()) {
-        d_ptr->m_textureFile.clear();
-        emit textureFileChanged(d_ptr->m_textureFile);
+        if (!d_ptr->m_textureFile.isEmpty()) {
+            d_ptr->m_textureFile.clear();
+            emit textureFileChanged(d_ptr->m_textureFile);
+        }
+        d_ptr->m_dirtyBits.textureDirty = true;
+        emit d_ptr->needUpdate();
     }
 }
 
@@ -249,6 +263,8 @@ void QCustom3DItem::setTextureFile(const QString &textureFile)
             d_ptr->m_textureImage.fill(Qt::gray);
         }
         emit textureFileChanged(textureFile);
+        d_ptr->m_dirtyBits.textureDirty = true;
+        emit d_ptr->needUpdate();
     }
 }
 

@@ -91,6 +91,11 @@ CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)
 
     connect(m_graph, &QAbstract3DGraph::elementSelected,
             this, &CustomItemGraph::handleElementSelected);
+
+    m_selectionAnimation = new QPropertyAnimation(this);
+    m_selectionAnimation->setPropertyName("scaling");
+    m_selectionAnimation->setDuration(500);
+    m_selectionAnimation->setLoopCount(-1);
 }
 
 CustomItemGraph::~CustomItemGraph()
@@ -118,6 +123,7 @@ void CustomItemGraph::toggleItemOne(bool show)
         m_graph->addCustomItem(item);
         //! [3]
     } else {
+        resetSelection();
         //! [4]
         m_graph->removeCustomItemAt(positionOne);
         //! [4]
@@ -138,6 +144,7 @@ void CustomItemGraph::toggleItemTwo(bool show)
         item->setTextureImage(color);
         m_graph->addCustomItem(item);
     } else {
+        resetSelection();
         m_graph->removeCustomItemAt(positionTwo);
     }
 }
@@ -156,6 +163,7 @@ void CustomItemGraph::toggleItemThree(bool show)
         item->setTextureImage(color);
         m_graph->addCustomItem(item);
     } else {
+        resetSelection();
         m_graph->removeCustomItemAt(positionThree);
     }
 }
@@ -196,15 +204,22 @@ void CustomItemGraph::toggleShadows(bool shadows)
 
 void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
 {
+    resetSelection();
     if (type == QAbstract3DGraph::ElementCustomItem) {
         int index = m_graph->selectedCustomItemIndex();
         QCustom3DItem *item = m_graph->selectedCustomItem();
+        m_previouslyAnimatedItem = item;
+        m_previousScaling = item->scaling();
         QString text;
         text.setNum(index);
         text.append(": ");
         QStringList split = item->meshFile().split("/");
         text.append(split.last());
         m_textField->setText(text);
+        m_selectionAnimation->setTargetObject(item);
+        m_selectionAnimation->setStartValue(item->scaling());
+        m_selectionAnimation->setEndValue(item->scaling() * 1.5f);
+        m_selectionAnimation->start();
     } else if (type == QAbstract3DGraph::ElementSeries) {
         QString text = "Surface (";
         QSurface3DSeries *series = m_graph->selectedSeries();
@@ -225,4 +240,12 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
     } else {
         m_textField->setText("Nothing");
     }
+}
+
+void CustomItemGraph::resetSelection()
+{
+    m_selectionAnimation->stop();
+    if (m_previouslyAnimatedItem)
+        m_previouslyAnimatedItem->setScaling(m_previousScaling);
+    m_previouslyAnimatedItem = 0;
 }

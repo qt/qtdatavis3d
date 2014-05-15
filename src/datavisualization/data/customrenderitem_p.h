@@ -34,6 +34,8 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+class QCustom3DItem;
+
 class CustomRenderItem : public AbstractRenderItem
 {
 public:
@@ -51,6 +53,8 @@ public:
     inline bool isBlendNeeded() { return m_needBlend; }
     inline void setVisible(bool visible) { m_visible = visible; }
     inline bool isVisible() { return m_visible; }
+    inline void setItemPointer(QCustom3DItem *item) { m_item = item; }
+    inline QCustom3DItem *itemPointer() { return m_item; }
 
 private:
     GLuint m_texture;
@@ -58,6 +62,7 @@ private:
     ObjectHelper *m_object;
     bool m_needBlend;
     bool m_visible;
+    QCustom3DItem *m_item;
  };
 typedef QVector<CustomRenderItem *> CustomRenderItemArray;
 

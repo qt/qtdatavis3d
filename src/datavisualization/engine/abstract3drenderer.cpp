@@ -427,6 +427,14 @@ void Abstract3DRenderer::updateCustomData(const QList<QCustom3DItem *> &customIt
         addCustomItem(item);
 }
 
+void Abstract3DRenderer::updateCustomItems()
+{
+    // Check all items
+    // TODO: Call updateCustomItem in a loop, as we can probably utilize the same function in updateCustomData when doing QTRD-3056
+    foreach (CustomRenderItem *item, m_customRenderCache)
+        updateCustomItem(item);
+}
+
 SeriesRenderCache *Abstract3DRenderer::createNewCache(QAbstract3DSeries *series)
 {
     return new SeriesRenderCache(series, this);
@@ -538,8 +546,10 @@ QVector4D Abstract3DRenderer::indexToSelectionColor(GLint index)
     return QVector4D(idxRed, idxGreen, idxBlue, 0);
 }
 
-void Abstract3DRenderer::addCustomItem(QCustom3DItem *item) {
+void Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
+{
     CustomRenderItem *newItem = new CustomRenderItem();
+    newItem->setItemPointer(item); // Store pointer for render item updates
     newItem->setMesh(item->meshFile());
     newItem->setScaling(item->scaling());
     newItem->setRotation(item->rotation());
@@ -553,6 +563,43 @@ void Abstract3DRenderer::addCustomItem(QCustom3DItem *item) {
     newItem->setTranslation(translation);
     newItem->setVisible(item->isVisible());
     m_customRenderCache.append(newItem);
+}
+
+void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
+{
+    QCustom3DItem *item = renderItem->itemPointer();
+    if (item->d_ptr->m_dirtyBits.meshDirty) {
+        renderItem->setMesh(item->meshFile());
+        item->d_ptr->m_dirtyBits.meshDirty = false;
+    }
+    if (item->d_ptr->m_dirtyBits.scalingDirty) {
+        renderItem->setScaling(item->scaling());
+        item->d_ptr->m_dirtyBits.scalingDirty = false;
+    }
+    if (item->d_ptr->m_dirtyBits.rotationDirty) {
+        renderItem->setRotation(item->rotation());
+        item->d_ptr->m_dirtyBits.rotationDirty = false;
+    }
+    if (item->d_ptr->m_dirtyBits.textureDirty) {
+        QImage textureImage = item->d_ptr->textureImage();
+        renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
+        GLuint oldTexture = renderItem->texture();
+        m_textureHelper->deleteTexture(&oldTexture);
+        GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
+        renderItem->setTexture(texture);
+        // TODO: Uncomment this once custom item render cache handling has been optimized (QTRD-3056)
+        //item->d_ptr->clearTextureImage();
+        item->d_ptr->m_dirtyBits.textureDirty = false;
+    }
+    if (item->d_ptr->m_dirtyBits.positionDirty) {
+        QVector3D translation = convertPositionToTranslation(item->position());
+        renderItem->setTranslation(translation);
+        item->d_ptr->m_dirtyBits.positionDirty = false;
+    }
+    if (item->d_ptr->m_dirtyBits.visibleDirty) {
+        renderItem->setVisible(item->isVisible());
+        item->d_ptr->m_dirtyBits.visibleDirty = false;
+    }
 }
 
 void Abstract3DRenderer::drawCustomItems(RenderingState state,
