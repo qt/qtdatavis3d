@@ -366,6 +366,14 @@ void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation or
         cache->setDataDirty(true);
 }
 
+void Abstract3DRenderer::updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientation orientation,
+                                                     float angle)
+{
+    AxisRenderCache &cache = axisCacheForOrientation(orientation);
+    if (cache.labelAutoRotation() != angle)
+        cache.setLabelAutoRotation(angle);
+}
+
 void Abstract3DRenderer::modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList)
 {
     foreach (QAbstract3DSeries *series, seriesList) {

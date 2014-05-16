@@ -89,6 +89,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If set, the axis will automatically adjust the range so that all data fits in it.
  */
 
+/*!
+ * \qmlproperty real AbstractAxis3D::labelAutoRotation
+ *
+ * Defines the maximum \a angle the labels can autorotate when the camera angle changes.
+ * The \a angle can be between 0 and 90, inclusive. The default value is 0.
+ * If the value is 0, axis labels do not automatically rotate.
+ * If the value is greater than zero, labels attempt to orient themselves toward the camera, up to
+ * the specified angle.
+ */
 
 /*!
  * \enum QAbstract3DAxis::AxisOrientation
@@ -194,6 +203,32 @@ void QAbstract3DAxis::setRange(float min, float max)
 }
 
 /*!
+ * \property QAbstract3DAxis::labelAutoRotation
+ *
+ * Defines the maximum \a angle the labels can autorotate when the camera angle changes.
+ * The \a angle can be between 0 and 90, inclusive. The default value is 0.
+ * If the value is 0, axis labels do not automatically rotate.
+ * If the value is greater than zero, labels attempt to orient themselves toward the camera, up to
+ * the specified angle.
+ */
+void QAbstract3DAxis::setLabelAutoRotation(float angle)
+{
+    if (angle < 0.0f)
+        angle = 0.0f;
+    if (angle > 90.0f)
+        angle = 90.0f;
+    if (d_ptr->m_labelAutoRotation != angle) {
+        d_ptr->m_labelAutoRotation = angle;
+        emit labelAutoRotationChanged(angle);
+    }
+}
+
+float QAbstract3DAxis::labelAutoRotation() const
+{
+    return d_ptr->m_labelAutoRotation;
+}
+
+/*!
  * \property QAbstract3DAxis::min
  *
  * Defines the minimum value on the axis.
@@ -266,7 +301,8 @@ QAbstract3DAxisPrivate::QAbstract3DAxisPrivate(QAbstract3DAxis *q, QAbstract3DAx
       m_isDefaultAxis(false),
       m_min(0.0f),
       m_max(10.0f),
-      m_autoAdjust(true)
+      m_autoAdjust(true),
+      m_labelAutoRotation(0.0f)
 {
 }
 

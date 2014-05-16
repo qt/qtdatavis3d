@@ -67,6 +67,7 @@ protected:
     float m_min;
     float m_max;
     bool m_autoAdjust;
+    float m_labelAutoRotation;
 
     friend class QAbstract3DAxis;
     friend class QValue3DAxis;

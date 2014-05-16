@@ -87,11 +87,13 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     // QtDataVisualization 1.1
 
     // New revisions
-    qmlRegisterType<QValue3DAxis, 1>(uri, 1, 1, "ValueAxis3D");
+    qmlRegisterUncreatableType<QAbstract3DAxis, 1>(uri, 1, 1, "AbstractAxis3D",
+                                                QLatin1String("Trying to create uncreatable: AbstractAxis."));
     qmlRegisterUncreatableType<QAbstract3DSeries, 1>(uri, 1, 1, "Abstract3DSeries",
                                                      QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
     qmlRegisterUncreatableType<AbstractDeclarative, 1>(uri, 1, 1, "AbstractGraph3D",
                                                     QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
+    qmlRegisterType<QValue3DAxis, 1>(uri, 1, 1, "ValueAxis3D");
     qmlRegisterType<QItemModelBarDataProxy, 1>(uri, 1, 1, "ItemModelBarDataProxy");
     qmlRegisterType<QItemModelSurfaceDataProxy, 1>(uri, 1, 1, "ItemModelSurfaceDataProxy");
     qmlRegisterType<QItemModelScatterDataProxy, 1>(uri, 1, 1, "ItemModelScatterDataProxy");

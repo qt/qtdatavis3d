@@ -100,6 +100,9 @@ void SurfaceGraph::enableSqrtSinModel(bool enable)
         m_graph->axisX()->setRange(sampleMin, sampleMax);
         m_graph->axisY()->setRange(0.0f, 2.0f);
         m_graph->axisZ()->setRange(sampleMin, sampleMax);
+        m_graph->axisX()->setLabelAutoRotation(30);
+        m_graph->axisY()->setLabelAutoRotation(90);
+        m_graph->axisZ()->setLabelAutoRotation(30);
 
         m_graph->removeSeries(m_heightMapSeries);
         m_graph->addSeries(m_sqrtSinSeries);

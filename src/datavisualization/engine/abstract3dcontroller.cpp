@@ -392,6 +392,24 @@ void Abstract3DController::synchDataToRenderer()
         }
     }
 
+    if (m_changeTracker.axisXLabelAutoRotationChanged) {
+        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationX,
+                                                m_axisX->labelAutoRotation());
+        m_changeTracker.axisXLabelAutoRotationChanged = false;
+    }
+
+    if (m_changeTracker.axisYLabelAutoRotationChanged) {
+        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationY,
+                                                m_axisY->labelAutoRotation());
+        m_changeTracker.axisYLabelAutoRotationChanged = false;
+    }
+
+    if (m_changeTracker.axisZLabelAutoRotationChanged) {
+        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationZ,
+                                                m_axisZ->labelAutoRotation());
+        m_changeTracker.axisZLabelAutoRotationChanged = false;
+    }
+
     if (m_changedSeriesList.size()) {
         m_renderer->modifiedSeriesList(m_changedSeriesList);
         m_changedSeriesList.clear();
@@ -1068,6 +1086,12 @@ void Abstract3DController::handleAxisFormatterDirty()
     handleAxisFormatterDirtyBySender(sender());
 }
 
+void Abstract3DController::handleAxisLabelAutoRotationChanged(float angle)
+{
+    Q_UNUSED(angle)
+    handleAxisLabelAutoRotationChangedBySender(sender());
+}
+
 void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::InputView view)
 {
     // When in automatic slicing mode, input view change to primary disables slice mode
@@ -1167,6 +1191,20 @@ void Abstract3DController::handleAxisFormatterDirtyBySender(QObject *sender)
     emitNeedRender();
 }
 
+void Abstract3DController::handleAxisLabelAutoRotationChangedBySender(QObject *sender)
+{
+    if (sender == m_axisX)
+        m_changeTracker.axisXLabelAutoRotationChanged = true;
+    else if (sender == m_axisY)
+        m_changeTracker.axisYLabelAutoRotationChanged = true;
+    else if (sender == m_axisZ)
+        m_changeTracker.axisZLabelAutoRotationChanged = true;
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+
+    emitNeedRender();
+}
+
 void Abstract3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
     QAbstract3DSeries *series = static_cast<QAbstract3DSeries *>(sender);
@@ -1223,6 +1261,8 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
                      this, &Abstract3DController::handleAxisRangeChanged);
     QObject::connect(axis, &QAbstract3DAxis::autoAdjustRangeChanged,
                      this, &Abstract3DController::handleAxisAutoAdjustRangeChanged);
+    QObject::connect(axis, &QAbstract3DAxis::labelAutoRotationChanged,
+                     this, &Abstract3DController::handleAxisLabelAutoRotationChanged);
 
     if (orientation == QAbstract3DAxis::AxisOrientationX)
         m_changeTracker.axisXTypeChanged = true;
@@ -1236,6 +1276,7 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
     handleAxisRangeChangedBySender(axis);
     handleAxisAutoAdjustRangeChangedInOrientation(axis->orientation(),
                                                   axis->isAutoAdjustRange());
+    handleAxisLabelAutoRotationChangedBySender(axis);
 
     if (axis->type() & QAbstract3DAxis::AxisTypeValue) {
         QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(axis);

@@ -85,8 +85,8 @@
     \c {Sqrt & Sin} radio button, the selected series is activated with the following
     code. First we set the decorative issues like enable the grid for the surface and
     select the flat shading mode. Next lines define the axis label format and value
-    ranges. Finally we make sure the correct series is added to the
-    graph:
+    ranges. Automatic label rotation is set to improve label readability at low camera angles.
+    Finally we make sure the correct series is added to the graph:
 
     \snippet surface/surfacegraph.cpp 3
 

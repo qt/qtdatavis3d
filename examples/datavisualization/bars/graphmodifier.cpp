@@ -68,9 +68,12 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_temperatureAxis->setSubSegmentCount(m_subSegments);
     m_temperatureAxis->setRange(m_minval, m_maxval);
     m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%.1f ") + celsiusString));
+    m_temperatureAxis->setLabelAutoRotation(90.0f);
 
     m_yearAxis->setTitle("Year");
+    m_yearAxis->setLabelAutoRotation(40.0f);
     m_monthAxis->setTitle("Month");
+    m_monthAxis->setLabelAutoRotation(40.0f);
 
     m_graph->setValueAxis(m_temperatureAxis);
     m_graph->setRowAxis(m_yearAxis);

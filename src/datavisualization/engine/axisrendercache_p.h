@@ -95,6 +95,8 @@ public:
         else
             return m_formatter->positionAt(value) * m_scale + m_translate;
     }
+    inline float labelAutoRotation() const { return m_labelAutoRotation; }
+    inline void setLabelAutoRotation(float angle) { m_labelAutoRotation = angle; }
 
 public slots:
     void updateTextures();
@@ -125,6 +127,7 @@ private:
     bool m_positionsDirty;
     float m_translate;
     float m_scale;
+    float m_labelAutoRotation;
 
     Q_DISABLE_COPY(AxisRenderCache)
 };

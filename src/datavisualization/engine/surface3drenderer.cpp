@@ -1016,7 +1016,7 @@ void Surface3DRenderer::drawSlicedScene()
     m_drawer->drawLabel(m_dummyRenderItem, m_axisCacheY.titleItem(), viewMatrix,
                         projectionMatrix, zeroVector, QVector3D(0.0f, 0.0f, 90.0f), 0,
                         m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
-                        false, false, Drawer::LabelMid, Qt::AlignHCenter);
+                        false, false, Drawer::LabelMid, Qt::AlignBottom);
 
     glDisable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
@@ -1836,6 +1836,11 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 
     glEnable(GL_POLYGON_OFFSET_FILL);
 
+    float labelAutoAngle = m_axisCacheZ.labelAutoRotation();
+    float labelAngleFraction = labelAutoAngle / 90.0f;
+    float fractionCamY = activeCamera->yRotation() * labelAngleFraction;
+    float fractionCamX = activeCamera->xRotation() * labelAngleFraction;
+
     // Z Labels
     QVector3D positionZComp(0.0f, 0.0f, 0.0f);
     if (m_axisCacheZ.segmentCount() > 0) {
@@ -1843,25 +1848,76 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         int labelNbr = 0;
         GLfloat labelXTrans = m_scaleXWithBackground + labelMargin;
         GLfloat labelYTrans = -backgroundMargin;
-        GLfloat rotLabelX = -90.0f;
-        GLfloat rotLabelY = 0.0f;
-        GLfloat rotLabelZ = 0.0f;
-        Qt::AlignmentFlag alignment = Qt::AlignRight;
-        if (m_zFlipped)
-            rotLabelY = 180.0f;
-        if (m_xFlipped) {
+        Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        QVector3D labelRotation;
+        if (m_xFlipped)
             labelXTrans = -labelXTrans;
-            alignment = Qt::AlignLeft;
-        }
-        if (m_yFlipped) {
-            rotLabelZ += 180.0f;
-            rotLabelY += 180.0f;
+        if (m_yFlipped)
             labelYTrans = -labelYTrans;
+        if (labelAutoAngle == 0.0f) {
+            labelRotation.setX(-90.0f);
+            if (m_zFlipped)
+                labelRotation.setY(180.0f);
+            if (m_yFlipped) {
+                if (m_zFlipped)
+                    labelRotation.setY(0.0f);
+                else
+                    labelRotation.setY(180.0f);
+                labelRotation.setZ(180.0f);
+            }
+        } else {
+            if (m_zFlipped)
+                labelRotation.setY(180.0f);
+            if (m_yFlipped) {
+                if (m_zFlipped) {
+                    if (m_xFlipped) {
+                        labelRotation.setX(90.0f - (labelAutoAngle - fractionCamX)
+                                           * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(labelAutoAngle + fractionCamY);
+                    } else {
+                        labelRotation.setX(90.0f + (labelAutoAngle + fractionCamX)
+                                           * (labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(-labelAutoAngle - fractionCamY);
+                    }
+                } else {
+                    if (m_xFlipped) {
+                        labelRotation.setX(90.0f + (labelAutoAngle - fractionCamX)
+                                           * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(-labelAutoAngle - fractionCamY);
+                    } else {
+                        labelRotation.setX(90.0f - (labelAutoAngle + fractionCamX)
+                                           * (labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(labelAutoAngle + fractionCamY);
+                    }
+                }
+            } else {
+                if (m_zFlipped) {
+                    if (m_xFlipped) {
+                        labelRotation.setX(-90.0f + (labelAutoAngle - fractionCamX)
+                                           * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(-labelAutoAngle + fractionCamY);
+                    } else {
+                        labelRotation.setX(-90.0f - (labelAutoAngle + fractionCamX)
+                                           * (labelAutoAngle - fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(labelAutoAngle - fractionCamY);
+                    }
+                } else {
+                    if (m_xFlipped) {
+                        labelRotation.setX(-90.0f - (labelAutoAngle - fractionCamX)
+                                           * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(labelAutoAngle - fractionCamY);
+                    } else {
+                        labelRotation.setX(-90.0f + (labelAutoAngle + fractionCamX)
+                                           * (labelAutoAngle - fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(-labelAutoAngle + fractionCamY);
+                    }
+                }
+            }
         }
+
         QVector3D labelTrans = QVector3D(labelXTrans,
                                          labelYTrans,
                                          0.0f);
-        QVector3D rotation(rotLabelX, rotLabelY, rotLabelZ);
 
         for (int label = 0; label < labelCount; label++) {
             if (m_axisCacheZ.labelItems().size() > labelNbr) {
@@ -1878,7 +1934,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, rotation, 0, m_cachedSelectionMode,
+                                    positionZComp, labelRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignment);
             }
@@ -1887,30 +1943,86 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     }
     // X Labels
     if (m_axisCacheX.segmentCount() > 0) {
+        labelAutoAngle = m_axisCacheX.labelAutoRotation();
+        labelAngleFraction = labelAutoAngle / 90.0f;
+        fractionCamY = activeCamera->yRotation() * labelAngleFraction;
+        fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheX.labelCount();
 
         int labelNbr = 0;
         GLfloat labelZTrans = m_scaleZWithBackground + labelMargin;
         GLfloat labelYTrans = -backgroundMargin;
-        GLfloat rotLabelX = -90.0f;
-        GLfloat rotLabelY = 90.0f;
-        GLfloat rotLabelZ = 0.0f;
-        Qt::AlignmentFlag alignment = Qt::AlignLeft;
-        if (m_xFlipped)
-            rotLabelY = -90.0f;
-        if (m_zFlipped) {
+        Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        QVector3D labelRotation;
+        if (m_zFlipped)
             labelZTrans = -labelZTrans;
-            alignment = Qt::AlignRight;
-        }
-        if (m_yFlipped) {
-            rotLabelZ += 180.0f;
-            rotLabelY += 180.0f;
+        if (m_yFlipped)
             labelYTrans = -labelYTrans;
+        if (labelAutoAngle == 0.0f) {
+            labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
+            if (m_xFlipped)
+                labelRotation.setY(-90.0f);
+            if (m_yFlipped) {
+                if (m_xFlipped)
+                    labelRotation.setY(90.0f);
+                else
+                    labelRotation.setY(-90.0f);
+                labelRotation.setZ(180.0f);
+            }
+        } else {
+            if (m_xFlipped)
+                labelRotation.setY(-90.0f);
+            else
+                labelRotation.setY(90.0f);
+            if (m_yFlipped) {
+                if (m_zFlipped) {
+                    if (m_xFlipped) {
+                        labelRotation.setX(90.0f - (2.0f * labelAutoAngle - fractionCamX)
+                                           * (labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(-labelAutoAngle - fractionCamY);
+                    } else {
+                        labelRotation.setX(90.0f - (2.0f * labelAutoAngle + fractionCamX)
+                                           * (labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(labelAutoAngle + fractionCamY);
+                    }
+                } else {
+                    if (m_xFlipped) {
+                        labelRotation.setX(90.0f + fractionCamX
+                                           * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(labelAutoAngle + fractionCamY);
+                    } else {
+                        labelRotation.setX(90.0f - fractionCamX
+                                           * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(-labelAutoAngle - fractionCamY);
+                    }
+                }
+            } else {
+                if (m_zFlipped) {
+                    if (m_xFlipped) {
+                        labelRotation.setX(-90.0f + (2.0f * labelAutoAngle - fractionCamX)
+                                           * (labelAutoAngle - fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(labelAutoAngle - fractionCamY);
+                    } else {
+                        labelRotation.setX(-90.0f + (2.0f * labelAutoAngle + fractionCamX)
+                                           * (labelAutoAngle - fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(-labelAutoAngle + fractionCamY);
+                    }
+                } else {
+                    if (m_xFlipped) {
+                        labelRotation.setX(-90.0f - fractionCamX
+                                           * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(-labelAutoAngle + fractionCamY);
+                    } else {
+                        labelRotation.setX(-90.0f + fractionCamX
+                                           * -(labelAutoAngle - fractionCamY) / labelAutoAngle);
+                        labelRotation.setZ(labelAutoAngle - fractionCamY);
+                    }
+                }
+            }
         }
         QVector3D labelTrans = QVector3D(0.0f,
                                          labelYTrans,
                                          labelZTrans);
-        QVector3D rotation(rotLabelX, rotLabelY, rotLabelZ);
 
         for (int label = 0; label < labelCount; label++) {
             if (m_axisCacheX.labelItems().size() > labelNbr) {
@@ -1927,7 +2039,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, rotation, 0, m_cachedSelectionMode,
+                                    positionZComp, labelRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignment);
             }
@@ -1936,44 +2048,56 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     }
     // Y Labels
     if (m_axisCacheY.segmentCount() > 0) {
+        labelAutoAngle = m_axisCacheY.labelAutoRotation();
+        labelAngleFraction = labelAutoAngle / 90.0f;
+        fractionCamY = activeCamera->yRotation() * labelAngleFraction;
+        fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheY.labelCount();
 
         int labelNbr = 0;
         GLfloat labelXTrans = m_scaleXWithBackground;
         GLfloat labelZTrans = m_scaleZWithBackground;
 
-        // Back wall init
+        // Back & side wall
         GLfloat labelMarginXTrans = labelMargin;
         GLfloat labelMarginZTrans = labelMargin;
-        GLfloat rotLabelX = 0.0f;
-        GLfloat rotLabelY = -90.0f;
-        GLfloat rotLabelZ = 0.0f;
-        Qt::AlignmentFlag alignmentBack = Qt::AlignLeft;
+        QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
+        QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
+        Qt::AlignmentFlag backAlignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag sideAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         if (!m_xFlipped) {
             labelXTrans = -labelXTrans;
             labelMarginXTrans = -labelMargin;
-            rotLabelY = 90.0f;
         }
         if (m_zFlipped) {
             labelZTrans = -labelZTrans;
             labelMarginZTrans = -labelMargin;
-            alignmentBack = Qt::AlignRight;
         }
-        QVector3D labelRotateVectorBack(rotLabelX, rotLabelY, rotLabelZ);
+        if (labelAutoAngle == 0.0f) {
+            if (!m_xFlipped)
+                backLabelRotation.setY(90.0f);
+            if (m_zFlipped)
+                sideLabelRotation.setY(180.f);
+        } else {
+            // Orient side labels somewhat towards the camera
+            if (m_xFlipped) {
+                if (m_zFlipped)
+                    sideLabelRotation.setY(180.0f + (2.0f * labelAutoAngle) - fractionCamX);
+                else
+                    sideLabelRotation.setY(-fractionCamX);
+                backLabelRotation.setY(-90.0f + labelAutoAngle - fractionCamX);
+            } else {
+                if (m_zFlipped)
+                    sideLabelRotation.setY(180.0f - (2.0f * labelAutoAngle) - fractionCamX);
+                else
+                    sideLabelRotation.setY(-fractionCamX);
+                backLabelRotation.setY(90.0f - labelAutoAngle - fractionCamX);
+            }
+        }
+        sideLabelRotation.setX(-fractionCamY);
+        backLabelRotation.setX(-fractionCamY);
+
         QVector3D labelTransBack = QVector3D(labelXTrans, 0.0f, labelZTrans + labelMarginZTrans);
-
-        // Side wall init
-        Qt::AlignmentFlag alignmentSide = Qt::AlignLeft;
-        if (m_xFlipped)
-            alignmentSide = Qt::AlignLeft;
-        else
-            alignmentSide = Qt::AlignRight;
-        if (m_zFlipped)
-            rotLabelY = 180.0f;
-        else
-            rotLabelY = 0.0f;
-
-        QVector3D labelRotateVectorSide(rotLabelX, rotLabelY, rotLabelZ);
         QVector3D labelTransSide(-labelXTrans - labelMarginXTrans, 0.0f, -labelZTrans);
 
         for (int label = 0; label < labelCount; label++) {
@@ -1993,17 +2117,17 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelTransBack.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransBack);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, labelRotateVectorBack, 0, m_cachedSelectionMode,
+                                    positionZComp, backLabelRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
-                                    true, true, Drawer::LabelMid, alignmentBack);
+                                    true, true, Drawer::LabelMid, backAlignment);
 
                 // Side wall
                 labelTransSide.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransSide);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, labelRotateVectorSide, 0, m_cachedSelectionMode,
+                                    positionZComp, sideLabelRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
-                                    true, true, Drawer::LabelMid, alignmentSide);
+                                    true, true, Drawer::LabelMid, sideAlignment);
             }
             labelNbr++;
         }

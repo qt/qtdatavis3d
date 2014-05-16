@@ -299,58 +299,22 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     // Apply alignment
-    GLfloat xAlignment = 0.0f;
-    GLfloat yAlignment = 0.0f;
-    GLfloat zAlignment = 0.0f;
-    GLfloat sinRotY = qFabs(qSin(qDegreesToRadians(rotation.y())));
-    GLfloat cosRotY = qFabs(qCos(qDegreesToRadians(rotation.y())));
-    GLfloat sinRotZ = 0.0f;
-    GLfloat cosRotZ = 0.0f;
-    if (rotation.z()) {
-        sinRotZ = qFabs(qSin(qDegreesToRadians(rotation.z())));
-        cosRotZ = qFabs(qCos(qDegreesToRadians(rotation.z())));
-    }
+    QVector3D anchorPoint;
     switch (alignment) {
     case Qt::AlignLeft: {
-        if (rotation.z() && rotation.z() != 180.0f && !rotation.y()) {
-            xAlignment = ((-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                          - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ) / 2.0f;
-            yAlignment = (((GLfloat)textureSize.width() * scaleFactor) * sinRotZ
-                          + ((GLfloat)textureSize.height() * scaleFactor) * cosRotZ) / 2.0f;
-        } else {
-            xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotY;
-            zAlignment = ((GLfloat)textureSize.width() * scaleFactor) * sinRotY;
-        }
+        anchorPoint.setX(float(-textureSize.width()) * scaleFactor);
         break;
     }
     case Qt::AlignRight: {
-        if (rotation.z() && rotation.z() != 180.0f && !rotation.y()) {
-            xAlignment = (((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                          + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ) / 2.0f;
-            yAlignment = (((GLfloat)textureSize.width() * scaleFactor) * sinRotZ
-                          + ((GLfloat)textureSize.height() * scaleFactor) * cosRotZ) / 2.0f;
-        } else {
-            xAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotY;
-            zAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * sinRotY;
-        }
+        anchorPoint.setX(float(textureSize.width()) * scaleFactor);
         break;
     }
     case Qt::AlignTop: {
-        yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotY;
+        anchorPoint.setY(float(-textureSize.height()) * scaleFactor);
         break;
     }
     case Qt::AlignBottom: {
-        yAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotY;
-        break;
-    }
-    case Qt::AlignHCenter: {
-        xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
-        break;
-    }
-    case Qt::AlignVCenter: {
-        yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
+        anchorPoint.setY(float(textureSize.height()) * scaleFactor);
         break;
     }
     default: {
@@ -367,15 +331,9 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     }
 
     // Position label
-    modelMatrix.translate(xPosition + xAlignment, yPosition + yAlignment, zPosition + zAlignment);
+    modelMatrix.translate(xPosition, yPosition, zPosition);
 
     // Rotate
-    QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
-    QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
-    QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
-    QQuaternion rotQuaternion = rotQuatY * rotQuatZ * rotQuatX;
-    modelMatrix.rotate(rotQuaternion);
-
     if (useDepth && !rotateAlong) {
         float yComp = float(qRadiansToDegrees(qTan(positionComp.y() / cameraDistance)));
         // Apply negative camera rotations to keep labels facing camera
@@ -383,7 +341,14 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         float camRotationY = camera->yRotation();
         modelMatrix.rotate(-camRotationX, 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-camRotationY - yComp, 1.0f, 0.0f, 0.0f);
+    } else {
+        QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
+        QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
+        QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
+        QQuaternion rotQuaternion = rotQuatY * rotQuatZ * rotQuatX;
+        modelMatrix.rotate(rotQuaternion);
     }
+    modelMatrix.translate(anchorPoint);
 
     // Scale label based on text size
     modelMatrix.scale(QVector3D((GLfloat)textureSize.width() * scaleFactor,

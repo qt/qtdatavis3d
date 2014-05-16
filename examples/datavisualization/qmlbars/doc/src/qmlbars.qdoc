@@ -88,6 +88,9 @@
 
     \snippet qmlbars/qml/qmlbars/Axes.qml 0
 
+    We also set automatic axis label rotation to make axis labels more readable at low camera
+    angles.
+
     \section1 Switching series
 
     In the \c main.qml, we set up the graph and various UI elements. There are three interesting

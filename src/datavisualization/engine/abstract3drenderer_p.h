@@ -108,6 +108,8 @@ public:
                                     bool enable);
     virtual void updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
                                      QValue3DAxisFormatter *formatter);
+    virtual void updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientation orientation,
+                                             float angle);
     virtual void modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);

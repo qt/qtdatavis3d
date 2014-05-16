@@ -103,6 +103,7 @@ Rectangle {
             barSpacingRelative: false
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
             columnAxis: graphAxes.column
+            rowAxis: graphAxes.row
             valueAxis: graphAxes.value
 
             //! [4]
