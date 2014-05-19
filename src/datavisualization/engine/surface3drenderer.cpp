@@ -958,7 +958,6 @@ void Surface3DRenderer::drawSlicedScene()
     int labelNbr = 0;
 
     QVector3D positionComp(0.0f, 0.0f, 0.0f);
-    QVector3D rotation(0.0f, 0.0f, 0.0f);
     QVector3D labelTrans = QVector3D(scaleXBackground + labelMargin, 0.0f, 0.0f);
     int labelCount = m_axisCacheY.labelCount();
     for (int label = 0; label < labelCount; label++) {
@@ -969,7 +968,7 @@ void Surface3DRenderer::drawSlicedScene()
             // Draw the label here
             m_dummyRenderItem.setTranslation(labelTrans);
             m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, rotation, 0, m_cachedSelectionMode, m_labelShader,
+                                positionComp, identityQuaternion, 0, m_cachedSelectionMode, m_labelShader,
                                 m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, Qt::AlignRight, true);
         }
@@ -979,9 +978,11 @@ void Surface3DRenderer::drawSlicedScene()
     // X Labels to ground
     int countLabelItems = sliceCache.labelItems().size();
 
+    QVector3D rotation(0.0f, 0.0f, -45.0f);
+    QQuaternion totalRotation = Utils::calculateRotation(rotation);
+
     labelNbr = 0;
     positionComp.setY(-0.1f);
-    rotation.setZ(-45.0f);
     labelTrans.setY(-backgroundMargin);
     labelCount = sliceCache.labelCount();
     for (int label = 0; label < labelCount; label++) {
@@ -995,7 +996,7 @@ void Surface3DRenderer::drawSlicedScene()
             axisLabelItem = sliceCache.labelItems().at(labelNbr);
 
             m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
-                                positionComp, rotation, 0, QAbstract3DGraph::SelectionRow,
+                                positionComp, totalRotation, 0, QAbstract3DGraph::SelectionRow,
                                 m_labelShader, m_labelObj, activeCamera,
                                 false, false, Drawer::LabelBelow, Qt::AlignBottom, true);
         }
@@ -1006,15 +1007,17 @@ void Surface3DRenderer::drawSlicedScene()
     AbstractRenderItem *dummyItem(0);
     positionComp.setY(m_autoScaleAdjustment);
     m_drawer->drawLabel(*dummyItem, sliceCache.titleItem(), viewMatrix, projectionMatrix,
-                        positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
+                        positionComp, identityQuaternion, 0, m_cachedSelectionMode, m_labelShader,
                         m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
                         Qt::AlignCenter, true);
 
     // Y-axis label
+    rotation = QVector3D(0.0f, 0.0f, 90.0f);
+    totalRotation = Utils::calculateRotation(rotation);
     labelTrans = QVector3D(-scaleXBackground - labelMargin, 0.0f, 0.0f);
     m_dummyRenderItem.setTranslation(labelTrans);
     m_drawer->drawLabel(m_dummyRenderItem, m_axisCacheY.titleItem(), viewMatrix,
-                        projectionMatrix, zeroVector, QVector3D(0.0f, 0.0f, 90.0f), 0,
+                        projectionMatrix, zeroVector, totalRotation, 0,
                         m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
                         false, false, Drawer::LabelMid, Qt::AlignBottom);
 
@@ -1915,6 +1918,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             }
         }
 
+        QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
+
         QVector3D labelTrans = QVector3D(labelXTrans,
                                          labelYTrans,
                                          0.0f);
@@ -1934,7 +1939,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, labelRotation, 0, m_cachedSelectionMode,
+                                    positionZComp, totalRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignment);
             }
@@ -2020,6 +2025,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
             }
         }
+        QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
+
         QVector3D labelTrans = QVector3D(0.0f,
                                          labelYTrans,
                                          labelZTrans);
@@ -2039,7 +2046,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, labelRotation, 0, m_cachedSelectionMode,
+                                    positionZComp, totalRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, alignment);
             }
@@ -2097,6 +2104,9 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         sideLabelRotation.setX(-fractionCamY);
         backLabelRotation.setX(-fractionCamY);
 
+        QQuaternion totalSideRotation = Utils::calculateRotation(sideLabelRotation);
+        QQuaternion totalBackRotation = Utils::calculateRotation(backLabelRotation);
+
         QVector3D labelTransBack = QVector3D(labelXTrans, 0.0f, labelZTrans + labelMarginZTrans);
         QVector3D labelTransSide(-labelXTrans - labelMarginXTrans, 0.0f, -labelZTrans);
 
@@ -2117,7 +2127,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelTransBack.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransBack);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, backLabelRotation, 0, m_cachedSelectionMode,
+                                    positionZComp, totalBackRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, backAlignment);
 
@@ -2125,7 +2135,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelTransSide.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransSide);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    positionZComp, sideLabelRotation, 0, m_cachedSelectionMode,
+                                    positionZComp, totalSideRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
                                     true, true, Drawer::LabelMid, sideAlignment);
             }

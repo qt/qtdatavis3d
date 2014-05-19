@@ -80,7 +80,7 @@ public:
     void drawLine(ShaderHelper *shader);
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                   const QVector3D &positionComp, const QVector3D &rotation, GLfloat itemHeight,
+                   const QVector3D &positionComp, const QQuaternion &rotation, GLfloat itemHeight,
                    QAbstract3DGraph::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
                    const Q3DCamera *camera, bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,

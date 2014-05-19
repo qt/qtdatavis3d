@@ -72,6 +72,7 @@ public:
     static QString defaultLabelFormat();
 
     static float wrapValue(float value, float min, float max);
+    static QQuaternion calculateRotation(const QVector3D &xyzRotations);
 
 private:
     static ParamType mapFormatCharToParamType(const QChar &formatChar);

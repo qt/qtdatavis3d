@@ -585,7 +585,6 @@ void Bars3DRenderer::drawSlicedScene()
             // Draw grid labels
             int labelNbr = 0;
             int labelCount = m_axisCacheY.labelCount();
-            QVector3D backLabelRotation(0.0f, 0.0f, 0.0f);
             QVector3D labelTrans = QVector3D(scaleFactor + labelMargin, 0.0f, 0.0f);
 
             for (int i = 0; i < labelCount; i++) {
@@ -595,7 +594,7 @@ void Bars3DRenderer::drawSlicedScene()
                     labelTrans.setY(gridPos);
                     m_dummyBarRenderItem.setTranslation(labelTrans);
                     m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix,
-                                        projectionMatrix, zeroVector, backLabelRotation, 0,
+                                        projectionMatrix, zeroVector, identityQuaternion, 0,
                                         m_cachedSelectionMode, m_labelShader, m_labelObj,
                                         activeCamera, true, true, Drawer::LabelMid, Qt::AlignRight);
                 }
@@ -786,6 +785,8 @@ void Bars3DRenderer::drawSlicedScene()
     // Draw labels for bars
     QVector3D sliceValueRotation(0.0f, 0.0f, 90.0f);
     QVector3D sliceLabelRotation(0.0f, 0.0f, -45.0f);
+    QQuaternion totalSliceValueRotation = Utils::calculateRotation(sliceValueRotation);
+    QQuaternion totalSliceLabelRotation = Utils::calculateRotation(sliceLabelRotation);
 
     int labelCount = m_sliceCache->labelItems().size();
 
@@ -798,7 +799,7 @@ void Bars3DRenderer::drawSlicedScene()
 
         // Draw labels
         m_drawer->drawLabel(m_dummyBarRenderItem, *m_sliceCache->labelItems().at(labelNo),
-                            viewMatrix, projectionMatrix, positionComp, sliceLabelRotation,
+                            viewMatrix, projectionMatrix, positionComp, totalSliceLabelRotation,
                             0, m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, false, false, Drawer::LabelMid,
                             Qt::AlignRight, true);
@@ -831,7 +832,7 @@ void Bars3DRenderer::drawSlicedScene()
                                                                       item.translation().z()));
 
                         m_drawer->drawLabel(m_dummyBarRenderItem, item.sliceLabelItem(), viewMatrix,
-                                            projectionMatrix, zeroVector, sliceValueRotation,
+                                            projectionMatrix, zeroVector, totalSliceValueRotation,
                                             item.height(), m_cachedSelectionMode, m_labelShader,
                                             m_labelObj, activeCamera, false, false, labelPos,
                                             alignment, true);
@@ -857,7 +858,7 @@ void Bars3DRenderer::drawSlicedScene()
                                                       selectedItem->translation().z()));
 
         m_drawer->drawLabel(m_dummyBarRenderItem, selectedItem->sliceLabelItem(), viewMatrix,
-                            projectionMatrix, zeroVector, sliceValueRotation,
+                            projectionMatrix, zeroVector, totalSliceValueRotation,
                             selectedItem->height(), m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, false, false, labelPos,
                             alignment, true);
@@ -867,22 +868,22 @@ void Bars3DRenderer::drawSlicedScene()
     if (rowMode) {
         if (m_sliceTitleItem) {
             m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
-                                positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
+                                positionComp, identityQuaternion, 0, m_cachedSelectionMode, m_labelShader,
                                 m_labelObj, activeCamera, false, false, Drawer::LabelTop,
                                 Qt::AlignCenter, true);
         }
         m_drawer->drawLabel(*dummyItem, m_axisCacheX.titleItem(), viewMatrix, projectionMatrix,
-                            positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
+                            positionComp, identityQuaternion, 0, m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
                             Qt::AlignCenter, true);
     } else {
         m_drawer->drawLabel(*dummyItem, m_axisCacheZ.titleItem(), viewMatrix, projectionMatrix,
-                            positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
+                            positionComp, identityQuaternion, 0, m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, false, false, Drawer::LabelBottom,
                             Qt::AlignCenter, true);
         if (m_sliceTitleItem) {
             m_drawer->drawLabel(*dummyItem, sliceSelectionLabel, viewMatrix, projectionMatrix,
-                                positionComp, zeroVector, 0, m_cachedSelectionMode, m_labelShader,
+                                positionComp, identityQuaternion, 0, m_cachedSelectionMode, m_labelShader,
                                 m_labelObj, activeCamera, false, false, Drawer::LabelTop,
                                 Qt::AlignCenter, true);
         }
@@ -891,7 +892,7 @@ void Bars3DRenderer::drawSlicedScene()
     QVector3D labelTrans = QVector3D(-scaleFactor - labelMargin, 0.2f, 0.0f); // y = 0.2 for row/column labels (see barPosYAdjustment)
     m_dummyBarRenderItem.setTranslation(labelTrans);
     m_drawer->drawLabel(m_dummyBarRenderItem, m_axisCacheY.titleItem(), viewMatrix,
-                        projectionMatrix, zeroVector, QVector3D(0.0f, 0.0f, 90.0f), 0,
+                        projectionMatrix, zeroVector, totalSliceValueRotation, 0,
                         m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
                         false, false, Drawer::LabelMid, Qt::AlignBottom);
 
@@ -1838,7 +1839,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
 
         m_drawer->drawLabel(*selectedBar, labelItem, viewMatrix, projectionMatrix,
-                            zeroVector, zeroVector, selectedBar->height(),
+                            zeroVector, identityQuaternion, selectedBar->height(),
                             m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, true, false);
 
@@ -1929,6 +1930,9 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     sideLabelRotation.setX(-fractionCamY);
     backLabelRotation.setX(-fractionCamY);
 
+    QQuaternion totalSideRotation = Utils::calculateRotation(sideLabelRotation);
+    QQuaternion totalBackRotation = Utils::calculateRotation(backLabelRotation);
+
     QVector3D backLabelTrans = QVector3D(labelXTrans, 0.0f,
                                          labelZTrans + labelMarginZTrans);
     QVector3D sideLabelTrans = QVector3D(-labelXTrans - labelMarginXTrans,
@@ -1952,14 +1956,14 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
             // Back wall
             m_dummyBarRenderItem.setTranslation(backLabelTrans);
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, backLabelRotation, 0, m_cachedSelectionMode,
+                                zeroVector, totalBackRotation, 0, m_cachedSelectionMode,
                                 shader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, backAlignment);
 
             // Side wall
             m_dummyBarRenderItem.setTranslation(sideLabelTrans);
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, sideLabelRotation, 0, m_cachedSelectionMode,
+                                zeroVector, totalSideRotation, 0, m_cachedSelectionMode,
                                 shader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, sideAlignment);
         }
@@ -2043,6 +2047,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
         }
     }
 
+    QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
     for (int row = 0; row != m_cachedRowCount; row++) {
         if (m_axisCacheZ.labelItems().size() > row) {
             // Go through all rows and get position of max+1 or min-1 column, depending on x flip
@@ -2068,7 +2073,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
             }
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, labelRotation, 0, m_cachedSelectionMode,
+                                zeroVector, totalRotation, 0, m_cachedSelectionMode,
                                 shader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, alignment,
                                 false, drawSelection);
@@ -2144,6 +2149,8 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
         }
     }
 
+    totalRotation = Utils::calculateRotation(labelRotation);
+
     for (int column = 0; column != m_cachedColumnCount; column++) {
         if (m_axisCacheX.labelItems().size() > column) {
             // Go through all columns and get position of max+1 or min-1 row, depending on z flip
@@ -2170,7 +2177,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
             }
 
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, labelRotation, 0, m_cachedSelectionMode,
+                                zeroVector, totalRotation, 0, m_cachedSelectionMode,
                                 shader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, alignment, false, drawSelection);
         }

@@ -1310,7 +1310,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         }
 
         m_drawer->drawLabel(*selectedItem, labelItem, viewMatrix, projectionMatrix,
-                            zeroVector, zeroVector, selectedItemSize, m_cachedSelectionMode,
+                            zeroVector, identityQuaternion, selectedItemSize, m_cachedSelectionMode,
                             m_labelShader, m_labelObj, activeCamera, true, false,
                             Drawer::LabelOver);
 
@@ -1433,6 +1433,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
             }
         }
+        QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
         QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, 0.0f);
         for (int label = 0; label < labelCount; label++) {
             if (m_axisCacheZ.labelItems().size() > labelNbr) {
@@ -1451,7 +1452,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, labelRotation, 0, m_cachedSelectionMode,
+                                    zeroVector, totalRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera, true, true,
                                     Drawer::LabelMid, alignment);
             }
@@ -1544,6 +1545,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             }
         }
 
+        QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
         QVector3D labelTrans = QVector3D(0.0f, labelYTrans, labelZTrans);
         for (int label = 0; label < labelCount; label++) {
             if (m_axisCacheX.labelItems().size() > labelNbr) {
@@ -1562,7 +1564,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
 
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, labelRotation, 0, m_cachedSelectionMode,
+                                    zeroVector, totalRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera, true, true,
                                     Drawer::LabelMid, alignment);
             }
@@ -1629,6 +1631,9 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         sideLabelRotation.setX(-fractionCamY);
         backLabelRotation.setX(-fractionCamY);
 
+        QQuaternion totalSideRotation = Utils::calculateRotation(sideLabelRotation);
+        QQuaternion totalBackRotation = Utils::calculateRotation(backLabelRotation);
+
         QVector3D labelTransBack = QVector3D(labelXTrans, 0.0f, labelZTrans + labelMarginZTrans);
         QVector3D labelTransSide(-labelXTrans - labelMarginXTrans, 0.0f, -labelZTrans);
 
@@ -1649,7 +1654,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelTransBack.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransBack);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, backLabelRotation, 0, m_cachedSelectionMode,
+                                    zeroVector, totalBackRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera, true, true,
                                     Drawer::LabelMid, backAlignment);
 
@@ -1657,7 +1662,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelTransSide.setY(labelYTrans);
                 m_dummyRenderItem.setTranslation(labelTransSide);
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, sideLabelRotation, 0, m_cachedSelectionMode,
+                                    zeroVector, totalSideRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera, true, true,
                                     Drawer::LabelMid, sideAlignment);
             }

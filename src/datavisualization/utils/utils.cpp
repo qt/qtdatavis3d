@@ -234,4 +234,13 @@ float Utils::wrapValue(float value, float min, float max)
     return value;
 }
 
+QQuaternion Utils::calculateRotation(const QVector3D &xyzRotations)
+{
+    QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, xyzRotations.x());
+    QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, xyzRotations.y());
+    QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, xyzRotations.z());
+    QQuaternion totalRotation = rotQuatY * rotQuatZ * rotQuatX;
+    return totalRotation;
+}
+
 QT_END_NAMESPACE_DATAVISUALIZATION

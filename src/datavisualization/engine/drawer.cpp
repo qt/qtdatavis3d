@@ -233,7 +233,7 @@ void Drawer::drawLine(ShaderHelper *shader)
 
 void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                       const QVector3D &positionComp, const QVector3D &rotation,
+                       const QVector3D &positionComp, const QQuaternion &rotation,
                        GLfloat itemHeight, QAbstract3DGraph::SelectionFlags mode,
                        ShaderHelper *shader, ObjectHelper *object,
                        const Q3DCamera *camera, bool useDepth, bool rotateAlong,
@@ -342,11 +342,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         modelMatrix.rotate(-camRotationX, 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-camRotationY - yComp, 1.0f, 0.0f, 0.0f);
     } else {
-        QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
-        QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
-        QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
-        QQuaternion rotQuaternion = rotQuatY * rotQuatZ * rotQuatX;
-        modelMatrix.rotate(rotQuaternion);
+        modelMatrix.rotate(rotation);
     }
     modelMatrix.translate(anchorPoint);
 
