@@ -481,7 +481,7 @@ void Bars3DRenderer::drawSlicedScene()
         scaleFactor = (1.1f * m_rowWidth) / m_scaleFactor;
     else
         scaleFactor = (1.1f * m_columnDepth) / m_scaleFactor;
-    GLfloat barLabelYPos = barPosYAdjustment - 0.4f - labelMargin; // 0.4 for labels
+    GLfloat barLabelYPos = barPosYAdjustment - labelMargin;
     GLfloat zeroPosAdjustment = 0.0f;
     GLfloat directionMultiplier = 2.0f;
     GLfloat directionBase = 0.0f;
@@ -596,7 +596,7 @@ void Bars3DRenderer::drawSlicedScene()
                     m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix,
                                         projectionMatrix, zeroVector, identityQuaternion, 0,
                                         m_cachedSelectionMode, m_labelShader, m_labelObj,
-                                        activeCamera, true, true, Drawer::LabelMid, Qt::AlignRight);
+                                        activeCamera, true, true, Drawer::LabelMid, Qt::AlignLeft);
                 }
                 labelNbr++;
             }
@@ -802,7 +802,7 @@ void Bars3DRenderer::drawSlicedScene()
                             viewMatrix, projectionMatrix, positionComp, totalSliceLabelRotation,
                             0, m_cachedSelectionMode, m_labelShader,
                             m_labelObj, activeCamera, false, false, Drawer::LabelMid,
-                            Qt::AlignRight, true);
+                            Qt::AlignmentFlag(Qt::AlignLeft | Qt::AlignTop), true);
     }
 
     if (!sliceGridLabels) {
@@ -824,7 +824,7 @@ void Bars3DRenderer::drawSlicedScene()
                             m_drawer->generateLabelItem(item.sliceLabelItem(), item.sliceLabel());
                             m_updateLabels = false;
                         }
-                        Qt::AlignmentFlag alignment = (item.height() < 0) ? Qt::AlignLeft : Qt::AlignRight;
+                        Qt::AlignmentFlag alignment = (item.height() > 0) ? Qt::AlignLeft : Qt::AlignRight;
                         Drawer::LabelPosition labelPos = (item.height() < 0) ? Drawer::LabelBelow : Drawer::LabelOver;
                         m_dummyBarRenderItem.setTranslation(QVector3D(item.translation().x(),
                                                                       barPosYAdjustment - zeroPosAdjustment
@@ -850,7 +850,7 @@ void Bars3DRenderer::drawSlicedScene()
             m_drawer->generateLabelItem(selectedItem->sliceLabelItem(), selectedItem->sliceLabel());
             m_updateLabels = false;
         }
-        Qt::AlignmentFlag alignment = (selectedItem->height() < 0) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag alignment = (selectedItem->height() > 0) ? Qt::AlignLeft : Qt::AlignRight;
         Drawer::LabelPosition labelPos = (selectedItem->height() < 0) ? Drawer::LabelBelow : Drawer::LabelOver;
         m_dummyBarRenderItem.setTranslation(QVector3D(selectedItem->translation().x(),
                                                       barPosYAdjustment - zeroPosAdjustment
@@ -1894,8 +1894,8 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     GLfloat labelZTrans = columnScaleFactor;
     QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
     QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
-    Qt::AlignmentFlag backAlignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
-    Qt::AlignmentFlag sideAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+    Qt::AlignmentFlag backAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+    Qt::AlignmentFlag sideAlignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
 
     if (!m_xFlipped) {
         labelXTrans = -labelXTrans;
@@ -1983,7 +1983,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     GLfloat rowPosValue = scaledColumnDepth + labelMargin;
     GLfloat rowPos = 0.0f;
     GLfloat colPos = 0.0f;
-    Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+    Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
     QVector3D labelRotation;
 
     if (labelAutoAngle == 0.0f) {
@@ -2085,7 +2085,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     labelAngleFraction = labelAutoAngle / 90.0f;
     fractionCamY = activeCamera->yRotation() * labelAngleFraction;
     fractionCamX = activeCamera->xRotation() * labelAngleFraction;
-    alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+    alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
     if (labelAutoAngle == 0.0f) {
         labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
         if (m_xFlipped)

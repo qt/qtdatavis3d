@@ -969,8 +969,8 @@ void Surface3DRenderer::drawSlicedScene()
             m_dummyRenderItem.setTranslation(labelTrans);
             m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 positionComp, identityQuaternion, 0, m_cachedSelectionMode, m_labelShader,
-                                m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, Qt::AlignRight, true);
+                                m_labelObj, activeCamera, true, true, Drawer::LabelMid,
+                                Qt::AlignLeft, true);
         }
         labelNbr++;
     }
@@ -998,7 +998,8 @@ void Surface3DRenderer::drawSlicedScene()
             m_drawer->drawLabel(m_dummyRenderItem, *axisLabelItem, viewMatrix, projectionMatrix,
                                 positionComp, totalRotation, 0, QAbstract3DGraph::SelectionRow,
                                 m_labelShader, m_labelObj, activeCamera,
-                                false, false, Drawer::LabelBelow, Qt::AlignBottom, true);
+                                false, false, Drawer::LabelBelow,
+                                Qt::AlignmentFlag(Qt::AlignLeft | Qt::AlignTop), true);
         }
         labelNbr++;
     }
@@ -1851,7 +1852,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         int labelNbr = 0;
         GLfloat labelXTrans = m_scaleXWithBackground + labelMargin;
         GLfloat labelYTrans = -backgroundMargin;
-        Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
         if (m_xFlipped)
             labelXTrans = -labelXTrans;
@@ -1957,7 +1958,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         int labelNbr = 0;
         GLfloat labelZTrans = m_scaleZWithBackground + labelMargin;
         GLfloat labelYTrans = -backgroundMargin;
-        Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
         if (m_zFlipped)
             labelZTrans = -labelZTrans;
@@ -2070,8 +2071,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         GLfloat labelMarginZTrans = labelMargin;
         QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
         QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
-        Qt::AlignmentFlag backAlignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
-        Qt::AlignmentFlag sideAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag backAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag sideAlignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         if (!m_xFlipped) {
             labelXTrans = -labelXTrans;
             labelMarginXTrans = -labelMargin;

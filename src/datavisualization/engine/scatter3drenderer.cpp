@@ -1367,7 +1367,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 #endif
         int labelNbr = 0;
         GLfloat labelYTrans = -1.0f - m_backgroundMargin;
-        Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
         if (m_xFlipped)
             labelXTrans = -labelXTrans;
@@ -1476,7 +1476,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 #endif
         int labelNbr = 0;
         GLfloat labelYTrans = -1.0f - m_backgroundMargin;
-        Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
         if (m_zFlipped)
             labelZTrans = -labelZTrans;
@@ -1597,8 +1597,8 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         GLfloat labelMarginZTrans = labelMargin;
         QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
         QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
-        Qt::AlignmentFlag backAlignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
-        Qt::AlignmentFlag sideAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag backAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag sideAlignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         if (!m_xFlipped) {
             labelXTrans = -labelXTrans;
             labelMarginXTrans = -labelMargin;

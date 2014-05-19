@@ -300,27 +300,16 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     // Apply alignment
     QVector3D anchorPoint;
-    switch (alignment) {
-    case Qt::AlignLeft: {
-        anchorPoint.setX(float(-textureSize.width()) * scaleFactor);
-        break;
-    }
-    case Qt::AlignRight: {
+
+    if (alignment & Qt::AlignLeft)
         anchorPoint.setX(float(textureSize.width()) * scaleFactor);
-        break;
-    }
-    case Qt::AlignTop: {
+    else if (alignment & Qt::AlignRight)
+        anchorPoint.setX(float(-textureSize.width()) * scaleFactor);
+
+    if (alignment & Qt::AlignTop)
         anchorPoint.setY(float(-textureSize.height()) * scaleFactor);
-        break;
-    }
-    case Qt::AlignBottom: {
+    else if (alignment & Qt::AlignBottom)
         anchorPoint.setY(float(textureSize.height()) * scaleFactor);
-        break;
-    }
-    default: {
-        break;
-    }
-    }
 
     if (position < LabelBottom) {
         xPosition = item.translation().x();
