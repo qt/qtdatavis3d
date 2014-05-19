@@ -858,7 +858,7 @@ void Surface3DRenderer::drawSlicedScene()
     glDisable(GL_TEXTURE_2D);
 
     glEnable(GL_CULL_FACE);
-    glCullFace(GL_FRONT);
+    glCullFace(GL_BACK);
 
     // Grid lines
     if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
@@ -867,6 +867,7 @@ void Surface3DRenderer::drawSlicedScene()
 #else
         ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
 #endif
+
         // Bind line shader
         lineShader->bind();
 
@@ -950,7 +951,6 @@ void Surface3DRenderer::drawSlicedScene()
     m_labelShader->bind();
     glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
-    glCullFace(GL_BACK);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
