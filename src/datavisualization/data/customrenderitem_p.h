@@ -44,17 +44,21 @@ public:
     virtual ~CustomRenderItem();
 
     inline void setTexture(GLuint texture) { m_texture = texture; }
-    inline GLuint texture() { return m_texture; }
+    inline GLuint texture() const { return m_texture; }
     void setMesh(const QString &meshFile);
-    inline ObjectHelper *mesh() { return m_object; }
+    inline ObjectHelper *mesh() const { return m_object; }
     inline void setScaling(const QVector3D &scaling) { m_scaling = scaling; }
-    inline QVector3D scaling() { return m_scaling; }
+    inline QVector3D scaling() const { return m_scaling; }
     inline void setBlendNeeded(bool blend) { m_needBlend = blend; }
-    inline bool isBlendNeeded() { return m_needBlend; }
+    inline bool isBlendNeeded() const { return m_needBlend; }
     inline void setVisible(bool visible) { m_visible = visible; }
-    inline bool isVisible() { return m_visible; }
+    inline bool isVisible() const { return m_visible; }
     inline void setItemPointer(QCustom3DItem *item) { m_item = item; }
-    inline QCustom3DItem *itemPointer() { return m_item; }
+    inline QCustom3DItem *itemPointer() const { return m_item; }
+    inline void setValid(bool valid) { m_valid = valid; }
+    inline bool isValid() const { return m_valid; }
+    inline void setIndex(int index) { m_index = index; }
+    inline int index() const { return m_index; }
 
 private:
     GLuint m_texture;
@@ -62,9 +66,11 @@ private:
     ObjectHelper *m_object;
     bool m_needBlend;
     bool m_visible;
+    bool m_valid;
+    int m_index;
     QCustom3DItem *m_item;
  };
-typedef QVector<CustomRenderItem *> CustomRenderItemArray;
+typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

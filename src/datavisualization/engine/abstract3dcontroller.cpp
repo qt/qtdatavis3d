@@ -884,6 +884,7 @@ int Abstract3DController::addCustomItem(QCustom3DItem *item)
     connect(item->d_ptr.data(), &QCustom3DItemPrivate::needUpdate,
             this, &Abstract3DController::updateCustomItem);
     m_customItems.append(item);
+    item->d_ptr->resetDirtyBits();
     m_isCustomDataDirty = true;
     emitNeedRender();
     return m_customItems.count() - 1;
@@ -914,9 +915,8 @@ void Abstract3DController::deleteCustomItem(const QVector3D &position)
 {
     // Get the item for the position
     foreach (QCustom3DItem *item, m_customItems) {
-        if (item->position() == position) {
+        if (item->position() == position)
             deleteCustomItem(item);
-        }
     }
 }
 

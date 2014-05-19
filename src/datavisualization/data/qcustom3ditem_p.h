@@ -63,6 +63,7 @@ public:
 
     QImage textureImage();
     void clearTextureImage();
+    void resetDirtyBits();
 
 public:
     QCustom3DItem *q_ptr;

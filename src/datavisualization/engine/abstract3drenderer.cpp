@@ -416,21 +416,34 @@ void Abstract3DRenderer::updateCustomData(const QList<QCustom3DItem *> &customIt
     if (customItems.isEmpty() && m_customRenderCache.isEmpty())
         return;
 
-    // There are probably not too many custom items, just recreate the array if something changes
-    foreach (CustomRenderItem *item, m_customRenderCache) {
-        GLuint texture = item->texture();
-        m_textureHelper->deleteTexture(&texture);
-        delete item;
+    foreach (CustomRenderItem *item, m_customRenderCache)
+        item->setValid(false);
+
+    int itemCount = customItems.size();
+    // Check custom item list for items that are not yet in render item cache
+    for (int i = 0; i < itemCount; i++) {
+        QCustom3DItem *item = customItems.at(i);
+        CustomRenderItem *renderItem = m_customRenderCache.value(item);
+        if (!renderItem)
+            renderItem = addCustomItem(item);
+        renderItem->setValid(true);
+        renderItem->setIndex(i); // always update index, as it must match the custom item index
     }
-    m_customRenderCache.clear();
-    foreach (QCustom3DItem *item, customItems)
-        addCustomItem(item);
+
+    // Check render item cache and remove items that are not in customItems list anymore
+    foreach (CustomRenderItem *renderItem, m_customRenderCache) {
+        if (!renderItem->isValid()) {
+            m_customRenderCache.remove(renderItem->itemPointer());
+            GLuint texture = renderItem->texture();
+            m_textureHelper->deleteTexture(&texture);
+            delete renderItem;
+        }
+    }
 }
 
 void Abstract3DRenderer::updateCustomItems()
 {
     // Check all items
-    // TODO: Call updateCustomItem in a loop, as we can probably utilize the same function in updateCustomData when doing QTRD-3056
     foreach (CustomRenderItem *item, m_customRenderCache)
         updateCustomItem(item);
 }
@@ -546,7 +559,7 @@ QVector4D Abstract3DRenderer::indexToSelectionColor(GLint index)
     return QVector4D(idxRed, idxGreen, idxBlue, 0);
 }
 
-void Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
+CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
 {
     CustomRenderItem *newItem = new CustomRenderItem();
     newItem->setItemPointer(item); // Store pointer for render item updates
@@ -557,12 +570,12 @@ void Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     newItem->setBlendNeeded(textureImage.hasAlphaChannel());
     GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
     newItem->setTexture(texture);
-    // TODO: Uncomment this once custom item render cache handling has been optimized (QTRD-3056)
-    //item->d_ptr->clearTextureImage();
+    item->d_ptr->clearTextureImage();
     QVector3D translation = convertPositionToTranslation(item->position());
     newItem->setTranslation(translation);
     newItem->setVisible(item->isVisible());
-    m_customRenderCache.append(newItem);
+    m_customRenderCache.insert(item, newItem);
+    return newItem;
 }
 
 void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
@@ -587,8 +600,7 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
         m_textureHelper->deleteTexture(&oldTexture);
         GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
         renderItem->setTexture(texture);
-        // TODO: Uncomment this once custom item render cache handling has been optimized (QTRD-3056)
-        //item->d_ptr->clearTextureImage();
+        item->d_ptr->clearTextureImage();
         item->d_ptr->m_dirtyBits.textureDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.positionDirty) {
@@ -612,8 +624,6 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
 {
     if (m_customRenderCache.isEmpty())
         return;
-
-    int itemIndex = 0;
 
     if (RenderingNormal == state) {
         shader->bind();
@@ -677,7 +687,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
         } else if (RenderingSelection == state) {
             // Selection render
             shader->setUniformValue(shader->MVP(), MVPMatrix);
-            QVector4D itemColor = indexToSelectionColor(itemIndex++);
+            QVector4D itemColor = indexToSelectionColor(item->index());
             itemColor.setW(customItemAlpha);
             itemColor /= 255.0f;
             shader->setUniformValue(shader->color(), itemColor);

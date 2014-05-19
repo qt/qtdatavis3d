@@ -112,7 +112,7 @@ public:
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
-    virtual void addCustomItem(QCustom3DItem *item);
+    virtual CustomRenderItem *addCustomItem(QCustom3DItem *item);
     virtual void updateCustomItem(CustomRenderItem *renderItem);
 
     virtual QVector3D convertPositionToTranslation(const QVector3D &position) = 0;

@@ -310,4 +310,14 @@ void QCustom3DItemPrivate::clearTextureImage()
     m_textureImage = QImage();
 }
 
+void QCustom3DItemPrivate::resetDirtyBits()
+{
+    m_dirtyBits.textureDirty = false;
+    m_dirtyBits.meshDirty = false;
+    m_dirtyBits.positionDirty = false;
+    m_dirtyBits.scalingDirty = false;
+    m_dirtyBits.rotationDirty = false;
+    m_dirtyBits.visibleDirty = false;
+}
+
 QT_END_NAMESPACE_DATAVISUALIZATION

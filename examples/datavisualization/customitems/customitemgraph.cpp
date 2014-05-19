@@ -26,7 +26,8 @@ using namespace QtDataVisualization;
 
 CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)
     : m_graph(surface),
-      m_textField(label)
+      m_textField(label),
+      m_previouslyAnimatedItem(0)
 {
     QImage layerOneHMap(":/maps/layer_1.png");
     QHeightMapSurfaceDataProxy *layerOneProxy = new QHeightMapSurfaceDataProxy(layerOneHMap);
