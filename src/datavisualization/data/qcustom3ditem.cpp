@@ -349,6 +349,7 @@ QImage QCustom3DItemPrivate::textureImage()
 void QCustom3DItemPrivate::clearTextureImage()
 {
     m_textureImage = QImage();
+    m_textureFile.clear();
 }
 
 void QCustom3DItemPrivate::resetDirtyBits()
