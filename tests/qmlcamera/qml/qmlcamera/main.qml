@@ -182,6 +182,7 @@ Rectangle {
         property bool addObject: false
         onClicked: {
             if (addObject === true) {
+                shuttleItem.textureFile(":/items/shuttle.png")
                 testChart.addCustomItem(shuttleItem)
                 text = "Remove Shuttle"
                 addObject = false

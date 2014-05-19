@@ -7,5 +7,6 @@
     <qresource prefix="/items">
         <file>refinery.obj</file>
         <file>oilrig.obj</file>
+        <file>pipe.obj</file>
     </qresource>
 </RCC>

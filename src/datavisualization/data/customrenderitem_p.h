@@ -59,6 +59,8 @@ public:
     inline bool isValid() const { return m_valid; }
     inline void setIndex(int index) { m_index = index; }
     inline int index() const { return m_index; }
+    inline void setShadowCasting(bool shadowCasting) { m_shadowCasting = shadowCasting; }
+    inline bool isShadowCasting() const { return m_shadowCasting; }
 
 private:
     GLuint m_texture;
@@ -68,6 +70,7 @@ private:
     bool m_visible;
     bool m_valid;
     int m_index;
+    bool m_shadowCasting;
     QCustom3DItem *m_item;
  };
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;

@@ -37,6 +37,7 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
     Q_PROPERTY(QVector3D scaling READ scaling WRITE setScaling NOTIFY scalingChanged)
     Q_PROPERTY(QQuaternion rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
+    Q_PROPERTY(bool shadowCasting READ isShadowCasting WRITE setShadowCasting NOTIFY shadowCastingChanged)
 
 public:
     explicit QCustom3DItem(QObject *parent = 0);
@@ -46,22 +47,25 @@ public:
     virtual ~QCustom3DItem();
 
     void setMeshFile(const QString &meshFile);
-    QString meshFile();
+    QString meshFile() const;
 
     void setTextureFile(const QString &textureFile);
-    QString textureFile();
+    QString textureFile() const;
 
     void setPosition(const QVector3D &position);
-    QVector3D position();
+    QVector3D position() const;
 
     void setScaling(const QVector3D &scaling);
-    QVector3D scaling();
+    QVector3D scaling() const;
 
     void setRotation(const QQuaternion &rotation);
     QQuaternion rotation();
 
     void setVisible(bool visible);
-    bool isVisible();
+    bool isVisible() const;
+
+    void setShadowCasting(bool enabled);
+    bool isShadowCasting() const;
 
     Q_INVOKABLE void setRotationAxisAndAngle(const QVector3D &axis, float angle);
 
@@ -74,6 +78,7 @@ signals:
     void scalingChanged(const QVector3D &scaling);
     void rotationChanged(const QQuaternion &rotation);
     void visibleChanged(bool visible);
+    void shadowCastingChanged(bool shadowCasting);
 
 protected:
     QScopedPointer<QCustom3DItemPrivate> d_ptr;

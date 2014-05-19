@@ -109,6 +109,7 @@ void CustomItemGraph::toggleItemOne(bool show)
     //! [1]
     QVector3D positionOne = QVector3D(39.0f, 77.0f, 19.2f);
     //! [1]
+    QVector3D positionOnePipe = QVector3D(39.0f, 45.0f, 19.2f);
     if (show) {
         //! [0]
         QImage color = QImage(2, 2, QImage::Format_RGB32);
@@ -123,17 +124,25 @@ void CustomItemGraph::toggleItemOne(bool show)
         //! [3]
         m_graph->addCustomItem(item);
         //! [3]
+        item = new QCustom3DItem(":/items/pipe.obj", positionOnePipe,
+                                 QVector3D(0.005f, 0.5f, 0.005f),
+                                 QQuaternion(),
+                                 color);
+        item->setShadowCasting(false);
+        m_graph->addCustomItem(item);
     } else {
         resetSelection();
         //! [4]
         m_graph->removeCustomItemAt(positionOne);
         //! [4]
+        m_graph->removeCustomItemAt(positionOnePipe);
     }
 }
 
 void CustomItemGraph::toggleItemTwo(bool show)
 {
     QVector3D positionTwo = QVector3D(34.5f, 77.0f, 23.4f);
+    QVector3D positionTwoPipe = QVector3D(34.5f, 45.0f, 23.4f);
     if (show) {
         QImage color = QImage(2, 2, QImage::Format_RGB32);
         color.fill(Qt::red);
@@ -144,9 +153,16 @@ void CustomItemGraph::toggleItemTwo(bool show)
         item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 25.0f));
         item->setTextureImage(color);
         m_graph->addCustomItem(item);
+        item = new QCustom3DItem(":/items/pipe.obj", positionTwoPipe,
+                                 QVector3D(0.005f, 0.5f, 0.005f),
+                                 QQuaternion(),
+                                 color);
+        item->setShadowCasting(false);
+        m_graph->addCustomItem(item);
     } else {
         resetSelection();
         m_graph->removeCustomItemAt(positionTwo);
+        m_graph->removeCustomItemAt(positionTwoPipe);
     }
 }
 
@@ -221,6 +237,7 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
         m_selectionAnimation->setStartValue(item->scaling());
         m_selectionAnimation->setEndValue(item->scaling() * 1.5f);
         m_selectionAnimation->start();
+        item->setShadowCasting(false);
     } else if (type == QAbstract3DGraph::ElementSeries) {
         QString text = "Surface (";
         QSurface3DSeries *series = m_graph->selectedSeries();

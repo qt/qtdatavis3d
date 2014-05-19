@@ -430,6 +430,11 @@ void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
  * Gets ownership of given \a item back and removes the \a item from the graph.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \note If the same item is added back to the graph, the texture or the texture file needs to be
+ * re-set.
+ *
+ * \sa QCustom3DItem::setTextureImage(), QCustom3DItem::setTextureFile()
  */
 void QAbstract3DGraph::releaseCustomItem(QCustom3DItem *item)
 {

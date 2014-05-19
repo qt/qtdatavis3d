@@ -56,6 +56,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * Holds the texture file name for the item. If left unset, a solid gray texture will be
  * used.
+ *
+ * \note To conserve memory the Image loaded from the file is cleared after a texture is created.
  */
 
 // TODO: Position check in task QTRD-3057
@@ -76,6 +78,18 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*! \qmlproperty quaternion Custom3DItem::rotation
  *
  * Holds the item \a rotation as a quaternion. Defaults to \c {quaternion(0.0, 0.0, 0.0, 0.0)}.
+ */
+
+/*! \qmlproperty bool Custom3DItem::visible
+ *
+ * Sets the item \a visible. Defaults to \c{true}.
+ */
+
+/*! \qmlproperty bool Custom3DItem::shadowCasting
+ *
+ * Sets shadow casting for the item to \a enabled. Defaults to \c{true}.
+ * If set \c{false}, the item does not cast shadows regardless of
+ * \l{QAbstract3DGraph::ShadowQuality}{ShadowQuality}.
  */
 
 /*!
@@ -129,7 +143,7 @@ void QCustom3DItem::setMeshFile(const QString &meshFile)
     }
 }
 
-QString QCustom3DItem::meshFile()
+QString QCustom3DItem::meshFile() const
 {
     return d_ptr->m_meshFile;
 }
@@ -152,7 +166,7 @@ void QCustom3DItem::setPosition(const QVector3D &position)
     }
 }
 
-QVector3D QCustom3DItem::position()
+QVector3D QCustom3DItem::position() const
 {
     return d_ptr->m_position;
 }
@@ -171,7 +185,7 @@ void QCustom3DItem::setScaling(const QVector3D &scaling)
     }
 }
 
-QVector3D QCustom3DItem::scaling()
+QVector3D QCustom3DItem::scaling() const
 {
     return d_ptr->m_scaling;
 }
@@ -209,9 +223,30 @@ void QCustom3DItem::setVisible(bool visible)
     }
 }
 
-bool QCustom3DItem::isVisible()
+bool QCustom3DItem::isVisible() const
 {
     return d_ptr->m_visible;
+}
+
+
+/*! \property QCustom3DItem::shadowCasting
+ *
+ * Sets shadow casting for the item to \a enabled. Defaults to \c{true}.
+ * If set \c{false}, the item does not cast shadows regardless of QAbstract3DGraph::ShadowQuality.
+ */
+void QCustom3DItem::setShadowCasting(bool enabled)
+{
+    if (d_ptr->m_shadowCasting != enabled) {
+        d_ptr->m_shadowCasting = enabled;
+        d_ptr->m_dirtyBits.shadowCastingDirty = true;
+        emit shadowCastingChanged(enabled);
+        emit d_ptr->needUpdate();
+    }
+}
+
+bool QCustom3DItem::isShadowCasting() const
+{
+    return d_ptr->m_shadowCasting;
 }
 
 /*!
@@ -226,6 +261,8 @@ void QCustom3DItem::setRotationAxisAndAngle(const QVector3D &axis, float angle)
 
 /*!
  * Set the \a textureImage as a QImage for the item. Texture defaults to solid gray.
+ *
+ * \note To conserve memory the given QImage is cleared after a texture is created.
  */
 void QCustom3DItem::setTextureImage(const QImage &textureImage)
 {
@@ -249,8 +286,10 @@ void QCustom3DItem::setTextureImage(const QImage &textureImage)
 
 /*! \property QCustom3DItem::textureFile
  *
- * Holds the texture file name for the item. If both this and textureImage are unset, a solid
+ * Holds the texture file name for the item. If both this and texture image are unset, a solid
  * gray texture will be used.
+ *
+ * \note To conserve memory the QImage loaded from the file is cleared after a texture is created.
  */
 void QCustom3DItem::setTextureFile(const QString &textureFile)
 {
@@ -268,7 +307,7 @@ void QCustom3DItem::setTextureFile(const QString &textureFile)
     }
 }
 
-QString QCustom3DItem::textureFile()
+QString QCustom3DItem::textureFile() const
 {
     return d_ptr->m_textureFile;
 }
@@ -279,7 +318,8 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, QObject *parent) :
     m_position(QVector3D(0.0f, 0.0f, 0.0f)),
     m_scaling(QVector3D(0.1f, 0.1f, 0.1f)),
     m_rotation(QQuaternion(0.0f, 0.0f, 0.0f, 0.0f)),
-    m_visible(true)
+    m_visible(true),
+    m_shadowCasting(true)
 {
 }
 
@@ -292,7 +332,8 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, const QString &mesh
     m_position(position),
     m_scaling(scaling),
     m_rotation(rotation),
-    m_visible(true)
+    m_visible(true),
+    m_shadowCasting(true)
 {
 }
 
@@ -318,6 +359,7 @@ void QCustom3DItemPrivate::resetDirtyBits()
     m_dirtyBits.scalingDirty = false;
     m_dirtyBits.rotationDirty = false;
     m_dirtyBits.visibleDirty = false;
+    m_dirtyBits.shadowCastingDirty = false;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

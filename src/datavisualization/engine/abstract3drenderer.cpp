@@ -582,6 +582,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     QVector3D translation = convertPositionToTranslation(item->position());
     newItem->setTranslation(translation);
     newItem->setVisible(item->isVisible());
+    newItem->setShadowCasting(item->isShadowCasting());
     m_customRenderCache.insert(item, newItem);
     return newItem;
 }
@@ -619,6 +620,10 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
     if (item->d_ptr->m_dirtyBits.visibleDirty) {
         renderItem->setVisible(item->isVisible());
         item->d_ptr->m_dirtyBits.visibleDirty = false;
+    }
+    if (item->d_ptr->m_dirtyBits.shadowCastingDirty) {
+        renderItem->setShadowCasting(item->isShadowCasting());
+        item->d_ptr->m_dirtyBits.shadowCastingDirty = false;
     }
 }
 
@@ -700,7 +705,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
             itemColor /= 255.0f;
             shader->setUniformValue(shader->color(), itemColor);
             m_drawer->drawObject(shader, item->mesh());
-        } else {
+        } else if (item->isShadowCasting()) {
             // Depth render
             shader->setUniformValue(shader->MVP(), depthProjectionViewMatrix * modelMatrix);
             m_drawer->drawObject(shader, item->mesh());

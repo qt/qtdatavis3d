@@ -40,6 +40,7 @@ struct QCustomItemDirtyBitField {
     bool scalingDirty               : 1;
     bool rotationDirty              : 1;
     bool visibleDirty               : 1;
+    bool shadowCastingDirty         : 1;
 
     QCustomItemDirtyBitField()
         : textureDirty(false),
@@ -47,7 +48,8 @@ struct QCustomItemDirtyBitField {
           positionDirty(false),
           scalingDirty(false),
           rotationDirty(false),
-          visibleDirty(false)
+          visibleDirty(false),
+          shadowCastingDirty(false)
     {
     }
 };
@@ -74,6 +76,7 @@ public:
     QVector3D m_scaling;
     QQuaternion m_rotation;
     bool m_visible;
+    bool m_shadowCasting;
 
     QCustomItemDirtyBitField m_dirtyBits;
 
