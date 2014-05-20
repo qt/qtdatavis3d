@@ -37,6 +37,7 @@ struct QCustomItemDirtyBitField {
     bool textureDirty               : 1;
     bool meshDirty                  : 1;
     bool positionDirty              : 1;
+    bool positionAbsoluteDirty      : 1;
     bool scalingDirty               : 1;
     bool rotationDirty              : 1;
     bool visibleDirty               : 1;
@@ -46,6 +47,7 @@ struct QCustomItemDirtyBitField {
         : textureDirty(false),
           meshDirty(false),
           positionDirty(false),
+          positionAbsoluteDirty(false),
           scalingDirty(false),
           rotationDirty(false),
           visibleDirty(false),
@@ -73,6 +75,7 @@ public:
     QString m_textureFile;
     QString m_meshFile;
     QVector3D m_position;
+    bool m_positionAbsolute;
     QVector3D m_scaling;
     QQuaternion m_rotation;
     bool m_visible;

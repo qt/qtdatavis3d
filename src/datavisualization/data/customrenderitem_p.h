@@ -51,6 +51,8 @@ public:
     inline QVector3D scaling() const { return m_scaling; }
     inline void setPosition(const QVector3D &position) { m_position = position; }
     inline QVector3D position() const { return m_position; }
+    inline void setPositionAbsolute(bool absolute) { m_absolute = absolute; }
+    inline bool isPositionAbsolute() const { return m_absolute; }
     inline void setBlendNeeded(bool blend) { m_needBlend = blend; }
     inline bool isBlendNeeded() const { return m_needBlend; }
     inline void setVisible(bool visible) { m_visible = visible; }
@@ -68,6 +70,7 @@ private:
     GLuint m_texture;
     QVector3D m_scaling;
     QVector3D m_position;
+    bool m_absolute;
     ObjectHelper *m_object;
     bool m_needBlend;
     bool m_visible;

@@ -108,7 +108,7 @@ public:
     void updateItems(const QVector<Scatter3DController::ChangeItem> &items);
     void updateScene(Q3DScene *scene);
 
-    QVector3D convertPositionToTranslation(const QVector3D &position);
+    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
     inline int clickedIndex() const { return m_clickedIndex; }
     void resetClickedStatus();

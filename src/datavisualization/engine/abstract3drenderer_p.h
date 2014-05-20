@@ -117,7 +117,8 @@ public:
     virtual CustomRenderItem *addCustomItem(QCustom3DItem *item);
     virtual void updateCustomItem(CustomRenderItem *renderItem);
 
-    virtual QVector3D convertPositionToTranslation(const QVector3D &position) = 0;
+    virtual QVector3D convertPositionToTranslation(const QVector3D &position,
+                                                   bool isAbsolute) = 0;
 
     void generateBaseColorTexture(const QColor &color, GLuint *texture);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);

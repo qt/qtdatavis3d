@@ -122,7 +122,7 @@ public:
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 
-    QVector3D convertPositionToTranslation(const QVector3D &position);
+    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
 protected:
     virtual void initializeOpenGL();

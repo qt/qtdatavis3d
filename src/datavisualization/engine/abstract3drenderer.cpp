@@ -574,13 +574,15 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     newItem->setMesh(item->meshFile());
     newItem->setScaling(item->scaling());
     newItem->setPosition(item->position());
+    newItem->setPositionAbsolute(item->isPositionAbsolute());
     newItem->setRotation(item->rotation());
     QImage textureImage = item->d_ptr->textureImage();
     newItem->setBlendNeeded(textureImage.hasAlphaChannel());
     GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
     newItem->setTexture(texture);
     item->d_ptr->clearTextureImage();
-    QVector3D translation = convertPositionToTranslation(item->position());
+    QVector3D translation = convertPositionToTranslation(item->position(),
+                                                         item->isPositionAbsolute());
     newItem->setTranslation(translation);
     newItem->setVisible(item->isVisible());
     newItem->setShadowCasting(item->isShadowCasting());
@@ -613,11 +615,14 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
         item->d_ptr->clearTextureImage();
         item->d_ptr->m_dirtyBits.textureDirty = false;
     }
-    if (item->d_ptr->m_dirtyBits.positionDirty) {
-        QVector3D translation = convertPositionToTranslation(item->position());
+    if (item->d_ptr->m_dirtyBits.positionDirty || item->d_ptr->m_dirtyBits.positionAbsoluteDirty) {
         renderItem->setPosition(item->position());
+        renderItem->setPositionAbsolute(item->isPositionAbsolute());
+        QVector3D translation = convertPositionToTranslation(item->position(),
+                                                             item->isPositionAbsolute());
         renderItem->setTranslation(translation);
         item->d_ptr->m_dirtyBits.positionDirty = false;
+        item->d_ptr->m_dirtyBits.positionAbsoluteDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.visibleDirty) {
         renderItem->setVisible(item->isVisible());
@@ -653,15 +658,20 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
 
     // Draw custom items
     foreach (CustomRenderItem *item, m_customRenderCache) {
-        // Check that the render item is visible and within axis ranges, and skip drawing if not
-        if (!item->isVisible()
-                || item->position().x() < m_axisCacheX.min()
-                || item->position().x() > m_axisCacheX.max()
-                || item->position().z() < m_axisCacheZ.min()
-                || item->position().z() > m_axisCacheZ.max()
-                || item->position().y() < m_axisCacheY.min()
-                || item->position().y() > m_axisCacheY.max())
+        // Check that the render item is visible, and skip drawing if not
+        if (!item->isVisible())
             continue;
+
+        // Check if the render item is in data coordinates and not within axis ranges, and skip drawing if it is
+        if (!item->isPositionAbsolute()
+                && (item->position().x() < m_axisCacheX.min()
+                    || item->position().x() > m_axisCacheX.max()
+                    || item->position().z() < m_axisCacheZ.min()
+                    || item->position().z() > m_axisCacheZ.max()
+                    || item->position().y() < m_axisCacheY.min()
+                    || item->position().y() > m_axisCacheY.max())) {
+            continue;
+        }
 
         QMatrix4x4 modelMatrix;
         QMatrix4x4 itModelMatrix;

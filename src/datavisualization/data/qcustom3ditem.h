@@ -34,6 +34,7 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
     Q_PROPERTY(QString meshFile READ meshFile WRITE setMeshFile NOTIFY meshFileChanged)
     Q_PROPERTY(QString textureFile READ textureFile WRITE setTextureFile NOTIFY textureFileChanged)
     Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged)
+    Q_PROPERTY(bool positionAbsolute READ isPositionAbsolute WRITE setPositionAbsolute NOTIFY positionAbsoluteChanged)
     Q_PROPERTY(QVector3D scaling READ scaling WRITE setScaling NOTIFY scalingChanged)
     Q_PROPERTY(QQuaternion rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
@@ -55,6 +56,9 @@ public:
     void setPosition(const QVector3D &position);
     QVector3D position() const;
 
+    void setPositionAbsolute(bool positionAbsolute);
+    bool isPositionAbsolute() const;
+
     void setScaling(const QVector3D &scaling);
     QVector3D scaling() const;
 
@@ -75,6 +79,7 @@ signals:
     void meshFileChanged(const QString &meshFile);
     void textureFileChanged(const QString &textureFile);
     void positionChanged(const QVector3D &position);
+    void positionAbsoluteChanged(bool positionAbsolute);
     void scalingChanged(const QVector3D &scaling);
     void rotationChanged(const QQuaternion &rotation);
     void visibleChanged(bool visible);

@@ -2604,13 +2604,23 @@ void Bars3DRenderer::initLabelShaders(const QString &vertexShader, const QString
     m_labelShader->initialize();
 }
 
-QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position) {
-    // Convert row and column to translation on graph
-    float xTrans = (((position.x() + 0.5f) * m_cachedBarSpacing.width()) - m_rowWidth)
-            / m_scaleFactor;
-    float zTrans = (m_columnDepth - ((position.z() + 0.5f) * m_cachedBarSpacing.height()))
-            / m_scaleFactor;
-    float yTrans = m_axisCacheY.positionAt(position.y());
+QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position, bool isAbsolute)
+{
+    float xTrans = 0.0f;
+    float yTrans = 0.0f;
+    float zTrans = 0.0f;
+    if (!isAbsolute) {
+        // Convert row and column to translation on graph
+        xTrans = (((position.x() + 0.5f) * m_cachedBarSpacing.width()) - m_rowWidth)
+                / m_scaleFactor;
+        zTrans = (m_columnDepth - ((position.z() + 0.5f) * m_cachedBarSpacing.height()))
+                / m_scaleFactor;
+        yTrans = m_axisCacheY.positionAt(position.y());
+    } else {
+        xTrans = position.x() * m_scaleX;
+        yTrans = position.y();
+        zTrans = position.z() * m_scaleZ;
+    }
     return QVector3D(xTrans, yTrans, zTrans);
 }
 

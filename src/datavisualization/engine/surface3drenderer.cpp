@@ -1212,7 +1212,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw selection buffer
     if (!m_cachedIsSlicingActivated && (!m_renderCacheList.isEmpty()
-            || !m_customRenderCache.isEmpty())
+                                        || !m_customRenderCache.isEmpty())
             && m_selectionState == SelectOnScene
             && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone) {
         m_selectionShader->bind();
@@ -2682,10 +2682,21 @@ void Surface3DRenderer::updateDepthBuffer()
 }
 #endif
 
-QVector3D Surface3DRenderer::convertPositionToTranslation(const QVector3D &position) {
-    float xTrans = m_axisCacheX.positionAt(position.x());
-    float yTrans = m_axisCacheY.positionAt(position.y());
-    float zTrans = m_axisCacheZ.positionAt(position.z());
+QVector3D Surface3DRenderer::convertPositionToTranslation(const QVector3D &position,
+                                                          bool isAbsolute)
+{
+    float xTrans = 0.0f;
+    float yTrans = 0.0f;
+    float zTrans = 0.0f;
+    if (!isAbsolute) {
+        xTrans = m_axisCacheX.positionAt(position.x());
+        yTrans = m_axisCacheY.positionAt(position.y());
+        zTrans = m_axisCacheZ.positionAt(position.z());
+    } else {
+        xTrans = position.x() * m_scaleX;
+        yTrans = position.y();
+        zTrans = position.z() * m_scaleZ;
+    }
     return QVector3D(xTrans, yTrans, zTrans);
 }
 

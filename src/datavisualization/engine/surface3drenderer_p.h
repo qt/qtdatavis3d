@@ -116,7 +116,7 @@ public:
     void updateSelectedPoint(const QPoint &position, QSurface3DSeries *series);
     inline QPoint clickedPosition() const { return m_clickedPosition; }
     void resetClickedStatus();
-    QVector3D convertPositionToTranslation(const QVector3D &position);
+    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
     void render(GLuint defaultFboHandle = 0);
 
