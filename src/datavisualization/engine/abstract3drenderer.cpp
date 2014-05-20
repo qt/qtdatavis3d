@@ -573,6 +573,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     newItem->setItemPointer(item); // Store pointer for render item updates
     newItem->setMesh(item->meshFile());
     newItem->setScaling(item->scaling());
+    newItem->setPosition(item->position());
     newItem->setRotation(item->rotation());
     QImage textureImage = item->d_ptr->textureImage();
     newItem->setBlendNeeded(textureImage.hasAlphaChannel());
@@ -614,6 +615,7 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
     }
     if (item->d_ptr->m_dirtyBits.positionDirty) {
         QVector3D translation = convertPositionToTranslation(item->position());
+        renderItem->setPosition(item->position());
         renderItem->setTranslation(translation);
         item->d_ptr->m_dirtyBits.positionDirty = false;
     }
@@ -651,7 +653,14 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
 
     // Draw custom items
     foreach (CustomRenderItem *item, m_customRenderCache) {
-        if (!item->isVisible())
+        // Check that the render item is visible and within axis ranges, and skip drawing if not
+        if (!item->isVisible()
+                || item->position().x() < m_axisCacheX.min()
+                || item->position().x() > m_axisCacheX.max()
+                || item->position().z() < m_axisCacheZ.min()
+                || item->position().z() > m_axisCacheZ.max()
+                || item->position().y() < m_axisCacheY.min()
+                || item->position().y() > m_axisCacheY.max())
             continue;
 
         QMatrix4x4 modelMatrix;

@@ -60,14 +60,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \note To conserve memory the Image loaded from the file is cleared after a texture is created.
  */
 
-// TODO: Position check in task QTRD-3057
 /*! \qmlproperty vector3d Custom3DItem::position
  *
  * Holds the item \a position as a vector3d. Item position is in data coordinates. Defaults to
  * \c {vector3d(0.0, 0.0, 0.0)}.
  *
- * \note No validity checks are made for the position of the item, so it is up to the user to
- * provide a valid position. Items positioned outside axis ranges are still rendered.
+ * \note Items positioned outside axis ranges are not rendered.
  */
 
 /*! \qmlproperty vector3d Custom3DItem::scaling
@@ -153,8 +151,7 @@ QString QCustom3DItem::meshFile() const
  * Holds the item \a position as a QVector3D. Item position is in data coordinates. Defaults to
  * \c {QVector3D(0.0, 0.0, 0.0)}.
  *
- * \note No validity checks are made for the position of the item, so it is up to the user to
- * provide a valid position. Items positioned outside axis ranges are still rendered.
+ * \note Items positioned outside axis ranges are not rendered.
  */
 void QCustom3DItem::setPosition(const QVector3D &position)
 {

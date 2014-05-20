@@ -74,7 +74,7 @@ Rectangle {
             id: shuttleItem
             meshFile: ":/items/shuttle.obj"
             textureFile: ":/items/shuttle.png"
-            position: Qt.vector3d(5.0,35.0,3.0)
+            position: Qt.vector3d(5.0,29.0,3.0)
             scaling: Qt.vector3d(0.2,0.2,0.2)
         }
 
@@ -152,6 +152,7 @@ Rectangle {
         onClicked: {
             currentAngle += 5
             chartData.series.meshAngle = currentAngle
+            shuttleItem.setRotationAxisAndAngle(Qt.vector3d(0.0, 1.0, 1.0), currentAngle)
         }
     }
 

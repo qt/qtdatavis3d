@@ -49,6 +49,8 @@ public:
     inline ObjectHelper *mesh() const { return m_object; }
     inline void setScaling(const QVector3D &scaling) { m_scaling = scaling; }
     inline QVector3D scaling() const { return m_scaling; }
+    inline void setPosition(const QVector3D &position) { m_position = position; }
+    inline QVector3D position() const { return m_position; }
     inline void setBlendNeeded(bool blend) { m_needBlend = blend; }
     inline bool isBlendNeeded() const { return m_needBlend; }
     inline void setVisible(bool visible) { m_visible = visible; }
@@ -65,6 +67,7 @@ public:
 private:
     GLuint m_texture;
     QVector3D m_scaling;
+    QVector3D m_position;
     ObjectHelper *m_object;
     bool m_needBlend;
     bool m_visible;
