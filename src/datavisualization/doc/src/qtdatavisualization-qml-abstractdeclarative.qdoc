@@ -201,55 +201,70 @@
 /*!
  * \qmlmethod int AbstractGraph3D::selectedLabelIndex()
  *
- * Can be used to query the index of the selected label after receiving elementSelected signal with
- * any label type. Selection is valid until the next elementSelected signal.
+ * Can be used to query the index of the selected label after receiving \c selectedElementChanged
+ * signal with any label type. Selection is valid until the next \c selectedElementChanged signal.
  *
  * \return index of the selected label, or -1.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \sa selectedElement
  */
 
 /*!
  * \qmlmethod Abstract3DAxis AbstractGraph3D::selectedAxis()
  *
- * Can be used to get the selected axis after receiving elementSelected signal with any label type.
- * Selection is valid until the next elementSelected signal.
+ * Can be used to get the selected axis after receiving \c selectedElementChanged signal with any label
+ * type. Selection is valid until the next \c selectedElementChanged signal.
  *
  * \return the selected axis, or null.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \sa selectedElement
  */
 
 /*!
  * \qmlmethod int AbstractGraph3D::selectedCustomItemIndex()
  *
- * Can be used to query the index of the selected custom item after receiving elementSelected signal
- * with \l{QAbstract3DGraph::ElementCustomItem}{ElementCustomItem} type. Selection is valid until
- * the next elementSelected signal.
+ * Can be used to query the index of the selected custom item after receiving \c selectedElementChanged
+ * signal with \l{QAbstract3DGraph::ElementCustomItem}{ElementCustomItem} type. Selection is valid
+ * until the next \c selectedElementChanged signal.
  *
  * \return index of the selected custom item, or -1.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \sa selectedElement
  */
 
 /*!
  * \qmlmethod Custom3DItem AbstractGraph3D::selectedCustomItem()
  *
- * Can be used to get the selected custom item after receiving elementSelected signal with
+ * Can be used to get the selected custom item after receiving \c selectedElementChanged signal with
  * \l{QAbstract3DGraph::ElementCustomItem}{ElementCustomItem} type. Ownership of the item remains
- * with the graph. Selection is valid until the next elementSelected signal.
+ * with the graph. Selection is valid until the next \c selectedElementChanged signal.
  *
  * \return the selected custom item, or null.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \sa selectedElement
  */
 
-/*! \qmlsignal AbstractGraph3D::elementSelected(ElementType type)
+/*!
+ * \qmlproperty AbstractGraph3D.ElementType AbstractGraph3D::selectedElement
  *
- * Emits selection \a type when a selection is made in the graph.
+ * Can be used to query the selected element type.
+ * Type is valid until the next \c selectedElementChanged signal.
+ *
+ * \c selectedElementChanged signal is emitted when a selection is made in the graph.
+ *
+ * Signal can be used for example for implementing customized input handling, as demonstrated in
+ * this \l {Qt Quick 2 Axis Dragging Example}{example}.
  *
  * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
- * Bars3D::selectedSeries, Scatter3D::selectedSeries, Surface3D::selectedSeries
+ * Bars3D::selectedSeries, Scatter3D::selectedSeries, Scene3D::selectionQueryPosition
  *
  * \since Qt Data Visualization 1.1
  */

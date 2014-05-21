@@ -442,12 +442,14 @@ void QAbstract3DGraph::releaseCustomItem(QCustom3DItem *item)
 }
 
 /*!
- * Can be used to query the index of the selected label after receiving elementSelected signal with
- * any label type. Selection is valid until the next elementSelected signal.
+ * Can be used to query the index of the selected label after receiving \c selectedElementChanged
+ * signal with any label type. Selection is valid until the next \c selectedElementChanged signal.
  *
  * \return index of the selected label, or -1.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \sa selectedElement
  */
 int QAbstract3DGraph::selectedLabelIndex() const
 {
@@ -455,12 +457,14 @@ int QAbstract3DGraph::selectedLabelIndex() const
 }
 
 /*!
- * Can be used to get the selected axis after receiving elementSelected signal with any label type.
- * Selection is valid until the next elementSelected signal.
+ * Can be used to get the selected axis after receiving \c selectedElementChanged signal with any label
+ * type. Selection is valid until the next \c selectedElementChanged signal.
  *
  * \return pointer to the selected axis, or null.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \sa selectedElement
  */
 QAbstract3DAxis *QAbstract3DGraph::selectedAxis() const
 {
@@ -468,13 +472,15 @@ QAbstract3DAxis *QAbstract3DGraph::selectedAxis() const
 }
 
 /*!
- * Can be used to query the index of the selected custom item after receiving elementSelected signal
- * with QAbstract3DGraph::ElementCustomItem type. Selection is valid until the next elementSelected
- * signal.
+ * Can be used to query the index of the selected custom item after receiving \c selectedElementChanged
+ * signal with QAbstract3DGraph::ElementCustomItem type. Selection is valid until the next
+ * \c selectedElementChanged signal.
  *
  * \return index of the selected custom item, or -1.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \sa selectedElement
  */
 int QAbstract3DGraph::selectedCustomItemIndex() const
 {
@@ -482,17 +488,41 @@ int QAbstract3DGraph::selectedCustomItemIndex() const
 }
 
 /*!
- * Can be used to get the selected custom item after receiving elementSelected signal with
+ * Can be used to get the selected custom item after receiving \c selectedElementChanged signal with
  * QAbstract3DGraph::ElementCustomItem type. Ownership of the item remains with the graph.
- * Selection is valid until the next elementSelected signal.
+ * Selection is valid until the next \c selectedElementChanged signal.
  *
  * \return pointer to the selected custom item, or null.
  *
  * \since Qt Data Visualization 1.1
+ *
+ * \sa selectedElement
  */
 QCustom3DItem *QAbstract3DGraph::selectedCustomItem() const
 {
     return d_ptr->m_visualController->selectedCustomItem();
+}
+
+/*!
+ * \property QAbstract3DGraph::selectedElement
+ *
+ * Can be used to query the selected element type.
+ * Type is valid until the next \c selectedElementChanged signal.
+ *
+ * \c selectedElementChanged signal is emitted when a selection is made in the graph.
+ *
+ * Signal can be used for example for implementing custom input handlers, as demonstrated in this
+ * \l {Axis Range Dragging With Labels Example}{example}.
+ *
+ * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
+ * Q3DBars::selectedSeries(), Q3DScatter::selectedSeries(), Q3DSurface::selectedSeries(),
+ * Q3DScene::setSelectionQueryPosition()
+ *
+ * \since Qt Data Visualization 1.1
+ */
+QAbstract3DGraph::ElementType QAbstract3DGraph::selectedElement() const
+{
+    return d_ptr->m_visualController->selectedElement();
 }
 
 /*!
@@ -510,18 +540,6 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
         renderSize = size();
     return d_ptr->renderToImage(msaaSamples, renderSize);
 }
-
-/*! \fn QAbstract3DGraph::elementSelected(ElementType type)
- * \since Qt Data Visualization 1.1
- *
- * Emits selection \a type when a selection is made in the graph.
- *
- * Signal can be used for example for implementing custom input handlers, as demonstrated in this
- * \l {Axis Range Dragging With Labels Example}{example}.
- *
- * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
- * Q3DBars::selectedSeries(), Q3DScatter::selectedSeries(), Q3DSurface::selectedSeries()
- */
 
 /*!
  * \property QAbstract3DGraph::measureFps
@@ -699,7 +717,7 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
     QObject::connect(m_visualController, &Abstract3DController::shadowQualityChanged, q_ptr,
                      &QAbstract3DGraph::shadowQualityChanged);
     QObject::connect(m_visualController, &Abstract3DController::elementSelected, q_ptr,
-                     &QAbstract3DGraph::elementSelected);
+                     &QAbstract3DGraph::selectedElementChanged);
 
     QObject::connect(m_visualController, &Abstract3DController::needRender, this,
                      &QAbstract3DGraphPrivate::renderLater);

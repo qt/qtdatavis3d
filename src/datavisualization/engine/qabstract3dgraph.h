@@ -36,6 +36,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
 {
     Q_OBJECT
     Q_ENUMS(ShadowQuality)
+    Q_ENUMS(ElementType)
     Q_FLAGS(SelectionFlag SelectionFlags)
     Q_PROPERTY(QAbstract3DInputHandler* activeInputHandler READ activeInputHandler WRITE setActiveInputHandler NOTIFY activeInputHandlerChanged)
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
@@ -45,6 +46,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged)
     Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged)
     Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged)
+    Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -131,6 +133,8 @@ public:
     void setOrthoProjection(bool enable);
     bool isOrthoProjection() const;
 
+    ElementType selectedElement() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -148,7 +152,7 @@ signals:
     void activeThemeChanged(Q3DTheme *theme);
     void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
-    void elementSelected(QAbstract3DGraph::ElementType type);
+    void selectedElementChanged(QAbstract3DGraph::ElementType type);
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);

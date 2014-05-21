@@ -57,6 +57,7 @@ class AbstractDeclarative : public QQuickItem
     Q_OBJECT
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(RenderingMode)
+    Q_ENUMS(ElementType)
     Q_FLAGS(SelectionFlag SelectionFlags)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
@@ -70,6 +71,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged REVISION 1)
     Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList REVISION 1)
     Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged REVISION 1)
+    Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged REVISION 1)
 
 public:
     enum SelectionFlag {
@@ -94,6 +96,15 @@ public:
         ShadowQualitySoftLow,
         ShadowQualitySoftMedium,
         ShadowQualitySoftHigh
+    };
+
+    enum ElementType {
+        ElementNone = 0,
+        ElementSeries,
+        ElementAxisXLabel,
+        ElementAxisZLabel,
+        ElementAxisYLabel,
+        ElementCustomItem
     };
 
     enum RenderingMode {
@@ -168,6 +179,8 @@ public:
     void setOrthoProjection(bool enable);
     bool isOrthoProjection() const;
 
+    AbstractDeclarative::ElementType selectedElement() const;
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -199,7 +212,7 @@ signals:
     void renderingModeChanged(AbstractDeclarative::RenderingMode mode);
     Q_REVISION(1) void measureFpsChanged(bool enabled);
     Q_REVISION(1) void currentFpsChanged(qreal fps);
-    Q_REVISION(1) void elementSelected(QAbstract3DGraph::ElementType type);
+    Q_REVISION(1) void selectedElementChanged(QAbstract3DGraph::ElementType type);
     Q_REVISION(1) void orthoProjectionChanged(bool enabled);
 
 private:

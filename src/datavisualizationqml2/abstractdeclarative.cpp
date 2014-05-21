@@ -309,7 +309,7 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
     QObject::connect(m_controller.data(), &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::handleSelectionModeChange);
     QObject::connect(m_controller.data(), &Abstract3DController::elementSelected, this,
-                     &AbstractDeclarative::elementSelected);
+                     &AbstractDeclarative::selectedElementChanged);
 
     QObject::connect(m_controller.data(), &Abstract3DController::axisXChanged, this,
                      &AbstractDeclarative::handleAxisXChanged);
@@ -680,6 +680,11 @@ void AbstractDeclarative::setOrthoProjection(bool enable)
 bool AbstractDeclarative::isOrthoProjection() const
 {
     return m_controller->isOrthoProjection();
+}
+
+AbstractDeclarative::ElementType AbstractDeclarative::selectedElement() const
+{
+    return ElementType(m_controller->selectedElement());
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

@@ -320,6 +320,8 @@ public slots:
     inline bool measureFps() const { return m_measureFps; }
     inline qreal currentFps() const { return m_currentFps; }
 
+    QAbstract3DGraph::ElementType selectedElement() const;
+
     void updateCustomItem();
 
 signals:

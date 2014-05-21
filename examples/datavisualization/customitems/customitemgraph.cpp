@@ -90,7 +90,7 @@ CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)
 
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
-    connect(m_graph, &QAbstract3DGraph::elementSelected,
+    connect(m_graph, &QAbstract3DGraph::selectedElementChanged,
             this, &CustomItemGraph::handleElementSelected);
 
     m_selectionAnimation = new QPropertyAnimation(this);
@@ -237,7 +237,6 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
         m_selectionAnimation->setStartValue(item->scaling());
         m_selectionAnimation->setEndValue(item->scaling() * 1.5f);
         m_selectionAnimation->start();
-        item->setShadowCasting(false);
     } else if (type == QAbstract3DGraph::ElementSeries) {
         QString text = "Surface (";
         QSurface3DSeries *series = m_graph->selectedSeries();

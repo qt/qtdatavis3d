@@ -30,7 +30,7 @@ AxesInputHandler::AxesInputHandler(QAbstract3DGraph *graph, QObject *parent) :
 {
     //! [3]
     // Connect to the item selection signal from graph
-    connect(graph, &QAbstract3DGraph::elementSelected, this,
+    connect(graph, &QAbstract3DGraph::selectedElementChanged, this,
             &AxesInputHandler::handleElementSelected);
     //! [3]
 }

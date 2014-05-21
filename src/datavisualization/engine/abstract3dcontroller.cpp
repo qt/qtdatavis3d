@@ -1393,6 +1393,11 @@ QCustom3DItem *Abstract3DController::selectedCustomItem() const
     return item;
 }
 
+QAbstract3DGraph::ElementType Abstract3DController::selectedElement() const
+{
+    return m_renderer->clickedType();
+}
+
 void Abstract3DController::setOrthoProjection(bool enable)
 {
     if (enable != m_useOrthoProjection) {

@@ -102,6 +102,9 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<QValue3DAxisFormatter>(uri, 1, 1, "ValueAxis3DFormatter");
     qmlRegisterType<QLogValue3DAxisFormatter>(uri, 1, 1, "LogValueAxis3DFormatter");
     qmlRegisterType<QCustom3DItem>(uri, 1, 1, "Custom3DItem");
+
+    // New metatypes
+    qRegisterMetaType<QAbstract3DGraph::ElementType>("QAbstract3DGraph::ElementType");
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
