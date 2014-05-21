@@ -268,6 +268,8 @@ void Data::changeMode(int mode)
 void Data::start()
 {
     m_started = true;
+    // Reset resolution before starting (otherwise restart will crash due to empty data)
+    setResolution(m_resolutionLevel);
     updateData();
     m_statusArea->append(QStringLiteral("<b>Started<\b>"));
 }

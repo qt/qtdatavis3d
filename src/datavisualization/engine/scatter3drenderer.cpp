@@ -118,11 +118,11 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_selectionShader;
     delete m_backgroundShader;
     delete m_labelShader;
-    delete m_backgroundObj;
+    ObjectHelper::releaseObjectHelper(this, m_backgroundObj);
 #if !defined(QT_OPENGL_ES_2)
-    delete m_gridLineObj;
+    ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
 #endif
-    delete m_labelObj;
+    ObjectHelper::releaseObjectHelper(this, m_labelObj);
 }
 
 void Scatter3DRenderer::initializeOpenGL()
@@ -1731,28 +1731,22 @@ void Scatter3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality qual
 
 void Scatter3DRenderer::loadBackgroundMesh()
 {
-    if (m_backgroundObj)
-        delete m_backgroundObj;
-    m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
-    m_backgroundObj->load();
+    ObjectHelper::resetObjectHelper(this, m_backgroundObj,
+                                    QStringLiteral(":/defaultMeshes/background"));
 }
 
 #if !(defined QT_OPENGL_ES_2)
 void Scatter3DRenderer::loadGridLineMesh()
 {
-    if (m_gridLineObj)
-        delete m_gridLineObj;
-    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
-    m_gridLineObj->load();
+    ObjectHelper::resetObjectHelper(this, m_gridLineObj,
+                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 #endif
 
 void Scatter3DRenderer::loadLabelMesh()
 {
-    if (m_labelObj)
-        delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
-    m_labelObj->load();
+    ObjectHelper::resetObjectHelper(this, m_labelObj,
+                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 
 void Scatter3DRenderer::updateTextures()

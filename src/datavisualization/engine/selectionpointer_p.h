@@ -53,6 +53,7 @@ public:
     void setPosition(const QVector3D &position);
     void setLabel(const QString &label);
     void setPointerObject(ObjectHelper *object);
+    void setLabelObject(ObjectHelper *object);
     void handleDrawerChange();
     void updateBoundingRect(const QRect &rect);
     void updateScene(Q3DScene *scene);
@@ -63,12 +64,11 @@ public:
 private:
     void initializeOpenGL();
     void initShaders();
-    void loadLabelMesh();
 
 private:
     ShaderHelper *m_labelShader;
     ShaderHelper *m_pointShader;
-    ObjectHelper *m_labelObj;
+    ObjectHelper *m_labelObj; // Not owned
     ObjectHelper *m_pointObj; // Not owned
     TextureHelper *m_textureHelper;
     Q3DTheme *m_cachedTheme;

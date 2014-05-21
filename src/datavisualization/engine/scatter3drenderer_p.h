@@ -68,11 +68,11 @@ private:
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_backgroundObj;
+    ObjectHelper *m_backgroundObj; // Shared reference
 #if !(defined QT_OPENGL_ES_2)
-    ObjectHelper *m_gridLineObj;
+    ObjectHelper *m_gridLineObj; // Shared reference
 #endif
-    ObjectHelper *m_labelObj;
+    ObjectHelper *m_labelObj; // Shared reference
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
     GLuint m_selectionTexture;

@@ -35,12 +35,12 @@
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QCustom3DItem;
+class Abstract3DRenderer;
 
 class CustomRenderItem : public AbstractRenderItem
 {
 public:
     CustomRenderItem();
-    CustomRenderItem(const CustomRenderItem &other);
     virtual ~CustomRenderItem();
 
     inline void setTexture(GLuint texture) { m_texture = texture; }
@@ -65,19 +65,24 @@ public:
     inline int index() const { return m_index; }
     inline void setShadowCasting(bool shadowCasting) { m_shadowCasting = shadowCasting; }
     inline bool isShadowCasting() const { return m_shadowCasting; }
+    inline void setRenderer(Abstract3DRenderer *renderer) { m_renderer = renderer; }
 
 private:
+    Q_DISABLE_COPY(CustomRenderItem)
+
     GLuint m_texture;
     QVector3D m_scaling;
     QVector3D m_position;
     bool m_absolute;
-    ObjectHelper *m_object;
+    ObjectHelper *m_object; // shared reference
     bool m_needBlend;
     bool m_visible;
     bool m_valid;
     int m_index;
     bool m_shadowCasting;
     QCustom3DItem *m_item;
+    Abstract3DRenderer *m_renderer;
+
  };
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 

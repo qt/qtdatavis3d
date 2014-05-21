@@ -73,11 +73,11 @@ private:
     GLfloat m_maxVisibleRowValue;
     GLfloat m_visibleColumnRange;
     GLfloat m_visibleRowRange;
-    ObjectHelper *m_backgroundObj;
+    ObjectHelper *m_backgroundObj; // Shared reference
 #if !(defined QT_OPENGL_ES_2)
-    ObjectHelper *m_gridLineObj;
+    ObjectHelper *m_gridLineObj; // Shared reference
 #endif
-    ObjectHelper *m_labelObj;
+    ObjectHelper *m_labelObj; // Shared reference
     GLuint m_depthTexture;
     GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;

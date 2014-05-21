@@ -27,15 +27,87 @@ ObjectHelper::ObjectHelper(const QString &objectFile)
     : m_objectFile(objectFile)
 {
     m_indicesType = GL_UNSIGNED_SHORT;
+    load();
 }
+
+struct ObjectHelperRef {
+    int refCount;
+    ObjectHelper *obj;
+};
+
+// The "Abstract3DRenderer *" key identifies the renderer
+static QHash<const Abstract3DRenderer *, QHash<QString, ObjectHelperRef *> *> cacheTable;
 
 ObjectHelper::~ObjectHelper()
 {
 }
 
-void ObjectHelper::setObjectFile(const QString &objectFile)
+void ObjectHelper::resetObjectHelper(const Abstract3DRenderer *cacheId, ObjectHelper *&obj,
+                                     const QString &meshFile)
 {
-    m_objectFile = objectFile;
+    Q_ASSERT(cacheId);
+
+    if (obj) {
+        const QString &oldFile = obj->objectFile();
+        if (meshFile == oldFile)
+            return; // same file, do nothing
+        releaseObjectHelper(cacheId, obj);
+    }
+    obj = getObjectHelper(cacheId, meshFile);
+}
+
+void ObjectHelper::releaseObjectHelper(const Abstract3DRenderer *cacheId, ObjectHelper *&obj)
+{
+    Q_ASSERT(cacheId);
+
+    if (obj) {
+        QHash<QString, ObjectHelperRef *> *objectTable = cacheTable.value(cacheId, 0);
+        if (objectTable) {
+            // Delete object if last reference is released
+            ObjectHelperRef *objRef = objectTable->value(obj->m_objectFile, 0);
+            if (objRef) {
+                objRef->refCount--;
+                if (objRef->refCount <= 0) {
+                    objectTable->remove(obj->m_objectFile);
+                    delete objRef->obj;
+                    delete objRef;
+                }
+            }
+            if (objectTable->isEmpty()) {
+                // Remove the entire cache if last object was removed
+                cacheTable.remove(cacheId);
+                delete objectTable;
+            }
+        } else {
+            // Just delete the object if unknown cache
+            delete obj;
+        }
+        obj = 0;
+    }
+}
+
+ObjectHelper *ObjectHelper::getObjectHelper(const Abstract3DRenderer *cacheId,
+                                            const QString &objectFile)
+{
+    if (objectFile.isEmpty())
+        return 0;
+
+    QHash<QString, ObjectHelperRef *> *objectTable = cacheTable.value(cacheId, 0);
+    if (!objectTable) {
+        objectTable = new QHash<QString, ObjectHelperRef *>;
+        cacheTable.insert(cacheId, objectTable);
+    }
+
+    // Check if object helper for this mesh already exists
+    ObjectHelperRef *objRef = objectTable->value(objectFile, 0);
+    if (!objRef) {
+        objRef = new ObjectHelperRef;
+        objRef->refCount = 0;
+        objRef->obj = new ObjectHelper(objectFile);
+        objectTable->insert(objectFile, objRef);
+    }
+    objRef->refCount++;
+    return objRef->obj;
 }
 
 void ObjectHelper::load()

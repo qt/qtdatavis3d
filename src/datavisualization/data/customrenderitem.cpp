@@ -24,29 +24,19 @@ CustomRenderItem::CustomRenderItem()
     : AbstractRenderItem(),
       m_texture(0),
       m_object(0),
-      m_visible(true)
+      m_visible(true),
+      m_renderer(0)
 {
-}
-
-CustomRenderItem::CustomRenderItem(const CustomRenderItem &other)
-    : AbstractRenderItem(other)
-{
-    m_texture = other.m_texture;
 }
 
 CustomRenderItem::~CustomRenderItem()
 {
-    if (m_object)
-        delete m_object;
+    ObjectHelper::releaseObjectHelper(m_renderer, m_object);
 }
 
 void CustomRenderItem::setMesh(const QString &meshFile)
 {
-    if (m_object)
-        delete m_object;
-    // Load mesh and make an object of it
-    m_object = new ObjectHelper(meshFile);
-    m_object->load();
+    ObjectHelper::resetObjectHelper(m_renderer, m_object, meshFile);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

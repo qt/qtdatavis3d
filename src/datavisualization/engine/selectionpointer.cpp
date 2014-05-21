@@ -54,7 +54,6 @@ SelectionPointer::~SelectionPointer()
 {
     delete m_labelShader;
     delete m_pointShader;
-    delete m_labelObj;
     delete m_textureHelper;
 }
 
@@ -66,7 +65,6 @@ void SelectionPointer::initializeOpenGL()
     m_drawer->initializeOpenGL();
 
     initShaders();
-    loadLabelMesh();
 }
 
 void SelectionPointer::updateScene(Q3DScene *scene)
@@ -235,6 +233,11 @@ void SelectionPointer::setPointerObject(ObjectHelper *object)
     m_pointObj = object;
 }
 
+void SelectionPointer::setLabelObject(ObjectHelper *object)
+{
+    m_labelObj = object;
+}
+
 void SelectionPointer::handleDrawerChange()
 {
     m_cachedTheme = m_drawer->theme();
@@ -267,14 +270,6 @@ void SelectionPointer::initShaders()
 #endif
     m_pointShader->initialize();
 
-}
-
-void SelectionPointer::loadLabelMesh()
-{
-    if (m_labelObj)
-        delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
-    m_labelObj->load();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

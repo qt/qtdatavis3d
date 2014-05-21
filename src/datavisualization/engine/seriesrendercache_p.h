@@ -74,7 +74,7 @@ public:
 
 protected:
     QAbstract3DSeries *m_series;
-    ObjectHelper *m_object;
+    ObjectHelper *m_object; // Shared reference
     QAbstract3DSeries::Mesh m_mesh;
     QQuaternion m_meshRotation;
 

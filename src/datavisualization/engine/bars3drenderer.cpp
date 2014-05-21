@@ -120,9 +120,9 @@ Bars3DRenderer::~Bars3DRenderer()
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
-    delete m_backgroundObj;
-    delete m_gridLineObj;
-    delete m_labelObj;
+    ObjectHelper::releaseObjectHelper(this, m_backgroundObj);
+    ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
+    ObjectHelper::releaseObjectHelper(this, m_labelObj);
     delete m_labelShader;
 }
 
@@ -2336,26 +2336,20 @@ void Bars3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality
 
 void Bars3DRenderer::loadBackgroundMesh()
 {
-    if (m_backgroundObj)
-        delete m_backgroundObj;
-    m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/negativeBackground"));
-    m_backgroundObj->load();
+    ObjectHelper::resetObjectHelper(this, m_backgroundObj,
+                                    QStringLiteral(":/defaultMeshes/negativeBackground"));
 }
 
 void Bars3DRenderer::loadGridLineMesh()
 {
-    if (m_gridLineObj)
-        delete m_gridLineObj;
-    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
-    m_gridLineObj->load();
+    ObjectHelper::resetObjectHelper(this, m_gridLineObj,
+                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 
 void Bars3DRenderer::loadLabelMesh()
 {
-    if (m_labelObj)
-        delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
-    m_labelObj->load();
+    ObjectHelper::resetObjectHelper(this, m_labelObj,
+                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 
 void Bars3DRenderer::updateTextures()

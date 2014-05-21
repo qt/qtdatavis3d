@@ -109,13 +109,7 @@ void SeriesRenderCache::populate(bool newSeries)
             m_renderer->fixMeshFileName(meshFileName, m_mesh);
         }
 
-        delete m_object;
-        if (meshFileName.isEmpty()) {
-            m_object = 0;
-        } else {
-            m_object = new ObjectHelper(meshFileName);
-            m_object->load();
-        }
+        ObjectHelper::resetObjectHelper(m_renderer, m_object, meshFileName);
     }
 
     if (newSeries || changeTracker.meshRotationChanged) {
@@ -193,7 +187,7 @@ void SeriesRenderCache::populate(bool newSeries)
 
 void SeriesRenderCache::cleanup(TextureHelper *texHelper)
 {
-    delete m_object;
+    ObjectHelper::releaseObjectHelper(m_renderer, m_object);
     if (QOpenGLContext::currentContext()) {
         texHelper->deleteTexture(&m_baseUniformTexture);
         texHelper->deleteTexture(&m_baseGradientTexture);

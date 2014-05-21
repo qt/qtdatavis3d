@@ -570,6 +570,7 @@ QVector4D Abstract3DRenderer::indexToSelectionColor(GLint index)
 CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
 {
     CustomRenderItem *newItem = new CustomRenderItem();
+    newItem->setRenderer(this);
     newItem->setItemPointer(item); // Store pointer for render item updates
     newItem->setMesh(item->meshFile());
     newItem->setScaling(item->scaling());

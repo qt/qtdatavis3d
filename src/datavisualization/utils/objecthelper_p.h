@@ -35,17 +35,26 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+class Abstract3DRenderer;
+
 class ObjectHelper : public AbstractObjectHelper
 {
+private:
+    ObjectHelper(const QString &objectFile);
 public:
-    ObjectHelper(const QString &objectFile = QString());
     ~ObjectHelper();
 
-    void setObjectFile(const QString &objectFile);
+    static void resetObjectHelper(const Abstract3DRenderer *cacheId, ObjectHelper *&obj,
+                                  const QString &meshFile);
+    static void releaseObjectHelper(const Abstract3DRenderer *cacheId, ObjectHelper *&obj);
 
-    void load();
+    inline const QString &objectFile() { return m_objectFile; }
 
 private:
+    static ObjectHelper *getObjectHelper(const Abstract3DRenderer *cacheId,
+                                         const QString &objectFile);
+    void load();
+
     QString m_objectFile;
 };
 

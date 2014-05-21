@@ -142,11 +142,11 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_surfaceSliceSmoothShader;
     delete m_labelShader;
 
-    delete m_backgroundObj;
+    ObjectHelper::releaseObjectHelper(this, m_backgroundObj);
 #if !defined(QT_OPENGL_ES_2)
-    delete m_gridLineObj;
+    ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
 #endif
-    delete m_labelObj;
+    ObjectHelper::releaseObjectHelper(this, m_labelObj);
 }
 
 void Surface3DRenderer::initializeOpenGL()
@@ -2311,19 +2311,15 @@ void Surface3DRenderer::resetClickedStatus()
 
 void Surface3DRenderer::loadBackgroundMesh()
 {
-    if (m_backgroundObj)
-        delete m_backgroundObj;
-    m_backgroundObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/background"));
-    m_backgroundObj->load();
+    ObjectHelper::resetObjectHelper(this, m_backgroundObj,
+                                    QStringLiteral(":/defaultMeshes/background"));
 }
 
 #if !(defined QT_OPENGL_ES_2)
 void Surface3DRenderer::loadGridLineMesh()
 {
-    if (m_gridLineObj)
-        delete m_gridLineObj;
-    m_gridLineObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
-    m_gridLineObj->load();
+    ObjectHelper::resetObjectHelper(this, m_gridLineObj,
+                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 #endif
 
@@ -2407,6 +2403,7 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
         slicePointer->setPosition((subPosFront + subPosBack) / 2.0f);
         slicePointer->setLabel(selectionLabel);
         slicePointer->setPointerObject(cache->object());
+        slicePointer->setLabelObject(m_labelObj);
         slicePointer->setHighlightColor(cache->singleHighlightColor());
         slicePointer->updateScene(m_cachedScene);
         slicePointer->setRotation(cache->meshRotation());
@@ -2420,6 +2417,7 @@ void Surface3DRenderer::updateSelectionPoint(SurfaceSeriesRenderCache *cache, co
     mainPointer->setPosition(mainPos);
     mainPointer->setLabel(selectionLabel);
     mainPointer->setPointerObject(cache->object());
+    mainPointer->setLabelObject(m_labelObj);
     mainPointer->setHighlightColor(cache->singleHighlightColor());
     mainPointer->updateScene(m_cachedScene);
     mainPointer->setRotation(cache->meshRotation());
@@ -2548,10 +2546,8 @@ void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 
 void Surface3DRenderer::loadLabelMesh()
 {
-    if (m_labelObj)
-        delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
-    m_labelObj->load();
+    ObjectHelper::resetObjectHelper(this, m_labelObj,
+                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 
 void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
