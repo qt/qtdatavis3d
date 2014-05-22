@@ -177,6 +177,7 @@ Rectangle {
         TableViewColumn{ role: "income" ; title: "Income" ; width: tableView.width / 4 }
         itemDelegate: Item {
             Text {
+                id: delegateText
                 anchors.verticalCenter: parent.verticalCenter
                 width: parent.width
                 anchors.leftMargin: 4
@@ -187,13 +188,15 @@ Rectangle {
                 text: styleData.value
                 horizontalAlignment: styleData.textAlignment
 
-                Component.onCompleted: {
-                    if (styleData.column === 0) {
-                        var pattern = /(\d\d\d\d)-(\d\d)/
-                        var matches = pattern.exec(styleData.value)
-                        var colIndex = parseInt(matches[2], 10) - 1
-                        text = matches[1] + " - " + graphAxes.column.labels[colIndex]
+                property bool customFormatted: false
 
+                onTextChanged: {
+                    if (styleData.column === 0 && !customFormatted) {
+                        customFormatted = true
+                        var pattern = /(\d\d\d\d)-(\d\d)/
+                        var matches = pattern.exec(delegateText.text)
+                        var colIndex = parseInt(matches[2], 10) - 1
+                        delegateText.text = matches[1] + " - " + graphAxes.column.labels[colIndex]
                     }
                 }
             }
