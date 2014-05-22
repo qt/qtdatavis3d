@@ -166,6 +166,7 @@ Item {
         MouseArea {
             id: inputArea
             anchors.fill: parent
+            hoverEnabled: true
             acceptedButtons: Qt.LeftButton
             //! [1]
             property int mouseX: -1
