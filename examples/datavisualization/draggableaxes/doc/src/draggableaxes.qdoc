@@ -21,6 +21,7 @@
     \title Axis Range Dragging With Labels Example
     \ingroup qtdatavisualization_examples
     \brief Implementing a custom input handler to support axis dragging.
+    \since Qt Data Visualization 1.1
 
     The Axis Range Dragging example shows how to customize the 3D graph controls in a widget
     application to allow changing axis ranges by clicking on an axis label and dragging. This is

@@ -56,10 +56,12 @@ Item {
                               });
         }
 
+        //! [10]
         onTriggered: {
             rotationAngle = rotationAngle + 1
-            scatterSeries.setMeshAxisAndAngle(Qt.vector3d(1,1,1), rotationAngle)
             qtCube.setRotationAxisAndAngle(Qt.vector3d(1,0,1), rotationAngle)
+            //! [10]
+            scatterSeries.setMeshAxisAndAngle(Qt.vector3d(1,1,1), rotationAngle)
             if (isIncreasing) {
                 for (var i = 0; i < 10; i++)
                     appendRow()
@@ -112,8 +114,11 @@ Item {
         width: parent.width
         height: parent.height
 
+        //! [0]
         Scatter3D {
             id: scatterGraph
+            inputHandler: null
+            //! [0]
             width: dataView.width
             height: dataView.height
             theme: dynamicColorTheme
@@ -121,7 +126,6 @@ Item {
             scene.activeCamera.yRotation: 45.0
             scene.activeCamera.xRotation: 45.0
             scene.activeCamera.zoomLevel: 75.0
-            inputHandler: null
 
             Scatter3DSeries {
                 id: scatterSeries
@@ -136,6 +140,7 @@ Item {
                     rotationRole: "rotation"
                 }
             }
+            //! [9]
             customItemList: [
                 Custom3DItem {
                     id: qtCube
@@ -145,6 +150,8 @@ Item {
                     scaling: Qt.vector3d(0.3,0.3,0.3)
                 }
             ]
+            //! [9]
+            //! [5]
             onSelectedElementChanged: {
                 if (selectedElement >= AbstractGraph3D.ElementAxisXLabel
                         && selectedElement <= AbstractGraph3D.ElementAxisYLabel)
@@ -152,41 +159,50 @@ Item {
                 else
                     selectedAxisLabel = -1
             }
+            //! [5]
         }
 
+        //! [1]
         MouseArea {
             id: inputArea
             anchors.fill: parent
-            hoverEnabled: true
             acceptedButtons: Qt.LeftButton
+            //! [1]
             property int mouseX: -1
             property int mouseY: -1
             property int previousMouseX: -1
             property int previousMouseY: -1
 
+            //! [3]
             onPositionChanged: {
                 mouseX = mouse.x;
                 mouseY = mouse.y;
+                //! [3]
+                //! [6]
                 if (pressed && selectedAxisLabel != -1)
                     dragAxis(mouseX, mouseY, previousMouseX, previousMouseY);
+                //! [6]
+                //! [4]
                 previousMouseX = mouseX;
                 previousMouseY = mouseY;
             }
+            //! [4]
 
+            //! [2]
             onPressed: {
                 scatterGraph.scene.selectionQueryPosition = Qt.point(inputArea.mouseX,
                                                                      inputArea.mouseY);
             }
+            //! [2]
         }
     }
 
+    //! [7]
     function dragAxis(mouseX, mouseY, previousMouseX, previousMouseY) {
         // Directional drag multipliers based on rotation
-        // In this example camera is locked to 45 degrees, so we can use precalculated values
-        var xMulX = 0.70710678146
-        var xMulY = 0.7071067809
-        var zMulX = 0.7071067809
-        var zMulY = 0.70710678146
+        // Camera is locked to 45 degrees, so we can use one precalculated value instead of
+        // calculating xx, xy, zx and zy individually
+        var cameraMultiplier = 0.70710678
 
         // Get the drag amount
         var moveX = mouseX - previousMouseX
@@ -195,12 +211,12 @@ Item {
         // Adjust axes
         switch (selectedAxisLabel) {
         case AbstractGraph3D.ElementAxisXLabel:
-            var distance = (moveX * xMulX - moveY * xMulY) / dragSpeedModifier
+            var distance = ((moveX - moveY) * cameraMultiplier) / dragSpeedModifier
             scatterGraph.axisX.min -= distance
             scatterGraph.axisX.max -= distance
             break
         case AbstractGraph3D.ElementAxisZLabel:
-            distance = (moveX * zMulX + moveY * zMulY) / dragSpeedModifier
+            distance = ((moveX + moveY) * cameraMultiplier) / dragSpeedModifier
             scatterGraph.axisZ.min += distance
             scatterGraph.axisZ.max += distance
             break
@@ -211,6 +227,7 @@ Item {
             break
         }
     }
+    //! [7]
 
     NewButton {
         id: rangeToggle
@@ -240,6 +257,7 @@ Item {
         }
     }
 
+    //! [8]
     NewButton {
         id: orthoToggle
         width: parent.width / 3
@@ -255,6 +273,7 @@ Item {
             }
         }
     }
+    //! [8]
 
     NewButton {
         id: exitButton

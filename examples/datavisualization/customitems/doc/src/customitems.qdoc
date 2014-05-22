@@ -21,6 +21,7 @@
     \title Custom Items Example
     \ingroup qtdatavisualization_examples
     \brief Adding custom items to a surface graph.
+    \since Qt Data Visualization 1.1
 
     The custom items example shows how to add your own custom meshes as items to a graph, and how
     to remove them.
