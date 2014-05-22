@@ -320,6 +320,8 @@ void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orient
 
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
+
+    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
@@ -348,6 +350,8 @@ void Abstract3DRenderer::updateAxisReversed(QAbstract3DAxis::AxisOrientation ori
     axisCacheForOrientation(orientation).setReversed(enable);
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
+
+    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
@@ -364,6 +368,8 @@ void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation or
 
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
+
+    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientation orientation,
@@ -632,6 +638,16 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
     if (item->d_ptr->m_dirtyBits.shadowCastingDirty) {
         renderItem->setShadowCasting(item->isShadowCasting());
         item->d_ptr->m_dirtyBits.shadowCastingDirty = false;
+    }
+}
+
+void Abstract3DRenderer::updateCustomItemPositions()
+{
+    foreach (CustomRenderItem *renderItem, m_customRenderCache) {
+        if (!renderItem->isPositionAbsolute()) {
+            QVector3D translation = convertPositionToTranslation(renderItem->position(), false);
+            renderItem->setTranslation(translation);
+        }
     }
 }
 

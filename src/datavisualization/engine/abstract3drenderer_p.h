@@ -69,6 +69,7 @@ public:
     virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
     virtual void updateCustomData(const QList<QCustom3DItem *> &customItems);
     virtual void updateCustomItems();
+    virtual void updateCustomItemPositions();
     virtual SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     virtual void cleanCache(SeriesRenderCache *cache);
     virtual void render(GLuint defaultFboHandle);
