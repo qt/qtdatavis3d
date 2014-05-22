@@ -122,7 +122,7 @@ Item {
             width: dataView.width
             height: dataView.height
             theme: dynamicColorTheme
-            shadowQuality: AbstractGraph3D.ShadowQualityNone
+            shadowQuality: AbstractGraph3D.ShadowQualityLow
             scene.activeCamera.yRotation: 45.0
             scene.activeCamera.xRotation: 45.0
             scene.activeCamera.zoomLevel: 75.0
@@ -146,7 +146,7 @@ Item {
                     id: qtCube
                     meshFile: ":/mesh/cube"
                     textureFile: ":/texture/texture"
-                    position: Qt.vector3d(0.5,0.5,0.5)
+                    position: Qt.vector3d(0.65,0.35,0.65)
                     scaling: Qt.vector3d(0.3,0.3,0.3)
                 }
             ]
@@ -268,6 +268,7 @@ Item {
             if (scatterGraph.orthoProjection) {
                 text = "Display Orthographic";
                 scatterGraph.orthoProjection = false
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityLow
             } else {
                 text = "Display Perspective";
                 scatterGraph.orthoProjection = true
