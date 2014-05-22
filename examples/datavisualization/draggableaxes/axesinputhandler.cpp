@@ -76,11 +76,11 @@ void AxesInputHandler::handleElementSelected(QAbstract3DGraph::ElementType type)
     case QAbstract3DGraph::ElementAxisXLabel:
         m_state = StateDraggingX;
         break;
-    case QAbstract3DGraph::ElementAxisZLabel:
-        m_state = StateDraggingZ;
-        break;
     case QAbstract3DGraph::ElementAxisYLabel:
         m_state = StateDraggingY;
+        break;
+    case QAbstract3DGraph::ElementAxisZLabel:
+        m_state = StateDraggingZ;
         break;
     default:
         m_state = StateNormal;

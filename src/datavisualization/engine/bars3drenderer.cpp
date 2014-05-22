@@ -2337,7 +2337,7 @@ void Bars3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality
 void Bars3DRenderer::loadBackgroundMesh()
 {
     ObjectHelper::resetObjectHelper(this, m_backgroundObj,
-                                    QStringLiteral(":/defaultMeshes/negativeBackground"));
+                                    QStringLiteral(":/defaultMeshes/backgroundNoFloor"));
 }
 
 void Bars3DRenderer::loadGridLineMesh()

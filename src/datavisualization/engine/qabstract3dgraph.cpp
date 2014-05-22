@@ -131,10 +131,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
            A series (i.e. an item in a series).
     \value ElementAxisXLabel
            X axis label.
-    \value ElementAxisZLabel
-           Z axis label.
     \value ElementAxisYLabel
            Y axis label.
+    \value ElementAxisZLabel
+           Z axis label.
     \value ElementCustomItem
            Custom item.
 */

@@ -154,7 +154,7 @@ Item {
             //! [5]
             onSelectedElementChanged: {
                 if (selectedElement >= AbstractGraph3D.ElementAxisXLabel
-                        && selectedElement <= AbstractGraph3D.ElementAxisYLabel)
+                        && selectedElement <= AbstractGraph3D.ElementAxisZLabel)
                     selectedAxisLabel = selectedElement
                 else
                     selectedAxisLabel = -1
@@ -216,15 +216,15 @@ Item {
             scatterGraph.axisX.min -= distance
             scatterGraph.axisX.max -= distance
             break
-        case AbstractGraph3D.ElementAxisZLabel:
-            distance = ((moveX + moveY) * cameraMultiplier) / dragSpeedModifier
-            scatterGraph.axisZ.min += distance
-            scatterGraph.axisZ.max += distance
-            break
         case AbstractGraph3D.ElementAxisYLabel:
             distance = moveY / dragSpeedModifier
             scatterGraph.axisY.min += distance
             scatterGraph.axisY.max += distance
+            break
+        case AbstractGraph3D.ElementAxisZLabel:
+            distance = ((moveX + moveY) * cameraMultiplier) / dragSpeedModifier
+            scatterGraph.axisZ.min += distance
+            scatterGraph.axisZ.max += distance
             break
         }
     }

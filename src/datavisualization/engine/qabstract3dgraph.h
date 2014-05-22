@@ -81,8 +81,8 @@ public:
         ElementNone = 0,
         ElementSeries,
         ElementAxisXLabel,
-        ElementAxisZLabel,
         ElementAxisYLabel,
+        ElementAxisZLabel,
         ElementCustomItem
     };
 
