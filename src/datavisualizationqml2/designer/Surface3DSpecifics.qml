@@ -204,6 +204,29 @@ Column {
                     }
                 }
             }
+            Label {
+                text: qsTr("measureFps")
+                toolTip: qsTr("Measure Frames Per Second")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                CheckBox {
+                    backendValue: backendValues.measureFps
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("orthoProjection")
+                toolTip: qsTr("Use Orthographic Projection")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                CheckBox {
+                    backendValue: backendValues.orthoProjection
+                    Layout.fillWidth: true
+                }
+            }
+
             // Kept for debugging
             Label { }
             SecondColumnLayout {
