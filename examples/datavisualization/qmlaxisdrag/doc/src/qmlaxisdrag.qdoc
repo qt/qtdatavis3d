@@ -48,7 +48,7 @@
 
     \snippet qmlaxisdrag/qml/qmlaxisdrag/main.qml 2
 
-    Mouse position (\c mouseX and \c mouseY used in \c{onPressed}) is caught in
+    Current mouse position, that will be needed for move distance calculation, is caught in
     \c{onPositionChanged}:
 
     \snippet qmlaxisdrag/qml/qmlaxisdrag/main.qml 3

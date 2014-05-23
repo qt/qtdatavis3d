@@ -28,6 +28,10 @@ Item {
 
     property int selectedAxisLabel: -1
     property real dragSpeedModifier: 100.0
+    property int currentMouseX: -1
+    property int currentMouseY: -1
+    property int previousMouseX: -1
+    property int previousMouseY: -1
 
     ListModel {
         id: graphModel
@@ -164,67 +168,92 @@ Item {
 
         //! [1]
         MouseArea {
-            id: inputArea
             anchors.fill: parent
             hoverEnabled: true
             acceptedButtons: Qt.LeftButton
             //! [1]
-            property int mouseX: -1
-            property int mouseY: -1
-            property int previousMouseX: -1
-            property int previousMouseY: -1
 
             //! [3]
             onPositionChanged: {
-                mouseX = mouse.x;
-                mouseY = mouse.y;
+                currentMouseX = mouse.x;
+                currentMouseY = mouse.y;
                 //! [3]
                 //! [6]
                 if (pressed && selectedAxisLabel != -1)
-                    dragAxis(mouseX, mouseY, previousMouseX, previousMouseY);
+                    dragAxis();
                 //! [6]
                 //! [4]
-                previousMouseX = mouseX;
-                previousMouseY = mouseY;
+                previousMouseX = currentMouseX;
+                previousMouseY = currentMouseY;
             }
             //! [4]
 
             //! [2]
             onPressed: {
-                scatterGraph.scene.selectionQueryPosition = Qt.point(inputArea.mouseX,
-                                                                     inputArea.mouseY);
+                scatterGraph.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
             }
             //! [2]
+
+            onReleased: {
+                // We need to clear mouse positions and selected axis, because touch devices cannot
+                // track position all the time
+                selectedAxisLabel = -1
+                currentMouseX = -1
+                currentMouseY = -1
+                previousMouseX = -1
+                previousMouseY = -1
+            }
         }
     }
 
     //! [7]
-    function dragAxis(mouseX, mouseY, previousMouseX, previousMouseY) {
-        // Directional drag multipliers based on rotation
-        // Camera is locked to 45 degrees, so we can use one precalculated value instead of
-        // calculating xx, xy, zx and zy individually
+    function dragAxis() {
+        // Do nothing if previous mouse position is uninitialized
+        if (previousMouseX === -1)
+            return
+
+        // Directional drag multipliers based on rotation. Camera is locked to 45 degrees, so we
+        // can use one precalculated value instead of calculating xx, xy, zx and zy individually
         var cameraMultiplier = 0.70710678
 
-        // Get the drag amount
-        var moveX = mouseX - previousMouseX
-        var moveY = mouseY - previousMouseY
+        // Calculate the mouse move amount
+        var moveX = currentMouseX - previousMouseX
+        var moveY = currentMouseY - previousMouseY
 
         // Adjust axes
         switch (selectedAxisLabel) {
         case AbstractGraph3D.ElementAxisXLabel:
             var distance = ((moveX - moveY) * cameraMultiplier) / dragSpeedModifier
-            scatterGraph.axisX.min -= distance
-            scatterGraph.axisX.max -= distance
+            // Check if we need to change min or max first to avoid invalid ranges
+            if (distance > 0) {
+                scatterGraph.axisX.min -= distance
+                scatterGraph.axisX.max -= distance
+            } else {
+                scatterGraph.axisX.max -= distance
+                scatterGraph.axisX.min -= distance
+            }
             break
         case AbstractGraph3D.ElementAxisYLabel:
             distance = moveY / dragSpeedModifier
-            scatterGraph.axisY.min += distance
-            scatterGraph.axisY.max += distance
+            // Check if we need to change min or max first to avoid invalid ranges
+            if (distance > 0) {
+                scatterGraph.axisY.max += distance
+                scatterGraph.axisY.min += distance
+            } else {
+                scatterGraph.axisY.min += distance
+                scatterGraph.axisY.max += distance
+            }
             break
         case AbstractGraph3D.ElementAxisZLabel:
             distance = ((moveX + moveY) * cameraMultiplier) / dragSpeedModifier
-            scatterGraph.axisZ.min += distance
-            scatterGraph.axisZ.max += distance
+            // Check if we need to change min or max first to avoid invalid ranges
+            if (distance > 0) {
+                scatterGraph.axisZ.max += distance
+                scatterGraph.axisZ.min += distance
+            } else {
+                scatterGraph.axisZ.min += distance
+                scatterGraph.axisZ.max += distance
+            }
             break
         }
     }
@@ -268,6 +297,7 @@ Item {
             if (scatterGraph.orthoProjection) {
                 text = "Display Orthographic";
                 scatterGraph.orthoProjection = false
+                // Orthographic projection disables shadows, so we need to switch them back on
                 scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityLow
             } else {
                 text = "Display Perspective";
