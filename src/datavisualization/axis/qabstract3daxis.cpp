@@ -49,6 +49,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string AbstractAxis3D::title
  * Defines the title for the axis.
+ *
+ * \sa titleVisible, titleFixed
  */
 
 /*!
@@ -97,6 +99,27 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If the value is 0, axis labels do not automatically rotate.
  * If the value is greater than zero, labels attempt to orient themselves toward the camera, up to
  * the specified angle.
+ */
+
+/*!
+ * \qmlproperty bool AbstractAxis3D::titleVisible
+ *
+ * Defines if the axis title is visible in the primary graph view. The default value is \c{false}.
+ *
+ * \sa title, titleFixed
+ */
+
+/*!
+ * \qmlproperty bool AbstractAxis3D::titleFixed
+ *
+ * If \c{true}, axis titles in the primary graph view will be rotated towards the camera similarly
+ * to the axis labels.
+ * If \c{false}, axis titles are only rotated around their axis but are not otherwise oriented
+ * towards the camera.
+ * This property doesn't have any effect if labelAutoRotation property value is zero.
+ * Default value is \c{true}.
+ *
+ * \sa labelAutoRotation, title, titleVisible
  */
 
 /*!
@@ -160,6 +183,8 @@ QAbstract3DAxis::AxisType QAbstract3DAxis::type() const
  * \property QAbstract3DAxis::title
  *
  * Defines the title for the axis.
+ *
+ * \sa titleVisible, titleFixed
  */
 void QAbstract3DAxis::setTitle(const QString &title)
 {
@@ -226,6 +251,51 @@ void QAbstract3DAxis::setLabelAutoRotation(float angle)
 float QAbstract3DAxis::labelAutoRotation() const
 {
     return d_ptr->m_labelAutoRotation;
+}
+
+/*!
+ * \property QAbstract3DAxis::titleVisible
+ *
+ * Defines if the axis title is visible in the primary graph view. The default value is \c{false}.
+ *
+ * \sa title, titleFixed
+ */
+void QAbstract3DAxis::setTitleVisible(bool visible)
+{
+    if (d_ptr->m_titleVisible != visible) {
+        d_ptr->m_titleVisible = visible;
+        emit titleVisibilityChanged(visible);
+    }
+}
+
+bool QAbstract3DAxis::isTitleVisible() const
+{
+    return d_ptr->m_titleVisible;
+}
+
+/*!
+ * \property QAbstract3DAxis::titleFixed
+ *
+ * If \c{true}, axis titles in the primary graph view will be rotated towards the camera similarly
+ * to the axis labels.
+ * If \c{false}, axis titles are only rotated around their axis but are not otherwise oriented
+ * towards the camera.
+ * This property doesn't have any effect if labelAutoRotation property value is zero.
+ * Default value is \c{true}.
+ *
+ * \sa labelAutoRotation, title, titleVisible
+ */
+void QAbstract3DAxis::setTitleFixed(bool fixed)
+{
+    if (d_ptr->m_titleFixed != fixed) {
+        d_ptr->m_titleFixed = fixed;
+        emit titleFixedChanged(fixed);
+    }
+}
+
+bool QAbstract3DAxis::isTitleFixed() const
+{
+    return d_ptr->m_titleFixed;
 }
 
 /*!
@@ -302,7 +372,9 @@ QAbstract3DAxisPrivate::QAbstract3DAxisPrivate(QAbstract3DAxis *q, QAbstract3DAx
       m_min(0.0f),
       m_max(10.0f),
       m_autoAdjust(true),
-      m_labelAutoRotation(0.0f)
+      m_labelAutoRotation(0.0f),
+      m_titleVisible(false),
+      m_titleFixed(true)
 {
 }
 

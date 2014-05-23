@@ -232,6 +232,21 @@ int main(int argc, char **argv)
     aspectRatioSlider->setValue(20);
     aspectRatioSlider->setMaximum(100);
 
+    QCheckBox *axisTitlesVisibleCB = new QCheckBox(widget);
+    axisTitlesVisibleCB->setText(QStringLiteral("Axis titles visible"));
+    axisTitlesVisibleCB->setChecked(false);
+
+    QCheckBox *axisTitlesFixedCB = new QCheckBox(widget);
+    axisTitlesFixedCB->setText(QStringLiteral("Axis titles fixed"));
+    axisTitlesFixedCB->setChecked(true);
+
+    QSlider *axisLabelRotationSlider = new QSlider(Qt::Horizontal, widget);
+    axisLabelRotationSlider->setTickInterval(10);
+    axisLabelRotationSlider->setTickPosition(QSlider::TicksBelow);
+    axisLabelRotationSlider->setMinimum(0);
+    axisLabelRotationSlider->setValue(0);
+    axisLabelRotationSlider->setMaximum(90);
+
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -276,9 +291,13 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout2->addWidget(fontList);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")));
-    vLayout2->addWidget(fontSizeSlider, 0, Qt::AlignTop);
+    vLayout2->addWidget(fontSizeSlider);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
     vLayout2->addWidget(aspectRatioSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(axisTitlesVisibleCB);
+    vLayout2->addWidget(axisTitlesFixedCB);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
+    vLayout2->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -366,7 +385,12 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::setMaxY);
     QObject::connect(maxSliderZ, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setMaxZ);
-
+    QObject::connect(axisTitlesVisibleCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::toggleAxisTitleVisibility);
+    QObject::connect(axisTitlesFixedCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::toggleAxisTitleFixed);
+    QObject::connect(axisLabelRotationSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::changeLabelRotation);
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setAspectRatio);
 

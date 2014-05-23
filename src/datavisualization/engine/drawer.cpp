@@ -55,7 +55,8 @@ Drawer::Drawer(Q3DTheme *theme)
     : m_theme(theme),
       m_textureHelper(0),
       m_pointbuffer(0),
-      m_linebuffer(0)
+      m_linebuffer(0),
+      m_scaledFontSize(0.0f)
 {
 }
 
@@ -79,6 +80,7 @@ void Drawer::initializeOpenGL()
 void Drawer::setTheme(Q3DTheme *theme)
 {
     m_theme = theme;
+    m_scaledFontSize = 0.05f + m_theme->font().pointSizeF() / 500.0f;
     emit drawerChanged();
 }
 
@@ -295,8 +297,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     }
 
     // Calculate scale factor to get uniform font size
-    GLfloat scaledFontSize = 0.05f + m_theme->font().pointSizeF() / 500.0f;
-    GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
+    GLfloat scaleFactor = m_scaledFontSize / (GLfloat)textureSize.height();
 
     // Apply alignment
     QVector3D anchorPoint;
@@ -337,7 +338,7 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
 
     // Scale label based on text size
     modelMatrix.scale(QVector3D((GLfloat)textureSize.width() * scaleFactor,
-                                scaledFontSize,
+                                m_scaledFontSize,
                                 0.0f));
 
     MVPMatrix = projectionmatrix * viewmatrix * modelMatrix;

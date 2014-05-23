@@ -53,8 +53,13 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_visibleSeriesCount(0),
       m_customItemShader(0),
       m_useOrthoProjection(false),
-      m_graphAspectRatio(2.0f)
-
+      m_graphAspectRatio(2.0f),
+      m_xFlipped(false),
+      m_yFlipped(false),
+      m_zFlipped(false),
+      m_backgroundObj(0),
+      m_gridLineObj(0),
+      m_labelObj(0)
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,
@@ -83,6 +88,10 @@ Abstract3DRenderer::~Abstract3DRenderer()
         delete item;
     }
     m_customRenderCache.clear();
+
+    ObjectHelper::releaseObjectHelper(this, m_backgroundObj);
+    ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
+    ObjectHelper::releaseObjectHelper(this, m_labelObj);
 
     delete m_textureHelper;
 }
@@ -397,6 +406,22 @@ void Abstract3DRenderer::updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrient
         cache.setLabelAutoRotation(angle);
 }
 
+void Abstract3DRenderer::updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
+                                                   bool visible)
+{
+    AxisRenderCache &cache = axisCacheForOrientation(orientation);
+    if (cache.isTitleVisible() != visible)
+        cache.setTitleVisible(visible);
+}
+
+void Abstract3DRenderer::updateAxisTitleFixed(QAbstract3DAxis::AxisOrientation orientation,
+                                              bool fixed)
+{
+    AxisRenderCache &cache = axisCacheForOrientation(orientation);
+    if (cache.isTitleFixed() != fixed)
+        cache.setTitleFixed(fixed);
+}
+
 void Abstract3DRenderer::modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList)
 {
     foreach (QAbstract3DSeries *series, seriesList) {
@@ -544,6 +569,229 @@ void Abstract3DRenderer::lowerShadowQuality()
     emit requestShadowQuality(newQuality);
     updateShadowQuality(newQuality);
 }
+
+void Abstract3DRenderer::drawAxisTitleY(const QVector3D &sideLabelRotation,
+                                        const QVector3D &backLabelRotation,
+                                        const QVector3D &sideLabelTrans,
+                                        const QVector3D &backLabelTrans,
+                                        const QQuaternion &totalSideRotation,
+                                        const QQuaternion &totalBackRotation,
+                                        AbstractRenderItem &dummyItem,
+                                        const Q3DCamera *activeCamera,
+                                        float labelsMaxWidth,
+                                        const QMatrix4x4 &viewMatrix,
+                                        const QMatrix4x4 &projectionMatrix,
+                                        ShaderHelper *shader)
+{
+    float scaleFactor = m_drawer->scaledFontSize() / m_axisCacheY.titleItem().size().height();
+    float titleOffset = 2.0f * (labelMargin + (labelsMaxWidth * scaleFactor));
+    float yRotation;
+    QVector3D titleTrans;
+    QQuaternion totalRotation;
+    if (m_xFlipped == m_zFlipped) {
+        yRotation = backLabelRotation.y();
+        titleTrans = backLabelTrans;
+        totalRotation = totalBackRotation;
+    } else {
+        yRotation = sideLabelRotation.y();
+        titleTrans = sideLabelTrans;
+        totalRotation = totalSideRotation;
+    }
+
+    QQuaternion offsetRotator = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation);
+    QVector3D titleOffsetVector =
+            offsetRotator.rotatedVector(QVector3D(-titleOffset, 0.0f, 0.0f));
+
+    QQuaternion titleRotation;
+    if (m_axisCacheY.isTitleFixed()) {
+        titleRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation)
+                * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, 90.0f);
+    } else {
+        titleRotation = totalRotation
+                * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, 90.0f);
+    }
+    dummyItem.setTranslation(titleTrans + titleOffsetVector);
+
+    m_drawer->drawLabel(dummyItem, m_axisCacheY.titleItem(), viewMatrix,
+                        projectionMatrix, zeroVector, titleRotation, 0,
+                        m_cachedSelectionMode, shader, m_labelObj, activeCamera,
+                        true, true, Drawer::LabelMid, Qt::AlignBottom);
+}
+
+void Abstract3DRenderer::drawAxisTitleX(const QVector3D &labelRotation,
+                                        const QVector3D &labelTrans,
+                                        const QQuaternion &totalRotation,
+                                        AbstractRenderItem &dummyItem,
+                                        const Q3DCamera *activeCamera,
+                                        float labelsMaxWidth,
+                                        const QMatrix4x4 &viewMatrix,
+                                        const QMatrix4x4 &projectionMatrix,
+                                        ShaderHelper *shader)
+{
+    float scaleFactor = m_drawer->scaledFontSize() / m_axisCacheX.titleItem().size().height();
+    float titleOffset = 2.0f * (labelMargin + (labelsMaxWidth * scaleFactor));
+    float zRotation = 0.0f;
+    float yRotation = 0.0f;
+    float xRotation = -90.0f + labelRotation.z();
+    float offsetRotation = labelRotation.z();
+    float extraRotation = -90.0f;
+    Qt::AlignmentFlag alignment = Qt::AlignTop;
+    if (m_yFlipped) {
+        alignment = Qt::AlignBottom;
+        if (m_zFlipped) {
+            zRotation = 180.0f;
+            titleOffset = -titleOffset;
+            if (m_xFlipped) {
+                offsetRotation = -offsetRotation;
+                extraRotation = -extraRotation;
+            } else {
+                xRotation = -90.0f - labelRotation.z();
+            }
+        } else {
+            zRotation = 180.0f;
+            yRotation = 180.0f;
+            if (m_xFlipped) {
+                offsetRotation = -offsetRotation;
+                xRotation = -90.0f - labelRotation.z();
+            } else {
+                extraRotation = -extraRotation;
+            }
+        }
+    } else {
+        if (m_zFlipped) {
+            titleOffset = -titleOffset;
+            if (m_xFlipped) {
+                yRotation = 180.0f;
+                offsetRotation = -offsetRotation;
+            } else {
+                yRotation = 180.0f;
+                xRotation = -90.0f - labelRotation.z();
+                extraRotation = -extraRotation;
+            }
+        } else {
+            if (m_xFlipped) {
+                offsetRotation = -offsetRotation;
+                xRotation = -90.0f - labelRotation.z();
+                extraRotation = -extraRotation;
+            }
+        }
+    }
+
+    if (offsetRotation == 180.0f || offsetRotation == -180.0f)
+        offsetRotation = 0.0f;
+    QQuaternion offsetRotator = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, offsetRotation);
+    QVector3D titleOffsetVector =
+            offsetRotator.rotatedVector(QVector3D(0.0f, 0.0f, titleOffset));
+
+    QQuaternion titleRotation;
+    if (m_axisCacheX.isTitleFixed()) {
+        titleRotation = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, zRotation)
+                * QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation)
+                * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, xRotation);
+    } else {
+        titleRotation = totalRotation
+                * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, extraRotation);
+    }
+    dummyItem.setTranslation(labelTrans + titleOffsetVector);
+
+    m_drawer->drawLabel(dummyItem, m_axisCacheX.titleItem(), viewMatrix,
+                        projectionMatrix, zeroVector, titleRotation, 0,
+                        m_cachedSelectionMode, shader, m_labelObj, activeCamera,
+                        true, true, Drawer::LabelMid, alignment);
+}
+
+void Abstract3DRenderer::drawAxisTitleZ(const QVector3D &labelRotation,
+                                        const QVector3D &labelTrans,
+                                        const QQuaternion &totalRotation,
+                                        AbstractRenderItem &dummyItem,
+                                        const Q3DCamera *activeCamera,
+                                        float labelsMaxWidth,
+                                        const QMatrix4x4 &viewMatrix,
+                                        const QMatrix4x4 &projectionMatrix,
+                                        ShaderHelper *shader)
+{
+    float scaleFactor = m_drawer->scaledFontSize() / m_axisCacheZ.titleItem().size().height();
+    float titleOffset = 2.0f * (labelMargin + (labelsMaxWidth * scaleFactor));
+    float zRotation = labelRotation.z();
+    float yRotation = -90.0f;
+    float xRotation = -90.0f;
+    float extraRotation = 90.0f;
+    Qt::AlignmentFlag alignment = Qt::AlignTop;
+    if (m_yFlipped) {
+        alignment = Qt::AlignBottom;
+        xRotation = -xRotation;
+        if (m_zFlipped) {
+            if (m_xFlipped) {
+                titleOffset = -titleOffset;
+                zRotation = -zRotation;
+                extraRotation = -extraRotation;
+            } else {
+                zRotation = -zRotation;
+                yRotation = -yRotation;
+            }
+        } else {
+            if (m_xFlipped) {
+                titleOffset = -titleOffset;
+            } else {
+                extraRotation = -extraRotation;
+                yRotation = -yRotation;
+            }
+        }
+    } else {
+        if (m_zFlipped) {
+            zRotation = -zRotation;
+            if (m_xFlipped) {
+                titleOffset = -titleOffset;
+            } else {
+                extraRotation = -extraRotation;
+                yRotation = -yRotation;
+            }
+        } else {
+            if (m_xFlipped) {
+                titleOffset = -titleOffset;
+                extraRotation = -extraRotation;
+            } else {
+                yRotation = -yRotation;
+            }
+        }
+    }
+
+    float offsetRotation = zRotation;
+    if (offsetRotation == 180.0f || offsetRotation == -180.0f)
+        offsetRotation = 0.0f;
+    QQuaternion offsetRotator = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, offsetRotation);
+    QVector3D titleOffsetVector =
+            offsetRotator.rotatedVector(QVector3D(titleOffset, 0.0f, 0.0f));
+
+    QQuaternion titleRotation;
+    if (m_axisCacheZ.isTitleFixed()) {
+        titleRotation = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, zRotation)
+                * QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation)
+                * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, xRotation);
+    } else {
+        titleRotation = totalRotation
+                * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, extraRotation);
+    }
+    dummyItem.setTranslation(labelTrans + titleOffsetVector);
+
+    m_drawer->drawLabel(dummyItem, m_axisCacheZ.titleItem(), viewMatrix,
+                        projectionMatrix, zeroVector, titleRotation, 0,
+                        m_cachedSelectionMode, shader, m_labelObj, activeCamera,
+                        true, true, Drawer::LabelMid, alignment);
+}
+
+void Abstract3DRenderer::loadGridLineMesh()
+{
+    ObjectHelper::resetObjectHelper(this, m_gridLineObj,
+                                    QStringLiteral(":/defaultMeshes/plane"));
+}
+
+void Abstract3DRenderer::loadLabelMesh()
+{
+    ObjectHelper::resetObjectHelper(this, m_labelObj,
+                                    QStringLiteral(":/defaultMeshes/plane"));
+}
+
 
 void Abstract3DRenderer::generateBaseColorTexture(const QColor &color, GLuint *texture)
 {

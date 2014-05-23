@@ -71,6 +71,7 @@ public:
     void setTheme(Q3DTheme *theme);
     Q3DTheme *theme() const;
     QFont font() const;
+    inline GLfloat scaledFontSize() const { return m_scaledFontSize; }
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
                     GLuint depthTextureId = 0);
@@ -98,6 +99,7 @@ private:
     TextureHelper *m_textureHelper;
     GLuint m_pointbuffer;
     GLuint m_linebuffer;
+    GLfloat m_scaledFontSize;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

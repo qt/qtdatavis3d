@@ -68,6 +68,7 @@ static const GLfloat gradientTextureHeight = 1024.0f;
 static const GLfloat gradientTextureWidth = 2.0f;
 static const GLfloat uniformTextureHeight = 64.0f;
 static const GLfloat uniformTextureWidth = 2.0f;
+static const GLfloat labelMargin = 0.05f;
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

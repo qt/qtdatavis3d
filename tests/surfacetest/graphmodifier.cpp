@@ -700,6 +700,27 @@ void GraphModifier::handleFpsChange(qreal fps)
     qDebug() << "FPS:" << fps;
 }
 
+void GraphModifier::changeLabelRotation(int rotation)
+{
+    m_graph->axisX()->setLabelAutoRotation(float(rotation));
+    m_graph->axisY()->setLabelAutoRotation(float(rotation));
+    m_graph->axisZ()->setLabelAutoRotation(float(rotation));
+}
+
+void GraphModifier::toggleAxisTitleVisibility(bool enabled)
+{
+    m_graph->axisX()->setTitleVisible(enabled);
+    m_graph->axisY()->setTitleVisible(enabled);
+    m_graph->axisZ()->setTitleVisible(enabled);
+}
+
+void GraphModifier::toggleAxisTitleFixed(bool enabled)
+{
+    m_graph->axisX()->setTitleFixed(enabled);
+    m_graph->axisY()->setTitleFixed(enabled);
+    m_graph->axisZ()->setTitleFixed(enabled);
+}
+
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);

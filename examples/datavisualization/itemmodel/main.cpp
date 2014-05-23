@@ -167,8 +167,11 @@ void GraphDataGenerator::setupModel()
     // Add labels
     //! [10]
     m_graph->rowAxis()->setTitle("Week of year");
+    m_graph->rowAxis()->setTitleVisible(true);
     m_graph->columnAxis()->setTitle("Day of week");
+    m_graph->columnAxis()->setTitleVisible(true);
     m_graph->valueAxis()->setTitle("Hours spent on the Internet");
+    m_graph->valueAxis()->setTitleVisible(true);
     m_graph->valueAxis()->setLabelFormat("%.1f h");
     //! [10]
 

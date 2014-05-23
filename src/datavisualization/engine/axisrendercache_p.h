@@ -97,6 +97,10 @@ public:
     }
     inline float labelAutoRotation() const { return m_labelAutoRotation; }
     inline void setLabelAutoRotation(float angle) { m_labelAutoRotation = angle; }
+    inline bool isTitleVisible() const { return m_titleVisible; }
+    inline void setTitleVisible(bool visible) { m_titleVisible = visible; }
+    inline bool isTitleFixed() const { return m_titleFixed; }
+    inline void setTitleFixed(bool fixed) { m_titleFixed = fixed; }
 
 public slots:
     void updateTextures();
@@ -128,6 +132,8 @@ private:
     float m_translate;
     float m_scale;
     float m_labelAutoRotation;
+    bool m_titleVisible;
+    bool m_titleFixed;
 
     Q_DISABLE_COPY(AxisRenderCache)
 };

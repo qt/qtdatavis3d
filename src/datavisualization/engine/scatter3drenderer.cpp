@@ -45,7 +45,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
 
-const GLfloat labelMargin = 0.05f;
 const GLfloat defaultMinSize = 0.01f;
 const GLfloat defaultMaxSize = 0.1f;
 const GLfloat itemScaler = 3.0f;
@@ -54,9 +53,6 @@ const GLfloat gridLineWidth = 0.005f;
 Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
     : Abstract3DRenderer(controller),
       m_selectedItem(0),
-      m_xFlipped(false),
-      m_zFlipped(false),
-      m_yFlipped(false),
       m_updateLabels(false),
       m_dotShader(0),
       m_dotGradientShader(0),
@@ -67,11 +63,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_selectionShader(0),
       m_backgroundShader(0),
       m_labelShader(0),
-      m_backgroundObj(0),
-      #if !defined(QT_OPENGL_ES_2)
-      m_gridLineObj(0),
-      #endif
-      m_labelObj(0),
       m_bgrTexture(0),
       m_depthTexture(0),
       m_selectionTexture(0),
@@ -117,11 +108,6 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_selectionShader;
     delete m_backgroundShader;
     delete m_labelShader;
-    ObjectHelper::releaseObjectHelper(this, m_backgroundObj);
-#if !defined(QT_OPENGL_ES_2)
-    ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
-#endif
-    ObjectHelper::releaseObjectHelper(this, m_labelObj);
 }
 
 void Scatter3DRenderer::initializeOpenGL()
@@ -1357,6 +1343,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     float labelAngleFraction = labelAutoAngle / 90.0f;
     float fractionCamY = activeCamera->yRotation() * labelAngleFraction;
     float fractionCamX = activeCamera->xRotation() * labelAngleFraction;
+    float labelsMaxWidth = 0.0f;
 
     // Z Labels
     if (m_axisCacheZ.segmentCount() > 0) {
@@ -1458,13 +1445,21 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     zeroVector, totalRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, alignment);
+                                    Drawer::LabelMid, alignment, false, drawSelection);
+                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
             }
             labelNbr++;
         }
+        if (!drawSelection && m_axisCacheZ.isTitleVisible()) {
+            labelTrans.setZ(0.0f);
+            drawAxisTitleZ(labelRotation, labelTrans, totalRotation, m_dummyRenderItem,
+                           activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader);
+        }
     }
+
     // X Labels
     if (m_axisCacheX.segmentCount() > 0) {
+        labelsMaxWidth = 0.0f;
         labelAutoAngle = m_axisCacheX.labelAutoRotation();
         labelAngleFraction = labelAutoAngle / 90.0f;
         fractionCamY = activeCamera->yRotation() * labelAngleFraction;
@@ -1570,13 +1565,21 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     zeroVector, totalRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, alignment);
+                                    Drawer::LabelMid, alignment, false, drawSelection);
+                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
             }
             labelNbr++;
         }
+        if (!drawSelection && m_axisCacheX.isTitleVisible()) {
+            labelTrans.setX(0.0f);
+            drawAxisTitleX(labelRotation, labelTrans, totalRotation, m_dummyRenderItem,
+                           activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader);
+        }
     }
+
     // Y Labels
     if (m_axisCacheY.segmentCount() > 0) {
+        labelsMaxWidth = 0.0f;
         labelAutoAngle = m_axisCacheY.labelAutoRotation();
         labelAngleFraction = labelAutoAngle / 90.0f;
         fractionCamY = activeCamera->yRotation() * labelAngleFraction;
@@ -1660,7 +1663,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     zeroVector, totalBackRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, backAlignment);
+                                    Drawer::LabelMid, backAlignment, false, drawSelection);
 
                 // Side wall
                 labelTransSide.setY(labelYTrans);
@@ -1668,9 +1671,16 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     zeroVector, totalSideRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, sideAlignment);
+                                    Drawer::LabelMid, sideAlignment, false, drawSelection);
+                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
             }
             labelNbr++;
+        }
+        if (!drawSelection && m_axisCacheY.isTitleVisible()) {
+            drawAxisTitleY(sideLabelRotation, backLabelRotation, labelTransSide, labelTransBack,
+                           totalSideRotation, totalBackRotation, m_dummyRenderItem, activeCamera,
+                           labelsMaxWidth, viewMatrix, projectionMatrix,
+                           shader);
         }
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -1737,20 +1747,6 @@ void Scatter3DRenderer::loadBackgroundMesh()
 {
     ObjectHelper::resetObjectHelper(this, m_backgroundObj,
                                     QStringLiteral(":/defaultMeshes/background"));
-}
-
-#if !(defined QT_OPENGL_ES_2)
-void Scatter3DRenderer::loadGridLineMesh()
-{
-    ObjectHelper::resetObjectHelper(this, m_gridLineObj,
-                                    QStringLiteral(":/defaultMeshes/plane"));
-}
-#endif
-
-void Scatter3DRenderer::loadLabelMesh()
-{
-    ObjectHelper::resetObjectHelper(this, m_labelObj,
-                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 
 void Scatter3DRenderer::updateTextures()

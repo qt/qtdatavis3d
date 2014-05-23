@@ -41,6 +41,8 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DAxis : public QObject
     Q_PROPERTY(float max READ max WRITE setMax NOTIFY maxChanged)
     Q_PROPERTY(bool autoAdjustRange READ isAutoAdjustRange WRITE setAutoAdjustRange NOTIFY autoAdjustRangeChanged)
     Q_PROPERTY(float labelAutoRotation READ labelAutoRotation WRITE setLabelAutoRotation NOTIFY labelAutoRotationChanged REVISION 1)
+    Q_PROPERTY(bool titleVisible READ isTitleVisible WRITE setTitleVisible NOTIFY titleVisibilityChanged REVISION 1)
+    Q_PROPERTY(bool titleFixed READ isTitleFixed WRITE setTitleFixed NOTIFY titleFixedChanged REVISION 1)
 
 public:
     enum AxisOrientation {
@@ -85,6 +87,12 @@ public:
     void setLabelAutoRotation(float angle);
     float labelAutoRotation() const;
 
+    void setTitleVisible(bool visible);
+    bool isTitleVisible() const;
+
+    void setTitleFixed(bool fixed);
+    bool isTitleFixed() const;
+
 signals:
     void titleChanged(const QString &newTitle);
     void labelsChanged();
@@ -94,6 +102,8 @@ signals:
     void rangeChanged(float min, float max);
     void autoAdjustRangeChanged(bool autoAdjust);
     Q_REVISION(1) void labelAutoRotationChanged(float angle);
+    Q_REVISION(1) void titleVisibilityChanged(bool visible);
+    Q_REVISION(1) void titleFixedChanged(bool fixed);
 
 protected:
     QScopedPointer<QAbstract3DAxisPrivate> d_ptr;

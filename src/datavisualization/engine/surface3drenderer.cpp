@@ -43,7 +43,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 // Margin for background (1.10 make it 10% larger to avoid
 // selection ball being drawn inside background)
 const GLfloat backgroundMargin = 1.1f;
-const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
 const GLfloat sliceUnits = 2.5f;
@@ -75,11 +74,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_maxVisibleRowValue(0.0f),
       m_visibleColumnRange(0.0f),
       m_visibleRowRange(0.0f),
-      m_backgroundObj(0),
-      #if !defined(QT_OPENGL_ES_2)
-      m_gridLineObj(0),
-      #endif
-      m_labelObj(0),
       m_depthTexture(0),
       m_depthModelTexture(0),
       m_depthFrameBuffer(0),
@@ -89,9 +83,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_shadowQualityToShader(33.3f),
       m_flatSupported(true),
       m_selectionActive(false),
-      m_xFlipped(false),
-      m_zFlipped(false),
-      m_yFlipped(false),
       m_shadowQualityMultiplier(3),
       m_hasHeightAdjustmentChanged(true),
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),
@@ -140,12 +131,6 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_surfaceSliceFlatShader;
     delete m_surfaceSliceSmoothShader;
     delete m_labelShader;
-
-    ObjectHelper::releaseObjectHelper(this, m_backgroundObj);
-#if !defined(QT_OPENGL_ES_2)
-    ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
-#endif
-    ObjectHelper::releaseObjectHelper(this, m_labelObj);
 }
 
 void Surface3DRenderer::initializeOpenGL()
@@ -1843,6 +1828,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     float labelAngleFraction = labelAutoAngle / 90.0f;
     float fractionCamY = activeCamera->yRotation() * labelAngleFraction;
     float fractionCamX = activeCamera->xRotation() * labelAngleFraction;
+    float labelsMaxWidth = 0.0f;
 
     // Z Labels
     QVector3D positionZComp(0.0f, 0.0f, 0.0f);
@@ -1941,13 +1927,20 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, totalRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
-                                    true, true, Drawer::LabelMid, alignment);
+                                    true, true, Drawer::LabelMid, alignment, false, drawSelection);
+                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
             }
             labelNbr++;
+        }
+        if (!drawSelection && m_axisCacheZ.isTitleVisible()) {
+            labelTrans.setZ(0.0f);
+            drawAxisTitleZ(labelRotation, labelTrans, totalRotation, m_dummyRenderItem,
+                           activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader);
         }
     }
     // X Labels
     if (m_axisCacheX.segmentCount() > 0) {
+        labelsMaxWidth = 0.0f;
         labelAutoAngle = m_axisCacheX.labelAutoRotation();
         labelAngleFraction = labelAutoAngle / 90.0f;
         fractionCamY = activeCamera->yRotation() * labelAngleFraction;
@@ -2048,13 +2041,20 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, totalRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
-                                    true, true, Drawer::LabelMid, alignment);
+                                    true, true, Drawer::LabelMid, alignment, false, drawSelection);
+                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
             }
             labelNbr++;
+        }
+        if (!drawSelection && m_axisCacheX.isTitleVisible()) {
+            labelTrans.setX(0.0f);
+            drawAxisTitleX(labelRotation, labelTrans, totalRotation, m_dummyRenderItem,
+                           activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader);
         }
     }
     // Y Labels
     if (m_axisCacheY.segmentCount() > 0) {
+        labelsMaxWidth = 0.0f;
         labelAutoAngle = m_axisCacheY.labelAutoRotation();
         labelAngleFraction = labelAutoAngle / 90.0f;
         fractionCamY = activeCamera->yRotation() * labelAngleFraction;
@@ -2129,7 +2129,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, totalBackRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
-                                    true, true, Drawer::LabelMid, backAlignment);
+                                    true, true, Drawer::LabelMid, backAlignment, false,
+                                    drawSelection);
 
                 // Side wall
                 labelTransSide.setY(labelYTrans);
@@ -2137,9 +2138,17 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                     positionZComp, totalSideRotation, 0, m_cachedSelectionMode,
                                     shader, m_labelObj, activeCamera,
-                                    true, true, Drawer::LabelMid, sideAlignment);
+                                    true, true, Drawer::LabelMid, sideAlignment, false,
+                                    drawSelection);
+                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
             }
             labelNbr++;
+        }
+        if (!drawSelection && m_axisCacheY.isTitleVisible()) {
+            drawAxisTitleY(sideLabelRotation, backLabelRotation, labelTransSide, labelTransBack,
+                           totalSideRotation, totalBackRotation, m_dummyRenderItem, activeCamera,
+                           labelsMaxWidth, viewMatrix, projectionMatrix,
+                           shader);
         }
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
@@ -2313,14 +2322,6 @@ void Surface3DRenderer::loadBackgroundMesh()
     ObjectHelper::resetObjectHelper(this, m_backgroundObj,
                                     QStringLiteral(":/defaultMeshes/background"));
 }
-
-#if !(defined QT_OPENGL_ES_2)
-void Surface3DRenderer::loadGridLineMesh()
-{
-    ObjectHelper::resetObjectHelper(this, m_gridLineObj,
-                                    QStringLiteral(":/defaultMeshes/plane"));
-}
-#endif
 
 void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 {
@@ -2541,12 +2542,6 @@ void Surface3DRenderer::updateSlicingActive(bool isSlicing)
         if (cache->mainSelectionPointer())
             cache->mainSelectionPointer()->updateBoundingRect(m_primarySubViewport);
     }
-}
-
-void Surface3DRenderer::loadLabelMesh()
-{
-    ObjectHelper::resetObjectHelper(this, m_labelObj,
-                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 
 void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)

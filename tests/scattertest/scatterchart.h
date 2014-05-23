@@ -85,11 +85,13 @@ public slots:
     void removeSeries();
     void toggleSeriesVisibility();
     void changeSeriesName();
-
     void handleAxisXChanged(QValue3DAxis *axis);
     void handleAxisYChanged(QValue3DAxis *axis);
     void handleAxisZChanged(QValue3DAxis *axis);
     void handleFpsChange(qreal fps);
+    void changeLabelRotation(int rotation);
+    void toggleAxisTitleVisibility(bool enabled);
+    void toggleAxisTitleFixed(bool enabled);
 
 signals:
     void shadowQualityChanged(int quality);

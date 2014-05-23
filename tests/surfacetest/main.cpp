@@ -370,6 +370,21 @@ int main(int argc, char *argv[])
     line3->setFrameShape(QFrame::HLine);
     line3->setFrameShadow(QFrame::Sunken);
 
+    QCheckBox *axisTitlesVisibleCB = new QCheckBox(widget);
+    axisTitlesVisibleCB->setText(QStringLiteral("Axis titles visible"));
+    axisTitlesVisibleCB->setChecked(false);
+
+    QCheckBox *axisTitlesFixedCB = new QCheckBox(widget);
+    axisTitlesFixedCB->setText(QStringLiteral("Axis titles fixed"));
+    axisTitlesFixedCB->setChecked(true);
+
+    QSlider *axisLabelRotationSlider = new QSlider(Qt::Horizontal, widget);
+    axisLabelRotationSlider->setTickInterval(10);
+    axisLabelRotationSlider->setTickPosition(QSlider::TicksBelow);
+    axisLabelRotationSlider->setMinimum(0);
+    axisLabelRotationSlider->setValue(0);
+    axisLabelRotationSlider->setMaximum(90);
+
     // Add controls to the layout
 #ifdef MULTI_SERIES
     vLayout->addWidget(series1CB);
@@ -450,6 +465,10 @@ int main(int argc, char *argv[])
     vLayout2->addWidget(massiveDataTestButton);
     vLayout2->addWidget(testReverseButton);
     vLayout2->addWidget(testDataOrderingButton);
+    vLayout2->addWidget(axisTitlesVisibleCB);
+    vLayout2->addWidget(axisTitlesFixedCB);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
+    vLayout2->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -611,6 +630,12 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::testAxisReverse);
     QObject::connect(testDataOrderingButton, &QPushButton::clicked,
                      modifier, &GraphModifier::testDataOrdering);
+    QObject::connect(axisTitlesVisibleCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleAxisTitleVisibility);
+    QObject::connect(axisTitlesFixedCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleAxisTitleFixed);
+    QObject::connect(axisLabelRotationSlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::changeLabelRotation);
 
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged,
                      modifier, &GraphModifier::setAspectRatio);

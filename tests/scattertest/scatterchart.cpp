@@ -478,9 +478,9 @@ void ScatterDataModifier::testAxisReverse()
 void ScatterDataModifier::addData()
 {
     // Add labels
-    m_chart->axisX()->setTitle("X");
-    m_chart->axisY()->setTitle("Y");
-    m_chart->axisZ()->setTitle("Z");
+    m_chart->axisX()->setTitle("X - Axis");
+    m_chart->axisY()->setTitle("Y - Axis");
+    m_chart->axisZ()->setTitle("Z - Axis");
     m_chart->axisX()->setRange(-50.0f, 50.0f);
     m_chart->axisY()->setRange(-1.0f, 1.2f);
     m_chart->axisZ()->setRange(-50.0f, 50.0f);
@@ -919,6 +919,27 @@ void ScatterDataModifier::handleFpsChange(qreal fps)
 {
     static const QString fpsPrefix(QStringLiteral("FPS: "));
     m_fpsLabel->setText(fpsPrefix + QString::number(qRound(fps)));
+}
+
+void ScatterDataModifier::changeLabelRotation(int rotation)
+{
+    m_chart->axisX()->setLabelAutoRotation(float(rotation));
+    m_chart->axisY()->setLabelAutoRotation(float(rotation));
+    m_chart->axisZ()->setLabelAutoRotation(float(rotation));
+}
+
+void ScatterDataModifier::toggleAxisTitleVisibility(bool enabled)
+{
+    m_chart->axisX()->setTitleVisible(enabled);
+    m_chart->axisY()->setTitleVisible(enabled);
+    m_chart->axisZ()->setTitleVisible(enabled);
+}
+
+void ScatterDataModifier::toggleAxisTitleFixed(bool enabled)
+{
+    m_chart->axisX()->setTitleFixed(enabled);
+    m_chart->axisY()->setTitleFixed(enabled);
+    m_chart->axisZ()->setTitleFixed(enabled);
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)

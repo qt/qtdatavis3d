@@ -63,9 +63,6 @@ private:
     BarRenderItem *m_selectedBar; // points to renderitem array
     AxisRenderCache *m_sliceCache; // not owned
     const LabelItem *m_sliceTitleItem; // not owned
-    bool m_xFlipped;
-    bool m_zFlipped;
-    bool m_yFlipped;
     bool m_updateLabels;
     ShaderHelper *m_barShader;
     ShaderHelper *m_barGradientShader;
@@ -73,9 +70,6 @@ private:
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_backgroundObj; // Shared reference
-    ObjectHelper *m_gridLineObj; // Shared reference
-    ObjectHelper *m_labelObj; // Shared reference
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
     GLuint m_selectionTexture;
@@ -159,8 +153,6 @@ private:
                     GLfloat rowScaleFactor, GLfloat columnScaleFactor);
 
     void loadBackgroundMesh();
-    void loadGridLineMesh();
-    void loadLabelMesh();
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);

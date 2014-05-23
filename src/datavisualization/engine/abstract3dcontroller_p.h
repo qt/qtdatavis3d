@@ -84,6 +84,12 @@ struct Abstract3DChangeBitField {
     bool axisYLabelAutoRotationChanged : 1;
     bool axisZLabelAutoRotationChanged : 1;
     bool aspectRatioChanged            : 1;
+    bool axisXTitleVisibilityChanged   : 1;
+    bool axisYTitleVisibilityChanged   : 1;
+    bool axisZTitleVisibilityChanged   : 1;
+    bool axisXTitleFixedChanged        : 1;
+    bool axisYTitleFixedChanged        : 1;
+    bool axisZTitleFixedChanged        : 1;
 
     Abstract3DChangeBitField() :
         themeChanged(true),
@@ -120,7 +126,13 @@ struct Abstract3DChangeBitField {
         axisXLabelAutoRotationChanged(true),
         axisYLabelAutoRotationChanged(true),
         axisZLabelAutoRotationChanged(true),
-        aspectRatioChanged(true)
+        aspectRatioChanged(true),
+        axisXTitleVisibilityChanged(true),
+        axisYTitleVisibilityChanged(true),
+        axisZTitleVisibilityChanged(true),
+        axisXTitleFixedChanged(true),
+        axisYTitleFixedChanged(true),
+        axisZTitleFixedChanged(true)
     {
     }
 };
@@ -278,6 +290,8 @@ public:
     virtual void handleAxisReversedChangedBySender(QObject *sender);
     virtual void handleAxisFormatterDirtyBySender(QObject *sender);
     virtual void handleAxisLabelAutoRotationChangedBySender(QObject *sender);
+    virtual void handleAxisTitleVisibilityChangedBySender(QObject *sender);
+    virtual void handleAxisTitleFixedChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick() = 0;
     virtual void adjustAxisRanges() = 0;
@@ -295,6 +309,8 @@ public slots:
     void handleAxisReversedChanged(bool enable);
     void handleAxisFormatterDirty();
     void handleAxisLabelAutoRotationChanged(float angle);
+    void handleAxisTitleVisibilityChanged(bool visible);
+    void handleAxisTitleFixedChanged(bool fixed);
     void handleInputViewChanged(QAbstract3DInputHandler::InputView view);
     void handleInputPositionChanged(const QPoint &position);
     void handleSeriesVisibilityChanged(bool visible);

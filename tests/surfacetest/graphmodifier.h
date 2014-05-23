@@ -126,6 +126,9 @@ public slots:
     void handleAxisYChanged(QValue3DAxis *axis);
     void handleAxisZChanged(QValue3DAxis *axis);
     void handleFpsChange(qreal fps);
+    void changeLabelRotation(int rotation);
+    void toggleAxisTitleVisibility(bool enabled);
+    void toggleAxisTitleFixed(bool enabled);
 
 private:
     void fillSeries();

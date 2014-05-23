@@ -73,11 +73,6 @@ private:
     GLfloat m_maxVisibleRowValue;
     GLfloat m_visibleColumnRange;
     GLfloat m_visibleRowRange;
-    ObjectHelper *m_backgroundObj; // Shared reference
-#if !(defined QT_OPENGL_ES_2)
-    ObjectHelper *m_gridLineObj; // Shared reference
-#endif
-    ObjectHelper *m_labelObj; // Shared reference
     GLuint m_depthTexture;
     GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;
@@ -87,9 +82,6 @@ private:
     GLfloat m_shadowQualityToShader;
     bool m_flatSupported;
     bool m_selectionActive;
-    bool m_xFlipped;
-    bool m_zFlipped;
-    bool m_yFlipped;
     AbstractRenderItem m_dummyRenderItem;
     GLint m_shadowQualityMultiplier;
     QSizeF m_areaSize;
@@ -139,7 +131,6 @@ private:
     void initShaders(const QString &vertexShader, const QString &fragmentShader);
     QRect calculateSampleRect(const QSurfaceDataArray &array);
     void loadBackgroundMesh();
-    void loadLabelMesh();
 
     void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
@@ -161,7 +152,6 @@ private:
     void updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point, bool label);
     QPoint selectionIdToSurfacePoint(uint id);
 #if !defined(QT_OPENGL_ES_2)
-    void loadGridLineMesh();
     void updateDepthBuffer();
 #endif
     void emitSelectedPointChanged(QPoint position);

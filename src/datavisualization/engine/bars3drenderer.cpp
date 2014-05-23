@@ -40,9 +40,7 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-const GLfloat labelMargin = 0.05f;
 const GLfloat gridLineWidth = 0.005f;
-
 const bool sliceGridLabels = true;
 
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
@@ -53,9 +51,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_selectedBar(0),
       m_sliceCache(0),
       m_sliceTitleItem(0),
-      m_xFlipped(false),
-      m_zFlipped(false),
-      m_yFlipped(false),
       m_updateLabels(false),
       m_barShader(0),
       m_barGradientShader(0),
@@ -63,9 +58,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_selectionShader(0),
       m_backgroundShader(0),
       m_labelShader(0),
-      m_backgroundObj(0),
-      m_gridLineObj(0),
-      m_labelObj(0),
       m_bgrTexture(0),
       m_depthTexture(0),
       m_selectionTexture(0),
@@ -120,9 +112,6 @@ Bars3DRenderer::~Bars3DRenderer()
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
-    ObjectHelper::releaseObjectHelper(this, m_backgroundObj);
-    ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
-    ObjectHelper::releaseObjectHelper(this, m_labelObj);
     delete m_labelShader;
 }
 
@@ -1884,6 +1873,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     float labelAngleFraction = labelAutoAngle / 90.0f;
     float fractionCamY = activeCamera->yRotation() * labelAngleFraction;
     float fractionCamX = activeCamera->xRotation() * labelAngleFraction;
+    float labelsMaxWidth = 0.0f;
 
     // Y Labels
     int labelNbr = 0;
@@ -1958,20 +1948,31 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 zeroVector, totalBackRotation, 0, m_cachedSelectionMode,
                                 shader, m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, backAlignment);
+                                true, true, Drawer::LabelMid, backAlignment, false, drawSelection);
 
             // Side wall
             m_dummyBarRenderItem.setTranslation(sideLabelTrans);
             m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
                                 zeroVector, totalSideRotation, 0, m_cachedSelectionMode,
                                 shader, m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, sideAlignment);
+                                true, true, Drawer::LabelMid, sideAlignment, false, drawSelection);
+
+            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
         }
         labelNbr++;
     }
 
+    if (!drawSelection && m_axisCacheY.isTitleVisible()) {
+        sideLabelTrans.setY(m_backgroundAdjustment);
+        backLabelTrans.setY(m_backgroundAdjustment);
+        drawAxisTitleY(sideLabelRotation, backLabelRotation, sideLabelTrans, backLabelTrans,
+                       totalSideRotation, totalBackRotation, m_dummyBarRenderItem, activeCamera,
+                       labelsMaxWidth, viewMatrix, projectionMatrix, shader);
+    }
+
     // Z labels
     // Calculate the positions for row and column labels and store them
+    labelsMaxWidth = 0.0f;
     labelAutoAngle = m_axisCacheZ.labelAutoRotation();
     labelAngleFraction = labelAutoAngle / 90.0f;
     fractionCamY = activeCamera->yRotation() * labelAngleFraction;
@@ -2077,10 +2078,18 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
                                 shader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, alignment,
                                 false, drawSelection);
+            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
         }
     }
 
+    if (!drawSelection && m_axisCacheZ.isTitleVisible()) {
+        QVector3D titleTrans(colPos, 0.0f, 0.0f);
+        drawAxisTitleZ(labelRotation, titleTrans, totalRotation, m_dummyBarRenderItem,
+                       activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader);
+    }
+
     // X labels
+    labelsMaxWidth = 0.0f;
     labelAutoAngle = m_axisCacheX.labelAutoRotation();
     labelAngleFraction = labelAutoAngle / 90.0f;
     fractionCamY = activeCamera->yRotation() * labelAngleFraction;
@@ -2180,20 +2189,28 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
                                 zeroVector, totalRotation, 0, m_cachedSelectionMode,
                                 shader, m_labelObj, activeCamera,
                                 true, true, Drawer::LabelMid, alignment, false, drawSelection);
+            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
         }
+    }
+
+    if (!drawSelection && m_axisCacheX.isTitleVisible()) {
+        QVector3D titleTrans(0.0f, 0.0f, rowPos);
+        drawAxisTitleX(labelRotation, titleTrans, totalRotation, m_dummyBarRenderItem,
+                       activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader);
     }
 
 #if 0 // Debug label
     static LabelItem debugLabelItem;
-    QString debugLabelString(QStringLiteral("Flips: x:%1 y:%2 z:%3"));
-    QString finalDebugString = debugLabelString.arg(m_xFlipped).arg(m_yFlipped).arg(m_zFlipped);
+    QString debugLabelString(QStringLiteral("Flips: x:%1 y:%2 z:%3 xr:%4 yr:%5"));
+    QString finalDebugString = debugLabelString.arg(m_xFlipped).arg(m_yFlipped).arg(m_zFlipped)
+            .arg(activeCamera->xRotation()).arg(activeCamera->yRotation());
     m_dummyBarRenderItem.setTranslation(QVector3D(m_xFlipped ? -1.5f : 1.5f,
                                                   m_yFlipped ? 1.5f : -1.5f,
                                                   m_zFlipped ? -1.5f : 1.5f));
 
     m_drawer->generateLabelItem(debugLabelItem, finalDebugString);
     m_drawer->drawLabel(m_dummyBarRenderItem, debugLabelItem, viewMatrix, projectionMatrix,
-                        zeroVector, labelRotation, 0, m_cachedSelectionMode,
+                        zeroVector, identityQuaternion, 0, m_cachedSelectionMode,
                         shader, m_labelObj, activeCamera,
                         true, false, Drawer::LabelMid, Qt::AlignHCenter, false, drawSelection);
 #endif
@@ -2338,18 +2355,6 @@ void Bars3DRenderer::loadBackgroundMesh()
 {
     ObjectHelper::resetObjectHelper(this, m_backgroundObj,
                                     QStringLiteral(":/defaultMeshes/backgroundNoFloor"));
-}
-
-void Bars3DRenderer::loadGridLineMesh()
-{
-    ObjectHelper::resetObjectHelper(this, m_gridLineObj,
-                                    QStringLiteral(":/defaultMeshes/plane"));
-}
-
-void Bars3DRenderer::loadLabelMesh()
-{
-    ObjectHelper::resetObjectHelper(this, m_labelObj,
-                                    QStringLiteral(":/defaultMeshes/plane"));
 }
 
 void Bars3DRenderer::updateTextures()

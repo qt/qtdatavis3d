@@ -183,6 +183,21 @@ int main(int argc, char **argv)
     rangeList->addItem(QStringLiteral("All"));
     rangeList->setCurrentIndex(8);
 
+    QCheckBox *axisTitlesVisibleCB = new QCheckBox(widget);
+    axisTitlesVisibleCB->setText(QStringLiteral("Axis titles visible"));
+    axisTitlesVisibleCB->setChecked(true);
+
+    QCheckBox *axisTitlesFixedCB = new QCheckBox(widget);
+    axisTitlesFixedCB->setText(QStringLiteral("Axis titles fixed"));
+    axisTitlesFixedCB->setChecked(true);
+
+    QSlider *axisLabelRotationSlider = new QSlider(Qt::Horizontal, widget);
+    axisLabelRotationSlider->setTickInterval(10);
+    axisLabelRotationSlider->setTickPosition(QSlider::TicksBelow);
+    axisLabelRotationSlider->setMinimum(0);
+    axisLabelRotationSlider->setValue(30);
+    axisLabelRotationSlider->setMaximum(90);
+
     //! [5]
     vLayout->addWidget(new QLabel(QStringLiteral("Rotate horizontally")));
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
@@ -196,6 +211,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(smoothCheckBox);
     vLayout->addWidget(seriesCheckBox);
     vLayout->addWidget(reverseValueAxisCheckBox);
+    vLayout->addWidget(axisTitlesVisibleCB);
+    vLayout->addWidget(axisTitlesFixedCB);
     vLayout->addWidget(new QLabel(QStringLiteral("Show year")));
     vLayout->addWidget(rangeList);
     vLayout->addWidget(new QLabel(QStringLiteral("Change bar style")));
@@ -209,7 +226,9 @@ int main(int argc, char **argv)
     vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout->addWidget(fontList);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
-    vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
+    vLayout->addWidget(fontSizeSlider);
+    vLayout->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
+    vLayout->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
 
     //! [2]
     GraphModifier *modifier = new GraphModifier(widgetgraph);
@@ -271,6 +290,12 @@ int main(int argc, char **argv)
     QObject::connect(modifier, &GraphModifier::fontChanged, fontList,
                      &QFontComboBox::setCurrentFont);
 
+    QObject::connect(axisTitlesVisibleCB, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setAxisTitleVisibility);
+    QObject::connect(axisTitlesFixedCB, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setAxisTitleFixed);
+    QObject::connect(axisLabelRotationSlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::changeLabelRotation);
     //! [3]
     widget->show();
     return app.exec();

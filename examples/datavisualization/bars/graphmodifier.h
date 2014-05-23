@@ -57,6 +57,9 @@ public slots:
     void changeTheme(int theme);
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
+    void changeLabelRotation(int rotation);
+    void setAxisTitleVisibility(bool enabled);
+    void setAxisTitleFixed(bool enabled);
 
 signals:
     void shadowQualityChanged(int quality);

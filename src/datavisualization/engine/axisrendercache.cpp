@@ -37,7 +37,9 @@ AxisRenderCache::AxisRenderCache()
       m_positionsDirty(true),
       m_translate(0.0f),
       m_scale(1.0f),
-      m_labelAutoRotation(0.0f)
+      m_labelAutoRotation(0.0f),
+      m_titleVisible(false),
+      m_titleFixed(false)
 {
 }
 

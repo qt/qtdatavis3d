@@ -111,6 +111,10 @@ public:
                                      QValue3DAxisFormatter *formatter);
     virtual void updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientation orientation,
                                              float angle);
+    virtual void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
+                                      bool visible);
+    virtual void updateAxisTitleFixed(QAbstract3DAxis::AxisOrientation orientation,
+                                      bool fixed);
     virtual void modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
@@ -162,6 +166,26 @@ protected:
     void fixGradient(QLinearGradient *gradient, GLuint *gradientTexture);
 
     void calculateZoomLevel();
+    void drawAxisTitleY(const QVector3D &sideLabelRotation, const QVector3D &backLabelRotation,
+                        const QVector3D &sideLabelTrans, const QVector3D &backLabelTrans,
+                        const QQuaternion &totalSideRotation, const QQuaternion &totalBackRotation,
+                        AbstractRenderItem &dummyItem, const Q3DCamera *activeCamera,
+                        float labelsMaxWidth,
+                        const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
+                        ShaderHelper *shader);
+    void drawAxisTitleX(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                        const QQuaternion &totalRotation, AbstractRenderItem &dummyItem,
+                        const Q3DCamera *activeCamera, float labelsMaxWidth,
+                        const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
+                        ShaderHelper *shader);
+    void drawAxisTitleZ(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                        const QQuaternion &totalRotation, AbstractRenderItem &dummyItem,
+                        const Q3DCamera *activeCamera, float labelsMaxWidth,
+                        const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
+                        ShaderHelper *shader);
+
+    void loadGridLineMesh();
+    void loadLabelMesh();
 
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
@@ -200,6 +224,13 @@ protected:
     ShaderHelper *m_customItemShader;
 
     bool m_useOrthoProjection;
+    bool m_xFlipped;
+    bool m_zFlipped;
+    bool m_yFlipped;
+
+    ObjectHelper *m_backgroundObj; // Shared reference
+    ObjectHelper *m_gridLineObj; // Shared reference
+    ObjectHelper *m_labelObj; // Shared reference
 
     float m_graphAspectRatio;
 

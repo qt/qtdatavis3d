@@ -55,9 +55,6 @@ class QT_DATAVISUALIZATION_EXPORT Scatter3DRenderer : public Abstract3DRenderer
 private:
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
-    bool m_xFlipped;
-    bool m_zFlipped;
-    bool m_yFlipped;
     bool m_updateLabels;
     ShaderHelper *m_dotShader;
     ShaderHelper *m_dotGradientShader;
@@ -68,11 +65,6 @@ private:
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_backgroundObj; // Shared reference
-#if !(defined QT_OPENGL_ES_2)
-    ObjectHelper *m_gridLineObj; // Shared reference
-#endif
-    ObjectHelper *m_labelObj; // Shared reference
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
     GLuint m_selectionTexture;
@@ -130,13 +122,11 @@ private:
                     const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
 
     void loadBackgroundMesh();
-    void loadLabelMesh();
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
 #if !defined(QT_OPENGL_ES_2)
-    void loadGridLineMesh();
     void initDepthShader();
     void updateDepthBuffer();
 #else
