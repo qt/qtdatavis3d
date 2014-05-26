@@ -52,7 +52,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_selectionLabelItem(0),
       m_visibleSeriesCount(0),
       m_customItemShader(0),
-      m_useOrthoProjection(false)
+      m_useOrthoProjection(false),
+      m_graphAspectRatio(2.0f)
 
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
@@ -271,18 +272,23 @@ void Abstract3DRenderer::updateSelectionMode(QAbstract3DGraph::SelectionFlags mo
     m_selectionDirty = true;
 }
 
+void Abstract3DRenderer::updateAspectRatio(float ratio)
+{
+    m_graphAspectRatio = ratio;
+    calculateZoomLevel();
+    m_cachedScene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
+    updateCustomItemPositions();
+}
+
 void Abstract3DRenderer::handleResize()
 {
     if (m_primarySubViewport.width() == 0 || m_primarySubViewport.height() == 0)
         return;
 
-    // Calculate zoom level based on aspect ratio
-    GLfloat div;
-    GLfloat zoomAdjustment;
-    div = qMin(m_primarySubViewport.width(), m_primarySubViewport.height());
-    zoomAdjustment = defaultRatio * ((m_primarySubViewport.width() / div)
-                                     / (m_primarySubViewport.height() / div));
-    m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
+    // Recalculate zoom
+    calculateZoomLevel();
 
     // Re-init selection buffer
     initSelectionBuffer();
@@ -291,6 +297,17 @@ void Abstract3DRenderer::handleResize()
     // Re-init depth buffer
     updateDepthBuffer();
 #endif
+}
+
+void Abstract3DRenderer::calculateZoomLevel()
+{
+    // Calculate zoom level based on aspect ratio
+    GLfloat div;
+    GLfloat zoomAdjustment;
+    div = qMin(m_primarySubViewport.width(), m_primarySubViewport.height());
+    zoomAdjustment = 2.0f * defaultRatio * ((m_primarySubViewport.width() / div)
+                                     / (m_primarySubViewport.height() / div)) / m_graphAspectRatio;
+    m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 }
 
 void Abstract3DRenderer::updateAxisType(QAbstract3DAxis::AxisOrientation orientation,

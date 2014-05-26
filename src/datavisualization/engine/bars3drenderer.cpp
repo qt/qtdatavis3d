@@ -2618,4 +2618,9 @@ QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position
     return QVector3D(xTrans, yTrans, zTrans);
 }
 
+void Bars3DRenderer::updateAspectRatio(float ratio)
+{
+    Q_UNUSED(ratio)
+}
+
 QT_END_NAMESPACE_DATAVISUALIZATION

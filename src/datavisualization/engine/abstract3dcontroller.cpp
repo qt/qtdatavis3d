@@ -58,7 +58,8 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_renderPending(false),
     m_measureFps(false),
     m_numFrames(0),
-    m_currentFps(0.0)
+    m_currentFps(0.0),
+    m_aspectRatio(2.0f)
 {
     if (!m_scene)
         m_scene = new Q3DScene;
@@ -195,6 +196,11 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.projectionChanged) {
         m_renderer->m_useOrthoProjection = m_useOrthoProjection;
         m_changeTracker.projectionChanged = false;
+    }
+
+    if (m_changeTracker.aspectRatioChanged) {
+        m_renderer->updateAspectRatio(m_aspectRatio);
+        m_changeTracker.aspectRatioChanged = false;
     }
 
     if (m_changeTracker.axisXFormatterChanged) {
@@ -1414,6 +1420,22 @@ void Abstract3DController::setOrthoProjection(bool enable)
 bool Abstract3DController::isOrthoProjection() const
 {
     return m_useOrthoProjection;
+}
+
+void Abstract3DController::setAspectRatio(float ratio)
+{
+    if (m_aspectRatio != ratio) {
+        m_aspectRatio = ratio;
+        m_changeTracker.aspectRatioChanged = true;
+        emit aspectRatioChanged(m_aspectRatio);
+        m_isDataDirty = true;
+        emitNeedRender();
+    }
+}
+
+float Abstract3DController::aspectRatio()
+{
+    return m_aspectRatio;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

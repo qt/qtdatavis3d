@@ -325,6 +325,9 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
     QObject::connect(m_controller.data(), &Abstract3DController::orthoProjectionChanged, this,
                      &AbstractDeclarative::orthoProjectionChanged);
+
+    QObject::connect(m_controller.data(), &Abstract3DController::aspectRatioChanged, this,
+                     &AbstractDeclarative::aspectRatioChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -685,6 +688,16 @@ bool AbstractDeclarative::isOrthoProjection() const
 AbstractDeclarative::ElementType AbstractDeclarative::selectedElement() const
 {
     return ElementType(m_controller->selectedElement());
+}
+
+void AbstractDeclarative::setAspectRatio(qreal ratio)
+{
+    m_controller->setAspectRatio(float(ratio));
+}
+
+qreal AbstractDeclarative::aspectRatio() const
+{
+    return m_controller->aspectRatio();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

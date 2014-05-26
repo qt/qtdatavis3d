@@ -592,6 +592,25 @@ bool QAbstract3DGraph::isOrthoProjection() const
 }
 
 /*!
+ * \property QAbstract3DGraph::aspectRatio
+ * \since Qt Data Visualization 1.1
+ *
+ * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
+ * vertical axes. Defaults to \c{2.0}.
+ *
+ * \note Has no effect on Q3DBars.
+ */
+void QAbstract3DGraph::setAspectRatio(qreal ratio)
+{
+    d_ptr->m_visualController->setAspectRatio(float(ratio));
+}
+
+qreal QAbstract3DGraph::aspectRatio() const
+{
+    return d_ptr->m_visualController->aspectRatio();
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)
@@ -736,6 +755,9 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
 
     QObject::connect(m_visualController, &Abstract3DController::orthoProjectionChanged, q_ptr,
                      &QAbstract3DGraph::orthoProjectionChanged);
+
+    QObject::connect(m_visualController, &Abstract3DController::aspectRatioChanged, q_ptr,
+                     &QAbstract3DGraph::aspectRatioChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

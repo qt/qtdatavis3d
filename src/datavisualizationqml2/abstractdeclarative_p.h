@@ -72,6 +72,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList REVISION 1)
     Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged REVISION 1)
     Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged REVISION 1)
+    Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged REVISION 1)
 
 public:
     enum SelectionFlag {
@@ -181,6 +182,9 @@ public:
 
     AbstractDeclarative::ElementType selectedElement() const;
 
+    void setAspectRatio(qreal ratio);
+    qreal aspectRatio() const;
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -214,6 +218,7 @@ signals:
     Q_REVISION(1) void currentFpsChanged(qreal fps);
     Q_REVISION(1) void selectedElementChanged(QAbstract3DGraph::ElementType type);
     Q_REVISION(1) void orthoProjectionChanged(bool enabled);
+    Q_REVISION(1) void aspectRatioChanged(qreal ratio);
 
 private:
     QPointer<Abstract3DController> m_controller;

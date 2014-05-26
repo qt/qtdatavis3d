@@ -113,6 +113,8 @@ public:
     void testAxisReverse();
     void testDataOrdering();
 
+    void setAspectRatio(int ratio);
+
 public slots:
     void changeShadowQuality(int quality);
     void changeTheme(int theme);

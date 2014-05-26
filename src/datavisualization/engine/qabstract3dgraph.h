@@ -47,6 +47,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged)
     Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged)
     Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged)
+    Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -135,6 +136,9 @@ public:
 
     ElementType selectedElement() const;
 
+    void setAspectRatio(qreal ratio);
+    qreal aspectRatio() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -156,6 +160,7 @@ signals:
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);
+    void aspectRatioChanged(qreal ratio);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)

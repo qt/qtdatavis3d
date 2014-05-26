@@ -218,6 +218,11 @@ int main(int argc, char *argv[])
     axisMinSliderZ->setMaximum(100);
     axisMinSliderZ->setEnabled(true);
 
+    QSlider *aspectRatioSlider = new QSlider(Qt::Horizontal, widget);
+    aspectRatioSlider->setMinimum(1);
+    aspectRatioSlider->setValue(20);
+    aspectRatioSlider->setMaximum(100);
+
     QLinearGradient gr(0, 0, 100, 1);
     gr.setColorAt(0.0, Qt::black);
     gr.setColorAt(0.33, Qt::blue);
@@ -403,6 +408,8 @@ int main(int argc, char *argv[])
     vLayout->addWidget(gridSliderX);
     vLayout->addWidget(gridSliderZ);
 #endif
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
+    vLayout->addWidget(aspectRatioSlider);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis range")));
     vLayout->addWidget(axisRangeSliderX);
     vLayout->addWidget(axisRangeSliderY);
@@ -604,6 +611,9 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::testAxisReverse);
     QObject::connect(testDataOrderingButton, &QPushButton::clicked,
                      modifier, &GraphModifier::testDataOrdering);
+
+    QObject::connect(aspectRatioSlider, &QSlider::valueChanged,
+                     modifier, &GraphModifier::setAspectRatio);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

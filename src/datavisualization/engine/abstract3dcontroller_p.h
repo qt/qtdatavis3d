@@ -86,6 +86,7 @@ struct Abstract3DChangeBitField {
     bool axisXLabelAutoRotationChanged : 1;
     bool axisYLabelAutoRotationChanged : 1;
     bool axisZLabelAutoRotationChanged : 1;
+    bool aspectRatioChanged            : 1;
 
     Abstract3DChangeBitField() :
         zoomLevelChanged(true),
@@ -123,7 +124,8 @@ struct Abstract3DChangeBitField {
         projectionChanged(true),
         axisXLabelAutoRotationChanged(true),
         axisYLabelAutoRotationChanged(true),
-        axisZLabelAutoRotationChanged(true)
+        axisZLabelAutoRotationChanged(true),
+        aspectRatioChanged(true)
     {
     }
 };
@@ -157,6 +159,7 @@ private:
     QAbstract3DGraph::SelectionFlags m_selectionMode;
     QAbstract3DGraph::ShadowQuality m_shadowQuality;
     bool m_useOrthoProjection;
+    float m_aspectRatio;
 
 protected:
     Q3DScene *m_scene;
@@ -324,6 +327,9 @@ public slots:
 
     void updateCustomItem();
 
+    void setAspectRatio(float ratio);
+    float aspectRatio();
+
 signals:
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
@@ -337,6 +343,7 @@ signals:
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);
+    void aspectRatioChanged(float ratio);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

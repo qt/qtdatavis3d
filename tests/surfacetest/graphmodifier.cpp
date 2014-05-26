@@ -1489,3 +1489,9 @@ void GraphModifier::updateSamples()
         break;
     }
 }
+
+void GraphModifier::setAspectRatio(int ratio)
+{
+    float aspectRatio = float(ratio) / 10.0f;
+    m_graph->setAspectRatio(aspectRatio);
+}

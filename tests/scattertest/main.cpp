@@ -170,58 +170,67 @@ int main(int argc, char **argv)
     QFontComboBox *fontList = new QFontComboBox(widget);
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
-    fontSizeSlider->setTickInterval(1);
+    fontSizeSlider->setTickInterval(15);
+    fontSizeSlider->setTickPosition(QSlider::TicksBelow);
     fontSizeSlider->setMinimum(1);
     fontSizeSlider->setValue(30);
     fontSizeSlider->setMaximum(200);
 
     QSlider *pointSizeSlider = new QSlider(Qt::Horizontal, widget);
-    pointSizeSlider->setTickInterval(1);
+    pointSizeSlider->setTickInterval(15);
+    pointSizeSlider->setTickPosition(QSlider::TicksBelow);
     pointSizeSlider->setMinimum(1);
     pointSizeSlider->setValue(30);
     pointSizeSlider->setMaximum(100);
 
     QSlider *minSliderX = new QSlider(Qt::Horizontal, widget);
-    minSliderX->setTickInterval(1);
+    minSliderX->setTickInterval(50);
     minSliderX->setTickPosition(QSlider::TicksBelow);
     minSliderX->setMinimum(-100);
     minSliderX->setValue(-50);
     minSliderX->setMaximum(100);
 
     QSlider *minSliderY = new QSlider(Qt::Horizontal, widget);
-    minSliderY->setTickInterval(1);
+    minSliderY->setTickInterval(100);
     minSliderY->setTickPosition(QSlider::TicksBelow);
     minSliderY->setMinimum(-200);
     minSliderY->setValue(-100);
     minSliderY->setMaximum(200);
 
     QSlider *minSliderZ = new QSlider(Qt::Horizontal, widget);
-    minSliderZ->setTickInterval(1);
+    minSliderZ->setTickInterval(50);
     minSliderZ->setTickPosition(QSlider::TicksBelow);
     minSliderZ->setMinimum(-100);
     minSliderZ->setValue(-50);
     minSliderZ->setMaximum(100);
 
     QSlider *maxSliderX = new QSlider(Qt::Horizontal, widget);
-    maxSliderX->setTickInterval(1);
+    maxSliderX->setTickInterval(50);
     maxSliderX->setTickPosition(QSlider::TicksAbove);
     maxSliderX->setMinimum(-100);
     maxSliderX->setValue(50);
     maxSliderX->setMaximum(100);
 
     QSlider *maxSliderY = new QSlider(Qt::Horizontal, widget);
-    maxSliderY->setTickInterval(1);
+    maxSliderY->setTickInterval(100);
     maxSliderY->setTickPosition(QSlider::TicksAbove);
     maxSliderY->setMinimum(-200);
     maxSliderY->setValue(120);
     maxSliderY->setMaximum(200);
 
     QSlider *maxSliderZ = new QSlider(Qt::Horizontal, widget);
-    maxSliderZ->setTickInterval(1);
+    maxSliderZ->setTickInterval(50);
     maxSliderZ->setTickPosition(QSlider::TicksAbove);
     maxSliderZ->setMinimum(-100);
     maxSliderZ->setValue(50);
     maxSliderZ->setMaximum(100);
+
+    QSlider *aspectRatioSlider = new QSlider(Qt::Horizontal, widget);
+    aspectRatioSlider->setTickInterval(10);
+    aspectRatioSlider->setTickPosition(QSlider::TicksBelow);
+    aspectRatioSlider->setMinimum(1);
+    aspectRatioSlider->setValue(20);
+    aspectRatioSlider->setMaximum(100);
 
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
@@ -267,7 +276,9 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout2->addWidget(fontList);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")));
-    vLayout2->addWidget(fontSizeSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(fontSizeSlider, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
+    vLayout2->addWidget(aspectRatioSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -356,6 +367,8 @@ int main(int argc, char **argv)
     QObject::connect(maxSliderZ, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setMaxZ);
 
+    QObject::connect(aspectRatioSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setAspectRatio);
 
     modifier->setFpsLabel(fpsLabel);
 

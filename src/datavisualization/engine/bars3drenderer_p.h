@@ -124,6 +124,8 @@ public:
 
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
+    void updateAspectRatio(float ratio);
+
 protected:
     virtual void initializeOpenGL();
 

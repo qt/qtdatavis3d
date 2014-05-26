@@ -270,9 +270,19 @@
  */
 
 /*!
- * \qmlproperty bool QAbstract3DGraph::orthoProjection
+ * \qmlproperty bool AbstractGraph3D::orthoProjection
  * \since Qt Data Visualization 1.1
  *
  * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
  * \note Shadows will be disabled when set to \c{true}.
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::aspectRatio
+ * \since Qt Data Visualization 1.1
+ *
+ * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
+ * vertical axes. Defaults to \c{2.0}.
+ *
+ * \note Has no effect on Bars3D.
  */

@@ -40,7 +40,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 // Margin for background (1.10 make it 10% larger to avoid
 // selection ball being drawn inside background)
 const GLfloat backgroundMargin = 1.1f;
@@ -2262,12 +2261,12 @@ void Surface3DRenderer::calculateSceneScalingFactors()
     m_areaSize.setHeight(m_axisCacheZ.max() -  m_axisCacheZ.min());
     m_areaSize.setWidth(m_axisCacheX.max() - m_axisCacheX.min());
     m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
-    m_scaleX = aspectRatio * m_areaSize.width() / m_scaleFactor;
-    m_scaleZ = aspectRatio * m_areaSize.height() / m_scaleFactor;
+    m_scaleX = m_graphAspectRatio * m_areaSize.width() / m_scaleFactor;
+    m_scaleZ = m_graphAspectRatio * m_areaSize.height() / m_scaleFactor;
     m_scaleXWithBackground = m_scaleX + backgroundMargin - 1.0f;
     m_scaleZWithBackground = m_scaleZ + backgroundMargin - 1.0f;
 
-    float factorScaler = 2.0f * aspectRatio / m_scaleFactor;
+    float factorScaler = 2.0f * m_graphAspectRatio / m_scaleFactor;
     m_axisCacheX.setScale(factorScaler * m_areaSize.width());
     m_axisCacheZ.setScale(-factorScaler * m_areaSize.height());
     m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);

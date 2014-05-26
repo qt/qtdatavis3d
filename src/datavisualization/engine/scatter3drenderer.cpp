@@ -45,7 +45,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 //#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
 
-const GLfloat aspectRatio = 2.0f; // Forced ratio of x and z to y. Dynamic will make it look odd.
 const GLfloat labelMargin = 0.05f;
 const GLfloat defaultMinSize = 0.01f;
 const GLfloat defaultMaxSize = 0.1f;
@@ -825,17 +824,19 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         QMatrix4x4 itModelMatrix;
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        GLfloat xScale = (aspectRatio * m_areaSize.width()) / m_scaleFactor + m_backgroundMargin;
-        GLfloat zScale = (aspectRatio * m_areaSize.height()) / m_scaleFactor + m_backgroundMargin;
+        GLfloat xScale = (m_graphAspectRatio * m_areaSize.width()) / m_scaleFactor
+                + m_backgroundMargin;
+        GLfloat zScale = (m_graphAspectRatio * m_areaSize.height()) / m_scaleFactor
+                + m_backgroundMargin;
         if (m_maxItemSize > xScale)
             xScale = m_maxItemSize;
         if (m_maxItemSize > zScale)
             zScale = m_maxItemSize;
         QVector3D bgScale(xScale, 1.0f + m_backgroundMargin, zScale);
 #else // ..and this if we want uniform scaling based on largest dimension
-        QVector3D bgScale((aspectRatio + m_backgroundMargin),
+        QVector3D bgScale((m_graphAspectRatio + m_backgroundMargin),
                           1.0f + m_backgroundMargin,
-                          (aspectRatio + m_backgroundMargin));
+                          (m_graphAspectRatio + m_backgroundMargin));
 #endif
         modelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
@@ -948,12 +949,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             int gridLineCount = m_axisCacheZ.gridLineCount();
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat xScale = (aspectRatio * m_areaSize.width()) / m_scaleFactor + m_backgroundMargin;
+            GLfloat xScale = (m_graphAspectRatio * m_areaSize.width()) / m_scaleFactor
+                    + m_backgroundMargin;
             if (m_maxItemSize > xScale)
                 xScale = m_maxItemSize;
             QVector3D gridLineScaler(xScale, gridLineWidth, gridLineWidth);
 #else // ..and this if we want uniform scaling based on largest dimension
-            QVector3D gridLineScaler((aspectRatio + m_backgroundMargin),
+            QVector3D gridLineScaler((m_graphAspectRatio + m_backgroundMargin),
                                      gridLineWidth, gridLineWidth);
 #endif
 
@@ -997,12 +999,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             // Side wall lines
             gridLineScaler = QVector3D(gridLineWidth, 1.0f + m_backgroundMargin, gridLineWidth);
 #ifndef USE_UNIFORM_SCALING
-            GLfloat lineXTrans = (aspectRatio * m_areaSize.width())
+            GLfloat lineXTrans = (m_graphAspectRatio * m_areaSize.width())
                     / m_scaleFactor - gridLineOffset + m_backgroundMargin;
             if (m_maxItemSize > lineXTrans)
                 lineXTrans = m_maxItemSize - gridLineOffset;
 #else
-            GLfloat lineXTrans = aspectRatio + m_backgroundMargin - gridLineOffset;
+            GLfloat lineXTrans = m_graphAspectRatio + m_backgroundMargin - gridLineOffset;
 #endif
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
@@ -1059,13 +1061,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             int gridLineCount = m_axisCacheX.gridLineCount();
 
 #ifndef USE_UNIFORM_SCALING
-            GLfloat zScale = (aspectRatio * m_areaSize.height()) / m_scaleFactor + m_backgroundMargin;
+            GLfloat zScale = (m_graphAspectRatio * m_areaSize.height()) / m_scaleFactor
+                    + m_backgroundMargin;
             if (m_maxItemSize > zScale)
                 zScale = m_maxItemSize;
             QVector3D gridLineScaler(gridLineWidth, gridLineWidth, zScale);
 #else
             QVector3D gridLineScaler(gridLineWidth, gridLineWidth,
-                                     aspectRatio + m_backgroundMargin);
+                                     m_graphAspectRatio + m_backgroundMargin);
 #endif
 
             for (int line = 0; line < gridLineCount; line++) {
@@ -1107,12 +1110,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             // Back wall lines
 #ifndef USE_UNIFORM_SCALING
-            GLfloat lineZTrans = (aspectRatio * m_areaSize.height())
+            GLfloat lineZTrans = (m_graphAspectRatio * m_areaSize.height())
                     / m_scaleFactor - gridLineOffset + m_backgroundMargin;
             if (m_maxItemSize > lineZTrans)
                 lineZTrans = m_maxItemSize - gridLineOffset;
 #else
-            GLfloat lineZTrans = aspectRatio + m_backgroundMargin - gridLineOffset;
+            GLfloat lineZTrans = m_graphAspectRatio + m_backgroundMargin - gridLineOffset;
 #endif
             if (!m_zFlipped)
                 lineZTrans = -lineZTrans;
@@ -1170,17 +1173,18 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             int gridLineCount = m_axisCacheY.gridLineCount();
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat lineZTrans = (aspectRatio * m_areaSize.height())
+            GLfloat lineZTrans = (m_graphAspectRatio * m_areaSize.height())
                     / m_scaleFactor - gridLineOffset + m_backgroundMargin;
             if (m_maxItemSize > lineZTrans)
                 lineZTrans = m_maxItemSize - gridLineOffset;
-            GLfloat xScale = (aspectRatio * m_areaSize.width()) / m_scaleFactor + m_backgroundMargin;
+            GLfloat xScale = (m_graphAspectRatio * m_areaSize.width()) / m_scaleFactor
+                    + m_backgroundMargin;
             if (m_maxItemSize > xScale)
                 xScale = m_maxItemSize;
             QVector3D gridLineScaler(xScale, gridLineWidth, gridLineWidth);
 #else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineZTrans = aspectRatio + m_backgroundMargin - gridLineOffset;
-            QVector3D gridLineScaler((aspectRatio + m_backgroundMargin),
+            GLfloat lineZTrans = m_graphAspectRatio + m_backgroundMargin - gridLineOffset;
+            QVector3D gridLineScaler((m_graphAspectRatio + m_backgroundMargin),
                                      gridLineWidth, gridLineWidth);
 #endif
             if (!m_zFlipped)
@@ -1227,19 +1231,19 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             // Side wall
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat lineXTrans = (aspectRatio * m_areaSize.width())
+            GLfloat lineXTrans = (m_graphAspectRatio * m_areaSize.width())
                     / m_scaleFactor - gridLineOffset + m_backgroundMargin;
             if (m_maxItemSize > lineXTrans)
                 lineXTrans = m_maxItemSize - gridLineOffset;
-            GLfloat zScale = (aspectRatio * m_areaSize.height())
+            GLfloat zScale = (m_graphAspectRatio * m_areaSize.height())
                     / m_scaleFactor + m_backgroundMargin;
             if (m_maxItemSize > zScale)
                 zScale = m_maxItemSize;
             gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, zScale);
 #else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineXTrans = aspectRatio + m_backgroundMargin - gridLineOffset;
+            GLfloat lineXTrans = m_graphAspectRatio + m_backgroundMargin - gridLineOffset;
             gridLineScaler = QVector3D(gridLineWidth, gridLineWidth,
-                                       aspectRatio + m_backgroundMargin);
+                                       m_graphAspectRatio + m_backgroundMargin);
 #endif
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
@@ -1358,12 +1362,12 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     if (m_axisCacheZ.segmentCount() > 0) {
         int labelCount = m_axisCacheZ.labelCount();
 #ifndef USE_UNIFORM_SCALING
-        GLfloat labelXTrans = (aspectRatio * m_areaSize.width())
+        GLfloat labelXTrans = (m_graphAspectRatio * m_areaSize.width())
                 / m_scaleFactor + labelMargin + m_backgroundMargin;
         if (m_maxItemSize > labelXTrans)
             labelXTrans = m_maxItemSize + labelMargin;
 #else
-        GLfloat labelXTrans = aspectRatio + m_backgroundMargin + labelMargin;
+        GLfloat labelXTrans = m_graphAspectRatio + m_backgroundMargin + labelMargin;
 #endif
         int labelNbr = 0;
         GLfloat labelYTrans = -1.0f - m_backgroundMargin;
@@ -1467,12 +1471,12 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheX.labelCount();
 #ifndef USE_UNIFORM_SCALING
-        GLfloat labelZTrans = (aspectRatio * m_areaSize.height())
+        GLfloat labelZTrans = (m_graphAspectRatio * m_areaSize.height())
                 / m_scaleFactor + labelMargin + m_backgroundMargin;
         if (m_maxItemSize > labelZTrans)
             labelZTrans = m_maxItemSize + labelMargin;
 #else
-        GLfloat labelZTrans = aspectRatio + m_backgroundMargin + labelMargin;
+        GLfloat labelZTrans = m_graphAspectRatio + m_backgroundMargin + labelMargin;
 #endif
         int labelNbr = 0;
         GLfloat labelYTrans = -1.0f - m_backgroundMargin;
@@ -1580,16 +1584,16 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         int labelCount = m_axisCacheY.labelCount();
         int labelNbr = 0;
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        GLfloat labelXTrans = (aspectRatio* m_areaSize.width())
+        GLfloat labelXTrans = (m_graphAspectRatio* m_areaSize.width())
                 / m_scaleFactor + m_backgroundMargin;
-        GLfloat labelZTrans = (aspectRatio * m_areaSize.height())
+        GLfloat labelZTrans = (m_graphAspectRatio * m_areaSize.height())
                 / m_scaleFactor + m_backgroundMargin;
         if (m_maxItemSize > labelXTrans)
             labelXTrans = m_maxItemSize;
         if (m_maxItemSize > labelZTrans)
             labelZTrans = m_maxItemSize;
 #else // ..and this if we want uniform scaling based on largest dimension
-        GLfloat labelXTrans = aspectRatio + m_backgroundMargin;
+        GLfloat labelXTrans = m_graphAspectRatio + m_backgroundMargin;
         GLfloat labelZTrans = labelXTrans;
 #endif
         // Back & side wall
@@ -1784,11 +1788,11 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
     m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
 
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-    float factorScaler = 2.0f * aspectRatio / m_scaleFactor;
+    float factorScaler = 2.0f * m_graphAspectRatio / m_scaleFactor;
     m_axisCacheX.setScale(factorScaler * m_areaSize.width());
     m_axisCacheZ.setScale(-factorScaler * m_areaSize.height());
 #else // ..and this if we want uniform scaling based on largest dimension
-    m_axisCacheX.setScale(2.0f * aspectRatio);
+    m_axisCacheX.setScale(2.0f * m_graphAspectRatio);
     m_axisCacheZ.setScale(-m_axisCacheX.scale());
 #endif
     m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
@@ -1943,7 +1947,8 @@ void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
     series = 0;
 }
 
-void Scatter3DRenderer::updateRenderItem(const QScatterDataItem &dataItem, ScatterRenderItem &renderItem)
+void Scatter3DRenderer::updateRenderItem(const QScatterDataItem &dataItem,
+                                         ScatterRenderItem &renderItem)
 {
     QVector3D dotPos = dataItem.position();
     if ((dotPos.x() >= m_axisCacheX.min() && dotPos.x() <= m_axisCacheX.max() )

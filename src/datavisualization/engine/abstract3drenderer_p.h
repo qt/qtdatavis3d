@@ -118,6 +118,8 @@ public:
     virtual CustomRenderItem *addCustomItem(QCustom3DItem *item);
     virtual void updateCustomItem(CustomRenderItem *renderItem);
 
+    virtual void updateAspectRatio(float ratio);
+
     virtual QVector3D convertPositionToTranslation(const QVector3D &position,
                                                    bool isAbsolute) = 0;
 
@@ -159,6 +161,8 @@ protected:
 
     void fixGradient(QLinearGradient *gradient, GLuint *gradientTexture);
 
+    void calculateZoomLevel();
+
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
     Drawer *m_drawer;
@@ -196,6 +200,8 @@ protected:
     ShaderHelper *m_customItemShader;
 
     bool m_useOrthoProjection;
+
+    float m_graphAspectRatio;
 
 private:
     friend class Abstract3DController;
