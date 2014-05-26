@@ -226,6 +226,21 @@ Column {
                     Layout.fillWidth: true
                 }
             }
+            Label {
+                text: qsTr("aspectRatio")
+                toolTip: qsTr("Horizontal to Vertical Aspect Ratio")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    backendValue: backendValues.aspectRatio
+                    minimumValue: 0.1
+                    maximumValue: 10.0
+                    stepSize: 0.1
+                    decimals: 1
+                    Layout.fillWidth: true
+                }
+            }
 
             // Kept for debugging
             Label { }

@@ -97,6 +97,7 @@ Module {
         }
         Property { name: "orthoProjection"; revision: 1; type: "bool" }
         Property { name: "selectedElement"; revision: 1; type: "ElementType"; isReadonly: true }
+        Property { name: "aspectRatio"; revision: 1; type: "double" }
         Signal {
             name: "selectionModeChanged"
             Parameter { name: "mode"; type: "AbstractDeclarative::SelectionFlags" }
@@ -148,6 +149,11 @@ Module {
             name: "orthoProjectionChanged"
             revision: 1
             Parameter { name: "enabled"; type: "bool" }
+        }
+        Signal {
+            name: "aspectRatioChanged"
+            revision: 1
+            Parameter { name: "ratio"; type: "double" }
         }
         Method {
             name: "handleAxisXChanged"
@@ -568,7 +574,7 @@ Module {
         }
         Property { name: "xRotation"; type: "double" }
         Property { name: "yRotation"; type: "double" }
-        Property { name: "zoomLevel"; type: "int" }
+        Property { name: "zoomLevel"; type: "double" }
         Property { name: "cameraPreset"; type: "CameraPreset" }
         Property { name: "wrapXRotation"; type: "bool" }
         Property { name: "wrapYRotation"; type: "bool" }
@@ -582,7 +588,7 @@ Module {
         }
         Signal {
             name: "zoomLevelChanged"
-            Parameter { name: "zoomLevel"; type: "int" }
+            Parameter { name: "zoomLevel"; type: "double" }
         }
         Signal {
             name: "cameraPresetChanged"
