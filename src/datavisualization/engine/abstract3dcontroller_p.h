@@ -33,13 +33,12 @@
 #include "qabstract3daxis.h"
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
-#include "qabstractdataproxy.h"
+#include "qabstract3dgraph.h"
 #include "q3dscene_p.h"
 #include "qcustom3ditem.h"
 #include <QtGui/QLinearGradient>
 #include <QtCore/QTime>
 
-class QFont;
 class QOpenGLFramebufferObject;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -50,11 +49,9 @@ class QAbstract3DSeries;
 class ThemeManager;
 
 struct Abstract3DChangeBitField {
-    bool zoomLevelChanged              : 1;
     bool themeChanged                  : 1;
     bool shadowQualityChanged          : 1;
     bool selectionModeChanged          : 1;
-    bool objFileChanged                : 1;
     bool axisXTypeChanged              : 1;
     bool axisYTypeChanged              : 1;
     bool axisZTypeChanged              : 1;
@@ -89,11 +86,9 @@ struct Abstract3DChangeBitField {
     bool aspectRatioChanged            : 1;
 
     Abstract3DChangeBitField() :
-        zoomLevelChanged(true),
         themeChanged(true),
         shadowQualityChanged(true),
         selectionModeChanged(true),
-        objFileChanged(true),
         axisXTypeChanged(true),
         axisYTypeChanged(true),
         axisZTypeChanged(true),
@@ -222,9 +217,6 @@ public:
     virtual void setActiveInputHandler(QAbstract3DInputHandler *inputHandler);
     virtual QAbstract3DInputHandler *activeInputHandler();
     virtual QList<QAbstract3DInputHandler *> inputHandlers() const;
-
-    virtual int zoomLevel();
-    virtual void setZoomLevel(int zoomLevel);
 
     virtual void addTheme(Q3DTheme *theme);
     virtual void releaseTheme(Q3DTheme *theme);

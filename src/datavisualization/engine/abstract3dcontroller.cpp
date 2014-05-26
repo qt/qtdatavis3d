@@ -762,19 +762,6 @@ QList<QAbstract3DInputHandler *> Abstract3DController::inputHandlers() const
     return m_inputHandlers;
 }
 
-int Abstract3DController::zoomLevel()
-{
-    return m_scene->activeCamera()->zoomLevel();
-}
-
-void Abstract3DController::setZoomLevel(int zoomLevel)
-{
-    m_scene->activeCamera()->setZoomLevel(zoomLevel);
-
-    m_changeTracker.zoomLevelChanged = true;
-    emitNeedRender();
-}
-
 void Abstract3DController::addTheme(Q3DTheme *theme)
 {
     m_themeManager->addTheme(theme);
