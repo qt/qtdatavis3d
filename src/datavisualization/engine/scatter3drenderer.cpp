@@ -1345,6 +1345,10 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     float fractionCamX = activeCamera->xRotation() * labelAngleFraction;
     float labelsMaxWidth = 0.0f;
 
+    int startIndex;
+    int endIndex;
+    int indexStep;
+
     // Z Labels
     if (m_axisCacheZ.segmentCount() > 0) {
         int labelCount = m_axisCacheZ.labelCount();
@@ -1356,7 +1360,6 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 #else
         GLfloat labelXTrans = m_graphAspectRatio + m_backgroundMargin + labelMargin;
 #endif
-        int labelNbr = 0;
         GLfloat labelYTrans = -1.0f - m_backgroundMargin;
         Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
@@ -1426,29 +1429,35 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
         QVector3D labelTrans = QVector3D(labelXTrans, labelYTrans, 0.0f);
-        for (int label = 0; label < labelCount; label++) {
-            if (m_axisCacheZ.labelItems().size() > labelNbr) {
-                labelTrans.setZ(m_axisCacheZ.labelPosition(label));
+        if (m_zFlipped) {
+            startIndex = 0;
+            endIndex = labelCount;
+            indexStep = 1;
+        } else {
+            startIndex = labelCount - 1;
+            endIndex = -1;
+            indexStep = -1;
+        }
+        for (int label = startIndex; label != endIndex; label = label + indexStep) {
+            labelTrans.setZ(m_axisCacheZ.labelPosition(label));
 
-                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
 
-                // Draw the label here
-                m_dummyRenderItem.setTranslation(labelTrans);
-                const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(labelNbr);
+            // Draw the label here
+            m_dummyRenderItem.setTranslation(labelTrans);
+            const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(label);
 
-                if (drawSelection) {
-                    QVector4D labelColor = QVector4D(label / 255.0f, 0.0f, 0.0f,
-                                                     alphaForRowSelection);
-                    shader->setUniformValue(shader->color(), labelColor);
-                }
-
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, totalRotation, 0, m_cachedSelectionMode,
-                                    shader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, alignment, false, drawSelection);
-                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
+            if (drawSelection) {
+                QVector4D labelColor = QVector4D(label / 255.0f, 0.0f, 0.0f,
+                                                 alphaForRowSelection);
+                shader->setUniformValue(shader->color(), labelColor);
             }
-            labelNbr++;
+
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                zeroVector, totalRotation, 0, m_cachedSelectionMode,
+                                shader, m_labelObj, activeCamera, true, true,
+                                Drawer::LabelMid, alignment, false, drawSelection);
+            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
         }
         if (!drawSelection && m_axisCacheZ.isTitleVisible()) {
             labelTrans.setZ(0.0f);
@@ -1473,7 +1482,6 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 #else
         GLfloat labelZTrans = m_graphAspectRatio + m_backgroundMargin + labelMargin;
 #endif
-        int labelNbr = 0;
         GLfloat labelYTrans = -1.0f - m_backgroundMargin;
         Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
@@ -1546,29 +1554,35 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 
         QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
         QVector3D labelTrans = QVector3D(0.0f, labelYTrans, labelZTrans);
-        for (int label = 0; label < labelCount; label++) {
-            if (m_axisCacheX.labelItems().size() > labelNbr) {
-                labelTrans.setX(m_axisCacheX.labelPosition(label));
+        if (m_xFlipped) {
+            startIndex = labelCount - 1;
+            endIndex = -1;
+            indexStep = -1;
+        } else {
+            startIndex = 0;
+            endIndex = labelCount;
+            indexStep = 1;
+        }
+        for (int label = startIndex; label != endIndex; label = label + indexStep) {
+            labelTrans.setX(m_axisCacheX.labelPosition(label));
 
-                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
 
-                // Draw the label here
-                m_dummyRenderItem.setTranslation(labelTrans);
-                const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(labelNbr);
+            // Draw the label here
+            m_dummyRenderItem.setTranslation(labelTrans);
+            const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(label);
 
-                if (drawSelection) {
-                    QVector4D labelColor = QVector4D(0.0f, label / 255.0f, 0.0f,
-                                                     alphaForColumnSelection);
-                    shader->setUniformValue(shader->color(), labelColor);
-                }
-
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, totalRotation, 0, m_cachedSelectionMode,
-                                    shader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, alignment, false, drawSelection);
-                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
+            if (drawSelection) {
+                QVector4D labelColor = QVector4D(0.0f, label / 255.0f, 0.0f,
+                                                 alphaForColumnSelection);
+                shader->setUniformValue(shader->color(), labelColor);
             }
-            labelNbr++;
+
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                zeroVector, totalRotation, 0, m_cachedSelectionMode,
+                                shader, m_labelObj, activeCamera, true, true,
+                                Drawer::LabelMid, alignment, false, drawSelection);
+            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
         }
         if (!drawSelection && m_axisCacheX.isTitleVisible()) {
             labelTrans.setX(0.0f);
@@ -1585,7 +1599,6 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         fractionCamY = activeCamera->yRotation() * labelAngleFraction;
         fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheY.labelCount();
-        int labelNbr = 0;
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
         GLfloat labelXTrans = (m_graphAspectRatio* m_areaSize.width())
                 / m_scaleFactor + m_backgroundMargin;
@@ -1644,37 +1657,43 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         QVector3D labelTransBack = QVector3D(labelXTrans, 0.0f, labelZTrans + labelMarginZTrans);
         QVector3D labelTransSide(-labelXTrans - labelMarginXTrans, 0.0f, -labelZTrans);
 
-        for (int label = 0; label < labelCount; label++) {
-            if (m_axisCacheY.labelItems().size() > labelNbr) {
-                const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
-                const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
+        if (m_yFlipped) {
+            startIndex = labelCount - 1;
+            endIndex = -1;
+            indexStep = -1;
+        } else {
+            startIndex = 0;
+            endIndex = labelCount;
+            indexStep = 1;
+        }
+        for (int label = startIndex; label != endIndex; label = label + indexStep) {
+            const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(label);
+            const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
 
-                glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
 
-                if (drawSelection) {
-                    QVector4D labelColor = QVector4D(0.0f, 0.0f, label / 255.0f,
-                                                     alphaForValueSelection);
-                    shader->setUniformValue(shader->color(), labelColor);
-                }
-
-                // Back wall
-                labelTransBack.setY(labelYTrans);
-                m_dummyRenderItem.setTranslation(labelTransBack);
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, totalBackRotation, 0, m_cachedSelectionMode,
-                                    shader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, backAlignment, false, drawSelection);
-
-                // Side wall
-                labelTransSide.setY(labelYTrans);
-                m_dummyRenderItem.setTranslation(labelTransSide);
-                m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                    zeroVector, totalSideRotation, 0, m_cachedSelectionMode,
-                                    shader, m_labelObj, activeCamera, true, true,
-                                    Drawer::LabelMid, sideAlignment, false, drawSelection);
-                labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
+            if (drawSelection) {
+                QVector4D labelColor = QVector4D(0.0f, 0.0f, label / 255.0f,
+                                                 alphaForValueSelection);
+                shader->setUniformValue(shader->color(), labelColor);
             }
-            labelNbr++;
+
+            // Back wall
+            labelTransBack.setY(labelYTrans);
+            m_dummyRenderItem.setTranslation(labelTransBack);
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                zeroVector, totalBackRotation, 0, m_cachedSelectionMode,
+                                shader, m_labelObj, activeCamera, true, true,
+                                Drawer::LabelMid, backAlignment, false, drawSelection);
+
+            // Side wall
+            labelTransSide.setY(labelYTrans);
+            m_dummyRenderItem.setTranslation(labelTransSide);
+            m_drawer->drawLabel(m_dummyRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                                zeroVector, totalSideRotation, 0, m_cachedSelectionMode,
+                                shader, m_labelObj, activeCamera, true, true,
+                                Drawer::LabelMid, sideAlignment, false, drawSelection);
+            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
         }
         if (!drawSelection && m_axisCacheY.isTitleVisible()) {
             drawAxisTitleY(sideLabelRotation, backLabelRotation, labelTransSide, labelTransBack,

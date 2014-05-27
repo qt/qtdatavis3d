@@ -1875,8 +1875,11 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     float fractionCamX = activeCamera->xRotation() * labelAngleFraction;
     float labelsMaxWidth = 0.0f;
 
+    int startIndex;
+    int endIndex;
+    int indexStep;
+
     // Y Labels
-    int labelNbr = 0;
     int labelCount = m_axisCacheY.labelCount();
     GLfloat labelMarginXTrans = labelMargin;
     GLfloat labelMarginZTrans = labelMargin;
@@ -1928,38 +1931,44 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     QVector3D sideLabelTrans = QVector3D(-labelXTrans - labelMarginXTrans,
                                          0.0f, -labelZTrans);
 
-    for (int i = 0; i < labelCount; i++) {
-        if (m_axisCacheY.labelItems().size() > labelNbr) {
-            backLabelTrans.setY(m_axisCacheY.labelPosition(i));
-            sideLabelTrans.setY(backLabelTrans.y());
+    if (m_yFlipped) {
+        startIndex = labelCount - 1;
+        endIndex = -1;
+        indexStep = -1;
+    } else {
+        startIndex = 0;
+        endIndex = labelCount;
+        indexStep = 1;
+    }
+    for (int i = startIndex; i != endIndex; i = i + indexStep) {
+        backLabelTrans.setY(m_axisCacheY.labelPosition(i));
+        sideLabelTrans.setY(backLabelTrans.y());
 
-            glPolygonOffset(GLfloat(i) / -10.0f, 1.0f);
+        glPolygonOffset(GLfloat(i) / -10.0f, 1.0f);
 
-            const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(labelNbr);
+        const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(i);
 
-            if (drawSelection) {
-                QVector4D labelColor = QVector4D(0.0f, 0.0f, i / 255.0f,
-                                                 alphaForValueSelection);
-                shader->setUniformValue(shader->color(), labelColor);
-            }
-
-            // Back wall
-            m_dummyBarRenderItem.setTranslation(backLabelTrans);
-            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, totalBackRotation, 0, m_cachedSelectionMode,
-                                shader, m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, backAlignment, false, drawSelection);
-
-            // Side wall
-            m_dummyBarRenderItem.setTranslation(sideLabelTrans);
-            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, totalSideRotation, 0, m_cachedSelectionMode,
-                                shader, m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, sideAlignment, false, drawSelection);
-
-            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
+        if (drawSelection) {
+            QVector4D labelColor = QVector4D(0.0f, 0.0f, i / 255.0f,
+                                             alphaForValueSelection);
+            shader->setUniformValue(shader->color(), labelColor);
         }
-        labelNbr++;
+
+        // Back wall
+        m_dummyBarRenderItem.setTranslation(backLabelTrans);
+        m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                            zeroVector, totalBackRotation, 0, m_cachedSelectionMode,
+                            shader, m_labelObj, activeCamera,
+                            true, true, Drawer::LabelMid, backAlignment, false, drawSelection);
+
+        // Side wall
+        m_dummyBarRenderItem.setTranslation(sideLabelTrans);
+        m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                            zeroVector, totalSideRotation, 0, m_cachedSelectionMode,
+                            shader, m_labelObj, activeCamera,
+                            true, true, Drawer::LabelMid, sideAlignment, false, drawSelection);
+
+        labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
     }
 
     if (!drawSelection && m_axisCacheY.isTitleVisible()) {
@@ -2049,37 +2058,44 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     }
 
     QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
-    for (int row = 0; row != m_cachedRowCount; row++) {
-        if (m_axisCacheZ.labelItems().size() > row) {
-            // Go through all rows and get position of max+1 or min-1 column, depending on x flip
-            // We need only positions for them, labels have already been generated
-            rowPos = (row + 0.5f) * m_cachedBarSpacing.height();
-            if (m_xFlipped)
-                colPos = -colPosValue;
-            else
-                colPos = colPosValue;
+    if (m_zFlipped) {
+        startIndex = 0;
+        endIndex = m_cachedRowCount;
+        indexStep = 1;
+    } else {
+        startIndex = m_cachedRowCount - 1;
+        endIndex = -1;
+        indexStep = -1;
+    }
+    for (int row = startIndex; row != endIndex; row = row + indexStep) {
+        // Go through all rows and get position of max+1 or min-1 column, depending on x flip
+        // We need only positions for them, labels have already been generated
+        rowPos = (row + 0.5f) * m_cachedBarSpacing.height();
+        if (m_xFlipped)
+            colPos = -colPosValue;
+        else
+            colPos = colPosValue;
 
-            glPolygonOffset(GLfloat(row) / -10.0f, 1.0f);
+        glPolygonOffset(GLfloat(row) / -10.0f, 1.0f);
 
-            QVector3D labelPos = QVector3D(colPos,
-                                           labelYAdjustment, // raise a bit over background to avoid depth "glimmering"
-                                           (m_columnDepth - rowPos) / m_scaleFactor);
+        QVector3D labelPos = QVector3D(colPos,
+                                       labelYAdjustment, // raise a bit over background to avoid depth "glimmering"
+                                       (m_columnDepth - rowPos) / m_scaleFactor);
 
-            m_dummyBarRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(row);
+        m_dummyBarRenderItem.setTranslation(labelPos);
+        const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(row);
 
-            if (drawSelection) {
-                QVector4D labelColor = QVector4D(row / 255.0f, 0.0f, 0.0f, alphaForRowSelection);
-                shader->setUniformValue(shader->color(), labelColor);
-            }
-
-            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, totalRotation, 0, m_cachedSelectionMode,
-                                shader, m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, alignment,
-                                false, drawSelection);
-            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
+        if (drawSelection) {
+            QVector4D labelColor = QVector4D(row / 255.0f, 0.0f, 0.0f, alphaForRowSelection);
+            shader->setUniformValue(shader->color(), labelColor);
         }
+
+        m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                            zeroVector, totalRotation, 0, m_cachedSelectionMode,
+                            shader, m_labelObj, activeCamera,
+                            true, true, Drawer::LabelMid, alignment,
+                            false, drawSelection);
+        labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
     }
 
     if (!drawSelection && m_axisCacheZ.isTitleVisible()) {
@@ -2160,37 +2176,44 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
 
     totalRotation = Utils::calculateRotation(labelRotation);
 
-    for (int column = 0; column != m_cachedColumnCount; column++) {
-        if (m_axisCacheX.labelItems().size() > column) {
-            // Go through all columns and get position of max+1 or min-1 row, depending on z flip
-            // We need only positions for them, labels have already been generated
-            colPos = (column + 0.5f) * m_cachedBarSpacing.width();
-            if (m_zFlipped)
-                rowPos = -rowPosValue;
-            else
-                rowPos = rowPosValue;
+    if (m_xFlipped) {
+        startIndex = m_cachedColumnCount - 1;
+        endIndex = -1;
+        indexStep = -1;
+    } else {
+        startIndex = 0;
+        endIndex = m_cachedColumnCount;
+        indexStep = 1;
+    }
+    for (int column = startIndex; column != endIndex; column = column + indexStep) {
+        // Go through all columns and get position of max+1 or min-1 row, depending on z flip
+        // We need only positions for them, labels have already been generated
+        colPos = (column + 0.5f) * m_cachedBarSpacing.width();
+        if (m_zFlipped)
+            rowPos = -rowPosValue;
+        else
+            rowPos = rowPosValue;
 
-            glPolygonOffset(GLfloat(column) / -10.0f, 1.0f);
+        glPolygonOffset(GLfloat(column) / -10.0f, 1.0f);
 
-            QVector3D labelPos = QVector3D((colPos - m_rowWidth) / m_scaleFactor,
-                                           labelYAdjustment, // raise a bit over background to avoid depth "glimmering"
-                                           rowPos);
+        QVector3D labelPos = QVector3D((colPos - m_rowWidth) / m_scaleFactor,
+                                       labelYAdjustment, // raise a bit over background to avoid depth "glimmering"
+                                       rowPos);
 
-            m_dummyBarRenderItem.setTranslation(labelPos);
-            const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(column);
+        m_dummyBarRenderItem.setTranslation(labelPos);
+        const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(column);
 
-            if (drawSelection) {
-                QVector4D labelColor = QVector4D(0.0f, column / 255.0f, 0.0f,
-                                                 alphaForColumnSelection);
-                shader->setUniformValue(shader->color(), labelColor);
-            }
-
-            m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
-                                zeroVector, totalRotation, 0, m_cachedSelectionMode,
-                                shader, m_labelObj, activeCamera,
-                                true, true, Drawer::LabelMid, alignment, false, drawSelection);
-            labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
+        if (drawSelection) {
+            QVector4D labelColor = QVector4D(0.0f, column / 255.0f, 0.0f,
+                                             alphaForColumnSelection);
+            shader->setUniformValue(shader->color(), labelColor);
         }
+
+        m_drawer->drawLabel(m_dummyBarRenderItem, axisLabelItem, viewMatrix, projectionMatrix,
+                            zeroVector, totalRotation, 0, m_cachedSelectionMode,
+                            shader, m_labelObj, activeCamera,
+                            true, true, Drawer::LabelMid, alignment, false, drawSelection);
+        labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
     }
 
     if (!drawSelection && m_axisCacheX.isTitleVisible()) {
