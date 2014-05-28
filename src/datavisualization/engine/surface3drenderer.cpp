@@ -68,12 +68,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_scaleZ(0.0f),
       m_scaleXWithBackground(0.0f),
       m_scaleZWithBackground(0.0f),
-      m_minVisibleColumnValue(0.0f),
-      m_maxVisibleColumnValue(0.0f),
-      m_minVisibleRowValue(0.0f),
-      m_maxVisibleRowValue(0.0f),
-      m_visibleColumnRange(0.0f),
-      m_visibleRowRange(0.0f),
       m_depthTexture(0),
       m_depthModelTexture(0),
       m_depthFrameBuffer(0),
@@ -561,43 +555,78 @@ void Surface3DRenderer::updateSliceObject(SurfaceSeriesRenderCache *cache, const
     }
 }
 
+inline static float getDataValue(const QSurfaceDataArray &array, bool searchRow, int index)
+{
+    if (searchRow)
+        return array.at(0)->at(index).x();
+    else
+        return array.at(index)->at(0).z();
+}
+
+inline static int binarySearchArray(const QSurfaceDataArray &array, int maxIdx, float limitValue,
+                                    bool searchRow, bool lowBound, bool ascending)
+{
+    int min = 0;
+    int max = maxIdx;
+    int mid = 0;
+    int retVal;
+    while (max >= min) {
+        mid = (min + max) / 2;
+        float arrayValue = getDataValue(array, searchRow, mid);
+        if (arrayValue == limitValue)
+            return mid;
+        if (ascending) {
+            if (arrayValue < limitValue)
+                min = mid + 1;
+            else
+                max = mid - 1;
+        } else {
+            if (arrayValue > limitValue)
+                min = mid + 1;
+            else
+                max = mid - 1;
+        }
+    }
+
+    // Exact match not found, return closest depending on bound.
+    // The boundary is between last mid and min/max.
+    if (lowBound == ascending) {
+        if (mid > max)
+            retVal = mid;
+        else
+            retVal = min;
+    } else {
+        if (mid > max)
+            retVal = max;
+        else
+            retVal = mid;
+    }
+    if (retVal < 0 || retVal > maxIdx) {
+        retVal = -1;
+    } else if (lowBound) {
+        if (getDataValue(array, searchRow, retVal) < limitValue)
+            retVal = -1;
+    } else {
+        if (getDataValue(array, searchRow, retVal) > limitValue)
+            retVal = -1;
+    }
+    return retVal;
+}
+
 QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
 {
     QRect sampleSpace;
 
-    const int rowCount = array.size();
-    const int columnCount = array.at(0)->size();
-
-    const float axisMinX = m_axisCacheX.min();
-    const float axisMaxX = m_axisCacheX.max();
-    const float axisMinZ = m_axisCacheZ.min();
-    const float axisMaxZ = m_axisCacheZ.max();
+    const int maxRow = array.size() - 1;
+    const int maxColumn = array.at(0)->size() - 1;
 
     // We assume data is ordered sequentially in rows for X-value and in columns for Z-value.
     // Determine if data is ascending or descending in each case.
-    const bool ascendingX = array.at(0)->at(0).x() < array.at(0)->at(columnCount - 1).x();
-    const bool ascendingZ = array.at(0)->at(0).z() < array.at(rowCount - 1)->at(0).z();
+    const bool ascendingX = array.at(0)->at(0).x() < array.at(0)->at(maxColumn).x();
+    const bool ascendingZ = array.at(0)->at(0).z() < array.at(maxRow)->at(0).z();
 
-    const int minCol = ascendingX ? 0 : columnCount - 1;
-    const int maxCol = ascendingX ? columnCount - 1 : 0;
-    const int colStep = ascendingX ? 1 : -1;
-    const int minRow = ascendingZ ? 0 : rowCount - 1;
-    const int maxRow = ascendingZ ? rowCount - 1 : 0;
-    const int rowStep = ascendingZ ? 1 : -1;
-
-    bool found = false;
-    int idx = 0;
-    int i = 0;
-    // m_minVisibleColumnValue
-    for (i = 0, idx = minCol, found = false; i < columnCount; i++) {
-        if (array.at(0)->at(idx).x() >= axisMinX) {
-            found = true;
-            break;
-        }
-        idx += colStep;
-    }
-    if (found) {
-        m_minVisibleColumnValue = array.at(0)->at(idx).x();
+    int idx = binarySearchArray(array, maxColumn, m_axisCacheX.min(), true, true, ascendingX);
+    if (idx != -1) {
         if (ascendingX)
             sampleSpace.setLeft(idx);
         else
@@ -607,16 +636,8 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
         return sampleSpace;
     }
 
-    // m_maxVisibleColumnValue
-    for (i = 0, idx = maxCol, found = false; i < columnCount; i++) {
-        if (array.at(0)->at(idx).x() <= axisMaxX) {
-            found = true;
-            break;
-        }
-        idx -= colStep;
-    }
-    if (found) {
-        m_maxVisibleColumnValue = array.at(0)->at(idx).x();
+    idx = binarySearchArray(array, maxColumn, m_axisCacheX.max(), true, false, ascendingX);
+    if (idx != -1) {
         if (ascendingX)
             sampleSpace.setRight(idx);
         else
@@ -626,16 +647,8 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
         return sampleSpace;
     }
 
-    // m_minVisibleRowValue
-    for (i = 0, idx = minRow, found = false; i < rowCount; i++) {
-        if (array.at(idx)->at(0).z() >= axisMinZ) {
-            found = true;
-            break;
-        }
-        idx += rowStep;
-    }
-    if (found) {
-        m_minVisibleRowValue = array.at(idx)->at(0).z();
+    idx = binarySearchArray(array, maxRow, m_axisCacheZ.min(), false, true, ascendingZ);
+    if (idx != -1) {
         if (ascendingZ)
             sampleSpace.setTop(idx);
         else
@@ -645,16 +658,8 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
         return sampleSpace;
     }
 
-    // m_maxVisibleRowValue
-    for (i = 0, idx = maxRow, found = false; i < rowCount; i++) {
-        if (array.at(idx)->at(0).z() <= axisMaxZ) {
-            found = true;
-            break;
-        }
-        idx -= rowStep;
-    }
-    if (found) {
-        m_maxVisibleRowValue = array.at(idx)->at(0).z();
+    idx = binarySearchArray(array, maxRow, m_axisCacheZ.max(), false, false, ascendingZ);
+    if (idx != -1) {
         if (ascendingZ)
             sampleSpace.setBottom(idx);
         else
@@ -663,9 +668,6 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
         sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
         return sampleSpace;
     }
-
-    m_visibleColumnRange = m_maxVisibleColumnValue - m_minVisibleColumnValue;
-    m_visibleRowRange = m_maxVisibleRowValue - m_minVisibleRowValue;
 
     return sampleSpace;
 }
@@ -2203,11 +2205,18 @@ void Surface3DRenderer::updateSelectionTextures()
 void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
                                                uint &lastSelectionId)
 {
+
     // Create the selection ID image. Each grid corner gets 2x2 pixel area of
     // ID color so that each vertex (data point) has 4x4 pixel area of ID color
     const QRect &sampleSpace = cache->sampleSpace();
     int idImageWidth = (sampleSpace.width() - 1) * 4;
     int idImageHeight = (sampleSpace.height() - 1) * 4;
+
+    if (idImageHeight < 0 || idImageWidth < 0) {
+        cache->setSelectionIdRange(-1, -1);
+        return;
+    }
+
     int stride = idImageWidth * 4 * sizeof(uchar); // 4 = number of color components (rgba)
 
     uint idStart = lastSelectionId;

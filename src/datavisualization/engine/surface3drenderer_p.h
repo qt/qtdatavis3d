@@ -67,12 +67,6 @@ private:
     GLfloat m_scaleZ;
     GLfloat m_scaleXWithBackground;
     GLfloat m_scaleZWithBackground;
-    GLfloat m_minVisibleColumnValue;
-    GLfloat m_maxVisibleColumnValue;
-    GLfloat m_minVisibleRowValue;
-    GLfloat m_maxVisibleRowValue;
-    GLfloat m_visibleColumnRange;
-    GLfloat m_visibleRowRange;
     GLuint m_depthTexture;
     GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;

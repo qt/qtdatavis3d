@@ -129,6 +129,8 @@ public slots:
     void changeLabelRotation(int rotation);
     void toggleAxisTitleVisibility(bool enabled);
     void toggleAxisTitleFixed(bool enabled);
+    void toggleXAscending(bool enabled);
+    void toggleZAscending(bool enabled);
 
 private:
     void fillSeries();

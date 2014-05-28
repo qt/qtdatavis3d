@@ -721,6 +721,62 @@ void GraphModifier::toggleAxisTitleFixed(bool enabled)
     m_graph->axisZ()->setTitleFixed(enabled);
 }
 
+void GraphModifier::toggleXAscending(bool enabled)
+{
+    // Flip data array contents if necessary
+    foreach (QSurface3DSeries *series, m_graph->seriesList()) {
+        QSurfaceDataArray *array = const_cast<QSurfaceDataArray *>(series->dataProxy()->array());
+        const int rowCount = array->size();
+        const int columnCount = array->at(0)->size();
+        const bool dataAscending = array->at(0)->at(0).x() < array->at(0)->at(columnCount - 1).x();
+        if (dataAscending != enabled) {
+            // Create new array of equal size
+            QSurfaceDataArray *newArray = new QSurfaceDataArray;
+            newArray->reserve(rowCount);
+            for (int i = 0; i < rowCount; i++)
+                newArray->append(new QSurfaceDataRow(columnCount));
+
+            // Flip each row
+            for (int i = 0; i < rowCount; i++) {
+                QSurfaceDataRow *oldRow = array->at(i);
+                QSurfaceDataRow *newRow = newArray->at(i);
+                for (int j = 0; j < columnCount; j++)
+                    (*newRow)[j] = oldRow->at(columnCount - 1 - j);
+            }
+
+            series->dataProxy()->resetArray(newArray);
+        }
+    }
+}
+
+void GraphModifier::toggleZAscending(bool enabled)
+{
+    // Flip data array contents if necessary
+    foreach (QSurface3DSeries *series, m_graph->seriesList()) {
+        QSurfaceDataArray *array = const_cast<QSurfaceDataArray *>(series->dataProxy()->array());
+        const int rowCount = array->size();
+        const int columnCount = array->at(0)->size();
+        const bool dataAscending = array->at(0)->at(0).z() < array->at(rowCount - 1)->at(0).z();
+        if (dataAscending != enabled) {
+            // Create new array of equal size
+            QSurfaceDataArray *newArray = new QSurfaceDataArray;
+            newArray->reserve(rowCount);
+            for (int i = 0; i < rowCount; i++)
+                newArray->append(new QSurfaceDataRow(columnCount));
+
+            // Flip each column
+            for (int i = 0; i < rowCount; i++) {
+                QSurfaceDataRow *oldRow = array->at(rowCount - 1 - i);
+                QSurfaceDataRow *newRow = newArray->at(i);
+                for (int j = 0; j < columnCount; j++)
+                    (*newRow)[j] = oldRow->at(j);
+            }
+
+            series->dataProxy()->resetArray(newArray);
+        }
+    }
+}
+
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);

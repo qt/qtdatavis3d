@@ -385,6 +385,14 @@ int main(int argc, char *argv[])
     axisLabelRotationSlider->setValue(0);
     axisLabelRotationSlider->setMaximum(90);
 
+    QCheckBox *xAscendingCB = new QCheckBox(widget);
+    xAscendingCB->setText(QStringLiteral("X Ascending"));
+    xAscendingCB->setChecked(true);
+
+    QCheckBox *zAscendingCB = new QCheckBox(widget);
+    zAscendingCB->setText(QStringLiteral("Z Ascending"));
+    zAscendingCB->setChecked(true);
+
     // Add controls to the layout
 #ifdef MULTI_SERIES
     vLayout->addWidget(series1CB);
@@ -433,6 +441,8 @@ int main(int argc, char *argv[])
     vLayout->addWidget(axisMinSliderX);
     vLayout->addWidget(axisMinSliderY);
     vLayout->addWidget(axisMinSliderZ);
+    vLayout->addWidget(xAscendingCB);
+    vLayout->addWidget(zAscendingCB);
     vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout2->addWidget(fontList);
     vLayout2->addWidget(labelButton);
@@ -636,6 +646,10 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::toggleAxisTitleFixed);
     QObject::connect(axisLabelRotationSlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::changeLabelRotation);
+    QObject::connect(xAscendingCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleXAscending);
+    QObject::connect(zAscendingCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::toggleZAscending);
 
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged,
                      modifier, &GraphModifier::setAspectRatio);
