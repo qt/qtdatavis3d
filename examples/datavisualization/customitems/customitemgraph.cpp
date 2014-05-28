@@ -20,6 +20,7 @@
 
 #include <QtDataVisualization/Q3DTheme>
 #include <QtDataVisualization/QCustom3DItem>
+#include <QtDataVisualization/QCustom3DLabel>
 #include <QtGui/QImage>
 
 using namespace QtDataVisualization;
@@ -97,6 +98,17 @@ CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)
     m_selectionAnimation->setPropertyName("scaling");
     m_selectionAnimation->setDuration(500);
     m_selectionAnimation->setLoopCount(-1);
+
+    QFont titleFont = QFont("Century Gothic", 30);
+    titleFont.setBold(true);
+    QCustom3DLabel *titleLabel = new QCustom3DLabel("Oil Rigs on Imaginary Sea", titleFont,
+                                                    QVector3D(0.0f, 1.2f, 0.0f),
+                                                    QVector3D(1.0f, 1.0f, 0.0f),
+                                                    QQuaternion());
+    titleLabel->setPositionAbsolute(true);
+    titleLabel->setFacingCamera(true);
+    titleLabel->setBackgroundColor(QColor(0x66cdaa));
+    m_graph->addCustomItem(titleLabel);
 }
 
 CustomItemGraph::~CustomItemGraph()
@@ -110,6 +122,7 @@ void CustomItemGraph::toggleItemOne(bool show)
     QVector3D positionOne = QVector3D(39.0f, 77.0f, 19.2f);
     //! [1]
     QVector3D positionOnePipe = QVector3D(39.0f, 45.0f, 19.2f);
+    QVector3D positionOneLabel = QVector3D(39.0f, 107.0f, 19.2f);
     if (show) {
         //! [0]
         QImage color = QImage(2, 2, QImage::Format_RGB32);
@@ -130,12 +143,19 @@ void CustomItemGraph::toggleItemOne(bool show)
                                  color);
         item->setShadowCasting(false);
         m_graph->addCustomItem(item);
+
+        QCustom3DLabel *label = new QCustom3DLabel();
+        label->setText("Oil Rig One");
+        label->setPosition(positionOneLabel);
+        label->setScaling(QVector3D(1.0f, 1.0f, 1.0f));
+        m_graph->addCustomItem(label);
     } else {
         resetSelection();
         //! [4]
         m_graph->removeCustomItemAt(positionOne);
         //! [4]
         m_graph->removeCustomItemAt(positionOnePipe);
+        m_graph->removeCustomItemAt(positionOneLabel);
     }
 }
 
@@ -143,6 +163,7 @@ void CustomItemGraph::toggleItemTwo(bool show)
 {
     QVector3D positionTwo = QVector3D(34.5f, 77.0f, 23.4f);
     QVector3D positionTwoPipe = QVector3D(34.5f, 45.0f, 23.4f);
+    QVector3D positionTwoLabel = QVector3D(34.5f, 107.0f, 23.4f);
     if (show) {
         QImage color = QImage(2, 2, QImage::Format_RGB32);
         color.fill(Qt::red);
@@ -159,16 +180,24 @@ void CustomItemGraph::toggleItemTwo(bool show)
                                  color);
         item->setShadowCasting(false);
         m_graph->addCustomItem(item);
+
+        QCustom3DLabel *label = new QCustom3DLabel();
+        label->setText("Oil Rig Two");
+        label->setPosition(positionTwoLabel);
+        label->setScaling(QVector3D(1.0f, 1.0f, 1.0f));
+        m_graph->addCustomItem(label);
     } else {
         resetSelection();
         m_graph->removeCustomItemAt(positionTwo);
         m_graph->removeCustomItemAt(positionTwoPipe);
+        m_graph->removeCustomItemAt(positionTwoLabel);
     }
 }
 
 void CustomItemGraph::toggleItemThree(bool show)
 {
     QVector3D positionThree = QVector3D(34.5f, 86.0f, 19.1f);
+    QVector3D positionThreeLabel = QVector3D(34.5f, 116.0f, 19.1f);
     if (show) {
         QImage color = QImage(2, 2, QImage::Format_RGB32);
         color.fill(Qt::darkMagenta);
@@ -179,9 +208,16 @@ void CustomItemGraph::toggleItemThree(bool show)
         item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 75.0f));
         item->setTextureImage(color);
         m_graph->addCustomItem(item);
+
+        QCustom3DLabel *label = new QCustom3DLabel();
+        label->setText("Refinery");
+        label->setPosition(positionThreeLabel);
+        label->setScaling(QVector3D(1.0f, 1.0f, 1.0f));
+        m_graph->addCustomItem(label);
     } else {
         resetSelection();
         m_graph->removeCustomItemAt(positionThree);
+        m_graph->removeCustomItemAt(positionThreeLabel);
     }
 }
 
@@ -225,14 +261,14 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
     if (type == QAbstract3DGraph::ElementCustomItem) {
         int index = m_graph->selectedCustomItemIndex();
         QCustom3DItem *item = m_graph->selectedCustomItem();
-        m_previouslyAnimatedItem = item;
-        m_previousScaling = item->scaling();
         QString text;
         text.setNum(index);
         text.append(": ");
         QStringList split = item->meshFile().split("/");
         text.append(split.last());
         m_textField->setText(text);
+        m_previouslyAnimatedItem = item;
+        m_previousScaling = item->scaling();
         m_selectionAnimation->setTargetObject(item);
         m_selectionAnimation->setStartValue(item->scaling());
         m_selectionAnimation->setEndValue(item->scaling() * 1.5f);

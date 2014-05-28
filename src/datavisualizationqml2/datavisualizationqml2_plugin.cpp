@@ -88,11 +88,11 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 
     // New revisions
     qmlRegisterUncreatableType<QAbstract3DAxis, 1>(uri, 1, 1, "AbstractAxis3D",
-                                                QLatin1String("Trying to create uncreatable: AbstractAxis."));
+                                                   QLatin1String("Trying to create uncreatable: AbstractAxis."));
     qmlRegisterUncreatableType<QAbstract3DSeries, 1>(uri, 1, 1, "Abstract3DSeries",
                                                      QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
     qmlRegisterUncreatableType<AbstractDeclarative, 1>(uri, 1, 1, "AbstractGraph3D",
-                                                    QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
+                                                       QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
     qmlRegisterType<QValue3DAxis, 1>(uri, 1, 1, "ValueAxis3D");
     qmlRegisterType<QItemModelBarDataProxy, 1>(uri, 1, 1, "ItemModelBarDataProxy");
     qmlRegisterType<QItemModelSurfaceDataProxy, 1>(uri, 1, 1, "ItemModelSurfaceDataProxy");
@@ -102,6 +102,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<QValue3DAxisFormatter>(uri, 1, 1, "ValueAxis3DFormatter");
     qmlRegisterType<QLogValue3DAxisFormatter>(uri, 1, 1, "LogValueAxis3DFormatter");
     qmlRegisterType<QCustom3DItem>(uri, 1, 1, "Custom3DItem");
+    qmlRegisterType<QCustom3DLabel>(uri, 1, 1, "Custom3DLabel");
 
     // New metatypes
     qRegisterMetaType<QAbstract3DGraph::ElementType>("QAbstract3DGraph::ElementType");

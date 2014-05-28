@@ -86,6 +86,8 @@ signals:
     void shadowCastingChanged(bool shadowCasting);
 
 protected:
+    QCustom3DItem(QCustom3DItemPrivate *d, QObject *parent = 0);
+
     QScopedPointer<QCustom3DItemPrivate> d_ptr;
 
 private:

@@ -2640,7 +2640,7 @@ QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position
         yTrans = m_axisCacheY.positionAt(position.y());
     } else {
         xTrans = position.x() * m_scaleX;
-        yTrans = position.y();
+        yTrans = position.y() + m_backgroundAdjustment;
         zTrans = position.z() * m_scaleZ;
     }
     return QVector3D(xTrans, yTrans, zTrans);

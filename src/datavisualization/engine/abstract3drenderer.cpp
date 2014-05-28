@@ -29,6 +29,7 @@
 #include "qvalue3daxisformatter_p.h"
 #include "shaderhelper_p.h"
 #include "qcustom3ditem_p.h"
+#include "qcustom3dlabel_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -315,7 +316,7 @@ void Abstract3DRenderer::calculateZoomLevel()
     GLfloat zoomAdjustment;
     div = qMin(m_primarySubViewport.width(), m_primarySubViewport.height());
     zoomAdjustment = 2.0f * defaultRatio * ((m_primarySubViewport.width() / div)
-                                     / (m_primarySubViewport.height() / div)) / m_graphAspectRatio;
+                                            / (m_primarySubViewport.height() / div)) / m_graphAspectRatio;
     m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 }
 
@@ -844,11 +845,33 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     newItem->setRenderer(this);
     newItem->setItemPointer(item); // Store pointer for render item updates
     newItem->setMesh(item->meshFile());
-    newItem->setScaling(item->scaling());
+    QVector3D scaling = item->scaling();
+    QImage textureImage = item->d_ptr->textureImage();
+    bool facingCamera = false;
+    if (item->d_ptr->m_isLabelItem) {
+        QCustom3DLabel *labelItem = static_cast<QCustom3DLabel *>(item);
+        float pointSize = labelItem->font().pointSizeF();
+        // Check do we have custom visuals or need to use theme
+        if (!labelItem->dptr()->m_customVisuals) {
+            // Recreate texture using theme
+            labelItem->dptr()->createTextureImage(m_cachedTheme->labelBackgroundColor(),
+                                                  m_cachedTheme->labelTextColor(),
+                                                  m_cachedTheme->isLabelBackgroundEnabled(),
+                                                  m_cachedTheme->isLabelBorderEnabled());
+            pointSize = m_cachedTheme->font().pointSizeF();
+            textureImage = item->d_ptr->textureImage();
+        }
+        // Calculate scaling based on text (texture size), font size and asked scaling
+        float scaledFontSize = (0.05f + pointSize / 500.0f) / float(textureImage.height());
+        scaling.setX(scaling.x() * textureImage.width() * scaledFontSize);
+        scaling.setY(scaling.y() * textureImage.height() * scaledFontSize);
+        // Check if facing camera
+        facingCamera = labelItem->isFacingCamera();
+    }
+    newItem->setScaling(scaling);
+    newItem->setRotation(item->rotation());
     newItem->setPosition(item->position());
     newItem->setPositionAbsolute(item->isPositionAbsolute());
-    newItem->setRotation(item->rotation());
-    QImage textureImage = item->d_ptr->textureImage();
     newItem->setBlendNeeded(textureImage.hasAlphaChannel());
     GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
     newItem->setTexture(texture);
@@ -858,6 +881,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     newItem->setTranslation(translation);
     newItem->setVisible(item->isVisible());
     newItem->setShadowCasting(item->isShadowCasting());
+    newItem->setFacingCamera(facingCamera);
     m_customRenderCache.insert(item, newItem);
     return newItem;
 }
@@ -870,7 +894,31 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
         item->d_ptr->m_dirtyBits.meshDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.scalingDirty) {
-        renderItem->setScaling(item->scaling());
+        QVector3D scaling = item->scaling();
+        // In case we have label item, we need to recreate texture for scaling adjustment
+        if (item->d_ptr->m_isLabelItem) {
+            QCustom3DLabel *labelItem = static_cast<QCustom3DLabel *>(item);
+            float pointSize = labelItem->font().pointSizeF();
+            // Check do we have custom visuals or need to use theme
+            if (labelItem->dptr()->m_customVisuals) {
+                // Recreate texture
+                labelItem->dptr()->createTextureImage();
+            } else {
+                // Recreate texture using theme
+                labelItem->dptr()->createTextureImage(m_cachedTheme->labelBackgroundColor(),
+                                                      m_cachedTheme->labelTextColor(),
+                                                      m_cachedTheme->isLabelBackgroundEnabled(),
+                                                      m_cachedTheme->isLabelBorderEnabled());
+                pointSize = m_cachedTheme->font().pointSizeF();
+            }
+            QImage textureImage = item->d_ptr->textureImage();
+            // Calculate scaling based on text (texture size), font size and asked scaling
+            float scaledFontSize = (0.05f + pointSize / 500.0f) / float(textureImage.height());
+            scaling.setX(scaling.x() * textureImage.width() * scaledFontSize);
+            scaling.setY(scaling.y() * textureImage.height() * scaledFontSize);
+            item->d_ptr->clearTextureImage();
+        }
+        renderItem->setScaling(scaling);
         item->d_ptr->m_dirtyBits.scalingDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.rotationDirty) {
@@ -879,6 +927,18 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
     }
     if (item->d_ptr->m_dirtyBits.textureDirty) {
         QImage textureImage = item->d_ptr->textureImage();
+        if (item->d_ptr->m_isLabelItem) {
+            QCustom3DLabel *labelItem = static_cast<QCustom3DLabel *>(item);
+            // Check do we have custom visuals or need to use theme
+            if (!labelItem->dptr()->m_customVisuals) {
+                // Recreate texture using theme
+                labelItem->dptr()->createTextureImage(m_cachedTheme->labelBackgroundColor(),
+                                                      m_cachedTheme->labelTextColor(),
+                                                      m_cachedTheme->isLabelBackgroundEnabled(),
+                                                      m_cachedTheme->isLabelBorderEnabled());
+                textureImage = item->d_ptr->textureImage();
+            }
+        }
         renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
         GLuint oldTexture = renderItem->texture();
         m_textureHelper->deleteTexture(&oldTexture);
@@ -904,15 +964,21 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
         renderItem->setShadowCasting(item->isShadowCasting());
         item->d_ptr->m_dirtyBits.shadowCastingDirty = false;
     }
+    if (item->d_ptr->m_isLabelItem) {
+        QCustom3DLabel *labelItem = static_cast<QCustom3DLabel *>(item);
+        if (labelItem->dptr()->m_facingCameraDirty) {
+            renderItem->setFacingCamera(labelItem->isFacingCamera());
+            labelItem->dptr()->m_facingCameraDirty = false;
+        }
+    }
 }
 
 void Abstract3DRenderer::updateCustomItemPositions()
 {
     foreach (CustomRenderItem *renderItem, m_customRenderCache) {
-        if (!renderItem->isPositionAbsolute()) {
-            QVector3D translation = convertPositionToTranslation(renderItem->position(), false);
-            renderItem->setTranslation(translation);
-        }
+        QVector3D translation = convertPositionToTranslation(renderItem->position(),
+                                                             renderItem->isPositionAbsolute());
+        renderItem->setTranslation(translation);
     }
 }
 
@@ -959,11 +1025,21 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
         QMatrix4x4 itModelMatrix;
         QMatrix4x4 MVPMatrix;
 
+        QQuaternion rotation = item->rotation();
+        // Check if the (label) item should be facing camera, and adjust rotation accordingly
+        if (item->isFacingCamera()) {
+            float camRotationX = m_cachedScene->activeCamera()->xRotation();
+            float camRotationY = m_cachedScene->activeCamera()->yRotation();
+            rotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -camRotationX)
+                    * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -camRotationY);
+        }
+
         modelMatrix.translate(item->translation());
-        modelMatrix.rotate(item->rotation());
+        modelMatrix.rotate(rotation);
         modelMatrix.scale(item->scaling());
-        itModelMatrix.rotate(item->rotation());
-        itModelMatrix.scale(item->scaling());
+        itModelMatrix.rotate(rotation);
+        if (!item->isFacingCamera())
+            itModelMatrix.scale(item->scaling());
         MVPMatrix = projectionViewMatrix * modelMatrix;
 
         if (RenderingNormal == state) {

@@ -65,6 +65,8 @@ public:
     inline int index() const { return m_index; }
     inline void setShadowCasting(bool shadowCasting) { m_shadowCasting = shadowCasting; }
     inline bool isShadowCasting() const { return m_shadowCasting; }
+    inline void setFacingCamera(bool facing) { m_isFacingCamera = facing; }
+    inline bool isFacingCamera() const { return m_isFacingCamera; }
     inline void setRenderer(Abstract3DRenderer *renderer) { m_renderer = renderer; }
 
 private:
@@ -80,10 +82,10 @@ private:
     bool m_valid;
     int m_index;
     bool m_shadowCasting;
+    bool m_isFacingCamera;
     QCustom3DItem *m_item;
     Abstract3DRenderer *m_renderer;
-
- };
+};
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 
 QT_END_NAMESPACE_DATAVISUALIZATION

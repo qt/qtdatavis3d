@@ -67,7 +67,7 @@ Rectangle {
             scene.activeCamera.zoomLevel: zoomSlider.value
             inputHandler: null
 
-            customItemList: [shuttleItem]
+            customItemList: [shuttleItem, labelItem]
         }
 
         Custom3DItem {
@@ -76,6 +76,15 @@ Rectangle {
             textureFile: ":/items/shuttle.png"
             position: Qt.vector3d(5.0,29.0,3.0)
             scaling: Qt.vector3d(0.2,0.2,0.2)
+        }
+
+        Custom3DLabel {
+            id: labelItem
+            facingCamera: true
+            positionAbsolute: true
+            position: Qt.vector3d(0.0,1.5,0.0)
+            scaling: Qt.vector3d(1.0,1.0,1.0)
+            text: "Qt Shuttle"
         }
 
         MouseArea {

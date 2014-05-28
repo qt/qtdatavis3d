@@ -60,9 +60,9 @@ class QCustom3DItemPrivate : public QObject
 {
     Q_OBJECT
 public:
-    QCustom3DItemPrivate(QCustom3DItem *q, QObject *parent);
+    QCustom3DItemPrivate(QCustom3DItem *q);
     QCustom3DItemPrivate(QCustom3DItem *q, const QString &meshFile, const QVector3D &position,
-                         const QVector3D &scaling, const QQuaternion &rotation, QObject *parent);
+                         const QVector3D &scaling, const QQuaternion &rotation);
     virtual ~QCustom3DItemPrivate();
 
     QImage textureImage();
@@ -81,12 +81,16 @@ public:
     bool m_visible;
     bool m_shadowCasting;
 
+    bool m_isLabelItem;
+
     QCustomItemDirtyBitField m_dirtyBits;
 
 signals:
     void needUpdate();
 
 private:
+    QCustom3DItemPrivate(QCustom3DItemPrivate *d);
+
     friend class QCustom3DItem;
 };
 

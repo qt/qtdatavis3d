@@ -17,8 +17,6 @@
 ****************************************************************************/
 
 #include "qcustom3ditem_p.h"
-#include "objecthelper_p.h"
-#include "texturehelper_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -76,7 +74,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*! \qmlproperty bool Custom3DItem::positionAbsolute
  *
  * This property dictates if item position is to be handled in data coordinates or in absolute
- * coordinates. Defaults to \c{false}. Items with absolute cooridnates will always be rendered,
+ * coordinates. Defaults to \c{false}. Items with absolute coordinates will always be rendered,
  * whereas items with data coordinates are only rendered if they are within axis ranges.
  *
  * \sa position
@@ -118,7 +116,18 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Constructs QCustom3DItem with given \a parent.
  */
 QCustom3DItem::QCustom3DItem(QObject *parent) :
-    d_ptr(new QCustom3DItemPrivate(this, parent))
+    QObject(parent),
+    d_ptr(new QCustom3DItemPrivate(this))
+{
+    setTextureImage(QImage());
+}
+
+/*!
+ * \internal
+ */
+QCustom3DItem::QCustom3DItem(QCustom3DItemPrivate *d, QObject *parent) :
+    QObject(parent),
+    d_ptr(d)
 {
     setTextureImage(QImage());
 }
@@ -130,7 +139,8 @@ QCustom3DItem::QCustom3DItem(QObject *parent) :
 QCustom3DItem::QCustom3DItem(const QString &meshFile, const QVector3D &position,
                              const QVector3D &scaling, const QQuaternion &rotation,
                              const QImage &texture, QObject *parent) :
-    d_ptr(new QCustom3DItemPrivate(this, meshFile, position, scaling, rotation, parent))
+    QObject(parent),
+    d_ptr(new QCustom3DItemPrivate(this, meshFile, position, scaling, rotation))
 {
     setTextureImage(texture);
 }
@@ -192,7 +202,7 @@ QVector3D QCustom3DItem::position() const
 /*! \property QCustom3DItem::positionAbsolute
  *
  * This property dictates if item position is to be handled in data coordinates or in absolute
- * coordinates. Defaults to \c{false}. Items with absolute cooridnates will always be rendered,
+ * coordinates. Defaults to \c{false}. Items with absolute coordinates will always be rendered,
  * whereas items with data coordinates are only rendered if they are within axis ranges.
  *
  * \sa position
@@ -355,22 +365,21 @@ QString QCustom3DItem::textureFile() const
     return d_ptr->m_textureFile;
 }
 
-QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, QObject *parent) :
-    QObject(parent),
+QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q) :
     q_ptr(q),
     m_position(QVector3D(0.0f, 0.0f, 0.0f)),
     m_positionAbsolute(false),
     m_scaling(QVector3D(0.1f, 0.1f, 0.1f)),
     m_rotation(QQuaternion(0.0f, 0.0f, 0.0f, 0.0f)),
     m_visible(true),
-    m_shadowCasting(true)
+    m_shadowCasting(true),
+    m_isLabelItem(false)
 {
 }
 
 QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, const QString &meshFile,
                                            const QVector3D &position, const QVector3D &scaling,
-                                           const QQuaternion &rotation, QObject *parent) :
-    QObject(parent),
+                                           const QQuaternion &rotation) :
     q_ptr(q),
     m_meshFile(meshFile),
     m_position(position),
@@ -378,7 +387,8 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, const QString &mesh
     m_scaling(scaling),
     m_rotation(rotation),
     m_visible(true),
-    m_shadowCasting(true)
+    m_shadowCasting(true),
+    m_isLabelItem(false)
 {
 }
 
