@@ -28,8 +28,8 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 
     // QtDataVisualization 1.0
 
-    qmlRegisterUncreatableType<const QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
-                                                         QLatin1String("Trying to create uncreatable: AbstractItemModel."));
+    qmlRegisterUncreatableType<QAbstractItemModel>(uri, 1, 0, "AbstractItemModel",
+                                                   QLatin1String("Trying to create uncreatable: AbstractItemModel."));
     qmlRegisterUncreatableType<QAbstract3DAxis>(uri, 1, 0, "AbstractAxis3D",
                                                 QLatin1String("Trying to create uncreatable: AbstractAxis."));
     qmlRegisterUncreatableType<QAbstractDataProxy>(uri, 1, 0, "AbstractDataProxy",

@@ -57,7 +57,7 @@ QML_DECLARE_TYPE(DeclarativeBars)
 QML_DECLARE_TYPE(DeclarativeScatter)
 QML_DECLARE_TYPE(DeclarativeSurface)
 
-QML_DECLARE_TYPE(const QAbstractItemModel)
+QML_DECLARE_TYPE(QAbstractItemModel)
 
 QML_DECLARE_TYPE(QAbstract3DAxis)
 QML_DECLARE_TYPE(QCategory3DAxis)
