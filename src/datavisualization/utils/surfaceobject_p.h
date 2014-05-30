@@ -72,10 +72,11 @@ public:
     void clear();
 
 private:
-    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
+    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c, bool flipNormal);
     void createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
                        const QVector<QVector3D> &normals, const GLint *indices,
                        bool changeGeometry);
+    bool checkFlipNormal(const QSurfaceDataArray &array);
 
 private:
     SurfaceType m_surfaceType;

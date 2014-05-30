@@ -101,25 +101,30 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
         m_normals.resize(totalSize);
 
     totalIndex = 0;
+    const bool flipNormal = checkFlipNormal(dataArray);
     for (int row = 0; row < rowColLimit; row += m_columns) {
         for (int j = 0; j < colLimit; j++) {
             m_normals[totalIndex++] = normal(m_vertices.at(row + j),
                                              m_vertices.at(row + j + 1),
-                                             m_vertices.at(row + m_columns + j));
+                                             m_vertices.at(row + m_columns + j),
+                                             flipNormal);
         }
         int p = row + colLimit;
         m_normals[totalIndex++] = normal(m_vertices.at(p),
                                          m_vertices.at(p + m_columns),
-                                         m_vertices.at(p - 1));
+                                         m_vertices.at(p - 1),
+                                         flipNormal);
     }
     for (int j = rowColLimit; j < totalLimit; j++) {
         m_normals[totalIndex++] = normal(m_vertices.at(j),
                                          m_vertices.at(j - m_columns),
-                                         m_vertices.at(j + 1));
+                                         m_vertices.at(j + 1),
+                                         flipNormal);
     }
     m_normals[totalIndex++] = normal(m_vertices.at(totalLimit),
                                      m_vertices.at(totalLimit - 1),
-                                     m_vertices.at(totalLimit - m_columns));
+                                     m_vertices.at(totalLimit - m_columns),
+                                     flipNormal);
 
     // Create indices table
     if (changeGeometry)
@@ -156,18 +161,21 @@ void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowI
     if (rowIndex == m_rows - 1)
         rowLimit = rowIndex * m_columns; // The rowIndex is top most row, special handling
 
+    const bool flipNormal = checkFlipNormal(dataArray);
     for (int row = totalIndex; row < rowLimit; row += m_columns) {
         for (int j = 0; j < colLimit; j++) {
             // One right and one up
             m_normals[totalIndex++] = normal(m_vertices.at(row + j),
                                              m_vertices.at(row + j + 1),
-                                             m_vertices.at(row + m_columns + j));
+                                             m_vertices.at(row + m_columns + j),
+                                             flipNormal);
         }
         int p = row + colLimit;
         // One up and one left
         m_normals[totalIndex++] = normal(m_vertices.at(p),
                                          m_vertices.at(p + m_columns),
-                                         m_vertices.at(p - 1));
+                                         m_vertices.at(p - 1),
+                                         flipNormal);
     }
     if (rowIndex == m_rows - 1) {
         // Top most line, nothing above, must have different handling.
@@ -176,13 +184,15 @@ void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowI
         for (int j = rowIndex * m_columns; j < rowLimit; j++) {
             m_normals[totalIndex++] = normal(m_vertices.at(j),
                                              m_vertices.at(j - m_columns),
-                                             m_vertices.at(j + 1));
+                                             m_vertices.at(j + 1),
+                                             flipNormal);
         }
 
         // Top left corner. Take from one left and one down
         m_normals[totalIndex++] = normal(m_vertices.at(rowLimit),
                                          m_vertices.at(rowLimit - 1),
-                                         m_vertices.at(rowLimit - m_columns));
+                                         m_vertices.at(rowLimit - m_columns),
+                                         flipNormal);
     }
 }
 
@@ -205,6 +215,7 @@ void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row
     int rightCol = m_columns - 1;
     int topRow = m_rows - 1;
 
+    const bool flipNormal = checkFlipNormal(dataArray);
     for (int i = startRow; i <= row; i++) {
         for (int j = startCol; j <= column; j++) {
             int p = i * m_columns + j;
@@ -213,12 +224,14 @@ void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row
                     // One right and one up
                     m_normals[p] = normal(m_vertices.at(p),
                                           m_vertices.at(p + 1),
-                                          m_vertices.at(p + m_columns));
+                                          m_vertices.at(p + m_columns),
+                                          flipNormal);
                 } else {
                     // Last item, nothing on the right. One up and one left
                     m_normals[p] = normal(m_vertices.at(p),
                                           m_vertices.at(p + m_columns),
-                                          m_vertices.at(p - 1));
+                                          m_vertices.at(p - 1),
+                                          flipNormal);
                 }
             } else {
                 // Top most line, nothing above, must have different handling.
@@ -226,12 +239,14 @@ void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row
                     // Take from one down and one right. Read till second-to-last
                     m_normals[p] = normal(m_vertices.at(p),
                                           m_vertices.at(p - m_columns),
-                                          m_vertices.at(p + 1));
+                                          m_vertices.at(p + 1),
+                                          flipNormal);
                 } else {
                     // Top left corner. Take from one left and one down
                     m_normals[p] = normal(m_vertices.at(p),
                                           m_vertices.at(p - 1),
-                                          m_vertices.at(p - m_columns));
+                                          m_vertices.at(p - m_columns),
+                                          flipNormal);
                 }
             }
         }
@@ -383,6 +398,7 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     }
 
     totalIndex = 0;
+    const bool flipNormal = checkFlipNormal(dataArray);
     for (int row = 0, upperRow = doubleColumns;
          row < rowColLimit;
          row += doubleColumns, upperRow += doubleColumns) {
@@ -390,12 +406,14 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
             // Normal for the left triangle
             m_normals[totalIndex++] = normal(m_vertices.at(row + j),
                                              m_vertices.at(row + j + 1),
-                                             m_vertices.at(upperRow + j));
+                                             m_vertices.at(upperRow + j),
+                                             flipNormal);
 
             // Normal for the right triangle
             m_normals[totalIndex++] = normal(m_vertices.at(row + j + 1),
                                              m_vertices.at(upperRow + j + 1),
-                                             m_vertices.at(upperRow + j));
+                                             m_vertices.at(upperRow + j),
+                                             flipNormal);
 
             if (changeGeometry) {
                 // Left triangle
@@ -448,6 +466,7 @@ void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowI
     int rowLimit = (rowIndex + 1) * doubleColumns;
     if (rowIndex == m_rows - 1)
         rowLimit = rowIndex * doubleColumns; //Topmost row, no normals
+    const bool flipNormal = checkFlipNormal(dataArray);
     for (int row = p, upperRow = p + doubleColumns;
          row < rowLimit;
          row += doubleColumns, upperRow += doubleColumns) {
@@ -455,12 +474,14 @@ void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowI
             // Normal for the left triangle
             m_normals[p++] = normal(m_vertices.at(row + j),
                                     m_vertices.at(row + j + 1),
-                                    m_vertices.at(upperRow + j));
+                                    m_vertices.at(upperRow + j),
+                                    flipNormal);
 
             // Normal for the right triangle
             m_normals[p++] = normal(m_vertices.at(row + j + 1),
                                     m_vertices.at(upperRow + j + 1),
-                                    m_vertices.at(upperRow + j));
+                                    m_vertices.at(upperRow + j),
+                                    flipNormal);
         }
     }
 }
@@ -494,19 +515,22 @@ void SurfaceObject::updateCoarseItem(const QSurfaceDataArray &dataArray, int row
     if (column == m_columns - 1)
         column--;
 
+    const bool flipNormal = checkFlipNormal(dataArray);
     for (int i = startRow; i <= row; i++) {
         for (int j = startCol; j <= column; j++) {
             p = i * doubleColumns + j * 2;
             // Normal for the left triangle
             m_normals[p] = normal(m_vertices.at(p),
                                   m_vertices.at(p + 1),
-                                  m_vertices.at(p + doubleColumns));
+                                  m_vertices.at(p + doubleColumns),
+                                  flipNormal);
             p++;
 
             // Normal for the right triangle
             m_normals[p] = normal(m_vertices.at(p),
                                   m_vertices.at(p + doubleColumns),
-                                  m_vertices.at(p + doubleColumns - 1));
+                                  m_vertices.at(p + doubleColumns - 1),
+                                  flipNormal);
         }
     }
 }
@@ -642,6 +666,13 @@ void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVec
     m_meshDataLoaded = true;
 }
 
+bool SurfaceObject::checkFlipNormal(const QSurfaceDataArray &array)
+{
+    const bool ascendingX = array.at(0)->at(0).x() < array.at(0)->at(array.at(0)->size() - 1).x();
+    const bool ascendingZ = array.at(0)->at(0).z() < array.at(array.size() - 1)->at(0).z();
+    return ascendingX != ascendingZ;
+}
+
 GLuint SurfaceObject::gridElementBuf()
 {
     if (!m_meshDataLoaded)
@@ -676,11 +707,15 @@ void SurfaceObject::clear()
     m_normals.clear();
 }
 
-QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QVector3D &c)
+QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QVector3D &c,
+                                bool flipNormal)
 {
     QVector3D v1 = b - a;
     QVector3D v2 = c - a;
-    return QVector3D::crossProduct(v1, v2);
+    QVector3D normal = QVector3D::crossProduct(v1, v2);
+    if (flipNormal)
+        normal *= -1;
+    return normal;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
