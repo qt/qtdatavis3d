@@ -298,8 +298,11 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
                 m_haveGradientSeries = true;
         }
     }
-    if (noSelection && !selectionLabel().isEmpty())
-        m_selectionLabelDirty = true;
+    if (noSelection) {
+        if (!selectionLabel().isEmpty())
+            m_selectionLabelDirty = true;
+        m_selectedSeriesCache = 0;
+    }
 }
 
 SeriesRenderCache *Bars3DRenderer::createNewCache(QAbstract3DSeries *series)
@@ -2058,12 +2061,13 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     }
 
     QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
+    labelCount = qMin(m_axisCacheZ.labelCount(), m_cachedColumnCount);
     if (m_zFlipped) {
         startIndex = 0;
-        endIndex = m_cachedRowCount;
+        endIndex = labelCount;
         indexStep = 1;
     } else {
-        startIndex = m_cachedRowCount - 1;
+        startIndex = labelCount - 1;
         endIndex = -1;
         indexStep = -1;
     }
@@ -2175,14 +2179,14 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     }
 
     totalRotation = Utils::calculateRotation(labelRotation);
-
+    labelCount = qMin(m_axisCacheX.labelCount(), m_cachedColumnCount);
     if (m_xFlipped) {
-        startIndex = m_cachedColumnCount - 1;
+        startIndex = labelCount - 1;
         endIndex = -1;
         indexStep = -1;
     } else {
         startIndex = 0;
-        endIndex = m_cachedColumnCount;
+        endIndex = labelCount;
         indexStep = 1;
     }
     for (int column = startIndex; column != endIndex; column = column + indexStep) {

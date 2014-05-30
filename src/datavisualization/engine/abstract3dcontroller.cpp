@@ -45,6 +45,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_selectionMode(QAbstract3DGraph::SelectionItem),
     m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
     m_useOrthoProjection(false),
+    m_aspectRatio(2.0f),
     m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -58,8 +59,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_renderPending(false),
     m_measureFps(false),
     m_numFrames(0),
-    m_currentFps(0.0),
-    m_aspectRatio(2.0f)
+    m_currentFps(0.0)
 {
     if (!m_scene)
         m_scene = new Q3DScene;

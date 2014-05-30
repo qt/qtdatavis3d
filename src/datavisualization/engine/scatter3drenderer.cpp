@@ -227,8 +227,11 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     else
         m_backgroundMargin = defaultMaxSize;
 
-    if (noSelection && !selectionLabel().isEmpty())
-        m_selectionLabelDirty = true;
+    if (noSelection) {
+        if (!selectionLabel().isEmpty())
+            m_selectionLabelDirty = true;
+        m_selectedSeriesCache = 0;
+    }
 }
 
 SeriesRenderCache *Scatter3DRenderer::createNewCache(QAbstract3DSeries *series)

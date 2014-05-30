@@ -313,11 +313,16 @@ void GraphModifier::swapAxis()
 
 void GraphModifier::releaseAxes()
 {
-    // Releases all axes - results in default axes for all dimensions.
+    // Releases all axes we have created - results in default axes for all dimensions.
     // Axes reset when the graph is switched as set*Axis calls are made, which
     // implicitly add axes.
-    foreach (QAbstract3DAxis *axis, m_graph->axes())
-        m_graph->releaseAxis(axis);
+    m_graph->releaseAxis(m_autoAdjustingAxis);
+    m_graph->releaseAxis(m_fixedRangeAxis);
+    m_graph->releaseAxis(m_temperatureAxis);
+    m_graph->releaseAxis(m_yearAxis);
+    m_graph->releaseAxis(m_monthAxis);
+    m_graph->releaseAxis(m_genericRowAxis);
+    m_graph->releaseAxis(m_genericColumnAxis);
 }
 
 void GraphModifier::releaseSeries()
@@ -999,8 +1004,6 @@ void GraphModifier::primarySeriesTest()
         nextStep = 0;
         break;
     }
-
-
 }
 
 void GraphModifier::insertRemoveTestToggle()
@@ -1038,7 +1041,7 @@ void GraphModifier::toggleRotation()
 void GraphModifier::useLogAxis()
 {
     static int counter = -1;
-    static QLogValue3DAxisFormatter *logFormatter = new QLogValue3DAxisFormatter;
+    static QLogValue3DAxisFormatter *logFormatter = 0;
     static float minRange = 1.0f;
     counter++;
 
@@ -1115,8 +1118,6 @@ void GraphModifier::useLogAxis()
         counter = -1;
         break;
     }
-
-
 }
 
 void GraphModifier::changeValueAxisFormat(const QString & text)

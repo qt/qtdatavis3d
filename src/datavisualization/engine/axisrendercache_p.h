@@ -80,7 +80,14 @@ public:
     inline float gridLinePosition(int index) { return m_adjustedGridLinePositions.at(index); }
     inline int gridLineCount() { return m_adjustedGridLinePositions.size(); }
     inline float labelPosition(int index) { return m_adjustedLabelPositions.at(index); }
-    inline int labelCount() { return m_adjustedLabelPositions.size(); }
+    inline int labelCount() {
+        // Some value axis formatters may opt to not show all labels,
+        // so use positions array for determining count in that case.
+        if (m_type == QAbstract3DAxis::AxisTypeValue)
+            return m_adjustedLabelPositions.size();
+        else
+            return m_labels.size();
+    }
     void updateAllPositions();
     inline bool positionsDirty() const { return m_positionsDirty; }
     inline void markPositionsDirty() { m_positionsDirty = true; }

@@ -54,13 +54,13 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_visibleSeriesCount(0),
       m_customItemShader(0),
       m_useOrthoProjection(false),
-      m_graphAspectRatio(2.0f),
       m_xFlipped(false),
       m_yFlipped(false),
       m_zFlipped(false),
       m_backgroundObj(0),
       m_gridLineObj(0),
-      m_labelObj(0)
+      m_labelObj(0),
+      m_graphAspectRatio(2.0f)
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,

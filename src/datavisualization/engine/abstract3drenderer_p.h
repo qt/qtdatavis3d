@@ -225,8 +225,8 @@ protected:
 
     bool m_useOrthoProjection;
     bool m_xFlipped;
-    bool m_zFlipped;
     bool m_yFlipped;
+    bool m_zFlipped;
 
     ObjectHelper *m_backgroundObj; // Shared reference
     ObjectHelper *m_gridLineObj; // Shared reference
