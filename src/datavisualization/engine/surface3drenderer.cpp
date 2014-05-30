@@ -2205,15 +2205,15 @@ void Surface3DRenderer::updateSelectionTextures()
 void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
                                                uint &lastSelectionId)
 {
-
     // Create the selection ID image. Each grid corner gets 2x2 pixel area of
     // ID color so that each vertex (data point) has 4x4 pixel area of ID color
     const QRect &sampleSpace = cache->sampleSpace();
     int idImageWidth = (sampleSpace.width() - 1) * 4;
     int idImageHeight = (sampleSpace.height() - 1) * 4;
 
-    if (idImageHeight < 0 || idImageWidth < 0) {
+    if (idImageHeight <= 0 || idImageWidth <= 0) {
         cache->setSelectionIdRange(-1, -1);
+        cache->setSelectionTexture(0);
         return;
     }
 
@@ -2245,7 +2245,7 @@ void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
     cache->setSelectionIdRange(idStart, lastSelectionId - 1);
 
     // Move the ID image (bits) to the texture
-    QImage image = QImage(bits, idImageWidth, idImageHeight, QImage::Format_RGB32);
+    QImage image = QImage(bits, idImageWidth, idImageHeight, QImage::Format_ARGB32);
     GLuint selectionTexture = m_textureHelper->create2DTexture(image, false, false, false);
     cache->setSelectionTexture(selectionTexture);
 
