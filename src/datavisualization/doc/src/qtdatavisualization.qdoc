@@ -73,8 +73,8 @@
     in the package manager.
 
     After installation Qt Data Visualization documentation and examples are available in Qt Creator.
-    You can find all Qt Data Visualization examples by typing \c visualization in the
-    \c {Search in Examples...} field.
+    Examples can be found on the examples page of Qt Creator by selecting the Qt Data Visualization
+    component from the drop-down menu.
 
     The source code is installed into the QtDataVisualization folder under EnterpriseAddOns.
 
