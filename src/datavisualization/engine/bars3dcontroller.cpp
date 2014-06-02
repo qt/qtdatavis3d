@@ -18,16 +18,12 @@
 
 #include "bars3dcontroller_p.h"
 #include "bars3drenderer_p.h"
-#include "camerahelper_p.h"
-#include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
 #include "qcategory3daxis_p.h"
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
-
-#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

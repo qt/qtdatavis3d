@@ -38,7 +38,6 @@ class Bars3DRenderer;
 class QBar3DSeries;
 
 struct Bars3DChangeBitField {
-    bool slicingActiveChanged       : 1;
     bool multiSeriesScalingChanged  : 1;
     bool barSpecsChanged            : 1;
     bool selectedBarChanged         : 1;
@@ -46,7 +45,6 @@ struct Bars3DChangeBitField {
     bool itemChanged                : 1;
 
     Bars3DChangeBitField() :
-        slicingActiveChanged(true),
         multiSeriesScalingChanged(true),
         barSpecsChanged(true),
         selectedBarChanged(true),

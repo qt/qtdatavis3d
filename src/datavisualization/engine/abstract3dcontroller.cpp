@@ -17,21 +17,13 @@
 ****************************************************************************/
 
 #include "abstract3dcontroller_p.h"
-#include "camerahelper_p.h"
 #include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
-#include "qcategory3daxis.h"
 #include "abstract3drenderer_p.h"
-#include "q3dcamera.h"
-#include "q3dlight.h"
-#include "qabstractdataproxy_p.h"
 #include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
-#include "qabstract3dseries_p.h"
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
-#include "q3dscene_p.h"
-#include "q3dscene.h"
 #include "qcustom3ditem_p.h"
 #include <QtCore/QThread>
 #include <QtGui/QOpenGLFramebufferObject>

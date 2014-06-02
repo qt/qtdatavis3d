@@ -43,7 +43,6 @@ class QOpenGLFramebufferObject;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class CameraHelper;
 class Abstract3DRenderer;
 class QAbstract3DSeries;
 class ThemeManager;
@@ -151,8 +150,6 @@ public:
 
 private:
     Abstract3DChangeBitField m_changeTracker;
-    GLfloat m_horizontalRotation;
-    GLfloat m_verticalRotation;
     ThemeManager *m_themeManager;
     QAbstract3DGraph::SelectionFlags m_selectionMode;
     QAbstract3DGraph::ShadowQuality m_shadowQuality;
@@ -163,7 +160,6 @@ protected:
     Q3DScene *m_scene;
     QList<QAbstract3DInputHandler *> m_inputHandlers; // List of all added input handlers
     QAbstract3DInputHandler *m_activeInputHandler;
-    CameraHelper *m_cameraHelper;
     // Active axes
     QAbstract3DAxis *m_axisX;
     QAbstract3DAxis *m_axisY;

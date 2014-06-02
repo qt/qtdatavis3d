@@ -18,14 +18,9 @@
 
 #include "scatter3dcontroller_p.h"
 #include "scatter3drenderer_p.h"
-#include "camerahelper_p.h"
-#include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
-
-#include <QtGui/QMatrix4x4>
-#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -38,15 +38,11 @@ class Surface3DRenderer;
 class QSurface3DSeries;
 
 struct Surface3DChangeBitField {
-    bool smoothStatusChanged      : 1;
-    bool surfaceGridChanged       : 1;
     bool selectedPointChanged     : 1;
     bool rowsChanged              : 1;
     bool itemChanged              : 1;
 
     Surface3DChangeBitField() :
-        smoothStatusChanged(true),
-        surfaceGridChanged(true),
         selectedPointChanged(true),
         rowsChanged(false),
         itemChanged(false)

@@ -18,15 +18,9 @@
 
 #include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
-#include "camerahelper_p.h"
-#include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
-#include "qcategory3daxis.h"
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
-#include "shaderhelper_p.h"
-
-#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
