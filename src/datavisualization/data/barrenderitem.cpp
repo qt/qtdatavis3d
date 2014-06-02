@@ -66,6 +66,7 @@ void BarRenderSliceItem::setItem(const BarRenderItem &renderItem)
     m_position = renderItem.position();
     m_height = renderItem.height();
     m_sliceLabel = QString();
+    delete m_sliceLabelItem;
     m_sliceLabelItem = 0;
 }
 

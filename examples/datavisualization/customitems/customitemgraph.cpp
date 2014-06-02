@@ -259,13 +259,17 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
 {
     resetSelection();
     if (type == QAbstract3DGraph::ElementCustomItem) {
-        int index = m_graph->selectedCustomItemIndex();
         QCustom3DItem *item = m_graph->selectedCustomItem();
         QString text;
-        text.setNum(index);
-        text.append(": ");
-        QStringList split = item->meshFile().split("/");
-        text.append(split.last());
+        if (qobject_cast<QCustom3DLabel *>(item) != 0) {
+            text.append("Custom label: ");
+        } else {
+            QStringList split = item->meshFile().split("/");
+            text.append(split.last());
+            text.append(": ");
+        }
+        int index = m_graph->selectedCustomItemIndex();
+        text.append(QString::number(index));
         m_textField->setText(text);
         m_previouslyAnimatedItem = item;
         m_previousScaling = item->scaling();
@@ -289,7 +293,16 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
         m_textField->setText(text);
     } else if (type > QAbstract3DGraph::ElementSeries
                && type < QAbstract3DGraph::ElementCustomItem) {
-        m_textField->setText("Axis");
+        int index = m_graph->selectedLabelIndex();
+        QString text;
+        if (type == QAbstract3DGraph::ElementAxisXLabel)
+            text.append("Axis X label: ");
+        else if (type == QAbstract3DGraph::ElementAxisYLabel)
+            text.append("Axis Y label: ");
+        else
+            text.append("Axis Z label: ");
+        text.append(QString::number(index));
+        m_textField->setText(text);
     } else {
         m_textField->setText("Nothing");
     }

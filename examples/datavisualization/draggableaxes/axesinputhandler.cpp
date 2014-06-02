@@ -130,6 +130,8 @@ void AxesInputHandler::handleAxisDragging()
         distance = move.y() / m_speedModifier; // No need to use adjusted y move here
         m_axisY->setRange(m_axisY->min() + distance, m_axisY->max() + distance);
         break;
+    default:
+        break;
     }
     //! [9]
 }

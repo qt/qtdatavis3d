@@ -282,9 +282,9 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
     m_haveGradientSeries = false;
     for (int i = 0; i < seriesCount; i++) {
         QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(seriesList[i]);
+        BarSeriesRenderCache *cache =
+                static_cast<BarSeriesRenderCache *>(m_renderCacheList.value(barSeries));
         if (barSeries->isVisible()) {
-            BarSeriesRenderCache *cache =
-                    static_cast<BarSeriesRenderCache *>(m_renderCacheList.value(barSeries));
             if (noSelection
                     && barSeries->selectedBar() != QBar3DSeries::invalidSelectionPosition()) {
                 if (selectionLabel() != cache->itemLabel())
@@ -296,7 +296,10 @@ void Bars3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
                 m_haveUniformColorSeries = true;
             else
                 m_haveGradientSeries = true;
+        } else {
+            cache->setVisualIndex(-1);
         }
+
     }
     if (noSelection) {
         if (!selectionLabel().isEmpty())
@@ -1830,10 +1833,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             m_selectedBar = selectedBar;
         }
 
+        Drawer::LabelPosition position =
+                m_selectedBar->height() >= 0 ? Drawer::LabelOver : Drawer::LabelBelow;
+
         m_drawer->drawLabel(*selectedBar, labelItem, viewMatrix, projectionMatrix,
                             zeroVector, identityQuaternion, selectedBar->height(),
                             m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, activeCamera, true, false);
+                            m_labelObj, activeCamera, true, false, position);
 
         // Reset label update flag; they should have been updated when we get here
         m_updateLabels = false;

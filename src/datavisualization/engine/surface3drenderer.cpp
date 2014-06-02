@@ -1241,10 +1241,10 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
 
         // Put the RGBA value back to uint
-        uint selectionId = clickedColor.x()
-                + clickedColor.y() * greenMultiplier
-                + clickedColor.z() * blueMultiplier
-                + clickedColor.w() * alphaMultiplier;
+        uint selectionId = uint(clickedColor.x())
+                + uint(clickedColor.y()) * greenMultiplier
+                + uint(clickedColor.z()) * blueMultiplier
+                + uint(clickedColor.w()) * alphaMultiplier;
 
         m_clickedPosition = selectionIdToSurfacePoint(selectionId);
 
@@ -2460,21 +2460,21 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
     m_selectedCustomItemIndex = -1;
     // Check for label and custom item selection
     if (id / alphaMultiplier == labelRowAlpha) {
-        m_selectedLabelIndex = id - (alphaMultiplier * labelRowAlpha);
+        m_selectedLabelIndex = id - (alphaMultiplier * uint(labelRowAlpha));
         m_clickedType = QAbstract3DGraph::ElementAxisZLabel;
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == labelColumnAlpha) {
-        m_selectedLabelIndex = (id - (alphaMultiplier * labelColumnAlpha)) / greenMultiplier;
+        m_selectedLabelIndex = (id - (alphaMultiplier * uint(labelColumnAlpha))) / greenMultiplier;
         m_clickedType = QAbstract3DGraph::ElementAxisXLabel;
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == labelValueAlpha) {
-        m_selectedLabelIndex = (id - (alphaMultiplier * labelValueAlpha)) / blueMultiplier;
+        m_selectedLabelIndex = (id - (alphaMultiplier * uint(labelValueAlpha))) / blueMultiplier;
         m_clickedType = QAbstract3DGraph::ElementAxisYLabel;
         return Surface3DController::invalidSelectionPosition();
     } else if (id / alphaMultiplier == customItemAlpha) {
         // Custom item selection
         m_clickedType = QAbstract3DGraph::ElementCustomItem;
-        m_selectedCustomItemIndex = id - (alphaMultiplier * customItemAlpha);
+        m_selectedCustomItemIndex = id - (alphaMultiplier * uint(customItemAlpha));
         return Surface3DController::invalidSelectionPosition();
     }
 

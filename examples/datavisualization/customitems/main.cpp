@@ -31,7 +31,7 @@ int main(int argc, char **argv)
     Q3DSurface *graph = new Q3DSurface();
     QWidget *container = QWidget::createWindowContainer(graph);
 
-    container->setMinimumSize(QSize(1280, 768));
+    container->setMinimumSize(QSize(800, 600));
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
