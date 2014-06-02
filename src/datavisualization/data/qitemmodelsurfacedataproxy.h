@@ -32,7 +32,7 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelSurfaceDataProxy : public QSurfaceDa
 {
     Q_OBJECT
     Q_ENUMS(MultiMatchBehavior)
-    Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
+    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
     Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY rowRoleChanged)
     Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY columnRoleChanged)
     Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole NOTIFY xPosRoleChanged)
@@ -64,29 +64,31 @@ public:
     };
 
     explicit QItemModelSurfaceDataProxy(QObject *parent = 0);
-    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, QObject *parent = 0);
-    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &yPosRole,
+    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, QObject *parent = 0);
+    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &yPosRole,
                                QObject *parent = 0);
-    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
                                const QString &columnRole, const QString &yPosRole,
                                QObject *parent = 0);
-    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
                                const QString &columnRole, const QString &xPosRole,
                                const QString &yPosRole, const QString &zPosRole,
                                QObject *parent = 0);
-    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
                                const QString &columnRole, const QString &yPosRole,
-                               const QStringList &rowCategories, const QStringList &columnCategories,
+                               const QStringList &rowCategories,
+                               const QStringList &columnCategories,
                                QObject *parent = 0);
-    QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
                                const QString &columnRole, const QString &xPosRole,
                                const QString &yPosRole, const QString &zPosRole,
-                               const QStringList &rowCategories, const QStringList &columnCategories,
+                               const QStringList &rowCategories,
+                               const QStringList &columnCategories,
                                QObject *parent = 0);
     virtual ~QItemModelSurfaceDataProxy();
 
-    void setItemModel(const QAbstractItemModel *itemModel);
-    const QAbstractItemModel *itemModel() const;
+    void setItemModel(QAbstractItemModel *itemModel);
+    QAbstractItemModel *itemModel() const;
 
     void setRowRole(const QString &role);
     QString rowRole() const;

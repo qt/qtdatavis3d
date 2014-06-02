@@ -325,7 +325,7 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QObject *parent)
  * Constructs QItemModelSurfaceDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
  * ownership of the \a itemModel, as typically item models are owned by other controls.
  */
-QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
+QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel,
                                                        QObject *parent)
     : QSurfaceDataProxy(new QItemModelSurfaceDataProxyPrivate(this), parent)
 {
@@ -340,7 +340,7 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
  * This constructor is meant to be used with models that have data properly sorted
  * in rows and columns already, so it also sets useModelCategories property to true.
  */
-QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
+QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel,
                                                        const QString &yPosRole,
                                                        QObject *parent)
     : QSurfaceDataProxy(new QItemModelSurfaceDataProxyPrivate(this), parent)
@@ -357,7 +357,7 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
  * The role mappings are set with \a rowRole, \a columnRole, and \a yPosRole.
  * The zPosRole and the xPosRole are set to \a rowRole and \a columnRole, respectively.
  */
-QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
+QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel,
                                                        const QString &rowRole,
                                                        const QString &columnRole,
                                                        const QString &yPosRole,
@@ -379,7 +379,7 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
  * The role mappings are set with \a rowRole, \a columnRole, \a xPosRole, \a yPosRole, and
  * \a zPosRole.
  */
-QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
+QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel,
                                                        const QString &rowRole,
                                                        const QString &columnRole,
                                                        const QString &xPosRole,
@@ -405,7 +405,7 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
  * Row and column categories are set with \a rowCategories and \a columnCategories.
  * This constructor also sets autoRowCategories and autoColumnCategories to false.
  */
-QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
+QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel,
                                                        const QString &rowRole,
                                                        const QString &columnRole,
                                                        const QString &yPosRole,
@@ -435,7 +435,7 @@ QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel 
  * Row and column categories are set with \a rowCategories and \a columnCategories.
  * This constructor also sets autoRowCategories and autoColumnCategories to false.
  */
-QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(const QAbstractItemModel *itemModel,
+QItemModelSurfaceDataProxy::QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel,
                                                        const QString &rowRole,
                                                        const QString &columnRole,
                                                        const QString &xPosRole,
@@ -472,12 +472,12 @@ QItemModelSurfaceDataProxy::~QItemModelSurfaceDataProxy()
  * Defines item model. Does not take ownership of the model, but does connect to it to listen for
  * changes.
  */
-void QItemModelSurfaceDataProxy::setItemModel(const QAbstractItemModel *itemModel)
+void QItemModelSurfaceDataProxy::setItemModel(QAbstractItemModel *itemModel)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
 }
 
-const QAbstractItemModel *QItemModelSurfaceDataProxy::itemModel() const
+QAbstractItemModel *QItemModelSurfaceDataProxy::itemModel() const
 {
     return dptrc()->m_itemModelHandler->itemModel();
 }

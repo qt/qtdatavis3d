@@ -43,8 +43,8 @@ public:
     AbstractItemModelHandler(QObject *parent = 0);
     virtual ~AbstractItemModelHandler();
 
-    virtual void setItemModel(const QAbstractItemModel *itemModel);
-    virtual const QAbstractItemModel *itemModel() const;
+    virtual void setItemModel(QAbstractItemModel *itemModel);
+    virtual QAbstractItemModel *itemModel() const;
 
 public slots:
     virtual void handleColumnsInserted(const QModelIndex &parent, int start, int end);
@@ -71,7 +71,7 @@ signals:
 protected:
     virtual void resolveModel() = 0;
 
-    QPointer<const QAbstractItemModel> m_itemModel;  // Not owned
+    QPointer<QAbstractItemModel> m_itemModel;  // Not owned
     bool resolvePending;
     QTimer m_resolveTimer;
     bool m_fullReset;

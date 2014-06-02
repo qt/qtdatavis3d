@@ -206,7 +206,7 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(QObject *parent)
  * Constructs QItemModelScatterDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
  * ownership of the \a itemModel, as typically item models are owned by other controls.
  */
-QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
+QItemModelScatterDataProxy::QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
                                                        QObject *parent)
     : QScatterDataProxy(new QItemModelScatterDataProxyPrivate(this), parent)
 {
@@ -220,7 +220,7 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel 
  * The xPosRole property is set to \a xPosRole, yPosRole property to \a yPosRole, and zPosRole property
  * to \a zPosRole.
  */
-QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
+QItemModelScatterDataProxy::QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
                                                        const QString &xPosRole,
                                                        const QString &yPosRole,
                                                        const QString &zPosRole,
@@ -240,7 +240,7 @@ QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel 
  * The xPosRole property is set to \a xPosRole, yPosRole property to \a yPosRole, zPosRole property
  * to \a zPosRole, and rotationRole property to \a rotationRole.
  */
-QItemModelScatterDataProxy::QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
+QItemModelScatterDataProxy::QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
                                                        const QString &xPosRole,
                                                        const QString &yPosRole,
                                                        const QString &zPosRole,
@@ -269,12 +269,12 @@ QItemModelScatterDataProxy::~QItemModelScatterDataProxy()
  * Defines the item model. Does not take ownership of the model, but does connect to it to listen for
  * changes.
  */
-void QItemModelScatterDataProxy::setItemModel(const QAbstractItemModel *itemModel)
+void QItemModelScatterDataProxy::setItemModel(QAbstractItemModel *itemModel)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
 }
 
-const QAbstractItemModel *QItemModelScatterDataProxy::itemModel() const
+QAbstractItemModel *QItemModelScatterDataProxy::itemModel() const
 {
     return dptrc()->m_itemModelHandler->itemModel();
 }

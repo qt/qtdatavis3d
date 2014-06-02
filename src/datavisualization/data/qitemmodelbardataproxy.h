@@ -31,7 +31,7 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
     Q_ENUMS(MultiMatchBehavior)
-    Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
+    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
     Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY rowRoleChanged)
     Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY columnRoleChanged)
     Q_PROPERTY(QString valueRole READ valueRole WRITE setValueRole NOTIFY valueRoleChanged)
@@ -60,27 +60,27 @@ public:
     };
 
     explicit QItemModelBarDataProxy(QObject *parent = 0);
-    QItemModelBarDataProxy(const QAbstractItemModel *itemModel, QObject *parent = 0);
-    QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &valueRole,
+    QItemModelBarDataProxy(QAbstractItemModel *itemModel, QObject *parent = 0);
+    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &valueRole,
                            QObject *parent = 0);
-    QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
                            const QString &columnRole, const QString &valueRole,
                            QObject *parent = 0);
-    QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
                            const QString &columnRole, const QString &valueRole,
                            const QString &rotationRole, QObject *parent = 0);
-    QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
                            const QString &columnRole, const QString &valueRole,
                            const QStringList &rowCategories, const QStringList &columnCategories,
                            QObject *parent = 0);
-    QItemModelBarDataProxy(const QAbstractItemModel *itemModel, const QString &rowRole,
+    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
                            const QString &columnRole, const QString &valueRole,
                            const QString &rotationRole, const QStringList &rowCategories,
                            const QStringList &columnCategories, QObject *parent = 0);
     virtual ~QItemModelBarDataProxy();
 
-    void setItemModel(const QAbstractItemModel *itemModel);
-    const QAbstractItemModel *itemModel() const;
+    void setItemModel(QAbstractItemModel *itemModel);
+    QAbstractItemModel *itemModel() const;
 
     void setRowRole(const QString &role);
     QString rowRole() const;

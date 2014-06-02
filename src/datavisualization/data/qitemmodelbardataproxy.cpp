@@ -282,7 +282,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(QObject *parent)
  * Constructs QItemModelBarDataProxy with \a itemModel and optional \a parent. Proxy doesn't take
  * ownership of the \a itemModel, as typically item models are owned by other controls.
  */
-QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemModel, QObject *parent)
+QItemModelBarDataProxy::QItemModelBarDataProxy(QAbstractItemModel *itemModel, QObject *parent)
     : QBarDataProxy(new QItemModelBarDataProxyPrivate(this), parent)
 {
     setItemModel(itemModel);
@@ -296,7 +296,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
  * This constructor is meant to be used with models that have data properly sorted
  * in rows and columns already, so it also sets useModelCategories property to true.
  */
-QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemModel,
+QItemModelBarDataProxy::QItemModelBarDataProxy(QAbstractItemModel *itemModel,
                                                const QString &valueRole, QObject *parent)
     : QBarDataProxy(new QItemModelBarDataProxyPrivate(this), parent)
 {
@@ -311,7 +311,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
  * ownership of the \a itemModel, as typically item models are owned by other controls.
  * The role mappings are set with \a rowRole, \a columnRole, and \a valueRole.
  */
-QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemModel,
+QItemModelBarDataProxy::QItemModelBarDataProxy(QAbstractItemModel *itemModel,
                                                const QString &rowRole,
                                                const QString &columnRole,
                                                const QString &valueRole, QObject *parent)
@@ -329,7 +329,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
  * ownership of the \a itemModel, as typically item models are owned by other controls.
  * The role mappings are set with \a rowRole, \a columnRole, \a valueRole, and \a rotationRole.
  */
-QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemModel,
+QItemModelBarDataProxy::QItemModelBarDataProxy(QAbstractItemModel *itemModel,
                                                const QString &rowRole,
                                                const QString &columnRole,
                                                const QString &valueRole,
@@ -352,7 +352,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
  * Row and column categories are set with \a rowCategories and \a columnCategories.
  * This constructor also sets autoRowCategories and autoColumnCategories to false.
  */
-QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemModel,
+QItemModelBarDataProxy::QItemModelBarDataProxy(QAbstractItemModel *itemModel,
                                                const QString &rowRole,
                                                const QString &columnRole,
                                                const QString &valueRole,
@@ -379,7 +379,7 @@ QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemMod
  * Row and column categories are set with \a rowCategories and \a columnCategories.
  * This constructor also sets autoRowCategories and autoColumnCategories to false.
  */
-QItemModelBarDataProxy::QItemModelBarDataProxy(const QAbstractItemModel *itemModel,
+QItemModelBarDataProxy::QItemModelBarDataProxy(QAbstractItemModel *itemModel,
                                                const QString &rowRole,
                                                const QString &columnRole,
                                                const QString &valueRole,
@@ -414,12 +414,12 @@ QItemModelBarDataProxy::~QItemModelBarDataProxy()
  * Defines item model. Does not take ownership of the model, but does connect to it to listen for
  * changes.
  */
-void QItemModelBarDataProxy::setItemModel(const QAbstractItemModel *itemModel)
+void QItemModelBarDataProxy::setItemModel(QAbstractItemModel *itemModel)
 {
     dptr()->m_itemModelHandler->setItemModel(itemModel);
 }
 
-const QAbstractItemModel *QItemModelBarDataProxy::itemModel() const
+QAbstractItemModel *QItemModelBarDataProxy::itemModel() const
 {
     return dptrc()->m_itemModelHandler->itemModel();
 }

@@ -31,7 +31,7 @@ class QItemModelScatterDataProxyPrivate;
 class QT_DATAVISUALIZATION_EXPORT QItemModelScatterDataProxy : public QScatterDataProxy
 {
     Q_OBJECT
-    Q_PROPERTY(const QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
+    Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
     Q_PROPERTY(QString xPosRole READ xPosRole WRITE setXPosRole NOTIFY xPosRoleChanged)
     Q_PROPERTY(QString yPosRole READ yPosRole WRITE setYPosRole NOTIFY yPosRoleChanged)
     Q_PROPERTY(QString zPosRole READ zPosRole WRITE setZPosRole NOTIFY zPosRoleChanged)
@@ -47,18 +47,18 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelScatterDataProxy : public QScatterDa
 
 public:
     explicit QItemModelScatterDataProxy(QObject *parent = 0);
-    QItemModelScatterDataProxy(const QAbstractItemModel *itemModel, QObject *parent = 0);
-    QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
+    QItemModelScatterDataProxy(QAbstractItemModel *itemModel, QObject *parent = 0);
+    QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
                                const QString &xPosRole, const QString &yPosRole,
                                const QString &zPosRole, QObject *parent = 0);
-    QItemModelScatterDataProxy(const QAbstractItemModel *itemModel,
+    QItemModelScatterDataProxy(QAbstractItemModel *itemModel,
                                const QString &xPosRole, const QString &yPosRole,
                                const QString &zPosRole, const QString &rotationRole,
                                QObject *parent = 0);
     virtual ~QItemModelScatterDataProxy();
 
-    void setItemModel(const QAbstractItemModel *itemModel);
-    const QAbstractItemModel *itemModel() const;
+    void setItemModel(QAbstractItemModel *itemModel);
+    QAbstractItemModel *itemModel() const;
 
     void setXPosRole(const QString &role);
     QString xPosRole() const;
