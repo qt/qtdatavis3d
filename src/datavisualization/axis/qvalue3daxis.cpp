@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qvalue3daxis.h"
 #include "qvalue3daxis_p.h"
 #include "qvalue3daxisformatter_p.h"
 

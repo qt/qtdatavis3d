@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qabstract3daxis.h"
 #include "qabstract3daxis_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
