@@ -26,11 +26,11 @@
 //
 // We mean it.
 
-#include "datavisualizationglobal_p.h"
-#include "qabstract3dseries.h"
-
 #ifndef QABSTRACT3DSERIES_P_H
 #define QABSTRACT3DSERIES_P_H
+
+#include "datavisualizationglobal_p.h"
+#include "qabstract3dseries.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

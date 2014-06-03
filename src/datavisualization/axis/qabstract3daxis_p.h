@@ -26,12 +26,11 @@
 //
 // We mean it.
 
-#include "datavisualizationglobal_p.h"
-#include "qabstract3daxis.h"
-#include "abstract3dcontroller_p.h"
-
 #ifndef QABSTRACT3DAXIS_P_H
 #define QABSTRACT3DAXIS_P_H
+
+#include "datavisualizationglobal_p.h"
+#include "qabstract3daxis.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

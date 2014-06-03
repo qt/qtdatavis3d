@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qsurfacedataproxy.h"
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
 

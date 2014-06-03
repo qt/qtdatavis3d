@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "barrenderitem_p.h"
-#include "bars3drenderer_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

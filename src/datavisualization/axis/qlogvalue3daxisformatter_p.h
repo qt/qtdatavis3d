@@ -26,16 +26,14 @@
 //
 // We mean it.
 
+#ifndef QLOGVALUE3DAXISFORMATTER_P_H
+#define QLOGVALUE3DAXISFORMATTER_P_H
+
 #include "datavisualizationglobal_p.h"
 #include "qlogvalue3daxisformatter.h"
 #include "qvalue3daxisformatter_p.h"
 
-#ifndef QLOGVALUE3DAXISFORMATTER_P_H
-#define QLOGVALUE3DAXISFORMATTER_P_H
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
-
-class QLogValue3DAxis;
 
 class QLogValue3DAxisFormatterPrivate : public QValue3DAxisFormatterPrivate
 {

@@ -39,9 +39,6 @@ class QScatterDataItemPrivate
 public:
     QScatterDataItemPrivate();
     virtual ~QScatterDataItemPrivate();
-
-protected:
-    friend class QScatterDataItem;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

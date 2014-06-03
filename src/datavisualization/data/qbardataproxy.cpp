@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qbardataproxy.h"
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
 

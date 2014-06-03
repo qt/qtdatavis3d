@@ -32,8 +32,6 @@
 #include "datavisualizationglobal_p.h"
 #include "labelitem_p.h"
 
-#include <QtCore/QString>
-#include <QtGui/QOpenGLFunctions>
 #include <QtGui/QVector3D>
 #include <QtGui/QQuaternion>
 

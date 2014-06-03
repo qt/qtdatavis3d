@@ -33,8 +33,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class Bars3DRenderer;
-
 class BarRenderItem : public AbstractRenderItem
 {
 public:

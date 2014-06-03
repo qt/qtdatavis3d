@@ -17,8 +17,6 @@
 ****************************************************************************/
 
 #include "scatterrenderitem_p.h"
-#include "scatter3drenderer_p.h"
-#include "qscatterdataproxy.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -26,12 +26,12 @@
 //
 // We mean it.
 
+#ifndef QVALUE3DAXISFORMATTER_P_H
+#define QVALUE3DAXISFORMATTER_P_H
+
 #include "datavisualizationglobal_p.h"
 #include "qvalue3daxisformatter.h"
 #include "utils_p.h"
-
-#ifndef QVALUE3DAXISFORMATTER_P_H
-#define QVALUE3DAXISFORMATTER_P_H
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

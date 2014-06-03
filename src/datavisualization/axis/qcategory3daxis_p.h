@@ -26,12 +26,11 @@
 //
 // We mean it.
 
-#include "qcategory3daxis.h"
-#include "qabstract3daxis_p.h"
-#include "qbardataitem.h"
-
 #ifndef QCATEGORY3DAXIS_P_H
 #define QCATEGORY3DAXIS_P_H
+
+#include "qcategory3daxis.h"
+#include "qabstract3daxis_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

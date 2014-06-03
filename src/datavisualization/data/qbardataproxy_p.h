@@ -31,7 +31,6 @@
 
 #include "qbardataproxy.h"
 #include "qabstractdataproxy_p.h"
-#include "qbardataitem.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

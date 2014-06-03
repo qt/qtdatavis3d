@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qscatterdataproxy.h"
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
 

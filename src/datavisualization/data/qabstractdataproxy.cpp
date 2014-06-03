@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qabstractdataproxy.h"
 #include "qabstractdataproxy_p.h"
 #include "qabstract3dseries_p.h"
 

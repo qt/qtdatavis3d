@@ -36,7 +36,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Q3DCamera;
 class Q3DLight;
-class Q3DScene;
 
 struct Q3DSceneChangeBitField {
     bool viewportChanged               : 1;
