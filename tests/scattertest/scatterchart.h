@@ -102,6 +102,7 @@ private:
     void populateFlatSeries(QScatter3DSeries *series, int rows, int columns, float value);
     void populateRisingSeries(QScatter3DSeries *series, int rows, int columns, float minValue,
                               float maxValue);
+    void deleteAxis(QValue3DAxis *axis);
 
     Q3DScatter *m_chart;
     int m_fontSize;

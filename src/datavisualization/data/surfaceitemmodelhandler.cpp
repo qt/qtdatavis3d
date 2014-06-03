@@ -313,6 +313,8 @@ void SurfaceItemModelHandler::resolveModel()
                 newProxyRow[j].setPosition(itemPos);
             }
         }
+
+        delete matchCountMap;
     }
 
     m_proxy->resetArray(m_proxyArray);

@@ -2157,6 +2157,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
         }
         if (!drawSelection && m_axisCacheY.isTitleVisible()) {
+            labelTransSide.setY(0.0f);
+            labelTransBack.setY(0.0f);
             drawAxisTitleY(sideLabelRotation, backLabelRotation, labelTransSide, labelTransBack,
                            totalSideRotation, totalBackRotation, m_dummyRenderItem, activeCamera,
                            labelsMaxWidth, viewMatrix, projectionMatrix,

@@ -250,7 +250,7 @@ void ScatterDataModifier::testItemChanges()
         foreach (QScatter3DSeries *series, m_chart->seriesList())
             m_chart->removeSeries(series);
         foreach (QValue3DAxis *axis, m_chart->axes())
-            m_chart->releaseAxis(axis);
+            deleteAxis(axis);
         delete series0;
         delete series1;
         delete series2;
@@ -425,7 +425,7 @@ void ScatterDataModifier::testAxisReverse()
         foreach (QScatter3DSeries *series, m_chart->seriesList())
             m_chart->removeSeries(series);
         foreach (QValue3DAxis *axis, m_chart->axes())
-            m_chart->releaseAxis(axis);
+            deleteAxis(axis);
         delete series0;
         delete series1;
         series0 = new QScatter3DSeries;
@@ -627,11 +627,17 @@ void ScatterDataModifier::clear()
     qDebug() << m_loopCounter << "Cleared array";
 }
 
+void ScatterDataModifier::deleteAxis(QValue3DAxis *axis)
+{
+    m_chart->releaseAxis(axis);
+    delete axis;
+}
+
 void ScatterDataModifier::resetAxes()
 {
-    m_chart->releaseAxis(m_chart->axisX());
-    m_chart->releaseAxis(m_chart->axisY());
-    m_chart->releaseAxis(m_chart->axisZ());
+    deleteAxis(m_chart->axisX());
+    deleteAxis(m_chart->axisY());
+    deleteAxis(m_chart->axisZ());
 
     m_chart->setAxisX(new QValue3DAxis);
     m_chart->setAxisY(new QValue3DAxis);

@@ -282,6 +282,8 @@ void BarItemModelHandler::resolveModel()
         rowLabels = rowList;
         columnLabels = columnList;
         m_columnCount = columnList.size();
+
+        delete matchCountMap;
     }
 
     m_proxy->resetArray(m_proxyArray, rowLabels, columnLabels);
