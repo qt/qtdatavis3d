@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "seriesrendercache_p.h"
-#include "objecthelper_p.h"
 #include "abstract3drenderer_p.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"

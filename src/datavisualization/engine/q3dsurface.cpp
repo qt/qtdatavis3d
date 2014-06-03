@@ -18,10 +18,6 @@
 
 #include "q3dsurface.h"
 #include "q3dsurface_p.h"
-#include "qvalue3daxis.h"
-#include "qsurfacedataproxy.h"
-#include "q3dcamera.h"
-#include "qsurface3dseries_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

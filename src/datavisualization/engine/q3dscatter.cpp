@@ -18,10 +18,6 @@
 
 #include "q3dscatter.h"
 #include "q3dscatter_p.h"
-#include "scatter3dcontroller_p.h"
-#include "qvalue3daxis.h"
-#include "q3dcamera.h"
-#include "qscatter3dseries_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

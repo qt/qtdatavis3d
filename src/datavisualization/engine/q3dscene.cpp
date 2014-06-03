@@ -16,14 +16,9 @@
 **
 ****************************************************************************/
 
-#include "datavisualizationglobal_p.h"
-
-#include "q3dscene.h"
 #include "q3dscene_p.h"
 #include "q3dcamera_p.h"
 #include "q3dlight_p.h"
-
-#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

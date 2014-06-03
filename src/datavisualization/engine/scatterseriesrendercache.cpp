@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "scatterseriesrendercache_p.h"
-#include "scatter3drenderer_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

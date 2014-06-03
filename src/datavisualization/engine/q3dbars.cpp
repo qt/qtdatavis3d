@@ -16,13 +16,7 @@
 **
 ****************************************************************************/
 
-#include "q3dbars.h"
 #include "q3dbars_p.h"
-#include "bars3dcontroller_p.h"
-#include "qvalue3daxis.h"
-#include "qcategory3daxis.h"
-#include "q3dcamera.h"
-#include "qbar3dseries_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

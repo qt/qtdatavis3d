@@ -31,7 +31,6 @@
 
 #include "datavisualizationglobal_p.h"
 #include "seriesrendercache_p.h"
-#include "qabstract3dseries_p.h"
 #include "qsurface3dseries_p.h"
 #include "surfaceobject_p.h"
 #include "selectionpointer_p.h"
@@ -40,10 +39,7 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class Abstract3DRenderer;
 class Surface3DRenderer;
-class ObjectHelper;
-class TextureHelper;
 
 class SurfaceSeriesRenderCache : public SeriesRenderCache
 {

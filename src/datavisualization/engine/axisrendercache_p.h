@@ -30,8 +30,6 @@
 #define AXISRENDERCACHE_P_H
 
 #include "datavisualizationglobal_p.h"
-#include "labelitem_p.h"
-#include "qabstract3daxis_p.h"
 #include "drawer_p.h"
 #include <QtCore/QPointer>
 

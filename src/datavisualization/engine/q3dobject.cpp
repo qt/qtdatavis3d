@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "q3dobject.h"
 #include "q3dobject_p.h"
 #include "q3dscene_p.h"
 

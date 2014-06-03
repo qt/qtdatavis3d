@@ -17,16 +17,11 @@
 ****************************************************************************/
 
 #include "selectionpointer_p.h"
-#include "surface3dcontroller_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "q3dcamera_p.h"
-#include "drawer_p.h"
 #include "utils_p.h"
-#include "q3dlight.h"
-
-#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

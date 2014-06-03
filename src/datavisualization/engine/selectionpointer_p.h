@@ -29,7 +29,6 @@
 #ifndef SELECTIONPOINTER_P_H
 #define SELECTIONPOINTER_P_H
 
-#include "q3dscene.h"
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"
 
@@ -37,7 +36,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
-class SurfaceObject;
 class TextureHelper;
 class Drawer;
 

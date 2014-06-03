@@ -18,7 +18,6 @@
 
 #include "axisrendercache_p.h"
 
-#include <QtCore/qmath.h>
 #include <QtGui/QFontMetrics>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION

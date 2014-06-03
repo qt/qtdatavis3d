@@ -16,12 +16,9 @@
 **
 ****************************************************************************/
 
-#include "seriesrendercache_p.h"
 #include "surfaceseriesrendercache_p.h"
-#include "objecthelper_p.h"
 #include "surface3drenderer_p.h"
 #include "texturehelper_p.h"
-#include "utils_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -33,7 +30,7 @@ SurfaceSeriesRenderCache::SurfaceSeriesRenderCache(QAbstract3DSeries *series,
       m_surfaceFlatShading(false),
       m_surfaceObj(new SurfaceObject(renderer)),
       m_sliceSurfaceObj(new SurfaceObject(renderer)),
-      m_sampleSpace(QRect(0, 0, 0 , 0)),
+      m_sampleSpace(QRect(0, 0, 0, 0)),
       m_selectionTexture(0),
       m_selectionIdStart(0),
       m_selectionIdEnd(0),

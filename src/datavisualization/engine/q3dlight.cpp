@@ -16,8 +16,6 @@
 **
 ****************************************************************************/
 
-#include "q3dlight.h"
-#include "q3dscene.h"
 #include "q3dlight_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
