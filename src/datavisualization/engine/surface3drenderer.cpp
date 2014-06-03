@@ -16,22 +16,12 @@
 **
 ****************************************************************************/
 
-#include "surface3dcontroller_p.h"
 #include "surface3drenderer_p.h"
-#include "q3dcamera.h"
 #include "q3dcamera_p.h"
 #include "shaderhelper_p.h"
-#include "objecthelper_p.h"
-#include "surfaceobject_p.h"
 #include "texturehelper_p.h"
-#include "selectionpointer_p.h"
 #include "utils_p.h"
-#include "drawer_p.h"
-#include "q3dlight.h"
-#include "qsurface3dseries_p.h"
 
-#include <QtGui/QMatrix4x4>
-#include <QtGui/QMouseEvent>
 #include <QtCore/qmath.h>
 
 static const int ID_TO_RGBA_MASK = 0xff;

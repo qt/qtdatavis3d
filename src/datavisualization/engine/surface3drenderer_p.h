@@ -32,17 +32,12 @@
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
-#include "scatterrenderitem_p.h"
-#include "qsurfacedataproxy.h"
 #include "surfaceseriesrendercache_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
-class ObjectHelper;
-class SurfaceObject;
 class Q3DScene;
-class SelectionPointer;
 
 class QT_DATAVISUALIZATION_EXPORT Surface3DRenderer : public Abstract3DRenderer
 {

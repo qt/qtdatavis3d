@@ -17,25 +17,13 @@
 ****************************************************************************/
 
 #include "scatter3drenderer_p.h"
-#include "scatter3dcontroller_p.h"
-#include "q3dcamera.h"
 #include "q3dcamera_p.h"
 #include "shaderhelper_p.h"
-#include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
-#include "q3dlight.h"
-#include "qscatter3dseries_p.h"
 #include "scatterseriesrendercache_p.h"
 
-#include <QtGui/QMatrix4x4>
-#include <QtGui/QMouseEvent>
-#include <QtCore/QThread>
 #include <QtCore/qmath.h>
-
-// Commenting this draws the shadow map with perspective projection. Otherwise it's drawn in
-// orthographic projection.
-//#define USE_WIDER_SHADOWS
 
 // You can verify that depth buffer drawing works correctly by uncommenting this.
 // You should see the scene from  where the light is
@@ -393,16 +381,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     zeroVector, 0.0f, 2.5f / m_autoScaleAdjustment);
         depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
         // Set the depth projection matrix
-#ifndef USE_WIDER_SHADOWS
-        // Use this for perspective shadows
         depthProjectionMatrix.perspective(15.0f, viewPortRatio, 3.0f, 100.0f);
-#else
-        // Use these for orthographic shadows
-        GLfloat testAspectRatio = viewPortRatio;
-        depthProjectionMatrix.ortho(-testAspectRatio * 2.0f, testAspectRatio * 2.0f,
-                                    -m_heightNormalizer * 2.0f, m_heightNormalizer * 2.0f,
-                                    0.0f, 100.0f);
-#endif
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
         // Draw dots to depth buffer

@@ -34,7 +34,6 @@
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "axisrendercache_p.h"
-#include "qabstractdataproxy.h"
 #include "seriesrendercache_p.h"
 #include "customrenderitem_p.h"
 

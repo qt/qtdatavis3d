@@ -32,17 +32,14 @@
 #include "datavisualizationglobal_p.h"
 #include "bars3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
-#include "qbardataproxy.h"
 #include "barrenderitem_p.h"
 
 class QPoint;
 class QSizeF;
-class QOpenGLShaderProgram;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
-class ObjectHelper;
 class LabelItem;
 class Q3DScene;
 class BarSeriesRenderCache;
@@ -172,8 +169,6 @@ private:
     inline void updateRenderItem(const QBarDataItem &dataItem, BarRenderItem &renderItem);
 
     Q_DISABLE_COPY(Bars3DRenderer)
-
-    friend class BarRenderItem;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -17,21 +17,12 @@
 ****************************************************************************/
 
 #include "bars3drenderer_p.h"
-#include "bars3dcontroller_p.h"
 #include "q3dcamera_p.h"
 #include "shaderhelper_p.h"
-#include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
-#include "drawer_p.h"
-#include "qbardataitem.h"
-#include "q3dlight.h"
-#include "qbar3dseries_p.h"
 #include "barseriesrendercache_p.h"
 
-#include <QtGui/QMatrix4x4>
-#include <QtGui/QMouseEvent>
-#include <QtCore/QThread>
 #include <QtCore/qmath.h>
 
 // You can verify that depth buffer drawing works correctly by uncommenting this.

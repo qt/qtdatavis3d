@@ -17,15 +17,9 @@
 ****************************************************************************/
 
 #include "abstract3drenderer_p.h"
-#include "qvalue3daxis.h"
 #include "texturehelper_p.h"
-#include "utils_p.h"
-#include "q3dscene_p.h"
 #include "q3dcamera_p.h"
-#include "q3dlight_p.h"
-#include "qabstract3dseries_p.h"
 #include "q3dtheme_p.h"
-#include "objecthelper_p.h"
 #include "qvalue3daxisformatter_p.h"
 #include "shaderhelper_p.h"
 #include "qcustom3ditem_p.h"
