@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "qabstract3dinputhandler_p.h"
-#include "q3dscene.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -30,7 +30,6 @@
 #define TEXTUREHELPER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QtGui/QOpenGLFunctions>
 #include <QtGui/QRgb>
 #include <QtGui/QLinearGradient>
 

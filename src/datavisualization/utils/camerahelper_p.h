@@ -33,9 +33,7 @@
 #include "q3dcamera.h"
 
 class QMatrix4x4;
-class QVector3D;
 class QPoint;
-class QPointF;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

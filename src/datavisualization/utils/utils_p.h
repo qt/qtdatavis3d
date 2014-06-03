@@ -31,12 +31,6 @@
 
 #include "datavisualizationglobal_p.h"
 
-class QVector3D;
-class QColor;
-class QPainter;
-class QString;
-class QPoint;
-class QImage;
 class QLinearGradient;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -55,8 +49,6 @@ public:
     static QVector4D vectorFromColor(const QColor &color);
     static QColor colorFromVector(const QVector3D &colorVector);
     static QColor colorFromVector(const QVector4D &colorVector);
-    static void printText(QPainter *painter, const QString &text, const QSize &position,
-                          bool absoluteCoords = true, float rotation = 0.0f, float scale = 1.0f);
     static QImage printTextToImage(const QFont &font,
                                    const QString &text,
                                    const QColor &bgrColor,

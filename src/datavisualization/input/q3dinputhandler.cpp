@@ -18,7 +18,6 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dinputhandler_p.h"
-#include "q3dcamera_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

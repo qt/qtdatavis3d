@@ -18,12 +18,7 @@
 
 #include "utils_p.h"
 
-#include <QtGui/QColor>
 #include <QtGui/QPainter>
-#include <QtCore/QPoint>
-#include <QtGui/QImage>
-#include <QtCore/QRegExp>
-#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

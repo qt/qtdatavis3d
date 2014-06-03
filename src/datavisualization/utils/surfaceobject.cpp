@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "surfaceobject_p.h"
-#include "abstractobjecthelper_p.h"
 #include "surface3drenderer_p.h"
 
 #include <QtGui/QVector2D>

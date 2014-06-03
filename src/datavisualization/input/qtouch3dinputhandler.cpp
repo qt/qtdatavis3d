@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "qtouch3dinputhandler_p.h"
-#include "q3dcamera_p.h"
 #include <QtCore/QTimer>
 #include <QtCore/qmath.h>
 

@@ -55,9 +55,6 @@ public:
     int m_prevDistance;
     QPoint m_previousInputPos;
 
-    GLfloat m_defaultXRotation;
-    GLfloat m_defaultYRotation;
-
 private:
     QAbstract3DInputHandler::InputView m_inputView;
     QPoint m_inputPosition;

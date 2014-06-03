@@ -19,7 +19,6 @@
 #include "meshloader_p.h"
 #include "vertexindexer_p.h"
 #include "objecthelper_p.h"
-#include "abstractobjecthelper_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

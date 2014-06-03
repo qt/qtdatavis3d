@@ -30,7 +30,6 @@
 #define ABSTRACTOBJECTHELPER_H
 
 #include "datavisualizationglobal_p.h"
-#include <QtGui/QOpenGLFunctions>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
