@@ -17,9 +17,6 @@
 ****************************************************************************/
 
 #include "declarativebars_p.h"
-#include "qvalue3daxis.h"
-#include "qitemmodelbardataproxy.h"
-#include "declarativescene_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

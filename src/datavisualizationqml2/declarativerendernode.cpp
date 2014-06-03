@@ -17,9 +17,7 @@
 ****************************************************************************/
 
 #include "declarativerendernode_p.h"
-#include "abstract3dcontroller_p.h"
 #include "abstractdeclarative_p.h"
-#include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLFramebufferObject>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION

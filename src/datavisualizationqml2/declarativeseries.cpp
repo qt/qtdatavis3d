@@ -17,14 +17,12 @@
 ****************************************************************************/
 
 #include "declarativeseries_p.h"
-#include "qbardataproxy.h"
-#include "qscatterdataproxy.h"
-#include "qsurfacedataproxy.h"
 #include <QtCore/QMetaMethod>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-static void setSeriesGradient(QAbstract3DSeries *series, const ColorGradient &gradient, GradientType type)
+static void setSeriesGradient(QAbstract3DSeries *series, const ColorGradient &gradient,
+                              GradientType type)
 {
     QLinearGradient newGradient;
     QGradientStops stops;
@@ -198,7 +196,8 @@ QQmlListProperty<QObject> DeclarativeScatter3DSeries::seriesChildren()
                                      , 0, 0, 0);
 }
 
-void DeclarativeScatter3DSeries::appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element)
+void DeclarativeScatter3DSeries::appendSeriesChildren(QQmlListProperty<QObject> *list,
+                                                      QObject *element)
 {
     QScatterDataProxy *proxy = qobject_cast<QScatterDataProxy *>(element);
     if (proxy)
@@ -293,7 +292,8 @@ QQmlListProperty<QObject> DeclarativeSurface3DSeries::seriesChildren()
                                      , 0, 0, 0);
 }
 
-void DeclarativeSurface3DSeries::appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element)
+void DeclarativeSurface3DSeries::appendSeriesChildren(QQmlListProperty<QObject> *list,
+                                                      QObject *element)
 {
     QSurfaceDataProxy *proxy = qobject_cast<QSurfaceDataProxy *>(element);
     if (proxy)

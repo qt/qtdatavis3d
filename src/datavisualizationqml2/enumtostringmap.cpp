@@ -15,11 +15,12 @@
 ** contact form at http://qt.digia.com
 **
 ****************************************************************************/
+
 #include "enumtostringmap_p.h"
-#include <QString>
-#include <QDebug>
 
 #ifdef VERBOSE_STATE_STORE
+
+#include <QDebug>
 
 static EnumToStringMap *theInstance = 0;
 static unsigned int theInstanceCount = 0;

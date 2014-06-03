@@ -32,9 +32,6 @@
 #include "datavisualizationglobal_p.h"
 #include "abstractdeclarative_p.h"
 #include "surface3dcontroller_p.h"
-#include "declarativesurface_p.h"
-#include "qvalue3daxis.h"
-#include "qsurfacedataproxy.h"
 #include "qsurface3dseries.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION

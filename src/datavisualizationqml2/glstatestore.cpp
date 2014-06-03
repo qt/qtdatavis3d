@@ -15,6 +15,7 @@
 ** contact form at http://qt.digia.com
 **
 ****************************************************************************/
+
 #include "glstatestore_p.h"
 #include <QDebug>
 #include <QColor>

@@ -31,12 +31,9 @@
 
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
-#include "qabstract3dinputhandler.h"
 #include "declarativescene_p.h"
 
-#include <QtCore/QAbstractItemModel>
 #include <QtQuick/QQuickItem>
-#include <QtQuick/QQuickWindow>
 #include <QtCore/QPointer>
 #include <QtCore/QThread>
 

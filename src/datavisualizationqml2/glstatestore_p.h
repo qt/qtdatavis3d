@@ -29,9 +29,7 @@
 #ifndef GLSTATESTORE_P_H
 #define GLSTATESTORE_P_H
 
-#include <QObject>
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLContext>
 #include <QtCore/QScopedArrayPointer>
 #include "enumtostringmap_p.h"
 

@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "abstractdeclarative_p.h"
-#include "qvalue3daxis.h"
 #include "declarativetheme_p.h"
 #include "declarativerendernode_p.h"
 

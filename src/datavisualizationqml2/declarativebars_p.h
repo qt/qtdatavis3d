@@ -32,11 +32,6 @@
 #include "datavisualizationglobal_p.h"
 #include "abstractdeclarative_p.h"
 #include "bars3dcontroller_p.h"
-#include "declarativebars_p.h"
-#include "qvalue3daxis.h"
-#include "qcategory3daxis.h"
-#include "qbardataproxy.h"
-#include "qbar3dseries.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
