@@ -121,33 +121,21 @@ Rectangle {
                 Layout.fillHeight: true
                 series: station1
                 theme: barGraph.theme
-                onColorChanged: legendPanel.relayout()
             }
             LegendItem {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 series: station2
                 theme: barGraph.theme
-                onColorChanged: legendPanel.relayout()
             }
             LegendItem {
                 Layout.fillWidth: true
                 Layout.fillHeight: true
                 series: station3
                 theme: barGraph.theme
-                onColorChanged: legendPanel.relayout()
             }
         }
         //! [0]
-
-        function relayout() {
-            // Workaround for a layout bug that causes transparent colors to use black background
-            // instead of what is actually under the items if just the color changes.
-            // Forcing a relayout by adjusting layout's available area fixes the background.
-            var originalWidth = border.width
-            border.width = originalWidth + 1
-            border.width = originalWidth
-        }
 
         states: [
             State  {

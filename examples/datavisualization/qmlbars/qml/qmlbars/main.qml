@@ -185,18 +185,22 @@ Rectangle {
                 anchors.right: parent.right
                 color: styleData.textColor
                 elide: styleData.elideMode
-                text: styleData.value
+                text: customText
                 horizontalAlignment: styleData.textAlignment
 
-                property bool customFormatted: false
+                property string originalText: styleData.value
+                property string customText
 
-                onTextChanged: {
-                    if (styleData.column === 0 && !customFormatted) {
-                        customFormatted = true
-                        var pattern = /(\d\d\d\d)-(\d\d)/
-                        var matches = pattern.exec(delegateText.text)
-                        var colIndex = parseInt(matches[2], 10) - 1
-                        delegateText.text = matches[1] + " - " + graphAxes.column.labels[colIndex]
+                onOriginalTextChanged: {
+                    if (styleData.column === 0) {
+                        if (delegateText.originalText !== "") {
+                            var pattern = /(\d\d\d\d)-(\d\d)/
+                            var matches = pattern.exec(delegateText.originalText)
+                            var colIndex = parseInt(matches[2], 10) - 1
+                            delegateText.customText = matches[1] + " - " + graphAxes.column.labels[colIndex]
+                        }
+                    } else {
+                        delegateText.customText = originalText
                     }
                 }
             }

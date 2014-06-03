@@ -82,6 +82,13 @@ Item {
                 meshSmooth: true
                 itemLabelFormat: "@xLabel, @zLabel: @yLabel"
                 itemLabelVisible: false
+
+                onItemLabelChanged: {
+                    if (surfaceSeries.selectedPoint === surfaceSeries.invalidSelectionPosition)
+                        selectionText.text = "No selection"
+                    else
+                        selectionText.text = surfaceSeries.itemLabel
+                }
             }
             //! [0]
 
@@ -244,15 +251,7 @@ Item {
                         anchors.fill: parent
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
-
-                        Binding on text {
-                            when: surfaceSeries.itemLabel.length
-                            value: surfaceSeries.itemLabel
-                        }
-                        Binding on text {
-                            when: !surfaceSeries.itemLabel.length
-                            value: "No selection"
-                        }
+                        text: "No selection"
                     }
                 }
             }

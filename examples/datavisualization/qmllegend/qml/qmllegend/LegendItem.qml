@@ -31,6 +31,12 @@ Rectangle {
     id: legendItem
     state: "unselected"
 
+    // Workaround for a layout bug that in some situations causes changing from fully opaque color
+    // to a transparent one to use black background instead of what is actually under the items.
+    // Having the control always slighthly transparent forces the background to be refreshed
+    // properly.
+    opacity: 0.999
+
     //! [1]
     RowLayout {
         anchors.fill: parent

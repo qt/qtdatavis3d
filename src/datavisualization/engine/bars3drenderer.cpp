@@ -2058,7 +2058,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     }
 
     QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
-    labelCount = qMin(m_axisCacheZ.labelCount(), m_cachedColumnCount);
+    labelCount = qMin(m_axisCacheZ.labelCount(), m_cachedRowCount);
     if (m_zFlipped) {
         startIndex = 0;
         endIndex = labelCount;
