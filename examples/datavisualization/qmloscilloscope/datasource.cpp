@@ -23,7 +23,6 @@ using namespace QtDataVisualization;
 
 //! [3]
 Q_DECLARE_METATYPE(QSurface3DSeries *)
-Q_DECLARE_METATYPE(QValue3DAxis *)
 //! [3]
 
 DataSource::DataSource(QObject *parent) :
@@ -33,7 +32,6 @@ DataSource::DataSource(QObject *parent) :
 {
     //! [4]
     qRegisterMetaType<QSurface3DSeries *>();
-    qRegisterMetaType<QValue3DAxis *>();
     //! [4]
 }
 

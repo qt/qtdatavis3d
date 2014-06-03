@@ -226,8 +226,10 @@ void GraphDataGenerator::changeSelectedButtonClicked()
     QVariant value = QVariant::fromValue(float((rand() % 10) + 1));
     QList<QTableWidgetItem *> selectedItems = m_tableWidget->selectedItems();
     foreach (QTableWidgetItem *item, selectedItems) {
+        QString oldData = item->data(Qt::DisplayRole).toString();
         item->setData(Qt::DisplayRole,
-                      QString::number(value.toReal())
+                      oldData.left(5)
+                      .append(QString::number(value.toReal()))
                       .append("/")
                       .append(QString::number(value.toReal() * 10)));
     }

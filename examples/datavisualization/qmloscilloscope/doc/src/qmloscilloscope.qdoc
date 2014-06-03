@@ -64,9 +64,9 @@
 
     \snippet qmloscilloscope/main.cpp 0
 
-    To make it possible to use Qt Data Visualization class pointers as parameters on the
+    To make it possible to use QSurface3DSeries pointers as parameters on the
     \c DataSource class methods on all environments and builds, we need to make sure the meta
-    types are registered:
+    type is registered:
 
     \snippet qmloscilloscope/datasource.cpp 3
     \dots 0

@@ -230,7 +230,8 @@ QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputH
     m_previousInputPos(QPoint(0,0)),
     m_inputView(QAbstract3DInputHandler::InputViewNone),
     m_inputPosition(QPoint(0,0)),
-    m_scene(0)
+    m_scene(0),
+    m_isDefaultHandler(false)
 {
 }
 

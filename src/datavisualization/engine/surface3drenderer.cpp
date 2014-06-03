@@ -1126,9 +1126,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
 
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-
         Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
                                             projectionViewMatrix, depthProjectionViewMatrix,
                                             m_depthTexture, m_shadowQualityToShader);
