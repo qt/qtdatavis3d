@@ -646,7 +646,8 @@ bool QAbstract3DSeries::isItemLabelVisible() const
 
 // QAbstract3DSeriesPrivate
 
-QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type)
+QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q,
+                                                   QAbstract3DSeries::SeriesType type)
     : QObject(0),
       q_ptr(q),
       m_type(type),
