@@ -582,7 +582,8 @@ void Abstract3DController::handleThemeSingleHighlightColorChanged(const QColor &
     markSeriesVisualsDirty();
 }
 
-void Abstract3DController::handleThemeSingleHighlightGradientChanged(const QLinearGradient &gradient)
+void Abstract3DController::handleThemeSingleHighlightGradientChanged(
+        const QLinearGradient &gradient)
 {
     // Set value for series that have not explicitly set this value
     foreach (QAbstract3DSeries *series, m_seriesList) {
@@ -1361,7 +1362,8 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
     }
 }
 
-QAbstract3DAxis *Abstract3DController::createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation)
+QAbstract3DAxis *Abstract3DController::createDefaultAxis(
+        QAbstract3DAxis::AxisOrientation orientation)
 {
     Q_UNUSED(orientation)
 

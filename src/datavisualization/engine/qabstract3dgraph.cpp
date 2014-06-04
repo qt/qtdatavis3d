@@ -187,7 +187,8 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
 
 #if !defined(QT_OPENGL_ES_2)
     // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
-    QStringList splitversionstr = QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
+    QStringList splitversionstr =
+            QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
     if (splitversionstr[0].toFloat() < 1.2)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #else

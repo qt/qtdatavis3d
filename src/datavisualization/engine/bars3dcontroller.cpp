@@ -584,7 +584,8 @@ void Bars3DController::adjustAxisRanges()
         int seriesCount = m_seriesList.size();
         if (adjustZ || adjustX) {
             for (int series = 0; series < seriesCount; series++) {
-                const QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_seriesList.at(series));
+                const QBar3DSeries *barSeries =
+                        static_cast<QBar3DSeries *>(m_seriesList.at(series));
                 if (barSeries->isVisible()) {
                     const QBarDataProxy *proxy = barSeries->dataProxy();
 
@@ -620,14 +621,16 @@ void Bars3DController::adjustAxisRanges()
         // Now that we know the row and column ranges, figure out the value axis range
         if (adjustY) {
             for (int series = 0; series < seriesCount; series++) {
-                const QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_seriesList.at(series));
+                const QBar3DSeries *barSeries =
+                        static_cast<QBar3DSeries *>(m_seriesList.at(series));
                 if (barSeries->isVisible()) {
                     const QBarDataProxy *proxy = barSeries->dataProxy();
                     if (adjustY && proxy) {
-                        QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisZ->min(),
-                                                                                     categoryAxisZ->max(),
-                                                                                     categoryAxisX->min(),
-                                                                                     categoryAxisX->max());
+                        QPair<GLfloat, GLfloat> limits =
+                                proxy->dptrc()->limitValues(categoryAxisZ->min(),
+                                                            categoryAxisZ->max(),
+                                                            categoryAxisX->min(),
+                                                            categoryAxisX->max());
                         if (!series) {
                             // First series initializes the values
                             minValue = limits.first;

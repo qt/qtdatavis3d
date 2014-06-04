@@ -309,8 +309,9 @@ void Abstract3DRenderer::calculateZoomLevel()
     GLfloat div;
     GLfloat zoomAdjustment;
     div = qMin(m_primarySubViewport.width(), m_primarySubViewport.height());
-    zoomAdjustment = 2.0f * defaultRatio * ((m_primarySubViewport.width() / div)
-                                            / (m_primarySubViewport.height() / div)) / m_graphAspectRatio;
+    zoomAdjustment = 2.0f * defaultRatio
+            * ((m_primarySubViewport.width() / div)
+               / (m_primarySubViewport.height() / div)) / m_graphAspectRatio;
     m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 }
 
@@ -794,7 +795,8 @@ void Abstract3DRenderer::generateBaseColorTexture(const QColor &color, GLuint *t
     *texture = m_textureHelper->createUniformTexture(color);
 }
 
-void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture)
+void Abstract3DRenderer::fixGradientAndGenerateTexture(QLinearGradient *gradient,
+                                                       GLuint *gradientTexture)
 {
     // Readjust start/stop to match gradient texture size
     gradient->setStart(qreal(gradientTextureWidth), qreal(gradientTextureHeight));

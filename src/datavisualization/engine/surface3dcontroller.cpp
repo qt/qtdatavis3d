@@ -200,7 +200,8 @@ void Surface3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode
     }
 }
 
-void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSeries *series, bool enterSlice)
+void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSeries *series,
+                                           bool enterSlice)
 {
     // If the selection targets non-existent point, clear selection instead.
     QPoint pos = position;

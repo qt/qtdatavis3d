@@ -205,10 +205,12 @@ float Q3DCamera::xRotation() const {
 
 void Q3DCamera::setXRotation(float rotation)
 {
-    if (d_ptr->m_wrapXRotation)
+    if (d_ptr->m_wrapXRotation) {
         rotation = Utils::wrapValue(rotation, d_ptr->m_minXRotation, d_ptr->m_maxXRotation);
-    else
-        rotation = qBound(float(d_ptr->m_minXRotation), float(rotation), float(d_ptr->m_maxXRotation));
+    } else {
+        rotation = qBound(float(d_ptr->m_minXRotation), float(rotation),
+                          float(d_ptr->m_maxXRotation));
+    }
 
     if (d_ptr->m_xRotation != rotation) {
         d_ptr->setXRotation(rotation);
@@ -232,10 +234,12 @@ float Q3DCamera::yRotation() const {
 
 void Q3DCamera::setYRotation(float rotation)
 {
-    if (d_ptr->m_wrapYRotation)
+    if (d_ptr->m_wrapYRotation) {
         rotation = Utils::wrapValue(rotation, d_ptr->m_minYRotation, d_ptr->m_maxYRotation);
-    else
-        rotation = qBound(float(d_ptr->m_minYRotation), float(rotation), float(d_ptr->m_maxYRotation));
+    } else {
+        rotation = qBound(float(d_ptr->m_minYRotation), float(rotation),
+                          float(d_ptr->m_maxYRotation));
+    }
 
     if (d_ptr->m_yRotation != rotation) {
         d_ptr->setYRotation(rotation);
