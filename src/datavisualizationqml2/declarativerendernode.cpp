@@ -24,15 +24,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 DeclarativeRenderNode::DeclarativeRenderNode(AbstractDeclarative *declarative)
     : QSGGeometryNode(),
-    m_geometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4),
-    m_texture(0),
-    m_declarative(declarative),
-    m_controller(0),
-    m_fbo(0),
-    m_multisampledFBO(0),
-    m_window(0),
-    m_samples(0),
-    m_dirtyFBO(false)
+      m_geometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4),
+      m_texture(0),
+      m_declarative(declarative),
+      m_controller(0),
+      m_fbo(0),
+      m_multisampledFBO(0),
+      m_window(0),
+      m_samples(0),
+      m_dirtyFBO(false)
 {
     setMaterial(&m_material);
     setOpaqueMaterial(&m_materialO);
@@ -90,8 +90,10 @@ void DeclarativeRenderNode::updateFBO()
 
     QSGGeometry::updateTexturedRectGeometry(&m_geometry,
                                             QRectF(0, 0,
-                                                   m_size.width() / m_controller->scene()->devicePixelRatio(),
-                                                   m_size.height() / m_controller->scene()->devicePixelRatio()),
+                                                   m_size.width()
+                                                   / m_controller->scene()->devicePixelRatio(),
+                                                   m_size.height()
+                                                   / m_controller->scene()->devicePixelRatio()),
                                             QRectF(0, 1, 1, -1));
 
     delete m_texture;

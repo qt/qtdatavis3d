@@ -87,7 +87,8 @@ bool DeclarativeBars::isMultiSeriesUniform() const
 void DeclarativeBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {
-        m_barsController->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+        m_barsController->setBarSpecs(GLfloat(thicknessRatio), barSpacing(),
+                                      isBarSpacingRelative());
         emit barThicknessChanged(thicknessRatio);
     }
 }

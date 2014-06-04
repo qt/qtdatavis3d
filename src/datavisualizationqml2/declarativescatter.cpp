@@ -77,13 +77,14 @@ QScatter3DSeries *DeclarativeScatter::selectedSeries() const
 QQmlListProperty<QScatter3DSeries> DeclarativeScatter::seriesList()
 {
     return QQmlListProperty<QScatter3DSeries>(this, this,
-                                          &DeclarativeScatter::appendSeriesFunc,
-                                          &DeclarativeScatter::countSeriesFunc,
-                                          &DeclarativeScatter::atSeriesFunc,
-                                          &DeclarativeScatter::clearSeriesFunc);
+                                              &DeclarativeScatter::appendSeriesFunc,
+                                              &DeclarativeScatter::countSeriesFunc,
+                                              &DeclarativeScatter::atSeriesFunc,
+                                              &DeclarativeScatter::clearSeriesFunc);
 }
 
-void DeclarativeScatter::appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, QScatter3DSeries *series)
+void DeclarativeScatter::appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list,
+                                          QScatter3DSeries *series)
 {
     reinterpret_cast<DeclarativeScatter *>(list->data)->addSeries(series);
 }

@@ -112,11 +112,14 @@ void GLStateStore::storeGLState()
     glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &m_boundElementArrayBuffer);
 
     for (int i = 0; i < m_maxVertexAttribs;i++) {
-        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &m_vertexAttribArrayEnabledStates[i]);
-        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &m_vertexAttribArrayBoundBuffers[i]);
+        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_ENABLED,
+                            &m_vertexAttribArrayEnabledStates[i]);
+        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+                            &m_vertexAttribArrayBoundBuffers[i]);
         glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_SIZE, &m_vertexAttribArraySizes[i]);
         glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_TYPE, &m_vertexAttribArrayTypes[i]);
-        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &m_vertexAttribArrayNormalized[i]);
+        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED,
+                            &m_vertexAttribArrayNormalized[i]);
         glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &m_vertexAttribArrayStrides[i]);
     }
 }
@@ -201,11 +204,14 @@ void GLStateStore::printCurrentState(bool in)
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &arrayBufferBinding);
 
         for (int i = 0; i < m_maxVertexAttribs;i++) {
-            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &vertexAttribArrayEnabledStates[i]);
-            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &vertexAttribArrayBoundBuffers[i]);
+            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_ENABLED,
+                                &vertexAttribArrayEnabledStates[i]);
+            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+                                &vertexAttribArrayBoundBuffers[i]);
             glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_SIZE, &vertexAttribArraySizes[i]);
             glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_TYPE, &vertexAttribArrayTypes[i]);
-            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &vertexAttribArrayNormalized[i]);
+            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED,
+                                &vertexAttribArrayNormalized[i]);
             glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &vertexAttribArrayStrides[i]);
         }
 
