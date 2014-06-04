@@ -92,6 +92,7 @@ public slots:
     void changeLabelRotation(int rotation);
     void toggleAxisTitleVisibility(bool enabled);
     void toggleAxisTitleFixed(bool enabled);
+    void renderToImage();
 
 signals:
     void shadowQualityChanged(int quality);

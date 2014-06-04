@@ -129,6 +129,9 @@ int main(int argc, char **argv)
     QPushButton *testReverseButton = new QPushButton(widget);
     testReverseButton->setText(QStringLiteral("Test Axis Reversing"));
 
+    QPushButton *renderToImageButton = new QPushButton(widget);
+    renderToImageButton->setText(QStringLiteral("Render the graph to an image"));
+
     QLinearGradient grBtoY(0, 0, 100, 0);
     grBtoY.setColorAt(1.0, Qt::black);
     grBtoY.setColorAt(0.67, Qt::blue);
@@ -270,7 +273,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
     vLayout->addWidget(massiveDataTestButton, 0, Qt::AlignTop);
     vLayout->addWidget(testItemChangesButton, 0, Qt::AlignTop);
-    vLayout->addWidget(testReverseButton, 1, Qt::AlignTop);
+    vLayout->addWidget(testReverseButton, 0, Qt::AlignTop);
+    vLayout->addWidget(renderToImageButton, 1, Qt::AlignTop);
 
     vLayout2->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
     vLayout2->addWidget(fpsLabel, 0, Qt::AlignTop);
@@ -298,8 +302,6 @@ int main(int argc, char **argv)
     vLayout2->addWidget(axisTitlesFixedCB);
     vLayout2->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
     vLayout2->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
-
-    widget->show();
 
     ScatterDataModifier *modifier = new ScatterDataModifier(chart);
 
@@ -352,6 +354,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::testItemChanges);
     QObject::connect(testReverseButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::testAxisReverse);
+    QObject::connect(renderToImageButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::renderToImage);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::setGradient);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
@@ -396,7 +400,12 @@ int main(int argc, char **argv)
 
     modifier->setFpsLabel(fpsLabel);
 
+    chart->setGeometry(QRect(0, 0, 800, 800));
+
     modifier->start();
+    modifier->renderToImage(); // Initial hidden render
+
+    widget->show();
 
     return app.exec();
 }

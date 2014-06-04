@@ -948,6 +948,28 @@ void ScatterDataModifier::toggleAxisTitleFixed(bool enabled)
     m_chart->axisZ()->setTitleFixed(enabled);
 }
 
+void ScatterDataModifier::renderToImage()
+{
+    QImage renderedImage8AA = m_chart->renderToImage(8);
+    QImage renderedImageNoAA = m_chart->renderToImage(0);
+    QImage renderedImage8AASmall = m_chart->renderToImage(8, QSize(100, 100));
+    QImage renderedImageNoAASmall = m_chart->renderToImage(0, QSize(100, 100));
+
+    if (m_chart->isVisible()) {
+        renderedImage8AA.save(QStringLiteral("./renderedImage8AA_visible.png"));
+        renderedImageNoAA.save(QStringLiteral("./renderedImageNoAA_visible.png"));
+        renderedImage8AASmall.save(QStringLiteral("./renderedImage8AASmall_visible.png"));
+        renderedImageNoAASmall.save(QStringLiteral("./renderedImageNoAASmall_visible.png"));
+        qDebug() << "Visible images rendered!";
+    } else {
+        renderedImage8AA.save(QStringLiteral("./renderedImage8AA_hidden.png"));
+        renderedImageNoAA.save(QStringLiteral("./renderedImageNoAA_hidden.png"));
+        renderedImage8AASmall.save(QStringLiteral("./renderedImage8AASmall_hidden.png"));
+        renderedImageNoAASmall.save(QStringLiteral("./renderedImageNoAASmall_hidden.png"));
+        qDebug() << "Hidden images rendered!";
+    }
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
