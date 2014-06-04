@@ -2238,7 +2238,7 @@ void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
     cache->setSelectionIdRange(idStart, lastSelectionId - 1);
 
     // Move the ID image (bits) to the texture
-    QImage image = QImage(bits, idImageWidth, idImageHeight, QImage::Format_ARGB32);
+    QImage image = QImage(bits, idImageWidth, idImageHeight, QImage::Format_RGB32);
     GLuint selectionTexture = m_textureHelper->create2DTexture(image, false, false, false);
     cache->setSelectionTexture(selectionTexture);
 
