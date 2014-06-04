@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "texturehelper_p.h"
+#include "utils_p.h"
 
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
