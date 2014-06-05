@@ -16,10 +16,7 @@
 **
 ****************************************************************************/
 
-#include "q3dcamera.h"
 #include "q3dcamera_p.h"
-#include "q3dscene.h"
-#include "q3dobject.h"
 #include "utils_p.h"
 
 #include <QtCore/qmath.h>
@@ -30,7 +27,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class Q3DCamera
  * \inmodule QtDataVisualization
  * \brief Representation of a camera in 3D space.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * Q3DCamera represents a basic orbit around centerpoint 3D camera that is used when rendering the
  * data visualization. The class offers simple methods for rotating the camera around the origin
@@ -85,7 +82,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * data visualization. The type offers simple methods for rotating the camera around the origin
  * and setting zoom level.
  *
- * For Camera3D enums, see \l Q3DCamera::CameraPreset
+ * For Camera3D enums, see \l{Q3DCamera::CameraPreset}.
  */
 
 /*!
@@ -208,10 +205,12 @@ float Q3DCamera::xRotation() const {
 
 void Q3DCamera::setXRotation(float rotation)
 {
-    if (d_ptr->m_wrapXRotation)
+    if (d_ptr->m_wrapXRotation) {
         rotation = Utils::wrapValue(rotation, d_ptr->m_minXRotation, d_ptr->m_maxXRotation);
-    else
-        rotation = qBound(float(d_ptr->m_minXRotation), float(rotation), float(d_ptr->m_maxXRotation));
+    } else {
+        rotation = qBound(float(d_ptr->m_minXRotation), float(rotation),
+                          float(d_ptr->m_maxXRotation));
+    }
 
     if (d_ptr->m_xRotation != rotation) {
         d_ptr->setXRotation(rotation);
@@ -235,10 +234,12 @@ float Q3DCamera::yRotation() const {
 
 void Q3DCamera::setYRotation(float rotation)
 {
-    if (d_ptr->m_wrapYRotation)
+    if (d_ptr->m_wrapYRotation) {
         rotation = Utils::wrapValue(rotation, d_ptr->m_minYRotation, d_ptr->m_maxYRotation);
-    else
-        rotation = qBound(float(d_ptr->m_minYRotation), float(rotation), float(d_ptr->m_maxYRotation));
+    } else {
+        rotation = qBound(float(d_ptr->m_minYRotation), float(rotation),
+                          float(d_ptr->m_maxYRotation));
+    }
 
     if (d_ptr->m_yRotation != rotation) {
         d_ptr->setYRotation(rotation);

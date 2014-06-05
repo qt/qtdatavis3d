@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qabstract3daxis.h"
 #include "qabstract3daxis_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -25,7 +24,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QAbstract3DAxis
  * \inmodule QtDataVisualization
  * \brief QAbstract3DAxis is base class for axes of a graph.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * You should not need to use this class directly, but one of its subclasses instead.
  *
@@ -42,12 +41,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * For AbstractAxis3D enums, see \l QAbstract3DAxis::AxisOrientation and \l QAbstract3DAxis::AxisType
+ * For AbstractAxis3D enums, see \l QAbstract3DAxis::AxisOrientation and
+ * \l{QAbstract3DAxis::AxisType}.
  */
 
 /*!
  * \qmlproperty string AbstractAxis3D::title
  * Defines the title for the axis.
+ *
+ * \sa titleVisible, titleFixed
  */
 
 /*!
@@ -88,6 +90,36 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If set, the axis will automatically adjust the range so that all data fits in it.
  */
 
+/*!
+ * \qmlproperty real AbstractAxis3D::labelAutoRotation
+ *
+ * Defines the maximum \a angle the labels can autorotate when the camera angle changes.
+ * The \a angle can be between 0 and 90, inclusive. The default value is 0.
+ * If the value is 0, axis labels do not automatically rotate.
+ * If the value is greater than zero, labels attempt to orient themselves toward the camera, up to
+ * the specified angle.
+ */
+
+/*!
+ * \qmlproperty bool AbstractAxis3D::titleVisible
+ *
+ * Defines if the axis title is visible in the primary graph view. The default value is \c{false}.
+ *
+ * \sa title, titleFixed
+ */
+
+/*!
+ * \qmlproperty bool AbstractAxis3D::titleFixed
+ *
+ * If \c{true}, axis titles in the primary graph view will be rotated towards the camera similarly
+ * to the axis labels.
+ * If \c{false}, axis titles are only rotated around their axis but are not otherwise oriented
+ * towards the camera.
+ * This property doesn't have any effect if labelAutoRotation property value is zero.
+ * Default value is \c{true}.
+ *
+ * \sa labelAutoRotation, title, titleVisible
+ */
 
 /*!
  * \enum QAbstract3DAxis::AxisOrientation
@@ -150,6 +182,8 @@ QAbstract3DAxis::AxisType QAbstract3DAxis::type() const
  * \property QAbstract3DAxis::title
  *
  * Defines the title for the axis.
+ *
+ * \sa titleVisible, titleFixed
  */
 void QAbstract3DAxis::setTitle(const QString &title)
 {
@@ -190,6 +224,77 @@ void QAbstract3DAxis::setRange(float min, float max)
 {
     d_ptr->setRange(min, max);
     setAutoAdjustRange(false);
+}
+
+/*!
+ * \property QAbstract3DAxis::labelAutoRotation
+ *
+ * Defines the maximum \a angle the labels can autorotate when the camera angle changes.
+ * The \a angle can be between 0 and 90, inclusive. The default value is 0.
+ * If the value is 0, axis labels do not automatically rotate.
+ * If the value is greater than zero, labels attempt to orient themselves toward the camera, up to
+ * the specified angle.
+ */
+void QAbstract3DAxis::setLabelAutoRotation(float angle)
+{
+    if (angle < 0.0f)
+        angle = 0.0f;
+    if (angle > 90.0f)
+        angle = 90.0f;
+    if (d_ptr->m_labelAutoRotation != angle) {
+        d_ptr->m_labelAutoRotation = angle;
+        emit labelAutoRotationChanged(angle);
+    }
+}
+
+float QAbstract3DAxis::labelAutoRotation() const
+{
+    return d_ptr->m_labelAutoRotation;
+}
+
+/*!
+ * \property QAbstract3DAxis::titleVisible
+ *
+ * Defines if the axis title is visible in the primary graph view. The default value is \c{false}.
+ *
+ * \sa title, titleFixed
+ */
+void QAbstract3DAxis::setTitleVisible(bool visible)
+{
+    if (d_ptr->m_titleVisible != visible) {
+        d_ptr->m_titleVisible = visible;
+        emit titleVisibilityChanged(visible);
+    }
+}
+
+bool QAbstract3DAxis::isTitleVisible() const
+{
+    return d_ptr->m_titleVisible;
+}
+
+/*!
+ * \property QAbstract3DAxis::titleFixed
+ *
+ * If \c{true}, axis titles in the primary graph view will be rotated towards the camera similarly
+ * to the axis labels.
+ * If \c{false}, axis titles are only rotated around their axis but are not otherwise oriented
+ * towards the camera.
+ * This property doesn't have any effect if labelAutoRotation property value is zero.
+ * Default value is \c{true}.
+ *
+ * \sa labelAutoRotation, title, titleVisible
+ */
+void QAbstract3DAxis::setTitleFixed(bool fixed)
+{
+    if (d_ptr->m_titleFixed != fixed) {
+        d_ptr->m_titleFixed = fixed;
+        emit titleFixedChanged(fixed);
+    }
+}
+
+bool QAbstract3DAxis::isTitleFixed() const
+{
+    return d_ptr->m_titleFixed;
 }
 
 /*!
@@ -266,8 +371,9 @@ QAbstract3DAxisPrivate::QAbstract3DAxisPrivate(QAbstract3DAxis *q, QAbstract3DAx
       m_min(0.0f),
       m_max(10.0f),
       m_autoAdjust(true),
-      m_onlyPositiveValues(false),
-      m_allowMinMaxSame(false)
+      m_labelAutoRotation(0.0f),
+      m_titleVisible(false),
+      m_titleFixed(true)
 {
 }
 
@@ -290,17 +396,28 @@ void QAbstract3DAxisPrivate::updateLabels()
     // Default implementation does nothing
 }
 
-void QAbstract3DAxisPrivate::setRange(float min, float max)
+void QAbstract3DAxisPrivate::setRange(float min, float max, bool suppressWarnings)
 {
     bool adjusted = false;
-    if (m_onlyPositiveValues) {
-        if (min < 0.0f) {
-            min = 0.0f;
-            adjusted = true;
-        }
-        if (max < 0.0f) {
-            max = 0.0f;
-            adjusted = true;
+    if (!allowNegatives()) {
+        if (allowZero()) {
+            if (min < 0.0f) {
+                min = 0.0f;
+                adjusted = true;
+            }
+            if (max < 0.0f) {
+                max = 0.0f;
+                adjusted = true;
+            }
+        } else {
+            if (min <= 0.0f) {
+                min = 1.0f;
+                adjusted = true;
+            }
+            if (max <= 0.0f) {
+                max = 1.0f;
+                adjusted = true;
+            }
         }
     }
     // If min >= max, we adjust ranges so that
@@ -312,8 +429,8 @@ void QAbstract3DAxisPrivate::setRange(float min, float max)
         m_min = min;
         minDirty = true;
     }
-    if (m_max != max || min > max || (!m_allowMinMaxSame && min == max)) {
-        if (min > max || (!m_allowMinMaxSame && min == max)) {
+    if (m_max != max || min > max || (!allowMinMaxSame() && min == max)) {
+        if (min > max || (!allowMinMaxSame() && min == max)) {
             m_max = min + 1.0f;
             adjusted = true;
         } else {
@@ -323,7 +440,7 @@ void QAbstract3DAxisPrivate::setRange(float min, float max)
     }
 
     if (minDirty || maxDirty) {
-        if (adjusted) {
+        if (adjusted && !suppressWarnings) {
             qWarning() << "Warning: Tried to set invalid range for axis."
                           " Range automatically adjusted to a valid one:"
                        << min << "-" << max << "-->" << m_min << "-" << m_max;
@@ -339,17 +456,25 @@ void QAbstract3DAxisPrivate::setRange(float min, float max)
 
 void QAbstract3DAxisPrivate::setMin(float min)
 {
-    if (m_onlyPositiveValues) {
-        if (min < 0.0f) {
-            min = 0.0f;
-            qWarning() << "Warning: Tried to set negative minimum for an axis that only supports"
-                          " positive values:" << min;
+    if (!allowNegatives()) {
+        if (allowZero()) {
+            if (min < 0.0f) {
+                min = 0.0f;
+                qWarning() << "Warning: Tried to set negative minimum for an axis that only"
+                              "supports positive values and zero:" << min;
+            }
+        } else {
+            if (min <= 0.0f) {
+                min = 1.0f;
+                qWarning() << "Warning: Tried to set negative or zero minimum for an axis that only"
+                              "supports positive values:" << min;
+            }
         }
     }
 
     if (m_min != min) {
         bool maxChanged = false;
-        if (min > m_max || (!m_allowMinMaxSame && min == m_max)) {
+        if (min > m_max || (!allowMinMaxSame() && min == m_max)) {
             float oldMax = m_max;
             m_max = min + 1.0f;
             qWarning() << "Warning: Tried to set minimum to equal or larger than maximum for"
@@ -368,22 +493,34 @@ void QAbstract3DAxisPrivate::setMin(float min)
 
 void QAbstract3DAxisPrivate::setMax(float max)
 {
-    if (m_onlyPositiveValues) {
-        if (max < 0.0f) {
-            max = 0.0f;
-            qWarning() << "Warning: Tried to set negative maximum for an axis that only supports"
-                          " positive values:" << max;
+    if (!allowNegatives()) {
+        if (allowZero()) {
+            if (max < 0.0f) {
+                max = 0.0f;
+                qWarning() << "Warning: Tried to set negative maximum for an axis that only"
+                              "supports positive values and zero:" << max;
+            }
+        } else {
+            if (max <= 0.0f) {
+                max = 1.0f;
+                qWarning() << "Warning: Tried to set negative or zero maximum for an axis that only"
+                              "supports positive values:" << max;
+            }
         }
     }
 
     if (m_max != max) {
         bool minChanged = false;
-        if (m_min > max || (!m_allowMinMaxSame && m_min == max)) {
+        if (m_min > max || (!allowMinMaxSame() && m_min == max)) {
             float oldMin = m_min;
             m_min = max - 1.0f;
-            if (m_onlyPositiveValues && m_min < 0.0f) {
-                m_min = 0.0f;
-                if (!m_allowMinMaxSame && max == 0.0f) {
+            if (!allowNegatives() && m_min < 0.0f) {
+                if (allowZero())
+                    m_min = 0.0f;
+                else
+                    m_min = max / 2.0f; // Need some positive value smaller than max
+
+                if (!allowMinMaxSame() && max == 0.0f) {
                     m_min = oldMin;
                     qWarning() << "Unable to set maximum value to zero.";
                     return;

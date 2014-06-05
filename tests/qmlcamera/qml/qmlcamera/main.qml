@@ -18,7 +18,7 @@
 
 import QtQuick 2.1
 import QtQuick.Controls 1.0
-import QtDataVisualization 1.0
+import QtDataVisualization 1.1
 import "."
 
 Rectangle {
@@ -66,6 +66,25 @@ Rectangle {
             scene.activeCamera.yRotation: camControlArea.yValue
             scene.activeCamera.zoomLevel: zoomSlider.value
             inputHandler: null
+
+            customItemList: [shuttleItem, labelItem]
+        }
+
+        Custom3DItem {
+            id: shuttleItem
+            meshFile: ":/items/shuttle.obj"
+            textureFile: ":/items/shuttle.png"
+            position: Qt.vector3d(5.0,29.0,3.0)
+            scaling: Qt.vector3d(0.2,0.2,0.2)
+        }
+
+        Custom3DLabel {
+            id: labelItem
+            facingCamera: true
+            positionAbsolute: true
+            position: Qt.vector3d(0.0,1.5,0.0)
+            scaling: Qt.vector3d(1.0,1.0,1.0)
+            text: "Qt Shuttle"
         }
 
         MouseArea {
@@ -75,9 +94,10 @@ Rectangle {
             property bool selectionOn: false
 
             onPressed: {
-                if (mouse.button == Qt.LeftButton)
+                if (mouse.button == Qt.LeftButton) {
                     selectionOn = true;
                     testChart.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
+                }
             }
 
             onReleased: {
@@ -141,6 +161,7 @@ Rectangle {
         onClicked: {
             currentAngle += 5
             chartData.series.meshAngle = currentAngle
+            shuttleItem.setRotationAxisAndAngle(Qt.vector3d(0.0, 1.0, 1.0), currentAngle)
         }
     }
 
@@ -159,6 +180,26 @@ Rectangle {
                 // all years in the model, just for the selected ones.
                 chartData.proxy.autoRowCategories = false
                 chartData.proxy.rowCategories = ["2010", "2011", "2012"]
+            }
+        }
+    }
+
+    Button {
+        id: shuttleAdd
+        anchors.bottom: dataToggle.top
+        width: camControlArea.width
+        text: "Remove Shuttle"
+        property bool addObject: false
+        onClicked: {
+            if (addObject === true) {
+                shuttleItem.textureFile = ":/items/shuttle.png"
+                testChart.addCustomItem(shuttleItem)
+                text = "Remove Shuttle"
+                addObject = false
+            } else {
+                testChart.releaseCustomItem(shuttleItem)
+                text = "Add Shuttle"
+                addObject = true
             }
         }
     }

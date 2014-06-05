@@ -31,12 +31,9 @@
 
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
-#include "qabstract3dinputhandler.h"
 #include "declarativescene_p.h"
 
-#include <QtCore/QAbstractItemModel>
 #include <QtQuick/QQuickItem>
-#include <QtQuick/QQuickWindow>
 #include <QtCore/QPointer>
 #include <QtCore/QThread>
 
@@ -57,7 +54,9 @@ class AbstractDeclarative : public QQuickItem
     Q_OBJECT
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(RenderingMode)
+    Q_ENUMS(ElementType)
     Q_FLAGS(SelectionFlag SelectionFlags)
+    Q_FLAGS(OptimizationHint OptimizationHints)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(bool shadowsSupported READ shadowsSupported NOTIFY shadowsSupportedChanged)
@@ -66,6 +65,13 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
+    Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged REVISION 1)
+    Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged REVISION 1)
+    Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList REVISION 1)
+    Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged REVISION 1)
+    Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged REVISION 1)
+    Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged REVISION 1)
+    Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged REVISION 1)
 
 public:
     enum SelectionFlag {
@@ -92,11 +98,26 @@ public:
         ShadowQualitySoftHigh
     };
 
+    enum ElementType {
+        ElementNone = 0,
+        ElementSeries,
+        ElementAxisXLabel,
+        ElementAxisYLabel,
+        ElementAxisZLabel,
+        ElementCustomItem
+    };
+
     enum RenderingMode {
         RenderDirectToBackground = 0,
         RenderDirectToBackground_NoClear,
         RenderIndirect
     };
+
+    enum OptimizationHint {
+        OptimizationDefault = 0,
+        OptimizationStatic  = 1
+    };
+    Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
@@ -126,7 +147,26 @@ public:
 
     Q_INVOKABLE virtual void clearSelection();
 
-    virtual void geometryChanged(const QRectF & newGeometry, const QRectF & oldGeometry);
+    Q_REVISION(1) Q_INVOKABLE virtual int addCustomItem(QCustom3DItem *item);
+    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItems();
+    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItem(QCustom3DItem *item);
+    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItemAt(const QVector3D &position);
+    Q_REVISION(1) Q_INVOKABLE virtual void releaseCustomItem(QCustom3DItem *item);
+
+    Q_REVISION(1) Q_INVOKABLE virtual int selectedLabelIndex() const;
+    Q_REVISION(1) Q_INVOKABLE virtual QAbstract3DAxis *selectedAxis() const;
+
+    Q_REVISION(1) Q_INVOKABLE virtual int selectedCustomItemIndex() const;
+    Q_REVISION(1) Q_INVOKABLE virtual QCustom3DItem *selectedCustomItem() const;
+
+    QQmlListProperty<QCustom3DItem> customItemList();
+    static void appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
+                                     QCustom3DItem *item);
+    static int countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list);
+    static QCustom3DItem *atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list, int index);
+    static void clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list);
+
+    virtual void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
 
     void setSharedController(Abstract3DController *controller);
     // Used to synch up data model from controller to renderer while main thread is locked
@@ -137,6 +177,21 @@ public:
     void doneOpenGLContext(QQuickWindow *window);
 
     void checkWindowList(QQuickWindow *window);
+
+    void setMeasureFps(bool enable);
+    bool measureFps() const;
+    qreal currentFps() const;
+
+    void setOrthoProjection(bool enable);
+    bool isOrthoProjection() const;
+
+    AbstractDeclarative::ElementType selectedElement() const;
+
+    void setAspectRatio(qreal ratio);
+    qreal aspectRatio() const;
+
+    void setOptimizationHints(OptimizationHints hints);
+    OptimizationHints optimizationHints() const;
 
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
@@ -167,6 +222,12 @@ signals:
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
     void renderingModeChanged(AbstractDeclarative::RenderingMode mode);
+    Q_REVISION(1) void measureFpsChanged(bool enabled);
+    Q_REVISION(1) void currentFpsChanged(qreal fps);
+    Q_REVISION(1) void selectedElementChanged(QAbstract3DGraph::ElementType type);
+    Q_REVISION(1) void orthoProjectionChanged(bool enabled);
+    Q_REVISION(1) void aspectRatioChanged(qreal ratio);
+    Q_REVISION(1) void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
 
 private:
     QPointer<Abstract3DController> m_controller;
@@ -187,6 +248,7 @@ private:
     bool m_runningInDesigner;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::OptimizationHints)
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

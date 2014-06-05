@@ -26,11 +26,11 @@
 //
 // We mean it.
 
-#include "datavisualizationglobal_p.h"
-#include "qabstractdataproxy.h"
-
 #ifndef QABSTRACTDATAPROXY_P_H
 #define QABSTRACTDATAPROXY_P_H
+
+#include "datavisualizationglobal_p.h"
+#include "qabstractdataproxy.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -30,7 +30,6 @@
 #define SHADERHELPER_P_H
 
 #include "datavisualizationglobal_p.h"
-#include <QtGui/QOpenGLFunctions>
 
 class QOpenGLShaderProgram;
 

@@ -18,10 +18,6 @@
 
 #include "q3dsurface.h"
 #include "q3dsurface_p.h"
-#include "qvalue3daxis.h"
-#include "qsurfacedataproxy.h"
-#include "q3dcamera.h"
-#include "qsurface3dseries_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -29,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class Q3DSurface
  * \inmodule QtDataVisualization
  * \brief The Q3DSurface class provides methods for rendering 3D surface plots.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * This class enables developers to render 3D surface plots and to view them by rotating the scene
  * freely. The visual properties of the surface such as draw mode and shading can be controlled

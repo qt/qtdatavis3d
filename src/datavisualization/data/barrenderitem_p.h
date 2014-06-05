@@ -33,8 +33,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class Bars3DRenderer;
-
 class BarRenderItem : public AbstractRenderItem
 {
 public:
@@ -54,16 +52,10 @@ public:
     inline void setHeight(GLfloat height) { m_height = height; }
     inline GLfloat height() const { return m_height; }
 
-    // Series index in visual series that this item belongs to.
-    // This is only utilized by slicing, so it may not be up to date on all items.
-    inline void setSeriesIndex(int seriesIndex) { m_seriesIndex = seriesIndex; }
-    inline int seriesIndex() const { return m_seriesIndex; }
-
 protected:
     float m_value;
     QPoint m_position; // x = row, y = column
     GLfloat m_height;
-    int m_seriesIndex;
 
     friend class QBarDataItem;
 };

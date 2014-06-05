@@ -16,9 +16,8 @@
 **
 ****************************************************************************/
 
-#include "qvalue3daxis.h"
 #include "qvalue3daxis_p.h"
-#include "utils_p.h"
+#include "qvalue3daxisformatter_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -26,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QValue3DAxis
  * \inmodule QtDataVisualization
  * \brief The QValue3DAxis class is used for manipulating an axis of a graph.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QValue3DAxis provides an axis that can be given a range of values and segment and subsegment
  * counts to divide the range into.
@@ -74,11 +73,30 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty ValueAxis3DFormatter ValueAxis3D::formatter
+ * \since QtDataVisualization 1.1
+ *
+ * Defines the axis \a formatter to be used. Any existing formatter is deleted when a new formatter
+ * is set.
+ *
+ */
+
+/*!
+ * \qmlproperty bool ValueAxis3D::reversed
+ * \since QtDataVisualization 1.1
+ *
+ * If \c{true}, the axis will be rendered in reverse, i.e. the positions of minimum and maximum
+ * values are swapped when the graph is rendered. This property doesn't affect the actual
+ * minimum and maximum values of the axis.
+ */
+
+/*!
  * Constructs QValue3DAxis with the given \a parent.
  */
 QValue3DAxis::QValue3DAxis(QObject *parent) :
     QAbstract3DAxis(new QValue3DAxisPrivate(this), parent)
 {
+    setFormatter(new QValue3DAxisFormatter);
 }
 
 /*!
@@ -87,7 +105,6 @@ QValue3DAxis::QValue3DAxis(QObject *parent) :
 QValue3DAxis::~QValue3DAxis()
 {
 }
-
 
 /*!
  * \property QValue3DAxis::segmentCount
@@ -105,7 +122,7 @@ void QValue3DAxis::setSegmentCount(int count)
                    << count << "-> 1";
         count = 1;
     }
-    if (dptr()->m_segmentCount != count){
+    if (dptr()->m_segmentCount != count) {
         dptr()->m_segmentCount = count;
         dptr()->emitLabelsChanged();
         emit segmentCountChanged(count);
@@ -169,6 +186,53 @@ QString QValue3DAxis::labelFormat() const
 }
 
 /*!
+ * \property QValue3DAxis::formatter
+ * \since QtDataVisualization 1.1
+ *
+ * Defines the axis \a formatter to be used. Any existing formatter is deleted when a new formatter
+ * is set.
+ */
+void QValue3DAxis::setFormatter(QValue3DAxisFormatter *formatter)
+{
+    Q_ASSERT(formatter);
+
+    if (formatter != dptr()->m_formatter) {
+        delete dptr()->m_formatter;
+        dptr()->m_formatter = formatter;
+        formatter->setParent(this);
+        formatter->d_ptr->setAxis(this);
+        emit formatterChanged(formatter);
+        emit dptr()->formatterDirty();
+    }
+}
+
+QValue3DAxisFormatter *QValue3DAxis::formatter() const
+{
+    return dptrc()->m_formatter;
+}
+
+/*!
+ * \property QValue3DAxis::reversed
+ * \since QtDataVisualization 1.1
+ *
+ * If \c{true}, the axis will be rendered in reverse, i.e. the positions of minimum and maximum
+ * values are swapped when the graph is rendered. This property doesn't affect the actual
+ * minimum and maximum values of the axis.
+ */
+void QValue3DAxis::setReversed(bool enable)
+{
+    if (dptr()->m_reversed != enable) {
+        dptr()->m_reversed = enable;
+        emit reversedChanged(enable);
+    }
+}
+
+bool QValue3DAxis::reversed() const
+{
+    return dptrc()->m_reversed;
+}
+
+/*!
  * \internal
  */
 QValue3DAxisPrivate *QValue3DAxis::dptr()
@@ -189,7 +253,9 @@ QValue3DAxisPrivate::QValue3DAxisPrivate(QValue3DAxis *q)
       m_segmentCount(5),
       m_subSegmentCount(1),
       m_labelFormat(Utils::defaultLabelFormat()),
-      m_labelsDirty(true)
+      m_labelsDirty(true),
+      m_formatter(0),
+      m_reversed(false)
 {
 }
 
@@ -197,11 +263,11 @@ QValue3DAxisPrivate::~QValue3DAxisPrivate()
 {
 }
 
-void QValue3DAxisPrivate::setRange(float min, float max)
+void QValue3DAxisPrivate::setRange(float min, float max, bool suppressWarnings)
 {
     bool dirty = (min != m_min || max != m_max);
 
-    QAbstract3DAxisPrivate::setRange(min, max);
+    QAbstract3DAxisPrivate::setRange(min, max, suppressWarnings);
 
     if (dirty)
         emitLabelsChanged();
@@ -240,26 +306,24 @@ void QValue3DAxisPrivate::updateLabels()
 
     m_labelsDirty = false;
 
-    QStringList newLabels;
-    newLabels.reserve(m_segmentCount + 1);
+    m_formatter->d_ptr->recalculate();
 
-    // First label is at axis min, which is an extra segment
-    float segmentStep = (m_max - m_min) / m_segmentCount;
+    m_labels = m_formatter->labelStrings();
+}
 
-    QString formatString(m_labelFormat);
-    Utils::ParamType paramType = Utils::findFormatParamType(formatString);
-    QByteArray formatArray = formatString.toUtf8();
+bool QValue3DAxisPrivate::allowZero()
+{
+    return m_formatter->allowZero();
+}
 
-    for (int i = 0; i < m_segmentCount; i++) {
-        float value = m_min + (segmentStep * i);
-        newLabels.append(Utils::formatLabel(formatArray, paramType, value));
-    }
+bool QValue3DAxisPrivate::allowNegatives()
+{
+    return m_formatter->allowNegatives();
+}
 
-    // Ensure max label doesn't suffer from any rounding errors
-    newLabels.append(Utils::formatLabel(formatArray, paramType, m_max));
-
-    if (m_labels != newLabels)
-        m_labels = newLabels;
+bool QValue3DAxisPrivate::allowMinMaxSame()
+{
+    return false;
 }
 
 QValue3DAxis *QValue3DAxisPrivate::qptr()

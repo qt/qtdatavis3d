@@ -62,6 +62,8 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
                      &ScatterDataModifier::handleAxisYChanged);
     QObject::connect(m_chart, &Q3DScatter::axisZChanged, this,
                      &ScatterDataModifier::handleAxisZChanged);
+    QObject::connect(m_chart, &QAbstract3DGraph::currentFpsChanged, this,
+                     &ScatterDataModifier::handleFpsChange);
 }
 
 ScatterDataModifier::~ScatterDataModifier()
@@ -74,15 +76,420 @@ void ScatterDataModifier::start()
     addData();
 }
 
+static const int itemsPerUnit = 100; // "unit" is one unit range along Z-axis
+
+void ScatterDataModifier::massiveDataTest()
+{
+    static int testPhase = 0;
+    static QTimer *massiveTestTimer = 0;
+
+    if (!massiveTestTimer)
+        massiveTestTimer = new QTimer;
+
+    int items = 1000000;
+    int visibleRange = 200;
+    int unitCount = items / itemsPerUnit;
+    int cacheSize = visibleRange * itemsPerUnit * 5;
+
+    switch (testPhase) {
+    case 0: {
+        float yRangeMin = 0.0f;
+        float yRangeMax = 1.0f;
+        float yRangeMargin = 0.05f;
+        float minY = yRangeMin + yRangeMargin;
+        float maxY = yRangeMax - yRangeMargin;
+        float unitBase = minY;
+        float direction = 1.0f;
+
+        if (!m_massiveTestCacheArray.size()) {
+            m_massiveTestCacheArray.resize(cacheSize);
+            int totalIndex = 0;
+            for (int i = 0; i < unitCount && totalIndex < cacheSize; i++) {
+                unitBase += direction * (float(rand() % 3) / 100.0f);
+                if (unitBase > maxY) {
+                    unitBase = maxY;
+                    direction = -1.0f;
+                } else if (unitBase < minY) {
+                    unitBase = minY;
+                    direction = 1.0f;
+                }
+                for (int j = 0; j < itemsPerUnit && totalIndex < cacheSize; j++) {
+                    float randFactor = float(rand() % 100) / (100 / yRangeMargin);
+                    m_massiveTestCacheArray[totalIndex].setPosition(
+                                QVector3D(float(qrand() % itemsPerUnit),
+                                          unitBase + randFactor, 0.0f));
+                    // Z value is irrelevant, we replace it anyway when we take item to use
+                    totalIndex++;
+                }
+            }
+        }
+
+        qDebug() << __FUNCTION__ << testPhase << ": Setting the graph up...";
+        QValue3DAxis *xAxis = new QValue3DAxis();
+        QValue3DAxis *yAxis = new QValue3DAxis();
+        QValue3DAxis *zAxis = new QValue3DAxis();
+        xAxis->setRange(0.0f, float(itemsPerUnit - 1));
+        yAxis->setRange(yRangeMin, yRangeMax);
+        zAxis->setRange(0.0f, float(visibleRange - 1));
+        xAxis->setSegmentCount(1);
+        yAxis->setSegmentCount(1);
+        zAxis->setSegmentCount(1);
+        m_chart->setAxisX(xAxis);
+        m_chart->setAxisY(yAxis);
+        m_chart->setAxisZ(zAxis);
+        m_chart->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetRight);
+        m_chart->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+        foreach (QAbstract3DSeries *series, m_chart->seriesList())
+            m_chart->removeSeries(static_cast<QScatter3DSeries *>(series));
+
+        qDebug() << __FUNCTION__ << testPhase << ": Creating massive array..." << items;
+        QScatterDataArray *massiveArray = new QScatterDataArray;
+        massiveArray->resize(items);
+
+        int cacheIndex = 0;
+        for (int i = 0; i < items; i++) {
+            // Use qreals for precicion as the numbers can overflow int
+            float currentZ = float(qreal(i) * qreal(unitCount) / qreal(items));
+            (*massiveArray)[i] = m_massiveTestCacheArray.at(cacheIndex++);
+            (*massiveArray)[i].setZ(currentZ);
+            if (cacheIndex >= cacheSize)
+                cacheIndex = 0;
+        }
+        qDebug() << __FUNCTION__ << testPhase << ": Massive array creation finished!";
+
+        QScatter3DSeries *series =  new QScatter3DSeries;
+        series->dataProxy()->resetArray(massiveArray);
+        series->setMesh(QAbstract3DSeries::MeshPoint);
+        m_chart->addSeries(series);
+        break;
+    }
+    case 1: {
+        qDebug() << __FUNCTION__ << testPhase << ": Scroll";
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        QObject::connect(massiveTestTimer, &QTimer::timeout, this,
+                         &ScatterDataModifier::massiveTestScroll);
+        massiveTestTimer->start(16);
+        break;
+    }
+    case 2: {
+        qDebug() << __FUNCTION__ << testPhase << ": Append and scroll";
+        massiveTestTimer->stop();
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        QObject::connect(massiveTestTimer, &QTimer::timeout, this,
+                         &ScatterDataModifier::massiveTestAppendAndScroll);
+        m_chart->axisZ()->setRange(unitCount - visibleRange, unitCount);
+        massiveTestTimer->start(16);
+        break;
+    }
+    default:
+        QObject::disconnect(massiveTestTimer, 0, this, 0);
+        massiveTestTimer->stop();
+        qDebug() << __FUNCTION__ << testPhase << ": Resetting the test";
+        testPhase = -1;
+    }
+    testPhase++;
+}
+
+void ScatterDataModifier::massiveTestScroll()
+{
+    const int scrollAmount = 20;
+    int itemCount = m_chart->seriesList().at(0)->dataProxy()->itemCount();
+    int min = m_chart->axisZ()->min() + scrollAmount;
+    int max = m_chart->axisZ()->max() + scrollAmount;
+    if (max >= itemCount / itemsPerUnit) {
+        max = max - min - 1;
+        min = 0;
+    }
+    m_chart->axisZ()->setRange(min, max);
+}
+
+void ScatterDataModifier::massiveTestAppendAndScroll()
+{
+    const int addedUnits = 50;
+    const int addedItems = itemsPerUnit * addedUnits;
+    int cacheSize = m_massiveTestCacheArray.size();
+    int itemCount = m_chart->seriesList().at(0)->dataProxy()->itemCount();
+    static int cacheIndex = 0;
+
+    // Copy items from cache
+    QScatterDataArray appendArray;
+    appendArray.resize(addedItems);
+
+    float zOffset = m_chart->seriesList().at(0)->dataProxy()->itemAt(itemCount - 1)->z();
+    for (int i = 0; i < addedItems; i++) {
+        float currentZ = zOffset + float(qreal(i) * qreal(addedUnits) / qreal(addedItems));
+        appendArray[i] = m_massiveTestCacheArray.at(cacheIndex++);
+        appendArray[i].setZ(currentZ);
+        if (cacheIndex >= cacheSize)
+            cacheIndex = 0;
+    }
+
+    m_chart->seriesList().at(0)->dataProxy()->addItems(appendArray);
+    int min = m_chart->axisZ()->min() + addedUnits;
+    int max = m_chart->axisZ()->max() + addedUnits;
+    m_chart->axisZ()->setRange(min, max);
+}
+
+void ScatterDataModifier::setFpsMeasurement(bool enable)
+{
+    m_chart->setMeasureFps(enable);
+}
+
+void ScatterDataModifier::testItemChanges()
+{
+    static int counter = 0;
+    const int rowCount = 12;
+    const int colCount = 10;
+    static QScatter3DSeries *series0 = 0;
+    static QScatter3DSeries *series1 = 0;
+    static QScatter3DSeries *series2 = 0;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "Setup test";
+        foreach (QScatter3DSeries *series, m_chart->seriesList())
+            m_chart->removeSeries(series);
+        foreach (QValue3DAxis *axis, m_chart->axes())
+            deleteAxis(axis);
+        delete series0;
+        delete series1;
+        delete series2;
+        series0 = new QScatter3DSeries;
+        series1 = new QScatter3DSeries;
+        series2 = new QScatter3DSeries;
+        populateFlatSeries(series0, rowCount, colCount, 10.0f);
+        populateFlatSeries(series1, rowCount, colCount, 30.0f);
+        populateFlatSeries(series2, rowCount, colCount, 50.0f);
+        m_chart->axisX()->setRange(3.0f, 6.0f);
+        m_chart->axisY()->setRange(0.0f, 100.0f);
+        m_chart->axisZ()->setRange(4.0f, 8.0f);
+        m_chart->addSeries(series0);
+        m_chart->addSeries(series1);
+        m_chart->addSeries(series2);
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Change single item, unselected";
+        int itemIndex = 3 * colCount + 5;
+        QScatterDataItem item = *series0->dataProxy()->itemAt(itemIndex);
+        item.setY(75.0f);
+        series0->dataProxy()->setItem(itemIndex, item);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Change single item, selected";
+        int itemIndex = 4 * colCount + 4;
+        series1->setSelectedItem(itemIndex);
+        QScatterDataItem item = *series1->dataProxy()->itemAt(itemIndex);
+        item.setY(75.0f);
+        series1->dataProxy()->setItem(itemIndex, item);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Change item outside visible area";
+        int itemIndex = 2;
+        QScatterDataItem item = *series1->dataProxy()->itemAt(itemIndex);
+        item.setY(75.0f);
+        series1->dataProxy()->setItem(itemIndex, item);
+    }
+        break;
+    case 4: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, unselected";
+        int itemIndex = 4 * colCount + 6;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex);
+        item0.setY(65.0f);
+        item1.setY(85.0f);
+        series0->dataProxy()->setItem(itemIndex, item0);
+        series1->dataProxy()->setItem(itemIndex, item1);
+    }
+        break;
+    case 5: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, one selected";
+        int itemIndex0 = 5 * colCount + 5;
+        int itemIndex1 = 4 * colCount + 4;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex1);
+        item0.setY(65.0f);
+        item1.setY(85.0f);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series1->dataProxy()->setItem(itemIndex1, item1);
+    }
+        break;
+    case 6: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, one outside range";
+        int itemIndex0 = 6 * colCount + 6;
+        int itemIndex1 = 9 * colCount + 2;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex1);
+        item0.setY(65.0f);
+        item1.setY(85.0f);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series1->dataProxy()->setItem(itemIndex1, item1);
+    }
+        break;
+    case 7: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, both outside range";
+        int itemIndex0 = 1 * colCount + 3;
+        int itemIndex1 = 9 * colCount + 2;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex1);
+        item0.setY(65.0f);
+        item1.setY(85.0f);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series1->dataProxy()->setItem(itemIndex1, item1);
+    }
+        break;
+    case 8: {
+        qDebug() << __FUNCTION__ << counter << "Change item to same value as previously";
+        int itemIndex0 = 5 * colCount + 7;
+        int itemIndex1 = 4 * colCount + 7;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex1);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series1->dataProxy()->setItem(itemIndex1, item1);
+    }
+        break;
+    case 9: {
+        qDebug() << __FUNCTION__ << counter << "Change 3 items on each series";
+        int itemIndex0 = 5 * colCount + 6;
+        int itemIndex1 = 4 * colCount + 6;
+        QScatterDataItem item00 = *series0->dataProxy()->itemAt(itemIndex0);
+        QScatterDataItem item01 = *series0->dataProxy()->itemAt(itemIndex0 + 1);
+        QScatterDataItem item02 = *series0->dataProxy()->itemAt(itemIndex0 + 2);
+        QScatterDataItem item10 = *series1->dataProxy()->itemAt(itemIndex1);
+        QScatterDataItem item11 = *series1->dataProxy()->itemAt(itemIndex1 + 1);
+        QScatterDataItem item12 = *series1->dataProxy()->itemAt(itemIndex1 + 2);
+        item00.setY(65.0f);
+        item01.setY(70.0f);
+        item02.setY(75.0f);
+        item10.setY(80.0f);
+        item11.setY(85.0f);
+        item12.setY(90.0f);
+        series0->dataProxy()->setItem(itemIndex0, item00);
+        series0->dataProxy()->setItem(itemIndex0 + 1, item01);
+        series0->dataProxy()->setItem(itemIndex0 + 2, item02);
+        series1->dataProxy()->setItem(itemIndex1, item10);
+        series1->dataProxy()->setItem(itemIndex1 + 1, item11);
+        series1->dataProxy()->setItem(itemIndex1 + 2, item12);
+    }
+        break;
+    case 10: {
+        qDebug() << __FUNCTION__ << counter << "Level the field single item at a time";
+        QScatterDataItem item;
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < colCount; j++) {
+                int itemIndex = i * colCount + j;
+                QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex);
+                QScatterDataItem item1 = *series1->dataProxy()->itemAt(itemIndex);
+                QScatterDataItem item2 = *series2->dataProxy()->itemAt(itemIndex);
+                item0.setY(10.0f);
+                item1.setY(15.0f);
+                item2.setY(20.0f);
+                series0->dataProxy()->setItem(itemIndex, item0);
+                series1->dataProxy()->setItem(itemIndex, item1);
+                series2->dataProxy()->setItem(itemIndex, item2);
+            }
+        }
+    }
+        break;
+    case 11: {
+        qDebug() << __FUNCTION__ << counter << "Change same items multiple times";
+        int itemIndex0 = 6 * colCount + 6;
+        QScatterDataItem item0 = *series0->dataProxy()->itemAt(itemIndex0);
+        item0.setY(90.0f);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+        series0->dataProxy()->setItem(itemIndex0, item0);
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
+}
+
+void ScatterDataModifier::testAxisReverse()
+{
+    static int counter = 0;
+    const int rowCount = 16;
+    const int colCount = 16;
+    static QScatter3DSeries *series0 = 0;
+    static QScatter3DSeries *series1 = 0;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "Setup test";
+        foreach (QScatter3DSeries *series, m_chart->seriesList())
+            m_chart->removeSeries(series);
+        foreach (QValue3DAxis *axis, m_chart->axes())
+            deleteAxis(axis);
+        delete series0;
+        delete series1;
+        series0 = new QScatter3DSeries;
+        series1 = new QScatter3DSeries;
+        populateRisingSeries(series0, rowCount, colCount, 0.0f, 50.0f);
+        populateRisingSeries(series1, rowCount, colCount, -20.0f, 30.0f);
+        m_chart->axisX()->setRange(0.0f, 10.0f);
+        m_chart->axisY()->setRange(-20.0f, 50.0f);
+        m_chart->axisZ()->setRange(5.0f, 15.0f);
+        m_chart->addSeries(series0);
+        m_chart->addSeries(series1);
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Reverse X axis";
+        m_chart->axisX()->setReversed(true);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Reverse Y axis";
+        m_chart->axisY()->setReversed(true);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Reverse Z axis";
+        m_chart->axisZ()->setReversed(true);
+    }
+        break;
+    case 4: {
+        qDebug() << __FUNCTION__ << counter << "Return all axes to normal";
+        m_chart->axisX()->setReversed(false);
+        m_chart->axisY()->setReversed(false);
+        m_chart->axisZ()->setReversed(false);
+    }
+        break;
+    case 5: {
+        qDebug() << __FUNCTION__ << counter << "Reverse all axes";
+        m_chart->axisX()->setReversed(true);
+        m_chart->axisY()->setReversed(true);
+        m_chart->axisZ()->setReversed(true);
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
+}
+
 void ScatterDataModifier::addData()
 {
     // Add labels
-    m_chart->axisX()->setTitle("X");
-    m_chart->axisY()->setTitle("Y");
-    m_chart->axisZ()->setTitle("Z");
+    m_chart->axisX()->setTitle("X - Axis");
+    m_chart->axisY()->setTitle("Y - Axis");
+    m_chart->axisZ()->setTitle("Z - Axis");
     m_chart->axisX()->setRange(-50.0f, 50.0f);
     m_chart->axisY()->setRange(-1.0f, 1.2f);
     m_chart->axisZ()->setRange(-50.0f, 50.0f);
+    m_chart->axisX()->setSegmentCount(6);
+    m_chart->axisY()->setSegmentCount(4);
+    m_chart->axisZ()->setSegmentCount(9);
+    m_chart->axisX()->setSubSegmentCount(2);
+    m_chart->axisY()->setSubSegmentCount(3);
+    m_chart->axisZ()->setSubSegmentCount(1);
 
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(numberOfItems);
@@ -220,18 +627,27 @@ void ScatterDataModifier::clear()
     qDebug() << m_loopCounter << "Cleared array";
 }
 
+void ScatterDataModifier::deleteAxis(QValue3DAxis *axis)
+{
+    m_chart->releaseAxis(axis);
+    delete axis;
+}
+
 void ScatterDataModifier::resetAxes()
 {
-    m_chart->releaseAxis(m_chart->axisX());
-    m_chart->releaseAxis(m_chart->axisY());
-    m_chart->releaseAxis(m_chart->axisZ());
+    deleteAxis(m_chart->axisX());
+    deleteAxis(m_chart->axisY());
+    deleteAxis(m_chart->axisZ());
 
     m_chart->setAxisX(new QValue3DAxis);
     m_chart->setAxisY(new QValue3DAxis);
     m_chart->setAxisZ(new QValue3DAxis);
-    m_chart->axisX()->setSegmentCount(5);
-    m_chart->axisY()->setSegmentCount(5);
-    m_chart->axisZ()->setSegmentCount(5);
+    m_chart->axisX()->setSegmentCount(6);
+    m_chart->axisY()->setSegmentCount(4);
+    m_chart->axisZ()->setSegmentCount(9);
+    m_chart->axisX()->setSubSegmentCount(2);
+    m_chart->axisY()->setSubSegmentCount(3);
+    m_chart->axisZ()->setSubSegmentCount(1);
     m_chart->axisX()->setTitle("X");
     m_chart->axisY()->setTitle("Y");
     m_chart->axisZ()->setTitle("Z");
@@ -450,6 +866,12 @@ void ScatterDataModifier::setGradient()
     }
 }
 
+void ScatterDataModifier::clearSeriesData()
+{
+    if (m_targetSeries)
+        m_targetSeries->dataProxy()->resetArray(0);
+}
+
 void ScatterDataModifier::addSeries()
 {
     QScatter3DSeries *series = createAndAddSeries();
@@ -499,6 +921,55 @@ void ScatterDataModifier::handleAxisZChanged(QValue3DAxis *axis)
     qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_chart->axisZ());
 }
 
+void ScatterDataModifier::handleFpsChange(qreal fps)
+{
+    static const QString fpsPrefix(QStringLiteral("FPS: "));
+    m_fpsLabel->setText(fpsPrefix + QString::number(qRound(fps)));
+}
+
+void ScatterDataModifier::changeLabelRotation(int rotation)
+{
+    m_chart->axisX()->setLabelAutoRotation(float(rotation));
+    m_chart->axisY()->setLabelAutoRotation(float(rotation));
+    m_chart->axisZ()->setLabelAutoRotation(float(rotation));
+}
+
+void ScatterDataModifier::toggleAxisTitleVisibility(bool enabled)
+{
+    m_chart->axisX()->setTitleVisible(enabled);
+    m_chart->axisY()->setTitleVisible(enabled);
+    m_chart->axisZ()->setTitleVisible(enabled);
+}
+
+void ScatterDataModifier::toggleAxisTitleFixed(bool enabled)
+{
+    m_chart->axisX()->setTitleFixed(enabled);
+    m_chart->axisY()->setTitleFixed(enabled);
+    m_chart->axisZ()->setTitleFixed(enabled);
+}
+
+void ScatterDataModifier::renderToImage()
+{
+    QImage renderedImage8AA = m_chart->renderToImage(8);
+    QImage renderedImageNoAA = m_chart->renderToImage(0);
+    QImage renderedImage8AASmall = m_chart->renderToImage(8, QSize(100, 100));
+    QImage renderedImageNoAASmall = m_chart->renderToImage(0, QSize(100, 100));
+
+    if (m_chart->isVisible()) {
+        renderedImage8AA.save(QStringLiteral("./renderedImage8AA_visible.png"));
+        renderedImageNoAA.save(QStringLiteral("./renderedImageNoAA_visible.png"));
+        renderedImage8AASmall.save(QStringLiteral("./renderedImage8AASmall_visible.png"));
+        renderedImageNoAASmall.save(QStringLiteral("./renderedImageNoAASmall_visible.png"));
+        qDebug() << "Visible images rendered!";
+    } else {
+        renderedImage8AA.save(QStringLiteral("./renderedImage8AA_hidden.png"));
+        renderedImageNoAA.save(QStringLiteral("./renderedImageNoAA_hidden.png"));
+        renderedImage8AASmall.save(QStringLiteral("./renderedImage8AASmall_hidden.png"));
+        renderedImageNoAASmall.save(QStringLiteral("./renderedImageNoAASmall_hidden.png"));
+        qDebug() << "Hidden images rendered!";
+    }
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
@@ -516,12 +987,52 @@ void ScatterDataModifier::setGridEnabled(int enabled)
     m_chart->activeTheme()->setGridEnabled((bool)enabled);
 }
 
+void ScatterDataModifier::setMinX(int min)
+{
+    m_chart->axisX()->setMin(min);
+}
+
+void ScatterDataModifier::setMinY(int min)
+{
+    m_chart->axisY()->setMin(float(min) / 100.0f);
+}
+
+void ScatterDataModifier::setMinZ(int min)
+{
+    m_chart->axisZ()->setMin(min);
+}
+
+void ScatterDataModifier::setMaxX(int max)
+{
+    m_chart->axisX()->setMax(max);
+}
+
+void ScatterDataModifier::setMaxY(int max)
+{
+    m_chart->axisY()->setMax(float(max) / 100.0f);
+}
+
+void ScatterDataModifier::setMaxZ(int max)
+{
+    m_chart->axisZ()->setMax(max);
+}
+
+void ScatterDataModifier::setAspectRatio(int ratio)
+{
+    float aspectRatio = float(ratio) / 10.0f;
+    m_chart->setAspectRatio(aspectRatio);
+}
+
 QVector3D ScatterDataModifier::randVector()
 {
-    return QVector3D(
+    QVector3D retvec = QVector3D(
         (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f,
         (float)(rand() % 100) / 100.0f - (float)(rand() % 100) / 100.0f,
         (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f);
+
+    qDebug() << __FUNCTION__ << retvec;
+
+    return retvec;
 }
 
 QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
@@ -535,7 +1046,7 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
 
     m_chart->addSeries(series);
     series->setName(QString("Series %1").arg(counter++));
-    series->setItemLabelFormat(QStringLiteral("@seriesName: @xLabel - @yLabel - @zLabel"));
+    series->setItemLabelFormat(QStringLiteral("@seriesName: (X:@xLabel / Z:@zLabel) Y:@yLabel"));
     series->setMesh(QAbstract3DSeries::MeshSphere);
     series->setMeshSmooth(true);
     series->setBaseColor(QColor(rand() % 256, rand() % 256, rand() % 256));
@@ -545,4 +1056,32 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
                      &ScatterDataModifier::handleSelectionChange);
 
     return series;
+}
+
+void ScatterDataModifier::populateFlatSeries(QScatter3DSeries *series, int rows, int columns,
+                                             float value)
+{
+    QScatterDataArray *dataArray = new QScatterDataArray;
+    dataArray->resize(rows * columns);
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++)
+            (*dataArray)[i * columns + j].setPosition(QVector3D(float(i), value, float(j)));
+    }
+    series->dataProxy()->resetArray(dataArray);
+}
+
+void ScatterDataModifier::populateRisingSeries(QScatter3DSeries *series, int rows, int columns,
+                                               float minValue, float maxValue)
+{
+    QScatterDataArray *dataArray = new QScatterDataArray;
+    int arraySize = rows * columns;
+    dataArray->resize(arraySize);
+    float range = maxValue - minValue;
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < columns; j++) {
+            float yValue = minValue + (range * i * j / arraySize);
+            (*dataArray)[i * columns + j].setPosition(QVector3D(float(i), yValue, float(j)));
+        }
+    }
+    series->dataProxy()->resetArray(dataArray);
 }

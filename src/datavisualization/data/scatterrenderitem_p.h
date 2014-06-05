@@ -33,8 +33,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class Scatter3DRenderer;
-
 class ScatterRenderItem : public AbstractRenderItem
 {
 public:
@@ -55,8 +53,6 @@ public:
 protected:
     QVector3D m_position;
     bool m_visible;
-
-    friend class QScatterDataItem;
 };
 typedef QVector<ScatterRenderItem> ScatterRenderItemArray;
 

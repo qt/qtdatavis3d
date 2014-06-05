@@ -17,9 +17,6 @@
 ****************************************************************************/
 
 #include "declarativebars_p.h"
-#include "qvalue3daxis.h"
-#include "qitemmodelbardataproxy.h"
-#include "declarativescene_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -90,7 +87,8 @@ bool DeclarativeBars::isMultiSeriesUniform() const
 void DeclarativeBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {
-        m_barsController->setBarSpecs(GLfloat(thicknessRatio), barSpacing(), isBarSpacingRelative());
+        m_barsController->setBarSpecs(GLfloat(thicknessRatio), barSpacing(),
+                                      isBarSpacingRelative());
         emit barThicknessChanged(thicknessRatio);
     }
 }

@@ -20,12 +20,14 @@
 #include "custominputhandler.h"
 #include <QtDataVisualization/qcategory3daxis.h>
 #include <QtDataVisualization/qvalue3daxis.h>
+#include <QtDataVisualization/qlogvalue3daxisformatter.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/q3dinputhandler.h>
-#include <QTime>
+#include <QtCore/QTime>
+#include <QtCore/qmath.h>
 
 using namespace QtDataVisualization;
 
@@ -42,7 +44,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_barSpacingX(0.1f),
       m_barSpacingZ(0.1f),
       m_fontSize(20),
-      m_segments(4),
+      m_segments(10),
       m_subSegments(3),
       m_minval(-16.0f),
       m_maxval(20.0f),
@@ -69,7 +71,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_defaultInputHandler(0),
       m_ownTheme(0),
       m_builtinTheme(new Q3DTheme(Q3DTheme::ThemeStoneMoss)),
-      m_customInputHandler(new CustomInputHandler)
+      m_customInputHandler(new CustomInputHandler),
+      m_extraSeries(0)
 {
     m_temperatureData->setObjectName("m_temperatureData");
     m_temperatureData2->setObjectName("m_temperatureData2");
@@ -143,7 +146,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_dummyData4->setName("Dummy 4");
     m_dummyData5->setName("Dummy 5");
 
-    m_temperatureData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
+    m_temperatureData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel ~ %.4f"));
     m_temperatureData2->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for @colLabel @rowLabel: @valueLabel"));
     m_genericData->setItemLabelFormat(QStringLiteral("@seriesName: @valueTitle for (@rowIdx, @colIdx): @valueLabel"));
 
@@ -221,6 +224,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
                      &GraphModifier::handleValueAxisChanged);
     QObject::connect(m_graph, &Q3DBars::primarySeriesChanged, this,
                      &GraphModifier::handlePrimarySeriesChanged);
+    QObject::connect(m_temperatureAxis, &QAbstract3DAxis::labelsChanged, this,
+                     &GraphModifier::handleValueAxisLabelsChanged);
 
     QObject::connect(&m_insertRemoveTimer, &QTimer::timeout, this,
                      &GraphModifier::insertRemoveTimerTimeout);
@@ -232,6 +237,10 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
                      &GraphModifier::triggerSelection);
     QObject::connect(&m_rotationTimer, &QTimer::timeout, this,
                      &GraphModifier::triggerRotation);
+
+    QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
+                     &GraphModifier::handleFpsChange);
+
 
     resetTemperatureData();
 }
@@ -304,7 +313,7 @@ void GraphModifier::swapAxis()
 
 void GraphModifier::releaseAxes()
 {
-    // Releases all axes - results in default axes for all dimensions.
+    // Releases all axes we have created - results in default axes for all dimensions.
     // Axes reset when the graph is switched as set*Axis calls are made, which
     // implicitly add axes.
     m_graph->releaseAxis(m_autoAdjustingAxis);
@@ -316,23 +325,10 @@ void GraphModifier::releaseAxes()
     m_graph->releaseAxis(m_genericColumnAxis);
 }
 
-void GraphModifier::releaseProxies()
+void GraphModifier::releaseSeries()
 {
-    // Releases all series/add all series toggle
-    if (m_graph->seriesList().size() > 0) {
-        m_graph->removeSeries(m_temperatureData);
-        m_graph->removeSeries(m_temperatureData2);
-        m_graph->removeSeries(m_genericData);
-        m_graph->removeSeries(m_dummyData);
-        m_graph->removeSeries(m_dummyData2);
-        m_graph->removeSeries(m_dummyData3);
-        m_graph->removeSeries(m_dummyData4);
-        m_graph->removeSeries(m_dummyData5);
-    } else {
-        m_graph->addSeries(m_temperatureData);
-        m_graph->addSeries(m_temperatureData2);
-        m_graph->addSeries(m_genericData);
-    }
+    foreach (QBar3DSeries *series, m_graph->seriesList())
+        m_graph->removeSeries(series);
 }
 
 void GraphModifier::flipViews()
@@ -762,7 +758,7 @@ void GraphModifier::changeShadowQuality(int quality)
 
 void GraphModifier::showFiveSeries()
 {
-    releaseProxies();
+    releaseSeries();
     releaseAxes();
     m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemRowAndColumn | QAbstract3DGraph::SelectionMultiSeries);
 
@@ -829,7 +825,7 @@ void GraphModifier::primarySeriesTest()
     case 0: {
         qDebug() << "Step 0 - Init:";
         m_graph->addSeries(m_dummyData); // Add one series to enforce release in releaseProxies()
-        releaseProxies();
+        releaseSeries();
         releaseAxes();
         m_dummyData->dataProxy()->resetArray(makeDummyData(),
                                              testLabels,
@@ -1008,8 +1004,6 @@ void GraphModifier::primarySeriesTest()
         nextStep = 0;
         break;
     }
-
-
 }
 
 void GraphModifier::insertRemoveTestToggle()
@@ -1019,11 +1013,11 @@ void GraphModifier::insertRemoveTestToggle()
         m_selectionTimer.stop();
         m_graph->removeSeries(m_dummyData);
         m_graph->removeSeries(m_dummyData2);
-        releaseProxies();
+        releaseSeries();
         releaseAxes();
         m_graph->setActiveInputHandler(m_defaultInputHandler);
     } else {
-        releaseProxies();
+        releaseSeries();
         releaseAxes();
         m_graph->rowAxis()->setRange(0, 32);
         m_graph->columnAxis()->setRange(0, 10);
@@ -1042,6 +1036,381 @@ void GraphModifier::toggleRotation()
         m_rotationTimer.stop();
     else
         m_rotationTimer.start(20);
+}
+
+void GraphModifier::useLogAxis()
+{
+    static int counter = -1;
+    static QLogValue3DAxisFormatter *logFormatter = 0;
+    static float minRange = 1.0f;
+    counter++;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << "Case" << counter << ": Default log axis";
+        logFormatter = new QLogValue3DAxisFormatter;
+        m_graph->valueAxis()->setFormatter(logFormatter);
+        m_graph->valueAxis()->setRange(minRange, 1200.0f);
+        m_graph->valueAxis()->setLabelFormat(QStringLiteral("%.3f"));
+        break;
+    }
+    case 1: {
+        qDebug() << "Case" << counter << ": Hide max label";
+        logFormatter->setShowEdgeLabels(false);
+        break;
+    }
+    case 2: {
+        qDebug() << "Case" << counter << ": Try to hide subgrid unsuccessfully";
+        m_graph->valueAxis()->setSubSegmentCount(1);
+        break;
+    }
+    case 3: {
+        qDebug() << "Case" << counter << ": Hide subgrid property";
+        logFormatter->setAutoSubGrid(false);
+        m_graph->valueAxis()->setSubSegmentCount(1);
+        break;
+    }
+    case 4: {
+        qDebug() << "Case" << counter << ": Different base: 2";
+        logFormatter->setBase(2.0f);
+        logFormatter->setAutoSubGrid(true);
+        break;
+    }
+    case 5: {
+        qDebug() << "Case" << counter << ": Different base: 16";
+        logFormatter->setBase(16.0f);
+        break;
+    }
+    case 6: {
+        qDebug() << "Case" << counter << ": Invalid bases";
+        logFormatter->setBase(-1.0f);
+        logFormatter->setBase(1.0f);
+        break;
+    }
+    case 7: {
+        qDebug() << "Case" << counter << ": Zero base";
+        logFormatter->setBase(0.0f);
+        break;
+    }
+    case 8: {
+        qDebug() << "Case" << counter << ": Explicit ranges and segments";
+        int segmentCount = 6;
+        int base = 4;
+        m_graph->valueAxis()->setSegmentCount(segmentCount);
+        m_graph->valueAxis()->setSubSegmentCount(base - 1);
+        m_graph->valueAxis()->setRange(1.0f / float(base * base), qPow(base, segmentCount - 2));
+        break;
+    }
+    case 9: {
+        qDebug() << "Case" << counter << ": Negative range";
+        m_graph->valueAxis()->setRange(-20.0f, 50.0f);
+        break;
+    }
+    case 10: {
+        qDebug() << "Case" << counter << ": Non-integer base";
+        logFormatter->setBase(3.3f);
+        logFormatter->setAutoSubGrid(true);
+        break;
+    }
+    default:
+        qDebug() << "Resetting logaxis test";
+        minRange++;
+        counter = -1;
+        break;
+    }
+}
+
+void GraphModifier::changeValueAxisFormat(const QString & text)
+{
+    m_graph->valueAxis()->setLabelFormat(text);
+}
+
+void GraphModifier::changeLogBase(const QString &text)
+{
+    QLogValue3DAxisFormatter *formatter =
+        qobject_cast<QLogValue3DAxisFormatter *>(m_graph->valueAxis()->formatter());
+    if (formatter)
+        formatter->setBase(qreal(text.toDouble()));
+}
+
+void GraphModifier::addRemoveSeries()
+{
+    static int counter = 0;
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "New series";
+        m_extraSeries = new QBar3DSeries;
+        m_graph->addSeries(m_extraSeries);
+        QObject::connect(m_extraSeries, &QBar3DSeries::selectedBarChanged, this,
+                         &GraphModifier::handleSelectionChange);
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Add data to series";
+        QBarDataArray *array = new QBarDataArray;
+        array->reserve(5);
+        for (int i = 0; i < 5; i++) {
+            array->append(new QBarDataRow(10));
+            for (int j = 0; j < 10; j++)
+                (*array->at(i))[j].setValue(i * j);
+        }
+        m_extraSeries->dataProxy()->resetArray(array);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Hide series";
+        m_extraSeries->setVisible(false);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Modify data when hidden";
+        QBarDataArray array;
+        array.reserve(5);
+        for (int i = 0; i < 5; i++) {
+            array.append(new QBarDataRow(10));
+            for (int j = 0; j < 10; j++)
+                (*array.at(i))[j].setValue(2 * i * j);
+        }
+        m_extraSeries->dataProxy()->addRows(array);
+    }
+        break;
+    case 4: {
+        qDebug() << __FUNCTION__ << counter << "Show series again";
+        m_extraSeries->setVisible(true);
+    }
+        break;
+    case 5: {
+        qDebug() << __FUNCTION__ << counter << "Remove series";
+        m_graph->removeSeries(m_extraSeries);
+        delete m_extraSeries;
+        m_extraSeries = 0;
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
+}
+
+void GraphModifier::testItemAndRowChanges()
+{
+    static int counter = 0;
+    const int rowCount = 12;
+    const int colCount = 10;
+    const float flatValue = 10.0f;
+    static QBar3DSeries *series0 = 0;
+    static QBar3DSeries *series1 = 0;
+    static QBar3DSeries *series2 = 0;
+    QBarDataItem item25;
+    QBarDataItem item50;
+    QBarDataItem item75;
+    item25.setValue(25);
+    item50.setValue(50);
+    item75.setValue(75);
+
+    switch (counter) {
+    case 0: {
+        qDebug() << __FUNCTION__ << counter << "Setup test";
+        releaseSeries();
+        releaseAxes();
+        delete series0;
+        delete series1;
+        delete series2;
+        series0 = new QBar3DSeries;
+        series1 = new QBar3DSeries;
+        series2 = new QBar3DSeries;
+        populateFlatSeries(series0, rowCount, colCount, flatValue);
+        populateFlatSeries(series1, rowCount, colCount, flatValue);
+        populateFlatSeries(series2, rowCount, colCount, flatValue);
+        m_graph->rowAxis()->setRange(4.0f, 8.0f);
+        m_graph->columnAxis()->setRange(3.0f, 6.0f);
+        m_graph->valueAxis()->setRange(0.0f, 100.0f);
+        m_graph->addSeries(series0);
+        m_graph->addSeries(series1);
+        m_graph->addSeries(series2);
+        //counter = 11; // skip single item tests
+    }
+        break;
+    case 1: {
+        qDebug() << __FUNCTION__ << counter << "Change single item, unselected";
+        series0->dataProxy()->setItem(4, 3, item50);
+    }
+        break;
+    case 2: {
+        qDebug() << __FUNCTION__ << counter << "Change single item, selected";
+        series1->setSelectedBar(QPoint(4, 5));
+        series1->dataProxy()->setItem(4, 5, item25);
+    }
+        break;
+    case 3: {
+        qDebug() << __FUNCTION__ << counter << "Change item outside visible area";
+        series1->dataProxy()->setItem(0, 3, item25);
+    }
+        break;
+    case 4: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, unselected";
+        series0->dataProxy()->setItem(5, 3, item25);
+        series1->dataProxy()->setItem(5, 3, item75);
+    }
+        break;
+    case 5: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, one selected";
+        series0->dataProxy()->setItem(5, 4, item25);
+        series1->dataProxy()->setItem(4, 5, item75);
+    }
+        break;
+    case 6: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, one outside range";
+        series0->dataProxy()->setItem(1, 2, item25);
+        series1->dataProxy()->setItem(6, 6, item75);
+    }
+        break;
+    case 7: {
+        qDebug() << __FUNCTION__ << counter << "Change single item from two series, both outside range";
+        series0->dataProxy()->setItem(1, 2, item25);
+        series1->dataProxy()->setItem(8, 8, item75);
+    }
+        break;
+    case 8: {
+        qDebug() << __FUNCTION__ << counter << "Change item to same value";
+        series1->dataProxy()->setItem(6, 6, item75);
+    }
+        break;
+    case 9: {
+        qDebug() << __FUNCTION__ << counter << "Change 3 items on each series";
+        series0->dataProxy()->setItem(7, 3, item25);
+        series0->dataProxy()->setItem(7, 4, item50);
+        series0->dataProxy()->setItem(7, 5, item75);
+        series1->dataProxy()->setItem(6, 3, item25);
+        series1->dataProxy()->setItem(6, 4, item50);
+        series1->dataProxy()->setItem(6, 5, item75);
+    }
+        break;
+    case 10: {
+        qDebug() << __FUNCTION__ << counter << "Level the field single item at a time";
+        QBarDataItem item;
+        item.setValue(15.0f);
+        for (int i = 0; i < rowCount; i++) {
+            for (int j = 0; j < colCount; j++) {
+                series0->dataProxy()->setItem(i, j, item);
+                series1->dataProxy()->setItem(i, j, item);
+                series2->dataProxy()->setItem(i, j, item);
+            }
+        }
+    }
+        break;
+    case 11: {
+        qDebug() << __FUNCTION__ << counter << "Change same items multiple times";
+        series0->dataProxy()->setItem(7, 3, item25);
+        series1->dataProxy()->setItem(7, 3, item25);
+        series0->dataProxy()->setItem(7, 3, item50);
+        series1->dataProxy()->setItem(7, 3, item50);
+        series0->dataProxy()->setItem(7, 3, item75);
+        series1->dataProxy()->setItem(7, 3, item75);
+    }
+        break;
+    case 12: {
+        qDebug() << __FUNCTION__ << counter << "Change row";
+        series0->dataProxy()->setRow(5, createFlatRow(colCount, 50.0f));
+    }
+        break;
+    case 13: {
+        qDebug() << __FUNCTION__ << counter << "Change row with selected item";
+        series1->setSelectedBar(QPoint(6, 6));
+        series1->dataProxy()->setRow(6, createFlatRow(colCount, 40.0f));
+    }
+        break;
+    case 14: {
+        qDebug() << __FUNCTION__ << counter << "Change hidden row";
+        series1->dataProxy()->setRow(9, createFlatRow(colCount, 50.0f));
+    }
+        break;
+    case 15: {
+        qDebug() << __FUNCTION__ << counter << "Change multiple rows singly";
+        series0->dataProxy()->setRow(6, createFlatRow(colCount, 70.0f));
+        series1->dataProxy()->setRow(6, createFlatRow(colCount, 80.0f));
+        series2->dataProxy()->setRow(6, createFlatRow(colCount, 90.0f));
+    }
+        break;
+    case 16: {
+        qDebug() << __FUNCTION__ << counter << "Change multiple rows many at a time";
+        QBarDataArray newRows;
+        newRows.reserve(4);
+        newRows.append(createFlatRow(colCount, 26.0f));
+        newRows.append(createFlatRow(colCount, 30.0f));
+        newRows.append(createFlatRow(colCount, 34.0f));
+        newRows.append(createFlatRow(colCount, 38.0f));
+        series0->dataProxy()->setRows(2, newRows);
+        newRows[0] = createFlatRow(colCount, 26.0f);
+        newRows[1] = createFlatRow(colCount, 30.0f);
+        newRows[2] = createFlatRow(colCount, 34.0f);
+        newRows[3] = createFlatRow(colCount, 38.0f);
+        series1->dataProxy()->setRows(3, newRows);
+        newRows[0] = createFlatRow(colCount, 26.0f);
+        newRows[1] = createFlatRow(colCount, 30.0f);
+        newRows[2] = createFlatRow(colCount, 34.0f);
+        newRows[3] = createFlatRow(colCount, 38.0f);
+        series2->dataProxy()->setRows(4, newRows);
+    }
+        break;
+    case 17: {
+        qDebug() << __FUNCTION__ << counter << "Change same rows multiple times";
+        QBarDataArray newRows;
+        newRows.reserve(4);
+        newRows.append(createFlatRow(colCount, 65.0f));
+        newRows.append(createFlatRow(colCount, 65.0f));
+        newRows.append(createFlatRow(colCount, 65.0f));
+        newRows.append(createFlatRow(colCount, 65.0f));
+        series0->dataProxy()->setRows(4, newRows);
+        newRows[0] = createFlatRow(colCount, 65.0f);
+        newRows[1] = createFlatRow(colCount, 65.0f);
+        newRows[2] = createFlatRow(colCount, 65.0f);
+        newRows[3] = createFlatRow(colCount, 65.0f);
+        series1->dataProxy()->setRows(4, newRows);
+        newRows[0] = createFlatRow(colCount, 65.0f);
+        newRows[1] = createFlatRow(colCount, 65.0f);
+        newRows[2] = createFlatRow(colCount, 65.0f);
+        newRows[3] = createFlatRow(colCount, 65.0f);
+        series2->dataProxy()->setRows(4, newRows);
+        series0->dataProxy()->setRow(6, createFlatRow(colCount, 20.0f));
+        series1->dataProxy()->setRow(6, createFlatRow(colCount, 20.0f));
+        series2->dataProxy()->setRow(6, createFlatRow(colCount, 20.0f));
+        series0->dataProxy()->setRow(6, createFlatRow(colCount, 90.0f));
+        series1->dataProxy()->setRow(6, createFlatRow(colCount, 90.0f));
+        series2->dataProxy()->setRow(6, createFlatRow(colCount, 90.0f));
+    }
+        break;
+    case 18: {
+        qDebug() << __FUNCTION__ << counter << "Change row to different length";
+        series0->dataProxy()->setRow(4, createFlatRow(5, 20.0f));
+        series1->dataProxy()->setRow(4, createFlatRow(0, 20.0f));
+        series2->dataProxy()->setRow(4, 0);
+    }
+        break;
+    case 19: {
+        qDebug() << __FUNCTION__ << counter << "Change selected row shorter so that selected item is no longer valid";
+        series1->dataProxy()->setRow(6, createFlatRow(6, 20.0f));
+    }
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Resetting test";
+        counter = -1;
+    }
+    counter++;
+}
+
+void GraphModifier::reverseValueAxis(int enabled)
+{
+    m_graph->valueAxis()->setReversed(enabled);
+}
+
+void GraphModifier::changeValueAxisSegments(int value)
+{
+    qDebug() << __FUNCTION__ << value;
+    m_segments = value;
+    m_graph->valueAxis()->setSegmentCount(m_segments);
 }
 
 void GraphModifier::insertRemoveTimerTimeout()
@@ -1100,6 +1469,43 @@ void GraphModifier::triggerRotation()
     }
 }
 
+void GraphModifier::handleValueAxisLabelsChanged()
+{
+    qDebug() << __FUNCTION__;
+}
+
+void GraphModifier::handleFpsChange(qreal fps)
+{
+    static const QString fpsPrefix(QStringLiteral("FPS: "));
+    m_fpsLabel->setText(fpsPrefix + QString::number(qRound(fps)));
+}
+
+void GraphModifier::populateFlatSeries(QBar3DSeries *series, int rows, int columns, float value)
+{
+    QBarDataArray *dataArray = new QBarDataArray;
+    dataArray->reserve(rows);
+    for (int i = 0; i < rows; i++) {
+        QBarDataRow *dataRow = new QBarDataRow(columns);
+        for (int j = 0; j < columns; j++)
+            (*dataRow)[j].setValue(value);
+        dataArray->append(dataRow);
+    }
+    QStringList axisLabels;
+    int count = qMax(rows, columns);
+    for (int i = 0; i < count; i++)
+        axisLabels << QString::number(i);
+
+    series->dataProxy()->resetArray(dataArray, axisLabels, axisLabels);
+}
+
+QBarDataRow *GraphModifier::createFlatRow(int columns, float value)
+{
+    QBarDataRow *dataRow = new QBarDataRow(columns);
+    for (int j = 0; j < columns; j++)
+        (*dataRow)[j].setValue(value);
+    return dataRow;
+}
+
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
     m_graph->activeTheme()->setBackgroundEnabled(bool(enabled));
@@ -1120,6 +1526,11 @@ void GraphModifier::rotateY(int rotation)
 {
     m_yRotation = rotation;
     m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
+}
+
+void GraphModifier::setFpsMeasurement(bool enable)
+{
+    m_graph->setMeasureFps(enable);
 }
 
 void GraphModifier::setSpecsRatio(int barwidth)

@@ -82,8 +82,10 @@ public:
     void adjustXCount(int count);
     void adjustZCount(int count);
     void adjustXRange(int range);
+    void adjustYRange(int range);
     void adjustZRange(int range);
     void adjustXMin(int min);
+    void adjustYMin(int min);
     void adjustZMin(int min);
     void updateSamples();
     void gradientPressed();
@@ -103,6 +105,15 @@ public:
     void insertRow();
     void insertRows();
     void removeRow();
+    void resetArray();
+    void resetArrayEmpty();
+    void massiveDataTest();
+    void massiveTestScroll();
+    void massiveTestAppendAndScroll();
+    void testAxisReverse();
+    void testDataOrdering();
+
+    void setAspectRatio(int ratio);
 
 public slots:
     void changeShadowQuality(int quality);
@@ -114,12 +125,20 @@ public slots:
     void handleAxisXChanged(QValue3DAxis *axis);
     void handleAxisYChanged(QValue3DAxis *axis);
     void handleAxisZChanged(QValue3DAxis *axis);
+    void handleFpsChange(qreal fps);
+    void changeLabelRotation(int rotation);
+    void toggleAxisTitleVisibility(bool enabled);
+    void toggleAxisTitleFixed(bool enabled);
+    void toggleXAscending(bool enabled);
+    void toggleZAscending(bool enabled);
 
 private:
     void fillSeries();
     void resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX,
                               float maxX);
     QSurfaceDataRow *createMultiRow(int row, int series, bool change);
+    void populateRisingSeries(QSurface3DSeries *series, int rows, int columns, float minValue,
+                              float maxValue, bool ascendingX, bool ascendingZ);
 
     Q3DSurface *m_graph;
     QSurface3DSeries *m_multiseries[4];
@@ -143,8 +162,10 @@ private:
     int m_activeSample;
     int m_fontSize;
     float m_rangeX;
+    float m_rangeY;
     float m_rangeZ;
     float m_minX;
+    float m_minY;
     float m_minZ;
     int m_addRowCounter;
     int m_insertTestZPos;
@@ -162,6 +183,7 @@ private:
     float m_offset;
     float m_multiSampleOffsetX[4];
     float m_multiSampleOffsetZ[4];
+    QSurfaceDataArray m_massiveTestCacheArray;
 };
 
 #endif

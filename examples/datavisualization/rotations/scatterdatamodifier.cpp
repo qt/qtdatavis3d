@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qscatter3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/QCustom3DItem>
 #include <QtCore/qmath.h>
 
 using namespace QtDataVisualization;
@@ -40,7 +41,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_fieldLines(12),
       m_arrowsPerLine(16),
       m_magneticField(new QScatter3DSeries),
-      m_sun(new QScatter3DSeries),
+      m_sun(new QCustom3DItem),
       m_magneticFieldArray(0),
       m_angleOffset(0.0f),
       m_angleStep(doublePi / m_arrowsPerLine / animationFrames)
@@ -62,17 +63,15 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_magneticField->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
     //! [4]
 
-    // For 'sun' we use a custom large sphere.
-    m_sun->setItemSize(0.2f);
-    m_sun->setName(QStringLiteral("Sun"));
-    m_sun->setItemLabelFormat(QStringLiteral("@seriesName"));
-    m_sun->setMesh(QAbstract3DSeries::MeshUserDefined);
-    m_sun->setUserDefinedMesh(QStringLiteral(":/mesh/largesphere.obj"));
-    m_sun->setBaseColor(QColor(0xff, 0xBB, 0x00));
-    m_sun->dataProxy()->addItem(QScatterDataItem(QVector3D()));
+    // For 'sun' we use a custom large sphere
+    m_sun->setScaling(QVector3D(0.07f, 0.07f, 0.07f));
+    m_sun->setMeshFile(QStringLiteral(":/mesh/largesphere.obj"));
+    QImage sunColor = QImage(2, 2, QImage::Format_RGB32);
+    sunColor.fill(QColor(0xff, 0xbb, 0x00));
+    m_sun->setTextureImage(sunColor);
 
     m_graph->addSeries(m_magneticField);
-    m_graph->addSeries(m_sun);
+    m_graph->addCustomItem(m_sun);
 
     // Configure the axes according to the data
     m_graph->axisX()->setRange(-horizontalRange, horizontalRange);
@@ -171,7 +170,7 @@ void ScatterDataModifier::triggerRotation()
 
 void ScatterDataModifier::toggleSun()
 {
-    m_sun->setVisible(!m_graph->seriesList().at(1)->isVisible());
+    m_sun->setVisible(!m_sun->isVisible());
 }
 
 void ScatterDataModifier::toggleRotation()

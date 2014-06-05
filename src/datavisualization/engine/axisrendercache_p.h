@@ -30,9 +30,8 @@
 #define AXISRENDERCACHE_P_H
 
 #include "datavisualizationglobal_p.h"
-#include "labelitem_p.h"
-#include "qabstract3daxis_p.h"
 #include "drawer_p.h"
+#include <QtCore/QPointer>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -48,31 +47,70 @@ public:
     void setType(QAbstract3DAxis::AxisType type);
     inline QAbstract3DAxis::AxisType type() const { return m_type; }
     void setTitle(const QString &title);
-    inline const QString &title() { return m_title; }
+    inline const QString &title() const { return m_title; }
     void setLabels(const QStringList &labels);
-    inline const QStringList &labels() { return m_labels; }
-    void setMin(float min);
-    inline float min() { return m_min; }
-    void setMax(float max);
-    inline float max() { return m_max; }
-    void setSegmentCount(int count);
+    inline const QStringList &labels() const { return m_labels; }
+    inline void setMin(float min) { m_min = min; }
+    inline float min() const { return m_min; }
+    inline void setMax(float max) { m_max = max; }
+    inline float max() const { return m_max; }
+    inline void setSegmentCount(int count) { m_segmentCount = count; m_positionsDirty = true; }
     inline int segmentCount() const { return m_segmentCount; }
-    void setSubSegmentCount(int count);
+    inline void setSubSegmentCount(int count) { m_subSegmentCount = count; m_positionsDirty = true; }
     inline int subSegmentCount() const { return m_subSegmentCount; }
     inline void setLabelFormat(const QString &format) { m_labelFormat = format; }
-    inline const QString &labelFormat() { return m_labelFormat; }
+    inline const QString &labelFormat() const { return m_labelFormat; }
+    inline void setReversed(bool enable) { m_reversed = enable; m_positionsDirty = true; }
+    inline bool reversed() const { return m_reversed; }
+    inline void setFormatter(QValue3DAxisFormatter *formatter)
+    {
+        m_formatter = formatter; m_positionsDirty = true;
+    }
+    inline QValue3DAxisFormatter *formatter() const { return m_formatter; }
+    inline void setCtrlFormatter(QValue3DAxisFormatter *formatter)
+    {
+        m_ctrlFormatter = formatter;
+    }
+    inline QValue3DAxisFormatter *ctrlFormatter() const { return m_ctrlFormatter; }
 
     inline LabelItem &titleItem() { return m_titleItem; }
     inline QList<LabelItem *> &labelItems() { return m_labelItems; }
-    inline GLfloat segmentStep() const { return m_segmentStep; }
-    inline GLfloat subSegmentStep() const { return m_subSegmentStep; }
+    inline float gridLinePosition(int index) { return m_adjustedGridLinePositions.at(index); }
+    inline int gridLineCount() { return m_adjustedGridLinePositions.size(); }
+    inline float labelPosition(int index) { return m_adjustedLabelPositions.at(index); }
+    inline int labelCount() {
+        // Some value axis formatters may opt to not show all labels,
+        // so use positions array for determining count in that case.
+        if (m_type == QAbstract3DAxis::AxisTypeValue)
+            return m_adjustedLabelPositions.size();
+        else
+            return m_labels.size();
+    }
+    void updateAllPositions();
+    inline bool positionsDirty() const { return m_positionsDirty; }
+    inline void markPositionsDirty() { m_positionsDirty = true; }
+    inline void setTranslate(float translate) { m_translate = translate; m_positionsDirty = true; }
+    inline float translate() { return m_translate; }
+    inline void setScale(float scale) { m_scale = scale; m_positionsDirty = true; }
+    inline float scale() { return m_scale; }
+    inline float positionAt(float value)
+    {
+        if (m_reversed)
+            return (1.0f - m_formatter->positionAt(value)) * m_scale + m_translate;
+        else
+            return m_formatter->positionAt(value) * m_scale + m_translate;
+    }
+    inline float labelAutoRotation() const { return m_labelAutoRotation; }
+    inline void setLabelAutoRotation(float angle) { m_labelAutoRotation = angle; }
+    inline bool isTitleVisible() const { return m_titleVisible; }
+    inline void setTitleVisible(bool visible) { m_titleVisible = visible; }
+    inline bool isTitleFixed() const { return m_titleFixed; }
+    inline void setTitleFixed(bool fixed) { m_titleFixed = fixed; }
 
 public slots:
     void updateTextures();
 
 private:
-    void updateSegmentStep();
-    void updateSubSegmentStep();
     int maxLabelWidth(const QStringList &labels) const;
 
     // Cached axis values
@@ -84,14 +122,23 @@ private:
     int m_segmentCount;
     int m_subSegmentCount;
     QString m_labelFormat;
+    bool m_reversed;
     QFont m_font;
+    QValue3DAxisFormatter *m_formatter;
+    QPointer<QValue3DAxisFormatter> m_ctrlFormatter;
 
     // Renderer items
     Drawer *m_drawer; // Not owned
     LabelItem m_titleItem;
     QList<LabelItem *> m_labelItems;
-    GLfloat m_segmentStep;
-    GLfloat m_subSegmentStep;
+    QVector<float> m_adjustedGridLinePositions;
+    QVector<float> m_adjustedLabelPositions;
+    bool m_positionsDirty;
+    float m_translate;
+    float m_scale;
+    float m_labelAutoRotation;
+    bool m_titleVisible;
+    bool m_titleFixed;
 
     Q_DISABLE_COPY(AxisRenderCache)
 };

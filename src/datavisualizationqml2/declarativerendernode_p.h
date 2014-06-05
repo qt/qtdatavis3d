@@ -33,11 +33,7 @@
 
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>
-#include <QtQuick/QSGOpaqueTextureMaterial>
 #include <QtQuick/QQuickWindow>
-
-class QOpenGLContext;
-class QOpenGLFramebufferObject;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

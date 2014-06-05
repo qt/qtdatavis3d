@@ -39,9 +39,6 @@ class QBarDataItemPrivate
 public:
     QBarDataItemPrivate();
     virtual ~QBarDataItemPrivate();
-
-protected:
-    friend class QBarDataItem;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

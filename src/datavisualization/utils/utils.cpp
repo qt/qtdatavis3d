@@ -18,12 +18,7 @@
 
 #include "utils_p.h"
 
-#include <QtGui/QColor>
 #include <QtGui/QPainter>
-#include <QtCore/QPoint>
-#include <QtGui/QImage>
-#include <QtCore/QRegExp>
-#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -38,14 +33,21 @@ GLuint Utils::getNearestPowerOfTwo(GLuint value, GLuint &padding)
     return powOfTwoValue;
 }
 
-QVector3D Utils::vectorFromColor(const QColor &color)
+QVector4D Utils::vectorFromColor(const QColor &color)
 {
-    return QVector3D(color.redF(), color.greenF(), color.blueF());
+    return QVector4D(color.redF(), color.greenF(), color.blueF(), color.alphaF());
 }
 
 QColor Utils::colorFromVector(const QVector3D &colorVector)
 {
-    return QColor(colorVector.x() * 255.0f, colorVector.y() * 255.0f, colorVector.z() * 255.0f);
+    return QColor(colorVector.x() * 255.0f, colorVector.y() * 255.0f,
+                  colorVector.z() * 255.0f, 255.0f);
+}
+
+QColor Utils::colorFromVector(const QVector4D &colorVector)
+{
+    return QColor(colorVector.x() * 255.0f, colorVector.y() * 255.0f,
+                  colorVector.z() * 255.0f, colorVector.w() * 255.0f);
 }
 
 QImage Utils::printTextToImage(const QFont &font, const QString &text, const QColor &bgrColor,
@@ -126,16 +128,25 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     return image;
 }
 
-QVector3D Utils::getSelection(QPoint mousepos, int height)
+QVector4D Utils::getSelection(QPoint mousepos, int height)
 {
     // This is the only one that works with OpenGL ES 2.0, so we're forced to use it
     // Item count will be limited to 256*256*256
-    GLubyte pixel[4] = {255, 255, 255, 0};
+    GLubyte pixel[4] = {255, 255, 255, 255};
     glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE,
                  (void *)pixel);
-    QVector3D selectedColor(pixel[0], pixel[1], pixel[2]);
-
+    QVector4D selectedColor(pixel[0], pixel[1], pixel[2], pixel[3]);
     return selectedColor;
+}
+
+QImage Utils::getGradientImage(const QLinearGradient &gradient)
+{
+    QImage image(QSize(1, 101), QImage::Format_RGB32);
+    QPainter pmp(&image);
+    pmp.setBrush(QBrush(gradient));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 1, 101);
+    return image;
 }
 
 Utils::ParamType Utils::mapFormatCharToParamType(const QChar &formatChar)
@@ -177,7 +188,7 @@ Utils::ParamType Utils::findFormatParamType(const QString &format)
     return ParamTypeUnknown;
 }
 
-QString Utils::formatLabel(const QByteArray &format, ParamType paramType, float value)
+QString Utils::formatLabel(const QByteArray &format, ParamType paramType, qreal value)
 {
     switch (paramType) {
     case ParamTypeInt:
@@ -216,6 +227,15 @@ float Utils::wrapValue(float value, float min, float max)
     }
 
     return value;
+}
+
+QQuaternion Utils::calculateRotation(const QVector3D &xyzRotations)
+{
+    QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, xyzRotations.x());
+    QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, xyzRotations.y());
+    QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, xyzRotations.z());
+    QQuaternion totalRotation = rotQuatY * rotQuatZ * rotQuatX;
+    return totalRotation;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

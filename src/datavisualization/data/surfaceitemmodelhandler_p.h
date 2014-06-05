@@ -41,11 +41,27 @@ public:
     SurfaceItemModelHandler(QItemModelSurfaceDataProxy *proxy, QObject *parent = 0);
     virtual ~SurfaceItemModelHandler();
 
+public slots:
+    virtual void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+                                   const QVector<int> &roles = QVector<int> ());
+
 protected:
     void virtual resolveModel();
 
     QItemModelSurfaceDataProxy *m_proxy; // Not owned
     QSurfaceDataArray *m_proxyArray; // Not owned
+    int m_xPosRole;
+    int m_yPosRole;
+    int m_zPosRole;
+    QRegExp m_xPosPattern;
+    QRegExp m_yPosPattern;
+    QRegExp m_zPosPattern;
+    QString m_xPosReplace;
+    QString m_yPosReplace;
+    QString m_zPosReplace;
+    bool m_haveXPosPattern;
+    bool m_haveYPosPattern;
+    bool m_haveZPosPattern;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

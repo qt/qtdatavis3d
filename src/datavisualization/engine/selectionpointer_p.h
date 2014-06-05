@@ -29,7 +29,6 @@
 #ifndef SELECTIONPOINTER_P_H
 #define SELECTIONPOINTER_P_H
 
-#include "q3dscene.h"
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"
 
@@ -37,7 +36,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
 class ObjectHelper;
-class SurfaceObject;
 class TextureHelper;
 class Drawer;
 
@@ -49,26 +47,26 @@ public:
     explicit SelectionPointer(Drawer *drawer);
     ~SelectionPointer();
 
-    void render(GLuint defaultFboHandle = 0);
+    void render(GLuint defaultFboHandle = 0, bool useOrtho = false);
     void setPosition(const QVector3D &position);
     void setLabel(const QString &label);
     void setPointerObject(ObjectHelper *object);
+    void setLabelObject(ObjectHelper *object);
     void handleDrawerChange();
     void updateBoundingRect(const QRect &rect);
     void updateScene(Q3DScene *scene);
     void updateSliceData(bool sliceActivated, GLfloat autoScaleAdjustment);
-    void setHighlightColor(const QVector3D &colorVector);
+    void setHighlightColor(const QVector4D &colorVector);
     void setRotation(const QQuaternion &rotation);
 
 private:
     void initializeOpenGL();
     void initShaders();
-    void loadLabelMesh();
 
 private:
     ShaderHelper *m_labelShader;
     ShaderHelper *m_pointShader;
-    ObjectHelper *m_labelObj;
+    ObjectHelper *m_labelObj; // Not owned
     ObjectHelper *m_pointObj; // Not owned
     TextureHelper *m_textureHelper;
     Q3DTheme *m_cachedTheme;
@@ -81,7 +79,7 @@ private:
     QString m_label;
     bool m_cachedIsSlicingActivated;
     GLfloat m_autoScaleAdjustment;
-    QVector3D m_highlightColor;
+    QVector4D m_highlightColor;
     QQuaternion m_rotation;
 };
 

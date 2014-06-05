@@ -15,6 +15,7 @@
 ** contact form at http://qt.digia.com
 **
 ****************************************************************************/
+
 #include "glstatestore_p.h"
 #include <QDebug>
 #include <QColor>
@@ -50,13 +51,13 @@ GLStateStore::GLStateStore(QOpenGLContext *context, QObject *parent) :
 #endif
 
     m_maxVertexAttribs = qMin(maxVertexAttribs, 2); // Datavis only uses 2 attribs max
-    m_vertexAttribArrayEnabledStates = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayBoundBuffers = new GLint[maxVertexAttribs];
-    m_vertexAttribArraySizes = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayTypes = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayNormalized = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayStrides = new GLint[maxVertexAttribs];
-    m_vertexAttribArrayOffsets = new GLint[maxVertexAttribs];
+    m_vertexAttribArrayEnabledStates.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayBoundBuffers.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArraySizes.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayTypes.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayNormalized.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayStrides.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayOffsets.reset(new GLint[maxVertexAttribs]);
 
     initGLDefaultState();
 }
@@ -67,8 +68,6 @@ GLStateStore::~GLStateStore()
     EnumToStringMap::deleteInstance();
     m_map = 0;
 #endif
-    delete m_vertexAttribArrayEnabledStates;
-    delete m_vertexAttribArrayBoundBuffers;
 }
 
 void GLStateStore::storeGLState()
@@ -80,8 +79,10 @@ void GLStateStore::storeGLState()
 #if !defined(QT_OPENGL_ES_2)
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_drawFramebuffer);
     glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_readFramebuffer);
-#endif
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &m_renderbuffer);
+#else
+    glGetIntegerv(GL_RENDERBUFFER, &m_renderbuffer);
+#endif
     glGetFloatv(GL_COLOR_CLEAR_VALUE, m_clearColor);
     m_isBlendingEnabled = glIsEnabled(GL_BLEND);
     m_isDepthTestEnabled = glIsEnabled(GL_DEPTH_TEST);
@@ -111,11 +112,14 @@ void GLStateStore::storeGLState()
     glGetIntegerv(GL_ELEMENT_ARRAY_BUFFER_BINDING, &m_boundElementArrayBuffer);
 
     for (int i = 0; i < m_maxVertexAttribs;i++) {
-        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &m_vertexAttribArrayEnabledStates[i]);
-        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &m_vertexAttribArrayBoundBuffers[i]);
+        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_ENABLED,
+                            &m_vertexAttribArrayEnabledStates[i]);
+        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+                            &m_vertexAttribArrayBoundBuffers[i]);
         glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_SIZE, &m_vertexAttribArraySizes[i]);
         glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_TYPE, &m_vertexAttribArrayTypes[i]);
-        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &m_vertexAttribArrayNormalized[i]);
+        glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED,
+                            &m_vertexAttribArrayNormalized[i]);
         glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &m_vertexAttribArrayStrides[i]);
     }
 }
@@ -173,8 +177,10 @@ void GLStateStore::printCurrentState(bool in)
 #if !defined(QT_OPENGL_ES_2)
         glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFramebuffer);
         glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFramebuffer);
-#endif
         glGetIntegerv(GL_RENDERBUFFER_BINDING, &renderbuffer);
+#else
+        glGetIntegerv(GL_RENDERBUFFER, &renderbuffer);
+#endif
         glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColor);
         glGetFloatv(GL_DEPTH_CLEAR_VALUE, &clearDepth);
         glGetIntegerv(GL_DEPTH_FUNC, &depthFunc);
@@ -198,11 +204,14 @@ void GLStateStore::printCurrentState(bool in)
         glGetIntegerv(GL_ARRAY_BUFFER_BINDING, &arrayBufferBinding);
 
         for (int i = 0; i < m_maxVertexAttribs;i++) {
-            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_ENABLED, &vertexAttribArrayEnabledStates[i]);
-            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING, &vertexAttribArrayBoundBuffers[i]);
+            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_ENABLED,
+                                &vertexAttribArrayEnabledStates[i]);
+            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_BUFFER_BINDING,
+                                &vertexAttribArrayBoundBuffers[i]);
             glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_SIZE, &vertexAttribArraySizes[i]);
             glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_TYPE, &vertexAttribArrayTypes[i]);
-            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED, &vertexAttribArrayNormalized[i]);
+            glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_NORMALIZED,
+                                &vertexAttribArrayNormalized[i]);
             glGetVertexAttribiv(i, GL_VERTEX_ATTRIB_ARRAY_STRIDE, &vertexAttribArrayStrides[i]);
         }
 
@@ -265,8 +274,10 @@ void GLStateStore::restoreGLState()
 #if !defined(QT_OPENGL_ES_2)
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_readFramebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_drawFramebuffer);
-#endif
     glBindRenderbuffer(GL_RENDERBUFFER_BINDING, m_renderbuffer);
+#else
+    glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
+#endif
 
     if (m_isScissorTestEnabled)
         glEnable(GL_SCISSOR_TEST);

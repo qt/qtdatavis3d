@@ -68,9 +68,15 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_temperatureAxis->setSubSegmentCount(m_subSegments);
     m_temperatureAxis->setRange(m_minval, m_maxval);
     m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%.1f ") + celsiusString));
+    m_temperatureAxis->setLabelAutoRotation(30.0f);
+    m_temperatureAxis->setTitleVisible(true);
 
     m_yearAxis->setTitle("Year");
+    m_yearAxis->setLabelAutoRotation(30.0f);
+    m_yearAxis->setTitleVisible(true);
     m_monthAxis->setTitle("Month");
+    m_monthAxis->setLabelAutoRotation(30.0f);
+    m_monthAxis->setTitleVisible(true);
 
     m_graph->setValueAxis(m_temperatureAxis);
     m_graph->setRowAxis(m_yearAxis);
@@ -236,6 +242,27 @@ void GraphModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality
     emit shadowQualityChanged(quality);
 }
 
+void GraphModifier::changeLabelRotation(int rotation)
+{
+    m_temperatureAxis->setLabelAutoRotation(float(rotation));
+    m_monthAxis->setLabelAutoRotation(float(rotation));
+    m_yearAxis->setLabelAutoRotation(float(rotation));
+}
+
+void GraphModifier::setAxisTitleVisibility(bool enabled)
+{
+    m_temperatureAxis->setTitleVisible(enabled);
+    m_monthAxis->setTitleVisible(enabled);
+    m_yearAxis->setTitleVisible(enabled);
+}
+
+void GraphModifier::setAxisTitleFixed(bool enabled)
+{
+    m_temperatureAxis->setTitleFixed(enabled);
+    m_monthAxis->setTitleFixed(enabled);
+    m_yearAxis->setTitleFixed(enabled);
+}
+
 void GraphModifier::changeShadowQuality(int quality)
 {
     QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
@@ -277,4 +304,9 @@ void GraphModifier::setSmoothBars(int smooth)
 void GraphModifier::setSeriesVisibility(int enabled)
 {
     m_secondarySeries->setVisible(bool(enabled));
+}
+
+void GraphModifier::setReverseValueAxis(int enabled)
+{
+    m_graph->valueAxis()->setReversed(enabled);
 }

@@ -29,20 +29,31 @@
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QAbstract3DGraphPrivate;
+class QCustom3DItem;
+class QAbstract3DAxis;
 
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
     Q_ENUMS(ShadowQuality)
+    Q_ENUMS(ElementType)
     Q_FLAGS(SelectionFlag SelectionFlags)
+    Q_FLAGS(OptimizationHint OptimizationHints)
     Q_PROPERTY(QAbstract3DInputHandler* activeInputHandler READ activeInputHandler WRITE setActiveInputHandler NOTIFY activeInputHandlerChanged)
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DScene* scene READ scene)
+    Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged)
+    Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged)
+    Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged)
+    Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged)
+    Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged)
+    Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged)
 
 protected:
-    explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format, QWindow *parent = 0);
+    explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
+                              QWindow *parent = 0);
 
 public:
     enum SelectionFlag {
@@ -68,6 +79,21 @@ public:
         ShadowQualitySoftMedium,
         ShadowQualitySoftHigh
     };
+
+    enum ElementType {
+        ElementNone = 0,
+        ElementSeries,
+        ElementAxisXLabel,
+        ElementAxisYLabel,
+        ElementAxisZLabel,
+        ElementCustomItem
+    };
+
+    enum OptimizationHint {
+        OptimizationDefault = 0,
+        OptimizationStatic  = 1
+    };
+    Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
 
 public:
     virtual ~QAbstract3DGraph();
@@ -95,6 +121,35 @@ public:
 
     void clearSelection();
 
+    int addCustomItem(QCustom3DItem *item);
+    void removeCustomItems();
+    void removeCustomItem(QCustom3DItem *item);
+    void removeCustomItemAt(const QVector3D &position);
+    void releaseCustomItem(QCustom3DItem *item);
+
+    int selectedLabelIndex() const;
+    QAbstract3DAxis *selectedAxis() const;
+
+    int selectedCustomItemIndex() const;
+    QCustom3DItem *selectedCustomItem() const;
+
+    QImage renderToImage(int msaaSamples = 0, const QSize &imageSize = QSize());
+
+    void setMeasureFps(bool enable);
+    bool measureFps() const;
+    qreal currentFps() const;
+
+    void setOrthoProjection(bool enable);
+    bool isOrthoProjection() const;
+
+    ElementType selectedElement() const;
+
+    void setAspectRatio(qreal ratio);
+    qreal aspectRatio() const;
+
+    void setOptimizationHints(OptimizationHints hints);
+    OptimizationHints optimizationHints() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -107,12 +162,17 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
 
-
 signals:
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *theme);
     void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
+    void selectedElementChanged(QAbstract3DGraph::ElementType type);
+    void measureFpsChanged(bool enabled);
+    void currentFpsChanged(qreal fps);
+    void orthoProjectionChanged(bool enabled);
+    void aspectRatioChanged(qreal ratio);
+    void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)
@@ -123,6 +183,7 @@ private:
     friend class Q3DSurface;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::SelectionFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::OptimizationHints)
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

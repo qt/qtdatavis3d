@@ -108,13 +108,8 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindTexture(GL_TEXTURE_2D, textureid);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-#if !defined(QT_OPENGL_ES_2)
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGBA,
                  GL_UNSIGNED_BYTE, NULL);
-#else
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, size.width(), size.height(), 0, GL_RGB,
-                 GL_UNSIGNED_BYTE, NULL);
-#endif
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create render buffer
@@ -198,7 +193,8 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint textureSize)
 #endif
 
 #if !defined(QT_OPENGL_ES_2)
-GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize)
+GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer,
+                                                    GLuint textureSize)
 {
     GLuint depthtextureid = createDepthTexture(size, textureSize);
 
@@ -228,7 +224,8 @@ GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &f
 #endif
 
 #if !defined(QT_OPENGL_ES_2)
-void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint textureSize, GLfloat value)
+void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint textureSize,
+                                     GLfloat value)
 {
     int nItems = size.width() * textureSize * size.height() * textureSize;
     GLfloat *bits = new GLfloat[nItems];
@@ -244,9 +241,12 @@ void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint te
 }
 #endif
 
-void TextureHelper::deleteTexture(const GLuint *texture)
+void TextureHelper::deleteTexture(GLuint *texture)
 {
-    glDeleteTextures(1, texture);
+    if (texture && *texture) {
+        glDeleteTextures(1, texture);
+        *texture = 0;
+    }
 }
 
 QImage TextureHelper::convertToGLFormat(const QImage &srcImage)

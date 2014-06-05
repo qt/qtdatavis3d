@@ -59,6 +59,18 @@ private:
     int m_yPosRole;
     int m_zPosRole;
     int m_rotationRole;
+    QRegExp m_xPosPattern;
+    QRegExp m_yPosPattern;
+    QRegExp m_zPosPattern;
+    QRegExp m_rotationPattern;
+    QString m_xPosReplace;
+    QString m_yPosReplace;
+    QString m_zPosReplace;
+    QString m_rotationReplace;
+    bool m_haveXPosPattern;
+    bool m_haveYPosPattern;
+    bool m_haveZPosPattern;
+    bool m_haveRotationPattern;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

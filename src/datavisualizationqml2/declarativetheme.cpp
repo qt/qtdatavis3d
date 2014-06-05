@@ -36,17 +36,17 @@ DeclarativeTheme3D::~DeclarativeTheme3D()
 {
 }
 
-QQmlListProperty<QObject> DeclarativeTheme3D::seriesChildren()
+QQmlListProperty<QObject> DeclarativeTheme3D::themeChildren()
 {
-    return QQmlListProperty<QObject>(this, this, &DeclarativeTheme3D::appendSeriesChildren,
+    return QQmlListProperty<QObject>(this, this, &DeclarativeTheme3D::appendThemeChildren,
                                      0, 0, 0);
 }
 
-void DeclarativeTheme3D::appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element)
+void DeclarativeTheme3D::appendThemeChildren(QQmlListProperty<QObject> *list, QObject *element)
 {
     Q_UNUSED(list)
     Q_UNUSED(element)
-    // Nothing to do, seriesChildren is there only to enable scoping gradient items in Theme3D item.
+    // Nothing to do, themeChildren is there only to enable scoping gradient items in Theme3D item.
 }
 
 void DeclarativeTheme3D::handleTypeChange(Theme themeType)
@@ -236,6 +236,10 @@ ColorGradient *DeclarativeTheme3D::convertGradient(const QLinearGradient &gradie
 
 void DeclarativeTheme3D::addColor(DeclarativeColor *color)
 {
+    if (!color) {
+        qWarning("Color is invalid, use ThemeColor");
+        return;
+    }
     clearDummyColors();
     m_colors.append(color);
     connect(color, &DeclarativeColor::colorChanged,
@@ -283,6 +287,10 @@ void DeclarativeTheme3D::clearDummyColors()
 
 void DeclarativeTheme3D::addGradient(ColorGradient *gradient)
 {
+    if (!gradient) {
+        qWarning("Gradient is invalid, use ColorGradient");
+        return;
+    }
     clearDummyGradients();
     m_gradients.append(gradient);
     connect(gradient, &ColorGradient::updated,

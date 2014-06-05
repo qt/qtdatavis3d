@@ -25,6 +25,7 @@
 #include <QFont>
 #include <QDebug>
 #include <QTimer>
+#include <QLabel>
 
 using namespace QtDataVisualization;
 
@@ -45,7 +46,21 @@ public:
     void changePointSize(int pointSize);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
+    void setMinX(int min);
+    void setMinY(int min);
+    void setMinZ(int min);
+    void setMaxX(int max);
+    void setMaxY(int max);
+    void setMaxZ(int max);
+    void setAspectRatio(int ratio);
     void start();
+    void massiveDataTest();
+    void massiveTestScroll();
+    void massiveTestAppendAndScroll();
+    void setFpsMeasurement(bool enable);
+    void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
+    void testItemChanges();
+    void testAxisReverse();
 
 public slots:
     void changeShadowQuality(int quality);
@@ -65,14 +80,19 @@ public slots:
     void selectItem();
     void handleSelectionChange(int index);
     void setGradient();
+    void clearSeriesData();
     void addSeries();
     void removeSeries();
     void toggleSeriesVisibility();
     void changeSeriesName();
-
     void handleAxisXChanged(QValue3DAxis *axis);
     void handleAxisYChanged(QValue3DAxis *axis);
     void handleAxisZChanged(QValue3DAxis *axis);
+    void handleFpsChange(qreal fps);
+    void changeLabelRotation(int rotation);
+    void toggleAxisTitleVisibility(bool enabled);
+    void toggleAxisTitleFixed(bool enabled);
+    void renderToImage();
 
 signals:
     void shadowQualityChanged(int quality);
@@ -80,6 +100,10 @@ signals:
 private:
     QVector3D randVector();
     QScatter3DSeries *createAndAddSeries();
+    void populateFlatSeries(QScatter3DSeries *series, int rows, int columns, float value);
+    void populateRisingSeries(QScatter3DSeries *series, int rows, int columns, float minValue,
+                              float maxValue);
+    void deleteAxis(QValue3DAxis *axis);
 
     Q3DScatter *m_chart;
     int m_fontSize;
@@ -87,6 +111,8 @@ private:
     int m_loopCounter;
     int m_selectedItem;
     QScatter3DSeries *m_targetSeries;
+    QScatterDataArray m_massiveTestCacheArray;
+    QLabel *m_fpsLabel;
 };
 
 #endif

@@ -17,22 +17,16 @@
 ****************************************************************************/
 
 #include "abstract3dcontroller_p.h"
-#include "camerahelper_p.h"
 #include "qabstract3daxis_p.h"
-#include "qvalue3daxis.h"
-#include "qcategory3daxis.h"
+#include "qvalue3daxis_p.h"
 #include "abstract3drenderer_p.h"
-#include "q3dcamera.h"
-#include "q3dlight.h"
-#include "qabstractdataproxy_p.h"
 #include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
-#include "qabstract3dseries_p.h"
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
-#include "q3dscene_p.h"
-#include "q3dscene.h"
+#include "qcustom3ditem_p.h"
 #include <QtCore/QThread>
+#include <QtGui/QOpenGLFramebufferObject>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -42,6 +36,9 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_themeManager(new ThemeManager(this)),
     m_selectionMode(QAbstract3DGraph::SelectionItem),
     m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
+    m_useOrthoProjection(false),
+    m_aspectRatio(2.0f),
+    m_optimizationHints(QAbstract3DGraph::OptimizationDefault),
     m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -49,9 +46,13 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_axisZ(0),
     m_renderer(0),
     m_isDataDirty(true),
-    m_isSeriesVisibilityDirty(true),
+    m_isCustomDataDirty(true),
+    m_isCustomItemDirty(true),
     m_isSeriesVisualsDirty(true),
-    m_renderPending(false)
+    m_renderPending(false),
+    m_measureFps(false),
+    m_numFrames(0),
+    m_currentFps(0.0)
 {
     if (!m_scene)
         m_scene = new Q3DScene;
@@ -84,6 +85,9 @@ Abstract3DController::~Abstract3DController()
     destroyRenderer();
     delete m_scene;
     delete m_themeManager;
+    foreach (QCustom3DItem *item, m_customItems)
+        delete item;
+    m_customItems.clear();
 }
 
 void Abstract3DController::destroyRenderer()
@@ -142,7 +146,7 @@ void Abstract3DController::removeSeries(QAbstract3DSeries *series)
                             this, &Abstract3DController::handleSeriesVisibilityChanged);
         series->d_ptr->setController(0);
         m_isDataDirty = true;
-        m_isSeriesVisibilityDirty = true;
+        m_isSeriesVisualsDirty = true;
         emitNeedRender();
     }
 }
@@ -180,6 +184,46 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.selectionModeChanged) {
         m_renderer->updateSelectionMode(m_selectionMode);
         m_changeTracker.selectionModeChanged = false;
+    }
+
+    if (m_changeTracker.projectionChanged) {
+        m_renderer->m_useOrthoProjection = m_useOrthoProjection;
+        m_changeTracker.projectionChanged = false;
+    }
+
+    if (m_changeTracker.aspectRatioChanged) {
+        m_renderer->updateAspectRatio(m_aspectRatio);
+        m_changeTracker.aspectRatioChanged = false;
+    }
+
+    if (m_changeTracker.optimizationHintChanged) {
+        m_renderer->updateOptimizationHint(m_optimizationHints);
+        m_changeTracker.optimizationHintChanged = false;
+    }
+
+    if (m_changeTracker.axisXFormatterChanged) {
+        m_changeTracker.axisXFormatterChanged = false;
+        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationX,
+                                            valueAxisX->formatter());
+        }
+    }
+    if (m_changeTracker.axisYFormatterChanged) {
+        m_changeTracker.axisYFormatterChanged = false;
+        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationY,
+                                            valueAxisY->formatter());
+        }
+    }
+    if (m_changeTracker.axisZFormatterChanged) {
+        m_changeTracker.axisZFormatterChanged = false;
+        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
+            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationZ,
+                                            valueAxisZ->formatter());
+        }
     }
 
     if (m_changeTracker.axisXTypeChanged) {
@@ -325,9 +369,89 @@ void Abstract3DController::synchDataToRenderer()
         }
     }
 
-    if (m_isSeriesVisibilityDirty || m_isSeriesVisualsDirty) {
-        m_renderer->updateSeries(m_seriesList, m_isSeriesVisibilityDirty);
-        m_isSeriesVisibilityDirty = false;
+    if (m_changeTracker.axisXReversedChanged) {
+        m_changeTracker.axisXReversedChanged = false;
+        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
+            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationX,
+                                           valueAxisX->reversed());
+        }
+    }
+
+    if (m_changeTracker.axisYReversedChanged) {
+        m_changeTracker.axisYReversedChanged = false;
+        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
+            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationY,
+                                           valueAxisY->reversed());
+        }
+    }
+
+    if (m_changeTracker.axisZReversedChanged) {
+        m_changeTracker.axisZReversedChanged = false;
+        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
+            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationZ,
+                                           valueAxisZ->reversed());
+        }
+    }
+
+    if (m_changeTracker.axisXLabelAutoRotationChanged) {
+        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationX,
+                                                m_axisX->labelAutoRotation());
+        m_changeTracker.axisXLabelAutoRotationChanged = false;
+    }
+
+    if (m_changeTracker.axisYLabelAutoRotationChanged) {
+        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationY,
+                                                m_axisY->labelAutoRotation());
+        m_changeTracker.axisYLabelAutoRotationChanged = false;
+    }
+
+    if (m_changeTracker.axisZLabelAutoRotationChanged) {
+        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationZ,
+                                                m_axisZ->labelAutoRotation());
+        m_changeTracker.axisZLabelAutoRotationChanged = false;
+    }
+
+    if (m_changeTracker.axisXTitleVisibilityChanged) {
+        m_renderer->updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientationX,
+                                              m_axisX->isTitleVisible());
+        m_changeTracker.axisXTitleVisibilityChanged = false;
+    }
+    if (m_changeTracker.axisYTitleVisibilityChanged) {
+        m_renderer->updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientationY,
+                                              m_axisY->isTitleVisible());
+        m_changeTracker.axisYTitleVisibilityChanged = false;
+    }
+    if (m_changeTracker.axisZTitleVisibilityChanged) {
+        m_renderer->updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientationZ,
+                                              m_axisZ->isTitleVisible());
+        m_changeTracker.axisZTitleVisibilityChanged = false;
+    }
+    if (m_changeTracker.axisXTitleFixedChanged) {
+        m_renderer->updateAxisTitleFixed(QAbstract3DAxis::AxisOrientationX,
+                                         m_axisX->isTitleFixed());
+        m_changeTracker.axisXTitleFixedChanged = false;
+    }
+    if (m_changeTracker.axisYTitleFixedChanged) {
+        m_renderer->updateAxisTitleFixed(QAbstract3DAxis::AxisOrientationY,
+                                         m_axisY->isTitleFixed());
+        m_changeTracker.axisYTitleFixedChanged = false;
+    }
+    if (m_changeTracker.axisZTitleFixedChanged) {
+        m_renderer->updateAxisTitleFixed(QAbstract3DAxis::AxisOrientationZ,
+                                         m_axisZ->isTitleFixed());
+        m_changeTracker.axisZTitleFixedChanged = false;
+    }
+
+    if (m_changedSeriesList.size()) {
+        m_renderer->modifiedSeriesList(m_changedSeriesList);
+        m_changedSeriesList.clear();
+    }
+
+    if (m_isSeriesVisualsDirty) {
+        m_renderer->updateSeries(m_seriesList);
         m_isSeriesVisualsDirty = false;
     }
 
@@ -336,6 +460,16 @@ void Abstract3DController::synchDataToRenderer()
         // so no data needs to be passed in updateData()
         m_renderer->updateData();
         m_isDataDirty = false;
+    }
+
+    if (m_isCustomDataDirty) {
+        m_renderer->updateCustomData(m_customItems);
+        m_isCustomDataDirty = false;
+    }
+
+    if (m_isCustomItemDirty) {
+        m_renderer->updateCustomItems();
+        m_isCustomItemDirty = false;
     }
 }
 
@@ -347,12 +481,21 @@ void Abstract3DController::render(const GLuint defaultFboHandle)
     if (!m_renderer)
         return;
 
-    m_renderer->render(defaultFboHandle);
+    if (m_measureFps) {
+        // Measure speed (as milliseconds per frame)
+        m_numFrames++;
+        int elapsed = m_frameTimer.elapsed();
+        if (elapsed >= 1000) {
+            m_currentFps = qreal(m_numFrames) * 1000.0 / qreal(elapsed);
+            emit currentFpsChanged(m_currentFps);
+            m_numFrames = 0;
+            m_frameTimer.restart();
+        }
+        // To get meaningful framerate, don't just do render on demand.
+        emitNeedRender();
+    }
 
-#ifdef DISPLAY_RENDER_SPEED
-    // To get meaningful framerate, don't just do render on demand.
-    emitNeedRender();
-#endif
+    m_renderer->render(defaultFboHandle);
 }
 
 void Abstract3DController::mouseDoubleClickEvent(QMouseEvent *event)
@@ -445,7 +588,8 @@ void Abstract3DController::handleThemeSingleHighlightColorChanged(const QColor &
     markSeriesVisualsDirty();
 }
 
-void Abstract3DController::handleThemeSingleHighlightGradientChanged(const QLinearGradient &gradient)
+void Abstract3DController::handleThemeSingleHighlightGradientChanged(
+        const QLinearGradient &gradient)
 {
     // Set value for series that have not explicitly set this value
     foreach (QAbstract3DSeries *series, m_seriesList) {
@@ -503,7 +647,7 @@ void Abstract3DController::setAxisX(QAbstract3DAxis *axis)
     }
 }
 
-QAbstract3DAxis *Abstract3DController::axisX()
+QAbstract3DAxis *Abstract3DController::axisX() const
 {
     return m_axisX;
 }
@@ -517,7 +661,7 @@ void Abstract3DController::setAxisY(QAbstract3DAxis *axis)
     }
 }
 
-QAbstract3DAxis *Abstract3DController::axisY()
+QAbstract3DAxis *Abstract3DController::axisY() const
 {
     return m_axisY;
 }
@@ -531,7 +675,7 @@ void Abstract3DController::setAxisZ(QAbstract3DAxis *axis)
     }
 }
 
-QAbstract3DAxis *Abstract3DController::axisZ()
+QAbstract3DAxis *Abstract3DController::axisZ() const
 {
     return m_axisZ;
 }
@@ -648,19 +792,6 @@ QList<QAbstract3DInputHandler *> Abstract3DController::inputHandlers() const
     return m_inputHandlers;
 }
 
-int Abstract3DController::zoomLevel()
-{
-    return m_scene->activeCamera()->zoomLevel();
-}
-
-void Abstract3DController::setZoomLevel(int zoomLevel)
-{
-    m_scene->activeCamera()->setZoomLevel(zoomLevel);
-
-    m_changeTracker.zoomLevelChanged = true;
-    emitNeedRender();
-}
-
 void Abstract3DController::addTheme(Q3DTheme *theme)
 {
     m_themeManager->addTheme(theme);
@@ -675,12 +806,13 @@ void Abstract3DController::releaseTheme(Q3DTheme *theme)
     if (oldTheme != m_themeManager->activeTheme())
         emit activeThemeChanged(m_themeManager->activeTheme());
 }
+
 QList<Q3DTheme *> Abstract3DController::themes() const
 {
     return m_themeManager->themes();
 }
 
-void Abstract3DController::setActiveTheme(Q3DTheme *theme)
+void Abstract3DController::setActiveTheme(Q3DTheme *theme, bool force)
 {
     if (theme != m_themeManager->activeTheme()) {
         m_themeManager->setActiveTheme(theme);
@@ -689,7 +821,7 @@ void Abstract3DController::setActiveTheme(Q3DTheme *theme)
         Q3DTheme *newActiveTheme = m_themeManager->activeTheme();
         // Reset all attached series to the new theme
         for (int i = 0; i < m_seriesList.size(); i++)
-            m_seriesList.at(i)->d_ptr->resetToTheme(*newActiveTheme, i, true);
+            m_seriesList.at(i)->d_ptr->resetToTheme(*newActiveTheme, i, force);
         markSeriesVisualsDirty();
         emit activeThemeChanged(newActiveTheme);
     }
@@ -717,6 +849,12 @@ QAbstract3DGraph::SelectionFlags Abstract3DController::selectionMode() const
 
 void Abstract3DController::setShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
+    if (!m_useOrthoProjection)
+        doSetShadowQuality(quality);
+}
+
+void Abstract3DController::doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality)
+{
     if (quality != m_shadowQuality) {
         m_shadowQuality = quality;
         m_changeTracker.shadowQualityChanged = true;
@@ -728,6 +866,22 @@ void Abstract3DController::setShadowQuality(QAbstract3DGraph::ShadowQuality qual
 QAbstract3DGraph::ShadowQuality Abstract3DController::shadowQuality() const
 {
     return m_shadowQuality;
+}
+
+void Abstract3DController::setOptimizationHints(QAbstract3DGraph::OptimizationHints hints)
+{
+    if (hints != m_optimizationHints) {
+        m_optimizationHints = hints;
+        m_changeTracker.optimizationHintChanged = true;
+        m_isDataDirty = true;
+        emit optimizationHintsChanged(hints);
+        emitNeedRender();
+    }
+}
+
+QAbstract3DGraph::OptimizationHints Abstract3DController::optimizationHints() const
+{
+    return m_optimizationHints;
 }
 
 bool Abstract3DController::shadowsSupported() const
@@ -747,7 +901,6 @@ bool Abstract3DController::isSlicingActive() const
 void Abstract3DController::setSlicingActive(bool isSlicing)
 {
     m_scene->setSlicingActive(isSlicing);
-    emitNeedRender();
 }
 
 Q3DScene *Abstract3DController::scene()
@@ -758,12 +911,87 @@ Q3DScene *Abstract3DController::scene()
 void Abstract3DController::markDataDirty()
 {
     m_isDataDirty = true;
+
+    markSeriesItemLabelsDirty();
     emitNeedRender();
 }
 
 void Abstract3DController::markSeriesVisualsDirty()
 {
     m_isSeriesVisualsDirty = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::requestRender(QOpenGLFramebufferObject *fbo)
+{
+    m_renderer->render(fbo->handle());
+}
+
+int Abstract3DController::addCustomItem(QCustom3DItem *item)
+{
+    if (!item)
+        return -1;
+
+    int index = m_customItems.indexOf(item);
+
+    if (index != -1)
+        return index;
+
+    item->setParent(this);
+    connect(item->d_ptr.data(), &QCustom3DItemPrivate::needUpdate,
+            this, &Abstract3DController::updateCustomItem);
+    m_customItems.append(item);
+    item->d_ptr->resetDirtyBits();
+    m_isCustomDataDirty = true;
+    emitNeedRender();
+    return m_customItems.count() - 1;
+}
+
+void Abstract3DController::deleteCustomItems()
+{
+    foreach (QCustom3DItem *item, m_customItems)
+        delete item;
+    m_customItems.clear();
+    m_isCustomDataDirty = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::deleteCustomItem(QCustom3DItem *item)
+{
+    if (!item)
+        return;
+
+    m_customItems.removeOne(item);
+    delete item;
+    item = 0;
+    m_isCustomDataDirty = true;
+    emitNeedRender();
+}
+
+void Abstract3DController::deleteCustomItem(const QVector3D &position)
+{
+    // Get the item for the position
+    foreach (QCustom3DItem *item, m_customItems) {
+        if (item->position() == position)
+            deleteCustomItem(item);
+    }
+}
+
+void Abstract3DController::releaseCustomItem(QCustom3DItem *item)
+{
+    if (item && m_customItems.contains(item)) {
+        disconnect(item->d_ptr.data(), &QCustom3DItemPrivate::needUpdate,
+                   this, &Abstract3DController::updateCustomItem);
+        m_customItems.removeOne(item);
+        item->setParent(0);
+        m_isCustomDataDirty = true;
+        emitNeedRender();
+    }
+}
+
+void Abstract3DController::updateCustomItem()
+{
+    m_isCustomItemDirty = true;
     emitNeedRender();
 }
 
@@ -783,6 +1011,8 @@ void Abstract3DController::handleAxisTitleChangedBySender(QObject *sender)
         m_changeTracker.axisZTitleChanged = true;
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+
+    markSeriesItemLabelsDirty();
     emitNeedRender();
 }
 
@@ -801,6 +1031,8 @@ void Abstract3DController::handleAxisLabelsChangedBySender(QObject *sender)
         m_changeTracker.axisZLabelsChanged = true;
     else
         qWarning() << __FUNCTION__ << "invoked for invalid axis";
+
+    markSeriesItemLabelsDirty();
     emitNeedRender();
 }
 
@@ -882,6 +1114,35 @@ void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
     handleAxisLabelFormatChangedBySender(sender());
 }
 
+void Abstract3DController::handleAxisReversedChanged(bool enable)
+{
+    Q_UNUSED(enable)
+    handleAxisReversedChangedBySender(sender());
+}
+
+void Abstract3DController::handleAxisFormatterDirty()
+{
+    handleAxisFormatterDirtyBySender(sender());
+}
+
+void Abstract3DController::handleAxisLabelAutoRotationChanged(float angle)
+{
+    Q_UNUSED(angle)
+    handleAxisLabelAutoRotationChangedBySender(sender());
+}
+
+void Abstract3DController::handleAxisTitleVisibilityChanged(bool visible)
+{
+    Q_UNUSED(visible)
+    handleAxisTitleVisibilityChangedBySender(sender());
+}
+
+void Abstract3DController::handleAxisTitleFixedChanged(bool fixed)
+{
+    Q_UNUSED(fixed)
+    handleAxisTitleFixedChangedBySender(sender());
+}
+
 void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::InputView view)
 {
     // When in automatic slicing mode, input view change to primary disables slice mode
@@ -890,15 +1151,12 @@ void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::Input
         setSlicingActive(false);
     }
 
-    m_changeTracker.inputViewChanged = true;
     emitNeedRender();
 }
 
 void Abstract3DController::handleInputPositionChanged(const QPoint &position)
 {
     Q_UNUSED(position)
-
-    m_changeTracker.inputPositionChanged = true;
     emitNeedRender();
 }
 
@@ -912,6 +1170,21 @@ void Abstract3DController::handleSeriesVisibilityChanged(bool visible)
 void Abstract3DController::handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     setShadowQuality(quality);
+}
+
+void Abstract3DController::setMeasureFps(bool enable)
+{
+    if (m_measureFps != enable) {
+        m_measureFps = enable;
+        m_currentFps = 0.0;
+
+        if (enable) {
+            m_frameTimer.start();
+            m_numFrames = -1;
+            emitNeedRender();
+        }
+        emit measureFpsChanged(enable);
+    }
 }
 
 void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
@@ -932,13 +1205,102 @@ void Abstract3DController::handleAxisLabelFormatChangedBySender(QObject *sender)
     emitNeedRender();
 }
 
+void Abstract3DController::handleAxisReversedChangedBySender(QObject *sender)
+{
+    // Reversing change needs to dirty the data so item positions are recalculated
+    if (sender == m_axisX) {
+        m_isDataDirty = true;
+        m_changeTracker.axisXReversedChanged = true;
+    } else if (sender == m_axisY) {
+        m_isDataDirty = true;
+        m_changeTracker.axisYReversedChanged = true;
+    } else if (sender == m_axisZ) {
+        m_isDataDirty = true;
+        m_changeTracker.axisZReversedChanged = true;
+    } else {
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    }
+    emitNeedRender();
+}
+
+void Abstract3DController::handleAxisFormatterDirtyBySender(QObject *sender)
+{
+    // Sender is QValue3DAxisPrivate
+    QValue3DAxis *valueAxis = static_cast<QValue3DAxisPrivate *>(sender)->qptr();
+    if (valueAxis == m_axisX) {
+        m_isDataDirty = true;
+        m_changeTracker.axisXFormatterChanged = true;
+    } else if (valueAxis == m_axisY) {
+        m_isDataDirty = true;
+        m_changeTracker.axisYFormatterChanged = true;
+    } else if (valueAxis == m_axisZ) {
+        m_isDataDirty = true;
+        m_changeTracker.axisZFormatterChanged = true;
+    } else {
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+    }
+    emitNeedRender();
+}
+
+void Abstract3DController::handleAxisLabelAutoRotationChangedBySender(QObject *sender)
+{
+    if (sender == m_axisX)
+        m_changeTracker.axisXLabelAutoRotationChanged = true;
+    else if (sender == m_axisY)
+        m_changeTracker.axisYLabelAutoRotationChanged = true;
+    else if (sender == m_axisZ)
+        m_changeTracker.axisZLabelAutoRotationChanged = true;
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+
+    emitNeedRender();
+}
+
+void Abstract3DController::handleAxisTitleVisibilityChangedBySender(QObject *sender)
+{
+    if (sender == m_axisX)
+        m_changeTracker.axisXTitleVisibilityChanged = true;
+    else if (sender == m_axisY)
+        m_changeTracker.axisYTitleVisibilityChanged = true;
+    else if (sender == m_axisZ)
+        m_changeTracker.axisZTitleVisibilityChanged = true;
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+
+    emitNeedRender();
+}
+
+void Abstract3DController::handleAxisTitleFixedChangedBySender(QObject *sender)
+{
+    if (sender == m_axisX)
+        m_changeTracker.axisXTitleFixedChanged = true;
+    else if (sender == m_axisY)
+        m_changeTracker.axisYTitleFixedChanged = true;
+    else if (sender == m_axisZ)
+        m_changeTracker.axisZTitleFixedChanged = true;
+    else
+        qWarning() << __FUNCTION__ << "invoked for invalid axis";
+
+    emitNeedRender();
+}
+
 void Abstract3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
-    Q_UNUSED(sender)
+    QAbstract3DSeries *series = static_cast<QAbstract3DSeries *>(sender);
+    series->d_ptr->m_changeTracker.visibilityChanged = true;
 
     m_isDataDirty = true;
-    m_isSeriesVisibilityDirty = true;
+    m_isSeriesVisualsDirty = true;
+
+    adjustAxisRanges();
+
     emitNeedRender();
+}
+
+void Abstract3DController::markSeriesItemLabelsDirty()
+{
+    for (int i = 0; i < m_seriesList.size(); i++)
+        m_seriesList.at(i)->d_ptr->markItemLabelDirty();
 }
 
 void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orientation,
@@ -978,6 +1340,12 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
                      this, &Abstract3DController::handleAxisRangeChanged);
     QObject::connect(axis, &QAbstract3DAxis::autoAdjustRangeChanged,
                      this, &Abstract3DController::handleAxisAutoAdjustRangeChanged);
+    QObject::connect(axis, &QAbstract3DAxis::labelAutoRotationChanged,
+                     this, &Abstract3DController::handleAxisLabelAutoRotationChanged);
+    QObject::connect(axis, &QAbstract3DAxis::titleVisibilityChanged,
+                     this, &Abstract3DController::handleAxisTitleVisibilityChanged);
+    QObject::connect(axis, &QAbstract3DAxis::titleFixedChanged,
+                     this, &Abstract3DController::handleAxisTitleFixedChanged);
 
     if (orientation == QAbstract3DAxis::AxisOrientationX)
         m_changeTracker.axisXTypeChanged = true;
@@ -991,6 +1359,9 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
     handleAxisRangeChangedBySender(axis);
     handleAxisAutoAdjustRangeChangedInOrientation(axis->orientation(),
                                                   axis->isAutoAdjustRange());
+    handleAxisLabelAutoRotationChangedBySender(axis);
+    handleAxisTitleVisibilityChangedBySender(axis);
+    handleAxisTitleFixedChangedBySender(axis);
 
     if (axis->type() & QAbstract3DAxis::AxisTypeValue) {
         QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(axis);
@@ -1000,14 +1371,21 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
                          this, &Abstract3DController::handleAxisSubSegmentCountChanged);
         QObject::connect(valueAxis, &QValue3DAxis::labelFormatChanged,
                          this, &Abstract3DController::handleAxisLabelFormatChanged);
+        QObject::connect(valueAxis, &QValue3DAxis::reversedChanged,
+                         this, &Abstract3DController::handleAxisReversedChanged);
+        QObject::connect(valueAxis->dptr(), &QValue3DAxisPrivate::formatterDirty,
+                         this, &Abstract3DController::handleAxisFormatterDirty);
 
         handleAxisSegmentCountChangedBySender(valueAxis);
         handleAxisSubSegmentCountChangedBySender(valueAxis);
         handleAxisLabelFormatChangedBySender(valueAxis);
+        handleAxisReversedChangedBySender(valueAxis);
+        handleAxisFormatterDirtyBySender(valueAxis->dptr());
     }
 }
 
-QAbstract3DAxis *Abstract3DController::createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation)
+QAbstract3DAxis *Abstract3DController::createDefaultAxis(
+        QAbstract3DAxis::AxisOrientation orientation)
 {
     Q_UNUSED(orientation)
 
@@ -1045,6 +1423,99 @@ void Abstract3DController::emitNeedRender()
         emit needRender();
         m_renderPending = true;
     }
+}
+
+void Abstract3DController::handlePendingClick()
+{
+    QAbstract3DGraph::ElementType type = m_renderer->clickedType();
+    emit elementSelected(type);
+}
+
+int Abstract3DController::selectedLabelIndex() const
+{
+    int index = m_renderer->m_selectedLabelIndex;
+    QAbstract3DAxis *axis = selectedAxis();
+    if (axis && axis->labels().count() <= index)
+        index = -1;
+    return index;
+}
+
+QAbstract3DAxis *Abstract3DController::selectedAxis() const
+{
+    QAbstract3DAxis *axis = 0;
+    QAbstract3DGraph::ElementType type = m_renderer->clickedType();
+    switch (type) {
+    case QAbstract3DGraph::ElementAxisXLabel:
+        axis = axisX();
+        break;
+    case QAbstract3DGraph::ElementAxisYLabel:
+        axis = axisY();
+        break;
+    case QAbstract3DGraph::ElementAxisZLabel:
+        axis = axisZ();
+        break;
+    default:
+        axis = 0;
+        break;
+    }
+
+    return axis;
+}
+
+int Abstract3DController::selectedCustomItemIndex() const
+{
+    int index = m_renderer->m_selectedCustomItemIndex;
+    if (m_customItems.count() <= index)
+        index = -1;
+    return index;
+}
+
+QCustom3DItem *Abstract3DController::selectedCustomItem() const
+{
+    QCustom3DItem *item = 0;
+    int index = selectedCustomItemIndex();
+    if (index >= 0)
+        item = m_customItems[index];
+    return item;
+}
+
+QAbstract3DGraph::ElementType Abstract3DController::selectedElement() const
+{
+    return m_renderer->clickedType();
+}
+
+void Abstract3DController::setOrthoProjection(bool enable)
+{
+    if (enable != m_useOrthoProjection) {
+        m_useOrthoProjection = enable;
+        m_changeTracker.projectionChanged = true;
+        emit orthoProjectionChanged(m_useOrthoProjection);
+        // If changed to ortho, disable shadows
+        if (m_useOrthoProjection)
+            doSetShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+        emitNeedRender();
+    }
+}
+
+bool Abstract3DController::isOrthoProjection() const
+{
+    return m_useOrthoProjection;
+}
+
+void Abstract3DController::setAspectRatio(float ratio)
+{
+    if (m_aspectRatio != ratio) {
+        m_aspectRatio = ratio;
+        m_changeTracker.aspectRatioChanged = true;
+        emit aspectRatioChanged(m_aspectRatio);
+        m_isDataDirty = true;
+        emitNeedRender();
+    }
+}
+
+float Abstract3DController::aspectRatio()
+{
+    return m_aspectRatio;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

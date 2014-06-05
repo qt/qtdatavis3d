@@ -17,16 +17,11 @@
 ****************************************************************************/
 
 #include "selectionpointer_p.h"
-#include "surface3dcontroller_p.h"
 #include "shaderhelper_p.h"
 #include "objecthelper_p.h"
 #include "texturehelper_p.h"
 #include "q3dcamera_p.h"
-#include "drawer_p.h"
 #include "utils_p.h"
-#include "q3dlight.h"
-
-#include <QtGui/QMatrix4x4>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -54,7 +49,6 @@ SelectionPointer::~SelectionPointer()
 {
     delete m_labelShader;
     delete m_pointShader;
-    delete m_labelObj;
     delete m_textureHelper;
 }
 
@@ -66,7 +60,6 @@ void SelectionPointer::initializeOpenGL()
     m_drawer->initializeOpenGL();
 
     initShaders();
-    loadLabelMesh();
 }
 
 void SelectionPointer::updateScene(Q3DScene *scene)
@@ -74,7 +67,7 @@ void SelectionPointer::updateScene(Q3DScene *scene)
     m_cachedScene = scene;
 }
 
-void SelectionPointer::render(GLuint defaultFboHandle)
+void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
 {
     Q_UNUSED(defaultFboHandle)
 
@@ -89,17 +82,22 @@ void SelectionPointer::render(GLuint defaultFboHandle)
     // Get view matrix
     QMatrix4x4 viewMatrix;
     QMatrix4x4 projectionMatrix;
+    GLfloat viewPortRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
     if (m_cachedIsSlicingActivated) {
-        GLfloat aspect = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
         GLfloat sliceUnitsScaled = sliceUnits / m_autoScaleAdjustment;
         viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
-        projectionMatrix.ortho(-sliceUnitsScaled * aspect, sliceUnitsScaled * aspect,
+        projectionMatrix.ortho(-sliceUnitsScaled * viewPortRatio, sliceUnitsScaled * viewPortRatio,
                                -sliceUnitsScaled, sliceUnitsScaled,
                                -1.0f, 4.0f);
+    } else if (useOrtho) {
+        viewMatrix = camera->d_ptr->viewMatrix();
+        GLfloat orthoRatio = 2.0f;
+        projectionMatrix.ortho(-viewPortRatio * orthoRatio, viewPortRatio * orthoRatio,
+                               -orthoRatio, orthoRatio,
+                               0.0f, 100.0f);
     } else {
         viewMatrix = camera->d_ptr->viewMatrix();
-        projectionMatrix.perspective(45.0f, (GLfloat)m_mainViewPort.width()
-                                     / (GLfloat)m_mainViewPort.height(), 0.1f, 100.0f);
+        projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
     }
 
     // Calculate scale factor to get uniform font size
@@ -209,7 +207,7 @@ void SelectionPointer::updateSliceData(bool sliceActivated, GLfloat autoScaleAdj
     m_autoScaleAdjustment = autoScaleAdjustment;
 }
 
-void SelectionPointer::setHighlightColor(const QVector3D &colorVector)
+void SelectionPointer::setHighlightColor(const QVector4D &colorVector)
 {
     m_highlightColor = colorVector;
 }
@@ -228,6 +226,11 @@ void SelectionPointer::setLabel(const QString &label)
 void SelectionPointer::setPointerObject(ObjectHelper *object)
 {
     m_pointObj = object;
+}
+
+void SelectionPointer::setLabelObject(ObjectHelper *object)
+{
+    m_labelObj = object;
 }
 
 void SelectionPointer::handleDrawerChange()
@@ -262,14 +265,6 @@ void SelectionPointer::initShaders()
 #endif
     m_pointShader->initialize();
 
-}
-
-void SelectionPointer::loadLabelMesh()
-{
-    if (m_labelObj)
-        delete m_labelObj;
-    m_labelObj = new ObjectHelper(QStringLiteral(":/defaultMeshes/plane"));
-    m_labelObj->load();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

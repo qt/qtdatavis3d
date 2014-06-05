@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qabstractdataproxy.h"
 #include "qabstractdataproxy_p.h"
 #include "qabstract3dseries_p.h"
 
@@ -26,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QAbstractDataProxy
  * \inmodule QtDataVisualization
  * \brief Base class for all QtDataVisualization data proxies.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * You use the visualization type specific inherited classes instead of the base class.
  * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy, {Qt Data Visualization Data Handling}
@@ -42,7 +41,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * For AbstractDataProxy enums, see \l QAbstractDataProxy::DataType
+ * For AbstractDataProxy enums, see \l{QAbstractDataProxy::DataType}.
  *
  * \sa BarDataProxy, ScatterDataProxy, SurfaceDataProxy, {Qt Data Visualization Data Handling}
  */

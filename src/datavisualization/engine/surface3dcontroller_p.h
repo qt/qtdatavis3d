@@ -38,15 +38,11 @@ class Surface3DRenderer;
 class QSurface3DSeries;
 
 struct Surface3DChangeBitField {
-    bool smoothStatusChanged      : 1;
-    bool surfaceGridChanged       : 1;
     bool selectedPointChanged     : 1;
     bool rowsChanged              : 1;
     bool itemChanged              : 1;
 
     Surface3DChangeBitField() :
-        smoothStatusChanged(true),
-        surfaceGridChanged(true),
         selectedPointChanged(true),
         rowsChanged(false),
         itemChanged(false)
@@ -77,7 +73,6 @@ private:
     bool m_flatShadingSupported;
     QVector<ChangeItem> m_changedItems;
     QVector<ChangeRow> m_changedRows;
-    QVector<QSurface3DSeries *> m_changedSeriesList;
 
 public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
@@ -97,6 +92,7 @@ public:
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick();
+    virtual void adjustAxisRanges();
 
     static QPoint invalidSelectionPosition();
     bool isFlatShadingSupported();
@@ -119,8 +115,6 @@ signals:
     void selectedSeriesChanged(QSurface3DSeries *series);
 
 private:
-    void adjustValueAxisRange();
-
     Q_DISABLE_COPY(Surface3DController)
 };
 

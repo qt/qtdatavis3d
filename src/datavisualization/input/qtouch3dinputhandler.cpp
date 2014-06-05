@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "qtouch3dinputhandler_p.h"
-#include "q3dcamera_p.h"
 #include <QtCore/QTimer>
 #include <QtCore/qmath.h>
 
@@ -39,7 +38,7 @@ const int maxZoomLevel = 500;
  * \class QTouch3DInputHandler
  * \inmodule QtDataVisualization
  * \brief Basic touch display based input handler.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QTouch3DInputHandler is the basic input handler for touch screen devices.
  *

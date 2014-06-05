@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "abstractdeclarative_p.h"
-#include "qvalue3daxis.h"
 #include "declarativetheme_p.h"
 #include "declarativerendernode_p.h"
 
@@ -37,18 +36,18 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_controller(0),
     m_contextWindow(0),
     m_renderMode(RenderIndirect),
-#if defined(QT_OPENGL_ES_2)
+    #if defined(QT_OPENGL_ES_2)
     m_samples(0),
-#else
+    #else
     m_samples(4),
-#endif
+    #endif
     m_windowSamples(0),
     m_initialisedSize(0, 0),
-#ifdef USE_SHARED_CONTEXT
+    #ifdef USE_SHARED_CONTEXT
     m_context(0),
-#else
+    #else
     m_stateStore(0),
-#endif
+    #endif
     m_qtContext(0),
     m_mainThread(QThread::currentThread()),
     m_contextThread(0)
@@ -171,7 +170,7 @@ Declarative3DScene* AbstractDeclarative::scene() const
 
 void AbstractDeclarative::setTheme(Q3DTheme *theme)
 {
-    m_controller->setActiveTheme(theme);
+    m_controller->setActiveTheme(theme, isComponentComplete());
 }
 
 Q3DTheme *AbstractDeclarative::theme() const
@@ -211,6 +210,84 @@ bool AbstractDeclarative::shadowsSupported() const
     return m_controller->shadowsSupported();
 }
 
+int AbstractDeclarative::addCustomItem(QCustom3DItem *item)
+{
+    return m_controller->addCustomItem(item);
+}
+
+void AbstractDeclarative::removeCustomItems()
+{
+    m_controller->deleteCustomItems();
+}
+
+void AbstractDeclarative::removeCustomItem(QCustom3DItem *item)
+{
+    m_controller->deleteCustomItem(item);
+}
+
+void AbstractDeclarative::removeCustomItemAt(const QVector3D &position)
+{
+    m_controller->deleteCustomItem(position);
+}
+
+void AbstractDeclarative::releaseCustomItem(QCustom3DItem *item)
+{
+    return m_controller->releaseCustomItem(item);
+}
+
+int AbstractDeclarative::selectedLabelIndex() const
+{
+    return m_controller->selectedLabelIndex();
+}
+
+QAbstract3DAxis *AbstractDeclarative::selectedAxis() const
+{
+    return m_controller->selectedAxis();
+}
+
+int AbstractDeclarative::selectedCustomItemIndex() const
+{
+    return m_controller->selectedCustomItemIndex();
+}
+
+QCustom3DItem *AbstractDeclarative::selectedCustomItem() const
+{
+    return m_controller->selectedCustomItem();
+}
+
+QQmlListProperty<QCustom3DItem> AbstractDeclarative::customItemList()
+{
+    return QQmlListProperty<QCustom3DItem>(this, this,
+                                           &AbstractDeclarative::appendCustomItemFunc,
+                                           &AbstractDeclarative::countCustomItemFunc,
+                                           &AbstractDeclarative::atCustomItemFunc,
+                                           &AbstractDeclarative::clearCustomItemFunc);
+}
+
+void AbstractDeclarative::appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
+                                               QCustom3DItem *item)
+{
+    AbstractDeclarative *decl = reinterpret_cast<AbstractDeclarative *>(list->data);
+    decl->addCustomItem(item);
+}
+
+int AbstractDeclarative::countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
+{
+    return reinterpret_cast<AbstractDeclarative *>(list->data)->m_controller->m_customItems.size();
+}
+
+QCustom3DItem *AbstractDeclarative::atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
+                                                     int index)
+{
+    return reinterpret_cast<AbstractDeclarative *>(list->data)->m_controller->m_customItems.at(index);
+}
+
+void AbstractDeclarative::clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
+{
+    AbstractDeclarative *decl = reinterpret_cast<AbstractDeclarative *>(list->data);
+    decl->removeCustomItems();
+}
+
 void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);
@@ -230,6 +307,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::themeChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::handleSelectionModeChange);
+    QObject::connect(m_controller.data(), &Abstract3DController::elementSelected, this,
+                     &AbstractDeclarative::selectedElementChanged);
 
     QObject::connect(m_controller.data(), &Abstract3DController::axisXChanged, this,
                      &AbstractDeclarative::handleAxisXChanged);
@@ -237,6 +316,17 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::handleAxisYChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::axisZChanged, this,
                      &AbstractDeclarative::handleAxisZChanged);
+
+    QObject::connect(m_controller.data(), &Abstract3DController::measureFpsChanged, this,
+                     &AbstractDeclarative::measureFpsChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::currentFpsChanged, this,
+                     &AbstractDeclarative::currentFpsChanged);
+
+    QObject::connect(m_controller.data(), &Abstract3DController::orthoProjectionChanged, this,
+                     &AbstractDeclarative::orthoProjectionChanged);
+
+    QObject::connect(m_controller.data(), &Abstract3DController::aspectRatioChanged, this,
+                     &AbstractDeclarative::aspectRatioChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -567,6 +657,58 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
         // Disable clearing of the window as we render underneath
         window->setClearBeforeRendering(false);
     }
+}
+
+void AbstractDeclarative::setMeasureFps(bool enable)
+{
+    m_controller->setMeasureFps(enable);
+}
+
+bool AbstractDeclarative::measureFps() const
+{
+    return m_controller->measureFps();
+}
+
+qreal AbstractDeclarative::currentFps() const
+{
+    return m_controller->currentFps();
+}
+
+void AbstractDeclarative::setOrthoProjection(bool enable)
+{
+    m_controller->setOrthoProjection(enable);
+}
+
+bool AbstractDeclarative::isOrthoProjection() const
+{
+    return m_controller->isOrthoProjection();
+}
+
+AbstractDeclarative::ElementType AbstractDeclarative::selectedElement() const
+{
+    return ElementType(m_controller->selectedElement());
+}
+
+void AbstractDeclarative::setAspectRatio(qreal ratio)
+{
+    m_controller->setAspectRatio(float(ratio));
+}
+
+qreal AbstractDeclarative::aspectRatio() const
+{
+    return m_controller->aspectRatio();
+}
+
+void AbstractDeclarative::setOptimizationHints(OptimizationHints hints)
+{
+    int intmode = int(hints);
+    m_controller->setOptimizationHints(QAbstract3DGraph::OptimizationHints(intmode));
+}
+
+AbstractDeclarative::OptimizationHints AbstractDeclarative::optimizationHints() const
+{
+    int intmode = int(m_controller->optimizationHints());
+    return OptimizationHints(intmode);
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

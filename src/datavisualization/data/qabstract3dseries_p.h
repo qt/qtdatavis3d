@@ -26,11 +26,11 @@
 //
 // We mean it.
 
-#include "datavisualizationglobal_p.h"
-#include "qabstract3dseries.h"
-
 #ifndef QABSTRACT3DSERIES_P_H
 #define QABSTRACT3DSERIES_P_H
+
+#include "datavisualizationglobal_p.h"
+#include "qabstract3dseries.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -38,7 +38,6 @@ class QAbstractDataProxy;
 class Abstract3DController;
 
 struct QAbstract3DSeriesChangeBitField {
-    bool itemLabelFormatChanged         : 1;
     bool meshChanged                    : 1;
     bool meshSmoothChanged              : 1;
     bool meshRotationChanged            : 1;
@@ -51,10 +50,12 @@ struct QAbstract3DSeriesChangeBitField {
     bool multiHighlightColorChanged     : 1;
     bool multiHighlightGradientChanged  : 1;
     bool nameChanged                    : 1;
+    bool itemLabelChanged               : 1;
+    bool itemLabelVisibilityChanged     : 1;
+    bool visibilityChanged              : 1;
 
     QAbstract3DSeriesChangeBitField()
-        : itemLabelFormatChanged(true),
-          meshChanged(true),
+        : meshChanged(true),
           meshSmoothChanged(true),
           meshRotationChanged(true),
           userDefinedMeshChanged(true),
@@ -65,7 +66,10 @@ struct QAbstract3DSeriesChangeBitField {
           singleHighlightGradientChanged(true),
           multiHighlightColorChanged(true),
           multiHighlightGradientChanged(true),
-          nameChanged(true)
+          nameChanged(true),
+          itemLabelChanged(true),
+          itemLabelVisibilityChanged(true),
+          visibilityChanged(true)
     {
     }
 };
@@ -102,6 +106,7 @@ public:
     virtual void setDataProxy(QAbstractDataProxy *proxy);
     virtual void setController(Abstract3DController *controller);
     virtual void connectControllerAndProxy(Abstract3DController *newController) = 0;
+    virtual void createItemLabel() = 0;
 
     void setItemLabelFormat(const QString &format);
     void setVisible(bool visible);
@@ -120,6 +125,10 @@ public:
     void setName(const QString &name);
 
     void resetToTheme(const Q3DTheme &theme, int seriesIndex, bool force);
+    QString itemLabel();
+    void markItemLabelDirty();
+    inline bool itemLabelDirty() const { return m_itemLabelDirty; }
+    void setItemLabelVisible(bool visible);
 
     QAbstract3DSeriesChangeBitField m_changeTracker;
     QAbstract3DSeriesThemeOverrideBitField m_themeTracker;
@@ -143,6 +152,9 @@ public:
     QLinearGradient m_multiHighlightGradient;
 
     QString m_name;
+    QString m_itemLabel;
+    bool m_itemLabelDirty;
+    bool m_itemLabelVisible;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

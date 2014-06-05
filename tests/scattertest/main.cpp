@@ -40,6 +40,7 @@ int main(int argc, char **argv)
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
+    QVBoxLayout *vLayout2 = new QVBoxLayout();
 
     Q3DScatter *chart = new Q3DScatter();
     QSize screenSize = chart->screen()->size();
@@ -54,6 +55,7 @@ int main(int argc, char **argv)
 
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    hLayout->addLayout(vLayout2);
 
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
@@ -100,6 +102,9 @@ int main(int argc, char **argv)
     QPushButton *setSelectedItemButton = new QPushButton(widget);
     setSelectedItemButton->setText(QStringLiteral("Select/deselect item 3"));
 
+    QPushButton *clearSeriesDataButton = new QPushButton(widget);
+    clearSeriesDataButton->setText(QStringLiteral("Clear series data"));
+
     QPushButton *addSeriesButton = new QPushButton(widget);
     addSeriesButton->setText(QStringLiteral("Add Series"));
 
@@ -115,6 +120,18 @@ int main(int argc, char **argv)
     QPushButton *startTimerButton = new QPushButton(widget);
     startTimerButton->setText(QStringLiteral("Start/stop timer"));
 
+    QPushButton *massiveDataTestButton = new QPushButton(widget);
+    massiveDataTestButton->setText(QStringLiteral("Massive data test"));
+
+    QPushButton *testItemChangesButton = new QPushButton(widget);
+    testItemChangesButton->setText(QStringLiteral("Test Item changing"));
+
+    QPushButton *testReverseButton = new QPushButton(widget);
+    testReverseButton->setText(QStringLiteral("Test Axis Reversing"));
+
+    QPushButton *renderToImageButton = new QPushButton(widget);
+    renderToImageButton->setText(QStringLiteral("Render the graph to an image"));
+
     QLinearGradient grBtoY(0, 0, 100, 0);
     grBtoY.setColorAt(1.0, Qt::black);
     grBtoY.setColorAt(0.67, Qt::blue);
@@ -128,6 +145,12 @@ int main(int argc, char **argv)
     QPushButton *gradientBtoYPB = new QPushButton(widget);
     gradientBtoYPB->setIcon(QIcon(pm));
     gradientBtoYPB->setIconSize(QSize(100, 24));
+
+    QLabel *fpsLabel = new QLabel(QStringLiteral(""));
+
+    QCheckBox *fpsCheckBox = new QCheckBox(widget);
+    fpsCheckBox->setText(QStringLiteral("Measure Fps"));
+    fpsCheckBox->setChecked(false);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
@@ -150,16 +173,82 @@ int main(int argc, char **argv)
     QFontComboBox *fontList = new QFontComboBox(widget);
 
     QSlider *fontSizeSlider = new QSlider(Qt::Horizontal, widget);
-    fontSizeSlider->setTickInterval(1);
+    fontSizeSlider->setTickInterval(15);
+    fontSizeSlider->setTickPosition(QSlider::TicksBelow);
     fontSizeSlider->setMinimum(1);
     fontSizeSlider->setValue(30);
     fontSizeSlider->setMaximum(200);
 
     QSlider *pointSizeSlider = new QSlider(Qt::Horizontal, widget);
-    pointSizeSlider->setTickInterval(1);
+    pointSizeSlider->setTickInterval(15);
+    pointSizeSlider->setTickPosition(QSlider::TicksBelow);
     pointSizeSlider->setMinimum(1);
     pointSizeSlider->setValue(30);
     pointSizeSlider->setMaximum(100);
+
+    QSlider *minSliderX = new QSlider(Qt::Horizontal, widget);
+    minSliderX->setTickInterval(50);
+    minSliderX->setTickPosition(QSlider::TicksBelow);
+    minSliderX->setMinimum(-100);
+    minSliderX->setValue(-50);
+    minSliderX->setMaximum(100);
+
+    QSlider *minSliderY = new QSlider(Qt::Horizontal, widget);
+    minSliderY->setTickInterval(100);
+    minSliderY->setTickPosition(QSlider::TicksBelow);
+    minSliderY->setMinimum(-200);
+    minSliderY->setValue(-100);
+    minSliderY->setMaximum(200);
+
+    QSlider *minSliderZ = new QSlider(Qt::Horizontal, widget);
+    minSliderZ->setTickInterval(50);
+    minSliderZ->setTickPosition(QSlider::TicksBelow);
+    minSliderZ->setMinimum(-100);
+    minSliderZ->setValue(-50);
+    minSliderZ->setMaximum(100);
+
+    QSlider *maxSliderX = new QSlider(Qt::Horizontal, widget);
+    maxSliderX->setTickInterval(50);
+    maxSliderX->setTickPosition(QSlider::TicksAbove);
+    maxSliderX->setMinimum(-100);
+    maxSliderX->setValue(50);
+    maxSliderX->setMaximum(100);
+
+    QSlider *maxSliderY = new QSlider(Qt::Horizontal, widget);
+    maxSliderY->setTickInterval(100);
+    maxSliderY->setTickPosition(QSlider::TicksAbove);
+    maxSliderY->setMinimum(-200);
+    maxSliderY->setValue(120);
+    maxSliderY->setMaximum(200);
+
+    QSlider *maxSliderZ = new QSlider(Qt::Horizontal, widget);
+    maxSliderZ->setTickInterval(50);
+    maxSliderZ->setTickPosition(QSlider::TicksAbove);
+    maxSliderZ->setMinimum(-100);
+    maxSliderZ->setValue(50);
+    maxSliderZ->setMaximum(100);
+
+    QSlider *aspectRatioSlider = new QSlider(Qt::Horizontal, widget);
+    aspectRatioSlider->setTickInterval(10);
+    aspectRatioSlider->setTickPosition(QSlider::TicksBelow);
+    aspectRatioSlider->setMinimum(1);
+    aspectRatioSlider->setValue(20);
+    aspectRatioSlider->setMaximum(100);
+
+    QCheckBox *axisTitlesVisibleCB = new QCheckBox(widget);
+    axisTitlesVisibleCB->setText(QStringLiteral("Axis titles visible"));
+    axisTitlesVisibleCB->setChecked(false);
+
+    QCheckBox *axisTitlesFixedCB = new QCheckBox(widget);
+    axisTitlesFixedCB->setText(QStringLiteral("Axis titles fixed"));
+    axisTitlesFixedCB->setChecked(true);
+
+    QSlider *axisLabelRotationSlider = new QSlider(Qt::Horizontal, widget);
+    axisLabelRotationSlider->setTickInterval(10);
+    axisLabelRotationSlider->setTickPosition(QSlider::TicksBelow);
+    axisLabelRotationSlider->setMinimum(0);
+    axisLabelRotationSlider->setValue(0);
+    axisLabelRotationSlider->setMaximum(90);
 
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
@@ -176,24 +265,43 @@ int main(int argc, char **argv)
     vLayout->addWidget(removeOneButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeBunchButton, 0, Qt::AlignTop);
     vLayout->addWidget(setSelectedItemButton, 0, Qt::AlignTop);
+    vLayout->addWidget(clearSeriesDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(removeSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(toggleSeriesVisibilityButton, 0, Qt::AlignTop);
     vLayout->addWidget(changeSeriesNameButton, 0, Qt::AlignTop);
     vLayout->addWidget(startTimerButton, 0, Qt::AlignTop);
-    vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
-    vLayout->addWidget(backgroundCheckBox);
-    vLayout->addWidget(gridCheckBox);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
-    vLayout->addWidget(shadowQuality);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
-    vLayout->addWidget(fontList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
-    vLayout->addWidget(fontSizeSlider, 1, Qt::AlignTop);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust point size")));
-    vLayout->addWidget(pointSizeSlider, 1, Qt::AlignTop);
+    vLayout->addWidget(massiveDataTestButton, 0, Qt::AlignTop);
+    vLayout->addWidget(testItemChangesButton, 0, Qt::AlignTop);
+    vLayout->addWidget(testReverseButton, 0, Qt::AlignTop);
+    vLayout->addWidget(renderToImageButton, 1, Qt::AlignTop);
 
-    widget->show();
+    vLayout2->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
+    vLayout2->addWidget(fpsLabel, 0, Qt::AlignTop);
+    vLayout2->addWidget(fpsCheckBox, 0, Qt::AlignTop);
+    vLayout2->addWidget(backgroundCheckBox);
+    vLayout2->addWidget(gridCheckBox);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout2->addWidget(shadowQuality, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust point size")));
+    vLayout2->addWidget(pointSizeSlider, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust data window")));
+    vLayout2->addWidget(minSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(maxSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(minSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(maxSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(minSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(maxSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
+    vLayout2->addWidget(fontList);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")));
+    vLayout2->addWidget(fontSizeSlider);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
+    vLayout2->addWidget(aspectRatioSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(axisTitlesVisibleCB);
+    vLayout2->addWidget(axisTitlesFixedCB);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
+    vLayout2->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
 
     ScatterDataModifier *modifier = new ScatterDataModifier(chart);
 
@@ -228,6 +336,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::removeBunch);
     QObject::connect(setSelectedItemButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::selectItem);
+    QObject::connect(clearSeriesDataButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::clearSeriesData);
     QObject::connect(addSeriesButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::addSeries);
     QObject::connect(removeSeriesButton, &QPushButton::clicked, modifier,
@@ -238,6 +348,14 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changeSeriesName);
     QObject::connect(startTimerButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::startStopTimer);
+    QObject::connect(massiveDataTestButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::massiveDataTest);
+    QObject::connect(testItemChangesButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::testItemChanges);
+    QObject::connect(testReverseButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::testAxisReverse);
+    QObject::connect(renderToImageButton, &QPushButton::clicked, modifier,
+                     &ScatterDataModifier::renderToImage);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::setGradient);
     QObject::connect(themeButton, &QPushButton::clicked, modifier,
@@ -252,12 +370,42 @@ int main(int argc, char **argv)
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &ScatterDataModifier::changeFont);
 
+    QObject::connect(fpsCheckBox, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::setFpsMeasurement);
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::setGridEnabled);
 
+    QObject::connect(minSliderX, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMinX);
+    QObject::connect(minSliderY, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMinY);
+    QObject::connect(minSliderZ, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMinZ);
+    QObject::connect(maxSliderX, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMaxX);
+    QObject::connect(maxSliderY, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMaxY);
+    QObject::connect(maxSliderZ, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setMaxZ);
+    QObject::connect(axisTitlesVisibleCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::toggleAxisTitleVisibility);
+    QObject::connect(axisTitlesFixedCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::toggleAxisTitleFixed);
+    QObject::connect(axisLabelRotationSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::changeLabelRotation);
+    QObject::connect(aspectRatioSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setAspectRatio);
+
+    modifier->setFpsLabel(fpsLabel);
+
+    chart->setGeometry(QRect(0, 0, 800, 800));
+
     modifier->start();
+    modifier->renderToImage(); // Initial hidden render
+
+    widget->show();
 
     return app.exec();
 }

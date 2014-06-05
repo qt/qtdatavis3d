@@ -34,7 +34,7 @@ AbstractItemModelHandler::~AbstractItemModelHandler()
 {
 }
 
-void AbstractItemModelHandler::setItemModel(const QAbstractItemModel *itemModel)
+void AbstractItemModelHandler::setItemModel(QAbstractItemModel *itemModel)
 {
     if (itemModel != m_itemModel.data()) {
         if (!m_itemModel.isNull())
@@ -69,7 +69,7 @@ void AbstractItemModelHandler::setItemModel(const QAbstractItemModel *itemModel)
     }
 }
 
-const QAbstractItemModel *AbstractItemModelHandler::itemModel() const
+QAbstractItemModel *AbstractItemModelHandler::itemModel() const
 {
     return m_itemModel.data();
 }

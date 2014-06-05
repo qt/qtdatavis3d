@@ -16,14 +16,9 @@
 **
 ****************************************************************************/
 
-#include "datavisualizationglobal_p.h"
-
-#include "q3dscene.h"
 #include "q3dscene_p.h"
 #include "q3dcamera_p.h"
 #include "q3dlight_p.h"
-
-#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -31,7 +26,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class Q3DScene
  * \inmodule QtDataVisualization
  * \brief Q3DScene class provides description of the 3D scene being visualized.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * The 3D scene contains a single active camera and a single active light source.
  * Visualized data is assumed to be at a fixed location.
@@ -260,8 +255,12 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
  *
  * This property contains the coordinates for the user input that should be processed
  * by the scene as selection. If this is set to value other than invalidSelectionPoint() the
- * graph tries to select a data item at the given \a point within the primary viewport.
- * After the rendering pass the property is returned to its default state of invalidSelectionPoint().
+ * graph tries to select a data item, axis label, or a custom item at the given \a point within
+ * the primary viewport.
+ * After the rendering pass the property is returned to its default state of
+ * invalidSelectionPoint().
+ *
+ * \sa QAbstract3DGraph::selectedElement
  */
 void Q3DScene::setSelectionQueryPosition(const QPoint &point)
 {
@@ -411,6 +410,7 @@ void Q3DScene::setActiveLight(Q3DLight *light)
         d_ptr->m_sceneDirty = true;
 
         emit activeLightChanged(light);
+        emit d_ptr->needRender();
     }
 }
 
@@ -554,7 +554,6 @@ void Q3DScenePrivate::setWindowSize(const QSize &size)
         m_windowSize = size;
         updateGLViewport();
         m_changeTracker.windowSizeChanged = true;
-        m_sceneDirty = true;
         emit needRender();
     }
 }

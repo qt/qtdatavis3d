@@ -35,15 +35,11 @@ Item {
     }
     ValueAxis3D {
         id: incomeAxis
-        min: 0
-        max: 35
         labelFormat: "%.2f M\u20AC"
         title: "Monthly income"
     }
     ValueAxis3D {
         id: expensesAxis
-        min: 0
-        max: 35
         labelFormat: "-%.2f M\u20AC"
         title: "Monthly expenses"
     }

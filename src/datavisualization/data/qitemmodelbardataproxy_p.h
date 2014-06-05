@@ -63,6 +63,18 @@ private:
     bool m_autoRowCategories;
     bool m_autoColumnCategories;
 
+    QRegExp m_rowRolePattern;
+    QRegExp m_columnRolePattern;
+    QRegExp m_valueRolePattern;
+    QRegExp m_rotationRolePattern;
+
+    QString m_rowRoleReplace;
+    QString m_columnRoleReplace;
+    QString m_valueRoleReplace;
+    QString m_rotationRoleReplace;
+
+    QItemModelBarDataProxy::MultiMatchBehavior m_multiMatchBehavior;
+
     friend class BarItemModelHandler;
     friend class QItemModelBarDataProxy;
 };

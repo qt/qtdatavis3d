@@ -18,17 +18,12 @@
 
 #include "bars3dcontroller_p.h"
 #include "bars3drenderer_p.h"
-#include "camerahelper_p.h"
-#include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
 #include "qcategory3daxis_p.h"
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
-
-#include <QtGui/QMatrix4x4>
-#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -81,9 +76,28 @@ void Bars3DController::synchDataToRenderer()
             series->d_ptr->m_changeTracker.meshChanged = true;
     }
 
+    // If y range or reverse changed, scene needs to be updated to update camera limits
+    bool needSceneUpdate = false;
+    if (Abstract3DController::m_changeTracker.axisYRangeChanged
+            || Abstract3DController::m_changeTracker.axisYReversedChanged) {
+        needSceneUpdate = true;
+    }
+
     Abstract3DController::synchDataToRenderer();
 
     // Notify changes to renderer
+    if (m_changeTracker.rowsChanged) {
+        m_renderer->updateRows(m_changedRows);
+        m_changeTracker.rowsChanged = false;
+        m_changedRows.clear();
+    }
+
+    if (m_changeTracker.itemChanged) {
+        m_renderer->updateItems(m_changedItems);
+        m_changeTracker.itemChanged = false;
+        m_changedItems.clear();
+    }
+
     if (m_changeTracker.multiSeriesScalingChanged) {
         m_renderer->updateMultiSeriesScaling(m_isMultiSeriesUniform);
         m_changeTracker.multiSeriesScalingChanged = false;
@@ -99,6 +113,13 @@ void Bars3DController::synchDataToRenderer()
         m_renderer->updateSelectedBar(m_selectedBar, m_selectedBarSeries);
         m_changeTracker.selectedBarChanged = false;
     }
+
+    if (needSceneUpdate) {
+        // Since scene is updated before axis updates are handled,
+        // do another render pass for scene update
+        m_scene->d_ptr->m_sceneDirty = true;
+        emitNeedRender();
+    }
 }
 
 void Bars3DController::handleArrayReset()
@@ -107,7 +128,10 @@ void Bars3DController::handleArrayReset()
     if (series->isVisible()) {
         adjustAxisRanges();
         m_isDataDirty = true;
+        series->d_ptr->markItemLabelDirty();
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     // Clear selection unless still valid
     setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
     emitNeedRender();
@@ -122,19 +146,45 @@ void Bars3DController::handleRowsAdded(int startIndex, int count)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
     emitNeedRender();
 }
 
 void Bars3DController::handleRowsChanged(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
     QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_isDataDirty = true;
+    int oldChangeCount = m_changedRows.size();
+    if (!oldChangeCount)
+        m_changedRows.reserve(count);
+
+    for (int i = 0; i < count; i++) {
+        bool newItem = true;
+        int candidate = startIndex + i;
+        for (int j = 0; j < oldChangeCount; j++) {
+            const ChangeRow &oldChangeItem = m_changedRows.at(j);
+            if (oldChangeItem.row == candidate && series == oldChangeItem.series) {
+                newItem = false;
+                break;
+            }
+        }
+        if (newItem) {
+            ChangeRow newChangeItem = {series, candidate};
+            m_changedRows.append(newChangeItem);
+            if (series == m_selectedBarSeries && m_selectedBar.x() == candidate)
+                series->d_ptr->markItemLabelDirty();
+        }
     }
-    emitNeedRender();
+    if (count) {
+        m_changeTracker.rowsChanged = true;
+
+        if (series->isVisible())
+            adjustAxisRanges();
+
+        // Clear selection unless still valid (row length might have changed)
+        setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
+        emitNeedRender();
+    }
 }
 
 void Bars3DController::handleRowsRemoved(int startIndex, int count)
@@ -160,6 +210,8 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
 
     emitNeedRender();
 }
@@ -182,20 +234,36 @@ void Bars3DController::handleRowsInserted(int startIndex, int count)
         adjustAxisRanges();
         m_isDataDirty = true;
     }
+    if (!m_changedSeriesList.contains(series))
+        m_changedSeriesList.append(series);
 
     emitNeedRender();
 }
 
 void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
 {
-    Q_UNUSED(rowIndex)
-    Q_UNUSED(columnIndex)
     QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_isDataDirty = true;
+
+    bool newItem = true;
+    QPoint candidate(rowIndex, columnIndex);
+    foreach (ChangeItem item, m_changedItems) {
+        if (item.point == candidate && item.series == series) {
+            newItem = false;
+            break;
+        }
     }
-    emitNeedRender();
+
+    if (newItem) {
+        ChangeItem newItem = {series, candidate};
+        m_changedItems.append(newItem);
+        m_changeTracker.itemChanged = true;
+
+        if (series == m_selectedBarSeries && m_selectedBar == candidate)
+            series->d_ptr->markItemLabelDirty();
+        if (series->isVisible())
+            adjustAxisRanges();
+        emitNeedRender();
+    }
 }
 
 void Bars3DController::handleDataRowLabelsChanged()
@@ -238,8 +306,6 @@ void Bars3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
     Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
 
-    adjustAxisRanges();
-
     // Visibility changes may require disabling slicing,
     // so just reset selection to ensure everything is still valid.
     setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
@@ -252,6 +318,8 @@ void Bars3DController::handlePendingClick()
     QBar3DSeries *series = static_cast<QBar3DSeries *>(m_renderer->clickedSeries());
 
     setSelectedBar(position, series, true);
+
+    Abstract3DController::handlePendingClick();
 
     m_renderer->resetClickedStatus();
 }
@@ -337,9 +405,6 @@ void Bars3DController::insertSeries(int index, QAbstract3DSeries *series)
     Abstract3DController::insertSeries(index, series);
 
     if (oldSize != m_seriesList.size())  {
-        if (series->isVisible())
-            adjustAxisRanges();
-
         QBar3DSeries *barSeries =  static_cast<QBar3DSeries *>(series);
         if (!oldSize) {
             m_primarySeries = barSeries;
@@ -460,7 +525,8 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
     adjustSelectionPosition(pos, series);
 
     if (selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
-        // If the selected bar is outside data window, or there is no visible selected bar, disable slicing
+        // If the selected bar is outside data window, or there is no visible selected bar,
+        // disable slicing.
         if (pos.x() < m_axisZ->min() || pos.x() > m_axisZ->max()
                 || pos.y() < m_axisX->min() || pos.y() > m_axisX->max()
                 || !series->isVisible()) {
@@ -518,7 +584,8 @@ void Bars3DController::adjustAxisRanges()
         int seriesCount = m_seriesList.size();
         if (adjustZ || adjustX) {
             for (int series = 0; series < seriesCount; series++) {
-                const QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_seriesList.at(series));
+                const QBar3DSeries *barSeries =
+                        static_cast<QBar3DSeries *>(m_seriesList.at(series));
                 if (barSeries->isVisible()) {
                     const QBarDataProxy *proxy = barSeries->dataProxy();
 
@@ -546,22 +613,24 @@ void Bars3DController::adjustAxisRanges()
             }
             // Call private implementations of setRange to avoid unsetting auto adjust flag
             if (adjustZ)
-                categoryAxisZ->dptr()->setRange(0.0f, float(maxRowCount));
+                categoryAxisZ->dptr()->setRange(0.0f, float(maxRowCount), true);
             if (adjustX)
-                categoryAxisX->dptr()->setRange(0.0f, float(maxColumnCount));
+                categoryAxisX->dptr()->setRange(0.0f, float(maxColumnCount), true);
         }
 
         // Now that we know the row and column ranges, figure out the value axis range
         if (adjustY) {
             for (int series = 0; series < seriesCount; series++) {
-                const QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(m_seriesList.at(series));
+                const QBar3DSeries *barSeries =
+                        static_cast<QBar3DSeries *>(m_seriesList.at(series));
                 if (barSeries->isVisible()) {
                     const QBarDataProxy *proxy = barSeries->dataProxy();
                     if (adjustY && proxy) {
-                        QPair<GLfloat, GLfloat> limits = proxy->dptrc()->limitValues(categoryAxisZ->min(),
-                                                                                     categoryAxisZ->max(),
-                                                                                     categoryAxisX->min(),
-                                                                                     categoryAxisX->max());
+                        QPair<GLfloat, GLfloat> limits =
+                                proxy->dptrc()->limitValues(categoryAxisZ->min(),
+                                                            categoryAxisZ->max(),
+                                                            categoryAxisX->min(),
+                                                            categoryAxisX->max());
                         if (!series) {
                             // First series initializes the values
                             minValue = limits.first;
@@ -583,7 +652,7 @@ void Bars3DController::adjustAxisRanges()
                 minValue = 0.0f;
                 maxValue = 1.0f;
             }
-            valueAxis->dptr()->setRange(minValue, maxValue);
+            valueAxis->dptr()->setRange(minValue, maxValue, true);
         }
     }
 }

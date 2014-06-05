@@ -18,7 +18,6 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dinputhandler_p.h"
-#include "q3dcamera_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -37,7 +36,7 @@ const float rotationSpeed      = 100.0f;
  * \class Q3DInputHandler
  * \inmodule QtDataVisualization
  * \brief Basic wheel mouse based input handler.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * Q3DInputHandler is the basic input handler for wheel mouse type of input devices.
  *
@@ -88,19 +87,18 @@ Q3DInputHandler::~Q3DInputHandler()
  */
 void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_IOS)
     Q_UNUSED(event);
     Q_UNUSED(mousePos);
 #else
     if (Qt::LeftButton == event->button()) {
         if (scene()->isSlicingActive()) {
-            if (scene()->isPointInPrimarySubView(mousePos)) {
+            if (scene()->isPointInPrimarySubView(mousePos))
                 setInputView(InputViewOnPrimary);
-            } else if (scene()->isPointInSecondarySubView(mousePos)) {
+            else if (scene()->isPointInSecondarySubView(mousePos))
                 setInputView(InputViewOnSecondary);
-            } else {
+            else
                 setInputView(InputViewNone);
-            }
         } else {
             // update mouse positions to prevent jumping when releasing or repressing a button
             setInputPosition(mousePos);
@@ -128,7 +126,7 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
 void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_IOS)
     Q_UNUSED(mousePos);
 #else
     if (QAbstract3DInputHandlerPrivate::InputStateRotating == d_ptr->m_inputState) {
@@ -147,7 +145,7 @@ void Q3DInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouseP
 void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
     Q_UNUSED(event);
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(Q_OS_IOS)
     Q_UNUSED(mousePos);
 #else
     if (QAbstract3DInputHandlerPrivate::InputStateRotating == d_ptr->m_inputState) {

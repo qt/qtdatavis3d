@@ -93,7 +93,9 @@ private:
 
     friend class AbstractDeclarative;
     friend class QAbstract3DGraph;
+    friend class QAbstract3DGraphPrivate;
     friend class Abstract3DController;
+    friend class Bars3DController;
     friend class Q3DScenePrivate;
     friend class Abstract3DRenderer;
     friend class Bars3DRenderer;

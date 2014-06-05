@@ -18,13 +18,11 @@
 
 #include "drawer_p.h"
 #include "shaderhelper_p.h"
-#include "objecthelper_p.h"
-#include "abstractobjecthelper_p.h"
 #include "surfaceobject_p.h"
-#include "q3dcamera.h"
 #include "utils_p.h"
 #include "texturehelper_p.h"
 #include "abstract3drenderer_p.h"
+#include "scatterpointbufferhelper_p.h"
 
 #include <QtGui/QMatrix4x4>
 #include <QtCore/qmath.h>
@@ -45,18 +43,28 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
 
+// Vertex array buffer for line
+const GLfloat line_data[] = {
+    -1.0f, 0.0f, 0.0f,
+    1.0f, 0.0f, 0.0f,
+};
+
 Drawer::Drawer(Q3DTheme *theme)
     : m_theme(theme),
       m_textureHelper(0),
-      m_pointbuffer(0)
+      m_pointbuffer(0),
+      m_linebuffer(0),
+      m_scaledFontSize(0.0f)
 {
 }
 
 Drawer::~Drawer()
 {
     delete m_textureHelper;
-    if (QOpenGLContext::currentContext())
+    if (QOpenGLContext::currentContext()) {
         glDeleteBuffers(1, &m_pointbuffer);
+        glDeleteBuffers(1, &m_linebuffer);
+    }
 }
 
 void Drawer::initializeOpenGL()
@@ -70,6 +78,7 @@ void Drawer::initializeOpenGL()
 void Drawer::setTheme(Q3DTheme *theme)
 {
     m_theme = theme;
+    m_scaledFontSize = 0.05f + m_theme->font().pointSizeF() / 500.0f;
     emit drawerChanged();
 }
 
@@ -140,6 +149,18 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     }
 }
 
+void Drawer::drawSelectionObject(ShaderHelper *shader, AbstractObjectHelper *object)
+{
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void *)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
+    glDrawElements(GL_TRIANGLES, object->indexCount(), GL_UNSIGNED_SHORT, (void *)0);
+    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
 void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
 {
     // 1st attribute buffer : vertices
@@ -162,6 +183,8 @@ void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
 
 void Drawer::drawPoint(ShaderHelper *shader)
 {
+    // Draw a single point
+
     // Generate vertex buffer for point if it does not exist
     if (!m_pointbuffer) {
         glGenBuffers(1, &m_pointbuffer);
@@ -183,13 +206,55 @@ void Drawer::drawPoint(ShaderHelper *shader)
     glDisableVertexAttribArray(shader->posAtt());
 }
 
+void Drawer::drawPoints(ShaderHelper *shader, ScatterPointBufferHelper *object)
+{
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, object->pointBuf());
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Draw the points
+    glDrawArrays(GL_POINTS, 0, object->indexCount());
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
+void Drawer::drawLine(ShaderHelper *shader)
+{
+    // Draw a single line
+
+    // Generate vertex buffer for line if it does not exist
+    if (!m_linebuffer) {
+        glGenBuffers(1, &m_linebuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_linebuffer);
+        glBufferData(GL_ARRAY_BUFFER, sizeof(line_data), line_data, GL_STATIC_DRAW);
+    }
+
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, m_linebuffer);
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Draw the line
+    glDrawArrays(GL_LINES, 0, 2);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
 void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                        const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,
-                       const QVector3D &positionComp, const QVector3D &rotation,
+                       const QVector3D &positionComp, const QQuaternion &rotation,
                        GLfloat itemHeight, QAbstract3DGraph::SelectionFlags mode,
                        ShaderHelper *shader, ObjectHelper *object,
                        const Q3DCamera *camera, bool useDepth, bool rotateAlong,
-                       LabelPosition position, Qt::AlignmentFlag alignment, bool isSlicing)
+                       LabelPosition position, Qt::AlignmentFlag alignment, bool isSlicing,
+                       bool isSelecting)
 {
     // Draw label
     if (!labelItem.textureId())
@@ -246,68 +311,20 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     }
 
     // Calculate scale factor to get uniform font size
-    GLfloat scaledFontSize = 0.05f + m_theme->font().pointSizeF() / 500.0f;
-    GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
+    GLfloat scaleFactor = m_scaledFontSize / (GLfloat)textureSize.height();
 
     // Apply alignment
-    GLfloat xAlignment = 0.0f;
-    GLfloat yAlignment = 0.0f;
-    GLfloat zAlignment = 0.0f;
-    GLfloat sinRotY = qFabs(qSin(qDegreesToRadians(rotation.y())));
-    GLfloat cosRotY = qFabs(qCos(qDegreesToRadians(rotation.y())));
-    GLfloat sinRotZ = 0.0f;
-    GLfloat cosRotZ = 0.0f;
-    if (rotation.z()) {
-        sinRotZ = qFabs(qSin(qDegreesToRadians(rotation.z())));
-        cosRotZ = qFabs(qCos(qDegreesToRadians(rotation.z())));
-    }
-    switch (alignment) {
-    case Qt::AlignLeft: {
-        if (rotation.z() && rotation.z() != 180.0f && !rotation.y()) {
-            xAlignment = ((-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                          - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ) / 2.0f;
-            yAlignment = (((GLfloat)textureSize.width() * scaleFactor) * sinRotZ
-                          + ((GLfloat)textureSize.height() * scaleFactor) * cosRotZ) / 2.0f;
-        } else {
-            xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotY;
-            zAlignment = ((GLfloat)textureSize.width() * scaleFactor) * sinRotY;
-        }
-        break;
-    }
-    case Qt::AlignRight: {
-        if (rotation.z() && rotation.z() != 180.0f && !rotation.y()) {
-            xAlignment = (((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                          + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ) / 2.0f;
-            yAlignment = (((GLfloat)textureSize.width() * scaleFactor) * sinRotZ
-                          + ((GLfloat)textureSize.height() * scaleFactor) * cosRotZ) / 2.0f;
-        } else {
-            xAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotY;
-            zAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * sinRotY;
-        }
-        break;
-    }
-    case Qt::AlignTop: {
-        yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotY;
-        break;
-    }
-    case Qt::AlignBottom: {
-        yAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotY;
-        break;
-    }
-    case Qt::AlignHCenter: {
-        xAlignment = (-(GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                - ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
-        break;
-    }
-    case Qt::AlignVCenter: {
-        yAlignment = ((GLfloat)textureSize.width() * scaleFactor) * cosRotZ
-                + ((GLfloat)textureSize.height() * scaleFactor) * sinRotZ;
-        break;
-    }
-    default: {
-        break;
-    }
-    }
+    QVector3D anchorPoint;
+
+    if (alignment & Qt::AlignLeft)
+        anchorPoint.setX(float(textureSize.width()) * scaleFactor);
+    else if (alignment & Qt::AlignRight)
+        anchorPoint.setX(float(-textureSize.width()) * scaleFactor);
+
+    if (alignment & Qt::AlignTop)
+        anchorPoint.setY(float(-textureSize.height()) * scaleFactor);
+    else if (alignment & Qt::AlignBottom)
+        anchorPoint.setY(float(textureSize.height()) * scaleFactor);
 
     if (position < LabelBottom) {
         xPosition = item.translation().x();
@@ -318,15 +335,9 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
     }
 
     // Position label
-    modelMatrix.translate(xPosition + xAlignment, yPosition + yAlignment, zPosition + zAlignment);
+    modelMatrix.translate(xPosition, yPosition, zPosition);
 
     // Rotate
-    QQuaternion rotQuatX = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, rotation.x());
-    QQuaternion rotQuatY = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rotation.y());
-    QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, rotation.z());
-    QQuaternion rotQuaternion = rotQuatY * rotQuatZ * rotQuatX;
-    modelMatrix.rotate(rotQuaternion);
-
     if (useDepth && !rotateAlong) {
         float yComp = float(qRadiansToDegrees(qTan(positionComp.y() / cameraDistance)));
         // Apply negative camera rotations to keep labels facing camera
@@ -334,20 +345,27 @@ void Drawer::drawLabel(const AbstractRenderItem &item, const LabelItem &labelIte
         float camRotationY = camera->yRotation();
         modelMatrix.rotate(-camRotationX, 0.0f, 1.0f, 0.0f);
         modelMatrix.rotate(-camRotationY - yComp, 1.0f, 0.0f, 0.0f);
+    } else {
+        modelMatrix.rotate(rotation);
     }
+    modelMatrix.translate(anchorPoint);
 
     // Scale label based on text size
     modelMatrix.scale(QVector3D((GLfloat)textureSize.width() * scaleFactor,
-                                scaledFontSize,
+                                m_scaledFontSize,
                                 0.0f));
 
     MVPMatrix = projectionmatrix * viewmatrix * modelMatrix;
 
-    // Set shader bindings
     shader->setUniformValue(shader->MVP(), MVPMatrix);
 
-    // Draw the object
-    drawObject(shader, object, labelItem.textureId());
+    if (isSelecting) {
+        // Draw the selection object
+        drawSelectionObject(shader, object);
+    } else {
+        // Draw the object
+        drawObject(shader, object, labelItem.textureId());
+    }
 }
 
 void Drawer::generateSelectionLabelTexture(Abstract3DRenderer *renderer)

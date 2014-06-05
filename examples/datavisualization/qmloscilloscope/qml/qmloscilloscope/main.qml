@@ -19,7 +19,7 @@
 import QtQuick 2.1
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.0
-import QtDataVisualization 1.0
+import QtDataVisualization 1.1
 import "."
 
 Item {
@@ -65,6 +65,14 @@ Item {
             axisX.segmentCount: 4
             axisY.segmentCount: 4
             axisZ.segmentCount: 4
+            measureFps: true
+
+            onCurrentFpsChanged: {
+                if (fps > 10)
+                    fpsText.text = "FPS: " + Math.round(surfaceGraph.currentFps)
+                else
+                    fpsText.text = "FPS: " + Math.round(surfaceGraph.currentFps * 10.0) / 10.0
+            }
 
             //! [0]
             Surface3DSeries {
@@ -72,9 +80,15 @@ Item {
                 drawMode: Surface3DSeries.DrawSurface;
                 flatShadingEnabled: false;
                 meshSmooth: true
-                itemLabelFormat: ""
+                itemLabelFormat: "@xLabel, @zLabel: @yLabel"
+                itemLabelVisible: false
 
-                onSelectedPointChanged: mainView.updateSelectionLabel()
+                onItemLabelChanged: {
+                    if (surfaceSeries.selectedPoint === surfaceSeries.invalidSelectionPosition)
+                        selectionText.text = "No selection"
+                    else
+                        selectionText.text = surfaceSeries.itemLabel
+                }
             }
             //! [0]
 
@@ -90,10 +104,7 @@ Item {
         interval: 1000 / frequencySlider.value
         running: true
         repeat: true
-        onTriggered: {
-            dataSource.update(surfaceSeries)
-            mainView.updateSelectionLabel()
-        }
+        onTriggered: dataSource.update(surfaceSeries)
     }
     //! [3]
 
@@ -209,6 +220,25 @@ Item {
                 Rectangle {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
+                    Layout.minimumWidth: fpsText.implicitWidth + 10
+                    Layout.maximumWidth: fpsText.implicitWidth + 10
+                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+
+                    border.color: "gray"
+                    border.width: 1
+                    radius: 4
+
+                    Text {
+                        id: fpsText
+                        anchors.fill: parent
+                        verticalAlignment: Text.AlignVCenter
+                        horizontalAlignment: Text.AlignHCenter
+                    }
+                }
+
+                Rectangle {
+                    Layout.fillHeight: true
+                    Layout.fillWidth: true
                     Layout.minimumWidth: selectionText.implicitWidth + 10
                     Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
 
@@ -218,10 +248,10 @@ Item {
 
                     Text {
                         id: selectionText
-                        text: "No selection"
                         anchors.fill: parent
                         verticalAlignment: Text.AlignVCenter
                         horizontalAlignment: Text.AlignHCenter
+                        text: "No selection"
                     }
                 }
             }
@@ -284,15 +314,6 @@ Item {
         }
 
     }
-
-    //! [1]
-    function updateSelectionLabel() {
-        selectionText.text = dataSource.selectionLabel(surfaceSeries,
-                                                       surfaceGraph.axisX,
-                                                       surfaceGraph.axisY,
-                                                       surfaceGraph.axisZ)
-    }
-    //! [1]
 
     //! [4]
     function generateData() {

@@ -26,12 +26,11 @@
 //
 // We mean it.
 
-#include "datavisualizationglobal_p.h"
-#include "qabstract3daxis.h"
-#include "abstract3dcontroller_p.h"
-
 #ifndef QABSTRACT3DAXIS_P_H
 #define QABSTRACT3DAXIS_P_H
+
+#include "datavisualizationglobal_p.h"
+#include "qabstract3daxis.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -47,12 +46,15 @@ public:
     inline bool isDefaultAxis() { return m_isDefaultAxis; }
     inline void setDefaultAxis(bool isDefault) { m_isDefaultAxis = isDefault; }
 
-    virtual void setRange(float min, float max);
+    virtual void setRange(float min, float max, bool suppressWarnings = false);
     virtual void setMin(float min);
     virtual void setMax (float max);
 
 protected:
     virtual void updateLabels();
+    virtual bool allowZero() = 0;
+    virtual bool allowNegatives() = 0;
+    virtual bool allowMinMaxSame() = 0;
 
     QAbstract3DAxis *q_ptr;
 
@@ -64,8 +66,9 @@ protected:
     float m_min;
     float m_max;
     bool m_autoAdjust;
-    bool m_onlyPositiveValues;
-    bool m_allowMinMaxSame;
+    float m_labelAutoRotation;
+    bool m_titleVisible;
+    bool m_titleFixed;
 
     friend class QAbstract3DAxis;
     friend class QValue3DAxis;

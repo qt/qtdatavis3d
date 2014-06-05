@@ -18,10 +18,6 @@
 
 #include "q3dscatter.h"
 #include "q3dscatter_p.h"
-#include "scatter3dcontroller_p.h"
-#include "qvalue3daxis.h"
-#include "q3dcamera.h"
-#include "qscatter3dseries_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -29,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class Q3DScatter
  * \inmodule QtDataVisualization
  * \brief The Q3DScatter class provides methods for rendering 3D scatter graphs.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * This class enables developers to render scatter graphs in 3D and to view them by rotating the scene
  * freely. Rotation is done by holding down the right mouse button and moving the mouse. Zooming

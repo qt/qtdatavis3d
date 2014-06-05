@@ -31,12 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 
-class QVector3D;
-class QColor;
-class QPainter;
-class QString;
-class QPoint;
-class QImage;
+class QLinearGradient;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -51,10 +46,9 @@ public:
     };
 
     static GLuint getNearestPowerOfTwo(GLuint value, GLuint &padding);
-    static QVector3D vectorFromColor(const QColor &color);
+    static QVector4D vectorFromColor(const QColor &color);
     static QColor colorFromVector(const QVector3D &colorVector);
-    static void printText(QPainter *painter, const QString &text, const QSize &position,
-                          bool absoluteCoords = true, float rotation = 0.0f, float scale = 1.0f);
+    static QColor colorFromVector(const QVector4D &colorVector);
     static QImage printTextToImage(const QFont &font,
                                    const QString &text,
                                    const QColor &bgrColor,
@@ -62,13 +56,15 @@ public:
                                    bool labelBackground,
                                    bool borders = false,
                                    int maxLabelWidth = 0);
-    static QVector3D getSelection(QPoint mousepos, int height);
+    static QVector4D getSelection(QPoint mousepos, int height);
+    static QImage getGradientImage(const QLinearGradient &gradient);
 
     static ParamType findFormatParamType(const QString &format);
-    static QString formatLabel(const QByteArray &format, ParamType paramType, float value);
+    static QString formatLabel(const QByteArray &format, ParamType paramType, qreal value);
     static QString defaultLabelFormat();
 
     static float wrapValue(float value, float min, float max);
+    static QQuaternion calculateRotation(const QVector3D &xyzRotations);
 
 private:
     static ParamType mapFormatCharToParamType(const QChar &formatChar);

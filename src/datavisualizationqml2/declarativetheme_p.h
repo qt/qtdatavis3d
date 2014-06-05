@@ -42,19 +42,19 @@ class DeclarativeTheme3D : public Q3DTheme, public QQmlParserStatus
 {
     Q_OBJECT
     Q_INTERFACES(QQmlParserStatus)
-    Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
+    Q_PROPERTY(QQmlListProperty<QObject> themeChildren READ themeChildren)
     Q_PROPERTY(QQmlListProperty<DeclarativeColor> baseColors READ baseColors)
     Q_PROPERTY(QQmlListProperty<ColorGradient> baseGradients READ baseGradients)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
-    Q_CLASSINFO("DefaultProperty", "seriesChildren")
+    Q_CLASSINFO("DefaultProperty", "themeChildren")
 
 public:
     DeclarativeTheme3D(QObject *parent = 0);
     virtual ~DeclarativeTheme3D();
 
-    QQmlListProperty<QObject> seriesChildren();
-    static void appendSeriesChildren(QQmlListProperty<QObject> *list, QObject *element);
+    QQmlListProperty<QObject> themeChildren();
+    static void appendThemeChildren(QQmlListProperty<QObject> *list, QObject *element);
 
     QQmlListProperty<DeclarativeColor> baseColors();
     static void appendBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list,

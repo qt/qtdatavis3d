@@ -32,7 +32,7 @@
 #include "datavisualizationglobal_p.h"
 
 class QOpenGLContext;
-class QOpenGLPaintDevice;
+class QOffscreenSurface;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -52,6 +52,8 @@ public:
 
     void render();
 
+    QImage renderToImage(int msaaSamples, const QSize &imageSize);
+
 public slots:
     void renderLater();
     void renderNow();
@@ -67,6 +69,7 @@ public:
     QOpenGLContext *m_context;
     Abstract3DController *m_visualController;
     float m_devicePixelRatio;
+    QOffscreenSurface *m_offscreenSurface;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

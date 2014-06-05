@@ -40,9 +40,11 @@ class QScatter3DSeries;
 
 struct Scatter3DChangeBitField {
     bool selectedItemChanged : 1;
+    bool itemChanged         : 1;
 
     Scatter3DChangeBitField() :
-        selectedItemChanged(true)
+        selectedItemChanged(true),
+        itemChanged(false)
     {
     }
 };
@@ -51,8 +53,14 @@ class QT_DATAVISUALIZATION_EXPORT Scatter3DController : public Abstract3DControl
 {
     Q_OBJECT
 
+public:
+    struct ChangeItem {
+        QScatter3DSeries *series;
+        int index;
+    };
 private:
     Scatter3DChangeBitField m_changeTracker;
+    QVector<ChangeItem> m_changedItems;
 
     // Rendering
     Scatter3DRenderer *m_renderer;
@@ -108,8 +116,8 @@ public:
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
     virtual void handleAxisRangeChangedBySender(QObject *sender);
-    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick();
+    virtual void adjustAxisRanges();
 
 public slots:
     void handleArrayReset();
@@ -125,7 +133,6 @@ protected:
     virtual void startRecordingRemovesAndInserts();
 
 private:
-    void adjustValueAxisRange();
 
     Q_DISABLE_COPY(Scatter3DController)
 };

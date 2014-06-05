@@ -38,16 +38,18 @@ class Bars3DRenderer;
 class QBar3DSeries;
 
 struct Bars3DChangeBitField {
-    bool slicingActiveChanged       : 1;
     bool multiSeriesScalingChanged  : 1;
     bool barSpecsChanged            : 1;
     bool selectedBarChanged         : 1;
+    bool rowsChanged                : 1;
+    bool itemChanged                : 1;
 
     Bars3DChangeBitField() :
-        slicingActiveChanged(true),
         multiSeriesScalingChanged(true),
         barSpecsChanged(true),
-        selectedBarChanged(true)
+        selectedBarChanged(true),
+        rowsChanged(false),
+        itemChanged(false)
     {
     }
 };
@@ -56,8 +58,20 @@ class QT_DATAVISUALIZATION_EXPORT Bars3DController : public Abstract3DController
 {
     Q_OBJECT
 
+public:
+    struct ChangeItem {
+        QBar3DSeries *series;
+        QPoint point;
+    };
+    struct ChangeRow {
+        QBar3DSeries *series;
+        int row;
+    };
+
 private:
     Bars3DChangeBitField m_changeTracker;
+    QVector<ChangeItem> m_changedItems;
+    QVector<ChangeRow> m_changedRows;
 
     // Interaction
     QPoint m_selectedBar;     // Points to row & column in data window.
@@ -118,6 +132,7 @@ public:
     virtual QList<QBar3DSeries *> barSeriesList();
 
     virtual void handleAxisRangeChangedBySender(QObject *sender);
+    virtual void adjustAxisRanges();
 
 public slots:
     void handleArrayReset();
@@ -137,11 +152,9 @@ protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);
 
 private:
-    void adjustAxisRanges();
     void adjustSelectionPosition(QPoint &pos, const QBar3DSeries *series);
 
     Q_DISABLE_COPY(Bars3DController)
-
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

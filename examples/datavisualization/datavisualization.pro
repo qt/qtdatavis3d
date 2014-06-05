@@ -6,7 +6,9 @@ SUBDIRS += qmlbars \
            qmllegend \
            qmlmultigraph \
            qmloscilloscope \
-           qmlsurfacelayers
+           qmlsurfacelayers \
+           qmlaxisformatter \
+           qmlaxisdrag
 
 !android:!ios {
     SUBDIRS += bars \
@@ -15,7 +17,9 @@ SUBDIRS += qmlbars \
                itemmodel \
                scatter \
                surface \
-               rotations
+               rotations \
+               draggableaxes \
+               customitems
 }
 
 qtHaveModule(multimedia):!android:!ios: SUBDIRS += audiolevels

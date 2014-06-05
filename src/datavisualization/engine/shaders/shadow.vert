@@ -28,10 +28,10 @@ void main() {
     gl_Position = MVP * vec4(vertexPosition_mdl, 1.0);
     coords_mdl = vertexPosition_mdl.xy;
     shadowCoord = bias * depthMVP * vec4(vertexPosition_mdl, 1.0);
-    position_wrld = (M * vec4(vertexPosition_mdl, 1.0)).xyz;
-    vec3 vertexPosition_cmr = (V * M * vec4(vertexPosition_mdl, 1.0)).xyz;
+    position_wrld = vec4(M * vec4(vertexPosition_mdl, 1.0)).xyz;
+    vec3 vertexPosition_cmr = vec4(V * M * vec4(vertexPosition_mdl, 1.0)).xyz;
     eyeDirection_cmr = vec3(0.0, 0.0, 0.0) - vertexPosition_cmr;
-    lightDirection_cmr = (V * vec4(lightPosition_wrld, 0.0)).xyz;
-    normal_cmr = (V * itM * vec4(vertexNormal_mdl, 0.0)).xyz;
+    lightDirection_cmr = vec4(V * vec4(lightPosition_wrld, 0.0)).xyz;
+    normal_cmr = vec4(V * itM * vec4(vertexNormal_mdl, 0.0)).xyz;
     UV = vertexUV;
 }

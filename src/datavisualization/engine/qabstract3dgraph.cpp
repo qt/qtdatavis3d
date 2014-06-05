@@ -27,6 +27,8 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOpenGLPaintDevice>
 #include <QtGui/QPainter>
+#include <QtGui/QOpenGLFramebufferObject>
+#include <QtGui/QOffscreenSurface>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -34,7 +36,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QAbstract3DGraph
  * \inmodule QtDataVisualization
  * \brief The QAbstract3DGraph class provides a window and render loop for graphs.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * This class subclasses a QWindow and provides render loop for graphs inheriting it.
  *
@@ -118,6 +120,38 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 */
 
 /*!
+    \enum QAbstract3DGraph::ElementType
+    \since QtDataVisualization 1.1
+
+    Type of an element in the graph.
+
+    \value ElementNone
+           No defined element.
+    \value ElementSeries
+           A series (i.e. an item in a series).
+    \value ElementAxisXLabel
+           X axis label.
+    \value ElementAxisYLabel
+           Y axis label.
+    \value ElementAxisZLabel
+           Z axis label.
+    \value ElementCustomItem
+           Custom item.
+*/
+
+/*!
+    \enum QAbstract3DGraph::OptimizationHint
+    \since Qt Data Visualization 1.1
+
+    The optimization hint for rendering.
+
+    \value OptimizationDefault
+           Provides the full feature set at a reasonable performance.
+    \value OptimizationStatic
+           Beta level feature. Optimizes the rendering of static data sets at the expense of some features.
+*/
+
+/*!
  * \internal
  */
 QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -126,6 +160,7 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
       d_ptr(d)
 {
     qRegisterMetaType<QAbstract3DGraph::ShadowQuality>("QAbstract3DGraph::ShadowQuality");
+    qRegisterMetaType<QAbstract3DGraph::ElementType>("QAbstract3DGraph::ElementType");
 
     // Default to frameless window, as typically graphs are not toplevel
     setFlags(flags() | Qt::FramelessWindowHint);
@@ -164,7 +199,8 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
 
 #if !defined(QT_OPENGL_ES_2)
     // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
-    QStringList splitversionstr = QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
+    QStringList splitversionstr =
+            QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
     if (splitversionstr[0].toFloat() < 1.2)
         qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
 #else
@@ -342,7 +378,8 @@ bool QAbstract3DGraph::shadowsSupported() const
 /*!
  * \property QAbstract3DGraph::scene
  *
- * This property contains the read only Q3DScene that can be used to access, for example, a camera object.
+ * This property contains the read only Q3DScene that can be used to access, for example, a camera
+ * object.
  */
 Q3DScene *QAbstract3DGraph::scene() const
 {
@@ -355,6 +392,257 @@ Q3DScene *QAbstract3DGraph::scene() const
 void QAbstract3DGraph::clearSelection()
 {
     d_ptr->m_visualController->clearSelection();
+}
+
+/*!
+ * Adds a QCustom3DItem \a item to the graph. Graph takes ownership of the added item.
+ *
+ * \return index to the added item if add was successful, -1 if trying to add a null item, and
+ * index of the item if trying to add an already added item.
+ *
+ * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt()
+ *
+ * \since QtDataVisualization 1.1
+ */
+int QAbstract3DGraph::addCustomItem(QCustom3DItem *item)
+{
+    return d_ptr->m_visualController->addCustomItem(item);
+}
+
+/*!
+ * Removes all custom items. Deletes the resources allocated to them.
+ *
+ * \since QtDataVisualization 1.1
+ */
+void QAbstract3DGraph::removeCustomItems()
+{
+    d_ptr->m_visualController->deleteCustomItems();
+}
+
+/*!
+ * Removes the custom \a {item}. Deletes the resources allocated to it.
+ *
+ * \since QtDataVisualization 1.1
+ */
+void QAbstract3DGraph::removeCustomItem(QCustom3DItem *item)
+{
+    d_ptr->m_visualController->deleteCustomItem(item);
+}
+
+/*!
+ * Removes all custom items at \a {position}. Deletes the resources allocated to them.
+ *
+ * \since QtDataVisualization 1.1
+ */
+void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
+{
+    d_ptr->m_visualController->deleteCustomItem(position);
+}
+
+/*!
+ * Gets ownership of given \a item back and removes the \a item from the graph.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \note If the same item is added back to the graph, the texture or the texture file needs to be
+ * re-set.
+ *
+ * \sa QCustom3DItem::setTextureImage(), QCustom3DItem::setTextureFile()
+ */
+void QAbstract3DGraph::releaseCustomItem(QCustom3DItem *item)
+{
+    return d_ptr->m_visualController->releaseCustomItem(item);
+}
+
+/*!
+ * Can be used to query the index of the selected label after receiving \c selectedElementChanged
+ * signal with any label type. Selection is valid until the next \c selectedElementChanged signal.
+ *
+ * \return index of the selected label, or -1.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \sa selectedElement
+ */
+int QAbstract3DGraph::selectedLabelIndex() const
+{
+    return d_ptr->m_visualController->selectedLabelIndex();
+}
+
+/*!
+ * Can be used to get the selected axis after receiving \c selectedElementChanged signal with any label
+ * type. Selection is valid until the next \c selectedElementChanged signal.
+ *
+ * \return pointer to the selected axis, or null.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \sa selectedElement
+ */
+QAbstract3DAxis *QAbstract3DGraph::selectedAxis() const
+{
+    return d_ptr->m_visualController->selectedAxis();
+}
+
+/*!
+ * Can be used to query the index of the selected custom item after receiving \c selectedElementChanged
+ * signal with QAbstract3DGraph::ElementCustomItem type. Selection is valid until the next
+ * \c selectedElementChanged signal.
+ *
+ * \return index of the selected custom item, or -1.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \sa selectedElement
+ */
+int QAbstract3DGraph::selectedCustomItemIndex() const
+{
+    return d_ptr->m_visualController->selectedCustomItemIndex();
+}
+
+/*!
+ * Can be used to get the selected custom item after receiving \c selectedElementChanged signal with
+ * QAbstract3DGraph::ElementCustomItem type. Ownership of the item remains with the graph.
+ * Selection is valid until the next \c selectedElementChanged signal.
+ *
+ * \return pointer to the selected custom item, or null.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \sa selectedElement
+ */
+QCustom3DItem *QAbstract3DGraph::selectedCustomItem() const
+{
+    return d_ptr->m_visualController->selectedCustomItem();
+}
+
+/*!
+ * \property QAbstract3DGraph::selectedElement
+ *
+ * Can be used to query the selected element type.
+ * Type is valid until the next \c selectedElementChanged signal.
+ *
+ * \c selectedElementChanged signal is emitted when a selection is made in the graph.
+ *
+ * Signal can be used for example for implementing custom input handlers, as demonstrated in this
+ * \l {Axis Range Dragging With Labels Example}{example}.
+ *
+ * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
+ * Q3DBars::selectedSeries(), Q3DScatter::selectedSeries(), Q3DSurface::selectedSeries(),
+ * Q3DScene::setSelectionQueryPosition()
+ *
+ * \since QtDataVisualization 1.1
+ */
+QAbstract3DGraph::ElementType QAbstract3DGraph::selectedElement() const
+{
+    return d_ptr->m_visualController->selectedElement();
+}
+
+/*!
+ * Renders current frame to an image of \a imageSize. Default size is the window size. Image is
+ * rendered with antialiasing level given in \a msaaSamples. Default level is \c{0}.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \return rendered image.
+ */
+QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
+{
+    QSize renderSize = imageSize;
+    if (renderSize.isEmpty())
+        renderSize = size();
+    return d_ptr->renderToImage(msaaSamples, renderSize);
+}
+
+/*!
+ * \property QAbstract3DGraph::measureFps
+ * \since QtDataVisualization 1.1
+ *
+ * If \c {true}, the rendering is done continuously instead of on demand, and currentFps property
+ * is updated. Defaults to \c{false}.
+ *
+ * \sa currentFps
+ */
+void QAbstract3DGraph::setMeasureFps(bool enable)
+{
+    d_ptr->m_visualController->setMeasureFps(enable);
+}
+
+bool QAbstract3DGraph::measureFps() const
+{
+    return d_ptr->m_visualController->measureFps();
+}
+
+/*!
+ * \property QAbstract3DGraph::currentFps
+ * \since QtDataVisualization 1.1
+ *
+ * When fps measuring is enabled, the results for the last second are stored in this read-only
+ * property. It takes at least a second before this value updates after measurement is activated.
+ *
+ * \sa measureFps
+ */
+qreal QAbstract3DGraph::currentFps() const
+{
+    return d_ptr->m_visualController->currentFps();
+}
+
+/*!
+ * \property QAbstract3DGraph::orthoProjection
+ * \since QtDataVisualization 1.1
+ *
+ * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
+ * \note Shadows will be disabled when set to \c{true}.
+ */
+void QAbstract3DGraph::setOrthoProjection(bool enable)
+{
+    d_ptr->m_visualController->setOrthoProjection(enable);
+}
+
+bool QAbstract3DGraph::isOrthoProjection() const
+{
+    return d_ptr->m_visualController->isOrthoProjection();
+}
+
+/*!
+ * \property QAbstract3DGraph::aspectRatio
+ * \since QtDataVisualization 1.1
+ *
+ * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
+ * vertical axes. Defaults to \c{2.0}.
+ *
+ * \note Has no effect on Q3DBars.
+ */
+void QAbstract3DGraph::setAspectRatio(qreal ratio)
+{
+    d_ptr->m_visualController->setAspectRatio(float(ratio));
+}
+
+qreal QAbstract3DGraph::aspectRatio() const
+{
+    return d_ptr->m_visualController->aspectRatio();
+}
+
+/*!
+ * \property QAbstract3DGraph::optimizationHints
+ *
+ * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
+ * reasonable performance. Static is a beta level feature and currently supports only a subset of the
+ * features on the Scatter graph. Missing features are object gradient for mesh objects, both gradients
+ * for points, and diffuse and specular color on rotations. At this point static is intended just for
+ * introducing a new feature. It optimizes graph rendering and is ideal for large non-changing data
+ * sets. It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it
+ * with massive data sets is not advisable.
+ * Defaults to \c{OptimizationDefault}.
+ */
+void QAbstract3DGraph::setOptimizationHints(OptimizationHints hints)
+{
+    d_ptr->m_visualController->setOptimizationHints(hints);
+}
+
+QAbstract3DGraph::OptimizationHints QAbstract3DGraph::optimizationHints() const
+{
+    return d_ptr->m_visualController->optimizationHints();
 }
 
 /*!
@@ -453,12 +741,17 @@ QAbstract3DGraphPrivate::QAbstract3DGraphPrivate(QAbstract3DGraph *q)
       q_ptr(q),
       m_updatePending(false),
       m_visualController(0),
-      m_devicePixelRatio(1.f)
+      m_devicePixelRatio(1.f),
+      m_offscreenSurface(0)
 {
 }
 
 QAbstract3DGraphPrivate::~QAbstract3DGraphPrivate()
 {
+    if (m_offscreenSurface) {
+        m_offscreenSurface->destroy();
+        delete m_offscreenSurface;
+    }
     if (m_context)
         m_context->makeCurrent(q_ptr);
 
@@ -477,6 +770,11 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::selectionModeChanged);
     QObject::connect(m_visualController, &Abstract3DController::shadowQualityChanged, q_ptr,
                      &QAbstract3DGraph::shadowQualityChanged);
+    QObject::connect(m_visualController, &Abstract3DController::optimizationHintsChanged, q_ptr,
+                     &QAbstract3DGraph::optimizationHintsChanged);
+    QObject::connect(m_visualController, &Abstract3DController::elementSelected, q_ptr,
+                     &QAbstract3DGraph::selectedElementChanged);
+
     QObject::connect(m_visualController, &Abstract3DController::needRender, this,
                      &QAbstract3DGraphPrivate::renderLater);
 
@@ -486,6 +784,17 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraphPrivate::handleAxisYChanged);
     QObject::connect(m_visualController, &Abstract3DController::axisZChanged, this,
                      &QAbstract3DGraphPrivate::handleAxisZChanged);
+
+    QObject::connect(m_visualController, &Abstract3DController::measureFpsChanged, q_ptr,
+                     &QAbstract3DGraph::measureFpsChanged);
+    QObject::connect(m_visualController, &Abstract3DController::currentFpsChanged, q_ptr,
+                     &QAbstract3DGraph::currentFpsChanged);
+
+    QObject::connect(m_visualController, &Abstract3DController::orthoProjectionChanged, q_ptr,
+                     &QAbstract3DGraph::orthoProjectionChanged);
+
+    QObject::connect(m_visualController, &Abstract3DController::aspectRatioChanged, q_ptr,
+                     &QAbstract3DGraph::aspectRatioChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()
@@ -524,6 +833,44 @@ void QAbstract3DGraphPrivate::renderNow()
     render();
 
     m_context->swapBuffers(q_ptr);
+}
+
+QImage QAbstract3DGraphPrivate::renderToImage(int msaaSamples, const QSize &imageSize)
+{
+    QImage image;
+    QOpenGLFramebufferObject *fbo;
+    QOpenGLFramebufferObjectFormat fboFormat;
+    if (!m_offscreenSurface) {
+        // Create an offscreen surface for rendering to images without rendering on screen
+        m_offscreenSurface = new QOffscreenSurface(q_ptr->screen());
+        m_offscreenSurface->setFormat(q_ptr->requestedFormat());
+        m_offscreenSurface->create();
+    }
+    // Render the wanted frame offscreen
+    m_context->makeCurrent(m_offscreenSurface);
+    fboFormat.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+    fboFormat.setInternalTextureFormat(GL_RGB);
+    fboFormat.setSamples(msaaSamples);
+    fbo = new QOpenGLFramebufferObject(imageSize, fboFormat);
+    if (fbo->isValid()) {
+        QRect originalViewport = m_visualController->m_scene->viewport();
+        m_visualController->m_scene->d_ptr->setWindowSize(imageSize);
+        m_visualController->m_scene->d_ptr->setViewport(QRect(0, 0,
+                                                              imageSize.width(),
+                                                              imageSize.height()));
+        m_visualController->synchDataToRenderer();
+        fbo->bind();
+        m_context->swapBuffers(m_offscreenSurface);
+        m_visualController->requestRender(fbo);
+        image = fbo->toImage();
+        fbo->release();
+        m_visualController->m_scene->d_ptr->setWindowSize(originalViewport.size());
+        m_visualController->m_scene->d_ptr->setViewport(originalViewport);
+    }
+    delete fbo;
+    m_context->makeCurrent(q_ptr);
+
+    return image;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -28,6 +28,8 @@
 #include "qitemmodelsurfacedataproxy.h"
 #include "qheightmapsurfacedataproxy.h"
 #include "qvalue3daxis.h"
+#include "qvalue3daxisformatter.h"
+#include "qlogvalue3daxisformatter.h"
 #include "qcategory3daxis.h"
 #include "q3dobject.h"
 #include "q3dcamera.h"
@@ -43,6 +45,8 @@
 #include "qabstract3dinputhandler.h"
 #include "declarativecolor_p.h"
 #include "declarativescene_p.h"
+#include "qcustom3ditem.h"
+#include "qcustom3dlabel.h"
 
 #include <QtQml/QQmlExtensionPlugin>
 
@@ -53,11 +57,13 @@ QML_DECLARE_TYPE(DeclarativeBars)
 QML_DECLARE_TYPE(DeclarativeScatter)
 QML_DECLARE_TYPE(DeclarativeSurface)
 
-QML_DECLARE_TYPE(const QAbstractItemModel)
+QML_DECLARE_TYPE(QAbstractItemModel)
 
 QML_DECLARE_TYPE(QAbstract3DAxis)
 QML_DECLARE_TYPE(QCategory3DAxis)
 QML_DECLARE_TYPE(QValue3DAxis)
+QML_DECLARE_TYPE(QValue3DAxisFormatter)
+QML_DECLARE_TYPE(QLogValue3DAxisFormatter)
 
 QML_DECLARE_TYPE(Q3DScene)
 QML_DECLARE_TYPE(Declarative3DScene)
@@ -91,6 +97,9 @@ QML_DECLARE_TYPE(Q3DTheme)
 QML_DECLARE_TYPE(DeclarativeTheme3D)
 
 QML_DECLARE_TYPE(QAbstract3DInputHandler)
+
+QML_DECLARE_TYPE(QCustom3DItem)
+QML_DECLARE_TYPE(QCustom3DLabel)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

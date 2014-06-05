@@ -59,19 +59,14 @@
     we still need to call QSurfaceDataProxy::resetArray() after changing the data in it to prompt
     the graph to render the data.
 
-    The final method, \c selectionLabel(), is used to generate a label string we can show on the
-    QML ui. This method utilizes the axis formats to format the label:
-
-    \snippet qmloscilloscope/datasource.cpp 2
-
     To be able to access the \c DataSource methods from QML, we need to expose it. We do this by
     defining a context property in application main:
 
     \snippet qmloscilloscope/main.cpp 0
 
-    To make it possible to use Qt Data Visualization class pointers as parameters on the
+    To make it possible to use QSurface3DSeries pointers as parameters on the
     \c DataSource class methods on all environments and builds, we need to make sure the meta
-    types are registered:
+    type is registered:
 
     \snippet qmloscilloscope/datasource.cpp 3
     \dots 0
@@ -86,15 +81,11 @@
     One interesting detail is that we don't specify a proxy for the Surface3DSeries we attach
     to the graph. This makes the series to utilize the default QSurfaceDataProxy.
 
-    We also specify an empty string for \l{Abstract3DSeries::itemLabelFormat}{itemLabelFormat}, since we want to display
-    the selected item information in a \c Text element instead of a label above the selection pointer.
+    We also hide the item label with \l{Abstract3DSeries::itemLabelVisible}{itemLabelFormat}, since
+    we want to display the selected item information in a \c Text element instead of a floating
+    label above the selection pointer.
     This is done because the selection pointer moves around a lot as the data changes, which makes
     the regular selection label difficult to read.
-    When selection point changes, we update the label text using a helper function
-    \c updateSelectionLabel(), which calls one of the methods we defined for our \c DataSource class
-    to obtain the label:
-
-    \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 1
 
     We initialize the \c DataSource cache when the graph is complete by calling a helper function
     \c generateData(), which calls the method with the same name on the \c DataSource:

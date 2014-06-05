@@ -33,25 +33,25 @@
 #include "qabstract3daxis.h"
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
-#include "qabstractdataproxy.h"
+#include "qabstract3dgraph.h"
 #include "q3dscene_p.h"
+#include "qcustom3ditem.h"
 #include <QtGui/QLinearGradient>
+#include <QtCore/QTime>
 
-class QFont;
+class QOpenGLFramebufferObject;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class CameraHelper;
 class Abstract3DRenderer;
 class QAbstract3DSeries;
 class ThemeManager;
 
 struct Abstract3DChangeBitField {
-    bool zoomLevelChanged              : 1;
     bool themeChanged                  : 1;
     bool shadowQualityChanged          : 1;
     bool selectionModeChanged          : 1;
-    bool objFileChanged                : 1;
+    bool optimizationHintChanged       : 1;
     bool axisXTypeChanged              : 1;
     bool axisYTypeChanged              : 1;
     bool axisZTypeChanged              : 1;
@@ -73,15 +73,29 @@ struct Abstract3DChangeBitField {
     bool axisXLabelFormatChanged       : 1;
     bool axisYLabelFormatChanged       : 1;
     bool axisZLabelFormatChanged       : 1;
-    bool inputViewChanged              : 1;
-    bool inputPositionChanged          : 1;
+    bool axisXReversedChanged          : 1;
+    bool axisYReversedChanged          : 1;
+    bool axisZReversedChanged          : 1;
+    bool axisXFormatterChanged         : 1;
+    bool axisYFormatterChanged         : 1;
+    bool axisZFormatterChanged         : 1;
+    bool projectionChanged             : 1;
+    bool axisXLabelAutoRotationChanged : 1;
+    bool axisYLabelAutoRotationChanged : 1;
+    bool axisZLabelAutoRotationChanged : 1;
+    bool aspectRatioChanged            : 1;
+    bool axisXTitleVisibilityChanged   : 1;
+    bool axisYTitleVisibilityChanged   : 1;
+    bool axisZTitleVisibilityChanged   : 1;
+    bool axisXTitleFixedChanged        : 1;
+    bool axisYTitleFixedChanged        : 1;
+    bool axisZTitleFixedChanged        : 1;
 
     Abstract3DChangeBitField() :
-        zoomLevelChanged(true),
         themeChanged(true),
         shadowQualityChanged(true),
         selectionModeChanged(true),
-        objFileChanged(true),
+        optimizationHintChanged(true),
         axisXTypeChanged(true),
         axisYTypeChanged(true),
         axisZTypeChanged(true),
@@ -102,7 +116,24 @@ struct Abstract3DChangeBitField {
         axisZSubSegmentCountChanged(true),
         axisXLabelFormatChanged(true),
         axisYLabelFormatChanged(true),
-        axisZLabelFormatChanged(true)
+        axisZLabelFormatChanged(true),
+        axisXReversedChanged(true),
+        axisYReversedChanged(true),
+        axisZReversedChanged(true),
+        axisXFormatterChanged(true),
+        axisYFormatterChanged(true),
+        axisZFormatterChanged(true),
+        projectionChanged(true),
+        axisXLabelAutoRotationChanged(true),
+        axisYLabelAutoRotationChanged(true),
+        axisZLabelAutoRotationChanged(true),
+        aspectRatioChanged(true),
+        axisXTitleVisibilityChanged(true),
+        axisYTitleVisibilityChanged(true),
+        axisZTitleVisibilityChanged(true),
+        axisXTitleFixedChanged(true),
+        axisYTitleFixedChanged(true),
+        axisZTitleFixedChanged(true)
     {
     }
 };
@@ -119,28 +150,19 @@ public:
         SelectionColumn
     };
 
-    enum MouseState {
-        MouseNone = 0,
-        MouseOnScene,
-        MouseOnOverview,
-        MouseOnZoom,
-        MouseRotating,
-        MouseOnPinch
-    };
-
 private:
     Abstract3DChangeBitField m_changeTracker;
-    GLfloat m_horizontalRotation;
-    GLfloat m_verticalRotation;
     ThemeManager *m_themeManager;
     QAbstract3DGraph::SelectionFlags m_selectionMode;
     QAbstract3DGraph::ShadowQuality m_shadowQuality;
+    bool m_useOrthoProjection;
+    float m_aspectRatio;
+    QAbstract3DGraph::OptimizationHints m_optimizationHints;
 
 protected:
     Q3DScene *m_scene;
     QList<QAbstract3DInputHandler *> m_inputHandlers; // List of all added input handlers
     QAbstract3DInputHandler *m_activeInputHandler;
-    CameraHelper *m_cameraHelper;
     // Active axes
     QAbstract3DAxis *m_axisX;
     QAbstract3DAxis *m_axisY;
@@ -149,11 +171,21 @@ protected:
     QList<QAbstract3DAxis *> m_axes; // List of all added axes
     Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
-    bool m_isSeriesVisibilityDirty;
+    bool m_isCustomDataDirty;
+    bool m_isCustomItemDirty;
     bool m_isSeriesVisualsDirty;
     bool m_renderPending;
 
     QList<QAbstract3DSeries *> m_seriesList;
+
+    bool m_measureFps;
+    QTime m_frameTimer;
+    int m_numFrames;
+    qreal m_currentFps;
+
+    QVector<QAbstract3DSeries *> m_changedSeriesList;
+
+    QList<QCustom3DItem *> m_customItems;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
@@ -173,11 +205,11 @@ public:
     QList<QAbstract3DSeries *> seriesList();
 
     virtual void setAxisX(QAbstract3DAxis *axis);
-    virtual QAbstract3DAxis *axisX();
+    virtual QAbstract3DAxis *axisX() const;
     virtual void setAxisY(QAbstract3DAxis *axis);
-    virtual QAbstract3DAxis *axisY();
+    virtual QAbstract3DAxis *axisY() const;
     virtual void setAxisZ(QAbstract3DAxis *axis);
-    virtual QAbstract3DAxis *axisZ();
+    virtual QAbstract3DAxis *axisZ() const;
     virtual void addAxis(QAbstract3DAxis *axis);
     virtual void releaseAxis(QAbstract3DAxis *axis);
     virtual QList<QAbstract3DAxis *> axes() const; // Omits default axes
@@ -188,12 +220,9 @@ public:
     virtual QAbstract3DInputHandler *activeInputHandler();
     virtual QList<QAbstract3DInputHandler *> inputHandlers() const;
 
-    virtual int zoomLevel();
-    virtual void setZoomLevel(int zoomLevel);
-
     virtual void addTheme(Q3DTheme *theme);
     virtual void releaseTheme(Q3DTheme *theme);
-    virtual void setActiveTheme(Q3DTheme *theme);
+    virtual void setActiveTheme(Q3DTheme *theme, bool force = true);
     virtual Q3DTheme *activeTheme() const;
     virtual QList<Q3DTheme *> themes() const;
 
@@ -201,8 +230,12 @@ public:
     virtual QAbstract3DGraph::SelectionFlags selectionMode() const;
 
     virtual void setShadowQuality(QAbstract3DGraph::ShadowQuality quality);
+    virtual void doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual QAbstract3DGraph::ShadowQuality shadowQuality() const;
     virtual bool shadowsSupported() const;
+
+    void setOptimizationHints(QAbstract3DGraph::OptimizationHints hints);
+    QAbstract3DGraph::OptimizationHints optimizationHints() const;
 
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
@@ -211,6 +244,22 @@ public:
 
     void markDataDirty();
     void markSeriesVisualsDirty();
+
+    void requestRender(QOpenGLFramebufferObject *fbo);
+
+    int addCustomItem(QCustom3DItem *item);
+    void deleteCustomItems();
+    void deleteCustomItem(QCustom3DItem *item);
+    void deleteCustomItem(const QVector3D &position);
+    void releaseCustomItem(QCustom3DItem *item);
+
+    int selectedLabelIndex() const;
+    QAbstract3DAxis *selectedAxis() const;
+    int selectedCustomItemIndex() const;
+    QCustom3DItem *selectedCustomItem() const;
+
+    void setOrthoProjection(bool enable);
+    bool isOrthoProjection() const;
 
     void emitNeedRender();
 
@@ -231,8 +280,16 @@ public:
     virtual void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) = 0;
     virtual void handleAxisLabelFormatChangedBySender(QObject *sender);
+    virtual void handleAxisReversedChangedBySender(QObject *sender);
+    virtual void handleAxisFormatterDirtyBySender(QObject *sender);
+    virtual void handleAxisLabelAutoRotationChangedBySender(QObject *sender);
+    virtual void handleAxisTitleVisibilityChangedBySender(QObject *sender);
+    virtual void handleAxisTitleFixedChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
     virtual void handlePendingClick() = 0;
+    virtual void adjustAxisRanges() = 0;
+
+    void markSeriesItemLabelsDirty();
 
 public slots:
     void handleAxisTitleChanged(const QString &title);
@@ -242,6 +299,11 @@ public slots:
     void handleAxisSubSegmentCountChanged(int count);
     void handleAxisAutoAdjustRangeChanged(bool autoAdjust);
     void handleAxisLabelFormatChanged(const QString &format);
+    void handleAxisReversedChanged(bool enable);
+    void handleAxisFormatterDirty();
+    void handleAxisLabelAutoRotationChanged(float angle);
+    void handleAxisTitleVisibilityChanged(bool visible);
+    void handleAxisTitleFixedChanged(bool fixed);
     void handleInputViewChanged(QAbstract3DInputHandler::InputView view);
     void handleInputPositionChanged(const QPoint &position);
     void handleSeriesVisibilityChanged(bool visible);
@@ -258,6 +320,17 @@ public slots:
     // Renderer callback handlers
     void handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality);
 
+    void setMeasureFps(bool enable);
+    inline bool measureFps() const { return m_measureFps; }
+    inline qreal currentFps() const { return m_currentFps; }
+
+    QAbstract3DGraph::ElementType selectedElement() const;
+
+    void updateCustomItem();
+
+    void setAspectRatio(float ratio);
+    float aspectRatio();
+
 signals:
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
@@ -267,6 +340,12 @@ signals:
     void axisXChanged(QAbstract3DAxis *axis);
     void axisYChanged(QAbstract3DAxis *axis);
     void axisZChanged(QAbstract3DAxis *axis);
+    void elementSelected(QAbstract3DGraph::ElementType type);
+    void measureFpsChanged(bool enabled);
+    void currentFpsChanged(qreal fps);
+    void orthoProjectionChanged(bool enabled);
+    void aspectRatioChanged(float ratio);
+    void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);
@@ -278,7 +357,9 @@ private:
     void setAxisHelper(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis *axis,
                        QAbstract3DAxis **axisPtr);
 
+    friend class AbstractDeclarative;
     friend class Bars3DController;
+    friend class QAbstract3DGraphPrivate;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

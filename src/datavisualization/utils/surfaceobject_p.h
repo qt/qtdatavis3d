@@ -37,6 +37,9 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+class Surface3DRenderer;
+class AxisRenderCache;
+
 class SurfaceObject : public AbstractObjectHelper
 {
 public:
@@ -47,21 +50,17 @@ public:
     };
 
 public:
-    SurfaceObject();
+    SurfaceObject(Surface3DRenderer *renderer);
     ~SurfaceObject();
 
-    void setUpData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange,
-                   GLfloat yMin, bool changeGeometry);
-    void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space, GLfloat yRange,
-                         GLfloat yMin, bool changeGeometry);
-    void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex,
-                         GLfloat yRange, GLfloat yMin);
-    void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow,
-                         GLfloat yRange, GLfloat yMin);
-    void updateSmoothItem(const QSurfaceDataArray &dataArray, int row,
-                          int column, GLfloat yRange, GLfloat yMin);
-    void updateCoarseItem(const QSurfaceDataArray &dataArray, int row,
-                          int column, GLfloat yRange, GLfloat yMin);
+    void setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
+                   bool changeGeometry, bool flipXZ = false);
+    void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
+                         bool changeGeometry, bool flipXZ = false);
+    void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex);
+    void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow);
+    void updateSmoothItem(const QSurfaceDataArray &dataArray, int row, int column);
+    void updateCoarseItem(const QSurfaceDataArray &dataArray, int row, int column);
     void createSmoothIndices(int x, int y, int endX, int endY);
     void createCoarseIndices(int x, int y, int columns, int rows);
     void createSmoothGridlineIndices(int x, int y, int endX, int endY);
@@ -73,10 +72,11 @@ public:
     void clear();
 
 private:
-    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
+    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c, bool flipNormal);
     void createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
                        const QVector<QVector3D> &normals, const GLint *indices,
                        bool changeGeometry);
+    bool checkFlipNormal(const QSurfaceDataArray &array);
 
 private:
     SurfaceType m_surfaceType;
@@ -86,6 +86,10 @@ private:
     GLuint m_gridIndexCount;
     QVector<QVector3D> m_vertices;
     QVector<QVector3D> m_normals;
+    // Caches are not owned
+    AxisRenderCache &m_axisCacheX;
+    AxisRenderCache &m_axisCacheY;
+    AxisRenderCache &m_axisCacheZ;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

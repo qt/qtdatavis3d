@@ -7,7 +7,9 @@ HEADERS += $$PWD/meshloader_p.h \
            $$PWD/utils_p.h \
            $$PWD/abstractobjecthelper_p.h \
            $$PWD/surfaceobject_p.h \
-           $$PWD/qutils.h
+           $$PWD/qutils.h \
+           $$PWD/scatterobjectbufferhelper_p.h \
+           $$PWD/scatterpointbufferhelper_p.h
 
 SOURCES += $$PWD/meshloader.cpp \
            $$PWD/vertexindexer.cpp \
@@ -17,4 +19,6 @@ SOURCES += $$PWD/meshloader.cpp \
            $$PWD/texturehelper.cpp \
            $$PWD/utils.cpp \
            $$PWD/abstractobjecthelper.cpp \
-           $$PWD/surfaceobject.cpp
+           $$PWD/surfaceobject.cpp \
+           $$PWD/scatterobjectbufferhelper.cpp \
+           $$PWD/scatterpointbufferhelper.cpp

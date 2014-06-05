@@ -18,7 +18,6 @@
 
 #include "axisrendercache_p.h"
 
-#include <QtCore/qmath.h>
 #include <QtGui/QFontMetrics>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -29,10 +28,17 @@ AxisRenderCache::AxisRenderCache()
       m_max(10.0f),
       m_segmentCount(5),
       m_subSegmentCount(1),
+      m_reversed(false),
       m_font(QFont(QStringLiteral("Arial"))),
+      m_formatter(0),
+      m_ctrlFormatter(0),
       m_drawer(0),
-      m_segmentStep(10.0f),
-      m_subSegmentStep(10.0f)
+      m_positionsDirty(true),
+      m_translate(0.0f),
+      m_scale(1.0f),
+      m_labelAutoRotation(0.0f),
+      m_titleVisible(false),
+      m_titleFixed(false)
 {
 }
 
@@ -40,6 +46,8 @@ AxisRenderCache::~AxisRenderCache()
 {
     foreach (LabelItem *label, m_labelItems)
         delete label;
+
+    delete m_formatter;
 }
 
 void AxisRenderCache::setDrawer(Drawer *drawer)
@@ -69,8 +77,6 @@ void AxisRenderCache::setType(QAbstract3DAxis::AxisType type)
     foreach (LabelItem *label, m_labelItems)
         delete label;
     m_labelItems.clear();
-    m_segmentStep = 10.0f;
-    m_subSegmentStep = 10.0f;
 }
 
 void AxisRenderCache::setTitle(const QString &title)
@@ -110,28 +116,44 @@ void AxisRenderCache::setLabels(const QStringList &labels)
     }
 }
 
-void AxisRenderCache::setMin(float min)
+void AxisRenderCache::updateAllPositions()
 {
-    m_min = min;
-    updateSegmentStep();
-}
+    // As long as grid and subgrid lines are drawn identically, we can further optimize
+    // by caching all grid and subgrid positions into a single vector.
+    // If subgrid lines are ever themed separately, this array will probably become obsolete.
+    if (m_formatter) {
+        int gridCount = m_formatter->gridPositions().size();
+        int subGridCount = m_formatter->subGridPositions().size();
+        int labelCount = m_formatter->labelPositions().size();
+        int fullSize = gridCount + subGridCount;
 
-void AxisRenderCache::setMax(float max)
-{
-    m_max = max;
-    updateSegmentStep();
-}
+        m_adjustedGridLinePositions.resize(fullSize);
+        m_adjustedLabelPositions.resize(labelCount);
+        int index = 0;
+        int grid = 0;
+        int label = 0;
+        float position = 0.0f;
+        for (; label < labelCount; label++) {
+            position = m_formatter->labelPositions().at(label);
+            if (m_reversed)
+                position = 1.0f - position;
+            m_adjustedLabelPositions[label] = position * m_scale + m_translate;
+        }
+        for (; grid < gridCount; grid++) {
+            position = m_formatter->gridPositions().at(grid);
+            if (m_reversed)
+                position = 1.0f - position;
+            m_adjustedGridLinePositions[index++] = position * m_scale + m_translate;
+        }
+        for (int subGrid = 0; subGrid < subGridCount; subGrid++) {
+            position = m_formatter->subGridPositions().at(subGrid);
+            if (m_reversed)
+                position = 1.0f - position;
+            m_adjustedGridLinePositions[index++] = position * m_scale + m_translate;
+        }
 
-void AxisRenderCache::setSegmentCount(int count)
-{
-    m_segmentCount = count;
-    updateSegmentStep();
-}
-
-void AxisRenderCache::setSubSegmentCount(int count)
-{
-    m_subSegmentCount = count;
-    updateSubSegmentStep();
+        m_positionsDirty = false;
+    }
 }
 
 void AxisRenderCache::updateTextures()
@@ -151,23 +173,6 @@ void AxisRenderCache::updateTextures()
         else
             m_drawer->generateLabelItem(*m_labelItems[i], m_labels.at(i), widest);
     }
-}
-
-void AxisRenderCache::updateSegmentStep()
-{
-    if (m_segmentCount > 0)
-        m_segmentStep = qFabs((m_max - m_min) / m_segmentCount);
-    else
-        m_segmentStep = 0.0f; // Irrelevant
-    updateSubSegmentStep();
-}
-
-void AxisRenderCache::updateSubSegmentStep()
-{
-    if (m_subSegmentCount > 1)
-        m_subSegmentStep = m_segmentStep / m_subSegmentCount;
-    else
-        m_subSegmentStep = m_segmentStep;
 }
 
 int AxisRenderCache::maxLabelWidth(const QStringList &labels) const

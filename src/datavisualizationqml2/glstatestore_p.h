@@ -29,9 +29,8 @@
 #ifndef GLSTATESTORE_P_H
 #define GLSTATESTORE_P_H
 
-#include <QObject>
 #include <QtGui/QOpenGLFunctions>
-#include <QtGui/QOpenGLContext>
+#include <QtCore/QScopedArrayPointer>
 #include "enumtostringmap_p.h"
 
 class GLStateStore : public QObject, protected QOpenGLFunctions
@@ -66,13 +65,13 @@ public:
     GLboolean m_isDepthWriteEnabled;
     GLint m_currentProgram;
     GLint m_maxVertexAttribs;
-    GLint *m_vertexAttribArrayEnabledStates;
-    GLint *m_vertexAttribArrayBoundBuffers;
-    GLint *m_vertexAttribArraySizes;
-    GLint *m_vertexAttribArrayTypes;
-    GLint *m_vertexAttribArrayNormalized;
-    GLint *m_vertexAttribArrayStrides;
-    GLint *m_vertexAttribArrayOffsets;
+    QScopedArrayPointer<GLint> m_vertexAttribArrayEnabledStates;
+    QScopedArrayPointer<GLint> m_vertexAttribArrayBoundBuffers;
+    QScopedArrayPointer<GLint> m_vertexAttribArraySizes;
+    QScopedArrayPointer<GLint> m_vertexAttribArrayTypes;
+    QScopedArrayPointer<GLint> m_vertexAttribArrayNormalized;
+    QScopedArrayPointer<GLint> m_vertexAttribArrayStrides;
+    QScopedArrayPointer<GLint> m_vertexAttribArrayOffsets;
 
     GLint m_activeTexture;
     GLint m_texBinding2D;

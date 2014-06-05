@@ -20,9 +20,6 @@
 #define DATASOURCE_H
 
 #include <QtDataVisualization/QSurface3DSeries>
-#include <QtDataVisualization/QValue3DAxis>
-
-class QQuickView;
 
 using namespace QtDataVisualization;
 
@@ -39,9 +36,6 @@ public slots:
                       float xMin, float xMax, float yMin, float yMax, float zMin, float zMax);
 
     void update(QSurface3DSeries *series);
-
-    QString selectionLabel(QSurface3DSeries *series, QValue3DAxis *axisX,
-                           QValue3DAxis *axisY, QValue3DAxis *axisZ);
     //! [0]
 private:
     void clearData();

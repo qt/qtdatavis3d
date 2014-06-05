@@ -16,10 +16,8 @@
 **
 ****************************************************************************/
 
-#include "qcategory3daxis.h"
 #include "qcategory3daxis_p.h"
 #include "bars3dcontroller_p.h"
-#include "qbardataproxy.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -27,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QCategory3DAxis
  * \inmodule QtDataVisualization
  * \brief The QCategory3DAxis class is used for manipulating an axis of a graph.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QCategory3DAxis provides an axis that can be given labels. The axis is divided into equal-sized
  * categories based on the data window size defined by setting the axis range.
@@ -121,8 +119,6 @@ QCategory3DAxisPrivate::QCategory3DAxisPrivate(QCategory3DAxis *q)
     : QAbstract3DAxisPrivate(q, QAbstract3DAxis::AxisTypeCategory),
       m_labelsExplicitlySet(false)
 {
-    m_onlyPositiveValues = true;
-    m_allowMinMaxSame = true;
 }
 
 QCategory3DAxisPrivate::~QCategory3DAxisPrivate()
@@ -140,6 +136,21 @@ void QCategory3DAxisPrivate::setDataLabels(const QStringList &labels)
         m_labels = labels;
         emit qptr()->labelsChanged();
     }
+}
+
+bool QCategory3DAxisPrivate::allowZero()
+{
+    return true;
+}
+
+bool QCategory3DAxisPrivate::allowNegatives()
+{
+    return false;
+}
+
+bool QCategory3DAxisPrivate::allowMinMaxSame()
+{
+    return true;
 }
 
 QCategory3DAxis *QCategory3DAxisPrivate::qptr()

@@ -16,8 +16,6 @@
 **
 ****************************************************************************/
 
-#include "q3dlight.h"
-#include "q3dscene.h"
 #include "q3dlight_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -26,7 +24,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class Q3DLight
  * \inmodule QtDataVisualization
  * \brief Representation of a light source in 3D space.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * Q3DLight represents a monochrome non variable light source in 3D space.
  */

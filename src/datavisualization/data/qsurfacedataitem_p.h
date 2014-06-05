@@ -39,9 +39,6 @@ class QSurfaceDataItemPrivate
 public:
     QSurfaceDataItemPrivate();
     virtual ~QSurfaceDataItemPrivate();
-
-protected:
-    friend class QSurfaceDataItem;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

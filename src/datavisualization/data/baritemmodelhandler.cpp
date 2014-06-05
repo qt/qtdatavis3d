@@ -26,12 +26,60 @@ BarItemModelHandler::BarItemModelHandler(QItemModelBarDataProxy *proxy, QObject 
     : AbstractItemModelHandler(parent),
       m_proxy(proxy),
       m_proxyArray(0),
-      m_columnCount(0)
+      m_columnCount(0),
+      m_valueRole(noRoleIndex),
+      m_rotationRole(noRoleIndex),
+      m_haveValuePattern(false),
+      m_haveRotationPattern(false)
 {
 }
 
 BarItemModelHandler::~BarItemModelHandler()
 {
+}
+
+void BarItemModelHandler::handleDataChanged(const QModelIndex &topLeft,
+                                            const QModelIndex &bottomRight,
+                                            const QVector<int> &roles)
+{
+    // Do nothing if full reset already pending
+    if (!m_fullReset) {
+        if (!m_proxy->useModelCategories()) {
+            // If the data model doesn't directly map rows and columns, we cannot optimize
+            AbstractItemModelHandler::handleDataChanged(topLeft, bottomRight, roles);
+        } else {
+            int startRow = qMin(topLeft.row(), bottomRight.row());
+            int endRow = qMax(topLeft.row(), bottomRight.row());
+            int startCol = qMin(topLeft.column(), bottomRight.column());
+            int endCol = qMax(topLeft.column(), bottomRight.column());
+
+            for (int i = startRow; i <= endRow; i++) {
+                for (int j = startCol; j <= endCol; j++) {
+                    QModelIndex index = m_itemModel->index(i, j);
+                    QBarDataItem item;
+                    QVariant valueVar = index.data(m_valueRole);
+                    float value;
+                    if (m_haveValuePattern)
+                        value = valueVar.toString().replace(m_valuePattern, m_valueReplace).toFloat();
+                    else
+                        value = valueVar.toFloat();
+                    item.setValue(value);
+                    if (m_rotationRole != noRoleIndex) {
+                        QVariant rotationVar = index.data(m_rotationRole);
+                        float rotation;
+                        if (m_haveRotationPattern) {
+                            rotation = rotationVar.toString().replace(m_rotationPattern,
+                                                                      m_rotationReplace).toFloat();
+                        } else {
+                            rotation = rotationVar.toFloat();
+                        }
+                        item.setRotation(rotation);
+                    }
+                    m_proxy->setItem(i, j, item);
+                }
+            }
+        }
+    }
 }
 
 // Resolve entire item model into QBarDataArray.
@@ -48,14 +96,29 @@ void BarItemModelHandler::resolveModel()
         return;
     }
 
+    // Value and rotation patterns can be reused on single item changes,
+    // so store them to member variables.
+    QRegExp rowPattern(m_proxy->rowRolePattern());
+    QRegExp colPattern(m_proxy->columnRolePattern());
+    m_valuePattern = m_proxy->valueRolePattern();
+    m_rotationPattern = m_proxy->rotationRolePattern();
+    QString rowReplace = m_proxy->rowRoleReplace();
+    QString colReplace = m_proxy->columnRoleReplace();
+    m_valueReplace = m_proxy->valueRoleReplace();
+    m_rotationReplace = m_proxy->rotationRoleReplace();
+    bool haveRowPattern = !rowPattern.isEmpty() && rowPattern.isValid();
+    bool haveColPattern = !colPattern.isEmpty() && colPattern.isValid();
+    m_haveValuePattern = !m_valuePattern.isEmpty() && m_valuePattern.isValid();
+    m_haveRotationPattern = !m_rotationPattern.isEmpty() && m_rotationPattern.isValid();
+
     QStringList rowLabels;
     QStringList columnLabels;
 
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 
     // Default value role to display role if no mapping
-    int valueRole = roleHash.key(m_proxy->valueRole().toLatin1(), Qt::DisplayRole);
-    int rotationRole = roleHash.key(m_proxy->rotationRole().toLatin1(), noRoleIndex);
+    m_valueRole = roleHash.key(m_proxy->valueRole().toLatin1(), Qt::DisplayRole);
+    m_rotationRole = roleHash.key(m_proxy->rotationRole().toLatin1(), noRoleIndex);
     int rowCount = m_itemModel->rowCount();
     int columnCount = m_itemModel->columnCount();
 
@@ -71,9 +134,25 @@ void BarItemModelHandler::resolveModel()
         for (int i = 0; i < rowCount; i++) {
             QBarDataRow &newProxyRow = *m_proxyArray->at(i);
             for (int j = 0; j < columnCount; j++) {
-                newProxyRow[j].setValue(m_itemModel->index(i, j).data(valueRole).toReal());
-                if (rotationRole != noRoleIndex)
-                    newProxyRow[j].setRotation(m_itemModel->index(i, j).data(rotationRole).toReal());
+                QModelIndex index = m_itemModel->index(i, j);
+                QVariant valueVar = index.data(m_valueRole);
+                float value;
+                if (m_haveValuePattern)
+                    value = valueVar.toString().replace(m_valuePattern, m_valueReplace).toFloat();
+                else
+                    value = valueVar.toFloat();
+                newProxyRow[j].setValue(value);
+                if (m_rotationRole != noRoleIndex) {
+                    QVariant rotationVar = index.data(m_rotationRole);
+                    float rotation;
+                    if (m_haveRotationPattern) {
+                        rotation = rotationVar.toString().replace(m_rotationPattern,
+                                                                  m_rotationReplace).toFloat();
+                    } else {
+                        rotation = rotationVar.toFloat();
+                    }
+                    newProxyRow[j].setRotation(rotation);
+                }
             }
         }
         // Generate labels from headers if using model rows/columns
@@ -97,16 +176,62 @@ void BarItemModelHandler::resolveModel()
 
         // Sort values into rows and columns
         typedef QHash<QString, float> ColumnValueMap;
-        QHash <QString, ColumnValueMap> itemValueMap;
-        QHash <QString, ColumnValueMap> itemRotationMap;
+        QHash<QString, ColumnValueMap> itemValueMap;
+        QHash<QString, ColumnValueMap> itemRotationMap;
+
+        bool cumulative = m_proxy->multiMatchBehavior() == QItemModelBarDataProxy::MMBAverage
+                || m_proxy->multiMatchBehavior() == QItemModelBarDataProxy::MMBCumulative;
+        bool countMatches = m_proxy->multiMatchBehavior() == QItemModelBarDataProxy::MMBAverage;
+        bool takeFirst = m_proxy->multiMatchBehavior() == QItemModelBarDataProxy::MMBFirst;
+        QHash<QString, QHash<QString, int> > *matchCountMap = 0;
+        if (countMatches)
+            matchCountMap = new QHash<QString, QHash<QString, int> >;
+
         for (int i = 0; i < rowCount; i++) {
             for (int j = 0; j < columnCount; j++) {
                 QModelIndex index = m_itemModel->index(i, j);
                 QString rowRoleStr = index.data(rowRole).toString();
+                if (haveRowPattern)
+                    rowRoleStr.replace(rowPattern, rowReplace);
                 QString columnRoleStr = index.data(columnRole).toString();
-                itemValueMap[rowRoleStr][columnRoleStr] = index.data(valueRole).toReal();
-                if (rotationRole != noRoleIndex)
-                    itemRotationMap[rowRoleStr][columnRoleStr] = index.data(rotationRole).toReal();
+                if (haveColPattern)
+                    columnRoleStr.replace(colPattern, colReplace);
+                QVariant valueVar = index.data(m_valueRole);
+                float value;
+                if (m_haveValuePattern)
+                    value = valueVar.toString().replace(m_valuePattern, m_valueReplace).toFloat();
+                else
+                    value = valueVar.toFloat();
+                if (countMatches)
+                    (*matchCountMap)[rowRoleStr][columnRoleStr]++;
+
+                if (cumulative) {
+                    itemValueMap[rowRoleStr][columnRoleStr] += value;
+                } else {
+                    if (takeFirst && itemValueMap.contains(rowRoleStr)) {
+                        if (itemValueMap.value(rowRoleStr).contains(columnRoleStr))
+                            continue; // We already have a value for this row/column combo
+                    }
+                    itemValueMap[rowRoleStr][columnRoleStr] = value;
+                }
+
+                if (m_rotationRole != noRoleIndex) {
+                    QVariant rotationVar = index.data(m_rotationRole);
+                    float rotation;
+                    if (m_haveRotationPattern) {
+                        rotation = rotationVar.toString().replace(m_rotationPattern,
+                                                                  m_rotationReplace).toFloat();
+                    } else {
+                        rotation = rotationVar.toFloat();
+                    }
+                    if (cumulative) {
+                        itemRotationMap[rowRoleStr][columnRoleStr] += rotation;
+                    } else {
+                        // We know we are in take last mode if we get here,
+                        // as take first mode skips to next loop already earlier
+                        itemRotationMap[rowRoleStr][columnRoleStr] = rotation;
+                    }
+                }
                 if (generateRows && !rowListHash.value(rowRoleStr, false)) {
                     rowListHash.insert(rowRoleStr, true);
                     rowList << rowRoleStr;
@@ -141,15 +266,24 @@ void BarItemModelHandler::resolveModel()
             QString rowKey = rowList.at(i);
             QBarDataRow &newProxyRow = *m_proxyArray->at(i);
             for (int j = 0; j < columnList.size(); j++) {
-                newProxyRow[j].setValue(itemValueMap[rowKey][columnList.at(j)]);
-                if (rotationRole != noRoleIndex)
-                    newProxyRow[j].setRotation(itemRotationMap[rowKey][columnList.at(j)]);
+                float value = itemValueMap[rowKey][columnList.at(j)];
+                if (countMatches)
+                    value /= float((*matchCountMap)[rowKey][columnList.at(j)]);
+                newProxyRow[j].setValue(value);
+                if (m_rotationRole != noRoleIndex) {
+                    float angle = itemRotationMap[rowKey][columnList.at(j)];
+                    if (countMatches)
+                        angle /= float((*matchCountMap)[rowKey][columnList.at(j)]);
+                    newProxyRow[j].setRotation(angle);
+                }
             }
         }
 
         rowLabels = rowList;
         columnLabels = columnList;
         m_columnCount = columnList.size();
+
+        delete matchCountMap;
     }
 
     m_proxy->resetArray(m_proxyArray, rowLabels, columnLabels);

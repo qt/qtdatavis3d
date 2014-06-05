@@ -32,20 +32,16 @@
 #include "datavisualizationglobal_p.h"
 #include "scatter3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
-#include "qscatterdataproxy.h"
 #include "scatterrenderitem_p.h"
 
-class QPoint;
 class QSizeF;
-class QOpenGLShaderProgram;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class ShaderHelper;
-class ObjectHelper;
-class LabelItem;
 class Q3DScene;
-class QAbstractAxisPrivate;
+class ScatterSeriesRenderCache;
+class QScatterDataItem;
 
 class QT_DATAVISUALIZATION_EXPORT Scatter3DRenderer : public Abstract3DRenderer
 {
@@ -54,9 +50,6 @@ class QT_DATAVISUALIZATION_EXPORT Scatter3DRenderer : public Abstract3DRenderer
 private:
     // Internal state
     ScatterRenderItem *m_selectedItem; // points to renderitem array
-    bool m_xFlipped;
-    bool m_zFlipped;
-    bool m_yFlipped;
     bool m_updateLabels;
     ShaderHelper *m_dotShader;
     ShaderHelper *m_dotGradientShader;
@@ -67,9 +60,6 @@ private:
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
-    ObjectHelper *m_backgroundObj;
-    ObjectHelper *m_gridLineObj;
-    ObjectHelper *m_labelObj;
     GLuint m_bgrTexture;
     GLuint m_depthTexture;
     GLuint m_selectionTexture;
@@ -81,32 +71,39 @@ private:
     GLfloat m_heightNormalizer;
     GLfloat m_scaleFactor;
     int m_selectedItemIndex;
-    int m_selectedItemTotalIndex;
-    int m_selectedItemSeriesIndex;
-    const QScatter3DSeries *m_selectedSeries;
+    ScatterSeriesRenderCache *m_selectedSeriesCache;
+    ScatterSeriesRenderCache *m_oldSelectedSeriesCache;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
-    QVector3D m_translationOffset;
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
-    QVector<ScatterRenderItemArray> m_renderingArrays;
     GLfloat m_backgroundMargin;
     GLfloat m_maxItemSize;
-    QVector<float> m_cachedItemSize;
     int m_clickedIndex;
+    bool m_havePointSeries;
+    bool m_haveMeshSeries;
+    bool m_haveUniformColorMeshSeries;
+    bool m_haveGradientMeshSeries;
 
 public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
-    void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
     void updateData();
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
+    void updateItems(const QVector<Scatter3DController::ChangeItem> &items);
     void updateScene(Q3DScene *scene);
+
+    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
     inline int clickedIndex() const { return m_clickedIndex; }
     void resetClickedStatus();
 
     void render(GLuint defaultFboHandle);
+
+public slots:
+    void updateSelectedItem(int index, QScatter3DSeries *series);
 
 protected:
     virtual void initializeOpenGL();
@@ -119,10 +116,10 @@ private:
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 
     void drawScene(GLuint defaultFboHandle);
+    void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
+                    const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
 
     void loadBackgroundMesh();
-    void loadGridLineMesh();
-    void loadLabelMesh();
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -136,17 +133,11 @@ private:
     void calculateTranslation(ScatterRenderItem &item);
     void calculateSceneScalingFactors();
 
-    Q_DISABLE_COPY(Scatter3DRenderer)
-
-    friend class ScatterRenderItem;
-
-public slots:
-    void updateSelectedItem(int index, const QScatter3DSeries *series);
-
-private:
-    QVector3D indexToSelectionColor(GLint index);
-    void selectionColorToSeriesAndIndex(const QVector3D &color, int &index,
+    void selectionColorToSeriesAndIndex(const QVector4D &color, int &index,
                                         QAbstract3DSeries *&series);
+    inline void updateRenderItem(const QScatterDataItem &dataItem, ScatterRenderItem &renderItem);
+
+    Q_DISABLE_COPY(Scatter3DRenderer)
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -29,18 +29,13 @@
 #ifndef ABSTRACT3DRENDERER_P_H
 #define ABSTRACT3DRENDERER_P_H
 
-//#define DISPLAY_RENDER_SPEED
-
 #include <QtGui/QOpenGLFunctions>
-#ifdef DISPLAY_RENDER_SPEED
-#include <QtCore/QTime>
-#endif
 
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "axisrendercache_p.h"
-#include "qabstractdataproxy.h"
 #include "seriesrendercache_p.h"
+#include "customrenderitem_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -60,18 +55,27 @@ protected:
         SelectOnSlice
     };
 
-    QString generateValueLabel(const QString &format, float value);
+    enum RenderingState {
+        RenderingNormal = 0,
+        RenderingSelection,
+        RenderingDepth
+    };
 
 public:
     virtual ~Abstract3DRenderer();
 
     virtual void updateData() = 0;
-    virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList, bool updateVisibility);
-
+    virtual void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    virtual void updateCustomData(const QList<QCustom3DItem *> &customItems);
+    virtual void updateCustomItems();
+    virtual void updateCustomItemPositions();
+    virtual SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
+    virtual void cleanCache(SeriesRenderCache *cache);
     virtual void render(GLuint defaultFboHandle);
 
     virtual void updateTheme(Q3DTheme *theme);
     virtual void updateSelectionMode(QAbstract3DGraph::SelectionFlags newMode);
+    virtual void updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint);
     virtual void updateScene(Q3DScene *scene);
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
@@ -84,26 +88,63 @@ public:
     virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
-    virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation, QAbstract3DAxis::AxisType type);
-    virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation, const QString &title);
-    virtual void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation, const QStringList &labels);
-    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min, float max);
+    virtual void initBackgroundShaders(const QString &vertexShader,
+                                       const QString &fragmentShader) = 0;
+    virtual void initCustomItemShaders(const QString &vertexShader,
+                                       const QString &fragmentShader);
+    virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
+                                QAbstract3DAxis::AxisType type);
+    virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation,
+                                 const QString &title);
+    virtual void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                                  const QStringList &labels);
+    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
+                                 float max);
     virtual void updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation, int count);
-    virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation, const QString &format);
+    virtual void updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
+                                           int count);
+    virtual void updateAxisLabelFormat(QAbstract3DAxis::AxisOrientation orientation,
+                                       const QString &format);
+    virtual void updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation,
+                                    bool enable);
+    virtual void updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
+                                     QValue3DAxisFormatter *formatter);
+    virtual void updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientation orientation,
+                                             float angle);
+    virtual void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
+                                      bool visible);
+    virtual void updateAxisTitleFixed(QAbstract3DAxis::AxisOrientation orientation,
+                                      bool fixed);
+    virtual void modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
+
+    virtual CustomRenderItem *addCustomItem(QCustom3DItem *item);
+    virtual void updateCustomItem(CustomRenderItem *renderItem);
+
+    virtual void updateAspectRatio(float ratio);
+
+    virtual QVector3D convertPositionToTranslation(const QVector3D &position,
+                                                   bool isAbsolute) = 0;
+
     void generateBaseColorTexture(const QColor &color, GLuint *texture);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
 
     inline bool isClickPending() { return m_clickPending; }
     inline void clearClickPending() { m_clickPending = false; }
     inline QAbstract3DSeries *clickedSeries() const { return m_clickedSeries; }
+    inline QAbstract3DGraph::ElementType clickedType() { return m_clickedType; }
 
     LabelItem &selectionLabelItem();
     void setSelectionLabel(const QString &label);
     QString &selectionLabel();
+
+    void drawCustomItems(RenderingState state, ShaderHelper *shader,
+                         const QMatrix4x4 &viewMatrix,
+                         const QMatrix4x4 &projectionViewMatrix,
+                         const QMatrix4x4 &depthProjectionViewMatrix,
+                         GLuint depthTexture, GLfloat shadowQuality);
+    QVector4D indexToSelectionColor(GLint index);
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
@@ -124,6 +165,28 @@ protected:
 
     void fixGradient(QLinearGradient *gradient, GLuint *gradientTexture);
 
+    void calculateZoomLevel();
+    void drawAxisTitleY(const QVector3D &sideLabelRotation, const QVector3D &backLabelRotation,
+                        const QVector3D &sideLabelTrans, const QVector3D &backLabelTrans,
+                        const QQuaternion &totalSideRotation, const QQuaternion &totalBackRotation,
+                        AbstractRenderItem &dummyItem, const Q3DCamera *activeCamera,
+                        float labelsMaxWidth,
+                        const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
+                        ShaderHelper *shader);
+    void drawAxisTitleX(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                        const QQuaternion &totalRotation, AbstractRenderItem &dummyItem,
+                        const Q3DCamera *activeCamera, float labelsMaxWidth,
+                        const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
+                        ShaderHelper *shader);
+    void drawAxisTitleZ(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                        const QQuaternion &totalRotation, AbstractRenderItem &dummyItem,
+                        const Q3DCamera *activeCamera, float labelsMaxWidth,
+                        const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
+                        ShaderHelper *shader);
+
+    void loadGridLineMesh();
+    void loadLabelMesh();
+
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
     Drawer *m_drawer;
@@ -132,6 +195,7 @@ protected:
     GLfloat m_autoScaleAdjustment;
 
     QAbstract3DGraph::SelectionFlags m_cachedSelectionMode;
+    QAbstract3DGraph::OptimizationHints m_cachedOptimizationHint;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;
@@ -142,22 +206,37 @@ protected:
     bool m_selectionDirty;
     SelectionState m_selectionState;
     QPoint m_inputPosition;
-    QVector<SeriesRenderCache> m_visibleSeriesList;
+    QHash<QAbstract3DSeries *, SeriesRenderCache *> m_renderCacheList;
+    CustomRenderItemArray m_customRenderCache;
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
     float m_devicePixelRatio;
     bool m_selectionLabelDirty;
     bool m_clickPending;
     QAbstract3DSeries *m_clickedSeries;
+    QAbstract3DGraph::ElementType m_clickedType;
+    int m_selectedLabelIndex;
+    int m_selectedCustomItemIndex;
 
     QString m_selectionLabel;
     LabelItem *m_selectionLabelItem;
+    int m_visibleSeriesCount;
 
-#ifdef DISPLAY_RENDER_SPEED
-    bool m_isFirstFrame;
-    QTime m_lastFrameTime;
-    GLint m_numFrames;
-#endif
+    ShaderHelper *m_customItemShader;
+
+    bool m_useOrthoProjection;
+    bool m_xFlipped;
+    bool m_yFlipped;
+    bool m_zFlipped;
+
+    ObjectHelper *m_backgroundObj; // Shared reference
+    ObjectHelper *m_gridLineObj; // Shared reference
+    ObjectHelper *m_labelObj; // Shared reference
+
+    float m_graphAspectRatio;
+
+private:
+    friend class Abstract3DController;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

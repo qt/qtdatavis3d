@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qsurfacedataproxy.h"
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
 
@@ -26,10 +25,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DSurface.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
- * QSurfaceDataProxy takes care of surface related data handling. The QSurfaceDataProxy handles the data
- * in rows and for this it provides two auxiliary typedefs. QSurfaceDataArray is a QList for
+ * QSurfaceDataProxy takes care of surface related data handling. The QSurfaceDataProxy handles the
+ * data in rows and for this it provides two auxiliary typedefs. QSurfaceDataArray is a QList for
  * controlling the rows. For rows there is a QVector QSurfaceDataRow which contains QSurfaceDataItem
  * objects. See Q3DSurface documentation and basic sample code there how to feed the data for the
  * QSurfaceDataProxy.
@@ -41,17 +40,18 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If you use QSurfaceDataRow pointers to directly modify data after adding the array to the proxy,
  * you must also emit proper signal to make the graph update.
  *
- * To make a sensible surface, the X-value of each successive item in the same row must be greater than the
- * previous item in that row, and the the Z-value of each successive item in a column  must be greater than
- * the previous item in that column.
+ * To make a sensible surface, the X-value of each successive item in all rows must be
+ * either ascending or descending throughout the row.
+ * Similarly, the Z-value of each successive item in all columns must be either ascending or
+ * descending throughout the column.
  *
- * \note In the initial release, only surfaces with straight rows and columns are fully supported. Any row
- * with items that do not have the exact same Z-value or any columns with items that do not have the exact
- * same X-value may get clipped incorrectly if the whole surface doesn't fit to the visible X or Z axis
- * ranges.
+ * \note Currently only surfaces with straight rows and columns are fully supported. Any row
+ * with items that do not have the exact same Z-value or any column with items that do not have
+ * the exact same X-value may get clipped incorrectly if the whole surface doesn't completely fit
+ * in the visible X or Z axis ranges.
  *
  * \note Surfaces with less than two rows or columns are not considered valid surfaces and will
- * not get rendered.
+ * not be rendered.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -520,10 +520,14 @@ void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
     minValues.setY(min);
     maxValues.setY(max);
     if (columns) {
-        minValues.setX(m_dataArray->at(0)->at(0).x());
-        minValues.setZ(m_dataArray->at(0)->at(0).z());
-        maxValues.setX(m_dataArray->at(0)->last().x());
-        maxValues.setZ(m_dataArray->last()->at(0).z());
+        float xLow = m_dataArray->at(0)->at(0).x();
+        float xHigh = m_dataArray->at(0)->last().x();
+        float zLow = m_dataArray->at(0)->at(0).z();
+        float zHigh = m_dataArray->last()->at(0).z();
+        minValues.setX(qMin(xLow, xHigh));
+        minValues.setZ(qMin(zLow, zHigh));
+        maxValues.setX(qMax(xLow, xHigh));
+        maxValues.setZ(qMax(zLow, zHigh));
     } else {
         minValues.setX(0.0f);
         minValues.setZ(0.0f);

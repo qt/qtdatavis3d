@@ -26,12 +26,11 @@
 //
 // We mean it.
 
-#include "qcategory3daxis.h"
-#include "qabstract3daxis_p.h"
-#include "qbardataitem.h"
-
 #ifndef QCATEGORY3DAXIS_P_H
 #define QCATEGORY3DAXIS_P_H
+
+#include "qcategory3daxis.h"
+#include "qabstract3daxis_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -44,6 +43,11 @@ public:
     virtual ~QCategory3DAxisPrivate();
 
     void setDataLabels(const QStringList &labels);
+
+protected:
+    virtual bool allowZero();
+    virtual bool allowNegatives();
+    virtual bool allowMinMaxSame();
 
 private:
     QCategory3DAxis *qptr();

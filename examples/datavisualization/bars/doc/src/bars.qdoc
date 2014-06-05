@@ -29,6 +29,7 @@
         \li Create an application with Q3DBars and some widgets
         \li Use QBar3DSeries and QBarDataProxy to set data to the graph
         \li Adjust some graph and series properties using widget controls
+        \li Select a row or a column by clicking an axis label
     \endlist
 
     It also demonstrates how having negative bar values affects the graph.
@@ -166,6 +167,20 @@
         \li Font
         \li Font size
     \endlist
+
+    \section1 Selecting a row/column by clicking an axis label
+
+    Selection by axis label is default functionality for bar graphs. As an example, you can select
+    rows by clicking an axis label in the following way:
+
+    \list
+        \li Change selection mode to \c SelectionRow
+        \li Click a year label
+        \li The row with the clicked year is selected
+    \endlist
+
+    You can use the same method with \c SelectionSlice and \c SelectionItem flags, as long as
+    you have either \c SelectionRow or \c SelectionColumn set as well.
 
     \section1 Example contents
 

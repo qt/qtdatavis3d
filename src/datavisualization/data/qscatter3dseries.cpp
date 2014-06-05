@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QScatter3DSeries
  * \inmodule QtDataVisualization
  * \brief Base series class for Q3DScatter.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QScatter3DSeries manages the series specific visual elements, as well as series data
  * (via data proxy).
@@ -298,9 +298,54 @@ void QScatter3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
     }
 }
 
+void QScatter3DSeriesPrivate::createItemLabel()
+{
+    static const QString xTitleTag(QStringLiteral("@xTitle"));
+    static const QString yTitleTag(QStringLiteral("@yTitle"));
+    static const QString zTitleTag(QStringLiteral("@zTitle"));
+    static const QString xLabelTag(QStringLiteral("@xLabel"));
+    static const QString yLabelTag(QStringLiteral("@yLabel"));
+    static const QString zLabelTag(QStringLiteral("@zLabel"));
+    static const QString seriesNameTag(QStringLiteral("@seriesName"));
+
+    if (m_selectedItem == QScatter3DSeries::invalidSelectionIndex()) {
+        m_itemLabel = QString();
+        return;
+    }
+
+    QValue3DAxis *axisX = static_cast<QValue3DAxis *>(m_controller->axisX());
+    QValue3DAxis *axisY = static_cast<QValue3DAxis *>(m_controller->axisY());
+    QValue3DAxis *axisZ = static_cast<QValue3DAxis *>(m_controller->axisZ());
+    QVector3D selectedPosition = qptr()->dataProxy()->itemAt(m_selectedItem)->position();
+
+    m_itemLabel = m_itemLabelFormat;
+
+    m_itemLabel.replace(xTitleTag, axisX->title());
+    m_itemLabel.replace(yTitleTag, axisY->title());
+    m_itemLabel.replace(zTitleTag, axisZ->title());
+
+    if (m_itemLabel.contains(xLabelTag)) {
+        QString valueLabelText = axisX->formatter()->stringForValue(
+                    qreal(selectedPosition.x()), axisX->labelFormat());
+        m_itemLabel.replace(xLabelTag, valueLabelText);
+    }
+    if (m_itemLabel.contains(yLabelTag)) {
+        QString valueLabelText = axisY->formatter()->stringForValue(
+                    qreal(selectedPosition.y()), axisY->labelFormat());
+        m_itemLabel.replace(yLabelTag, valueLabelText);
+    }
+    if (m_itemLabel.contains(zLabelTag)) {
+        QString valueLabelText = axisZ->formatter()->stringForValue(
+                    qreal(selectedPosition.z()), axisZ->labelFormat());
+        m_itemLabel.replace(zLabelTag, valueLabelText);
+    }
+    m_itemLabel.replace(seriesNameTag, m_name);
+}
+
 void QScatter3DSeriesPrivate::setSelectedItem(int index)
 {
     if (index != m_selectedItem) {
+        markItemLabelDirty();
         m_selectedItem = index;
         emit qptr()->selectedItemChanged(m_selectedItem);
     }

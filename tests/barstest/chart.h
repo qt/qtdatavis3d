@@ -29,6 +29,7 @@
 #include <QPointer>
 #include <QColorDialog>
 #include <QTimer>
+#include <QLabel>
 
 using namespace QtDataVisualization;
 
@@ -58,6 +59,7 @@ public:
     void changeFontSize(int fontsize);
     void rotateX(int rotation);
     void rotateY(int rotation);
+    void setFpsMeasurement(bool enable);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void setSpecsRatio(int barwidth);
@@ -75,7 +77,7 @@ public:
     void selectBar();
     void swapAxis();
     void releaseAxes();
-    void releaseProxies();
+    void releaseSeries();
     void createMassiveArray();
     void useOwnTheme();
     void changeBaseColor(const QColor &color);
@@ -85,6 +87,13 @@ public:
     void primarySeriesTest();
     void insertRemoveTestToggle();
     void toggleRotation();
+    void useLogAxis();
+    void changeValueAxisFormat(const QString & text);
+    void changeLogBase(const QString & text);
+    void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
+    void addRemoveSeries();
+    void testItemAndRowChanges();
+    void reverseValueAxis(int enabled);
 
 public slots:
     void flipViews();
@@ -94,6 +103,7 @@ public slots:
     void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void handleSelectionChange(const QPoint &position);
     void setUseNullInputHandler(bool useNull);
+    void changeValueAxisSegments(int value);
 
     void handleRowAxisChanged(QCategory3DAxis *axis);
     void handleColumnAxisChanged(QCategory3DAxis *axis);
@@ -103,11 +113,16 @@ public slots:
     void insertRemoveTimerTimeout();
     void triggerSelection();
     void triggerRotation();
+    void handleValueAxisLabelsChanged();
+    void handleFpsChange(qreal fps);
 
 signals:
     void shadowQualityChanged(int quality);
 
 private:
+    void populateFlatSeries(QBar3DSeries *series, int rows, int columns, float value);
+    QBarDataRow *createFlatRow(int columns, float value);
+
     Q3DBars *m_graph;
     QColorDialog *m_colorDialog;
     int m_columnCount;
@@ -152,6 +167,8 @@ private:
     QAbstract3DInputHandler *m_customInputHandler;
     QTimer m_selectionTimer;
     QTimer m_rotationTimer;
+    QLabel *m_fpsLabel;
+    QBar3DSeries *m_extraSeries;
 };
 
 #endif

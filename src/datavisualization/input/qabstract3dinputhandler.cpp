@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "qabstract3dinputhandler_p.h"
-#include "q3dscene.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -25,7 +24,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QAbstract3DInputHandler
  * \inmodule QtDataVisualization
  * \brief The base class for implementations of input handlers.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QAbstract3DInputHandler is the base class that is subclassed by different input handling implementations
  * that take input events and translate those to camera and light movements. Input handlers also translate
@@ -56,7 +55,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This type is uncreatable.
  *
- * For AbstractInputHandler3D enums, see \l QAbstract3DInputHandler::InputView
+ * For AbstractInputHandler3D enums, see \l{QAbstract3DInputHandler::InputView}.
  */
 
 /*!
@@ -231,7 +230,8 @@ QAbstract3DInputHandlerPrivate::QAbstract3DInputHandlerPrivate(QAbstract3DInputH
     m_previousInputPos(QPoint(0,0)),
     m_inputView(QAbstract3DInputHandler::InputViewNone),
     m_inputPosition(QPoint(0,0)),
-    m_scene(0)
+    m_scene(0),
+    m_isDefaultHandler(false)
 {
 }
 

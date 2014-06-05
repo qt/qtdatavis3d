@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qbardataproxy.h"
 #include "qbardataproxy_p.h"
 #include "qbar3dseries_p.h"
 
@@ -26,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QBarDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DBars.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QBarDataProxy handles adding, inserting, changing and removing rows of data.
  *
@@ -554,7 +553,8 @@ void QBarDataProxyPrivate::setRow(int rowIndex, QBarDataRow *row, const QString 
     }
 }
 
-void QBarDataProxyPrivate::setRows(int rowIndex, const QBarDataArray &rows, const QStringList *labels)
+void QBarDataProxyPrivate::setRows(int rowIndex, const QBarDataArray &rows,
+                                   const QStringList *labels)
 {
     QBarDataArray &dataArray = *m_dataArray;
     Q_ASSERT(rowIndex >= 0 && (rowIndex + rows.size()) <= dataArray.size());
@@ -604,7 +604,8 @@ void QBarDataProxyPrivate::insertRow(int rowIndex, QBarDataRow *row, const QStri
     m_dataArray->insert(rowIndex, row);
 }
 
-void QBarDataProxyPrivate::insertRows(int rowIndex, const QBarDataArray &rows, const QStringList *labels)
+void QBarDataProxyPrivate::insertRows(int rowIndex, const QBarDataArray &rows,
+                                      const QStringList *labels)
 {
     Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray->size());
     if (labels)
@@ -656,7 +657,8 @@ void QBarDataProxyPrivate::clearArray()
  * \internal
  * Fixes the row label array to include specified labels.
  */
-void QBarDataProxyPrivate::fixRowLabels(int startIndex, int count, const QStringList &newLabels, bool isInsert)
+void QBarDataProxyPrivate::fixRowLabels(int startIndex, int count, const QStringList &newLabels,
+                                        bool isInsert)
 {
     bool changed = false;
     int currentSize = m_rowLabels.size();

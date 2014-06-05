@@ -26,7 +26,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QBar3DSeries
  * \inmodule QtDataVisualization
  * \brief Base series class for Q3DBars.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QBar3DSeries manages the series specific visual elements, as well as series data
  * (via data proxy).
@@ -317,6 +317,56 @@ void QBar3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *newCon
     }
 }
 
+void QBar3DSeriesPrivate::createItemLabel()
+{
+    static const QString rowIndexTag(QStringLiteral("@rowIdx"));
+    static const QString rowLabelTag(QStringLiteral("@rowLabel"));
+    static const QString rowTitleTag(QStringLiteral("@rowTitle"));
+    static const QString colIndexTag(QStringLiteral("@colIdx"));
+    static const QString colLabelTag(QStringLiteral("@colLabel"));
+    static const QString colTitleTag(QStringLiteral("@colTitle"));
+    static const QString valueTitleTag(QStringLiteral("@valueTitle"));
+    static const QString valueLabelTag(QStringLiteral("@valueLabel"));
+    static const QString seriesNameTag(QStringLiteral("@seriesName"));
+
+    if (m_selectedBar == QBar3DSeries::invalidSelectionPosition()) {
+        m_itemLabel = QString();
+        return;
+    }
+
+    QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_controller->axisZ());
+    QCategory3DAxis *categoryAxisX = static_cast<QCategory3DAxis *>(m_controller->axisX());
+    QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(m_controller->axisY());
+    qreal selectedBarValue = qreal(qptr()->dataProxy()->itemAt(m_selectedBar)->value());
+
+    // Custom format expects printf format specifier. There is no tag for it.
+    m_itemLabel = valueAxis->formatter()->stringForValue(selectedBarValue, m_itemLabelFormat);
+
+    int selBarPosRow = m_selectedBar.x();
+    int selBarPosCol = m_selectedBar.y();
+    m_itemLabel.replace(rowIndexTag, QString::number(selBarPosRow));
+    if (categoryAxisZ->labels().size() > selBarPosRow)
+        m_itemLabel.replace(rowLabelTag, categoryAxisZ->labels().at(selBarPosRow));
+    else
+        m_itemLabel.replace(rowLabelTag, QString());
+    m_itemLabel.replace(rowTitleTag, categoryAxisZ->title());
+    m_itemLabel.replace(colIndexTag, QString::number(selBarPosCol));
+    if (categoryAxisX->labels().size() > selBarPosCol)
+        m_itemLabel.replace(colLabelTag, categoryAxisX->labels().at(selBarPosCol));
+    else
+        m_itemLabel.replace(colLabelTag, QString());
+    m_itemLabel.replace(colTitleTag, categoryAxisX->title());
+    m_itemLabel.replace(valueTitleTag, valueAxis->title());
+
+    if (m_itemLabel.contains(valueLabelTag)) {
+        QString valueLabelText = valueAxis->formatter()->stringForValue(selectedBarValue,
+                                                                        valueAxis->labelFormat());
+        m_itemLabel.replace(valueLabelTag, valueLabelText);
+    }
+
+    m_itemLabel.replace(seriesNameTag, m_name);
+}
+
 void QBar3DSeriesPrivate::handleMeshRotationChanged(const QQuaternion &rotation)
 {
     emit qptr()->meshAngleChanged(quaternionAngle(rotation));
@@ -325,6 +375,7 @@ void QBar3DSeriesPrivate::handleMeshRotationChanged(const QQuaternion &rotation)
 void QBar3DSeriesPrivate::setSelectedBar(const QPoint &position)
 {
     if (position != m_selectedBar) {
+        markItemLabelDirty();
         m_selectedBar = position;
         emit qptr()->selectedBarChanged(m_selectedBar);
     }

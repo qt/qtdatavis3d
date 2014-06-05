@@ -16,7 +16,6 @@
 **
 ****************************************************************************/
 
-#include "qabstract3dseries.h"
 #include "qabstract3dseries_p.h"
 #include "qabstractdataproxy_p.h"
 #include "abstract3dcontroller_p.h"
@@ -27,7 +26,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QAbstract3DSeries
  * \inmodule QtDataVisualization
  * \brief Base class for all QtDataVisualization series.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * You use the visualization type specific inherited classes instead of the base class.
  * \sa QBar3DSeries, QScatter3DSeries, QSurface3DSeries, {Qt Data Visualization Data Handling}
@@ -53,7 +52,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * For Abstract3DSeries enums, see \l QAbstract3DSeries::SeriesType and \l QAbstract3DSeries::Mesh
+ * For Abstract3DSeries enums, see \l QAbstract3DSeries::SeriesType and \l{QAbstract3DSeries::Mesh}.
  *
  * \sa Bar3DSeries, Scatter3DSeries, Surface3DSeries, {Qt Data Visualization Data Handling}
  */
@@ -102,7 +101,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *         Arrow pointing upwards.
  *  \value MeshPoint
  *         2D point. Usable only with Q3DScatter.
- *         \b Note: Shadows and color gradients do not affect this style.
+ *         \b Note: Shadows do not affect this style. Color style Q3DTheme::ColorStyleObjectGradient
+ *         is not supported by this style.
  */
 
 /*!
@@ -237,6 +237,27 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Series name can be used in item label format with tag \c{@seriesName}.
  *
  * \sa itemLabelFormat
+ */
+
+/*!
+ * \qmlproperty string Abstract3DSeries::itemLabel
+ * \since QtDataVisualization 1.1
+ *
+ * Contains the formatted item label. If there is no selected item or the selected item is not
+ * visible, returns an empty string.
+ *
+ * \sa itemLabelFormat
+ */
+
+/*!
+ * \qmlproperty bool Abstract3DSeries::itemLabelVisible
+ * \since QtDataVisualization 1.1
+ *
+ * If \c true, item labels are drawn as floating labels in the graph. Otherwise item labels are not
+ * drawn. If you prefer to show the item label in an external control, set this property to
+ * \c false. Defaults to \c true.
+ *
+ * \sa itemLabelFormat, itemLabel
  */
 
 /*!
@@ -586,9 +607,47 @@ QString QAbstract3DSeries::name() const
     return d_ptr->m_name;
 }
 
+/*!
+ * \property QAbstract3DSeries::itemLabel
+ * \since QtDataVisualization 1.1
+ *
+ * Contains the formatted item label. If there is no selected item or the selected item is not
+ * visible, returns an empty string.
+ *
+ * \sa itemLabelFormat
+ */
+QString QAbstract3DSeries::itemLabel() const
+{
+    return d_ptr->itemLabel();
+}
+
+/*!
+ * \property QAbstract3DSeries::itemLabelVisible
+ * \since QtDataVisualization 1.1
+ *
+ * If \c true, item labels are drawn as floating labels in the graph. Otherwise item labels are not
+ * drawn. If you prefer to show the item label in an external control, set this property to
+ * \c false. Defaults to \c true.
+ *
+ * \sa itemLabelFormat, itemLabel
+ */
+void QAbstract3DSeries::setItemLabelVisible(bool visible)
+{
+    if (d_ptr->m_itemLabelVisible != visible) {
+        d_ptr->setItemLabelVisible(visible);
+        emit itemLabelVisibilityChanged(visible);
+    }
+}
+
+bool QAbstract3DSeries::isItemLabelVisible() const
+{
+    return d_ptr->m_itemLabelVisible;
+}
+
 // QAbstract3DSeriesPrivate
 
-QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstract3DSeries::SeriesType type)
+QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q,
+                                                   QAbstract3DSeries::SeriesType type)
     : QObject(0),
       q_ptr(q),
       m_type(type),
@@ -597,7 +656,9 @@ QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q, QAbstra
       m_controller(0),
       m_mesh(QAbstract3DSeries::MeshCube),
       m_meshSmooth(false),
-      m_colorStyle(Q3DTheme::ColorStyleUniform)
+      m_colorStyle(Q3DTheme::ColorStyleUniform),
+      m_itemLabelDirty(true),
+      m_itemLabelVisible(true)
 {
 }
 
@@ -630,53 +691,67 @@ void QAbstract3DSeriesPrivate::setController(Abstract3DController *controller)
     connectControllerAndProxy(controller);
     m_controller = controller;
     q_ptr->setParent(controller);
+    markItemLabelDirty();
 }
 
 void QAbstract3DSeriesPrivate::setItemLabelFormat(const QString &format)
 {
     m_itemLabelFormat = format;
-    m_changeTracker.itemLabelFormatChanged = true;
-    if (m_controller)
-        m_controller->markSeriesVisualsDirty();
+    markItemLabelDirty();
 }
 
 void QAbstract3DSeriesPrivate::setVisible(bool visible)
 {
     m_visible = visible;
-    if (m_controller)
-        m_controller->markSeriesVisualsDirty();
+    markItemLabelDirty();
 }
 
 void QAbstract3DSeriesPrivate::setMesh(QAbstract3DSeries::Mesh mesh)
 {
     m_mesh = mesh;
     m_changeTracker.meshChanged = true;
-    if (m_controller)
+    if (m_controller) {
         m_controller->markSeriesVisualsDirty();
+
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+            m_controller->markDataDirty();
+    }
 }
 
 void QAbstract3DSeriesPrivate::setMeshSmooth(bool enable)
 {
     m_meshSmooth = enable;
     m_changeTracker.meshSmoothChanged = true;
-    if (m_controller)
+    if (m_controller) {
         m_controller->markSeriesVisualsDirty();
+
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+            m_controller->markDataDirty();
+    }
 }
 
 void QAbstract3DSeriesPrivate::setMeshRotation(const QQuaternion &rotation)
 {
     m_meshRotation = rotation;
     m_changeTracker.meshRotationChanged = true;
-    if (m_controller)
+    if (m_controller) {
         m_controller->markSeriesVisualsDirty();
+
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+            m_controller->markDataDirty();
+    }
 }
 
 void QAbstract3DSeriesPrivate::setUserDefinedMesh(const QString &meshFile)
 {
     m_userDefinedMesh = meshFile;
     m_changeTracker.userDefinedMeshChanged = true;
-    if (m_controller)
+    if (m_controller) {
         m_controller->markSeriesVisualsDirty();
+
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+            m_controller->markDataDirty();
+    }
 }
 
 void QAbstract3DSeriesPrivate::setColorStyle(Q3DTheme::ColorStyle style)
@@ -738,9 +813,8 @@ void QAbstract3DSeriesPrivate::setMultiHighlightGradient(const QLinearGradient &
 void QAbstract3DSeriesPrivate::setName(const QString &name)
 {
     m_name = name;
+    markItemLabelDirty();
     m_changeTracker.nameChanged = true;
-    if (m_controller)
-        m_controller->markSeriesVisualsDirty();
 }
 
 void QAbstract3DSeriesPrivate::resetToTheme(const Q3DTheme &theme, int seriesIndex, bool force)
@@ -778,6 +852,38 @@ void QAbstract3DSeriesPrivate::resetToTheme(const Q3DTheme &theme, int seriesInd
         q_ptr->setMultiHighlightGradient(theme.multiHighlightGradient());
         m_themeTracker.multiHighlightGradientOverride = false;
     }
+}
+
+QString QAbstract3DSeriesPrivate::itemLabel()
+{
+    if (m_itemLabelDirty) {
+        QString oldLabel = m_itemLabel;
+        if (m_controller && m_visible)
+            createItemLabel();
+        else
+            m_itemLabel = QString();
+        m_itemLabelDirty = false;
+
+        if (oldLabel != m_itemLabel)
+            emit q_ptr->itemLabelChanged(m_itemLabel);
+    }
+
+    return m_itemLabel;
+}
+
+void QAbstract3DSeriesPrivate::markItemLabelDirty()
+{
+    m_itemLabelDirty = true;
+    m_changeTracker.itemLabelChanged = true;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
+}
+
+void QAbstract3DSeriesPrivate::setItemLabelVisible(bool visible)
+{
+    m_itemLabelVisible = visible;
+    markItemLabelDirty();
+    m_changeTracker.itemLabelVisibilityChanged = true;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

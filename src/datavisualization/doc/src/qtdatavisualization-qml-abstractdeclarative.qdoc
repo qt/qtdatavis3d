@@ -28,8 +28,9 @@
   Note that this type is uncreatable, but contains properties that are shared between
   the 3D visualizations.
 
-  For AbstractGraph3D enums, see \l QAbstract3DGraph::SelectionFlag and
-  \l QAbstract3DGraph::ShadowQuality
+  For AbstractGraph3D enums, see \l{QAbstract3DGraph::SelectionFlag},
+  \l{QAbstract3DGraph::ShadowQuality}, \l{QAbstract3DGraph::ElementType}, and
+  \l{QAbstract3DGraph::OptimizationHint}.
 
   \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
@@ -57,7 +58,7 @@
 
 /*!
   \qmlproperty AbstractInputHandler3D AbstractGraph3D::inputHandler
-  Input handler. You can disable default input handlers by setting this property to \c null.
+  Input handler. You can disable default input handlers by setting this property to \c {null}.
  */
 
 /*!
@@ -119,9 +120,29 @@
   When renderingMode is \c RenderDirectToBackground or \c RenderDirectToBackground_NoClear, this
   property value is read-only and returns the number of samples specified by the window surface
   format.
-  Defaults to 4.
+  Defaults to \c{4}.
 
   \sa renderingMode
+ */
+
+/*!
+ * \qmlproperty bool AbstractGraph3D::measureFps
+ * \since QtDataVisualization 1.1
+ *
+ * If \c {true}, the rendering is done continuously instead of on demand, and currentFps property
+ * is updated. Defaults to \c{false}.
+ *
+ * \sa currentFps
+ */
+
+/*!
+ * \qmlproperty int AbstractGraph3D::currentFps
+ * \since QtDataVisualization 1.1
+ *
+ * When fps measuring is enabled, the results for the last second are stored in this read-only
+ * property. It takes at least a second before this value updates after measurement is activated.
+ *
+ * \sa measureFps
  */
 
 /*!
@@ -129,3 +150,154 @@
  * Clears selection from all attached series.
  */
 
+/*!
+ * \qmlmethod int AbstractGraph3D::addCustomItem(Custom3DItem item)
+ *
+ * Adds a Custom3DItem \a item to the graph. Graph takes ownership of the added item.
+ *
+ * \return index to the added item if add was successful, -1 if trying to add a null item, and
+ * index of the item if trying to add an already added item.
+ *
+ * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt()
+ *
+ * \since QtDataVisualization 1.1
+ */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::removeCustomItems()
+ *
+ * Removes all custom items. Deletes the resources allocated to them.
+ *
+ * \since QtDataVisualization 1.1
+ */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::removeCustomItem(Custom3DItem item)
+ *
+ * Removes the custom \a {item}. Deletes the resources allocated to it.
+ *
+ * \since QtDataVisualization 1.1
+ */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::removeCustomItemAt(vector3d position)
+ *
+ * Removes all custom items at \a {position}. Deletes the resources allocated to them.
+ *
+ * \since QtDataVisualization 1.1
+ */
+
+/*!
+ * \qmlmethod void AbstractGraph3D::releaseCustomItem(Custom3DItem item)
+ *
+ * Gets ownership of \a item back and removes the \a item from the graph.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \note If the same item is added back to the graph, the texture file needs to be re-set.
+ *
+ * \sa Custom3DItem::textureFile
+ */
+
+/*!
+ * \qmlmethod int AbstractGraph3D::selectedLabelIndex()
+ *
+ * Can be used to query the index of the selected label after receiving \c selectedElementChanged
+ * signal with any label type. Selection is valid until the next \c selectedElementChanged signal.
+ *
+ * \return index of the selected label, or -1.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \sa selectedElement
+ */
+
+/*!
+ * \qmlmethod Abstract3DAxis AbstractGraph3D::selectedAxis()
+ *
+ * Can be used to get the selected axis after receiving \c selectedElementChanged signal with any label
+ * type. Selection is valid until the next \c selectedElementChanged signal.
+ *
+ * \return the selected axis, or null.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \sa selectedElement
+ */
+
+/*!
+ * \qmlmethod int AbstractGraph3D::selectedCustomItemIndex()
+ *
+ * Can be used to query the index of the selected custom item after receiving \c selectedElementChanged
+ * signal with \l{QAbstract3DGraph::ElementCustomItem}{ElementCustomItem} type. Selection is valid
+ * until the next \c selectedElementChanged signal.
+ *
+ * \return index of the selected custom item, or -1.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \sa selectedElement
+ */
+
+/*!
+ * \qmlmethod Custom3DItem AbstractGraph3D::selectedCustomItem()
+ *
+ * Can be used to get the selected custom item after receiving \c selectedElementChanged signal with
+ * \l{QAbstract3DGraph::ElementCustomItem}{ElementCustomItem} type. Ownership of the item remains
+ * with the graph. Selection is valid until the next \c selectedElementChanged signal.
+ *
+ * \return the selected custom item, or null.
+ *
+ * \since QtDataVisualization 1.1
+ *
+ * \sa selectedElement
+ */
+
+/*!
+ * \qmlproperty AbstractGraph3D.ElementType AbstractGraph3D::selectedElement
+ *
+ * Can be used to query the selected element type.
+ * Type is valid until the next \c selectedElementChanged signal.
+ *
+ * \c selectedElementChanged signal is emitted when a selection is made in the graph.
+ *
+ * Signal can be used for example for implementing customized input handling, as demonstrated in
+ * this \l {Qt Quick 2 Axis Dragging Example}{example}.
+ *
+ * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
+ * Bars3D::selectedSeries, Scatter3D::selectedSeries, Scene3D::selectionQueryPosition
+ *
+ * \since QtDataVisualization 1.1
+ */
+
+/*!
+ * \qmlproperty bool AbstractGraph3D::orthoProjection
+ * \since QtDataVisualization 1.1
+ *
+ * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
+ * \note Shadows will be disabled when set to \c{true}.
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::aspectRatio
+ * \since QtDataVisualization 1.1
+ *
+ * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
+ * vertical axes. Defaults to \c{2.0}.
+ *
+ * \note Has no effect on Bars3D.
+ */
+
+/*!
+ * \qmlproperty AbstractGraph3D.OptimizationHints AbstractGraph3D::optimizationHints
+ * \since Qt Data Visualization 1.1
+ *
+ * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
+ * reasonable performance. Static is a beta level feature and currently supports only a subset of the
+ * features on the Scatter graph. Missing features are object gradient for mesh objects, both gradients
+ * for points, and diffuse and specular color on rotations. At this point static is intended just for
+ * introducing a new feature. It optimizes graph rendering and is ideal for large non-changing data
+ * sets. It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it
+ * with massive data sets is not advisable.
+ * Defaults to \c{OptimizationDefault}
+ */

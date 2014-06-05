@@ -1,0 +1,72 @@
+/****************************************************************************
+**
+** Copyright (C) 2014 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \example customitems
+    \title Custom Items Example
+    \ingroup qtdatavisualization_examples
+    \brief Adding custom items to a surface graph.
+    \since QtDataVisualization 1.1
+
+    The custom items example shows how to add your own custom meshes as items to a graph, and how
+    to remove them.
+
+    \image customitems-example.png
+
+    \section1 Adding custom meshes to the application
+
+    We'll add the meshes in a resource file:
+
+    \code
+    <RCC>
+    ...
+    <qresource prefix="/items">
+        <file>refinery.obj</file>
+        <file>oilrig.obj</file>
+    </qresource>
+    </RCC>
+    \endcode
+
+    \section1 Adding custom item to a graph
+
+    In this example we do not have specific textures for our meshes, so we'll just create a small
+    QImage and fill it with a single color:
+
+    \snippet customitems/customitemgraph.cpp 0
+
+    Then we'll specify the position for the item in a variable. This way we'll be able to use it
+    later for removing the correct item:
+
+    \snippet customitems/customitemgraph.cpp 1
+
+    Then we'll create a new QCustom3DItem with all the parameters:
+
+    \snippet customitems/customitemgraph.cpp 2
+
+    And finally we'll just add the item:
+
+    \snippet customitems/customitemgraph.cpp 3
+
+    \section1 Removing custom item from a graph
+
+    We'll just call \c removeCustomItemAt() with the position of the item:
+
+    \snippet customitems/customitemgraph.cpp 4
+
+    \section1 Example Contents
+*/

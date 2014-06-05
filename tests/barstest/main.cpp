@@ -32,6 +32,8 @@
 #include <QLinearGradient>
 #include <QPainter>
 #include <QColorDialog>
+#include <QLineEdit>
+#include <QSpinBox>
 
 int main(int argc, char **argv)
 {
@@ -53,7 +55,7 @@ int main(int argc, char **argv)
     QSize screenSize = widgetchart->screen()->size();
 
     QWidget *container = QWidget::createWindowContainer(widgetchart);
-    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));
+    container->setMinimumSize(QSize(screenSize.width() / 3, screenSize.height() / 3));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
@@ -63,6 +65,10 @@ int main(int argc, char **argv)
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
+
+    QPushButton *addSeriesButton = new QPushButton(widget);
+    addSeriesButton->setText(QStringLiteral("Add / Remove a series"));
+    addSeriesButton->setEnabled(true);
 
     QPushButton *addDataButton = new QPushButton(widget);
     addDataButton->setText(QStringLiteral("Add a row of data"));
@@ -165,6 +171,14 @@ int main(int argc, char **argv)
     toggleRotationButton->setText(QStringLiteral("Toggle rotation"));
     toggleRotationButton->setEnabled(true);
 
+    QPushButton *logAxisButton = new QPushButton(widget);
+    logAxisButton->setText(QStringLiteral("Use Log Axis"));
+    logAxisButton->setEnabled(true);
+
+    QPushButton *testItemAndRowChangesButton = new QPushButton(widget);
+    testItemAndRowChangesButton->setText(QStringLiteral("Test Item/Row changing"));
+    testItemAndRowChangesButton->setEnabled(true);
+
     QColorDialog *colorDialog = new QColorDialog(widget);
 
     QLinearGradient grBtoY(0, 0, 100, 0);
@@ -180,6 +194,16 @@ int main(int argc, char **argv)
     QPushButton *gradientBtoYPB = new QPushButton(widget);
     gradientBtoYPB->setIcon(QIcon(pm));
     gradientBtoYPB->setIconSize(QSize(100, 24));
+
+    QLabel *fpsLabel = new QLabel(QStringLiteral(""));
+
+    QCheckBox *fpsCheckBox = new QCheckBox(widget);
+    fpsCheckBox->setText(QStringLiteral("Measure Fps"));
+    fpsCheckBox->setChecked(false);
+
+    QCheckBox *reverseValueAxisCheckBox = new QCheckBox(widget);
+    reverseValueAxisCheckBox->setText(QStringLiteral("Reverse value axis"));
+    reverseValueAxisCheckBox->setChecked(false);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
     backgroundCheckBox->setText(QStringLiteral("Show background"));
@@ -286,6 +310,14 @@ int main(int argc, char **argv)
     shadowQuality->addItem(QStringLiteral("High Soft"));
     shadowQuality->setCurrentIndex(5);
 
+    QLineEdit *valueAxisFormatEdit = new QLineEdit(widget);
+    QLineEdit *logBaseEdit = new QLineEdit(widget);
+    QSpinBox *valueAxisSegmentsSpin = new QSpinBox(widget);
+    valueAxisSegmentsSpin->setMinimum(1);
+    valueAxisSegmentsSpin->setMaximum(100);
+    valueAxisSegmentsSpin->setValue(10);
+
+    vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(addDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addMultiDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(insertDataButton, 0, Qt::AlignTop);
@@ -313,7 +345,9 @@ int main(int argc, char **argv)
     vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
     vLayout->addWidget(primarySeriesTestsButton, 0, Qt::AlignTop);
     vLayout->addWidget(toggleRotationButton, 0, Qt::AlignTop);
-    vLayout->addWidget(gradientBtoYPB, 1, Qt::AlignTop);
+    vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
+    vLayout->addWidget(logAxisButton, 0, Qt::AlignTop);
+    vLayout->addWidget(testItemAndRowChangesButton, 1, Qt::AlignTop);
 
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(rotationCheckBox, 0, Qt::AlignTop);
@@ -332,6 +366,9 @@ int main(int argc, char **argv)
     vLayout2->addWidget(minSliderZ, 0, Qt::AlignTop);
     vLayout2->addWidget(minSliderY, 0, Qt::AlignTop);
     vLayout2->addWidget(maxSliderY, 0, Qt::AlignTop);
+    vLayout2->addWidget(fpsLabel, 0, Qt::AlignTop);
+    vLayout2->addWidget(fpsCheckBox, 0, Qt::AlignTop);
+    vLayout2->addWidget(reverseValueAxisCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(gridCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
@@ -339,7 +376,13 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Change font")), 0, Qt::AlignTop);
     vLayout2->addWidget(fontList, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")), 0, Qt::AlignTop);
-    vLayout2->addWidget(fontSizeSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(fontSizeSlider, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Value axis format")), 0, Qt::AlignTop);
+    vLayout2->addWidget(valueAxisFormatEdit, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Log axis base")), 0, Qt::AlignTop);
+    vLayout2->addWidget(logBaseEdit, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Value axis segments")), 0, Qt::AlignTop);
+    vLayout2->addWidget(valueAxisSegmentsSpin, 0, Qt::AlignTop);
     // TODO: Add example for setMeshFileName
 
     widget->show();
@@ -375,6 +418,12 @@ int main(int argc, char **argv)
                      &QComboBox::setCurrentIndex);
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::changeFontSize);
+    QObject::connect(valueAxisFormatEdit, &QLineEdit::textEdited, modifier,
+                     &GraphModifier::changeValueAxisFormat);
+    QObject::connect(logBaseEdit, &QLineEdit::textEdited, modifier,
+                     &GraphModifier::changeLogBase);
+    QObject::connect(valueAxisSegmentsSpin, SIGNAL(valueChanged(int)), modifier,
+                     SLOT(changeValueAxisSegments(int)));
 
     QObject::connect(multiScaleButton, &QPushButton::clicked, modifier,
                      &GraphModifier::toggleMultiseriesScaling);
@@ -385,6 +434,7 @@ int main(int argc, char **argv)
     QObject::connect(labelButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changeLabelStyle);
     QObject::connect(addDataButton, &QPushButton::clicked, modifier, &GraphModifier::addRow);
+    QObject::connect(addSeriesButton, &QPushButton::clicked, modifier, &GraphModifier::addRemoveSeries);
     QObject::connect(addMultiDataButton, &QPushButton::clicked, modifier, &GraphModifier::addRows);
     QObject::connect(insertDataButton, &QPushButton::clicked, modifier, &GraphModifier::insertRow);
     QObject::connect(insertMultiDataButton, &QPushButton::clicked, modifier, &GraphModifier::insertRows);
@@ -406,7 +456,7 @@ int main(int argc, char **argv)
     QObject::connect(releaseAxesButton, &QPushButton::clicked, modifier,
                      &GraphModifier::releaseAxes);
     QObject::connect(releaseProxiesButton, &QPushButton::clicked, modifier,
-                     &GraphModifier::releaseProxies);
+                     &GraphModifier::releaseSeries);
 
     QObject::connect(flipViewsButton, &QPushButton::clicked, modifier,
                      &GraphModifier::flipViews);
@@ -418,6 +468,10 @@ int main(int argc, char **argv)
                      &GraphModifier::primarySeriesTest);
     QObject::connect(toggleRotationButton, &QPushButton::clicked, modifier,
                      &GraphModifier::toggleRotation);
+    QObject::connect(logAxisButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::useLogAxis);
+    QObject::connect(testItemAndRowChangesButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::testItemAndRowChanges);
     QObject::connect(colorDialog, &QColorDialog::currentColorChanged, modifier,
                      &GraphModifier::changeBaseColor);
     QObject::connect(gradientBtoYPB, &QPushButton::clicked, modifier,
@@ -426,6 +480,10 @@ int main(int argc, char **argv)
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,
                      &GraphModifier::changeFont);
 
+    QObject::connect(fpsCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setFpsMeasurement);
+    QObject::connect(reverseValueAxisCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::reverseValueAxis);
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
@@ -478,6 +536,8 @@ int main(int argc, char **argv)
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, swapAxisButton,
                      &QSlider::setEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, modifier, &GraphModifier::restart);
+
+    modifier->setFpsLabel(fpsLabel);
 
     modifier->start();
 

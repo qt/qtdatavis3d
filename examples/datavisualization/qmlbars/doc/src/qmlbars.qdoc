@@ -39,9 +39,9 @@
     \snippet qmlbars/qml/qmlbars/Data.qml 0
     \dots
 
-    Each data item has four roles: year, month, income, and expenses. Years and months are natural to
-    map to rows and columns of a bar chart, but we can only show either income or expenses as the
-    value.
+    Each data item has three roles: timestamp, income, and expenses. The timestamp value is in
+    format: \c{<four digit year>-<two digit month>}. Years and months are natural to map to rows and
+    columns of a bar chart, but we can only show either income or expenses as the value.
 
     Now we need to add the data to the Bars3D graph. We will create two Bar3DSeries inside it,
     starting with a series for the income:
@@ -50,22 +50,46 @@
     \dots
 
     The data is attached to the \c itemModel property of the ItemModelBarDataProxy inside the
-    series.
+    series. For \c valueRole we simply specify the \c income field, as it contains the value we
+    want, but getting the years and months is a bit more complicated, since they are both found
+    in the same field. To extract those values, we specify the \c timestamp field for both
+    \c rowRole and \c columnRole, and additionally specify a search pattern and a replace rule
+    for those roles to extract the correct portion of the field contents for each role.
+    The search pattern is a normal JavaScript regular expression and the replace rule specifies
+    what the field content that matches the regular expression is replaced with.
+    In this case we want to replace the entire field content with just the year or the month,
+    which is the first captured substring for both rows and columns.
+    For more information how the replace using regular expressions works, see
+    QString::replace(const QRegExp &rx, const QString &after) function documentation.
+
+    The \c multiMatchBehavior property specifies what to do in case multiple item model items match
+    the same row/column combination. In this case we want to add their values together.
+    This property has no effect when we are showing values for each month, as there are no
+    duplicate months in our item model, but it becomes relevant later when we want to show
+    the yearly totals.
 
     Then we add another series for the expenses:
 
     \snippet qmlbars/qml/qmlbars/main.qml 4
     \dots
 
+    The model contains expenses as negative values, but we want to show them as positive bars, so
+    that we can easily compare them to income bars. We use \c valueRolePattern to remove the minus
+    sign to achieve this. No replacement string needs to be specified as the default replacement
+    is an empty string.
+
     We use the \c visible property of the series to hide the second series for now.
 
     \section1 Custom axis labels
 
     One interesting tidbit about axes is that we redefine the category labels for column axis in
-    \c Axes.qml. This is done because the data contains abbreviated month names, which we don't want
+    \c Axes.qml. This is done because the data contains numbers for months, which we don't want
     to use for our column labels:
 
     \snippet qmlbars/qml/qmlbars/Axes.qml 0
+
+    We also set automatic axis label rotation to make axis labels more readable at low camera
+    angles.
 
     \section1 Switching series
 
@@ -76,15 +100,23 @@
 
     \snippet qmlbars/qml/qmlbars/main.qml 0
 
-    The axis change is done because income and expenses have a different label format. The same could have
-    been achieved using a single axis and just changing the label format.
+    The axis label format and item selection label formats are tweaked to get the negative sign
+    showing properly for expenses, which were actually resolved as positive values.
 
-    The second interesting block is where we filter some of the rows away from the visualized data:
+    The second interesting block is where we change the visualized data by adjusting the proxy
+    propertes:
 
     \snippet qmlbars/qml/qmlbars/main.qml 1
 
-    The filtering is done by setting \c autoRowCategories to false on the ItemModelBarDataProxy item and defining
-    the row categories explicitly. This way, only the items in specified rows are visualized.
+    To show yearly totals, we need to combine the twelve months of each year into a single bar.
+    We achieve this by specifying a \c columnRolePattern that matches all model items. That way
+    the data proxy will only have a single column. The cumulative \c multiMatchBehavior we
+    specified earlier for the proxy becomes relevant now, causing the values of all twelve months
+    of each year to be added up into a single bar.
+
+    To show just a subset of years, we set \c autoRowCategories to false on the
+    ItemModelBarDataProxy item and define the row categories explicitly. This way, only the items
+    in specified row categories are visualized.
 
     The third interesting block shows how to get the row and column index of an item if you know the
     row and column values by using ItemModelBarDataProxy methods \c rowCategoryIndex() and \c columnCategoryIndex():

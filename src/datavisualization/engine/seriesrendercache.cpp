@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "seriesrendercache_p.h"
-#include "objecthelper_p.h"
 #include "abstract3drenderer_p.h"
 #include "texturehelper_p.h"
 #include "utils_p.h"
@@ -26,14 +25,19 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const QString smoothString(QStringLiteral("Smooth"));
 
-SeriesRenderCache::SeriesRenderCache()
-    : m_series(0),
+SeriesRenderCache::SeriesRenderCache(QAbstract3DSeries *series, Abstract3DRenderer *renderer)
+    : m_series(series),
       m_object(0),
       m_mesh(QAbstract3DSeries::MeshCube),
       m_baseUniformTexture(0),
       m_baseGradientTexture(0),
+      m_gradientImage(0),
       m_singleHighlightGradientTexture(0),
-      m_multiHighlightGradientTexture(0)
+      m_multiHighlightGradientTexture(0),
+      m_valid(false),
+      m_visible(false),
+      m_renderer(renderer),
+      m_objectDirty(true)
 {
 }
 
@@ -41,27 +45,13 @@ SeriesRenderCache::~SeriesRenderCache()
 {
 }
 
-void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *renderer)
+void SeriesRenderCache::populate(bool newSeries)
 {
-    Q_ASSERT(series);
+    QAbstract3DSeriesChangeBitField &changeTracker = m_series->d_ptr->m_changeTracker;
 
-    bool seriesChanged = false;
-
-    if (m_series != series) {
-        m_series = series;
-        seriesChanged = true;
-    }
-
-    QAbstract3DSeriesChangeBitField &changeTracker = series->d_ptr->m_changeTracker;
-
-    if (seriesChanged || changeTracker.itemLabelFormatChanged) {
-        m_itemLabelFormat = series->itemLabelFormat();
-        changeTracker.itemLabelFormatChanged = false;
-    }
-
-    if (seriesChanged || changeTracker.meshChanged  || changeTracker.meshSmoothChanged
+    if (newSeries || changeTracker.meshChanged  || changeTracker.meshSmoothChanged
             || changeTracker.userDefinedMeshChanged) {
-        m_mesh = series->mesh();
+        m_mesh = m_series->mesh();
         changeTracker.meshChanged = false;
         changeTracker.meshSmoothChanged = false;
         changeTracker.userDefinedMeshChanged = false;
@@ -71,7 +61,7 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
         // Compose mesh filename
         if (m_mesh == QAbstract3DSeries::MeshUserDefined) {
             // Always use the supplied mesh directly
-            meshFileName = series->userDefinedMesh();
+            meshFileName = m_series->userDefinedMesh();
         } else {
             switch (m_mesh) {
             case QAbstract3DSeries::MeshBar:
@@ -111,24 +101,18 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
                 break;
             }
 
-            if (series->isMeshSmooth() && m_mesh != QAbstract3DSeries::MeshPoint)
+            if (m_series->isMeshSmooth() && m_mesh != QAbstract3DSeries::MeshPoint)
                 meshFileName += smoothString;
 
             // Give renderer an opportunity to customize the mesh
-            renderer->fixMeshFileName(meshFileName, m_mesh);
+            m_renderer->fixMeshFileName(meshFileName, m_mesh);
         }
 
-        delete m_object;
-        if (meshFileName.isEmpty()) {
-            m_object = 0;
-        } else {
-            m_object = new ObjectHelper(meshFileName);
-            m_object->load();
-        }
+        ObjectHelper::resetObjectHelper(m_renderer, m_object, meshFileName);
     }
 
-    if (seriesChanged || changeTracker.meshRotationChanged) {
-        m_meshRotation = series->meshRotation().normalized();
+    if (newSeries || changeTracker.meshRotationChanged) {
+        m_meshRotation = m_series->meshRotation().normalized();
         if (m_series->type() == QAbstract3DSeries::SeriesTypeBar
                 && (m_meshRotation.x() || m_meshRotation.z())) {
             m_meshRotation = identityQuaternion;
@@ -136,55 +120,73 @@ void SeriesRenderCache::populate(QAbstract3DSeries *series, Abstract3DRenderer *
         changeTracker.meshRotationChanged = false;
     }
 
-    if (seriesChanged || changeTracker.colorStyleChanged) {
-        m_colorStyle = series->colorStyle();
+    if (newSeries || changeTracker.colorStyleChanged) {
+        m_colorStyle = m_series->colorStyle();
         changeTracker.colorStyleChanged = false;
     }
 
-    if (seriesChanged || changeTracker.baseColorChanged) {
-        m_baseColor = Utils::vectorFromColor(series->baseColor());
+    if (newSeries || changeTracker.baseColorChanged) {
+        m_baseColor = Utils::vectorFromColor(m_series->baseColor());
         if (m_series->type() == QAbstract3DSeries::SeriesTypeSurface)
-            renderer->generateBaseColorTexture(series->baseColor(), &m_baseUniformTexture);
+            m_renderer->generateBaseColorTexture(m_series->baseColor(), &m_baseUniformTexture);
         changeTracker.baseColorChanged = false;
     }
 
-    if (seriesChanged || changeTracker.baseGradientChanged) {
-        QLinearGradient gradient = series->baseGradient();
-        renderer->fixGradientAndGenerateTexture(&gradient, &m_baseGradientTexture);
+    if (newSeries || changeTracker.baseGradientChanged) {
+        QLinearGradient gradient = m_series->baseGradient();
+        m_gradientImage = Utils::getGradientImage(gradient);
+        m_renderer->fixGradientAndGenerateTexture(&gradient, &m_baseGradientTexture);
         changeTracker.baseGradientChanged = false;
     }
 
-    if (seriesChanged || changeTracker.singleHighlightColorChanged) {
-        m_singleHighlightColor = Utils::vectorFromColor(series->singleHighlightColor());
+    if (newSeries || changeTracker.singleHighlightColorChanged) {
+        m_singleHighlightColor = Utils::vectorFromColor(m_series->singleHighlightColor());
         changeTracker.singleHighlightColorChanged = false;
     }
 
-    if (seriesChanged || changeTracker.singleHighlightGradientChanged) {
-        QLinearGradient gradient = series->singleHighlightGradient();
-        renderer->fixGradientAndGenerateTexture(&gradient, &m_singleHighlightGradientTexture);
+    if (newSeries || changeTracker.singleHighlightGradientChanged) {
+        QLinearGradient gradient = m_series->singleHighlightGradient();
+        m_renderer->fixGradientAndGenerateTexture(&gradient, &m_singleHighlightGradientTexture);
         changeTracker.singleHighlightGradientChanged = false;
     }
 
-    if (seriesChanged || changeTracker.multiHighlightColorChanged) {
-        m_multiHighlightColor = Utils::vectorFromColor(series->multiHighlightColor());
+    if (newSeries || changeTracker.multiHighlightColorChanged) {
+        m_multiHighlightColor = Utils::vectorFromColor(m_series->multiHighlightColor());
         changeTracker.multiHighlightColorChanged = false;
     }
 
-    if (seriesChanged || changeTracker.multiHighlightGradientChanged) {
-        QLinearGradient gradient = series->multiHighlightGradient();
-        renderer->fixGradientAndGenerateTexture(&gradient, &m_multiHighlightGradientTexture);
+    if (newSeries || changeTracker.multiHighlightGradientChanged) {
+        QLinearGradient gradient = m_series->multiHighlightGradient();
+        m_renderer->fixGradientAndGenerateTexture(&gradient, &m_multiHighlightGradientTexture);
         changeTracker.multiHighlightGradientChanged = false;
     }
 
-    if (seriesChanged || changeTracker.nameChanged) {
-        m_name = series->name();
+    if (newSeries || changeTracker.nameChanged) {
+        m_name = m_series->name();
         changeTracker.nameChanged = false;
+    }
+
+    if (newSeries || changeTracker.itemLabelChanged
+            || changeTracker.itemLabelVisibilityChanged) {
+        changeTracker.itemLabelChanged = false;
+        changeTracker.itemLabelVisibilityChanged = false;
+        // series->itemLabel() call resolves the item label and emits the changed signal
+        // if it is dirty, so we need to call it even if m_itemLabel is eventually set
+        // to an empty string.
+        m_itemLabel = m_series->itemLabel();
+        if (!m_series->isItemLabelVisible())
+            m_itemLabel = QString();
+    }
+
+    if (newSeries || changeTracker.visibilityChanged) {
+        m_visible = m_series->isVisible();
+        changeTracker.visibilityChanged = false;
     }
 }
 
 void SeriesRenderCache::cleanup(TextureHelper *texHelper)
 {
-    delete m_object;
+    ObjectHelper::releaseObjectHelper(m_renderer, m_object);
     if (QOpenGLContext::currentContext()) {
         texHelper->deleteTexture(&m_baseUniformTexture);
         texHelper->deleteTexture(&m_baseGradientTexture);

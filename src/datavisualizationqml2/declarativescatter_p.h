@@ -32,9 +32,6 @@
 #include "datavisualizationglobal_p.h"
 #include "abstractdeclarative_p.h"
 #include "scatter3dcontroller_p.h"
-#include "declarativescatter_p.h"
-#include "qvalue3daxis.h"
-#include "qscatterdataproxy.h"
 #include "qscatter3dseries.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION

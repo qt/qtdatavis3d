@@ -84,6 +84,43 @@ Column {
                     scope: "AbstractGraph3D"
                 }
             }
+            Label {
+                text: qsTr("measureFps")
+                toolTip: qsTr("Measure Frames Per Second")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                CheckBox {
+                    backendValue: backendValues.measureFps
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("orthoProjection")
+                toolTip: qsTr("Use Orthographic Projection")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                CheckBox {
+                    backendValue: backendValues.orthoProjection
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("aspectRatio")
+                toolTip: qsTr("Horizontal to Vertical Aspect Ratio")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    backendValue: backendValues.aspectRatio
+                    minimumValue: 0.1
+                    maximumValue: 10.0
+                    stepSize: 0.1
+                    decimals: 1
+                    Layout.fillWidth: true
+                }
+            }
         }
     }
 }

@@ -28,7 +28,7 @@ const float defaultMaxValue = 10.0f;
  * \class QHeightMapSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DSurface.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QHeightMapSurfaceDataProxy takes care of surface related height map data handling. It provides a
  * way to give a height map to be visualized as a surface plot.
