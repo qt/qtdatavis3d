@@ -255,8 +255,12 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
  *
  * This property contains the coordinates for the user input that should be processed
  * by the scene as selection. If this is set to value other than invalidSelectionPoint() the
- * graph tries to select a data item at the given \a point within the primary viewport.
- * After the rendering pass the property is returned to its default state of invalidSelectionPoint().
+ * graph tries to select a data item, axis label, or a custom item at the given \a point within
+ * the primary viewport.
+ * After the rendering pass the property is returned to its default state of
+ * invalidSelectionPoint().
+ *
+ * \sa QAbstract3DGraph::selectedElement
  */
 void Q3DScene::setSelectionQueryPosition(const QPoint &point)
 {
