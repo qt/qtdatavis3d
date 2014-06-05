@@ -78,6 +78,20 @@ Module {
                 "RenderIndirect": 2
             }
         }
+        Enum {
+            name: "OptimizationHint"
+            values: {
+                "OptimizationDefault": 0,
+                "OptimizationStatic": 1
+            }
+        }
+        Enum {
+            name: "OptimizationHints"
+            values: {
+                "OptimizationDefault": 0,
+                "OptimizationStatic": 1
+            }
+        }
         Property { name: "selectionMode"; type: "SelectionFlags" }
         Property { name: "shadowQuality"; type: "ShadowQuality" }
         Property { name: "shadowsSupported"; type: "bool"; isReadonly: true }
@@ -98,6 +112,7 @@ Module {
         Property { name: "orthoProjection"; revision: 1; type: "bool" }
         Property { name: "selectedElement"; revision: 1; type: "ElementType"; isReadonly: true }
         Property { name: "aspectRatio"; revision: 1; type: "double" }
+        Property { name: "optimizationHints"; revision: 1; type: "OptimizationHints" }
         Signal {
             name: "selectionModeChanged"
             Parameter { name: "mode"; type: "AbstractDeclarative::SelectionFlags" }
@@ -154,6 +169,11 @@ Module {
             name: "aspectRatioChanged"
             revision: 1
             Parameter { name: "ratio"; type: "double" }
+        }
+        Signal {
+            name: "optimizationHintsChanged"
+            revision: 1
+            Parameter { name: "hints"; type: "QAbstract3DGraph::OptimizationHints" }
         }
         Method {
             name: "handleAxisXChanged"
@@ -845,6 +865,8 @@ Module {
         Property { name: "max"; type: "double" }
         Property { name: "autoAdjustRange"; type: "bool" }
         Property { name: "labelAutoRotation"; revision: 1; type: "double" }
+        Property { name: "titleVisible"; revision: 1; type: "bool" }
+        Property { name: "titleFixed"; revision: 1; type: "bool" }
         Signal {
             name: "titleChanged"
             Parameter { name: "newTitle"; type: "string" }
@@ -874,6 +896,16 @@ Module {
             name: "labelAutoRotationChanged"
             revision: 1
             Parameter { name: "angle"; type: "double" }
+        }
+        Signal {
+            name: "titleVisibilityChanged"
+            revision: 1
+            Parameter { name: "visible"; type: "bool" }
+        }
+        Signal {
+            name: "titleFixedChanged"
+            revision: 1
+            Parameter { name: "fixed"; type: "bool" }
         }
     }
     Component {
@@ -1173,6 +1205,47 @@ Module {
         }
     }
     Component {
+        name: "QtDataVisualization::QCustom3DLabel"
+        prototype: "QtDataVisualization::QCustom3DItem"
+        exports: ["QtDataVisualization/Custom3DLabel 1.1"]
+        exportMetaObjectRevisions: [0]
+        Property { name: "text"; type: "string" }
+        Property { name: "font"; type: "QFont" }
+        Property { name: "textColor"; type: "QColor" }
+        Property { name: "backgroundColor"; type: "QColor" }
+        Property { name: "borderEnabled"; type: "bool" }
+        Property { name: "backgroundEnabled"; type: "bool" }
+        Property { name: "facingCamera"; type: "bool" }
+        Signal {
+            name: "textChanged"
+            Parameter { name: "text"; type: "string" }
+        }
+        Signal {
+            name: "fontChanged"
+            Parameter { name: "font"; type: "QFont" }
+        }
+        Signal {
+            name: "textColorChanged"
+            Parameter { name: "color"; type: "QColor" }
+        }
+        Signal {
+            name: "backgroundColorChanged"
+            Parameter { name: "color"; type: "QColor" }
+        }
+        Signal {
+            name: "borderEnabledChanged"
+            Parameter { name: "enabled"; type: "bool" }
+        }
+        Signal {
+            name: "backgroundEnabledChanged"
+            Parameter { name: "enabled"; type: "bool" }
+        }
+        Signal {
+            name: "facingCameraChanged"
+            Parameter { name: "enabled"; type: "bool" }
+        }
+    }
+    Component {
         name: "QtDataVisualization::QHeightMapSurfaceDataProxy"
         prototype: "QtDataVisualization::QSurfaceDataProxy"
         exports: ["QtDataVisualization/HeightMapSurfaceDataProxy 1.0"]
@@ -1225,7 +1298,7 @@ Module {
                 "MMBCumulative": 3
             }
         }
-        Property { name: "itemModel"; type: "const QAbstractItemModel"; isPointer: true }
+        Property { name: "itemModel"; type: "QAbstractItemModel"; isPointer: true }
         Property { name: "rowRole"; type: "string" }
         Property { name: "columnRole"; type: "string" }
         Property { name: "valueRole"; type: "string" }
@@ -1340,7 +1413,7 @@ Module {
             "QtDataVisualization/ItemModelScatterDataProxy 1.1"
         ]
         exportMetaObjectRevisions: [0, 1]
-        Property { name: "itemModel"; type: "const QAbstractItemModel"; isPointer: true }
+        Property { name: "itemModel"; type: "QAbstractItemModel"; isPointer: true }
         Property { name: "xPosRole"; type: "string" }
         Property { name: "yPosRole"; type: "string" }
         Property { name: "zPosRole"; type: "string" }
@@ -1431,7 +1504,7 @@ Module {
                 "MMBCumulativeY": 3
             }
         }
-        Property { name: "itemModel"; type: "const QAbstractItemModel"; isPointer: true }
+        Property { name: "itemModel"; type: "QAbstractItemModel"; isPointer: true }
         Property { name: "rowRole"; type: "string" }
         Property { name: "columnRole"; type: "string" }
         Property { name: "xPosRole"; type: "string" }
