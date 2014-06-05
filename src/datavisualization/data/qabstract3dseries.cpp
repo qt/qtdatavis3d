@@ -26,7 +26,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QAbstract3DSeries
  * \inmodule QtDataVisualization
  * \brief Base class for all QtDataVisualization series.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * You use the visualization type specific inherited classes instead of the base class.
  * \sa QBar3DSeries, QScatter3DSeries, QSurface3DSeries, {Qt Data Visualization Data Handling}
@@ -609,7 +609,7 @@ QString QAbstract3DSeries::name() const
 
 /*!
  * \property QAbstract3DSeries::itemLabel
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * Contains the formatted item label. If there is no selected item or the selected item is not
  * visible, returns an empty string.
@@ -623,7 +623,7 @@ QString QAbstract3DSeries::itemLabel() const
 
 /*!
  * \property QAbstract3DSeries::itemLabelVisible
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * If \c true, item labels are drawn as floating labels in the graph. Otherwise item labels are not
  * drawn. If you prefer to show the item label in an external control, set this property to

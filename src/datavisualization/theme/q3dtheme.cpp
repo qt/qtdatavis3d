@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class Q3DTheme
  * \inmodule QtDataVisualization
  * \brief Q3DTheme class provides a visual style for graphs.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * Q3DTheme is used to specify visual properties that affect the whole graph. There are several
  * built-in themes that can be used directly, or be modified freely. User can also create a theme

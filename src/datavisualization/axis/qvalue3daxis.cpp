@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QValue3DAxis
  * \inmodule QtDataVisualization
  * \brief The QValue3DAxis class is used for manipulating an axis of a graph.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QValue3DAxis provides an axis that can be given a range of values and segment and subsegment
  * counts to divide the range into.
@@ -187,7 +187,7 @@ QString QValue3DAxis::labelFormat() const
 
 /*!
  * \property QValue3DAxis::formatter
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * Defines the axis \a formatter to be used. Any existing formatter is deleted when a new formatter
  * is set.
@@ -213,7 +213,7 @@ QValue3DAxisFormatter *QValue3DAxis::formatter() const
 
 /*!
  * \property QValue3DAxis::reversed
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * If \c{true}, the axis will be rendered in reverse, i.e. the positions of minimum and maximum
  * values are swapped when the graph is rendered. This property doesn't affect the actual

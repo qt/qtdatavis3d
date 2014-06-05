@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QAbstract3DAxis
  * \inmodule QtDataVisualization
  * \brief QAbstract3DAxis is base class for axes of a graph.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * You should not need to use this class directly, but one of its subclasses instead.
  *

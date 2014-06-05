@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \inmodule QtDataVisualization
  * \brief The QSurfaceDataItem class provides a container for resolved data to be added to surface
  * graphs.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * A QSurfaceDataItem holds data for a single vertex in surface graph.
  * Surface data proxies parse data into QSurfaceDataItem instances for visualizing.

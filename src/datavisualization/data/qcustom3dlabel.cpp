@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QCustom3DLabel
  * \inmodule QtDataVisualization
  * \brief The QCustom3DLabel class is for creating custom labels to be added to a graph.
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * This class is for creating custom labels to be added to a graph. You can set text, font,
  * position, scaling, rotation, and colors. You can also toggle borders and background for the

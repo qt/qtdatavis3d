@@ -26,7 +26,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QBar3DSeries
  * \inmodule QtDataVisualization
  * \brief Base series class for Q3DBars.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QBar3DSeries manages the series specific visual elements, as well as series data
  * (via data proxy).

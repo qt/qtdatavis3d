@@ -21,7 +21,7 @@
     \title Qt Quick 2 Axis Dragging Example
     \ingroup qtdatavisualization_examples
     \brief Implementing axis dragging in QML
-    \since Qt Data Visualization 1.1
+    \since QtDataVisualization 1.1
 
     The Qt Quick 2 axis dragging example concentrates on showing how to implement axis range
     changing by dragging axis labels in QML. It also gives a quick peek to two other new features

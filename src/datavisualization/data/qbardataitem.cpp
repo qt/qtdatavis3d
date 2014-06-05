@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QBarDataItem
  * \inmodule QtDataVisualization
  * \brief The QBarDataItem class provides a container for resolved data to be added to bar graphs.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * A QBarDataItem holds data for a single rendered bar in a graph.
  * Bar data proxies parse data into QBarDataItem instances for visualizing.

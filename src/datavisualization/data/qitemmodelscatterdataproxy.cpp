@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QItemModelScatterDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DScatter.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QItemModelScatterDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DScatter. It maps roles of QAbstractItemModel to the XYZ-values of Q3DScatter points.

@@ -26,7 +26,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QLogValue3DAxisFormatter
  * \inmodule QtDataVisualization
  * \brief QLogValue3DAxisFormatter implements logarithmic value axis formatter.
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * This class provides formatting rules for a logarithmic QValue3DAxis.
  *

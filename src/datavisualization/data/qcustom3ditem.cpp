@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QCustom3DItem
  * \inmodule QtDataVisualization
  * \brief The QCustom3DItem class is for creating custom items to be added to a graph.
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * This class is for creating custom items to be added to a graph. The item has a custom mesh,
  * position, scaling, rotation, and an optional texture.

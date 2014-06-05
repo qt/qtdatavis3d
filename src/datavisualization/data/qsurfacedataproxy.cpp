@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QSurfaceDataProxy
  * \inmodule QtDataVisualization
  * \brief Base proxy class for Q3DSurface.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QSurfaceDataProxy takes care of surface related data handling. The QSurfaceDataProxy handles the
  * data in rows and for this it provides two auxiliary typedefs. QSurfaceDataArray is a QList for

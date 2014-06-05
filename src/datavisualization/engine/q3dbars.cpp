@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class Q3DBars
  * \inmodule QtDataVisualization
  * \brief The Q3DBars class provides methods for rendering 3D bar graphs.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * This class enables developers to render bar graphs in 3D and to view them by rotating the scene
  * freely. Rotation is done by holding down the right mouse button and moving the mouse. Zooming

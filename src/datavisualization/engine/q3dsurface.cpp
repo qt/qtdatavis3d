@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class Q3DSurface
  * \inmodule QtDataVisualization
  * \brief The Q3DSurface class provides methods for rendering 3D surface plots.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * This class enables developers to render 3D surface plots and to view them by rotating the scene
  * freely. The visual properties of the surface such as draw mode and shading can be controlled

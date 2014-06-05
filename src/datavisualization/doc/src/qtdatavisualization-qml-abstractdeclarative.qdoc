@@ -159,7 +159,7 @@
  *
  * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt()
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  */
 
 /*!
@@ -167,7 +167,7 @@
  *
  * Removes all custom items. Deletes the resources allocated to them.
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  */
 
 /*!
@@ -175,7 +175,7 @@
  *
  * Removes the custom \a {item}. Deletes the resources allocated to it.
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  */
 
 /*!
@@ -183,7 +183,7 @@
  *
  * Removes all custom items at \a {position}. Deletes the resources allocated to them.
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  */
 
 /*!
@@ -191,7 +191,7 @@
  *
  * Gets ownership of \a item back and removes the \a item from the graph.
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * \note If the same item is added back to the graph, the texture file needs to be re-set.
  *
@@ -206,7 +206,7 @@
  *
  * \return index of the selected label, or -1.
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * \sa selectedElement
  */
@@ -219,7 +219,7 @@
  *
  * \return the selected axis, or null.
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * \sa selectedElement
  */
@@ -233,7 +233,7 @@
  *
  * \return index of the selected custom item, or -1.
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * \sa selectedElement
  */
@@ -247,7 +247,7 @@
  *
  * \return the selected custom item, or null.
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * \sa selectedElement
  */
@@ -266,12 +266,12 @@
  * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
  * Bars3D::selectedSeries, Scatter3D::selectedSeries, Scene3D::selectionQueryPosition
  *
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  */
 
 /*!
  * \qmlproperty bool AbstractGraph3D::orthoProjection
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
  * \note Shadows will be disabled when set to \c{true}.
@@ -279,7 +279,7 @@
 
 /*!
  * \qmlproperty real AbstractGraph3D::aspectRatio
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
  * vertical axes. Defaults to \c{2.0}.

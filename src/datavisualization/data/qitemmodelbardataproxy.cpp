@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QItemModelBarDataProxy
  * \inmodule QtDataVisualization
  * \brief Proxy class for presenting data in item models with Q3DBars.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * QItemModelBarDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DBars. It uses the defined mappings to map data from the model to rows, columns, and

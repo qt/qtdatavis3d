@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QValue3DAxisFormatter
  * \inmodule QtDataVisualization
  * \brief QValue3DAxisFormatter is base class for value axis formatters.
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * This class provides formatting rules for a linear QValue3DAxis. Subclass it if you
  * want to implement custom value axes.

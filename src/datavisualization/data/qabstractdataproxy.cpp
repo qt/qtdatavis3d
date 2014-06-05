@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \class QAbstractDataProxy
  * \inmodule QtDataVisualization
  * \brief Base class for all QtDataVisualization data proxies.
- * \since Qt Data Visualization 1.0
+ * \since QtDataVisualization 1.0
  *
  * You use the visualization type specific inherited classes instead of the base class.
  * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy, {Qt Data Visualization Data Handling}
