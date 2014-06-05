@@ -23,11 +23,14 @@
 
 using namespace QtDataVisualization;
 
+Q_DECLARE_METATYPE(QValue3DAxisFormatter *)
+
 static const qreal oneDayMs = 60.0 * 60.0 * 24.0 * 1000.0;
 
 CustomFormatter::CustomFormatter(QObject *parent) :
     QValue3DAxisFormatter(parent)
 {
+    qRegisterMetaType<QValue3DAxisFormatter *>();
 }
 
 CustomFormatter::~CustomFormatter()
