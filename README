@@ -84,3 +84,7 @@ Known Issues
 - The color style Q3DTheme::ColorStyleObjectGradient doesn't work for surface graphs.
 - Widget based examples layout incorrectly in iOS.
 - Reparenting a graph to an item in another QQuickWindow is not supported.
+- There is a low-impact binary break between 1.0 and 1.1. The break is due to a QML type
+  registration conflict with QAbstractItemModel between QtDataVisualization and
+  QtCommercial.Charts. Introducing the binary break makes it possible to use both
+  Charts and Data Visualization in the same QML application.
