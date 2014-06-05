@@ -1606,10 +1606,11 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = -1;
             indexStep = -1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             labelTrans.setZ(m_axisCacheZ.labelPosition(label));
 
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
             // Draw the label here
             m_dummyRenderItem.setTranslation(labelTrans);
@@ -1731,10 +1732,11 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = labelCount;
             indexStep = 1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             labelTrans.setX(m_axisCacheX.labelPosition(label));
 
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
             // Draw the label here
             m_dummyRenderItem.setTranslation(labelTrans);
@@ -1836,11 +1838,12 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = labelCount;
             indexStep = 1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(label);
             const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
 
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
             if (drawSelection) {
                 QVector4D labelColor = QVector4D(0.0f, 0.0f, label / 255.0f,
