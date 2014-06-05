@@ -44,6 +44,7 @@ class SurfaceObject;
 class TextureHelper;
 class Q3DCamera;
 class Abstract3DRenderer;
+class ScatterPointBufferHelper;
 
 class Drawer : public QObject, public QOpenGLFunctions
 {
@@ -78,6 +79,7 @@ public:
     void drawSelectionObject(ShaderHelper *shader, AbstractObjectHelper *object);
     void drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object);
     void drawPoint(ShaderHelper *shader);
+    void drawPoints(ShaderHelper *shader, ScatterPointBufferHelper *object);
     void drawLine(ShaderHelper *shader);
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,

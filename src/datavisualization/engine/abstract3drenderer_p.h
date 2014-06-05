@@ -75,6 +75,7 @@ public:
 
     virtual void updateTheme(Q3DTheme *theme);
     virtual void updateSelectionMode(QAbstract3DGraph::SelectionFlags newMode);
+    virtual void updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint);
     virtual void updateScene(Q3DScene *scene);
     virtual void updateTextures() = 0;
     virtual void initSelectionBuffer() = 0;
@@ -194,6 +195,7 @@ protected:
     GLfloat m_autoScaleAdjustment;
 
     QAbstract3DGraph::SelectionFlags m_cachedSelectionMode;
+    QAbstract3DGraph::OptimizationHints m_cachedOptimizationHint;
 
     AxisRenderCache m_axisCacheX;
     AxisRenderCache m_axisCacheY;

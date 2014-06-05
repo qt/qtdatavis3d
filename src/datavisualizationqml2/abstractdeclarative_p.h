@@ -56,6 +56,7 @@ class AbstractDeclarative : public QQuickItem
     Q_ENUMS(RenderingMode)
     Q_ENUMS(ElementType)
     Q_FLAGS(SelectionFlag SelectionFlags)
+    Q_FLAGS(OptimizationHint OptimizationHints)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(bool shadowsSupported READ shadowsSupported NOTIFY shadowsSupportedChanged)
@@ -70,6 +71,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged REVISION 1)
     Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged REVISION 1)
     Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged REVISION 1)
+    Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged REVISION 1)
 
 public:
     enum SelectionFlag {
@@ -110,6 +112,12 @@ public:
         RenderDirectToBackground_NoClear,
         RenderIndirect
     };
+
+    enum OptimizationHint {
+        OptimizationDefault = 0,
+        OptimizationStatic  = 1
+    };
+    Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
@@ -182,6 +190,9 @@ public:
     void setAspectRatio(qreal ratio);
     qreal aspectRatio() const;
 
+    void setOptimizationHints(OptimizationHints hints);
+    OptimizationHints optimizationHints() const;
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -216,6 +227,7 @@ signals:
     Q_REVISION(1) void selectedElementChanged(QAbstract3DGraph::ElementType type);
     Q_REVISION(1) void orthoProjectionChanged(bool enabled);
     Q_REVISION(1) void aspectRatioChanged(qreal ratio);
+    Q_REVISION(1) void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
 
 private:
     QPointer<Abstract3DController> m_controller;
@@ -236,6 +248,7 @@ private:
     bool m_runningInDesigner;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::OptimizationHints)
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

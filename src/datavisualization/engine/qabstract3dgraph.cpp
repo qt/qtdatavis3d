@@ -140,6 +140,18 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 */
 
 /*!
+    \enum QAbstract3DGraph::OptimizationHint
+    \since Qt Data Visualization 1.1
+
+    The optimization hint for rendering.
+
+    \value OptimizationDefault
+           Provides the full feature set at a reasonable performance.
+    \value OptimizationStatic
+           Beta level feature. Optimizes the rendering of static data sets at the expense of some features.
+*/
+
+/*!
  * \internal
  */
 QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -612,6 +624,28 @@ qreal QAbstract3DGraph::aspectRatio() const
 }
 
 /*!
+ * \property QAbstract3DGraph::optimizationHints
+ *
+ * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
+ * reasonable performance. Static is a beta level feature and currently supports only a subset of the
+ * features on the Scatter graph. Missing features are object gradient for mesh objects, both gradients
+ * for points, and diffuse and specular color on rotations. At this point static is intended just for
+ * introducing a new feature. It optimizes graph rendering and is ideal for large non-changing data
+ * sets. It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it
+ * with massive data sets is not advisable.
+ * Defaults to \c{OptimizationDefault}.
+ */
+void QAbstract3DGraph::setOptimizationHints(OptimizationHints hints)
+{
+    d_ptr->m_visualController->setOptimizationHints(hints);
+}
+
+QAbstract3DGraph::OptimizationHints QAbstract3DGraph::optimizationHints() const
+{
+    return d_ptr->m_visualController->optimizationHints();
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)
@@ -736,6 +770,8 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::selectionModeChanged);
     QObject::connect(m_visualController, &Abstract3DController::shadowQualityChanged, q_ptr,
                      &QAbstract3DGraph::shadowQualityChanged);
+    QObject::connect(m_visualController, &Abstract3DController::optimizationHintsChanged, q_ptr,
+                     &QAbstract3DGraph::optimizationHintsChanged);
     QObject::connect(m_visualController, &Abstract3DController::elementSelected, q_ptr,
                      &QAbstract3DGraph::selectedElementChanged);
 

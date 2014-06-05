@@ -51,6 +51,7 @@ struct Abstract3DChangeBitField {
     bool themeChanged                  : 1;
     bool shadowQualityChanged          : 1;
     bool selectionModeChanged          : 1;
+    bool optimizationHintChanged       : 1;
     bool axisXTypeChanged              : 1;
     bool axisYTypeChanged              : 1;
     bool axisZTypeChanged              : 1;
@@ -94,6 +95,7 @@ struct Abstract3DChangeBitField {
         themeChanged(true),
         shadowQualityChanged(true),
         selectionModeChanged(true),
+        optimizationHintChanged(true),
         axisXTypeChanged(true),
         axisYTypeChanged(true),
         axisZTypeChanged(true),
@@ -155,6 +157,7 @@ private:
     QAbstract3DGraph::ShadowQuality m_shadowQuality;
     bool m_useOrthoProjection;
     float m_aspectRatio;
+    QAbstract3DGraph::OptimizationHints m_optimizationHints;
 
 protected:
     Q3DScene *m_scene;
@@ -230,6 +233,9 @@ public:
     virtual void doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual QAbstract3DGraph::ShadowQuality shadowQuality() const;
     virtual bool shadowsSupported() const;
+
+    void setOptimizationHints(QAbstract3DGraph::OptimizationHints hints);
+    QAbstract3DGraph::OptimizationHints optimizationHints() const;
 
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
@@ -339,6 +345,7 @@ signals:
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);
     void aspectRatioChanged(float ratio);
+    void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

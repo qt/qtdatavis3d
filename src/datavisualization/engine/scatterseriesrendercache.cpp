@@ -17,6 +17,8 @@
 ****************************************************************************/
 
 #include "scatterseriesrendercache_p.h"
+#include "scatterobjectbufferhelper_p.h"
+#include "scatterpointbufferhelper_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -24,12 +26,18 @@ ScatterSeriesRenderCache::ScatterSeriesRenderCache(QAbstract3DSeries *series,
                                                    Abstract3DRenderer *renderer)
     : SeriesRenderCache(series, renderer),
       m_itemSize(0.0f),
-      m_selectionIndexOffset(0)
+      m_selectionIndexOffset(0),
+      m_oldRenderArraySize(0),
+      m_oldMeshFileName(QString()),
+      m_scatterBufferObj(0),
+      m_scatterBufferPoints(0)
 {
 }
 
 ScatterSeriesRenderCache::~ScatterSeriesRenderCache()
 {
+    delete m_scatterBufferObj;
+    delete m_scatterBufferPoints;
 }
 
 void ScatterSeriesRenderCache::cleanup(TextureHelper *texHelper)

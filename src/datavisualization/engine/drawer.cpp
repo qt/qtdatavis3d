@@ -22,6 +22,7 @@
 #include "utils_p.h"
 #include "texturehelper_p.h"
 #include "abstract3drenderer_p.h"
+#include "scatterpointbufferhelper_p.h"
 
 #include <QtGui/QMatrix4x4>
 #include <QtCore/qmath.h>
@@ -198,6 +199,22 @@ void Drawer::drawPoint(ShaderHelper *shader)
 
     // Draw the point
     glDrawArrays(GL_POINTS, 0, 1);
+
+    // Free buffers
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    glDisableVertexAttribArray(shader->posAtt());
+}
+
+void Drawer::drawPoints(ShaderHelper *shader, ScatterPointBufferHelper *object)
+{
+    // 1st attribute buffer : vertices
+    glEnableVertexAttribArray(shader->posAtt());
+    glBindBuffer(GL_ARRAY_BUFFER, object->pointBuf());
+    glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // Draw the points
+    glDrawArrays(GL_POINTS, 0, object->indexCount());
 
     // Free buffers
     glBindBuffer(GL_ARRAY_BUFFER, 0);

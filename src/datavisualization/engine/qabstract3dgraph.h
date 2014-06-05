@@ -38,6 +38,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_ENUMS(ShadowQuality)
     Q_ENUMS(ElementType)
     Q_FLAGS(SelectionFlag SelectionFlags)
+    Q_FLAGS(OptimizationHint OptimizationHints)
     Q_PROPERTY(QAbstract3DInputHandler* activeInputHandler READ activeInputHandler WRITE setActiveInputHandler NOTIFY activeInputHandlerChanged)
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
@@ -48,6 +49,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged)
     Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged)
     Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged)
+    Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -86,6 +88,12 @@ public:
         ElementAxisZLabel,
         ElementCustomItem
     };
+
+    enum OptimizationHint {
+        OptimizationDefault = 0,
+        OptimizationStatic  = 1
+    };
+    Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
 
 public:
     virtual ~QAbstract3DGraph();
@@ -139,6 +147,9 @@ public:
     void setAspectRatio(qreal ratio);
     qreal aspectRatio() const;
 
+    void setOptimizationHints(OptimizationHints hints);
+    OptimizationHints optimizationHints() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -161,6 +172,7 @@ signals:
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);
     void aspectRatioChanged(qreal ratio);
+    void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)
@@ -171,6 +183,7 @@ private:
     friend class Q3DSurface;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::SelectionFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::OptimizationHints)
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

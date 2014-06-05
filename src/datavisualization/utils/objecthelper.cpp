@@ -118,6 +118,10 @@ void ObjectHelper::load()
         glDeleteBuffers(1, &m_uvbuffer);
         glDeleteBuffers(1, &m_normalbuffer);
         glDeleteBuffers(1, &m_elementbuffer);
+        m_indices.clear();
+        m_indexedVertices.clear();
+        m_indexedUVs.clear();
+        m_indexedNormals.clear();
     }
     QVector<QVector3D> vertices;
     QVector<QVector2D> uvs;
@@ -127,36 +131,32 @@ void ObjectHelper::load()
         qFatal("loading failed");
 
     // Index vertices
-    QVector<unsigned short> indices;
-    QVector<QVector3D> indexed_vertices;
-    QVector<QVector2D> indexed_uvs;
-    QVector<QVector3D> indexed_normals;
-    VertexIndexer::indexVBO(vertices, uvs, normals, indices, indexed_vertices, indexed_uvs,
-                            indexed_normals);
+    VertexIndexer::indexVBO(vertices, uvs, normals, m_indices, m_indexedVertices, m_indexedUVs,
+                            m_indexedNormals);
 
-    m_indexCount = indices.size();
+    m_indexCount = m_indices.size();
 
     glGenBuffers(1, &m_vertexbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, indexed_vertices.size() * sizeof(QVector3D),
-                 &indexed_vertices.at(0),
+    glBufferData(GL_ARRAY_BUFFER, m_indexedVertices.size() * sizeof(QVector3D),
+                 &m_indexedVertices.at(0),
                  GL_STATIC_DRAW);
 
     glGenBuffers(1, &m_normalbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
-    glBufferData(GL_ARRAY_BUFFER, indexed_normals.size() * sizeof(QVector3D),
-                 &indexed_normals.at(0),
+    glBufferData(GL_ARRAY_BUFFER, m_indexedNormals.size() * sizeof(QVector3D),
+                 &m_indexedNormals.at(0),
                  GL_STATIC_DRAW);
 
     glGenBuffers(1, &m_uvbuffer);
     glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, indexed_uvs.size() * sizeof(QVector2D),
-                 &indexed_uvs.at(0), GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, m_indexedUVs.size() * sizeof(QVector2D),
+                 &m_indexedUVs.at(0), GL_STATIC_DRAW);
 
     glGenBuffers(1, &m_elementbuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indices.size() * sizeof(unsigned short),
-                 &indices.at(0), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned short),
+                 &m_indices.at(0), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

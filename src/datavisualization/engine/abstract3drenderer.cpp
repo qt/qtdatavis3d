@@ -35,6 +35,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedShadowQuality(QAbstract3DGraph::ShadowQualityMedium),
       m_autoScaleAdjustment(1.0f),
       m_cachedSelectionMode(QAbstract3DGraph::SelectionNone),
+      m_cachedOptimizationHint(QAbstract3DGraph::OptimizationDefault),
       m_textureHelper(0),
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
@@ -284,6 +285,11 @@ void Abstract3DRenderer::updateAspectRatio(float ratio)
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
     updateCustomItemPositions();
+}
+
+void Abstract3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint)
+{
+    m_cachedOptimizationHint = hint;
 }
 
 void Abstract3DRenderer::handleResize()

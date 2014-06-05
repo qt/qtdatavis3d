@@ -710,32 +710,48 @@ void QAbstract3DSeriesPrivate::setMesh(QAbstract3DSeries::Mesh mesh)
 {
     m_mesh = mesh;
     m_changeTracker.meshChanged = true;
-    if (m_controller)
+    if (m_controller) {
         m_controller->markSeriesVisualsDirty();
+
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+            m_controller->markDataDirty();
+    }
 }
 
 void QAbstract3DSeriesPrivate::setMeshSmooth(bool enable)
 {
     m_meshSmooth = enable;
     m_changeTracker.meshSmoothChanged = true;
-    if (m_controller)
+    if (m_controller) {
         m_controller->markSeriesVisualsDirty();
+
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+            m_controller->markDataDirty();
+    }
 }
 
 void QAbstract3DSeriesPrivate::setMeshRotation(const QQuaternion &rotation)
 {
     m_meshRotation = rotation;
     m_changeTracker.meshRotationChanged = true;
-    if (m_controller)
+    if (m_controller) {
         m_controller->markSeriesVisualsDirty();
+
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+            m_controller->markDataDirty();
+    }
 }
 
 void QAbstract3DSeriesPrivate::setUserDefinedMesh(const QString &meshFile)
 {
     m_userDefinedMesh = meshFile;
     m_changeTracker.userDefinedMeshChanged = true;
-    if (m_controller)
+    if (m_controller) {
         m_controller->markSeriesVisualsDirty();
+
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+            m_controller->markDataDirty();
+    }
 }
 
 void QAbstract3DSeriesPrivate::setColorStyle(Q3DTheme::ColorStyle style)

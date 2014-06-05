@@ -38,6 +38,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
     m_useOrthoProjection(false),
     m_aspectRatio(2.0f),
+    m_optimizationHints(QAbstract3DGraph::OptimizationDefault),
     m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -193,6 +194,11 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.aspectRatioChanged) {
         m_renderer->updateAspectRatio(m_aspectRatio);
         m_changeTracker.aspectRatioChanged = false;
+    }
+
+    if (m_changeTracker.optimizationHintChanged) {
+        m_renderer->updateOptimizationHint(m_optimizationHints);
+        m_changeTracker.optimizationHintChanged = false;
     }
 
     if (m_changeTracker.axisXFormatterChanged) {
@@ -860,6 +866,22 @@ void Abstract3DController::doSetShadowQuality(QAbstract3DGraph::ShadowQuality qu
 QAbstract3DGraph::ShadowQuality Abstract3DController::shadowQuality() const
 {
     return m_shadowQuality;
+}
+
+void Abstract3DController::setOptimizationHints(QAbstract3DGraph::OptimizationHints hints)
+{
+    if (hints != m_optimizationHints) {
+        m_optimizationHints = hints;
+        m_changeTracker.optimizationHintChanged = true;
+        m_isDataDirty = true;
+        emit optimizationHintsChanged(hints);
+        emitNeedRender();
+    }
+}
+
+QAbstract3DGraph::OptimizationHints Abstract3DController::optimizationHints() const
+{
+    return m_optimizationHints;
 }
 
 bool Abstract3DController::shadowsSupported() const

@@ -36,6 +36,9 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+class ScatterObjectBufferHelper;
+class ScatterPointBufferHelper;
+
 class ScatterSeriesRenderCache : public SeriesRenderCache
 {
 public:
@@ -50,11 +53,23 @@ public:
     inline float itemSize() const { return m_itemSize; }
     inline void setSelectionIndexOffset(int offset) { m_selectionIndexOffset = offset; }
     inline int selectionIndexOffset() const { return m_selectionIndexOffset; }
+    inline int oldArraySize() const { return m_oldRenderArraySize; }
+    inline void setOldArraySize(int size) { m_oldRenderArraySize = size; }
+    inline const QString &oldMeshFileName() const { return m_oldMeshFileName; }
+    inline void setOldMeshFileName(const QString &meshFileName) { m_oldMeshFileName = meshFileName; }
+    inline void setBufferObject(ScatterObjectBufferHelper *object) { m_scatterBufferObj = object; }
+    inline ScatterObjectBufferHelper *bufferObject() const { return m_scatterBufferObj; }
+    inline void setBufferPoints(ScatterPointBufferHelper *object) { m_scatterBufferPoints = object; }
+    inline ScatterPointBufferHelper *bufferPoints() const { return m_scatterBufferPoints; }
 
 protected:
     ScatterRenderItemArray m_renderArray;
     float m_itemSize;
     int m_selectionIndexOffset; // Temporarily cached value for selection color calculations
+    int m_oldRenderArraySize; // Used to detect if full buffer change needed
+    QString m_oldMeshFileName; // Used to detect if full buffer change needed
+    ScatterObjectBufferHelper *m_scatterBufferObj;
+    ScatterPointBufferHelper *m_scatterBufferPoints;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

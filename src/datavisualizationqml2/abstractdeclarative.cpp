@@ -699,6 +699,18 @@ qreal AbstractDeclarative::aspectRatio() const
     return m_controller->aspectRatio();
 }
 
+void AbstractDeclarative::setOptimizationHints(OptimizationHints hints)
+{
+    int intmode = int(hints);
+    m_controller->setOptimizationHints(QAbstract3DGraph::OptimizationHints(intmode));
+}
+
+AbstractDeclarative::OptimizationHints AbstractDeclarative::optimizationHints() const
+{
+    int intmode = int(m_controller->optimizationHints());
+    return OptimizationHints(intmode);
+}
+
 void AbstractDeclarative::windowDestroyed(QObject *obj)
 {
     // Remove destroyed window from window lists

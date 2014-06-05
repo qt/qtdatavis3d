@@ -72,6 +72,7 @@ private:
     GLfloat m_scaleFactor;
     int m_selectedItemIndex;
     ScatterSeriesRenderCache *m_selectedSeriesCache;
+    ScatterSeriesRenderCache *m_oldSelectedSeriesCache;
     QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
     bool m_hasHeightAdjustmentChanged;
