@@ -32,7 +32,6 @@
 #include "datavisualizationglobal_p.h"
 #include "abstractobjecthelper_p.h"
 #include "scatterseriesrendercache_p.h"
-#include <QtGui/QOpenGLFunctions>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

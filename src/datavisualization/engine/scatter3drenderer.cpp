@@ -293,7 +293,8 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
 
     if (m_hasHeightAdjustmentChanged) {
         // Set initial camera position. Also update if height adjustment has changed.
-        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector, zeroVector, upVector);
+        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector, zeroVector,
+                                                         upVector);
         m_hasHeightAdjustmentChanged = false;
     }
 
@@ -328,7 +329,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     GLfloat selectedItemSize = 0.0f;
 
     // Get the optimization flag
-    const bool optimizationDefault = !m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic);
+    const bool optimizationDefault =
+            !m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic);
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
@@ -426,7 +428,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Draw dots to depth buffer
         foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
             if (baseCache->isVisible()) {
-                ScatterSeriesRenderCache *cache = static_cast<ScatterSeriesRenderCache *>(baseCache);
+                ScatterSeriesRenderCache *cache =
+                        static_cast<ScatterSeriesRenderCache *>(baseCache);
                 ObjectHelper *dotObj = cache->object();
                 QQuaternion seriesRotation(cache->meshRotation());
                 const ScatterRenderItemArray &renderArray = cache->renderArray();
@@ -502,8 +505,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
 
                             // Draw the triangles
-                            glDrawElements(GL_TRIANGLES, object->indexCount(), object->indicesType(),
-                                           (void *)0);
+                            glDrawElements(GL_TRIANGLES, object->indexCount(),
+                                           object->indicesType(), (void *)0);
 
                             // Free buffers
                             glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -826,10 +829,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                         dotShader->setUniformValue(dotShader->lightS(), lightStrength / 10.0f);
 
                         // Draw the object
-                        if (optimizationDefault)
-                            m_drawer->drawObject(dotShader, dotObj, gradientTexture, m_depthTexture);
-                        else
-                            m_drawer->drawObject(dotShader, cache->bufferObject(), gradientTexture, m_depthTexture);
+                        if (optimizationDefault) {
+                            m_drawer->drawObject(dotShader, dotObj, gradientTexture,
+                                                 m_depthTexture);
+                        } else {
+                            m_drawer->drawObject(dotShader, cache->bufferObject(), gradientTexture,
+                                                 m_depthTexture);
+                        }
                     } else {
                         // Draw the object
                         if (optimizationDefault)
@@ -1110,7 +1116,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(0.0f, yFloorLinePosition, m_axisCacheZ.gridLinePosition(line));
+                modelMatrix.translate(0.0f, yFloorLinePosition,
+                                      m_axisCacheZ.gridLinePosition(line));
 
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
@@ -1222,7 +1229,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(m_axisCacheX.gridLinePosition(line), yFloorLinePosition, 0.0f);
+                modelMatrix.translate(m_axisCacheX.gridLinePosition(line), yFloorLinePosition,
+                                      0.0f);
 
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
@@ -1777,8 +1785,10 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         GLfloat labelMarginZTrans = labelMargin;
         QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
         QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
-        Qt::AlignmentFlag backAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
-        Qt::AlignmentFlag sideAlignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag backAlignment =
+                (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
+        Qt::AlignmentFlag sideAlignment =
+                (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         if (!m_xFlipped) {
             labelXTrans = -labelXTrans;
             labelMarginXTrans = -labelMargin;
