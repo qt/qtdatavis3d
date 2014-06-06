@@ -39,9 +39,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * Q3DScatter supports more than one series visible at the same time.
  *
- * Methods are provided for changing themes, item selection modes and so on. See the
- * methods for more detailed descriptions.
- *
  * \section1 How to construct a minimal Q3DScatter graph
  *
  * First, construct Q3DScatter. Since we are running the graph as top level window
@@ -66,8 +63,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * \image q3dscatter-minimal.png
  *
- * The scene can be rotated and zoomed into, but no other interaction is included in this minimal
- * code example. You can learn more by familiarizing yourself with the examples provided, like
+ * The scene can be rotated, zoomed into, and an item can be selected to view its position,
+ * but no other interaction is included in this minimal code example.
+ * You can learn more by familiarizing yourself with the examples provided, like
  * the \l{Scatter Example}.
  *
  * \sa Q3DBars, Q3DSurface, {Qt Data Visualization C++ Classes}

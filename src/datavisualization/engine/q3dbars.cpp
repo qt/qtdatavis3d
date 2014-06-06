@@ -41,9 +41,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Row and column labels are taken from the first added series, unless explicitly defined to
  * row and column axes.
  *
- * Methods are provided for changing themes, bar selection modes and so on. See the
- * methods for more detailed descriptions.
- *
  * \section1 How to construct a minimal Q3DBars graph
  *
  * First, construct an instance of Q3DBars. Since we are running the graph as top level window
@@ -78,10 +75,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * \image q3dbars-minimal.png
  *
- * The scene can be rotated, zoomed into, and a bar can be selected to view it's value,
+ * The scene can be rotated, zoomed into, and a bar can be selected to view its value,
  * but no other interaction is included in this minimal code example. You can learn more by
- * familiarizing yourself with the examples provided, like the \l{Bars Example} or
- * the \l{Custom Proxy Example}.
+ * familiarizing yourself with the examples provided, like the \l{Bars Example}.
  *
  * \sa Q3DScatter, Q3DSurface, {Qt Data Visualization C++ Classes}
  */
@@ -135,12 +131,12 @@ QBar3DSeries *Q3DBars::primarySeries() const
 /*!
  * Adds the \a series to the graph. A graph can contain multiple series, but only one set of axes,
  * so the rows and columns of all series must match for the visualized data to be meaningful.
- * If the graph has multiple visible series, only the first one added will
+ * If the graph has multiple visible series, only the primary series will
  * generate the row or column labels on the axes in cases where the labels are not explicitly set
  * to the axes. If the newly added series has specified a selected bar, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  *
- * /sa seriesList()
+ * /sa seriesList(), primarySeries
  */
 void Q3DBars::addSeries(QBar3DSeries *series)
 {
