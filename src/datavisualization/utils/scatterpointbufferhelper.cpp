@@ -20,7 +20,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-const GLfloat itemScaler = 3.0f;
 const QVector3D hiddenPos(-1000.0f, -1000.0f, -1000.0f);
 
 ScatterPointBufferHelper::ScatterPointBufferHelper()
