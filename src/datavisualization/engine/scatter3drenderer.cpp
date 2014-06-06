@@ -444,6 +444,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 }
                 QVector3D modelScaler(itemSize, itemSize, itemSize);
 
+                if (!optimizationDefault
+                        && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
+                        || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
+                    continue;
+                }
+
                 int loopCount = 1;
                 if (optimizationDefault)
                     loopCount = renderArraySize;
@@ -709,6 +715,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
             QVector3D modelScaler(itemSize, itemSize, itemSize);
 
+            if (!optimizationDefault
+                    && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
+                    || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
+                continue;
+            }
+
             // Rebind shader if it has changed
             if (drawingPoints != previousDrawingPoints
                     || (!drawingPoints &&
@@ -920,7 +932,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 if (!drawingPoints) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
-                    glPolygonOffset(-0.5f, 1.0f);
+                    glPolygonOffset(-1.0f, 1.0f);
                 }
 
 #if !defined(QT_OPENGL_ES_2)

@@ -81,6 +81,7 @@ void ScatterPointBufferHelper::load(ScatterSeriesRenderCache *cache)
 
     ScatterRenderItemArray &renderArray = cache->renderArray();
     const int renderArraySize = renderArray.size();
+    m_indexCount = 0;
 
     if (m_meshDataLoaded) {
         // Delete old data
@@ -88,25 +89,31 @@ void ScatterPointBufferHelper::load(ScatterSeriesRenderCache *cache)
         m_bufferedPoints.clear();
     }
 
+    bool itemsVisible = false;
     m_bufferedPoints.resize(renderArraySize);
     for (int i = 0; i < renderArraySize; i++) {
         ScatterRenderItem &item = renderArray[i];
-        if (!item.isVisible())
+        if (!item.isVisible()) {
             m_bufferedPoints[i] = hiddenPos;
-        else
+        } else {
+            itemsVisible = true;
             m_bufferedPoints[i] = item.translation();
+        }
     }
 
-    m_indexCount = renderArraySize;
+    if (itemsVisible)
+        m_indexCount = renderArraySize;
 
-    glGenBuffers(1, &m_pointbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_pointbuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_bufferedPoints.size() * sizeof(QVector3D),
-                 &m_bufferedPoints.at(0),
-                 GL_DYNAMIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if (m_indexCount > 0) {
+        glGenBuffers(1, &m_pointbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_pointbuffer);
+        glBufferData(GL_ARRAY_BUFFER, m_bufferedPoints.size() * sizeof(QVector3D),
+                     &m_bufferedPoints.at(0),
+                     GL_DYNAMIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    m_meshDataLoaded = true;
+        m_meshDataLoaded = true;
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
