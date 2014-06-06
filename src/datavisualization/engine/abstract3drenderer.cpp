@@ -640,8 +640,8 @@ void Abstract3DRenderer::drawAxisTitleX(const QVector3D &labelRotation,
     Qt::AlignmentFlag alignment = Qt::AlignTop;
     if (m_yFlipped) {
         alignment = Qt::AlignBottom;
+        zRotation = 180.0f;
         if (m_zFlipped) {
-            zRotation = 180.0f;
             titleOffset = -titleOffset;
             if (m_xFlipped) {
                 offsetRotation = -offsetRotation;
@@ -650,7 +650,6 @@ void Abstract3DRenderer::drawAxisTitleX(const QVector3D &labelRotation,
                 xRotation = -90.0f - labelRotation.z();
             }
         } else {
-            zRotation = 180.0f;
             yRotation = 180.0f;
             if (m_xFlipped) {
                 offsetRotation = -offsetRotation;

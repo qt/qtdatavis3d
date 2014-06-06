@@ -2009,15 +2009,16 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     QVector3D labelRotation;
 
     if (labelAutoAngle == 0.0f) {
-        labelRotation.setX(-90.0f);
         if (m_zFlipped)
             labelRotation.setY(180.0f);
         if (m_yFlipped) {
             if (m_zFlipped)
-                labelRotation.setY(0.0f);
-            else
                 labelRotation.setY(180.0f);
-            labelRotation.setZ(180.0f);
+            else
+                labelRotation.setY(0.0f);
+            labelRotation.setX(90.0f);
+        } else {
+            labelRotation.setX(-90.0f);
         }
     } else {
         if (m_zFlipped)
@@ -2131,10 +2132,10 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
             labelRotation.setY(-90.0f);
         if (m_yFlipped) {
             if (m_xFlipped)
-                labelRotation.setY(90.0f);
-            else
                 labelRotation.setY(-90.0f);
-            labelRotation.setZ(180.0f);
+            else
+                labelRotation.setY(90.0f);
+            labelRotation.setX(90.0f);
         }
     } else {
         if (m_xFlipped)
