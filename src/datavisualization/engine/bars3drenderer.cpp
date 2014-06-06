@@ -1951,11 +1951,12 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
         endIndex = labelCount;
         indexStep = 1;
     }
+    float offsetValue = 0.0f;
     for (int i = startIndex; i != endIndex; i = i + indexStep) {
         backLabelTrans.setY(m_axisCacheY.labelPosition(i));
         sideLabelTrans.setY(backLabelTrans.y());
 
-        glPolygonOffset(GLfloat(i) / -10.0f, 1.0f);
+        glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
         const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(i);
 
@@ -2008,15 +2009,16 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     QVector3D labelRotation;
 
     if (labelAutoAngle == 0.0f) {
-        labelRotation.setX(-90.0f);
         if (m_zFlipped)
             labelRotation.setY(180.0f);
         if (m_yFlipped) {
             if (m_zFlipped)
-                labelRotation.setY(0.0f);
-            else
                 labelRotation.setY(180.0f);
-            labelRotation.setZ(180.0f);
+            else
+                labelRotation.setY(0.0f);
+            labelRotation.setX(90.0f);
+        } else {
+            labelRotation.setX(-90.0f);
         }
     } else {
         if (m_zFlipped)
@@ -2079,6 +2081,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
         endIndex = -1;
         indexStep = -1;
     }
+    offsetValue = 0.0f;
     for (int row = startIndex; row != endIndex; row = row + indexStep) {
         // Go through all rows and get position of max+1 or min-1 column, depending on x flip
         // We need only positions for them, labels have already been generated
@@ -2088,7 +2091,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
         else
             colPos = colPosValue;
 
-        glPolygonOffset(GLfloat(row) / -10.0f, 1.0f);
+        glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
         QVector3D labelPos = QVector3D(colPos,
                                        labelYAdjustment, // raise a bit over background to avoid depth "glimmering"
@@ -2129,10 +2132,10 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
             labelRotation.setY(-90.0f);
         if (m_yFlipped) {
             if (m_xFlipped)
-                labelRotation.setY(90.0f);
-            else
                 labelRotation.setY(-90.0f);
-            labelRotation.setZ(180.0f);
+            else
+                labelRotation.setY(90.0f);
+            labelRotation.setX(90.0f);
         }
     } else {
         if (m_xFlipped)
@@ -2197,6 +2200,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
         endIndex = labelCount;
         indexStep = 1;
     }
+    offsetValue = 0.0f;
     for (int column = startIndex; column != endIndex; column = column + indexStep) {
         // Go through all columns and get position of max+1 or min-1 row, depending on z flip
         // We need only positions for them, labels have already been generated
@@ -2206,7 +2210,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
         else
             rowPos = rowPosValue;
 
-        glPolygonOffset(GLfloat(column) / -10.0f, 1.0f);
+        glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
         QVector3D labelPos = QVector3D((colPos - m_rowWidth) / m_scaleFactor,
                                        labelYAdjustment, // raise a bit over background to avoid depth "glimmering"

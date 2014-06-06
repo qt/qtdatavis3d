@@ -1838,15 +1838,16 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         if (m_yFlipped)
             labelYTrans = -labelYTrans;
         if (labelAutoAngle == 0.0f) {
-            labelRotation.setX(-90.0f);
             if (m_zFlipped)
                 labelRotation.setY(180.0f);
             if (m_yFlipped) {
                 if (m_zFlipped)
-                    labelRotation.setY(0.0f);
-                else
                     labelRotation.setY(180.0f);
-                labelRotation.setZ(180.0f);
+                else
+                    labelRotation.setY(0.0f);
+                labelRotation.setX(90.0f);
+            } else {
+                labelRotation.setX(-90.0f);
             }
         } else {
             if (m_zFlipped)
@@ -1913,8 +1914,9 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = -1;
             indexStep = -1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
             // Draw the label here
             labelTrans.setZ(m_axisCacheZ.labelPosition(label));
             m_dummyRenderItem.setTranslation(labelTrans);
@@ -1961,10 +1963,10 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelRotation.setY(-90.0f);
             if (m_yFlipped) {
                 if (m_xFlipped)
-                    labelRotation.setY(90.0f);
-                else
                     labelRotation.setY(-90.0f);
-                labelRotation.setZ(180.0f);
+                else
+                    labelRotation.setY(90.0f);
+                labelRotation.setX(90.0f);
             }
         } else {
             if (m_xFlipped)
@@ -2032,8 +2034,9 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = labelCount;
             indexStep = 1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
             // Draw the label here
             labelTrans.setX(m_axisCacheX.labelPosition(label));
             m_dummyRenderItem.setTranslation(labelTrans);
@@ -2125,11 +2128,12 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = labelCount;
             indexStep = 1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(label);
             const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
 
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
             if (drawSelection) {
                 QVector4D labelColor = QVector4D(0.0f, 0.0f, label / 255.0f,

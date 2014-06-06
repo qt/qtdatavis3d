@@ -444,6 +444,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 }
                 QVector3D modelScaler(itemSize, itemSize, itemSize);
 
+                if (!optimizationDefault
+                        && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
+                        || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
+                    continue;
+                }
+
                 int loopCount = 1;
                 if (optimizationDefault)
                     loopCount = renderArraySize;
@@ -709,6 +715,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 #endif
             QVector3D modelScaler(itemSize, itemSize, itemSize);
 
+            if (!optimizationDefault
+                    && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
+                    || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
+                continue;
+            }
+
             // Rebind shader if it has changed
             if (drawingPoints != previousDrawingPoints
                     || (!drawingPoints &&
@@ -920,7 +932,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 if (!drawingPoints) {
                     glEnable(GL_POLYGON_OFFSET_FILL);
-                    glPolygonOffset(-0.5f, 1.0f);
+                    glPolygonOffset(-1.0f, 1.0f);
                 }
 
 #if !defined(QT_OPENGL_ES_2)
@@ -1536,15 +1548,16 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         if (m_yFlipped)
             labelYTrans = -labelYTrans;
         if (labelAutoAngle == 0.0f) {
-            labelRotation.setX(-90.0f);
             if (m_zFlipped)
                 labelRotation.setY(180.0f);
             if (m_yFlipped) {
                 if (m_zFlipped)
-                    labelRotation.setY(0.0f);
-                else
                     labelRotation.setY(180.0f);
-                labelRotation.setZ(180.0f);
+                else
+                    labelRotation.setY(0.0f);
+                labelRotation.setX(90.0f);
+            } else {
+                labelRotation.setX(-90.0f);
             }
         } else {
             if (m_zFlipped)
@@ -1606,10 +1619,11 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = -1;
             indexStep = -1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             labelTrans.setZ(m_axisCacheZ.labelPosition(label));
 
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
             // Draw the label here
             m_dummyRenderItem.setTranslation(labelTrans);
@@ -1663,10 +1677,10 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelRotation.setY(-90.0f);
             if (m_yFlipped) {
                 if (m_xFlipped)
-                    labelRotation.setY(90.0f);
-                else
                     labelRotation.setY(-90.0f);
-                labelRotation.setZ(180.0f);
+                else
+                    labelRotation.setY(90.0f);
+                labelRotation.setX(90.0f);
             }
         } else {
             if (m_xFlipped)
@@ -1731,10 +1745,11 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = labelCount;
             indexStep = 1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             labelTrans.setX(m_axisCacheX.labelPosition(label));
 
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
             // Draw the label here
             m_dummyRenderItem.setTranslation(labelTrans);
@@ -1836,11 +1851,12 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             endIndex = labelCount;
             indexStep = 1;
         }
+        float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(label);
             const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
 
-            glPolygonOffset(GLfloat(label) / -10.0f, 1.0f);
+            glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
             if (drawSelection) {
                 QVector4D labelColor = QVector4D(0.0f, 0.0f, label / 255.0f,

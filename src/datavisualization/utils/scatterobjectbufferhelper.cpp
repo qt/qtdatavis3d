@@ -38,12 +38,16 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
 {
     initializeOpenGLFunctions();
 
+    m_meshDataLoaded = false;
+    m_indexCount = 0;
+
     ObjectHelper *dotObj = cache->object();
     ScatterRenderItemArray &renderArray = cache->renderArray();
     const uint renderArraySize = renderArray.size();
+    if (renderArraySize == 0)
+        return;  // No use to go forward
     uint itemCount = renderArraySize;
     QQuaternion seriesRotation(cache->meshRotation());
-
     if (m_meshDataLoaded) {
         // Delete old data
         glDeleteBuffers(1, &m_vertexbuffer);
@@ -51,7 +55,6 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
         glDeleteBuffers(1, &m_normalbuffer);
         glDeleteBuffers(1, &m_elementbuffer);
     }
-
     // Index vertices
     const QVector<unsigned short> indices = dotObj->indices();
     const QVector<QVector3D> indexed_vertices = dotObj->indexedvertices();
@@ -89,6 +92,7 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
     buffered_uvs.resize(uvsCount * renderArraySize);
     buffered_normals.resize(normalsCount * renderArraySize);
     uint pos = 0;
+
     for (uint i = 0; i < renderArraySize; i++) {
         ScatterRenderItem &item = renderArray[i];
         if (!item.isVisible()) {
@@ -130,32 +134,34 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
 
     m_indexCount = indicesCount * itemCount;
 
-    glGenBuffers(1, &m_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, verticeCount * itemCount * sizeof(QVector3D),
-                 &buffered_vertices.at(0),
-                 GL_STATIC_DRAW);
+    if (itemCount > 0) {
+        glGenBuffers(1, &m_vertexbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
+        glBufferData(GL_ARRAY_BUFFER, verticeCount * itemCount * sizeof(QVector3D),
+                     &buffered_vertices.at(0),
+                     GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_normalbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
-    glBufferData(GL_ARRAY_BUFFER, normalsCount * itemCount * sizeof(QVector3D),
-                 &buffered_normals.at(0),
-                 GL_STATIC_DRAW);
+        glGenBuffers(1, &m_normalbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
+        glBufferData(GL_ARRAY_BUFFER, normalsCount * itemCount * sizeof(QVector3D),
+                     &buffered_normals.at(0),
+                     GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_uvbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, uvsCount * itemCount * sizeof(QVector2D),
-                 &buffered_uvs.at(0), GL_STATIC_DRAW);
+        glGenBuffers(1, &m_uvbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+        glBufferData(GL_ARRAY_BUFFER, uvsCount * itemCount * sizeof(QVector2D),
+                     &buffered_uvs.at(0), GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_elementbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesCount * itemCount * sizeof(GLint),
-                 &buffered_indices.at(0), GL_STATIC_DRAW);
+        glGenBuffers(1, &m_elementbuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indicesCount * itemCount * sizeof(GLint),
+                     &buffered_indices.at(0), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    m_meshDataLoaded = true;
+        m_meshDataLoaded = true;
+    }
 }
 
 void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal dotScale)
