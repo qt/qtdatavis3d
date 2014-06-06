@@ -31,9 +31,16 @@
         \li Interactive data: rotate, zoom, and highlight data using mouse or touch
         \li Uses OpenGL for rendering the data
         \li QML2 support
-        \li Customizable axes for data - control viewable data window with axis ranges
+        \li Customizable axes for data
+        \list
+            \li Control viewable data window with axis ranges
+            \li Customize value axis grid lines and labels with axis formatters
+        \endlist
         \li Customizable input handling
         \li Customizable themes
+        \li Custom items and labels can be added to any graph
+        \li Ready-made data proxies to visualize data from Qt item models and height maps
+        \li Perspective and orthographic projections
     \endlist
 
     \section1 Getting Started
