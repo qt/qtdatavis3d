@@ -57,7 +57,6 @@ General:
 - Surface3D: Fixed a crash when shadows were supported by OpenGL but flat shading was not.
 - Surface3D: Selection texture no longer gets corrupted in case there are multiple surfaces
   visible and the axis ranges are adjusted.
-- Surface3D: Fixed shadow culling, improving the shadow cast on the surface itself.
 
 New examples
 ------------
