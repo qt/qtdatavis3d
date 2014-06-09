@@ -25,6 +25,7 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/qcustom3dlabel.h>
 
 #include <QtMultimedia/QAudioDeviceInfo>
 #include <QtMultimedia/QAudioInput>
@@ -59,31 +60,48 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     //! [0]
     QAudioDeviceInfo inputDevice = QAudioDeviceInfo::defaultInputDevice();
 
-    QAudioFormat formatAudio;
-    formatAudio.setSampleRate(inputDevice.supportedSampleRates().at(0));
-    formatAudio.setChannelCount(inputDevice.supportedChannelCounts().at(0));
-    formatAudio.setSampleSize(inputDevice.supportedSampleSizes().at(0));
-    formatAudio.setCodec(inputDevice.supportedCodecs().at(0));
-    formatAudio.setByteOrder(QAudioFormat::LittleEndian);
-    formatAudio.setSampleType(QAudioFormat::UnSignedInt);
+    if (inputDevice.supportedSampleRates().size() > 0
+            && inputDevice.supportedChannelCounts().size() > 0
+            && inputDevice.supportedSampleSizes().size() > 0
+            && inputDevice.supportedCodecs().size() > 0) {
+        QAudioFormat formatAudio;
+        formatAudio.setSampleRate(inputDevice.supportedSampleRates().at(0));
+        formatAudio.setChannelCount(inputDevice.supportedChannelCounts().at(0));
+        formatAudio.setSampleSize(inputDevice.supportedSampleSizes().at(0));
+        formatAudio.setCodec(inputDevice.supportedCodecs().at(0));
+        formatAudio.setByteOrder(QAudioFormat::LittleEndian);
+        formatAudio.setSampleType(QAudioFormat::UnSignedInt);
 
-    m_audioInput = new QAudioInput(inputDevice, formatAudio, this);
+        m_audioInput = new QAudioInput(inputDevice, formatAudio, this);
 #ifdef Q_OS_MAC
-    // Mac seems to wait for entire buffer to fill before calling writeData, so use smaller buffer
-    m_audioInput->setBufferSize(256);
+        // Mac seems to wait for entire buffer to fill before calling writeData, so use smaller buffer
+        m_audioInput->setBufferSize(256);
 #else
-    m_audioInput->setBufferSize(1024);
+        m_audioInput->setBufferSize(1024);
 #endif
 
-    m_device = new AudioLevelsIODevice(m_graph->seriesList().at(0)->dataProxy(), this);
-    m_device->open(QIODevice::WriteOnly);
+        m_device = new AudioLevelsIODevice(m_graph->seriesList().at(0)->dataProxy(), this);
+        m_device->open(QIODevice::WriteOnly);
 
-    m_audioInput->start(m_device);
+        m_audioInput->start(m_device);
+    } else {
+        // No graph content can be shown, so add a custom warning label
+        QCustom3DLabel *titleLabel = new QCustom3DLabel("No valid audio input device found",
+                                                        QFont(),
+                                                        QVector3D(0.2f, 0.2f, 0.0f),
+                                                        QVector3D(1.0f, 1.0f, 0.0f),
+                                                        QQuaternion());
+        titleLabel->setPositionAbsolute(true);
+        titleLabel->setFacingCamera(true);
+        m_graph->addCustomItem(titleLabel);
+    }
     //! [0]
 }
 
 AudioLevels::~AudioLevels()
 {
-    m_audioInput->stop();
-    m_device->close();
+    if (m_audioInput)
+        m_audioInput->stop();
+    if (m_device)
+        m_device->close();
 }

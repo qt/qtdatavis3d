@@ -77,8 +77,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * \image q3dsurface-minimal.png
  *
- * The scene can be rotated and zoomed into, but no other interaction is included in this minimal
- * code example.
+ * The scene can be rotated, zoomed into, and a surface point can be selected to view its position,
+ * but no other interaction is included in this minimal code example.
+ * You can learn more by familiarizing yourself with the examples provided,
+ * like the \l{Surface Example}.
  *
  *
  * \sa Q3DBars, Q3DScatter, {Qt Data Visualization C++ Classes}
@@ -106,7 +108,9 @@ Q3DSurface::~Q3DSurface()
 }
 
 /*!
- * Adds the \a series to the graph.
+ * Adds the \a series to the graph.  A graph can contain multiple series, but has only one set of
+ * axes. If the newly added series has specified a selected item, it will be highlighted and
+ * any existing selection will be cleared. Only one added series can have an active selection.
  */
 void Q3DSurface::addSeries(QSurface3DSeries *series)
 {
