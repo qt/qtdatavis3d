@@ -158,7 +158,7 @@ Module {
         Signal {
             name: "selectedElementChanged"
             revision: 1
-            Parameter { name: "type"; type: "QAbstract3DGraph::ElementType" }
+            Parameter { name: "type"; type: "AbstractDeclarative::ElementType" }
         }
         Signal {
             name: "orthoProjectionChanged"
@@ -173,7 +173,7 @@ Module {
         Signal {
             name: "optimizationHintsChanged"
             revision: 1
-            Parameter { name: "hints"; type: "QAbstract3DGraph::OptimizationHints" }
+            Parameter { name: "hints"; type: "AbstractDeclarative::OptimizationHints" }
         }
         Method {
             name: "handleAxisXChanged"

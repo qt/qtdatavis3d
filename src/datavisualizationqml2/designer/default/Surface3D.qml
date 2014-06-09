@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 import QtQuick 2.0
-import QtDataVisualization 1.0
+import QtDataVisualization 1.1
 
 Surface3D {
     width: 300
