@@ -241,13 +241,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty ItemModelBarDataProxy.MultiMatchBehavior ItemModelBarDataProxy::multiMatchBehavior
  * This property defines how multiple matches for each row/column combination are handled.
- * Defaults to ItemModelBarDataProxy.MMBLast. The chosen behavior affects both bar value
- * and rotation.
+ * Defaults to \l{QItemModelBarDataProxy::MMBLast}{ItemModelBarDataProxy.MMBLast}. The chosen
+ * behavior affects both bar value and rotation.
  *
  * For example, you might have an item model with timestamped data taken at irregular intervals
  * and you want to visualize total value of data items on each day with a bar graph.
  * This can be done by specifying row and column categories so that each bar represents a day,
- * and setting multiMatchBehavior to ItemModelBarDataProxy.MMBCumulative.
+ * and setting multiMatchBehavior to
+ * \l{QItemModelBarDataProxy::MMBCumulative}{ItemModelBarDataProxy.MMBCumulative}.
  */
 
 /*!

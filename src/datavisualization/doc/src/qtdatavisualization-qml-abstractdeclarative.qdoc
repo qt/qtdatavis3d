@@ -53,7 +53,7 @@
 
 /*!
   \qmlproperty Scene3D AbstractGraph3D::scene
-  Read only Q3DScene that can be used to access e.g. camera object.
+  Read only property that can be used to access for example Camera3D via the Scene3D held here.
  */
 
 /*!
@@ -143,6 +143,13 @@
  * property. It takes at least a second before this value updates after measurement is activated.
  *
  * \sa measureFps
+ */
+
+/*!
+ * \qmlproperty list<Custom3DItem> AbstractGraph3D::customItemList
+ * \since QtDataVisualization 1.1
+ *
+ * Add a list of \l{Custom3DItem}s to the graph. Graph takes ownership of the added items.
  */
 
 /*!

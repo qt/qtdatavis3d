@@ -89,6 +89,9 @@
 
     \snippet bars/graphmodifier.cpp 3
 
+    We give axis labels a small autorotation angle to make them orient somewhat toward the
+    camera. This is done to improve axis label readability at extreme camera angles.
+
     Next we initialize the visual properties of the series.
     Note that the second series is initially not visible:
 
@@ -159,6 +162,8 @@
         \li Grid visibility
         \li Bar shading smoothness
         \li Visibility of the second bar series
+        \li Value axis direction
+        \li Axis title visibility and rotation
         \li Data range to be shown
         \li Bar style
         \li Selection mode
@@ -166,6 +171,7 @@
         \li Shadow quality
         \li Font
         \li Font size
+        \li Axis label rotation
     \endlist
 
     \section1 Selecting a row/column by clicking an axis label

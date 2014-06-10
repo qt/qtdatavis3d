@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 
     QLabel *label4 = new QLabel("Nothing");
     font.setBold(false);
-    font.setPointSize(12);
+    font.setPointSize(11);
     label4->setFont(font);
     vLayoutRight->addWidget(label4);
 

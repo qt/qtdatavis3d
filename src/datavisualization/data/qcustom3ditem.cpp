@@ -55,7 +55,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Holds the texture file name for the item. If left unset, a solid gray texture will be
  * used.
  *
- * \note To conserve memory the Image loaded from the file is cleared after a texture is created.
+ * \note To conserve memory the QImage loaded from the file is cleared after a texture is created.
  */
 
 /*! \qmlproperty vector3d Custom3DItem::position

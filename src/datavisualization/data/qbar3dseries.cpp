@@ -119,7 +119,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * A convenience property for defining the series rotation \a angle in degrees.
  *
- * \note: When reading this property, it is calculated from Abstract3DSeries::meshRotation value
+ * \note When reading this property, it is calculated from Abstract3DSeries::meshRotation value
  * using floating point precision and always returns a value from zero to 360 degrees.
  *
  * \sa Abstract3DSeries::meshRotation
@@ -222,7 +222,7 @@ static inline float quaternionAngle(const QQuaternion &rotation)
  * Setting this property is equivalent to the following call:
  * \code setMeshRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angle)) \endcode
  *
- * \note: When reading this property, it is calculated from QAbstract3DSeries::meshRotation value
+ * \note When reading this property, it is calculated from QAbstract3DSeries::meshRotation value
  * using floating point precision and always returns a value from zero to 360 degrees.
  *
  * \sa QAbstract3DSeries::meshRotation

@@ -89,14 +89,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty float Camera3D::xRotation
  *
  * This property contains the X-rotation angle of the camera around the target point in degrees
- * starting from the current base position set by the setBaseOrientation method.
+ * starting from the current base position.
  */
 
 /*!
  * \qmlproperty float Camera3D::yRotation
  *
  * This property contains the Y-rotation angle of the camera around the target point in degrees
- * starting from the current base position set by the setBaseOrientation method.
+ * starting from the current base position.
  */
 
 /*!
@@ -105,8 +105,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * This property contains the currently active camera preset, which is one of
  * \l{Q3DCamera::CameraPreset}{Camera3D.CameraPreset}. If no preset is active the value
  * is \l{Q3DCamera::CameraPresetNone}{Camera3D.CameraPresetNone}.
- * \note The base camera orientation set by setBaseOrientation will affect the presets as all
- * calculations are based on those values.
  */
 
 /*!

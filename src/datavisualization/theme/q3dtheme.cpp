@@ -240,7 +240,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty Color Theme3D::baseColors
+ * \qmlproperty list<ThemeColor> Theme3D::baseColors
  *
  * List of base colors to be used for all the objects in the graph, series by series. If there
  * are more series than colors, color list wraps and starts again with the first color in the list.
@@ -248,57 +248,57 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty Color Theme3D::backgroundColor
+ * \qmlproperty color Theme3D::backgroundColor
  *
  * Color for the graph background.
  */
 
 /*!
- * \qmlproperty Color Theme3D::windowColor
+ * \qmlproperty color Theme3D::windowColor
  *
  * Color for the application window.
  */
 
 /*!
- * \qmlproperty Color Theme3D::labelTextColor
+ * \qmlproperty color Theme3D::labelTextColor
  *
  * Color for the font used for labels.
  */
 
 /*!
- * \qmlproperty Color Theme3D::labelBackgroundColor
+ * \qmlproperty color Theme3D::labelBackgroundColor
  *
  * Color for the label backgrounds. Has no effect if labelBackgroundEnabled is \c false.
  */
 
 /*!
- * \qmlproperty Color Theme3D::gridLineColor
+ * \qmlproperty color Theme3D::gridLineColor
  *
  * Color for the grid lines.
  */
 
 /*!
- * \qmlproperty Color Theme3D::singleHighlightColor
+ * \qmlproperty color Theme3D::singleHighlightColor
  *
  * Highlight color for a highlighted object. Used if \l{AbstractGraph3D::selectionMode}{selectionMode}
  * has \c AbstractGraph3D.SelectionItem flag set.
  */
 
 /*!
- * \qmlproperty Color Theme3D::multiHighlightColor
+ * \qmlproperty color Theme3D::multiHighlightColor
  *
  * Highlight color for highlighted objects. Used if \l{AbstractGraph3D::selectionMode}{selectionMode}
  * has \c AbstractGraph3D.SelectionRow or \c AbstractGraph3D.SelectionColumn flag set.
  */
 
 /*!
- * \qmlproperty Color Theme3D::lightColor
+ * \qmlproperty color Theme3D::lightColor
  *
  * Color for the specular light defined in Scene3D.
  */
 
 /*!
- * \qmlproperty ColorGradient Theme3D::baseGradients
+ * \qmlproperty list<ColorGradient> Theme3D::baseGradients
  *
  * List of base gradients to be used for all the objects in the graph, series by series. If there
  * are more series than gradients, gradient list wraps and starts again with the first gradient in
@@ -321,19 +321,19 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty float Theme3D::lightStrength
+ * \qmlproperty real Theme3D::lightStrength
  *
  * Specular light strength for the whole graph. Value must be between 0.0 and 1.0.
  */
 
 /*!
- * \qmlproperty float Theme3D::ambientLightStrength
+ * \qmlproperty real Theme3D::ambientLightStrength
  *
  * Ambient light strength for the whole graph. Value must be between 0.0 and 1.0.
  */
 
 /*!
- * \qmlproperty float Theme3D::highlightLightStrength
+ * \qmlproperty real Theme3D::highlightLightStrength
  *
  * Specular light strength for highlighted objects. Value must be between 0.0 and 1.0.
  */
@@ -345,9 +345,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty Font Theme3D::font
+ * \qmlproperty font Theme3D::font
  *
- * Set \a font to be used for labels.
+ * Set font to be used for labels.
  */
 
 /*!

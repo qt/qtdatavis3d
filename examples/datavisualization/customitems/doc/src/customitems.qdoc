@@ -68,5 +68,8 @@
 
     \snippet customitems/customitemgraph.cpp 4
 
+    \note Removing a custom item from the graph also deletes it. If you want to preserve the item,
+    you need to use \c releaseCustomItem() method instead.
+
     \section1 Example Contents
 */
