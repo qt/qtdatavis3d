@@ -183,6 +183,7 @@ void GraphDataGenerator::setupModel()
     m_tableWidget->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_tableWidget->setVerticalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
     m_tableWidget->setCurrentCell(-1, -1);
+    m_tableWidget->setSelectionMode(QAbstractItemView::SingleSelection);
     //! [11]
 
     //! [12]

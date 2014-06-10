@@ -81,7 +81,7 @@
     One interesting detail is that we don't specify a proxy for the Surface3DSeries we attach
     to the graph. This makes the series to utilize the default QSurfaceDataProxy.
 
-    We also hide the item label with \l{Abstract3DSeries::itemLabelVisible}{itemLabelFormat}, since
+    We also hide the item label with \l{Abstract3DSeries::itemLabelVisible}{itemLabelVisible}, since
     we want to display the selected item information in a \c Text element instead of a floating
     label above the selection pointer.
     This is done because the selection pointer moves around a lot as the data changes, which makes

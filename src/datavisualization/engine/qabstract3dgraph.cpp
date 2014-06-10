@@ -349,12 +349,12 @@ QAbstract3DGraph::SelectionFlags QAbstract3DGraph::selectionMode() const
 /*!
  * \property QAbstract3DGraph::shadowQuality
  *
- * Sets shadow \a quality to one of ShadowQuality. It is preset to
+ * Sets the shadow \a quality to one of the ShadowQuality enum values. It is preset to
  * \c ShadowQualityMedium by default.
  *
- * \note If setting ShadowQuality of a certain level fails, a level is lowered
- * until it is successful and \c shadowQualityChanged signal is emitted for each time the change is
- * done.
+ * \note If setting the shadow quality to a certain level fails, the level is lowered
+ * until it is successfully set. The \c shadowQualityChanged signal is emitted for each time
+ * a change is done.
  */
 void QAbstract3DGraph::setShadowQuality(ShadowQuality quality)
 {
@@ -378,8 +378,8 @@ bool QAbstract3DGraph::shadowsSupported() const
 /*!
  * \property QAbstract3DGraph::scene
  *
- * This property contains the read only Q3DScene that can be used to access, for example, a camera
- * object.
+ * This property is read-only and contains the Q3DScene pointer that can be used to manipulate
+ * the scene and access the scene elements, such as the active camera.
  */
 Q3DScene *QAbstract3DGraph::scene() const
 {
