@@ -106,9 +106,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * Defines the item model role to map into item rotation.
  * The model may supply the value for rotation as either variant that is directly convertible
- * to QQuaternion, or as one of the string representations: \c{"scalar,x,y,z"} or
- * \c{"@angle,x,y,z"}. The first format will construct the quaternion directly with given values,
- * and the second one will construct the quaternion using QQuaternion::fromAxisAndAngle() method.
+ * to \l quaternion, or as one of the string representations: \c{"scalar,x,y,z"} or
+ * \c{"@angle,x,y,z"}. The first format will construct the \l quaternion directly with given values,
+ * and the second one will construct the \l quaternion using QQuaternion::fromAxisAndAngle() method.
  */
 
 /*!

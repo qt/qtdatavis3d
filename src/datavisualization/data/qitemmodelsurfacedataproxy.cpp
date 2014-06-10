@@ -128,7 +128,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string ItemModelSurfaceDataProxy::xPosRole
  * Defines the item model role to map into X position. If this role is not defined, columnRole is
- * used to determine the X-coordinate value of resolved QSurfaceDataItems.
+ * used to determine the X-coordinate value of resolved \l{QSurfaceDataItem}s.
  */
 
 /*!
@@ -139,7 +139,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string ItemModelSurfaceDataProxy::zPosRole
  * Defines the item model role to map into Z position. If this role is not defined, rowRole is
- * used to determine the Z-coordinate value of resolved QSurfaceDataItems.
+ * used to determine the Z-coordinate value of resolved \l{QSurfaceDataItem}s.
  */
 
 /*!
@@ -285,12 +285,13 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty ItemModelSurfaceDataProxy.MultiMatchBehavior ItemModelSurfaceDataProxy::multiMatchBehavior
  * This property defines how multiple matches for each row/column combination are handled.
- * Defaults to ItemModelSurfaceDataProxy.MMBLast.
+ * Defaults to \l{QItemModelSurfaceDataProxy::MMBLast}{ItemModelSurfaceDataProxy.MMBLast}.
  *
  * For example, you might have an item model with timestamped data taken at irregular intervals
  * and you want to visualize an average position of data items on each hour with a surface graph.
  * This can be done by specifying row and column categories so that each surface point represents
- * an hour, and setting multiMatchBehavior to ItemModelSurfaceDataProxy.MMBAverage.
+ * an hour, and setting multiMatchBehavior to
+ * \l{QItemModelSurfaceDataProxy::MMBAverage}{ItemModelSurfaceDataProxy.MMBAverage}.
  */
 
 /*!
@@ -528,7 +529,7 @@ QString QItemModelSurfaceDataProxy::columnRole() const
  * \property QItemModelSurfaceDataProxy::xPosRole
  *
  * Defines the item model role to map into X position. If this role is not defined, columnRole is
- * used to determine the X-coordinate value of resolved QSurfaceDataItems.
+ * used to determine the X-coordinate value of resolved \l{QSurfaceDataItem}s.
  */
 void QItemModelSurfaceDataProxy::setXPosRole(const QString &role)
 {
@@ -565,7 +566,7 @@ QString QItemModelSurfaceDataProxy::yPosRole() const
  * \property QItemModelSurfaceDataProxy::zPosRole
  *
  * Defines the item model role to map into Z position. If this role is not defined, rowRole is
- * used to determine the Z-coordinate value of resolved QSurfaceDataItems.
+ * used to determine the Z-coordinate value of resolved \l{QSurfaceDataItem}s.
  */
 void QItemModelSurfaceDataProxy::setZPosRole(const QString &role)
 {
