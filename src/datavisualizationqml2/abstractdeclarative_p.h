@@ -132,6 +132,8 @@ public:
     virtual void setShadowQuality(ShadowQuality quality);
     virtual AbstractDeclarative::ShadowQuality shadowQuality() const;
 
+    virtual AbstractDeclarative::ElementType selectedElement() const;
+
     virtual bool shadowsSupported() const;
 
     virtual void setMsaaSamples(int samples);
@@ -185,8 +187,6 @@ public:
     void setOrthoProjection(bool enable);
     bool isOrthoProjection() const;
 
-    AbstractDeclarative::ElementType selectedElement() const;
-
     void setAspectRatio(qreal ratio);
     qreal aspectRatio() const;
 
@@ -211,6 +211,8 @@ protected:
     virtual void updateWindowParameters();
     virtual void handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode);
     virtual void handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality);
+    virtual void handleSelectedElementChange(QAbstract3DGraph::ElementType type);
+    virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
     virtual QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
 signals:
@@ -224,10 +226,10 @@ signals:
     void renderingModeChanged(AbstractDeclarative::RenderingMode mode);
     Q_REVISION(1) void measureFpsChanged(bool enabled);
     Q_REVISION(1) void currentFpsChanged(qreal fps);
-    Q_REVISION(1) void selectedElementChanged(QAbstract3DGraph::ElementType type);
+    Q_REVISION(1) void selectedElementChanged(AbstractDeclarative::ElementType type);
     Q_REVISION(1) void orthoProjectionChanged(bool enabled);
     Q_REVISION(1) void aspectRatioChanged(qreal ratio);
-    Q_REVISION(1) void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    Q_REVISION(1) void optimizationHintsChanged(AbstractDeclarative::OptimizationHints hints);
 
 private:
     QPointer<Abstract3DController> m_controller;

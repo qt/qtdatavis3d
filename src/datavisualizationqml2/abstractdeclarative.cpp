@@ -308,7 +308,7 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
     QObject::connect(m_controller.data(), &Abstract3DController::selectionModeChanged, this,
                      &AbstractDeclarative::handleSelectionModeChange);
     QObject::connect(m_controller.data(), &Abstract3DController::elementSelected, this,
-                     &AbstractDeclarative::selectedElementChanged);
+                     &AbstractDeclarative::handleSelectedElementChange);
 
     QObject::connect(m_controller.data(), &Abstract3DController::axisXChanged, this,
                      &AbstractDeclarative::handleAxisXChanged);
@@ -327,6 +327,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
     QObject::connect(m_controller.data(), &Abstract3DController::aspectRatioChanged, this,
                      &AbstractDeclarative::aspectRatioChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::optimizationHintsChanged, this,
+                     &AbstractDeclarative::handleOptimizationHintChange);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -530,6 +532,17 @@ void AbstractDeclarative::handleSelectionModeChange(QAbstract3DGraph::SelectionF
 void AbstractDeclarative::handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality)
 {
     emit shadowQualityChanged(ShadowQuality(quality));
+}
+
+void AbstractDeclarative::handleSelectedElementChange(QAbstract3DGraph::ElementType type)
+{
+    emit selectedElementChanged(ElementType(type));
+}
+
+void AbstractDeclarative::handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints)
+{
+    int intHints = int(hints);
+    emit optimizationHintsChanged(OptimizationHints(intHints));
 }
 
 void AbstractDeclarative::render()
