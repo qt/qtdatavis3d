@@ -41,7 +41,7 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
 
     QImage texImage = image;
 
-#if defined(Q_OS_ANDROID) || defined(Q_OS_IOS)
+#if defined(QT_OPENGL_ES_2)
     GLuint temp;
     GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width(), temp);
     GLuint imageHeight = Utils::getNearestPowerOfTwo(image.height(), temp);
