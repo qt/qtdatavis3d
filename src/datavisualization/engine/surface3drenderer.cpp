@@ -1190,7 +1190,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     if (!m_cachedIsSlicingActivated && (!m_renderCacheList.isEmpty()
                                         || !m_customRenderCache.isEmpty())
             && m_selectionState == SelectOnScene
-            && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone) {
+            && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
+            && m_selectionResultTexture) {
         m_selectionShader->bind();
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glViewport(0,
@@ -2690,10 +2691,12 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
-        m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
-                                          m_shadowQualityMultiplier, 1.0f);
-        m_depthModelTexture = m_textureHelper->createDepthTexture(m_primarySubViewport.size(),
-                                                                  m_shadowQualityMultiplier);
+        if (m_depthTexture) {
+            m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
+                                              m_shadowQualityMultiplier, 1.0f);
+            m_depthModelTexture = m_textureHelper->createDepthTexture(m_primarySubViewport.size(),
+                                                                      m_shadowQualityMultiplier);
+        }
         if (!m_depthTexture || !m_depthModelTexture)
             lowerShadowQuality();
     }

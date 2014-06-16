@@ -116,11 +116,22 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     if (!depthBuffer)
         glGenRenderbuffers(1, &depthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
+    GLenum status = glGetError();
+    // glGetError docs advise to call glGetError in loop to clear all error flags
+    while (status)
+        status = glGetError();
 #if !defined(QT_OPENGL_ES_2)
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size.width(), size.height());
 #else
     glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.width(), size.height());
 #endif
+    status = glGetError();
+    if (status) {
+        qCritical() << "Selection texture render buffer creation failed:" << status;
+        glDeleteTextures(1, &textureid);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        return 0;
+    }
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // Create frame buffer
@@ -134,10 +145,11 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
     // Verify that the frame buffer is complete
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-        qCritical() << "Frame buffer creation failed" << status;
-        return 0;
+        qCritical() << "Selection texture frame buffer creation failed:" << status;
+        glDeleteTextures(1, &textureid);
+        textureid = 0;
     }
 
     // Restore the default framebuffer
@@ -212,8 +224,9 @@ GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &f
     // Verify that the frame buffer is complete
     GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-        qCritical() << "Frame buffer creation failed" << status;
-        return 0;
+        qCritical() << "Depth texture frame buffer creation failed" << status;
+        glDeleteTextures(1, &depthtextureid);
+        depthtextureid = 0;
     }
 
     // Restore the default framebuffer

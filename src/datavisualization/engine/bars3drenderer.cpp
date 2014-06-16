@@ -1117,7 +1117,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     // Skip selection mode drawing if we're slicing or have no selection mode
     if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
             && m_selectionState == SelectOnScene
-            && (m_visibleSeriesCount > 0 || !m_customRenderCache.isEmpty())) {
+            && (m_visibleSeriesCount > 0 || !m_customRenderCache.isEmpty())
+            && m_selectionTexture) {
         // Bind selection shader
         m_selectionShader->bind();
 

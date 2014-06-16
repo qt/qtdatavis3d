@@ -551,7 +551,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Skip selection mode drawing if we have no selection mode
     if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
             && SelectOnScene == m_selectionState
-            && (m_visibleSeriesCount > 0 || !m_customRenderCache.isEmpty())) {
+            && (m_visibleSeriesCount > 0 || !m_customRenderCache.isEmpty())
+            && m_selectionTexture) {
         // Draw dots to selection buffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_selectionFrameBuffer);
         glViewport(0, 0,
