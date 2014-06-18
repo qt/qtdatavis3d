@@ -106,10 +106,12 @@ void AxisRenderCache::setLabels(const QStringList &labels)
             if (i >= oldSize)
                 m_labelItems.append(new LabelItem);
             if (m_drawer) {
-                if (labels.at(i).isEmpty())
+                if (labels.at(i).isEmpty()) {
                     m_labelItems[i]->clear();
-                else if (i >= oldSize || labels.at(i) != m_labels.at(i))
+                } else if (i >= oldSize || labels.at(i) != m_labels.at(i)
+                           || m_labelItems[i]->size().width() != widest) {
                     m_drawer->generateLabelItem(*m_labelItems[i], labels.at(i), widest);
+                }
             }
         }
         m_labels = labels;
