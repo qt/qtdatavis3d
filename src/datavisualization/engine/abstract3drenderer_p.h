@@ -29,6 +29,8 @@
 #ifndef ABSTRACT3DRENDERER_P_H
 #define ABSTRACT3DRENDERER_P_H
 
+//#define USE_REFLECTIONS // Bars only test version (only floor reflects)
+
 #include <QtGui/QOpenGLFunctions>
 
 #include "datavisualizationglobal_p.h"
@@ -139,11 +141,19 @@ public:
     void setSelectionLabel(const QString &label);
     QString &selectionLabel();
 
+#ifdef USE_REFLECTIONS
+    void drawCustomItems(RenderingState state, ShaderHelper *shader,
+                         const QMatrix4x4 &viewMatrix,
+                         const QMatrix4x4 &projectionViewMatrix,
+                         const QMatrix4x4 &depthProjectionViewMatrix,
+                         GLuint depthTexture, GLfloat shadowQuality, GLfloat reflection = 1.0f);
+#else
     void drawCustomItems(RenderingState state, ShaderHelper *shader,
                          const QMatrix4x4 &viewMatrix,
                          const QMatrix4x4 &projectionViewMatrix,
                          const QMatrix4x4 &depthProjectionViewMatrix,
                          GLuint depthTexture, GLfloat shadowQuality);
+#endif
     QVector4D indexToSelectionColor(GLint index);
 
 signals:

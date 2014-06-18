@@ -149,6 +149,29 @@ private:
                     const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
                     GLfloat rowScaleFactor, GLfloat columnScaleFactor);
 
+#ifdef USE_REFLECTIONS
+    bool drawBars(BarRenderItem **selectedBar, const QMatrix4x4 &depthProjectionViewMatrix,
+                  const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
+                  GLint startRow, GLint stopRow, GLint stepRow,
+                  GLint startBar, GLint stopBar, GLint stepBar, GLfloat reflection = 1.0f);
+    void drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
+                        GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
+                        const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
+                        GLfloat reflection = 1.0f);
+#else
+    bool drawBars(BarRenderItem **selectedBar, const QMatrix4x4 &depthProjectionViewMatrix,
+                  const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
+                  GLint startRow, GLint stopRow, GLint stepRow,
+                  GLint startBar, GLint stopBar, GLint stepBar);
+    void drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
+                        GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
+                        const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix);
+#endif
+    void drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
+                       const QMatrix4x4 &depthProjectionViewMatrix,
+                       const QMatrix4x4 &projectionViewMatrix,
+                       const QMatrix4x4 &viewMatrix);
+
     void loadBackgroundMesh();
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);

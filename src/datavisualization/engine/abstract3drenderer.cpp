@@ -137,7 +137,7 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
     glEnable(GL_SCISSOR_TEST);
     QVector4D clearColor = Utils::vectorFromColor(m_cachedTheme->windowColor());
     glClearColor(clearColor.x(), clearColor.y(), clearColor.z(), 1.0f);
-    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
     glDisable(GL_SCISSOR_TEST);
 }
 
@@ -983,6 +983,16 @@ void Abstract3DRenderer::updateCustomItemPositions()
     }
 }
 
+#ifdef USE_REFLECTIONS
+void Abstract3DRenderer::drawCustomItems(RenderingState state,
+                                         ShaderHelper *shader,
+                                         const QMatrix4x4 &viewMatrix,
+                                         const QMatrix4x4 &projectionViewMatrix,
+                                         const QMatrix4x4 &depthProjectionViewMatrix,
+                                         GLuint depthTexture,
+                                         GLfloat shadowQuality,
+                                         GLfloat reflection)
+#else
 void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          ShaderHelper *shader,
                                          const QMatrix4x4 &viewMatrix,
@@ -990,6 +1000,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          const QMatrix4x4 &depthProjectionViewMatrix,
                                          GLuint depthTexture,
                                          GLfloat shadowQuality)
+#endif
 {
     if (m_customRenderCache.isEmpty())
         return;
@@ -1001,8 +1012,6 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
         shader->setUniformValue(shader->lightColor(),
                                 Utils::vectorFromColor(m_cachedTheme->lightColor()));
         shader->setUniformValue(shader->view(), viewMatrix);
-
-        glEnable(GL_TEXTURE_2D);
     }
 
     // Draw custom items
@@ -1035,10 +1044,36 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                     * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -camRotationY);
         }
 
+#ifdef USE_REFLECTIONS
+        if (reflection < 0.0f) {
+            if (item->itemPointer()->d_ptr->m_isLabelItem)
+                continue;
+            else
+                glCullFace(GL_FRONT);
+        } else {
+            glCullFace(GL_BACK);
+        }
+        QVector3D trans = item->translation();
+        trans.setY(reflection * trans.y());
+        modelMatrix.translate(trans);
+        if (reflection < 0.0f) {
+            QQuaternion mirror = QQuaternion(rotation.scalar(),
+                                             -rotation.x(), rotation.y(), -rotation.z());
+            modelMatrix.rotate(mirror);
+            itModelMatrix.rotate(mirror);
+        } else {
+            modelMatrix.rotate(rotation);
+            itModelMatrix.rotate(rotation);
+        }
+        QVector3D scale = item->scaling();
+        scale.setY(reflection * scale.y());
+        modelMatrix.scale(scale);
+#else
         modelMatrix.translate(item->translation());
         modelMatrix.rotate(rotation);
         modelMatrix.scale(item->scaling());
         itModelMatrix.rotate(rotation);
+#endif
         if (!item->isFacingCamera())
             itModelMatrix.scale(item->scaling());
         MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1091,7 +1126,6 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
     }
 
     if (RenderingNormal == state) {
-        glDisable(GL_TEXTURE_2D);
         glDisable(GL_BLEND);
         glEnable(GL_CULL_FACE);
     }
