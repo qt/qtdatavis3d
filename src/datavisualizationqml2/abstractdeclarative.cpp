@@ -329,6 +329,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::aspectRatioChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::optimizationHintsChanged, this,
                      &AbstractDeclarative::handleOptimizationHintChange);
+    QObject::connect(m_controller.data(), &Abstract3DController::polarChanged, this,
+                     &AbstractDeclarative::polarChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -722,6 +724,16 @@ AbstractDeclarative::OptimizationHints AbstractDeclarative::optimizationHints() 
 {
     int intmode = int(m_controller->optimizationHints());
     return OptimizationHints(intmode);
+}
+
+void AbstractDeclarative::setPolar(bool enable)
+{
+    m_controller->setPolar(enable);
+}
+
+bool AbstractDeclarative::isPolar() const
+{
+    return m_controller->isPolar();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

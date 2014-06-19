@@ -153,6 +153,19 @@
  */
 
 /*!
+ * \qmlproperty bool AbstractGraph3D::polar
+ * \since QtDataVisualization 1.2
+ *
+ * If \c {true}, the horizontal axes are changed into polar axes. The X axis becomes the
+ * angular axis and the Z axis becomes the radial axis.
+ * Polar mode is not available for bar graphs.
+ *
+ * Defaults to \c{false}.
+ *
+ * \sa orthoProjection, AbstractAxis3D::gridOffset, radialLabelOffset
+ */
+
+/*!
  * \qmlmethod void AbstractGraph3D::clearSelection()
  * Clears selection from all attached series.
  */

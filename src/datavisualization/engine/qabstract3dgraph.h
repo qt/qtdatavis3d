@@ -50,6 +50,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged)
     Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged)
     Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged)
+    Q_PROPERTY(bool polar READ isPolar WRITE setPolar NOTIFY polarChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -150,6 +151,9 @@ public:
     void setOptimizationHints(OptimizationHints hints);
     OptimizationHints optimizationHints() const;
 
+    void setPolar(bool enable);
+    bool isPolar() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -173,6 +177,7 @@ signals:
     void orthoProjectionChanged(bool enabled);
     void aspectRatioChanged(qreal ratio);
     void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    void polarChanged(bool enabled);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)

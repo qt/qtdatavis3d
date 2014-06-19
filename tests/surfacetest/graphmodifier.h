@@ -131,6 +131,7 @@ public slots:
     void toggleAxisTitleFixed(bool enabled);
     void toggleXAscending(bool enabled);
     void toggleZAscending(bool enabled);
+    void togglePolar(bool enabled);
 
 private:
     void fillSeries();

@@ -54,13 +54,13 @@ public:
     ~SurfaceObject();
 
     void setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
-                   bool changeGeometry, bool flipXZ = false);
+                   bool changeGeometry, bool polar, bool flipXZ = false);
     void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
-                         bool changeGeometry, bool flipXZ = false);
-    void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex);
-    void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow);
-    void updateSmoothItem(const QSurfaceDataArray &dataArray, int row, int column);
-    void updateCoarseItem(const QSurfaceDataArray &dataArray, int row, int column);
+                         bool changeGeometry, bool polar, bool flipXZ = false);
+    void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex, bool polar);
+    void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow, bool polar);
+    void updateSmoothItem(const QSurfaceDataArray &dataArray, int row, int column, bool polar);
+    void updateCoarseItem(const QSurfaceDataArray &dataArray, int row, int column, bool polar);
     void createSmoothIndices(int x, int y, int endX, int endY);
     void createCoarseIndices(int x, int y, int columns, int rows);
     void createSmoothGridlineIndices(int x, int y, int endX, int endY);
@@ -90,6 +90,7 @@ private:
     AxisRenderCache &m_axisCacheX;
     AxisRenderCache &m_axisCacheY;
     AxisRenderCache &m_axisCacheZ;
+    Surface3DRenderer *m_renderer;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

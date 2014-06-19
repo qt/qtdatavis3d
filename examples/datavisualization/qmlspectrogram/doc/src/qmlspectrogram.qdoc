@@ -1,0 +1,41 @@
+/****************************************************************************
+**
+** Copyright (C) 2014 Digia Plc
+** All rights reserved.
+** For any questions to Digia, please use contact form at http://qt.digia.com
+**
+** This file is part of the QtDataVisualization module.
+**
+** Licensees holding valid Qt Enterprise licenses may use this file in
+** accordance with the Qt Enterprise License Agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and Digia.
+**
+** If you have questions regarding the use of this file, please use
+** contact form at http://qt.digia.com
+**
+****************************************************************************/
+
+/*!
+    \example qmlspectrogram
+    \title Qt Quick 2 Spectrogram Example
+    \ingroup qtdatavisualization_examples
+    \brief Showing spectrogram graph in a QML application.
+
+    The Qt Quick 2 surface example demonstrates how to show a polar and cartesian spectrograms
+    and how to utilize orthographic projection to show them in 2D.
+
+    TODO!!!
+
+    \image qmlspectrogram-example.png
+
+    The focus in this example is on showing how to display spectrograms, so the basic
+    functionality is not explained. For more detailed QML example documentation,
+    see \l{Qt Quick 2 Scatter Example}.
+
+    \section1 TODO
+
+    \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 0
+
+    \section1 Example contents
+*/

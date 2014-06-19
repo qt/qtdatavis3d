@@ -33,7 +33,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 // Margin for background (1.10 make it 10% larger to avoid
 // selection ball being drawn inside background)
 const GLfloat backgroundMargin = 1.1f;
-const GLfloat gridLineWidth = 0.005f;
 const GLfloat sliceZScale = 0.1f;
 const GLfloat sliceUnits = 2.5f;
 const uint greenMultiplier = 256;
@@ -53,12 +52,10 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionShader(0),
       m_labelShader(0),
       m_heightNormalizer(0.0f),
-      m_scaleFactor(0.0f),
       m_scaleX(0.0f),
       m_scaleZ(0.0f),
       m_scaleXWithBackground(0.0f),
       m_scaleZWithBackground(0.0f),
-      m_depthTexture(0),
       m_depthModelTexture(0),
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
@@ -301,10 +298,13 @@ void Surface3DRenderer::updateRows(const QVector<Surface3DController::ChangeRow>
                             srcArray->at(row)->at(j + sampleSpace.x());
                 }
 
-                if (cache->isFlatShadingEnabled())
-                    cache->surfaceObject()->updateCoarseRow(dstArray, row - sampleSpace.y());
-                else
-                    cache->surfaceObject()->updateSmoothRow(dstArray, row - sampleSpace.y());
+                if (cache->isFlatShadingEnabled()) {
+                    cache->surfaceObject()->updateCoarseRow(dstArray, row - sampleSpace.y(),
+                                                            m_polarGraph);
+                } else {
+                    cache->surfaceObject()->updateSmoothRow(dstArray, row - sampleSpace.y(),
+                                                            m_polarGraph);
+                }
             }
             if (updateBuffers)
                 cache->surfaceObject()->uploadBuffers();
@@ -343,9 +343,9 @@ void Surface3DRenderer::updateItems(const QVector<Surface3DController::ChangeIte
                 (*(dstArray.at(y)))[x] = srcArray->at(point.x())->at(point.y());
 
                 if (cache->isFlatShadingEnabled())
-                    cache->surfaceObject()->updateCoarseItem(dstArray, y, x);
+                    cache->surfaceObject()->updateCoarseItem(dstArray, y, x, m_polarGraph);
                 else
-                    cache->surfaceObject()->updateSmoothItem(dstArray, y, x);
+                    cache->surfaceObject()->updateSmoothItem(dstArray, y, x, m_polarGraph);
             }
             if (updateBuffers)
                 cache->surfaceObject()->uploadBuffers();
@@ -538,10 +538,12 @@ void Surface3DRenderer::updateSliceObject(SurfaceSeriesRenderCache *cache, const
 
     QRect sliceRect(0, 0, sliceRow->size(), 2);
     if (sliceRow->size() > 0) {
-        if (cache->isFlatShadingEnabled())
-            cache->sliceSurfaceObject()->setUpData(sliceDataArray, sliceRect, true, flipZX);
-        else
-            cache->sliceSurfaceObject()->setUpSmoothData(sliceDataArray, sliceRect, true, flipZX);
+        if (cache->isFlatShadingEnabled()) {
+            cache->sliceSurfaceObject()->setUpData(sliceDataArray, sliceRect, true, false, flipZX);
+        } else {
+            cache->sliceSurfaceObject()->setUpSmoothData(sliceDataArray, sliceRect, true, false,
+                                                         flipZX);
+        }
     }
 }
 
@@ -902,8 +904,8 @@ void Surface3DRenderer::drawSlicedScene()
             modelMatrix.scale(gridLineScaleY);
             itModelMatrix.scale(gridLineScaleY);
 #if (defined QT_OPENGL_ES_2)
-            modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
-            itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+            modelMatrix.rotate(m_zRightAngleRotation);
+            itModelMatrix.rotate(m_zRightAngleRotation);
 #endif
 
             MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1365,7 +1367,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         // If we're viewing from below, background object must be flipped
         if (m_yFlipped) {
-            modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+            modelMatrix.rotate(m_xFlipRotation);
             modelMatrix.rotate(270.0f - backgroundRotation, 0.0f, 1.0f, 0.0f);
         } else {
             modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
@@ -1461,205 +1463,213 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         QQuaternion lineXRotation;
 
         if (m_xFlipped)
-            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
+            lineYRotation = m_yRightAngleRotationNeg;
         else
-            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+            lineYRotation = m_yRightAngleRotation;
 
         if (m_yFlipped)
-            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f);
+            lineXRotation = m_xRightAngleRotation;
         else
-            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f);
+            lineXRotation = m_xRightAngleRotationNeg;
 
-        GLfloat yFloorLinePosition = -backgroundMargin + gridLineOffset;
+        float yFloorLinePosition = -backgroundMargin + gridLineOffset;
         if (m_yFlipped)
             yFloorLinePosition = -yFloorLinePosition;
 
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
-            // Floor lines
             int gridLineCount = m_axisCacheZ.gridLineCount();
+            // Floor lines
+            if (m_polarGraph) {
+                drawRadialGrid(lineShader, yFloorLinePosition, projectionViewMatrix,
+                               depthProjectionViewMatrix);
+            } else {
+                for (int line = 0; line < gridLineCount; line++) {
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 itModelMatrix;
 
-            for (int line = 0; line < gridLineCount; line++) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-                QMatrix4x4 itModelMatrix;
+                    modelMatrix.translate(0.0f, yFloorLinePosition,
+                                          m_axisCacheZ.gridLinePosition(line));
 
-                modelMatrix.translate(0.0f, yFloorLinePosition,
-                                      m_axisCacheZ.gridLinePosition(line));
+                    modelMatrix.scale(gridLineScaleX);
+                    itModelMatrix.scale(gridLineScaleX);
 
-                modelMatrix.scale(gridLineScaleX);
-                itModelMatrix.scale(gridLineScaleX);
+                    modelMatrix.rotate(lineXRotation);
+                    itModelMatrix.rotate(lineXRotation);
 
-                modelMatrix.rotate(lineXRotation);
-                itModelMatrix.rotate(lineXRotation);
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                MVPMatrix = projectionViewMatrix * modelMatrix;
-
-                // Set the rest of the shader bindings
-                lineShader->setUniformValue(lineShader->model(), modelMatrix);
-                lineShader->setUniformValue(lineShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+                    // Set the rest of the shader bindings
+                    lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                    lineShader->setUniformValue(lineShader->nModel(),
+                                                itModelMatrix.inverted().transposed());
+                    lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
+#else
+                    m_drawer->drawLine(lineShader);
+#endif
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
-            }
+                // Side wall lines
+                GLfloat lineXTrans = m_scaleXWithBackground - gridLineOffset;
 
-            // Side wall lines
-            GLfloat lineXTrans = m_scaleXWithBackground - gridLineOffset;
+                if (!m_xFlipped)
+                    lineXTrans = -lineXTrans;
 
-            if (!m_xFlipped)
-                lineXTrans = -lineXTrans;
+                for (int line = 0; line < gridLineCount; line++) {
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 itModelMatrix;
 
-            for (int line = 0; line < gridLineCount; line++) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-                QMatrix4x4 itModelMatrix;
+                    modelMatrix.translate(lineXTrans, 0.0f, m_axisCacheZ.gridLinePosition(line));
 
-                modelMatrix.translate(lineXTrans, 0.0f, m_axisCacheZ.gridLinePosition(line));
-
-                modelMatrix.scale(gridLineScaleY);
-                itModelMatrix.scale(gridLineScaleY);
+                    modelMatrix.scale(gridLineScaleY);
+                    itModelMatrix.scale(gridLineScaleY);
 
 #if !defined(QT_OPENGL_ES_2)
-                modelMatrix.rotate(lineYRotation);
-                itModelMatrix.rotate(lineYRotation);
+                    modelMatrix.rotate(lineYRotation);
+                    itModelMatrix.rotate(lineYRotation);
 #else
-                modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
-                itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+                    modelMatrix.rotate(m_zRightAngleRotation);
+                    itModelMatrix.rotate(m_zRightAngleRotation);
 #endif
 
-                MVPMatrix = projectionViewMatrix * modelMatrix;
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                // Set the rest of the shader bindings
-                lineShader->setUniformValue(lineShader->model(), modelMatrix);
-                lineShader->setUniformValue(lineShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+                    // Set the rest of the shader bindings
+                    lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                    lineShader->setUniformValue(lineShader->nModel(),
+                                                itModelMatrix.inverted().transposed());
+                    lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
+#else
+                    m_drawer->drawLine(lineShader);
+#endif
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
             }
         }
 
         // Columns (= X)
         if (m_axisCacheX.segmentCount() > 0) {
 #if defined(QT_OPENGL_ES_2)
-            lineXRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+            lineXRotation = m_yRightAngleRotation;
 #endif
             // Floor lines
             int gridLineCount = m_axisCacheX.gridLineCount();
 
-            for (int line = 0; line < gridLineCount; line++) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-                QMatrix4x4 itModelMatrix;
+            if (m_polarGraph) {
+                drawAngularGrid(lineShader, yFloorLinePosition, projectionViewMatrix,
+                               depthProjectionViewMatrix);
+            } else {
+                for (int line = 0; line < gridLineCount; line++) {
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(m_axisCacheX.gridLinePosition(line), yFloorLinePosition,
-                                      0.0f);
+                    modelMatrix.translate(m_axisCacheX.gridLinePosition(line), yFloorLinePosition,
+                                          0.0f);
 
-                modelMatrix.scale(gridLineScaleZ);
-                itModelMatrix.scale(gridLineScaleZ);
+                    modelMatrix.scale(gridLineScaleZ);
+                    itModelMatrix.scale(gridLineScaleZ);
 
-                modelMatrix.rotate(lineXRotation);
-                itModelMatrix.rotate(lineXRotation);
+                    modelMatrix.rotate(lineXRotation);
+                    itModelMatrix.rotate(lineXRotation);
 
-                MVPMatrix = projectionViewMatrix * modelMatrix;
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                // Set the rest of the shader bindings
-                lineShader->setUniformValue(lineShader->model(), modelMatrix);
-                lineShader->setUniformValue(lineShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
-
-#if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
-                }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
-            }
-
-            // Back wall lines
-            GLfloat lineZTrans = m_scaleZWithBackground - gridLineOffset;
-
-            if (!m_zFlipped)
-                lineZTrans = -lineZTrans;
-
-            for (int line = 0; line < gridLineCount; line++) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-                QMatrix4x4 itModelMatrix;
-
-                modelMatrix.translate(m_axisCacheX.gridLinePosition(line), 0.0f, lineZTrans);
-
-                modelMatrix.scale(gridLineScaleY);
-                itModelMatrix.scale(gridLineScaleY);
+                    // Set the rest of the shader bindings
+                    lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                    lineShader->setUniformValue(lineShader->nModel(),
+                                                itModelMatrix.inverted().transposed());
+                    lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
-                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
-                }
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
 #else
-                modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
-                itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+                    m_drawer->drawLine(lineShader);
 #endif
+                }
 
-                MVPMatrix = projectionViewMatrix * modelMatrix;
+                // Back wall lines
+                GLfloat lineZTrans = m_scaleZWithBackground - gridLineOffset;
 
-                // Set the rest of the shader bindings
-                lineShader->setUniformValue(lineShader->model(), modelMatrix);
-                lineShader->setUniformValue(lineShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+                if (!m_zFlipped)
+                    lineZTrans = -lineZTrans;
+
+                for (int line = 0; line < gridLineCount; line++) {
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 itModelMatrix;
+
+                    modelMatrix.translate(m_axisCacheX.gridLinePosition(line), 0.0f, lineZTrans);
+
+                    modelMatrix.scale(gridLineScaleY);
+                    itModelMatrix.scale(gridLineScaleY);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
-                }
+                    if (m_zFlipped) {
+                        modelMatrix.rotate(m_xFlipRotation);
+                        itModelMatrix.rotate(m_xFlipRotation);
+                    }
 #else
-                m_drawer->drawLine(lineShader);
+                    modelMatrix.rotate(m_zRightAngleRotation);
+                    itModelMatrix.rotate(m_zRightAngleRotation);
 #endif
+
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
+
+                    // Set the rest of the shader bindings
+                    lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                    lineShader->setUniformValue(lineShader->nModel(),
+                                                itModelMatrix.inverted().transposed());
+                    lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+
+#if !defined(QT_OPENGL_ES_2)
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
+#else
+                    m_drawer->drawLine(lineShader);
+#endif
+                }
             }
         }
 
@@ -1684,8 +1694,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaleX);
 
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
-                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    modelMatrix.rotate(m_xFlipRotation);
+                    itModelMatrix.rotate(m_xFlipRotation);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1833,8 +1843,15 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     QVector3D positionZComp(0.0f, 0.0f, 0.0f);
     if (m_axisCacheZ.segmentCount() > 0) {
         int labelCount = m_axisCacheZ.labelCount();
-        GLfloat labelXTrans = m_scaleXWithBackground + labelMargin;
-        GLfloat labelYTrans = -backgroundMargin;
+        float labelXTrans = 0.0f;
+        float labelYTrans = -backgroundMargin;
+        if (m_polarGraph) {
+            // TODO optional placement of radial labels - YTrans up only if over background
+            labelXTrans = m_scaleXWithBackground + labelMargin;
+            //labelYTrans += gridLineOffset + gridLineWidth;
+        } else {
+            labelXTrans = m_scaleXWithBackground + labelMargin;
+        }
         Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
         if (m_xFlipped)
@@ -1921,10 +1938,17 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
-            // Draw the label here
-            labelTrans.setZ(m_axisCacheZ.labelPosition(label));
-            m_dummyRenderItem.setTranslation(labelTrans);
             const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(label);
+            // Draw the label here
+            if (m_polarGraph) {
+                float direction = m_zFlipped ? -1.0f : 1.0f;
+                labelTrans.setZ((m_axisCacheZ.formatter()->labelPositions().at(label)
+                                * -m_graphAspectRatio
+                                + m_drawer->scaledFontSize() + gridLineWidth) * direction);
+            } else {
+                labelTrans.setZ(m_axisCacheZ.labelPosition(label));
+            }
+            m_dummyRenderItem.setTranslation(labelTrans);
 
             if (drawSelection) {
                 QVector4D labelColor = QVector4D(label / 255.0f, 0.0f, 0.0f,
@@ -1953,8 +1977,13 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheX.labelCount();
 
-        GLfloat labelZTrans = m_scaleZWithBackground + labelMargin;
+        GLfloat labelZTrans = 0.0f;
         GLfloat labelYTrans = -backgroundMargin;
+        if (m_polarGraph)
+            labelYTrans += gridLineOffset + gridLineWidth;
+        else
+            labelZTrans = m_scaleZWithBackground + labelMargin;
+
         Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
         if (m_zFlipped)
@@ -2023,7 +2052,14 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 }
             }
         }
+
         QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
+        if (m_polarGraph) {
+            if (m_zFlipped != m_xFlipped)
+                totalRotation *= m_zRightAngleRotation;
+            else
+                totalRotation *= m_zRightAngleRotationNeg;
+        }
 
         QVector3D labelTrans = QVector3D(0.0f,
                                          labelYTrans,
@@ -2039,10 +2075,44 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             indexStep = 1;
         }
         float offsetValue = 0.0f;
+        bool showLastLabel = false;
+        QVector<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
+        int lastGridPosIndex = gridPositions.size() - 1;
+        if (gridPositions.size()
+                && (gridPositions.at(lastGridPosIndex) != 1.0f || gridPositions.at(0) != 0.0f)) {
+            // Avoid overlapping first and last label if they would get on same position
+            showLastLabel = true;
+        }
+
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
             // Draw the label here
-            labelTrans.setX(m_axisCacheX.labelPosition(label));
+            if (m_polarGraph) {
+                // Calculate angular position
+                if (label == lastGridPosIndex && !showLastLabel)
+                    continue;
+                float gridPosition = m_axisCacheX.formatter()->gridPositions().at(label);
+                qreal angle = gridPosition * M_PI * 2.0;
+                labelTrans.setX((m_graphAspectRatio + labelMargin)* float(qSin(angle)));
+                labelTrans.setZ(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)));
+                // Alignment depends on label angular position, as well as flips
+                Qt::AlignmentFlag vAlignment = Qt::AlignCenter;
+                Qt::AlignmentFlag hAlignment = Qt::AlignCenter;
+                const float centerMargin = 0.005f;
+                if (gridPosition < 0.25f - centerMargin || gridPosition > 0.75f + centerMargin)
+                    vAlignment = m_zFlipped ? Qt::AlignTop : Qt::AlignBottom;
+                else if (gridPosition > 0.25f + centerMargin && gridPosition < 0.75f - centerMargin)
+                    vAlignment = m_zFlipped ? Qt::AlignBottom : Qt::AlignTop;
+
+                if (gridPosition < 0.50f - centerMargin && gridPosition > centerMargin)
+                    hAlignment = m_zFlipped ? Qt::AlignRight : Qt::AlignLeft;
+                else if (gridPosition < 1.0f - centerMargin && gridPosition > 0.5f + centerMargin)
+                    hAlignment = m_zFlipped ? Qt::AlignLeft : Qt::AlignRight;
+
+                alignment = Qt::AlignmentFlag(vAlignment | hAlignment);
+            } else {
+                labelTrans.setX(m_axisCacheX.labelPosition(label));
+            }
             m_dummyRenderItem.setTranslation(labelTrans);
             const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(label);
 
@@ -2298,13 +2368,18 @@ void Surface3DRenderer::calculateSceneScalingFactors()
     m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min());
     m_areaSize.setHeight(m_axisCacheZ.max() -  m_axisCacheZ.min());
     m_areaSize.setWidth(m_axisCacheX.max() - m_axisCacheX.min());
-    m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
-    m_scaleX = m_graphAspectRatio * m_areaSize.width() / m_scaleFactor;
-    m_scaleZ = m_graphAspectRatio * m_areaSize.height() / m_scaleFactor;
+    float scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
+    if (m_polarGraph) {
+        m_scaleX = m_graphAspectRatio;
+        m_scaleZ = m_graphAspectRatio;
+    } else {
+        m_scaleX = m_graphAspectRatio * m_areaSize.width() / scaleFactor;
+        m_scaleZ = m_graphAspectRatio * m_areaSize.height() / scaleFactor;
+    }
     m_scaleXWithBackground = m_scaleX + backgroundMargin - 1.0f;
     m_scaleZWithBackground = m_scaleZ + backgroundMargin - 1.0f;
 
-    float factorScaler = 2.0f * m_graphAspectRatio / m_scaleFactor;
+    float factorScaler = 2.0f * m_graphAspectRatio / scaleFactor;
     m_axisCacheX.setScale(factorScaler * m_areaSize.width());
     m_axisCacheZ.setScale(-factorScaler * m_areaSize.height());
     m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
@@ -2327,10 +2402,12 @@ void Surface3DRenderer::updateObjects(SurfaceSeriesRenderCache *cache, bool dime
     QSurfaceDataArray &dataArray = cache->dataArray();
     const QRect &sampleSpace = cache->sampleSpace();
 
-    if (cache->isFlatShadingEnabled())
-        cache->surfaceObject()->setUpData(dataArray, sampleSpace, dimensionChanged);
-    else
-        cache->surfaceObject()->setUpSmoothData(dataArray, sampleSpace, dimensionChanged);
+    if (cache->isFlatShadingEnabled()) {
+        cache->surfaceObject()->setUpData(dataArray, sampleSpace, dimensionChanged, m_polarGraph);
+    } else {
+        cache->surfaceObject()->setUpSmoothData(dataArray, sampleSpace, dimensionChanged,
+                                                m_polarGraph);
+    }
 }
 
 void Surface3DRenderer::updateSelectedPoint(const QPoint &position, QSurface3DSeries *series)

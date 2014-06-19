@@ -8,7 +8,8 @@ SUBDIRS += qmlbars \
            qmloscilloscope \
            qmlsurfacelayers \
            qmlaxisformatter \
-           qmlaxisdrag
+           qmlaxisdrag \
+           qmlspectrogram
 
 !android:!ios {
     SUBDIRS += bars \

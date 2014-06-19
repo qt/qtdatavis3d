@@ -31,7 +31,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-const GLfloat gridLineWidth = 0.005f;
 const bool sliceGridLabels = true;
 
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
@@ -50,7 +49,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_backgroundShader(0),
       m_labelShader(0),
       m_bgrTexture(0),
-      m_depthTexture(0),
       m_selectionTexture(0),
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
@@ -421,7 +419,6 @@ void Bars3DRenderer::drawSlicedScene()
     GLfloat barPosX = 0;
     QVector3D lightPos;
     QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
-    static QQuaternion ninetyDegreeRotation = QQuaternion::fromAxisAndAngle(upVector, 90.0f);
 
     // Specify viewport
     glViewport(m_secondarySubViewport.x(),
@@ -698,7 +695,7 @@ void Bars3DRenderer::drawSlicedScene()
                     barPosX = item.translation().x();
                 } else {
                     barPosX = -(item.translation().z()); // flip z; frontmost bar to the left
-                    barRotation *= ninetyDegreeRotation;
+                    barRotation *= m_yRightAngleRotation;
                 }
 
                 modelMatrix.translate(barPosX, barPosY, 0.0f);
@@ -1701,9 +1698,9 @@ void Bars3DRenderer::drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleF
         modelMatrix.scale(backgroundScaler);
 
         if (m_yFlipped)
-            modelMatrix.rotate(90.0f, 1.0f, 0.0f, 0.0f);
+            modelMatrix.rotate(m_xRightAngleRotation);
         else
-            modelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
+            modelMatrix.rotate(m_xRightAngleRotationNeg);
 
         itModelMatrix = modelMatrix;
 
@@ -1835,9 +1832,9 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
         QVector3D gridLineScaler(rowScaleFactor, gridLineWidth, gridLineWidth);
 
         if (m_yFlipped)
-            lineRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f);
+            lineRotation = m_xRightAngleRotation;
         else
-            lineRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f);
+            lineRotation = m_xRightAngleRotationNeg;
 
         // Floor lines: rows
         for (GLfloat row = 0.0f; row <= m_cachedRowCount; row++) {
@@ -1879,7 +1876,7 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
 
         // Floor lines: columns
 #if defined(QT_OPENGL_ES_2)
-        lineRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+        lineRotation = m_yRightAngleRotation;
 #endif
         gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, columnScaleFactor);
         for (GLfloat bar = 0.0f; bar <= m_cachedColumnCount; bar++) {
@@ -1939,8 +1936,8 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
-                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    modelMatrix.rotate(m_xFlipRotation);
+                    itModelMatrix.rotate(m_xFlipRotation);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1973,9 +1970,9 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
                 xWallLinePosition = -xWallLinePosition;
 
             if (m_xFlipped)
-                lineRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
+                lineRotation = m_yRightAngleRotationNeg;
             else
-                lineRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+                lineRotation = m_yRightAngleRotation;
 
             gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, columnScaleFactor);
             for (int line = 0; line < gridLineCount; line++) {

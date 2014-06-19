@@ -125,6 +125,7 @@ public:
     virtual void updateCustomItem(CustomRenderItem *renderItem);
 
     virtual void updateAspectRatio(float ratio);
+    virtual void updatePolar(bool enable);
 
     virtual QVector3D convertPositionToTranslation(const QVector3D &position,
                                                    bool isAbsolute) = 0;
@@ -155,6 +156,7 @@ public:
                          GLuint depthTexture, GLfloat shadowQuality);
 #endif
     QVector4D indexToSelectionColor(GLint index);
+    void calculatePolarXZ(const QVector3D &dataPos, float &x, float &z) const;
 
 signals:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
@@ -197,6 +199,11 @@ protected:
     void loadGridLineMesh();
     void loadLabelMesh();
 
+    void drawRadialGrid(ShaderHelper *shader, float yFloorLinePos,
+                        const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &depthMatrix);
+    void drawAngularGrid(ShaderHelper *shader, float yFloorLinePos,
+                         const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &depthMatrix);
+
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
     Drawer *m_drawer;
@@ -211,6 +218,7 @@ protected:
     AxisRenderCache m_axisCacheY;
     AxisRenderCache m_axisCacheZ;
     TextureHelper *m_textureHelper;
+    GLuint m_depthTexture;
 
     Q3DScene *m_cachedScene;
     bool m_selectionDirty;
@@ -244,6 +252,15 @@ protected:
     ObjectHelper *m_labelObj; // Shared reference
 
     float m_graphAspectRatio;
+    bool m_polarGraph;
+
+    QQuaternion m_xRightAngleRotation;
+    QQuaternion m_yRightAngleRotation;
+    QQuaternion m_zRightAngleRotation;
+    QQuaternion m_xRightAngleRotationNeg;
+    QQuaternion m_yRightAngleRotationNeg;
+    QQuaternion m_zRightAngleRotationNeg;
+    QQuaternion m_xFlipRotation;
 
 private:
     friend class Abstract3DController;

@@ -50,6 +50,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_isCustomItemDirty(true),
     m_isSeriesVisualsDirty(true),
     m_renderPending(false),
+    m_isPolar(false),
     m_measureFps(false),
     m_numFrames(0),
     m_currentFps(0.0)
@@ -175,6 +176,11 @@ void Abstract3DController::synchDataToRenderer()
         m_renderer->updateScene(m_scene);
 
     m_renderer->updateTheme(m_themeManager->activeTheme());
+
+    if (m_changeTracker.polarChanged) {
+        m_renderer->updatePolar(m_isPolar);
+        m_changeTracker.polarChanged = false;
+    }
 
     if (m_changeTracker.shadowQualityChanged) {
         m_renderer->updateShadowQuality(m_shadowQuality);
@@ -1519,6 +1525,22 @@ void Abstract3DController::setAspectRatio(float ratio)
 float Abstract3DController::aspectRatio()
 {
     return m_aspectRatio;
+}
+
+void Abstract3DController::setPolar(bool enable)
+{
+    if (enable != m_isPolar) {
+        m_isPolar = enable;
+        m_changeTracker.polarChanged = true;
+        m_isDataDirty = true;
+        emit polarChanged(m_isPolar);
+        emitNeedRender();
+    }
+}
+
+bool Abstract3DController::isPolar() const
+{
+    return m_isPolar;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

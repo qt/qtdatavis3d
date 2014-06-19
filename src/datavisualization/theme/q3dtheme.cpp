@@ -679,7 +679,7 @@ QLinearGradient Q3DTheme::multiHighlightGradient() const
 /*!
  * \property Q3DTheme::lightStrength
  *
- * Specular light strength for the whole graph. Value must be 0.0f and 10.0f.
+ * Specular light strength for the whole graph. Value must be between 0.0f and 10.0f.
  */
 void Q3DTheme::setLightStrength(float strength)
 {

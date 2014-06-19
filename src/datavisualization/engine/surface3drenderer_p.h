@@ -57,12 +57,10 @@ private:
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_labelShader;
     GLfloat m_heightNormalizer;
-    GLfloat m_scaleFactor;
     GLfloat m_scaleX;
     GLfloat m_scaleZ;
     GLfloat m_scaleXWithBackground;
     GLfloat m_scaleZWithBackground;
-    GLuint m_depthTexture;
     GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;

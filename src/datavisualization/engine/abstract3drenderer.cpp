@@ -25,7 +25,15 @@
 #include "qcustom3ditem_p.h"
 #include "qcustom3dlabel_p.h"
 
+#include <QtCore/qmath.h>
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+
+const qreal doublePi(M_PI * 2.0);
+const int polarGridRoundness(64);
+const qreal polarGridAngle(doublePi / qreal(polarGridRoundness));
+const float polarGridAngleDegrees(float(360.0 / qreal(polarGridRoundness)));
+const qreal polarGridHalfAngle(polarGridAngle / 2.0);
 
 Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
     : QObject(0),
@@ -37,6 +45,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_cachedSelectionMode(QAbstract3DGraph::SelectionNone),
       m_cachedOptimizationHint(QAbstract3DGraph::OptimizationDefault),
       m_textureHelper(0),
+      m_depthTexture(0),
       m_cachedScene(new Q3DScene()),
       m_selectionDirty(true),
       m_selectionState(SelectNone),
@@ -55,7 +64,15 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
-      m_graphAspectRatio(2.0f)
+      m_graphAspectRatio(2.0f),
+      m_polarGraph(false),
+      m_xRightAngleRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f)),
+      m_yRightAngleRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f)),
+      m_zRightAngleRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, 90.0f)),
+      m_xRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f)),
+      m_yRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f)),
+      m_zRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -90.0f)),
+      m_xFlipRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -180.0f))
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,
@@ -89,7 +106,10 @@ Abstract3DRenderer::~Abstract3DRenderer()
     ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
     ObjectHelper::releaseObjectHelper(this, m_labelObj);
 
-    delete m_textureHelper;
+    if (m_textureHelper) {
+        m_textureHelper->deleteTexture(&m_depthTexture);
+        delete m_textureHelper;
+    }
 }
 
 void Abstract3DRenderer::initializeOpenGL()
@@ -282,6 +302,14 @@ void Abstract3DRenderer::updateAspectRatio(float ratio)
     m_graphAspectRatio = ratio;
     calculateZoomLevel();
     m_cachedScene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
+    updateCustomItemPositions();
+}
+
+void Abstract3DRenderer::updatePolar(bool enable)
+{
+    m_polarGraph = enable;
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
     updateCustomItemPositions();
@@ -607,10 +635,9 @@ void Abstract3DRenderer::drawAxisTitleY(const QVector3D &sideLabelRotation,
     QQuaternion titleRotation;
     if (m_axisCacheY.isTitleFixed()) {
         titleRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation)
-                * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, 90.0f);
+                * m_zRightAngleRotation;
     } else {
-        titleRotation = totalRotation
-                * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, 90.0f);
+        titleRotation = totalRotation * m_zRightAngleRotation;
     }
     dummyItem.setTranslation(titleTrans + titleOffsetVector);
 
@@ -792,7 +819,6 @@ void Abstract3DRenderer::loadLabelMesh()
     ObjectHelper::resetObjectHelper(this, m_labelObj,
                                     QStringLiteral(":/defaultMeshes/plane"));
 }
-
 
 void Abstract3DRenderer::generateBaseColorTexture(const QColor &color, GLuint *texture)
 {
@@ -1128,6 +1154,120 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
     if (RenderingNormal == state) {
         glDisable(GL_BLEND);
         glEnable(GL_CULL_FACE);
+    }
+}
+
+void Abstract3DRenderer::calculatePolarXZ(const QVector3D &dataPos, float &x, float &z) const
+{
+    // x is angular, z is radial
+    qreal angle = m_axisCacheX.formatter()->positionAt(dataPos.x()) * doublePi;
+    qreal radius = m_axisCacheZ.formatter()->positionAt(dataPos.z());
+
+    // Convert angle & radius to X and Z coords
+    x = float(radius * qSin(angle)) * m_graphAspectRatio;
+    z = -float(radius * qCos(angle)) * m_graphAspectRatio;
+}
+
+void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePos,
+                                        const QMatrix4x4 &projectionViewMatrix,
+                                        const QMatrix4x4 &depthMatrix)
+{
+    static QVector<QQuaternion> lineRotations;
+    if (!lineRotations.size()) {
+        lineRotations.resize(polarGridRoundness);
+        for (int j = 0; j < polarGridRoundness; j++) {
+            lineRotations[j] = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f,
+                                                             polarGridAngleDegrees * float(j));
+        }
+    }
+    int gridLineCount = m_axisCacheZ.gridLineCount();
+    const QVector<float> &gridPositions = m_axisCacheZ.formatter()->gridPositions();
+    const QVector<float> &subGridPositions = m_axisCacheZ.formatter()->subGridPositions();
+    int mainSize = gridPositions.size();
+    QVector3D translateVector(0.0f, yFloorLinePos, 0.0f);
+    for (int i = 0; i < gridLineCount; i++) {
+        float gridPosition = (i >= mainSize)
+                ? subGridPositions.at(i - mainSize) : gridPositions.at(i);
+        float radiusFraction = m_graphAspectRatio * gridPosition;
+        QVector3D gridLineScaler(radiusFraction * float(qSin(polarGridHalfAngle)),
+                                 gridLineWidth, gridLineWidth);
+        translateVector.setZ(gridPosition * m_graphAspectRatio);
+        for (int j = 0; j < polarGridRoundness; j++) {
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 itModelMatrix;
+            modelMatrix.rotate(lineRotations.at(j));
+            itModelMatrix.rotate(lineRotations.at(j));
+            modelMatrix.translate(translateVector);
+            modelMatrix.scale(gridLineScaler);
+            itModelMatrix.scale(gridLineScaler);
+            modelMatrix.rotate(m_xRightAngleRotationNeg);
+            itModelMatrix.rotate(m_xRightAngleRotationNeg);
+            QMatrix4x4 MVPMatrix = projectionViewMatrix * modelMatrix;
+
+            shader->setUniformValue(shader->model(), modelMatrix);
+            shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+            shader->setUniformValue(shader->MVP(), MVPMatrix);
+#if !defined(QT_OPENGL_ES_2)
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                // Set shadow shader bindings
+                QMatrix4x4 depthMVPMatrix = depthMatrix * modelMatrix;
+                shader->setUniformValue(shader->depth(), depthMVPMatrix);
+                // Draw the object
+                m_drawer->drawObject(shader, m_gridLineObj, 0, m_depthTexture);
+            } else {
+                // Draw the object
+                m_drawer->drawObject(shader, m_gridLineObj);
+            }
+#else
+            m_drawer->drawLine(shader);
+#endif
+        }
+    }
+}
+
+void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLinePos,
+                                         const QMatrix4x4 &projectionViewMatrix,
+                                         const QMatrix4x4 &depthMatrix)
+{
+    float halfRatio(m_graphAspectRatio / 2.0f);
+    QVector3D gridLineScaler(gridLineWidth, gridLineWidth, halfRatio);
+    int gridLineCount = m_axisCacheX.gridLineCount();
+    const QVector<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
+    const QVector<float> &subGridPositions = m_axisCacheX.formatter()->subGridPositions();
+    int mainSize = gridPositions.size();
+    QVector3D translateVector(0.0f, yFloorLinePos, -halfRatio);
+    for (int i = 0; i < gridLineCount; i++) {
+        QMatrix4x4 modelMatrix;
+        QMatrix4x4 itModelMatrix;
+        float gridPosition = (i >= mainSize)
+                ? subGridPositions.at(i - mainSize) : gridPositions.at(i);
+        QQuaternion lineRotation = QQuaternion::fromAxisAndAngle(upVector, gridPosition * 360.0f);
+        modelMatrix.rotate(lineRotation);
+        itModelMatrix.rotate(lineRotation);
+        modelMatrix.translate(translateVector);
+        modelMatrix.scale(gridLineScaler);
+        itModelMatrix.scale(gridLineScaler);
+        modelMatrix.rotate(m_xRightAngleRotationNeg);
+        itModelMatrix.rotate(m_xRightAngleRotationNeg);
+        QMatrix4x4 MVPMatrix = projectionViewMatrix * modelMatrix;
+
+        shader->setUniformValue(shader->model(), modelMatrix);
+        shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+        shader->setUniformValue(shader->MVP(), MVPMatrix);
+#if !defined(QT_OPENGL_ES_2)
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            // Set shadow shader bindings
+            QMatrix4x4 depthMVPMatrix = depthMatrix * modelMatrix;
+            shader->setUniformValue(shader->depth(), depthMVPMatrix);
+            // Draw the object
+            m_drawer->drawObject(shader, m_gridLineObj, 0, m_depthTexture);
+        } else {
+            // Draw the object
+            m_drawer->drawObject(shader, m_gridLineObj);
+        }
+#else
+        m_drawer->drawLine(shader);
+#endif
     }
 }
 

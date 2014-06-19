@@ -90,6 +90,7 @@ struct Abstract3DChangeBitField {
     bool axisXTitleFixedChanged        : 1;
     bool axisYTitleFixedChanged        : 1;
     bool axisZTitleFixedChanged        : 1;
+    bool polarChanged                  : 1;
 
     Abstract3DChangeBitField() :
         themeChanged(true),
@@ -133,7 +134,8 @@ struct Abstract3DChangeBitField {
         axisZTitleVisibilityChanged(true),
         axisXTitleFixedChanged(true),
         axisYTitleFixedChanged(true),
-        axisZTitleFixedChanged(true)
+        axisZTitleFixedChanged(true),
+        polarChanged(true)
     {
     }
 };
@@ -175,6 +177,7 @@ protected:
     bool m_isCustomItemDirty;
     bool m_isSeriesVisualsDirty;
     bool m_renderPending;
+    bool m_isPolar;
 
     QList<QAbstract3DSeries *> m_seriesList;
 
@@ -261,6 +264,17 @@ public:
     void setOrthoProjection(bool enable);
     bool isOrthoProjection() const;
 
+    void setMeasureFps(bool enable);
+    inline bool measureFps() const { return m_measureFps; }
+    inline qreal currentFps() const { return m_currentFps; }
+
+    QAbstract3DGraph::ElementType selectedElement() const;
+
+    void setAspectRatio(float ratio);
+    float aspectRatio();
+    void setPolar(bool enable);
+    bool isPolar() const;
+
     void emitNeedRender();
 
     virtual void clearSelection() = 0;
@@ -320,16 +334,7 @@ public slots:
     // Renderer callback handlers
     void handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality);
 
-    void setMeasureFps(bool enable);
-    inline bool measureFps() const { return m_measureFps; }
-    inline qreal currentFps() const { return m_currentFps; }
-
-    QAbstract3DGraph::ElementType selectedElement() const;
-
     void updateCustomItem();
-
-    void setAspectRatio(float ratio);
-    float aspectRatio();
 
 signals:
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
@@ -346,6 +351,7 @@ signals:
     void orthoProjectionChanged(bool enabled);
     void aspectRatioChanged(float ratio);
     void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    void polarChanged(bool enabled);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

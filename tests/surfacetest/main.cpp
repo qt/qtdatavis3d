@@ -393,6 +393,10 @@ int main(int argc, char *argv[])
     zAscendingCB->setText(QStringLiteral("Z Ascending"));
     zAscendingCB->setChecked(true);
 
+    QCheckBox *polarCB = new QCheckBox(widget);
+    polarCB->setText(QStringLiteral("Polar"));
+    polarCB->setChecked(false);
+
     // Add controls to the layout
 #ifdef MULTI_SERIES
     vLayout->addWidget(series1CB);
@@ -443,6 +447,7 @@ int main(int argc, char *argv[])
     vLayout->addWidget(axisMinSliderZ);
     vLayout->addWidget(xAscendingCB);
     vLayout->addWidget(zAscendingCB);
+    vLayout->addWidget(polarCB);
     vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout2->addWidget(fontList);
     vLayout2->addWidget(labelButton);
@@ -650,6 +655,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::toggleXAscending);
     QObject::connect(zAscendingCB, &QCheckBox::stateChanged,
                      modifier, &GraphModifier::toggleZAscending);
+    QObject::connect(polarCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::togglePolar);
 
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged,
                      modifier, &GraphModifier::setAspectRatio);

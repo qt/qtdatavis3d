@@ -38,7 +38,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 const GLfloat defaultMinSize = 0.01f;
 const GLfloat defaultMaxSize = 0.1f;
 const GLfloat itemScaler = 3.0f;
-const GLfloat gridLineWidth = 0.005f;
 
 Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
     : Abstract3DRenderer(controller),
@@ -54,7 +53,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_backgroundShader(0),
       m_labelShader(0),
       m_bgrTexture(0),
-      m_depthTexture(0),
       m_selectionTexture(0),
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
@@ -1006,7 +1004,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         modelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
         if (m_yFlipped) {
-            modelMatrix.rotate(180.0f, 1.0, 0.0, 0.0);
+            modelMatrix.rotate(m_xFlipRotation);
             modelMatrix.rotate(270.0f - backgroundRotation, 0.0f, 1.0f, 0.0f);
         } else {
             modelMatrix.rotate(backgroundRotation, 0.0f, 1.0f, 0.0f);
@@ -1095,14 +1093,14 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         QQuaternion lineXRotation;
 
         if (m_xFlipped)
-            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
+            lineYRotation = m_yRightAngleRotationNeg;
         else
-            lineYRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+            lineYRotation = m_yRightAngleRotation;
 
         if (m_yFlipped)
-            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f);
+            lineXRotation = m_xRightAngleRotation;
         else
-            lineXRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f);
+            lineXRotation = m_xRightAngleRotationNeg;
 
         GLfloat yFloorLinePosition = -1.0f - m_backgroundMargin + gridLineOffset;
         if (m_yFlipped)
@@ -1189,8 +1187,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 modelMatrix.rotate(lineYRotation);
                 itModelMatrix.rotate(lineYRotation);
 #else
-                modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
-                itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+                modelMatrix.rotate(m_zRightAngleRotation);
+                itModelMatrix.rotate(m_zRightAngleRotation);
 #endif
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1221,7 +1219,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         // Columns (= X)
         if (m_axisCacheX.segmentCount() > 0) {
 #if defined(QT_OPENGL_ES_2)
-            lineXRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+            lineXRotation = m_yRightAngleRotation;
 #endif
             // Floor lines
             int gridLineCount = m_axisCacheX.gridLineCount();
@@ -1301,12 +1299,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
 #if !defined(QT_OPENGL_ES_2)
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
-                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    modelMatrix.rotate(m_xFlipRotation);
+                    itModelMatrix.rotate(m_xFlipRotation);
                 }
 #else
-                modelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
-                itModelMatrix.rotate(90.0f, 0.0f, 0.0f, 1.0f);
+                modelMatrix.rotate(m_zRightAngleRotation);
+                itModelMatrix.rotate(m_zRightAngleRotation);
 #endif
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1368,8 +1366,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 itModelMatrix.scale(gridLineScaler);
 
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
-                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    modelMatrix.rotate(m_xFlipRotation);
+                    itModelMatrix.rotate(m_xFlipRotation);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;

@@ -777,6 +777,11 @@ void GraphModifier::toggleZAscending(bool enabled)
     }
 }
 
+void GraphModifier::togglePolar(bool enabled)
+{
+    m_graph->setPolar(enabled);
+}
+
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);

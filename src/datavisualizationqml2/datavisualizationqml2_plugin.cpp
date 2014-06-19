@@ -106,6 +106,12 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 
     // New metatypes
     qRegisterMetaType<QAbstract3DGraph::ElementType>("QAbstract3DGraph::ElementType");
+
+    // QtDataVisualization 1.2
+
+    // New revisions
+    qmlRegisterUncreatableType<AbstractDeclarative, 2>(uri, 1, 2, "AbstractGraph3D",
+                                                       QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

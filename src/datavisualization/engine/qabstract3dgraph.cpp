@@ -591,8 +591,15 @@ qreal QAbstract3DGraph::currentFps() const
  * \property QAbstract3DGraph::orthoProjection
  * \since QtDataVisualization 1.1
  *
- * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
+ * If \c {true}, orthographic projection will be used for displaying the graph.
+ * \note Orthographic projection can be used to create 2D graphs by replacing the default input
+ * handler with one that doesn't allow rotating the graph and setting the camera to view the graph
+ * directly from the side or from the top. Also, axis labels typically need to be rotated when
+ * viewing the graph from the sides.
+ * Defaults to \c{false}.
  * \note Shadows will be disabled when set to \c{true}.
+ *
+ * \sa QAbstract3DAxis::labelAutoRotation, Q3DCamera::cameraPreset
  */
 void QAbstract3DGraph::setOrthoProjection(bool enable)
 {
@@ -643,6 +650,28 @@ void QAbstract3DGraph::setOptimizationHints(OptimizationHints hints)
 QAbstract3DGraph::OptimizationHints QAbstract3DGraph::optimizationHints() const
 {
     return d_ptr->m_visualController->optimizationHints();
+}
+
+/*!
+ * \property QAbstract3DGraph::polar
+ * \since QtDataVisualization 1.2
+ *
+ * If \c {true}, the horizontal axes are changed into polar axes. The X axis becomes the
+ * angular axis and the Z axis becomes the radial axis.
+ * Polar mode is not available for bar graphs.
+ *
+ * Defaults to \c{false}.
+ *
+ * \sa orthoProjection, QAbstract3DAxis::gridOffset, radialLabelOffset
+ */
+void QAbstract3DGraph::setPolar(bool enable)
+{
+    d_ptr->m_visualController->setPolar(enable);
+}
+
+bool QAbstract3DGraph::isPolar() const
+{
+    return d_ptr->m_visualController->isPolar();
 }
 
 /*!
@@ -795,6 +824,8 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
 
     QObject::connect(m_visualController, &Abstract3DController::aspectRatioChanged, q_ptr,
                      &QAbstract3DGraph::aspectRatioChanged);
+    QObject::connect(m_visualController, &Abstract3DController::polarChanged, q_ptr,
+                     &QAbstract3DGraph::polarChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

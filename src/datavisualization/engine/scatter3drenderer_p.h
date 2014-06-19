@@ -61,7 +61,6 @@ private:
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
     GLuint m_bgrTexture;
-    GLuint m_depthTexture;
     GLuint m_selectionTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
