@@ -126,6 +126,7 @@ public:
 
     virtual void updateAspectRatio(float ratio);
     virtual void updatePolar(bool enable);
+    virtual void updateRadialLabelOffset(float offset);
 
     virtual QVector3D convertPositionToTranslation(const QVector3D &position,
                                                    bool isAbsolute) = 0;
@@ -254,6 +255,7 @@ protected:
 
     float m_graphAspectRatio;
     bool m_polarGraph;
+    float m_radialLabelOffset;
 
     QQuaternion m_xRightAngleRotation;
     QQuaternion m_yRightAngleRotation;

@@ -1050,15 +1050,19 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     else
         m_xFlipped = true;
 
+    m_yFlippedForGrid = m_yFlipped;
     if (m_flipHorizontalGrid) {
-        // Need to determine if camera is below graph top
-        float distanceToCenter = activeCamera->position().length()
-                / activeCamera->zoomLevel() / m_autoScaleAdjustment * 100.0f;
-        qreal cameraAngle = qreal(activeCamera->yRotation()) / 180.0 * M_PI;
-        float cameraYPos = float(qSin(cameraAngle)) * distanceToCenter;
-        m_yFlippedForGrid = cameraYPos < backgroundMargin;
-    } else {
-        m_yFlippedForGrid = m_yFlipped;
+        if (!m_useOrthoProjection) {
+            // Need to determine if camera is below graph top
+            float distanceToCenter = activeCamera->position().length()
+                    / activeCamera->zoomLevel() / m_autoScaleAdjustment * 100.0f;
+            qreal cameraAngle = qreal(activeCamera->yRotation()) / 180.0 * M_PI;
+            float cameraYPos = float(qSin(cameraAngle)) * distanceToCenter;
+            m_yFlippedForGrid = cameraYPos < backgroundMargin;
+        } else if (m_useOrthoProjection && activeCamera->yRotation() == 0.0f) {
+            // With ortho we only need to flip at angle zero, to fix label autorotation angles
+            m_yFlippedForGrid = !m_yFlipped;
+        }
     }
 
     // calculate background rotation based on view matrix rotation
@@ -1936,6 +1940,9 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         QVector3D labelTrans = QVector3D(labelXTrans,
                                          labelYTrans,
                                          0.0f);
+
+        if (m_polarGraph)
+            labelTrans.setX(labelTrans.x() * m_radialLabelOffset);
 
         if (m_zFlipped) {
             startIndex = 0;

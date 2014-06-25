@@ -662,7 +662,7 @@ QAbstract3DGraph::OptimizationHints QAbstract3DGraph::optimizationHints() const
  *
  * Defaults to \c{false}.
  *
- * \sa orthoProjection, QAbstract3DAxis::gridOffset, radialLabelOffset
+ * \sa orthoProjection, radialLabelOffset
  */
 void QAbstract3DGraph::setPolar(bool enable)
 {
@@ -672,6 +672,28 @@ void QAbstract3DGraph::setPolar(bool enable)
 bool QAbstract3DGraph::isPolar() const
 {
     return d_ptr->m_visualController->isPolar();
+}
+
+/*!
+ * \property QAbstract3DGraph::radialLabelOffset
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies the normalized horizontal offset for the axis labels of the radial
+ * polar axis. The value 0.0 indicates the labels should be drawn next to the 0-angle angular
+ * axis grid line. The value 1.0 indicates the labels are drawn on their normal place at the edge
+ * of the graph background.
+ * This property is ignored if polar property value is \c{false}. Defaults to 1.0.
+ *
+ * \sa polar
+ */
+void QAbstract3DGraph::setRadialLabelOffset(float offset)
+{
+    d_ptr->m_visualController->setRadialLabelOffset(offset);
+}
+
+float QAbstract3DGraph::radialLabelOffset() const
+{
+    return d_ptr->m_visualController->radialLabelOffset();
 }
 
 /*!
@@ -826,6 +848,8 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::aspectRatioChanged);
     QObject::connect(m_visualController, &Abstract3DController::polarChanged, q_ptr,
                      &QAbstract3DGraph::polarChanged);
+    QObject::connect(m_visualController, &Abstract3DController::radialLabelOffsetChanged, q_ptr,
+                     &QAbstract3DGraph::radialLabelOffsetChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

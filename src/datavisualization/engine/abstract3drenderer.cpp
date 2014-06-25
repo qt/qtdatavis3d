@@ -67,6 +67,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_labelObj(0),
       m_graphAspectRatio(2.0f),
       m_polarGraph(false),
+      m_radialLabelOffset(1.0f),
       m_xRightAngleRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f)),
       m_yRightAngleRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f)),
       m_zRightAngleRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, 90.0f)),
@@ -314,6 +315,11 @@ void Abstract3DRenderer::updatePolar(bool enable)
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
     updateCustomItemPositions();
+}
+
+void Abstract3DRenderer::updateRadialLabelOffset(float offset)
+{
+    m_radialLabelOffset = offset;
 }
 
 void Abstract3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint)

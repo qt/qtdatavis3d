@@ -58,7 +58,6 @@ Window {
             labelFormat: "%i"
             title: "Angle"
             titleVisible: true
-            labelAutoRotation: 30
             titleFixed: false
         }
 
@@ -78,7 +77,6 @@ Window {
             labelFormat: "%i"
             title: "Radius"
             titleVisible: true
-            labelAutoRotation: 30
             titleFixed: false
         }
 
@@ -101,6 +99,7 @@ Window {
 
             orthoProjection: true
             flipHorizontalGrid: true
+            radialLabelOffset: 0.01  // Add little offset so the labels do not overlap
 
             Surface3DSeries {
                 id: surfaceSeries
@@ -130,15 +129,15 @@ Window {
             id: polarToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: "Switch to Polar"
+            text: "Switch to polar"
             //! [1]
             onClicked: {
                 if (surfaceGraph.polar === false) {
                     surfaceGraph.polar = true
-                    text = "Switch to Cartesian"
+                    text = "Switch to cartesian"
                 } else {
                     surfaceGraph.polar = false
-                    text = "Switch to Polar"
+                    text = "Switch to polar"
                 }
             }
             //! [1]
@@ -202,12 +201,12 @@ Window {
             Layout.fillWidth: true
             Layout.fillHeight: true
             text: "Toggle radial label position"
-            //visible: surfaceGraph.polar
+            visible: surfaceGraph.polar
             onClicked: {
-                // TODO
-                if (surfaceGraph.theme.backgroundEnabled === true) {
+                if (surfaceGraph.radialLabelOffset > 1.0) {
+                    surfaceGraph.radialLabelOffset = 0.01
                 } else {
-                    surfaceGraph.theme.backgroundEnabled = true;
+                    surfaceGraph.radialLabelOffset = 1.06
                 }
             }
         }

@@ -51,6 +51,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_isSeriesVisualsDirty(true),
     m_renderPending(false),
     m_isPolar(false),
+    m_radialLabelOffset(1.0f),
     m_measureFps(false),
     m_numFrames(0),
     m_currentFps(0.0)
@@ -180,6 +181,11 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.polarChanged) {
         m_renderer->updatePolar(m_isPolar);
         m_changeTracker.polarChanged = false;
+    }
+
+    if (m_changeTracker.radialLabelOffsetChanged) {
+        m_renderer->updateRadialLabelOffset(m_radialLabelOffset);
+        m_changeTracker.radialLabelOffsetChanged = false;
     }
 
     if (m_changeTracker.shadowQualityChanged) {
@@ -1541,6 +1547,21 @@ void Abstract3DController::setPolar(bool enable)
 bool Abstract3DController::isPolar() const
 {
     return m_isPolar;
+}
+
+void Abstract3DController::setRadialLabelOffset(float offset)
+{
+    if (m_radialLabelOffset != offset) {
+        m_radialLabelOffset = offset;
+        m_changeTracker.radialLabelOffsetChanged = true;
+        emit radialLabelOffsetChanged(m_radialLabelOffset);
+        emitNeedRender();
+    }
+}
+
+float Abstract3DController::radialLabelOffset() const
+{
+    return m_radialLabelOffset;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -331,6 +331,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::handleOptimizationHintChange);
     QObject::connect(m_controller.data(), &Abstract3DController::polarChanged, this,
                      &AbstractDeclarative::polarChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::radialLabelOffsetChanged, this,
+                     &AbstractDeclarative::radialLabelOffsetChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -734,6 +736,16 @@ void AbstractDeclarative::setPolar(bool enable)
 bool AbstractDeclarative::isPolar() const
 {
     return m_controller->isPolar();
+}
+
+void AbstractDeclarative::setRadialLabelOffset(float offset)
+{
+    m_controller->setRadialLabelOffset(offset);
+}
+
+float AbstractDeclarative::radialLabelOffset() const
+{
+    return m_controller->radialLabelOffset();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

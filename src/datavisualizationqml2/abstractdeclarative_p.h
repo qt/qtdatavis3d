@@ -73,6 +73,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged REVISION 1)
     Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged REVISION 1)
     Q_PROPERTY(bool polar READ isPolar WRITE setPolar NOTIFY polarChanged REVISION 2)
+    Q_PROPERTY(float radialLabelOffset READ radialLabelOffset WRITE setRadialLabelOffset NOTIFY radialLabelOffsetChanged REVISION 2)
 
 public:
     enum SelectionFlag {
@@ -197,6 +198,9 @@ public:
     void setPolar(bool enable);
     bool isPolar() const;
 
+    void setRadialLabelOffset(float offset);
+    float radialLabelOffset() const;
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -235,6 +239,7 @@ signals:
     Q_REVISION(1) void aspectRatioChanged(qreal ratio);
     Q_REVISION(1) void optimizationHintsChanged(AbstractDeclarative::OptimizationHints hints);
     Q_REVISION(2) void polarChanged(bool enabled);
+    Q_REVISION(2) void radialLabelOffsetChanged(float offset);
 
 private:
     QPointer<Abstract3DController> m_controller;

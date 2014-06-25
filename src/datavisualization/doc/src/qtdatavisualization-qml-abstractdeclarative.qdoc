@@ -162,7 +162,20 @@
  *
  * Defaults to \c{false}.
  *
- * \sa orthoProjection, AbstractAxis3D::gridOffset, radialLabelOffset
+ * \sa orthoProjection, radialLabelOffset
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::radialLabelOffset
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies the normalized horizontal offset for the axis labels of the radial
+ * polar axis. The value 0.0 indicates the labels should be drawn next to the 0-angle angular
+ * axis grid line. The value 1.0 indicates the labels are drawn on their normal place at the edge
+ * of the graph background.
+ * This property is ignored if polar property value is \c{false}. Defaults to 1.0.
+ *
+ * \sa polar
  */
 
 /*!

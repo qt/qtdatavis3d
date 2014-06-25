@@ -91,6 +91,7 @@ struct Abstract3DChangeBitField {
     bool axisYTitleFixedChanged        : 1;
     bool axisZTitleFixedChanged        : 1;
     bool polarChanged                  : 1;
+    bool radialLabelOffsetChanged      : 1;
 
     Abstract3DChangeBitField() :
         themeChanged(true),
@@ -135,7 +136,8 @@ struct Abstract3DChangeBitField {
         axisXTitleFixedChanged(true),
         axisYTitleFixedChanged(true),
         axisZTitleFixedChanged(true),
-        polarChanged(true)
+        polarChanged(true),
+        radialLabelOffsetChanged(true)
     {
     }
 };
@@ -178,6 +180,7 @@ protected:
     bool m_isSeriesVisualsDirty;
     bool m_renderPending;
     bool m_isPolar;
+    float m_radialLabelOffset;
 
     QList<QAbstract3DSeries *> m_seriesList;
 
@@ -274,6 +277,8 @@ public:
     float aspectRatio();
     void setPolar(bool enable);
     bool isPolar() const;
+    void setRadialLabelOffset(float offset);
+    float radialLabelOffset() const;
 
     void emitNeedRender();
 
@@ -352,6 +357,7 @@ signals:
     void aspectRatioChanged(float ratio);
     void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
     void polarChanged(bool enabled);
+    void radialLabelOffsetChanged(float offset);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

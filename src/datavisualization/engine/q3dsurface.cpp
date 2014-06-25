@@ -233,6 +233,7 @@ QSurface3DSeries *Q3DSurface::selectedSeries() const
 
 /*!
  * \property Q3DSurface::flipHorizontalGrid
+ * \since QtDataVisualization 1.2
  *
  * If \c{false}, the horizontal axis grid and labels are drawn on the horizontal background
  * of the graph.
