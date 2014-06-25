@@ -372,6 +372,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         m_yFlipped = true;
     else
         m_yFlipped = false;
+    m_yFlippedForGrid = m_yFlipped; // Polar axis grid drawing in abstract needs this
 
     // Calculate background rotation
     if (!m_zFlipped && !m_xFlipped)

@@ -112,6 +112,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     // New revisions
     qmlRegisterUncreatableType<AbstractDeclarative, 2>(uri, 1, 2, "AbstractGraph3D",
                                                        QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
+    qmlRegisterType<DeclarativeSurface, 1>(uri, 1, 2, "Surface3D");
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

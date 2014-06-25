@@ -78,6 +78,7 @@ private:
     QPoint m_clickedPosition;
     bool m_selectionTexturesDirty;
     GLuint m_noShadowTexture;
+    bool m_flipHorizontalGrid;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -93,6 +94,7 @@ public:
     void updateScene(Q3DScene *scene);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, QSurface3DSeries *series);
+    void updateFlipHorizontalGrid(bool flip);
     inline QPoint clickedPosition() const { return m_clickedPosition; }
     void resetClickedStatus();
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);

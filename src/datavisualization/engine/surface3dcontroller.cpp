@@ -29,7 +29,8 @@ Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
       m_renderer(0),
       m_selectedPoint(invalidSelectionPosition()),
       m_selectedSeries(0),
-      m_flatShadingSupported(true)
+      m_flatShadingSupported(true),
+      m_flipHorizontalGrid(false)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
@@ -78,6 +79,11 @@ void Surface3DController::synchDataToRenderer()
     if (m_changeTracker.selectedPointChanged) {
         m_renderer->updateSelectedPoint(m_selectedPoint, m_selectedSeries);
         m_changeTracker.selectedPointChanged = false;
+    }
+
+    if (m_changeTracker.flipHorizontalGridChanged) {
+        m_renderer->updateFlipHorizontalGrid(m_flipHorizontalGrid);
+        m_changeTracker.flipHorizontalGridChanged = false;
     }
 }
 
@@ -166,6 +172,21 @@ QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
     }
 
     return surfaceSeriesList;
+}
+
+void Surface3DController::setFlipHorizontalGrid(bool flip)
+{
+    if (m_flipHorizontalGrid != flip) {
+        m_flipHorizontalGrid = flip;
+        m_changeTracker.flipHorizontalGridChanged = true;
+        emit flipHorizontalGridChanged(flip);
+        emitNeedRender();
+    }
+}
+
+bool Surface3DController::flipHorizontalGrid() const
+{
+    return m_flipHorizontalGrid;
 }
 
 void Surface3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)

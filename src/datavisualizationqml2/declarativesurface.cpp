@@ -32,6 +32,8 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 
     QObject::connect(m_surfaceController, &Surface3DController::selectedSeriesChanged,
                      this, &DeclarativeSurface::selectedSeriesChanged);
+    QObject::connect(m_surfaceController, &Surface3DController::flipHorizontalGridChanged,
+                     this, &DeclarativeSurface::flipHorizontalGridChanged);
 }
 
 DeclarativeSurface::~DeclarativeSurface()
@@ -72,6 +74,16 @@ void DeclarativeSurface::setAxisZ(QValue3DAxis *axis)
 QSurface3DSeries *DeclarativeSurface::selectedSeries() const
 {
     return m_surfaceController->selectedSeries();
+}
+
+void DeclarativeSurface::setFlipHorizontalGrid(bool flip)
+{
+   m_surfaceController->setFlipHorizontalGrid(flip);
+}
+
+bool DeclarativeSurface::flipHorizontalGrid() const
+{
+    return m_surfaceController->flipHorizontalGrid();
 }
 
 QQmlListProperty<QSurface3DSeries> DeclarativeSurface::seriesList()

@@ -34,6 +34,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public QAbstract3DGraph
     Q_PROPERTY(QValue3DAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
     Q_PROPERTY(QSurface3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
+    Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged)
 
 public:
     explicit Q3DSurface(const QSurfaceFormat *format = 0, QWindow *parent = 0);
@@ -55,12 +56,15 @@ public:
     QList<QValue3DAxis *> axes() const;
 
     QSurface3DSeries *selectedSeries() const;
+    void setFlipHorizontalGrid(bool flip);
+    bool flipHorizontalGrid() const;
 
 signals:
     void axisXChanged(QValue3DAxis *axis);
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);
     void selectedSeriesChanged(QSurface3DSeries *series);
+    void flipHorizontalGridChanged(bool flip);
 
 private:
     Q3DSurfacePrivate *dptr();

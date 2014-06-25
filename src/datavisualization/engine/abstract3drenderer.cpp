@@ -61,6 +61,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_xFlipped(false),
       m_yFlipped(false),
       m_zFlipped(false),
+      m_yFlippedForGrid(false),
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
@@ -665,7 +666,7 @@ void Abstract3DRenderer::drawAxisTitleX(const QVector3D &labelRotation,
     float offsetRotation = labelRotation.z();
     float extraRotation = -90.0f;
     Qt::AlignmentFlag alignment = Qt::AlignTop;
-    if (m_yFlipped) {
+    if (m_yFlippedForGrid) {
         alignment = Qt::AlignBottom;
         zRotation = 180.0f;
         if (m_zFlipped) {
@@ -745,7 +746,7 @@ void Abstract3DRenderer::drawAxisTitleZ(const QVector3D &labelRotation,
     float xRotation = -90.0f;
     float extraRotation = 90.0f;
     Qt::AlignmentFlag alignment = Qt::AlignTop;
-    if (m_yFlipped) {
+    if (m_yFlippedForGrid) {
         alignment = Qt::AlignBottom;
         xRotation = -xRotation;
         if (m_zFlipped) {
@@ -1185,6 +1186,10 @@ void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePo
     const QVector<float> &subGridPositions = m_axisCacheZ.formatter()->subGridPositions();
     int mainSize = gridPositions.size();
     QVector3D translateVector(0.0f, yFloorLinePos, 0.0f);
+    QQuaternion finalRotation = m_xRightAngleRotationNeg;
+    if (m_yFlippedForGrid)
+        finalRotation *= m_xFlipRotation;
+
     for (int i = 0; i < gridLineCount; i++) {
         float gridPosition = (i >= mainSize)
                 ? subGridPositions.at(i - mainSize) : gridPositions.at(i);
@@ -1200,8 +1205,8 @@ void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePo
             modelMatrix.translate(translateVector);
             modelMatrix.scale(gridLineScaler);
             itModelMatrix.scale(gridLineScaler);
-            modelMatrix.rotate(m_xRightAngleRotationNeg);
-            itModelMatrix.rotate(m_xRightAngleRotationNeg);
+            modelMatrix.rotate(finalRotation);
+            itModelMatrix.rotate(finalRotation);
             QMatrix4x4 MVPMatrix = projectionViewMatrix * modelMatrix;
 
             shader->setUniformValue(shader->model(), modelMatrix);
@@ -1229,13 +1234,16 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
                                          const QMatrix4x4 &projectionViewMatrix,
                                          const QMatrix4x4 &depthMatrix)
 {
-    float halfRatio(m_graphAspectRatio / 2.0f);
+    float halfRatio((m_graphAspectRatio + (labelMargin / 2.0f)) / 2.0f);
     QVector3D gridLineScaler(gridLineWidth, gridLineWidth, halfRatio);
     int gridLineCount = m_axisCacheX.gridLineCount();
     const QVector<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
     const QVector<float> &subGridPositions = m_axisCacheX.formatter()->subGridPositions();
     int mainSize = gridPositions.size();
     QVector3D translateVector(0.0f, yFloorLinePos, -halfRatio);
+    QQuaternion finalRotation = m_xRightAngleRotationNeg;
+    if (m_yFlippedForGrid)
+        finalRotation *= m_xFlipRotation;
     for (int i = 0; i < gridLineCount; i++) {
         QMatrix4x4 modelMatrix;
         QMatrix4x4 itModelMatrix;
@@ -1247,8 +1255,8 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
         modelMatrix.translate(translateVector);
         modelMatrix.scale(gridLineScaler);
         itModelMatrix.scale(gridLineScaler);
-        modelMatrix.rotate(m_xRightAngleRotationNeg);
-        itModelMatrix.rotate(m_xRightAngleRotationNeg);
+        modelMatrix.rotate(finalRotation);
+        itModelMatrix.rotate(finalRotation);
         QMatrix4x4 MVPMatrix = projectionViewMatrix * modelMatrix;
 
         shader->setUniformValue(shader->model(), modelMatrix);

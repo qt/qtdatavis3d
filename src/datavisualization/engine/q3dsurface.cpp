@@ -98,6 +98,8 @@ Q3DSurface::Q3DSurface(const QSurfaceFormat *format, QWindow *parent)
     dptr()->m_shared->initializeOpenGL();
     QObject::connect(dptr()->m_shared, &Surface3DController::selectedSeriesChanged,
                      this, &Q3DSurface::selectedSeriesChanged);
+    QObject::connect(dptr()->m_shared, &Surface3DController::flipHorizontalGridChanged,
+                     this, &Q3DSurface::flipHorizontalGridChanged);
 }
 
 /*!
@@ -227,6 +229,25 @@ QValue3DAxis *Q3DSurface::axisZ() const
 QSurface3DSeries *Q3DSurface::selectedSeries() const
 {
     return dptrc()->m_shared->selectedSeries();
+}
+
+/*!
+ * \property Q3DSurface::flipHorizontalGrid
+ *
+ * If \c{false}, the horizontal axis grid and labels are drawn on the horizontal background
+ * of the graph.
+ * If \c{true}, the horizontal axis grid and labels are drawn on the opposite side of the graph
+ * from the horizontal background.
+ * Defaults to \c{false}.
+ */
+void Q3DSurface::setFlipHorizontalGrid(bool flip)
+{
+    dptr()->m_shared->setFlipHorizontalGrid(flip);
+}
+
+bool Q3DSurface::flipHorizontalGrid() const
+{
+    return dptrc()->m_shared->flipHorizontalGrid();
 }
 
 /*!

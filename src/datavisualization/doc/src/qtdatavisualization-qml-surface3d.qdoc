@@ -86,6 +86,16 @@
  */
 
 /*!
+ * \qmlproperty bool Surface3D::flipHorizontalGrid
+ *
+ * If \c{false}, the horizontal axis grid and labels are drawn on the horizontal background
+ * of the graph.
+ * If \c{true}, the horizontal axis grid and labels are drawn on the opposite side of the graph
+ * from the horizontal background.
+ * Defaults to \c{false}.
+ */
+
+/*!
  * \qmlmethod void Surface3D::addSeries(Surface3DSeries series)
  * Adds the \a series to the graph.
  */

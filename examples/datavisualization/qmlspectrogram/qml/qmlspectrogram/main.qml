@@ -52,6 +52,36 @@ Window {
         }
         //! [0]
 
+        ValueAxis3D {
+            id: xAxis
+            segmentCount: 8
+            labelFormat: "%i"
+            title: "Angle"
+            titleVisible: true
+            labelAutoRotation: 30
+            titleFixed: false
+        }
+
+        ValueAxis3D {
+            id: yAxis
+            segmentCount: 8
+            labelFormat: "%i \%"
+            title: "Value"
+            titleVisible: true
+            labelAutoRotation: 0
+            titleFixed: false
+        }
+
+        ValueAxis3D {
+            id: zAxis
+            segmentCount: 5
+            labelFormat: "%i"
+            title: "Radius"
+            titleVisible: true
+            labelAutoRotation: 30
+            titleFixed: false
+        }
+
         Surface3D {
             id: surfaceGraph
             width: surfaceView.width
@@ -60,18 +90,9 @@ Window {
             shadowQuality: AbstractGraph3D.ShadowQualityNone
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetDirectlyAbove
-            axisX.segmentCount: 8
-            axisX.subSegmentCount: 2
-            axisX.labelFormat: "%i"
-            axisZ.segmentCount: 5
-            axisZ.subSegmentCount: 2
-            axisZ.labelFormat: "%i"
-            axisY.segmentCount: 8
-            axisY.subSegmentCount: 1
-            axisY.labelFormat: "%i \%"
-            axisY.title: "Value"
-            axisX.title: "Angle"
-            axisZ.title: "Radius"
+            axisX: xAxis
+            axisY: yAxis
+            axisZ: zAxis
 
             // Don't show specular spotlight as we don't want it to distort the colors
             theme.lightStrength: 0.0
@@ -79,6 +100,7 @@ Window {
             theme.backgroundEnabled: false
 
             orthoProjection: true
+            flipHorizontalGrid: true
 
             Surface3DSeries {
                 id: surfaceSeries
@@ -130,10 +152,16 @@ Window {
             onClicked: {
                 if (surfaceGraph.orthoProjection === true) {
                     surfaceGraph.orthoProjection = false;
+                    xAxis.labelAutoRotation = 30
+                    yAxis.labelAutoRotation = 30
+                    zAxis.labelAutoRotation = 30
                     text = "Switch to orthogonal"
                 } else {
                     surfaceGraph.orthoProjection = true;
                     surfaceGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetDirectlyAbove
+                    xAxis.labelAutoRotation = 0
+                    yAxis.labelAutoRotation = 0
+                    zAxis.labelAutoRotation = 0
                     text = "Switch to perspective"
                 }
             }
@@ -154,29 +182,17 @@ Window {
         }
 
         NewButton {
-            id: gridToggle
+            id: flipGridToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
-            text: "Toggle axis grid"
+            text: "Toggle axis grid on top"
             onClicked: {
-                if (surfaceGraph.theme.gridEnabled === true) {
-                    surfaceGraph.theme.gridEnabled = false;
-                } else {
-                    surfaceGraph.theme.gridEnabled = true;
-                }
-            }
-        }
-
-        NewButton {
-            id: gridOffsetToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Toggle grid position"
-            onClicked: {
-                // TODO
-                if (surfaceGraph.theme.backgroundEnabled === true) {
-                } else {
-                    surfaceGraph.theme.backgroundEnabled = true;
+                onClicked: {
+                    if (surfaceGraph.flipHorizontalGrid === true) {
+                        surfaceGraph.flipHorizontalGrid = false;
+                    } else {
+                        surfaceGraph.flipHorizontalGrid = true;
+                    }
                 }
             }
         }

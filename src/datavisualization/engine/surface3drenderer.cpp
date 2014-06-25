@@ -1050,6 +1050,17 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     else
         m_xFlipped = true;
 
+    if (m_flipHorizontalGrid) {
+        // Need to determine if camera is below graph top
+        float distanceToCenter = activeCamera->position().length()
+                / activeCamera->zoomLevel() / m_autoScaleAdjustment * 100.0f;
+        qreal cameraAngle = qreal(activeCamera->yRotation()) / 180.0 * M_PI;
+        float cameraYPos = float(qSin(cameraAngle)) * distanceToCenter;
+        m_yFlippedForGrid = cameraYPos < backgroundMargin;
+    } else {
+        m_yFlippedForGrid = m_yFlipped;
+    }
+
     // calculate background rotation based on view matrix rotation
     if (viewMatrix.row(0).x() > 0 && viewMatrix.row(0).z() <= 0)
         backgroundRotation = 270.0f;
@@ -1467,13 +1478,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         else
             lineYRotation = m_yRightAngleRotation;
 
-        if (m_yFlipped)
+        if (m_yFlippedForGrid)
             lineXRotation = m_xRightAngleRotation;
         else
             lineXRotation = m_xRightAngleRotationNeg;
 
         float yFloorLinePosition = -backgroundMargin + gridLineOffset;
-        if (m_yFlipped)
+        if (m_yFlipped != m_flipHorizontalGrid)
             yFloorLinePosition = -yFloorLinePosition;
 
         // Rows (= Z)
@@ -1844,7 +1855,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     if (m_axisCacheZ.segmentCount() > 0) {
         int labelCount = m_axisCacheZ.labelCount();
         float labelXTrans = 0.0f;
-        float labelYTrans = -backgroundMargin;
+        float labelYTrans = m_flipHorizontalGrid ? backgroundMargin : -backgroundMargin;
         if (m_polarGraph) {
             // TODO optional placement of radial labels - YTrans up only if over background
             labelXTrans = m_scaleXWithBackground + labelMargin;
@@ -1861,7 +1872,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         if (labelAutoAngle == 0.0f) {
             if (m_zFlipped)
                 labelRotation.setY(180.0f);
-            if (m_yFlipped) {
+            if (m_yFlippedForGrid) {
                 if (m_zFlipped)
                     labelRotation.setY(180.0f);
                 else
@@ -1873,7 +1884,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         } else {
             if (m_zFlipped)
                 labelRotation.setY(180.0f);
-            if (m_yFlipped) {
+            if (m_yFlippedForGrid) {
                 if (m_zFlipped) {
                     if (m_xFlipped) {
                         labelRotation.setX(90.0f - (labelAutoAngle - fractionCamX)
@@ -1978,7 +1989,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         int labelCount = m_axisCacheX.labelCount();
 
         GLfloat labelZTrans = 0.0f;
-        GLfloat labelYTrans = -backgroundMargin;
+        float labelYTrans = m_flipHorizontalGrid ? backgroundMargin : -backgroundMargin;
         if (m_polarGraph)
             labelYTrans += gridLineOffset + gridLineWidth;
         else
@@ -1994,7 +2005,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
             if (m_xFlipped)
                 labelRotation.setY(-90.0f);
-            if (m_yFlipped) {
+            if (m_yFlippedForGrid) {
                 if (m_xFlipped)
                     labelRotation.setY(-90.0f);
                 else
@@ -2006,7 +2017,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelRotation.setY(-90.0f);
             else
                 labelRotation.setY(90.0f);
-            if (m_yFlipped) {
+            if (m_yFlippedForGrid) {
                 if (m_zFlipped) {
                     if (m_xFlipped) {
                         labelRotation.setX(90.0f - (2.0f * labelAutoAngle - fractionCamX)
@@ -2055,10 +2066,12 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 
         QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
         if (m_polarGraph) {
-            if (m_zFlipped != m_xFlipped)
+            if (!m_yFlippedForGrid && (m_zFlipped != m_xFlipped)
+                    || m_yFlippedForGrid && (m_zFlipped == m_xFlipped)) {
                 totalRotation *= m_zRightAngleRotation;
-            else
+            } else {
                 totalRotation *= m_zRightAngleRotationNeg;
+            }
         }
 
         QVector3D labelTrans = QVector3D(0.0f,
@@ -2108,7 +2121,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                     hAlignment = m_zFlipped ? Qt::AlignRight : Qt::AlignLeft;
                 else if (gridPosition < 1.0f - centerMargin && gridPosition > 0.5f + centerMargin)
                     hAlignment = m_zFlipped ? Qt::AlignLeft : Qt::AlignRight;
-
+                if (m_yFlippedForGrid && vAlignment != Qt::AlignCenter)
+                    vAlignment = (vAlignment == Qt::AlignTop) ? Qt::AlignBottom : Qt::AlignTop;
                 alignment = Qt::AlignmentFlag(vAlignment | hAlignment);
             } else {
                 labelTrans.setX(m_axisCacheX.labelPosition(label));
@@ -2415,6 +2429,11 @@ void Surface3DRenderer::updateSelectedPoint(const QPoint &position, QSurface3DSe
     m_selectedPoint = position;
     m_selectedSeries = series;
     m_selectionDirty = true;
+}
+
+void Surface3DRenderer::updateFlipHorizontalGrid(bool flip)
+{
+    m_flipHorizontalGrid = flip;
 }
 
 void Surface3DRenderer::resetClickedStatus()

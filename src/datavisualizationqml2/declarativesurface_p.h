@@ -44,6 +44,7 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
     Q_PROPERTY(QSurface3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
+    Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged REVISION 1)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
@@ -66,6 +67,8 @@ public:
     Q_INVOKABLE void removeSeries(QSurface3DSeries *series);
 
     QSurface3DSeries *selectedSeries() const;
+    void setFlipHorizontalGrid(bool flip);
+    bool flipHorizontalGrid() const;
 
 public slots:
     void handleAxisXChanged(QAbstract3DAxis *axis);
@@ -77,6 +80,7 @@ signals:
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);
     void selectedSeriesChanged(QSurface3DSeries *series);
+    Q_REVISION(1) void flipHorizontalGridChanged(bool flip);
 
 private:
     Surface3DController *m_surfaceController;
