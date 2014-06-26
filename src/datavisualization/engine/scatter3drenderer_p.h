@@ -68,11 +68,13 @@ private:
     GLfloat m_shadowQualityToShader;
     GLint m_shadowQualityMultiplier;
     GLfloat m_heightNormalizer;
-    GLfloat m_scaleFactor;
+    float m_scaleX;
+    float m_scaleZ;
+    float m_scaleXWithBackground;
+    float m_scaleZWithBackground;
     int m_selectedItemIndex;
     ScatterSeriesRenderCache *m_selectedSeriesCache;
     ScatterSeriesRenderCache *m_oldSelectedSeriesCache;
-    QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;

@@ -1596,7 +1596,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
             if (m_polarGraph) {
                 drawAngularGrid(lineShader, yFloorLinePosition, projectionViewMatrix,
-                               depthProjectionViewMatrix);
+                                depthProjectionViewMatrix);
             } else {
                 for (int line = 0; line < gridLineCount; line++) {
                     QMatrix4x4 modelMatrix;
@@ -1858,14 +1858,13 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     QVector3D positionZComp(0.0f, 0.0f, 0.0f);
     if (m_axisCacheZ.segmentCount() > 0) {
         int labelCount = m_axisCacheZ.labelCount();
-        float labelXTrans = 0.0f;
+        float labelXTrans = m_scaleXWithBackground + labelMargin;
         float labelYTrans = m_flipHorizontalGrid ? backgroundMargin : -backgroundMargin;
         if (m_polarGraph) {
-            // TODO optional placement of radial labels - YTrans up only if over background
-            labelXTrans = m_scaleXWithBackground + labelMargin;
-            //labelYTrans += gridLineOffset + gridLineWidth;
-        } else {
-            labelXTrans = m_scaleXWithBackground + labelMargin;
+            labelXTrans *= m_radialLabelOffset;
+            // YTrans up only if over background
+            if (m_radialLabelOffset < 1.0f)
+                labelYTrans += gridLineOffset + gridLineWidth;
         }
         Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
@@ -1941,9 +1940,6 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                                          labelYTrans,
                                          0.0f);
 
-        if (m_polarGraph)
-            labelTrans.setX(labelTrans.x() * m_radialLabelOffset);
-
         if (m_zFlipped) {
             startIndex = 0;
             endIndex = labelCount;
@@ -1961,8 +1957,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             if (m_polarGraph) {
                 float direction = m_zFlipped ? -1.0f : 1.0f;
                 labelTrans.setZ((m_axisCacheZ.formatter()->labelPositions().at(label)
-                                * -m_graphAspectRatio
-                                + m_drawer->scaledFontSize() + gridLineWidth) * direction);
+                                 * -m_graphAspectRatio
+                                 + m_drawer->scaledFontSize() + gridLineWidth) * direction);
             } else {
                 labelTrans.setZ(m_axisCacheZ.labelPosition(label));
             }
@@ -1995,7 +1991,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheX.labelCount();
 
-        GLfloat labelZTrans = 0.0f;
+        float labelZTrans = 0.0f;
         float labelYTrans = m_flipHorizontalGrid ? backgroundMargin : -backgroundMargin;
         if (m_polarGraph)
             labelYTrans += gridLineOffset + gridLineWidth;
@@ -2111,7 +2107,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 // Calculate angular position
                 if (label == lastGridPosIndex && !showLastLabel)
                     continue;
-                float gridPosition = m_axisCacheX.formatter()->gridPositions().at(label);
+                float gridPosition = gridPositions.at(label);
                 qreal angle = gridPosition * M_PI * 2.0;
                 labelTrans.setX((m_graphAspectRatio + labelMargin)* float(qSin(angle)));
                 labelTrans.setZ(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)));
@@ -2164,12 +2160,12 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheY.labelCount();
 
-        GLfloat labelXTrans = m_scaleXWithBackground;
-        GLfloat labelZTrans = m_scaleZWithBackground;
+        float labelXTrans = m_scaleXWithBackground;
+        float labelZTrans = m_scaleZWithBackground;
 
         // Back & side wall
-        GLfloat labelMarginXTrans = labelMargin;
-        GLfloat labelMarginZTrans = labelMargin;
+        float labelMarginXTrans = labelMargin;
+        float labelMarginZTrans = labelMargin;
         QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
         QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
         Qt::AlignmentFlag backAlignment =
@@ -2226,7 +2222,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(label);
-            const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
+            const float labelYTrans = m_axisCacheY.labelPosition(label);
 
             glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
@@ -2387,22 +2383,23 @@ void Surface3DRenderer::calculateSceneScalingFactors()
 {
     // Calculate scene scaling and translation factors
     m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min());
-    m_areaSize.setHeight(m_axisCacheZ.max() -  m_axisCacheZ.min());
-    m_areaSize.setWidth(m_axisCacheX.max() - m_axisCacheX.min());
-    float scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
+    QSizeF areaSize;
+    areaSize.setHeight(m_axisCacheZ.max() -  m_axisCacheZ.min());
+    areaSize.setWidth(m_axisCacheX.max() - m_axisCacheX.min());
+    float scaleFactor = qMax(areaSize.width(), areaSize.height());
     if (m_polarGraph) {
         m_scaleX = m_graphAspectRatio;
         m_scaleZ = m_graphAspectRatio;
     } else {
-        m_scaleX = m_graphAspectRatio * m_areaSize.width() / scaleFactor;
-        m_scaleZ = m_graphAspectRatio * m_areaSize.height() / scaleFactor;
+        m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
+        m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
     }
     m_scaleXWithBackground = m_scaleX + backgroundMargin - 1.0f;
     m_scaleZWithBackground = m_scaleZ + backgroundMargin - 1.0f;
 
     float factorScaler = 2.0f * m_graphAspectRatio / scaleFactor;
-    m_axisCacheX.setScale(factorScaler * m_areaSize.width());
-    m_axisCacheZ.setScale(-factorScaler * m_areaSize.height());
+    m_axisCacheX.setScale(factorScaler * areaSize.width());
+    m_axisCacheZ.setScale(-factorScaler * areaSize.height());
     m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
     m_axisCacheZ.setTranslate(-m_axisCacheZ.scale() / 2.0f);
 }

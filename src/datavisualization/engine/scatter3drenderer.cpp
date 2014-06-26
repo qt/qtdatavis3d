@@ -60,11 +60,13 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_shadowQualityToShader(100.0f),
       m_shadowQualityMultiplier(3),
       m_heightNormalizer(1.0f),
-      m_scaleFactor(0),
+      m_scaleX(0.0f),
+      m_scaleZ(0.0f),
+      m_scaleXWithBackground(0.0f),
+      m_scaleZWithBackground(0.0f),
       m_selectedItemIndex(Scatter3DController::invalidSelectionIndex()),
       m_selectedSeriesCache(0),
       m_oldSelectedSeriesCache(0),
-      m_areaSize(QSizeF(0.0, 0.0)),
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true),
       m_backgroundMargin(defaultMaxSize),
@@ -248,6 +250,7 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         m_backgroundMargin = maxItemSize / itemScaler;
     else
         m_backgroundMargin = defaultMaxSize;
+    calculateSceneScalingFactors();
 
     if (noSelection) {
         if (!selectionLabel().isEmpty())
@@ -445,7 +448,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 if (!optimizationDefault
                         && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
-                        || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
+                            || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
                     continue;
                 }
 
@@ -717,7 +720,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             if (!optimizationDefault
                     && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
-                    || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
+                        || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
                 continue;
             }
 
@@ -987,21 +990,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        GLfloat xScale = (m_graphAspectRatio * m_areaSize.width()) / m_scaleFactor
-                + m_backgroundMargin;
-        GLfloat zScale = (m_graphAspectRatio * m_areaSize.height()) / m_scaleFactor
-                + m_backgroundMargin;
-        if (m_maxItemSize > xScale)
-            xScale = m_maxItemSize;
-        if (m_maxItemSize > zScale)
-            zScale = m_maxItemSize;
-        QVector3D bgScale(xScale, 1.0f + m_backgroundMargin, zScale);
-#else // ..and this if we want uniform scaling based on largest dimension
-        QVector3D bgScale((m_graphAspectRatio + m_backgroundMargin),
-                          1.0f + m_backgroundMargin,
-                          (m_graphAspectRatio + m_backgroundMargin));
-#endif
+        QVector3D bgScale(m_scaleXWithBackground, 1.0f + m_backgroundMargin,
+                          m_scaleZWithBackground);
         modelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
         if (m_yFlipped) {
@@ -1059,6 +1049,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     glDisable(GL_TEXTURE_2D);
 
     // Draw grid lines
+    QVector3D gridLineScaleX(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
+    QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
+    QVector3D gridLineScaleY(gridLineWidth, 1.0f + m_backgroundMargin, gridLineWidth);
+
     if (m_cachedTheme->isGridEnabled()) {
 #if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
@@ -1098,122 +1092,108 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         else
             lineYRotation = m_yRightAngleRotation;
 
-        if (m_yFlipped)
+        if (m_yFlippedForGrid)
             lineXRotation = m_xRightAngleRotation;
         else
             lineXRotation = m_xRightAngleRotationNeg;
 
         GLfloat yFloorLinePosition = -1.0f - m_backgroundMargin + gridLineOffset;
-        if (m_yFlipped)
+        if (m_yFlippedForGrid)
             yFloorLinePosition = -yFloorLinePosition;
 
         // Rows (= Z)
         if (m_axisCacheZ.segmentCount() > 0) {
             // Floor lines
             int gridLineCount = m_axisCacheZ.gridLineCount();
+            if (m_polarGraph) {
+                drawRadialGrid(lineShader, yFloorLinePosition, projectionViewMatrix,
+                               depthProjectionViewMatrix);
+            } else {
+                for (int line = 0; line < gridLineCount; line++) {
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 itModelMatrix;
 
-#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat xScale = (m_graphAspectRatio * m_areaSize.width()) / m_scaleFactor
-                    + m_backgroundMargin;
-            if (m_maxItemSize > xScale)
-                xScale = m_maxItemSize;
-            QVector3D gridLineScaler(xScale, gridLineWidth, gridLineWidth);
-#else // ..and this if we want uniform scaling based on largest dimension
-            QVector3D gridLineScaler((m_graphAspectRatio + m_backgroundMargin),
-                                     gridLineWidth, gridLineWidth);
-#endif
+                    modelMatrix.translate(0.0f, yFloorLinePosition,
+                                          m_axisCacheZ.gridLinePosition(line));
 
-            for (int line = 0; line < gridLineCount; line++) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-                QMatrix4x4 itModelMatrix;
+                    modelMatrix.scale(gridLineScaleX);
+                    itModelMatrix.scale(gridLineScaleX);
 
-                modelMatrix.translate(0.0f, yFloorLinePosition,
-                                      m_axisCacheZ.gridLinePosition(line));
+                    modelMatrix.rotate(lineXRotation);
+                    itModelMatrix.rotate(lineXRotation);
 
-                modelMatrix.scale(gridLineScaler);
-                itModelMatrix.scale(gridLineScaler);
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                modelMatrix.rotate(lineXRotation);
-                itModelMatrix.rotate(lineXRotation);
-
-                MVPMatrix = projectionViewMatrix * modelMatrix;
-
-                // Set the rest of the shader bindings
-                lineShader->setUniformValue(lineShader->model(), modelMatrix);
-                lineShader->setUniformValue(lineShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+                    // Set the rest of the shader bindings
+                    lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                    lineShader->setUniformValue(lineShader->nModel(),
+                                                itModelMatrix.inverted().transposed());
+                    lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    // Set shadow shader bindings
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        // Set shadow shader bindings
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
+#else
+                    m_drawer->drawLine(lineShader);
+#endif
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
-            }
 
-            // Side wall lines
-            gridLineScaler = QVector3D(gridLineWidth, 1.0f + m_backgroundMargin, gridLineWidth);
-#ifndef USE_UNIFORM_SCALING
-            GLfloat lineXTrans = (m_graphAspectRatio * m_areaSize.width())
-                    / m_scaleFactor - gridLineOffset + m_backgroundMargin;
-            if (m_maxItemSize > lineXTrans)
-                lineXTrans = m_maxItemSize - gridLineOffset;
-#else
-            GLfloat lineXTrans = m_graphAspectRatio + m_backgroundMargin - gridLineOffset;
-#endif
-            if (!m_xFlipped)
-                lineXTrans = -lineXTrans;
+                // Side wall lines
+                GLfloat lineXTrans = m_scaleXWithBackground - gridLineOffset;
 
-            for (int line = 0; line < gridLineCount; line++) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-                QMatrix4x4 itModelMatrix;
+                if (!m_xFlipped)
+                    lineXTrans = -lineXTrans;
 
-                modelMatrix.translate(lineXTrans, 0.0f, m_axisCacheZ.gridLinePosition(line));
+                for (int line = 0; line < gridLineCount; line++) {
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 itModelMatrix;
 
-                modelMatrix.scale(gridLineScaler);
-                itModelMatrix.scale(gridLineScaler);
+                    modelMatrix.translate(lineXTrans, 0.0f, m_axisCacheZ.gridLinePosition(line));
+
+                    modelMatrix.scale(gridLineScaleY);
+                    itModelMatrix.scale(gridLineScaleY);
 
 #if !defined(QT_OPENGL_ES_2)
-                modelMatrix.rotate(lineYRotation);
-                itModelMatrix.rotate(lineYRotation);
+                    modelMatrix.rotate(lineYRotation);
+                    itModelMatrix.rotate(lineYRotation);
 #else
-                modelMatrix.rotate(m_zRightAngleRotation);
-                itModelMatrix.rotate(m_zRightAngleRotation);
+                    modelMatrix.rotate(m_zRightAngleRotation);
+                    itModelMatrix.rotate(m_zRightAngleRotation);
 #endif
 
-                MVPMatrix = projectionViewMatrix * modelMatrix;
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                // Set the rest of the shader bindings
-                lineShader->setUniformValue(lineShader->model(), modelMatrix);
-                lineShader->setUniformValue(lineShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+                    // Set the rest of the shader bindings
+                    lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                    lineShader->setUniformValue(lineShader->nModel(),
+                                                itModelMatrix.inverted().transposed());
+                    lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
+#else
+                    m_drawer->drawLine(lineShader);
+#endif
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
             }
         }
 
@@ -1225,111 +1205,97 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             // Floor lines
             int gridLineCount = m_axisCacheX.gridLineCount();
 
-#ifndef USE_UNIFORM_SCALING
-            GLfloat zScale = (m_graphAspectRatio * m_areaSize.height()) / m_scaleFactor
-                    + m_backgroundMargin;
-            if (m_maxItemSize > zScale)
-                zScale = m_maxItemSize;
-            QVector3D gridLineScaler(gridLineWidth, gridLineWidth, zScale);
-#else
-            QVector3D gridLineScaler(gridLineWidth, gridLineWidth,
-                                     m_graphAspectRatio + m_backgroundMargin);
-#endif
+            if (m_polarGraph) {
+                drawAngularGrid(lineShader, yFloorLinePosition, projectionViewMatrix,
+                                depthProjectionViewMatrix);
+            } else {
+                for (int line = 0; line < gridLineCount; line++) {
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 itModelMatrix;
 
-            for (int line = 0; line < gridLineCount; line++) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-                QMatrix4x4 itModelMatrix;
+                    modelMatrix.translate(m_axisCacheX.gridLinePosition(line), yFloorLinePosition,
+                                          0.0f);
 
-                modelMatrix.translate(m_axisCacheX.gridLinePosition(line), yFloorLinePosition,
-                                      0.0f);
+                    modelMatrix.scale(gridLineScaleZ);
+                    itModelMatrix.scale(gridLineScaleZ);
 
-                modelMatrix.scale(gridLineScaler);
-                itModelMatrix.scale(gridLineScaler);
+                    modelMatrix.rotate(lineXRotation);
+                    itModelMatrix.rotate(lineXRotation);
 
-                modelMatrix.rotate(lineXRotation);
-                itModelMatrix.rotate(lineXRotation);
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                MVPMatrix = projectionViewMatrix * modelMatrix;
-
-                // Set the rest of the shader bindings
-                lineShader->setUniformValue(lineShader->model(), modelMatrix);
-                lineShader->setUniformValue(lineShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+                    // Set the rest of the shader bindings
+                    lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                    lineShader->setUniformValue(lineShader->nModel(),
+                                                itModelMatrix.inverted().transposed());
+                    lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
+#else
+                    m_drawer->drawLine(lineShader);
+#endif
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
-            }
 
-            // Back wall lines
-#ifndef USE_UNIFORM_SCALING
-            GLfloat lineZTrans = (m_graphAspectRatio * m_areaSize.height())
-                    / m_scaleFactor - gridLineOffset + m_backgroundMargin;
-            if (m_maxItemSize > lineZTrans)
-                lineZTrans = m_maxItemSize - gridLineOffset;
-#else
-            GLfloat lineZTrans = m_graphAspectRatio + m_backgroundMargin - gridLineOffset;
-#endif
-            if (!m_zFlipped)
-                lineZTrans = -lineZTrans;
+                // Back wall lines
+                GLfloat lineZTrans = m_scaleZWithBackground - gridLineOffset;
 
-            gridLineScaler = QVector3D(gridLineWidth, 1.0f + m_backgroundMargin, gridLineWidth);
+                if (!m_zFlipped)
+                    lineZTrans = -lineZTrans;
 
-            for (int line = 0; line < gridLineCount; line++) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-                QMatrix4x4 itModelMatrix;
+                for (int line = 0; line < gridLineCount; line++) {
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(m_axisCacheX.gridLinePosition(line), 0.0f, lineZTrans);
+                    modelMatrix.translate(m_axisCacheX.gridLinePosition(line), 0.0f, lineZTrans);
 
-                modelMatrix.scale(gridLineScaler);
-                itModelMatrix.scale(gridLineScaler);
+                    modelMatrix.scale(gridLineScaleY);
+                    itModelMatrix.scale(gridLineScaleY);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_zFlipped) {
-                    modelMatrix.rotate(m_xFlipRotation);
-                    itModelMatrix.rotate(m_xFlipRotation);
-                }
+                    if (m_zFlipped) {
+                        modelMatrix.rotate(m_xFlipRotation);
+                        itModelMatrix.rotate(m_xFlipRotation);
+                    }
 #else
-                modelMatrix.rotate(m_zRightAngleRotation);
-                itModelMatrix.rotate(m_zRightAngleRotation);
+                    modelMatrix.rotate(m_zRightAngleRotation);
+                    itModelMatrix.rotate(m_zRightAngleRotation);
 #endif
 
-                MVPMatrix = projectionViewMatrix * modelMatrix;
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 
-                // Set the rest of the shader bindings
-                lineShader->setUniformValue(lineShader->model(), modelMatrix);
-                lineShader->setUniformValue(lineShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-                lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
+                    // Set the rest of the shader bindings
+                    lineShader->setUniformValue(lineShader->model(), modelMatrix);
+                    lineShader->setUniformValue(lineShader->nModel(),
+                                                itModelMatrix.inverted().transposed());
+                    lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
-                } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
-                }
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
 #else
-                m_drawer->drawLine(lineShader);
+                    m_drawer->drawLine(lineShader);
 #endif
+                }
             }
         }
 
@@ -1338,21 +1304,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             // Back wall
             int gridLineCount = m_axisCacheY.gridLineCount();
 
-#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat lineZTrans = (m_graphAspectRatio * m_areaSize.height())
-                    / m_scaleFactor - gridLineOffset + m_backgroundMargin;
-            if (m_maxItemSize > lineZTrans)
-                lineZTrans = m_maxItemSize - gridLineOffset;
-            GLfloat xScale = (m_graphAspectRatio * m_areaSize.width()) / m_scaleFactor
-                    + m_backgroundMargin;
-            if (m_maxItemSize > xScale)
-                xScale = m_maxItemSize;
-            QVector3D gridLineScaler(xScale, gridLineWidth, gridLineWidth);
-#else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineZTrans = m_graphAspectRatio + m_backgroundMargin - gridLineOffset;
-            QVector3D gridLineScaler((m_graphAspectRatio + m_backgroundMargin),
-                                     gridLineWidth, gridLineWidth);
-#endif
+            GLfloat lineZTrans = m_scaleZWithBackground - gridLineOffset;
+
             if (!m_zFlipped)
                 lineZTrans = -lineZTrans;
 
@@ -1363,8 +1316,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 modelMatrix.translate(0.0f, m_axisCacheY.gridLinePosition(line), lineZTrans);
 
-                modelMatrix.scale(gridLineScaler);
-                itModelMatrix.scale(gridLineScaler);
+                modelMatrix.scale(gridLineScaleX);
+                itModelMatrix.scale(gridLineScaleX);
 
                 if (m_zFlipped) {
                     modelMatrix.rotate(m_xFlipRotation);
@@ -1396,21 +1349,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             }
 
             // Side wall
-#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-            GLfloat lineXTrans = (m_graphAspectRatio * m_areaSize.width())
-                    / m_scaleFactor - gridLineOffset + m_backgroundMargin;
-            if (m_maxItemSize > lineXTrans)
-                lineXTrans = m_maxItemSize - gridLineOffset;
-            GLfloat zScale = (m_graphAspectRatio * m_areaSize.height())
-                    / m_scaleFactor + m_backgroundMargin;
-            if (m_maxItemSize > zScale)
-                zScale = m_maxItemSize;
-            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, zScale);
-#else // ..and this if we want uniform scaling based on largest dimension
-            GLfloat lineXTrans = m_graphAspectRatio + m_backgroundMargin - gridLineOffset;
-            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth,
-                                       m_graphAspectRatio + m_backgroundMargin);
-#endif
+            GLfloat lineXTrans = m_scaleXWithBackground - gridLineOffset;
+
             if (!m_xFlipped)
                 lineXTrans = -lineXTrans;
 
@@ -1421,8 +1361,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                 modelMatrix.translate(lineXTrans, m_axisCacheY.gridLinePosition(line), 0.0f);
 
-                modelMatrix.scale(gridLineScaler);
-                itModelMatrix.scale(gridLineScaler);
+                modelMatrix.scale(gridLineScaleZ);
+                itModelMatrix.scale(gridLineScaleZ);
 
                 modelMatrix.rotate(lineYRotation);
                 itModelMatrix.rotate(lineYRotation);
@@ -1532,15 +1472,14 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     // Z Labels
     if (m_axisCacheZ.segmentCount() > 0) {
         int labelCount = m_axisCacheZ.labelCount();
-#ifndef USE_UNIFORM_SCALING
-        GLfloat labelXTrans = (m_graphAspectRatio * m_areaSize.width())
-                / m_scaleFactor + labelMargin + m_backgroundMargin;
-        if (m_maxItemSize > labelXTrans)
-            labelXTrans = m_maxItemSize + labelMargin;
-#else
-        GLfloat labelXTrans = m_graphAspectRatio + m_backgroundMargin + labelMargin;
-#endif
-        GLfloat labelYTrans = -1.0f - m_backgroundMargin;
+        float labelXTrans = m_scaleXWithBackground + labelMargin;
+        float labelYTrans = -1.0f - m_backgroundMargin;
+        if (m_polarGraph) {
+            labelXTrans *= m_radialLabelOffset;
+            // YTrans up only if over background
+            if (m_radialLabelOffset < 1.0f)
+                labelYTrans += gridLineOffset + gridLineWidth;
+        }
         Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
         if (m_xFlipped)
@@ -1550,7 +1489,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         if (labelAutoAngle == 0.0f) {
             if (m_zFlipped)
                 labelRotation.setY(180.0f);
-            if (m_yFlipped) {
+            if (m_yFlippedForGrid) {
                 if (m_zFlipped)
                     labelRotation.setY(180.0f);
                 else
@@ -1562,7 +1501,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         } else {
             if (m_zFlipped)
                 labelRotation.setY(180.0f);
-            if (m_yFlipped) {
+            if (m_yFlippedForGrid) {
                 if (m_zFlipped) {
                     if (m_xFlipped) {
                         labelRotation.setX(90.0f - (labelAutoAngle - fractionCamX)
@@ -1621,13 +1560,18 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
-            labelTrans.setZ(m_axisCacheZ.labelPosition(label));
-
             glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
-
-            // Draw the label here
-            m_dummyRenderItem.setTranslation(labelTrans);
             const LabelItem &axisLabelItem = *m_axisCacheZ.labelItems().at(label);
+            // Draw the label here
+            if (m_polarGraph) {
+                float direction = m_zFlipped ? -1.0f : 1.0f;
+                labelTrans.setZ((m_axisCacheZ.formatter()->labelPositions().at(label)
+                                 * -m_graphAspectRatio
+                                 + m_drawer->scaledFontSize() + gridLineWidth) * direction);
+            } else {
+                labelTrans.setZ(m_axisCacheZ.labelPosition(label));
+            }
+            m_dummyRenderItem.setTranslation(labelTrans);
 
             if (drawSelection) {
                 QVector4D labelColor = QVector4D(label / 255.0f, 0.0f, 0.0f,
@@ -1656,15 +1600,13 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         fractionCamY = activeCamera->yRotation() * labelAngleFraction;
         fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheX.labelCount();
-#ifndef USE_UNIFORM_SCALING
-        GLfloat labelZTrans = (m_graphAspectRatio * m_areaSize.height())
-                / m_scaleFactor + labelMargin + m_backgroundMargin;
-        if (m_maxItemSize > labelZTrans)
-            labelZTrans = m_maxItemSize + labelMargin;
-#else
-        GLfloat labelZTrans = m_graphAspectRatio + m_backgroundMargin + labelMargin;
-#endif
-        GLfloat labelYTrans = -1.0f - m_backgroundMargin;
+        float labelZTrans = 0.0f;
+        float labelYTrans = -1.0f - m_backgroundMargin;
+        if (m_polarGraph)
+            labelYTrans += gridLineOffset + gridLineWidth;
+        else
+            labelZTrans = m_scaleZWithBackground + labelMargin;
+
         Qt::AlignmentFlag alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
         QVector3D labelRotation;
         if (m_zFlipped)
@@ -1675,7 +1617,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
             if (m_xFlipped)
                 labelRotation.setY(-90.0f);
-            if (m_yFlipped) {
+            if (m_yFlippedForGrid) {
                 if (m_xFlipped)
                     labelRotation.setY(-90.0f);
                 else
@@ -1687,7 +1629,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 labelRotation.setY(-90.0f);
             else
                 labelRotation.setY(90.0f);
-            if (m_yFlipped) {
+            if (m_yFlippedForGrid) {
                 if (m_zFlipped) {
                     if (m_xFlipped) {
                         labelRotation.setX(90.0f - (2.0f * labelAutoAngle - fractionCamX)
@@ -1735,6 +1677,14 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
 
         QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
+        if (m_polarGraph) {
+            if (!m_yFlippedForGrid && (m_zFlipped != m_xFlipped)
+                    || m_yFlippedForGrid && (m_zFlipped == m_xFlipped)) {
+                totalRotation *= m_zRightAngleRotation;
+            } else {
+                totalRotation *= m_zRightAngleRotationNeg;
+            }
+        }
         QVector3D labelTrans = QVector3D(0.0f, labelYTrans, labelZTrans);
         if (m_xFlipped) {
             startIndex = labelCount - 1;
@@ -1746,12 +1696,45 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             indexStep = 1;
         }
         float offsetValue = 0.0f;
+        bool showLastLabel = false;
+        QVector<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
+        int lastGridPosIndex = gridPositions.size() - 1;
+        if (gridPositions.size()
+                && (gridPositions.at(lastGridPosIndex) != 1.0f || gridPositions.at(0) != 0.0f)) {
+            // Avoid overlapping first and last label if they would get on same position
+            showLastLabel = true;
+        }
+
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
-            labelTrans.setX(m_axisCacheX.labelPosition(label));
-
             glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
-
             // Draw the label here
+            if (m_polarGraph) {
+                // Calculate angular position
+                if (label == lastGridPosIndex && !showLastLabel)
+                    continue;
+                float gridPosition = gridPositions.at(label);
+                qreal angle = gridPosition * M_PI * 2.0;
+                labelTrans.setX((m_graphAspectRatio + labelMargin)* float(qSin(angle)));
+                labelTrans.setZ(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)));
+                // Alignment depends on label angular position, as well as flips
+                Qt::AlignmentFlag vAlignment = Qt::AlignCenter;
+                Qt::AlignmentFlag hAlignment = Qt::AlignCenter;
+                const float centerMargin = 0.005f;
+                if (gridPosition < 0.25f - centerMargin || gridPosition > 0.75f + centerMargin)
+                    vAlignment = m_zFlipped ? Qt::AlignTop : Qt::AlignBottom;
+                else if (gridPosition > 0.25f + centerMargin && gridPosition < 0.75f - centerMargin)
+                    vAlignment = m_zFlipped ? Qt::AlignBottom : Qt::AlignTop;
+
+                if (gridPosition < 0.50f - centerMargin && gridPosition > centerMargin)
+                    hAlignment = m_zFlipped ? Qt::AlignRight : Qt::AlignLeft;
+                else if (gridPosition < 1.0f - centerMargin && gridPosition > 0.5f + centerMargin)
+                    hAlignment = m_zFlipped ? Qt::AlignLeft : Qt::AlignRight;
+                if (m_yFlippedForGrid && vAlignment != Qt::AlignCenter)
+                    vAlignment = (vAlignment == Qt::AlignTop) ? Qt::AlignBottom : Qt::AlignTop;
+                alignment = Qt::AlignmentFlag(vAlignment | hAlignment);
+            } else {
+                labelTrans.setX(m_axisCacheX.labelPosition(label));
+            }
             m_dummyRenderItem.setTranslation(labelTrans);
             const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(label);
 
@@ -1782,22 +1765,13 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         fractionCamY = activeCamera->yRotation() * labelAngleFraction;
         fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheY.labelCount();
-#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-        GLfloat labelXTrans = (m_graphAspectRatio* m_areaSize.width())
-                / m_scaleFactor + m_backgroundMargin;
-        GLfloat labelZTrans = (m_graphAspectRatio * m_areaSize.height())
-                / m_scaleFactor + m_backgroundMargin;
-        if (m_maxItemSize > labelXTrans)
-            labelXTrans = m_maxItemSize;
-        if (m_maxItemSize > labelZTrans)
-            labelZTrans = m_maxItemSize;
-#else // ..and this if we want uniform scaling based on largest dimension
-        GLfloat labelXTrans = m_graphAspectRatio + m_backgroundMargin;
-        GLfloat labelZTrans = labelXTrans;
-#endif
+
+        float labelXTrans = m_scaleXWithBackground;
+        float labelZTrans = m_scaleZWithBackground;
+
         // Back & side wall
-        GLfloat labelMarginXTrans = labelMargin;
-        GLfloat labelMarginZTrans = labelMargin;
+        float labelMarginXTrans = labelMargin;
+        float labelMarginZTrans = labelMargin;
         QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
         QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
         Qt::AlignmentFlag backAlignment =
@@ -1854,7 +1828,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(label);
-            const GLfloat labelYTrans = m_axisCacheY.labelPosition(label);
+            const float labelYTrans = m_axisCacheY.labelPosition(label);
 
             glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
@@ -1991,27 +1965,44 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 {
     // We need to normalize translations
     const QVector3D &pos = item.position();
-    float xTrans = m_axisCacheX.positionAt(pos.x());
+    float xTrans;
     float yTrans = m_axisCacheY.positionAt(pos.y());
-    float zTrans = m_axisCacheZ.positionAt(pos.z());
+    float zTrans;
+    if (m_polarGraph) {
+        calculatePolarXZ(pos, xTrans, zTrans);
+    } else {
+        xTrans = m_axisCacheX.positionAt(pos.x());
+        zTrans = m_axisCacheZ.positionAt(pos.z());
+    }
     item.setTranslation(QVector3D(xTrans, yTrans, zTrans));
 }
 
 void Scatter3DRenderer::calculateSceneScalingFactors()
 {
     m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min()) / 2.0f;
-    m_areaSize.setHeight((m_axisCacheZ.max() - m_axisCacheZ.min()) / 2.0f);
-    m_areaSize.setWidth((m_axisCacheX.max() - m_axisCacheX.min()) / 2.0f);
-    m_scaleFactor = qMax(m_areaSize.width(), m_areaSize.height());
-
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
-    float factorScaler = 2.0f * m_graphAspectRatio / m_scaleFactor;
-    m_axisCacheX.setScale(factorScaler * m_areaSize.width());
-    m_axisCacheZ.setScale(-factorScaler * m_areaSize.height());
+    QSizeF areaSize;
+    areaSize.setHeight((m_axisCacheZ.max() - m_axisCacheZ.min()));
+    areaSize.setWidth((m_axisCacheX.max() - m_axisCacheX.min()));
+    float scaleFactor = qMax(areaSize.width(), areaSize.height());
+    if (m_polarGraph) {
+        m_scaleX = m_graphAspectRatio;
+        m_scaleZ = m_graphAspectRatio;
+    } else {
+        m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
+        m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
+    }
+    float factorScaler = 2.0f * m_graphAspectRatio / scaleFactor;
+    m_axisCacheX.setScale(factorScaler * areaSize.width());
+    m_axisCacheZ.setScale(-factorScaler * areaSize.height());
 #else // ..and this if we want uniform scaling based on largest dimension
+    m_scaleX = m_graphAspectRatio;
+    m_scaleZ = m_graphAspectRatio;
     m_axisCacheX.setScale(2.0f * m_graphAspectRatio);
     m_axisCacheZ.setScale(-m_axisCacheX.scale());
 #endif
+    m_scaleXWithBackground = m_scaleX + m_backgroundMargin;
+    m_scaleZWithBackground = m_scaleZ + m_backgroundMargin;
     m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
     m_axisCacheZ.setTranslate(-m_axisCacheZ.scale() / 2.0f);
 }

@@ -235,6 +235,18 @@ int main(int argc, char **argv)
     aspectRatioSlider->setValue(20);
     aspectRatioSlider->setMaximum(100);
 
+    QCheckBox *optimizationStaticCB = new QCheckBox(widget);
+    optimizationStaticCB->setText(QStringLiteral("Static optimization"));
+    optimizationStaticCB->setChecked(false);
+
+    QCheckBox *orthoCB = new QCheckBox(widget);
+    orthoCB->setText(QStringLiteral("Orthogonal projection"));
+    orthoCB->setChecked(false);
+
+    QCheckBox *polarCB = new QCheckBox(widget);
+    polarCB->setText(QStringLiteral("Polar graph"));
+    polarCB->setChecked(false);
+
     QCheckBox *axisTitlesVisibleCB = new QCheckBox(widget);
     axisTitlesVisibleCB->setText(QStringLiteral("Axis titles visible"));
     axisTitlesVisibleCB->setChecked(false);
@@ -249,6 +261,13 @@ int main(int argc, char **argv)
     axisLabelRotationSlider->setMinimum(0);
     axisLabelRotationSlider->setValue(0);
     axisLabelRotationSlider->setMaximum(90);
+
+    QSlider *radialLabelSlider = new QSlider(Qt::Horizontal, widget);
+    radialLabelSlider->setTickInterval(10);
+    radialLabelSlider->setTickPosition(QSlider::TicksBelow);
+    radialLabelSlider->setMinimum(0);
+    radialLabelSlider->setValue(100);
+    radialLabelSlider->setMaximum(150);
 
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
@@ -298,10 +317,15 @@ int main(int argc, char **argv)
     vLayout2->addWidget(fontSizeSlider);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
     vLayout2->addWidget(aspectRatioSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(optimizationStaticCB);
+    vLayout2->addWidget(orthoCB);
+    vLayout2->addWidget(polarCB);
     vLayout2->addWidget(axisTitlesVisibleCB);
     vLayout2->addWidget(axisTitlesFixedCB);
     vLayout2->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
-    vLayout2->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(axisLabelRotationSlider);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Radial label offset")));
+    vLayout2->addWidget(radialLabelSlider, 1, Qt::AlignTop);
 
     ScatterDataModifier *modifier = new ScatterDataModifier(chart);
 
@@ -389,6 +413,12 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::setMaxY);
     QObject::connect(maxSliderZ, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setMaxZ);
+    QObject::connect(optimizationStaticCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::toggleStatic);
+    QObject::connect(orthoCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::toggleOrtho);
+    QObject::connect(polarCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::togglePolar);
     QObject::connect(axisTitlesVisibleCB, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::toggleAxisTitleVisibility);
     QObject::connect(axisTitlesFixedCB, &QCheckBox::stateChanged, modifier,
@@ -397,6 +427,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changeLabelRotation);
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setAspectRatio);
+    QObject::connect(radialLabelSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::changeRadialLabelOffset);
 
     modifier->setFpsLabel(fpsLabel);
 

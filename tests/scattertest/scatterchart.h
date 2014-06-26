@@ -90,9 +90,13 @@ public slots:
     void handleAxisZChanged(QValue3DAxis *axis);
     void handleFpsChange(qreal fps);
     void changeLabelRotation(int rotation);
+    void changeRadialLabelOffset(int offset);
     void toggleAxisTitleVisibility(bool enabled);
     void toggleAxisTitleFixed(bool enabled);
     void renderToImage();
+    void togglePolar(bool enable);
+    void toggleStatic(bool enable);
+    void toggleOrtho(bool enable);
 
 signals:
     void shadowQualityChanged(int quality);

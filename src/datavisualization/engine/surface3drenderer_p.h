@@ -71,7 +71,6 @@ private:
     bool m_selectionActive;
     AbstractRenderItem m_dummyRenderItem;
     GLint m_shadowQualityMultiplier;
-    QSizeF m_areaSize;
     bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedPoint;
     QSurface3DSeries *m_selectedSeries;

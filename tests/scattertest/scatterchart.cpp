@@ -484,9 +484,9 @@ void ScatterDataModifier::addData()
     m_chart->axisX()->setRange(-50.0f, 50.0f);
     m_chart->axisY()->setRange(-1.0f, 1.2f);
     m_chart->axisZ()->setRange(-50.0f, 50.0f);
-    m_chart->axisX()->setSegmentCount(6);
+    m_chart->axisX()->setSegmentCount(5);
     m_chart->axisY()->setSegmentCount(4);
-    m_chart->axisZ()->setSegmentCount(9);
+    m_chart->axisZ()->setSegmentCount(10);
     m_chart->axisX()->setSubSegmentCount(2);
     m_chart->axisY()->setSubSegmentCount(3);
     m_chart->axisZ()->setSubSegmentCount(1);
@@ -934,6 +934,11 @@ void ScatterDataModifier::changeLabelRotation(int rotation)
     m_chart->axisZ()->setLabelAutoRotation(float(rotation));
 }
 
+void ScatterDataModifier::changeRadialLabelOffset(int offset)
+{
+    m_chart->setRadialLabelOffset(float(offset) / 100.0f);
+}
+
 void ScatterDataModifier::toggleAxisTitleVisibility(bool enabled)
 {
     m_chart->axisX()->setTitleVisible(enabled);
@@ -968,6 +973,24 @@ void ScatterDataModifier::renderToImage()
         renderedImageNoAASmall.save(QStringLiteral("./renderedImageNoAASmall_hidden.png"));
         qDebug() << "Hidden images rendered!";
     }
+}
+
+void ScatterDataModifier::togglePolar(bool enable)
+{
+    m_chart->setPolar(enable);
+}
+
+void ScatterDataModifier::toggleStatic(bool enable)
+{
+    if (enable)
+        m_chart->setOptimizationHints(QAbstract3DGraph::OptimizationStatic);
+    else
+        m_chart->setOptimizationHints(QAbstract3DGraph::OptimizationDefault);
+}
+
+void ScatterDataModifier::toggleOrtho(bool enable)
+{
+    m_chart->setOrthoProjection(enable);
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)
