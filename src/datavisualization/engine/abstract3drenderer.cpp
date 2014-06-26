@@ -74,7 +74,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_xRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f)),
       m_yRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f)),
       m_zRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -90.0f)),
-      m_xFlipRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -180.0f))
+      m_xFlipRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -180.0f)),
+      m_zFlipRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f))
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,
@@ -662,10 +663,15 @@ void Abstract3DRenderer::drawAxisTitleX(const QVector3D &labelRotation,
                                         float labelsMaxWidth,
                                         const QMatrix4x4 &viewMatrix,
                                         const QMatrix4x4 &projectionMatrix,
-                                        ShaderHelper *shader)
+                                        ShaderHelper *shader,
+                                        bool radial)
 {
     float scaleFactor = m_drawer->scaledFontSize() / m_axisCacheX.titleItem().size().height();
-    float titleOffset = 2.0f * (labelMargin + (labelsMaxWidth * scaleFactor));
+    float titleOffset;
+    if (radial)
+        titleOffset = -2.0f * (labelMargin + m_drawer->scaledFontSize());
+    else
+        titleOffset = 2.0f * (labelMargin + (labelsMaxWidth * scaleFactor));
     float zRotation = 0.0f;
     float yRotation = 0.0f;
     float xRotation = -90.0f + labelRotation.z();
@@ -709,6 +715,17 @@ void Abstract3DRenderer::drawAxisTitleX(const QVector3D &labelRotation,
                 xRotation = -90.0f - labelRotation.z();
                 extraRotation = -extraRotation;
             }
+        }
+    }
+
+    if (radial) {
+        if (m_zFlipped) {
+            titleOffset = -titleOffset;
+        } else {
+            if (m_yFlippedForGrid)
+                alignment = Qt::AlignTop;
+            else
+                alignment = Qt::AlignBottom;
         }
     }
 

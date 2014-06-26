@@ -80,6 +80,17 @@ Window {
             titleFixed: false
         }
 
+        Theme3D {
+            id: customTheme
+            type: Theme3D.ThemeQt
+            // Don't show specular spotlight as we don't want it to distort the colors
+            lightStrength: 0.0
+            ambientLightStrength: 0.9
+            backgroundEnabled: false
+            font.family: "Lucida Handwriting"
+            font.pointSize: 25
+        }
+
         Surface3D {
             id: surfaceGraph
             width: surfaceView.width
@@ -92,10 +103,7 @@ Window {
             axisY: yAxis
             axisZ: zAxis
 
-            // Don't show specular spotlight as we don't want it to distort the colors
-            theme.lightStrength: 0.0
-            theme.ambientLightStrength: 0.9
-            theme.backgroundEnabled: false
+            theme: customTheme
 
             orthoProjection: true
             flipHorizontalGrid: true

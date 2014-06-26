@@ -1969,7 +1969,14 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             labelsMaxWidth = qMax(labelsMaxWidth, float(axisLabelItem.size().width()));
         }
         if (!drawSelection && m_axisCacheZ.isTitleVisible()) {
-            labelTrans.setZ(0.0f);
+            if (m_polarGraph) {
+                float titleZ = -m_graphAspectRatio / 2.0f;
+                if (m_zFlipped)
+                    titleZ = -titleZ;
+                labelTrans.setZ(titleZ);
+            } else {
+                labelTrans.setZ(0.0f);
+            }
             drawAxisTitleZ(labelRotation, labelTrans, totalRotation, m_dummyRenderItem,
                            activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader);
         }
@@ -2139,8 +2146,20 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         if (!drawSelection && m_axisCacheX.isTitleVisible()) {
             labelTrans.setX(0.0f);
+            bool radial = false;
+            if (m_polarGraph) {
+                if (m_xFlipped == m_zFlipped)
+                    totalRotation *= m_zRightAngleRotation;
+                else
+                    totalRotation *= m_zRightAngleRotationNeg;
+                if (m_yFlippedForGrid)
+                    totalRotation *= QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f);
+                labelTrans.setZ(-m_graphAspectRatio);
+                radial = true;
+            }
             drawAxisTitleX(labelRotation, labelTrans, totalRotation, m_dummyRenderItem,
-                           activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader);
+                           activeCamera, labelsMaxWidth, viewMatrix, projectionMatrix, shader,
+                           radial);
         }
     }
     // Y Labels
