@@ -79,7 +79,7 @@ public:
     virtual void updateSelectionMode(QAbstract3DGraph::SelectionFlags newMode);
     virtual void updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint);
     virtual void updateScene(Q3DScene *scene);
-    virtual void updateTextures() = 0;
+    virtual void updateTextures();
     virtual void initSelectionBuffer() = 0;
     virtual void updateSelectionState(SelectionState state);
     virtual void updateInputPosition(const QPoint &position);
@@ -205,6 +205,8 @@ protected:
     void drawAngularGrid(ShaderHelper *shader, float yFloorLinePos,
                          const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &depthMatrix);
 
+    float calculatePolarBackgroundMargin();
+
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
     Drawer *m_drawer;
@@ -265,6 +267,9 @@ protected:
     QQuaternion m_zRightAngleRotationNeg;
     QQuaternion m_xFlipRotation;
     QQuaternion m_zFlipRotation;
+
+    float m_vBackgroundMargin;
+    float m_hBackgroundMargin;
 
 private:
     friend class Abstract3DController;

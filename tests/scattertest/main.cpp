@@ -240,7 +240,7 @@ int main(int argc, char **argv)
     optimizationStaticCB->setChecked(false);
 
     QCheckBox *orthoCB = new QCheckBox(widget);
-    orthoCB->setText(QStringLiteral("Orthogonal projection"));
+    orthoCB->setText(QStringLiteral("Orthographic projection"));
     orthoCB->setChecked(false);
 
     QCheckBox *polarCB = new QCheckBox(widget);

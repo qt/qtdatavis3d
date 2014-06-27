@@ -63,13 +63,13 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_scaleX(0.0f),
       m_scaleZ(0.0f),
       m_scaleXWithBackground(0.0f),
+      m_scaleYWithBackground(0.0f),
       m_scaleZWithBackground(0.0f),
       m_selectedItemIndex(Scatter3DController::invalidSelectionIndex()),
       m_selectedSeriesCache(0),
       m_oldSelectedSeriesCache(0),
       m_dotSizeScale(1.0f),
       m_hasHeightAdjustmentChanged(true),
-      m_backgroundMargin(defaultMaxSize),
       m_maxItemSize(0.0f),
       m_clickedIndex(Scatter3DController::invalidSelectionIndex()),
       m_havePointSeries(false),
@@ -162,7 +162,8 @@ void Scatter3DRenderer::updateData()
     }
 
     if (totalDataSize) {
-        m_dotSizeScale = GLfloat(qBound(defaultMinSize, 2.0f / float(qSqrt(qreal(totalDataSize))),
+        m_dotSizeScale = GLfloat(qBound(defaultMinSize,
+                                        2.0f / float(qSqrt(qreal(totalDataSize))),
                                         defaultMaxSize));
     }
 
@@ -246,10 +247,6 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
         }
     }
     m_maxItemSize = maxItemSize;
-    if (maxItemSize > defaultMaxSize)
-        m_backgroundMargin = maxItemSize / itemScaler;
-    else
-        m_backgroundMargin = defaultMaxSize;
     calculateSceneScalingFactors();
 
     if (noSelection) {
@@ -300,6 +297,26 @@ void Scatter3DRenderer::updateScene(Q3DScene *scene)
     }
 
     Abstract3DRenderer::updateScene(scene);
+}
+
+void Scatter3DRenderer::updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                                         const QStringList &labels)
+{
+    Abstract3DRenderer::updateAxisLabels(orientation, labels);
+
+    // Angular axis label dimensions affect the chart dimensions
+    if (m_polarGraph && orientation == QAbstract3DAxis::AxisOrientationX)
+        calculateSceneScalingFactors();
+}
+
+void Scatter3DRenderer::updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
+                                                  bool visible)
+{
+    Abstract3DRenderer::updateAxisTitleVisibility(orientation, visible);
+
+    // Angular axis title existence affects the chart dimensions
+    if (m_polarGraph && orientation == QAbstract3DAxis::AxisOrientationX)
+        calculateSceneScalingFactors();
 }
 
 void Scatter3DRenderer::resetClickedStatus()
@@ -989,7 +1006,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        QVector3D bgScale(m_scaleXWithBackground, 1.0f + m_backgroundMargin,
+        QVector3D bgScale(m_scaleXWithBackground, m_scaleYWithBackground,
                           m_scaleZWithBackground);
         modelMatrix.scale(bgScale);
         // If we're viewing from below, background object must be flipped
@@ -1047,7 +1064,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     // Draw grid lines
     QVector3D gridLineScaleX(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
     QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
-    QVector3D gridLineScaleY(gridLineWidth, 1.0f + m_backgroundMargin, gridLineWidth);
+    QVector3D gridLineScaleY(gridLineWidth, m_scaleYWithBackground, gridLineWidth);
 
     if (m_cachedTheme->isGridEnabled()) {
 #if !(defined QT_OPENGL_ES_2)
@@ -1093,7 +1110,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         else
             lineXRotation = m_xRightAngleRotationNeg;
 
-        GLfloat yFloorLinePosition = -1.0f - m_backgroundMargin + gridLineOffset;
+        GLfloat yFloorLinePosition = -m_scaleYWithBackground + gridLineOffset;
         if (m_yFlippedForGrid)
             yFloorLinePosition = -yFloorLinePosition;
 
@@ -1467,7 +1484,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     if (m_axisCacheZ.segmentCount() > 0) {
         int labelCount = m_axisCacheZ.labelCount();
         float labelXTrans = m_scaleXWithBackground + labelMargin;
-        float labelYTrans = -1.0f - m_backgroundMargin;
+        float labelYTrans = -m_scaleYWithBackground;
         if (m_polarGraph) {
             labelXTrans *= m_radialLabelOffset;
             // YTrans up only if over background
@@ -1602,7 +1619,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         fractionCamX = activeCamera->xRotation() * labelAngleFraction;
         int labelCount = m_axisCacheX.labelCount();
         float labelZTrans = 0.0f;
-        float labelYTrans = -1.0f - m_backgroundMargin;
+        float labelYTrans = -m_scaleYWithBackground;
         if (m_polarGraph)
             labelYTrans += gridLineOffset + gridLineWidth;
         else
@@ -1698,10 +1715,10 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         float offsetValue = 0.0f;
         bool showLastLabel = false;
-        QVector<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
-        int lastGridPosIndex = gridPositions.size() - 1;
-        if (gridPositions.size()
-                && (gridPositions.at(lastGridPosIndex) != 1.0f || gridPositions.at(0) != 0.0f)) {
+        QVector<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
+        int lastLabelPosIndex = labelPositions.size() - 1;
+        if (labelPositions.size()
+                && (labelPositions.at(lastLabelPosIndex) != 1.0f || labelPositions.at(0) != 0.0f)) {
             // Avoid overlapping first and last label if they would get on same position
             showLastLabel = true;
         }
@@ -1711,24 +1728,24 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             // Draw the label here
             if (m_polarGraph) {
                 // Calculate angular position
-                if (label == lastGridPosIndex && !showLastLabel)
+                if (label == lastLabelPosIndex && !showLastLabel)
                     continue;
-                float gridPosition = gridPositions.at(label);
-                qreal angle = gridPosition * M_PI * 2.0;
-                labelTrans.setX((m_graphAspectRatio + labelMargin)* float(qSin(angle)));
+                float labelPosition = labelPositions.at(label);
+                qreal angle = labelPosition * M_PI * 2.0;
+                labelTrans.setX((m_graphAspectRatio + labelMargin) * float(qSin(angle)));
                 labelTrans.setZ(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)));
                 // Alignment depends on label angular position, as well as flips
                 Qt::AlignmentFlag vAlignment = Qt::AlignCenter;
                 Qt::AlignmentFlag hAlignment = Qt::AlignCenter;
                 const float centerMargin = 0.005f;
-                if (gridPosition < 0.25f - centerMargin || gridPosition > 0.75f + centerMargin)
+                if (labelPosition < 0.25f - centerMargin || labelPosition > 0.75f + centerMargin)
                     vAlignment = m_zFlipped ? Qt::AlignTop : Qt::AlignBottom;
-                else if (gridPosition > 0.25f + centerMargin && gridPosition < 0.75f - centerMargin)
+                else if (labelPosition > 0.25f + centerMargin && labelPosition < 0.75f - centerMargin)
                     vAlignment = m_zFlipped ? Qt::AlignBottom : Qt::AlignTop;
 
-                if (gridPosition < 0.50f - centerMargin && gridPosition > centerMargin)
+                if (labelPosition < 0.50f - centerMargin && labelPosition > centerMargin)
                     hAlignment = m_zFlipped ? Qt::AlignRight : Qt::AlignLeft;
-                else if (gridPosition < 1.0f - centerMargin && gridPosition > 0.5f + centerMargin)
+                else if (labelPosition < 1.0f - centerMargin && labelPosition > 0.5f + centerMargin)
                     hAlignment = m_zFlipped ? Qt::AlignLeft : Qt::AlignRight;
                 if (m_yFlippedForGrid && vAlignment != Qt::AlignCenter)
                     vAlignment = (vAlignment == Qt::AlignTop) ? Qt::AlignBottom : Qt::AlignTop;
@@ -1959,8 +1976,13 @@ void Scatter3DRenderer::loadBackgroundMesh()
 
 void Scatter3DRenderer::updateTextures()
 {
+    Abstract3DRenderer::updateTextures();
+
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_updateLabels = true;
+
+    if (m_polarGraph)
+        calculateSceneScalingFactors();
 }
 
 void Scatter3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)
@@ -1992,6 +2014,16 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 
 void Scatter3DRenderer::calculateSceneScalingFactors()
 {
+    if (m_maxItemSize > defaultMaxSize)
+        m_hBackgroundMargin = m_maxItemSize / itemScaler;
+    else
+        m_hBackgroundMargin = defaultMaxSize;
+    m_vBackgroundMargin = m_hBackgroundMargin;
+    if (m_polarGraph) {
+        float polarMargin = calculatePolarBackgroundMargin();
+        m_hBackgroundMargin = qMax(m_hBackgroundMargin, polarMargin);
+    }
+
     m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min()) / 2.0f;
 #ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
     QSizeF areaSize;
@@ -2014,8 +2046,9 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
     m_axisCacheX.setScale(2.0f * m_graphAspectRatio);
     m_axisCacheZ.setScale(-m_axisCacheX.scale());
 #endif
-    m_scaleXWithBackground = m_scaleX + m_backgroundMargin;
-    m_scaleZWithBackground = m_scaleZ + m_backgroundMargin;
+    m_scaleXWithBackground = m_scaleX + m_hBackgroundMargin;
+    m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
+    m_scaleYWithBackground = m_vBackgroundMargin + 1.0f;
     m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
     m_axisCacheZ.setTranslate(-m_axisCacheZ.scale() / 2.0f);
 }

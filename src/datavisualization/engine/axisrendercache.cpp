@@ -54,10 +54,8 @@ void AxisRenderCache::setDrawer(Drawer *drawer)
 {
     m_drawer = drawer;
     m_font = m_drawer->font();
-    if (m_drawer) {
-        QObject::connect(m_drawer, &Drawer::drawerChanged, this, &AxisRenderCache::updateTextures);
+    if (m_drawer)
         updateTextures();
-    }
 }
 
 void AxisRenderCache::setType(QAbstract3DAxis::AxisType type)

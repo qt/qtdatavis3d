@@ -2553,6 +2553,8 @@ void Bars3DRenderer::loadBackgroundMesh()
 
 void Bars3DRenderer::updateTextures()
 {
+    Abstract3DRenderer::updateTextures();
+
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_updateLabels = true;
 }

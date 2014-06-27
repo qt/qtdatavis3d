@@ -30,9 +30,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-// Margin for background (1.10 make it 10% larger to avoid
-// selection ball being drawn inside background)
-const GLfloat backgroundMargin = 1.1f;
 const GLfloat sliceZScale = 0.1f;
 const GLfloat sliceUnits = 2.5f;
 const uint greenMultiplier = 256;
@@ -55,6 +52,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_scaleX(0.0f),
       m_scaleZ(0.0f),
       m_scaleXWithBackground(0.0f),
+      m_scaleYWithBackground(0.0f),
       m_scaleZWithBackground(0.0f),
       m_depthModelTexture(0),
       m_depthFrameBuffer(0),
@@ -889,7 +887,7 @@ void Surface3DRenderer::drawSlicedScene()
         }
 
         // Vertical lines
-        QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
+        QVector3D gridLineScaleY(gridLineWidth, m_scaleYWithBackground, gridLineWidth);
 
         gridLineCount = sliceCache.gridLineCount();
         for (int line = 0; line < gridLineCount; line++) {
@@ -957,7 +955,7 @@ void Surface3DRenderer::drawSlicedScene()
 
     labelNbr = 0;
     positionComp.setY(-0.1f);
-    labelTrans.setY(-backgroundMargin);
+    labelTrans.setY(-m_scaleYWithBackground);
     labelCount = sliceCache.labelCount();
     for (int label = 0; label < labelCount; label++) {
         if (countLabelItems > labelNbr) {
@@ -1053,7 +1051,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     / activeCamera->zoomLevel() / m_autoScaleAdjustment * 100.0f;
             qreal cameraAngle = qreal(activeCamera->yRotation()) / 180.0 * M_PI;
             float cameraYPos = float(qSin(cameraAngle)) * distanceToCenter;
-            m_yFlippedForGrid = cameraYPos < backgroundMargin;
+            m_yFlippedForGrid = cameraYPos < (m_scaleYWithBackground);
         } else if (m_useOrthoProjection && activeCamera->yRotation() == 0.0f) {
             // With ortho we only need to flip at angle zero, to fix label autorotation angles
             m_yFlippedForGrid = !m_yFlipped;
@@ -1369,7 +1367,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        QVector3D bgScale(m_scaleXWithBackground, backgroundMargin, m_scaleZWithBackground);
+        QVector3D bgScale(m_scaleXWithBackground, m_scaleYWithBackground, m_scaleZWithBackground);
         modelMatrix.scale(bgScale);
 
         // If we're viewing from below, background object must be flipped
@@ -1433,7 +1431,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     // Draw grid lines
     QVector3D gridLineScaleX(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
     QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
-    QVector3D gridLineScaleY(gridLineWidth, backgroundMargin, gridLineWidth);
+    QVector3D gridLineScaleY(gridLineWidth, m_scaleYWithBackground, gridLineWidth);
 
     if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
 #if !(defined QT_OPENGL_ES_2)
@@ -1479,7 +1477,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         else
             lineXRotation = m_xRightAngleRotationNeg;
 
-        float yFloorLinePosition = -backgroundMargin + gridLineOffset;
+        float yFloorLinePosition = -m_scaleYWithBackground + gridLineOffset;
         if (m_yFlipped != m_flipHorizontalGrid)
             yFloorLinePosition = -yFloorLinePosition;
 
@@ -1851,7 +1849,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     if (m_axisCacheZ.segmentCount() > 0) {
         int labelCount = m_axisCacheZ.labelCount();
         float labelXTrans = m_scaleXWithBackground + labelMargin;
-        float labelYTrans = m_flipHorizontalGrid ? backgroundMargin : -backgroundMargin;
+        float labelYTrans = m_flipHorizontalGrid ? m_scaleYWithBackground : -m_scaleYWithBackground;
         if (m_polarGraph) {
             labelXTrans *= m_radialLabelOffset;
             // YTrans up only if over background
@@ -1991,7 +1989,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         int labelCount = m_axisCacheX.labelCount();
 
         float labelZTrans = 0.0f;
-        float labelYTrans = m_flipHorizontalGrid ? backgroundMargin : -backgroundMargin;
+        float labelYTrans = m_flipHorizontalGrid ? m_scaleYWithBackground : -m_scaleYWithBackground;
         if (m_polarGraph)
             labelYTrans += gridLineOffset + gridLineWidth;
         else
@@ -2091,10 +2089,10 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         float offsetValue = 0.0f;
         bool showLastLabel = false;
-        QVector<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
-        int lastGridPosIndex = gridPositions.size() - 1;
-        if (gridPositions.size()
-                && (gridPositions.at(lastGridPosIndex) != 1.0f || gridPositions.at(0) != 0.0f)) {
+        QVector<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
+        int lastLabelPosIndex = labelPositions.size() - 1;
+        if (labelPositions.size()
+                && (labelPositions.at(lastLabelPosIndex) != 1.0f || labelPositions.at(0) != 0.0f)) {
             // Avoid overlapping first and last label if they would get on same position
             showLastLabel = true;
         }
@@ -2104,24 +2102,24 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             // Draw the label here
             if (m_polarGraph) {
                 // Calculate angular position
-                if (label == lastGridPosIndex && !showLastLabel)
+                if (label == lastLabelPosIndex && !showLastLabel)
                     continue;
-                float gridPosition = gridPositions.at(label);
-                qreal angle = gridPosition * M_PI * 2.0;
-                labelTrans.setX((m_graphAspectRatio + labelMargin)* float(qSin(angle)));
+                float labelPosition = labelPositions.at(label);
+                qreal angle = labelPosition * M_PI * 2.0;
+                labelTrans.setX((m_graphAspectRatio + labelMargin) * float(qSin(angle)));
                 labelTrans.setZ(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)));
                 // Alignment depends on label angular position, as well as flips
                 Qt::AlignmentFlag vAlignment = Qt::AlignCenter;
                 Qt::AlignmentFlag hAlignment = Qt::AlignCenter;
                 const float centerMargin = 0.005f;
-                if (gridPosition < 0.25f - centerMargin || gridPosition > 0.75f + centerMargin)
+                if (labelPosition < 0.25f - centerMargin || labelPosition > 0.75f + centerMargin)
                     vAlignment = m_zFlipped ? Qt::AlignTop : Qt::AlignBottom;
-                else if (gridPosition > 0.25f + centerMargin && gridPosition < 0.75f - centerMargin)
+                else if (labelPosition > 0.25f + centerMargin && labelPosition < 0.75f - centerMargin)
                     vAlignment = m_zFlipped ? Qt::AlignBottom : Qt::AlignTop;
 
-                if (gridPosition < 0.50f - centerMargin && gridPosition > centerMargin)
+                if (labelPosition < 0.50f - centerMargin && labelPosition > centerMargin)
                     hAlignment = m_zFlipped ? Qt::AlignRight : Qt::AlignLeft;
-                else if (gridPosition < 1.0f - centerMargin && gridPosition > 0.5f + centerMargin)
+                else if (labelPosition < 1.0f - centerMargin && labelPosition > 0.5f + centerMargin)
                     hAlignment = m_zFlipped ? Qt::AlignLeft : Qt::AlignRight;
                 if (m_yFlippedForGrid && vAlignment != Qt::AlignCenter)
                     vAlignment = (vAlignment == Qt::AlignTop) ? Qt::AlignBottom : Qt::AlignTop;
@@ -2390,6 +2388,15 @@ void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
 
 void Surface3DRenderer::calculateSceneScalingFactors()
 {
+    if (m_polarGraph) {
+        float polarMargin = calculatePolarBackgroundMargin();
+        m_hBackgroundMargin = qMax(m_hBackgroundMargin, polarMargin);
+    } else {
+        // Margin for background (0.10 make it 10% larger to avoid
+        // selection ball being drawn inside background)
+        m_hBackgroundMargin = 0.1f;
+    }
+
     // Calculate scene scaling and translation factors
     m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min());
     QSizeF areaSize;
@@ -2403,8 +2410,9 @@ void Surface3DRenderer::calculateSceneScalingFactors()
         m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
         m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
     }
-    m_scaleXWithBackground = m_scaleX + backgroundMargin - 1.0f;
-    m_scaleZWithBackground = m_scaleZ + backgroundMargin - 1.0f;
+    m_scaleXWithBackground = m_scaleX + m_hBackgroundMargin;
+    m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
+    m_scaleYWithBackground = m_vBackgroundMargin + 1.0f;
 
     float factorScaler = 2.0f * m_graphAspectRatio / scaleFactor;
     m_axisCacheX.setScale(factorScaler * areaSize.width());
@@ -2656,7 +2664,10 @@ void Surface3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality qual
 
 void Surface3DRenderer::updateTextures()
 {
-    // Do nothing, but required as it is pure virtual on parent
+    Abstract3DRenderer::updateTextures();
+
+    if (m_polarGraph)
+        calculateSceneScalingFactors();
 }
 
 void Surface3DRenderer::updateSlicingActive(bool isSlicing)
@@ -2828,6 +2839,25 @@ QVector3D Surface3DRenderer::convertPositionToTranslation(const QVector3D &posit
         zTrans = position.z() * m_scaleZ;
     }
     return QVector3D(xTrans, yTrans, zTrans);
+}
+
+void Surface3DRenderer::updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                                         const QStringList &labels)
+{
+    Abstract3DRenderer::updateAxisLabels(orientation, labels);
+
+    // Angular axis label dimensions affect the chart dimensions
+    if (m_polarGraph && orientation == QAbstract3DAxis::AxisOrientationX)
+        calculateSceneScalingFactors();
+}
+
+void Surface3DRenderer::updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation, bool visible)
+{
+    Abstract3DRenderer::updateAxisTitleVisibility(orientation, visible);
+
+    // Angular axis title existence affects the chart dimensions
+    if (m_polarGraph && orientation == QAbstract3DAxis::AxisOrientationX)
+        calculateSceneScalingFactors();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

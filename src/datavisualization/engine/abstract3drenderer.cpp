@@ -75,7 +75,9 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_yRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f)),
       m_zRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -90.0f)),
       m_xFlipRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -180.0f)),
-      m_zFlipRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f))
+      m_zFlipRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f)),
+      m_vBackgroundMargin(0.1f),
+      m_hBackgroundMargin(0.1f)
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,
@@ -245,6 +247,13 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
             updateSelectionState(SelectOnScene);
         }
     }
+}
+
+void Abstract3DRenderer::updateTextures()
+{
+    m_axisCacheX.updateTextures();
+    m_axisCacheY.updateTextures();
+    m_axisCacheZ.updateTextures();
 }
 
 void Abstract3DRenderer::reInitShaders()
@@ -1300,6 +1309,34 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
         m_drawer->drawLine(shader);
 #endif
     }
+}
+
+float Abstract3DRenderer::calculatePolarBackgroundMargin()
+{
+    // Check each extents of each angular label
+    // Calculate angular position
+    QVector<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
+    float actualLabelHeight = m_drawer->scaledFontSize() * 2.0f; // All labels are same height
+    float maxNeededMargin = 0.0f;
+
+    // Axis title needs to be accounted for
+    if (m_axisCacheX.isTitleVisible())
+        maxNeededMargin = 2.0f * actualLabelHeight + 3.0f * labelMargin;
+
+    for (int label = 0; label < labelPositions.size(); label++) {
+        QSize labelSize = m_axisCacheX.labelItems().at(label)->size();
+        float actualLabelWidth = actualLabelHeight / labelSize.height() * labelSize.width();
+        float labelPosition = labelPositions.at(label);
+        qreal angle = labelPosition * M_PI * 2.0;
+        float x = qAbs((m_graphAspectRatio + labelMargin) * float(qSin(angle)))
+                + actualLabelWidth - m_graphAspectRatio + labelMargin;
+        float z = qAbs(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)))
+                + actualLabelHeight - m_graphAspectRatio + labelMargin;
+        float neededMargin = qMax(x, z);
+        maxNeededMargin = qMax(maxNeededMargin, neededMargin);
+    }
+
+    return maxNeededMargin;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

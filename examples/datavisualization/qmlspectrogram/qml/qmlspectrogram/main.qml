@@ -99,6 +99,7 @@ Window {
             shadowQuality: AbstractGraph3D.ShadowQualityNone
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetDirectlyAbove
+            scene.activeCamera.zoomLevel: 85
             axisX: xAxis
             axisY: yAxis
             axisZ: zAxis
@@ -166,24 +167,11 @@ Window {
                 } else {
                     surfaceGraph.orthoProjection = true;
                     surfaceGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetDirectlyAbove
+                    surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
                     xAxis.labelAutoRotation = 0
                     yAxis.labelAutoRotation = 0
                     zAxis.labelAutoRotation = 0
                     text = "Switch to perspective"
-                }
-            }
-        }
-
-        NewButton {
-            id: surfaceGridToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Toggle surface grid"
-            onClicked: {
-                if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
-                    surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
-                } else {
-                    surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
                 }
             }
         }
@@ -211,13 +199,29 @@ Window {
             text: "Toggle radial label position"
             visible: surfaceGraph.polar
             onClicked: {
-                if (surfaceGraph.radialLabelOffset > 1.0) {
+                if (surfaceGraph.radialLabelOffset >= 1.0) {
                     surfaceGraph.radialLabelOffset = 0.01
                 } else {
-                    surfaceGraph.radialLabelOffset = 1.06
+                    surfaceGraph.radialLabelOffset = 1.0
                 }
             }
         }
+
+        NewButton {
+            id: surfaceGridToggle
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            text: "Toggle surface grid"
+            visible: !surfaceGraph.orthoProjection
+            onClicked: {
+                if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
+                    surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
+                } else {
+                    surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
+                }
+            }
+        }
+
     }
 
     Rectangle {

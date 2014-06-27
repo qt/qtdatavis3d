@@ -56,11 +56,12 @@ private:
     ShaderHelper *m_surfaceSliceSmoothShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_labelShader;
-    GLfloat m_heightNormalizer;
-    GLfloat m_scaleX;
-    GLfloat m_scaleZ;
-    GLfloat m_scaleXWithBackground;
-    GLfloat m_scaleZWithBackground;
+    float m_heightNormalizer;
+    float m_scaleX;
+    float m_scaleZ;
+    float m_scaleXWithBackground;
+    float m_scaleYWithBackground;
+    float m_scaleZWithBackground;
     GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
@@ -97,6 +98,10 @@ public:
     inline QPoint clickedPosition() const { return m_clickedPosition; }
     void resetClickedStatus();
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
+    void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                          const QStringList &labels);
+    void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
+                                   bool visible);
 
     void render(GLuint defaultFboHandle = 0);
 

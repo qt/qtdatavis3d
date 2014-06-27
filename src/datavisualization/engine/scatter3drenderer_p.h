@@ -67,10 +67,11 @@ private:
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
     GLint m_shadowQualityMultiplier;
-    GLfloat m_heightNormalizer;
+    float m_heightNormalizer;
     float m_scaleX;
     float m_scaleZ;
     float m_scaleXWithBackground;
+    float m_scaleYWithBackground;
     float m_scaleZWithBackground;
     int m_selectedItemIndex;
     ScatterSeriesRenderCache *m_selectedSeriesCache;
@@ -78,7 +79,6 @@ private:
     GLfloat m_dotSizeScale;
     bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
-    GLfloat m_backgroundMargin;
     GLfloat m_maxItemSize;
     int m_clickedIndex;
     bool m_havePointSeries;
@@ -95,6 +95,10 @@ public:
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void updateItems(const QVector<Scatter3DController::ChangeItem> &items);
     void updateScene(Q3DScene *scene);
+    void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                          const QStringList &labels);
+    void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
+                                   bool visible);
 
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
