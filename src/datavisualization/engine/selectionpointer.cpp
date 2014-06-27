@@ -122,9 +122,6 @@ void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
 
     MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-    // Enable texturing
-    glEnable(GL_TEXTURE_2D);
-
     QVector3D lightPos =  m_cachedScene->activeLight()->position();
 
     //
@@ -185,9 +182,6 @@ void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
 
     // Release shader
     glUseProgram(0);
-
-    // Disable textures
-    glDisable(GL_TEXTURE_2D);
 
     // Disable transparency
     glDisable(GL_BLEND);

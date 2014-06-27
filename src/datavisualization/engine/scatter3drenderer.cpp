@@ -686,7 +686,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             previousMeshColorStyle = Q3DTheme::ColorStyleRangeGradient;
             m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(), 0.0f);
         }
-        glEnable(GL_TEXTURE_2D);
     } else {
         dotShader = pointSelectionShader;
         previousDrawingPoints = true;
@@ -1044,9 +1043,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
         }
     }
-
-    // Disable textures
-    glDisable(GL_TEXTURE_2D);
 
     // Draw grid lines
     QVector3D gridLineScaleX(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
@@ -1429,7 +1425,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         glEnable(GL_DEPTH_TEST);
     }
 
-    glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
 
     // Release shader
@@ -1452,7 +1447,6 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         shader = m_labelShader;
         shader->bind();
 
-        glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }

@@ -832,9 +832,6 @@ void Surface3DRenderer::drawSlicedScene()
         }
     }
 
-    // Disable textures
-    glDisable(GL_TEXTURE_2D);
-
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
@@ -927,7 +924,6 @@ void Surface3DRenderer::drawSlicedScene()
 
     // Draw labels
     m_labelShader->bind();
-    glEnable(GL_TEXTURE_2D);
     glDisable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -1000,7 +996,6 @@ void Surface3DRenderer::drawSlicedScene()
                         m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
                         false, false, Drawer::LabelMid, Qt::AlignBottom);
 
-    glDisable(GL_TEXTURE_2D);
     glEnable(GL_DEPTH_TEST);
     glDisable(GL_BLEND);
 
@@ -1200,9 +1195,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glCullFace(GL_BACK);
     }
 #endif
-    // Enable texturing
-    glEnable(GL_TEXTURE_2D);
-
     // Draw selection buffer
     if (!m_cachedIsSlicingActivated && (!m_renderCacheList.isEmpty()
                                         || !m_customRenderCache.isEmpty())
@@ -1837,7 +1829,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     } else {
         shader = m_labelShader;
         shader->bind();
-        glEnable(GL_TEXTURE_2D);
+
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -2262,10 +2254,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
     }
     glDisable(GL_POLYGON_OFFSET_FILL);
 
-    if (!drawSelection) {
-        glDisable(GL_TEXTURE_2D);
+    if (!drawSelection)
         glDisable(GL_BLEND);
-    }
 }
 
 void Surface3DRenderer::updateSelectionMode(QAbstract3DGraph::SelectionFlags mode)
