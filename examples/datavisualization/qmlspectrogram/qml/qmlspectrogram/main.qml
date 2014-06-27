@@ -154,7 +154,7 @@ Window {
                     xAxis.labelAutoRotation = 30
                     yAxis.labelAutoRotation = 30
                     zAxis.labelAutoRotation = 30
-                    text = "Switch to orthogonal"
+                    text = "Switch to orthographic"
                 } else {
                     surfaceGraph.orthoProjection = true;
                     surfaceGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetDirectlyAbove
