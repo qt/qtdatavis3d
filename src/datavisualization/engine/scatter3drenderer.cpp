@@ -2227,13 +2227,17 @@ QVector3D Scatter3DRenderer::convertPositionToTranslation(const QVector3D &posit
     float yTrans = 0.0f;
     float zTrans = 0.0f;
     if (!isAbsolute) {
-        xTrans = m_axisCacheX.positionAt(position.x());
+        if (m_polarGraph) {
+            calculatePolarXZ(position, xTrans, zTrans);
+        } else {
+            xTrans = m_axisCacheX.positionAt(position.x());
+            zTrans = m_axisCacheZ.positionAt(position.z());
+        }
         yTrans = m_axisCacheY.positionAt(position.y());
-        zTrans = m_axisCacheZ.positionAt(position.z());
     } else {
-        xTrans = position.x() * m_axisCacheX.scale() / 2.0f;
+        xTrans = position.x() * m_scaleX;
         yTrans = position.y();
-        zTrans = position.z() * m_axisCacheZ.scale() / 2.0f;
+        zTrans = position.z() * m_scaleZ;
     }
     return QVector3D(xTrans, yTrans, zTrans);
 }

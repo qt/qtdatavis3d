@@ -2830,9 +2830,13 @@ QVector3D Surface3DRenderer::convertPositionToTranslation(const QVector3D &posit
     float yTrans = 0.0f;
     float zTrans = 0.0f;
     if (!isAbsolute) {
-        xTrans = m_axisCacheX.positionAt(position.x());
+        if (m_polarGraph) {
+            calculatePolarXZ(position, xTrans, zTrans);
+        } else {
+            xTrans = m_axisCacheX.positionAt(position.x());
+            zTrans = m_axisCacheZ.positionAt(position.z());
+        }
         yTrans = m_axisCacheY.positionAt(position.y());
-        zTrans = m_axisCacheZ.positionAt(position.z());
     } else {
         xTrans = position.x() * m_scaleX;
         yTrans = position.y();
