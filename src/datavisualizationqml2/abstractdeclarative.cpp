@@ -333,6 +333,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::polarChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::radialLabelOffsetChanged, this,
                      &AbstractDeclarative::radialLabelOffsetChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::horizontalAspectRatioChanged, this,
+                     &AbstractDeclarative::horizontalAspectRatioChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -708,7 +710,7 @@ AbstractDeclarative::ElementType AbstractDeclarative::selectedElement() const
 
 void AbstractDeclarative::setAspectRatio(qreal ratio)
 {
-    m_controller->setAspectRatio(float(ratio));
+    m_controller->setAspectRatio(ratio);
 }
 
 qreal AbstractDeclarative::aspectRatio() const
@@ -746,6 +748,16 @@ void AbstractDeclarative::setRadialLabelOffset(float offset)
 float AbstractDeclarative::radialLabelOffset() const
 {
     return m_controller->radialLabelOffset();
+}
+
+void AbstractDeclarative::setHorizontalAspectRatio(qreal ratio)
+{
+    m_controller->setHorizontalAspectRatio(ratio);
+}
+
+qreal AbstractDeclarative::horizontalAspectRatio() const
+{
+    return m_controller->horizontalAspectRatio();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

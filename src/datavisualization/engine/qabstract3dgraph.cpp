@@ -615,14 +615,16 @@ bool QAbstract3DGraph::isOrthoProjection() const
  * \property QAbstract3DGraph::aspectRatio
  * \since QtDataVisualization 1.1
  *
- * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
- * vertical axes. Defaults to \c{2.0}.
+ * The aspect ratio is the ratio of the graph scaling between the longest axis on the horizontal
+ * plane and the Y-axis. Defaults to \c{2.0}.
  *
  * \note Has no effect on Q3DBars.
+ *
+ * \sa horizontalAspectRatio
  */
 void QAbstract3DGraph::setAspectRatio(qreal ratio)
 {
-    d_ptr->m_visualController->setAspectRatio(float(ratio));
+    d_ptr->m_visualController->setAspectRatio(ratio);
 }
 
 qreal QAbstract3DGraph::aspectRatio() const
@@ -694,6 +696,30 @@ void QAbstract3DGraph::setRadialLabelOffset(float offset)
 float QAbstract3DGraph::radialLabelOffset() const
 {
     return d_ptr->m_visualController->radialLabelOffset();
+}
+
+/*!
+ * \property QAbstract3DGraph::horizontalAspectRatio
+ * \since QtDataVisualization 1.2
+ *
+ * The horizontal aspect ratio is the ratio of the graph scaling between the X and Z axes.
+ * Value of 0.0 indicates automatic scaling according to axis ranges.
+ * Defaults to \c{0.0}.
+ *
+ * \note Has no effect on Q3DBars, which handles scaling on the horizontal plane via
+ * \l{Q3DBars::barThickness}{barThickness} and \l{Q3DBars::barSpacing}{barSpacing} properties.
+ * Polar graphs also ignore this property.
+ *
+ * \sa aspectRatio, polar, Q3DBars::barThickness, Q3DBars::barSpacing
+ */
+void QAbstract3DGraph::setHorizontalAspectRatio(qreal ratio)
+{
+    d_ptr->m_visualController->setHorizontalAspectRatio(ratio);
+}
+
+qreal QAbstract3DGraph::horizontalAspectRatio() const
+{
+    return d_ptr->m_visualController->horizontalAspectRatio();
 }
 
 /*!
@@ -850,6 +876,8 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::polarChanged);
     QObject::connect(m_visualController, &Abstract3DController::radialLabelOffsetChanged, q_ptr,
                      &QAbstract3DGraph::radialLabelOffsetChanged);
+    QObject::connect(m_visualController, &Abstract3DController::horizontalAspectRatioChanged, q_ptr,
+                     &QAbstract3DGraph::horizontalAspectRatioChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

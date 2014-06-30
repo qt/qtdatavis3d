@@ -1574,6 +1574,12 @@ void GraphModifier::updateSamples()
 
 void GraphModifier::setAspectRatio(int ratio)
 {
-    float aspectRatio = float(ratio) / 10.0f;
+    qreal aspectRatio = qreal(ratio) / 10.0;
     m_graph->setAspectRatio(aspectRatio);
+}
+
+void GraphModifier::setHorizontalAspectRatio(int ratio)
+{
+    qreal aspectRatio = qreal(ratio) / 100.0;
+    m_graph->setHorizontalAspectRatio(aspectRatio);
 }

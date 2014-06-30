@@ -84,6 +84,7 @@ struct Abstract3DChangeBitField {
     bool axisYLabelAutoRotationChanged : 1;
     bool axisZLabelAutoRotationChanged : 1;
     bool aspectRatioChanged            : 1;
+    bool horizontalAspectRatioChanged  : 1;
     bool axisXTitleVisibilityChanged   : 1;
     bool axisYTitleVisibilityChanged   : 1;
     bool axisZTitleVisibilityChanged   : 1;
@@ -130,6 +131,7 @@ struct Abstract3DChangeBitField {
         axisYLabelAutoRotationChanged(true),
         axisZLabelAutoRotationChanged(true),
         aspectRatioChanged(true),
+        horizontalAspectRatioChanged(true),
         axisXTitleVisibilityChanged(true),
         axisYTitleVisibilityChanged(true),
         axisZTitleVisibilityChanged(true),
@@ -160,7 +162,8 @@ private:
     QAbstract3DGraph::SelectionFlags m_selectionMode;
     QAbstract3DGraph::ShadowQuality m_shadowQuality;
     bool m_useOrthoProjection;
-    float m_aspectRatio;
+    qreal m_aspectRatio;
+    qreal m_horizontalAspectRatio;
     QAbstract3DGraph::OptimizationHints m_optimizationHints;
 
 protected:
@@ -273,8 +276,11 @@ public:
 
     QAbstract3DGraph::ElementType selectedElement() const;
 
-    void setAspectRatio(float ratio);
-    float aspectRatio();
+    void setAspectRatio(qreal ratio);
+    qreal aspectRatio();
+    void setHorizontalAspectRatio(qreal ratio);
+    qreal horizontalAspectRatio() const;
+
     void setPolar(bool enable);
     bool isPolar() const;
     void setRadialLabelOffset(float offset);
@@ -354,7 +360,8 @@ signals:
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);
-    void aspectRatioChanged(float ratio);
+    void aspectRatioChanged(qreal ratio);
+    void horizontalAspectRatioChanged(qreal ratio);
     void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
     void polarChanged(bool enabled);
     void radialLabelOffsetChanged(float offset);

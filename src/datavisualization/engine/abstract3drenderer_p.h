@@ -125,6 +125,7 @@ public:
     virtual void updateCustomItem(CustomRenderItem *renderItem);
 
     virtual void updateAspectRatio(float ratio);
+    virtual void updateHorizontalAspectRatio(float ratio);
     virtual void updatePolar(bool enable);
     virtual void updateRadialLabelOffset(float offset);
 
@@ -256,6 +257,7 @@ protected:
     ObjectHelper *m_labelObj; // Shared reference
 
     float m_graphAspectRatio;
+    float m_graphHorizontalAspectRatio;
     bool m_polarGraph;
     float m_radialLabelOffset;
 

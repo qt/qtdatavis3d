@@ -114,6 +114,7 @@ public:
     void testDataOrdering();
 
     void setAspectRatio(int ratio);
+    void setHorizontalAspectRatio(int ratio);
 
 public slots:
     void changeShadowQuality(int quality);

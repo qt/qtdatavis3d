@@ -66,6 +66,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_gridLineObj(0),
       m_labelObj(0),
       m_graphAspectRatio(2.0f),
+      m_graphHorizontalAspectRatio(0.0f),
       m_polarGraph(false),
       m_radialLabelOffset(1.0f),
       m_xRightAngleRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f)),
@@ -314,6 +315,14 @@ void Abstract3DRenderer::updateAspectRatio(float ratio)
     m_graphAspectRatio = ratio;
     calculateZoomLevel();
     m_cachedScene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
+    updateCustomItemPositions();
+}
+
+void Abstract3DRenderer::updateHorizontalAspectRatio(float ratio)
+{
+    m_graphHorizontalAspectRatio = ratio;
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
     updateCustomItemPositions();

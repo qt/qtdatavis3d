@@ -315,10 +315,27 @@
  * \qmlproperty real AbstractGraph3D::aspectRatio
  * \since QtDataVisualization 1.1
  *
- * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
- * vertical axes. Defaults to \c{2.0}.
+ * The aspect ratio is the ratio of the graph scaling between the longest axis on the horizontal
+ * plane and the Y-axis. Defaults to \c{2.0}.
  *
  * \note Has no effect on Bars3D.
+ *
+ * \sa horizontalAspectRatio
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::horizontalAspectRatio
+ * \since QtDataVisualization 1.2
+ *
+ * The horizontal aspect ratio is the ratio of the graph scaling between the X and Z axes.
+ * Value of 0.0 indicates automatic scaling according to axis ranges.
+ * Defaults to \c{0.0}.
+ *
+ * \note Has no effect on Bars3D, which handles scaling on the horizontal plane via
+ * \l{Bars3D::barThickness}{barThickness} and \l{Bars3D::barSpacing}{barSpacing} properties.
+ * Polar graphs also ignore this property.
+ *
+ * \sa aspectRatio, polar, Bars3D::barThickness, Bars3D::barSpacing
  */
 
 /*!

@@ -223,6 +223,11 @@ int main(int argc, char *argv[])
     aspectRatioSlider->setValue(20);
     aspectRatioSlider->setMaximum(100);
 
+    QSlider *horizontalAspectRatioSlider = new QSlider(Qt::Horizontal, widget);
+    horizontalAspectRatioSlider->setMinimum(0);
+    horizontalAspectRatioSlider->setValue(0);
+    horizontalAspectRatioSlider->setMaximum(300);
+
     QLinearGradient gr(0, 0, 100, 1);
     gr.setColorAt(0.0, Qt::black);
     gr.setColorAt(0.33, Qt::blue);
@@ -435,8 +440,10 @@ int main(int argc, char *argv[])
     vLayout->addWidget(gridSliderX);
     vLayout->addWidget(gridSliderZ);
 #endif
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust vertical aspect ratio")));
     vLayout->addWidget(aspectRatioSlider);
+    vLayout->addWidget(new QLabel(QStringLiteral("Adjust horizontal aspect ratio")));
+    vLayout->addWidget(horizontalAspectRatioSlider);
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis range")));
     vLayout->addWidget(axisRangeSliderX);
     vLayout->addWidget(axisRangeSliderY);
@@ -660,6 +667,8 @@ int main(int argc, char *argv[])
 
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged,
                      modifier, &GraphModifier::setAspectRatio);
+    QObject::connect(horizontalAspectRatioSlider, &QSlider::valueChanged,
+                     modifier, &GraphModifier::setHorizontalAspectRatio);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

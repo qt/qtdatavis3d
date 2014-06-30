@@ -2399,17 +2399,26 @@ void Surface3DRenderer::calculateSceneScalingFactors()
 
     // Calculate scene scaling and translation factors
     m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min());
+
+    float horizontalAspectRatio;
+    if (m_polarGraph)
+        horizontalAspectRatio = 1.0f;
+    else
+        horizontalAspectRatio = m_graphHorizontalAspectRatio;
+
     QSizeF areaSize;
-    areaSize.setHeight(m_axisCacheZ.max() -  m_axisCacheZ.min());
-    areaSize.setWidth(m_axisCacheX.max() - m_axisCacheX.min());
-    float scaleFactor = qMax(areaSize.width(), areaSize.height());
-    if (m_polarGraph) {
-        m_scaleX = m_graphAspectRatio;
-        m_scaleZ = m_graphAspectRatio;
+    if (horizontalAspectRatio == 0.0f) {
+        areaSize.setHeight(m_axisCacheZ.max() -  m_axisCacheZ.min());
+        areaSize.setWidth(m_axisCacheX.max() - m_axisCacheX.min());
     } else {
-        m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
-        m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
+        areaSize.setHeight(1.0f);
+        areaSize.setWidth(horizontalAspectRatio);
     }
+
+    float scaleFactor = qMax(areaSize.width(), areaSize.height());
+    m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
+    m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
+
     m_scaleXWithBackground = m_scaleX + m_hBackgroundMargin;
     m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
     m_scaleYWithBackground = m_vBackgroundMargin + 1.0f;

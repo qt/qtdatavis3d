@@ -53,6 +53,7 @@ public:
     void setMaxY(int max);
     void setMaxZ(int max);
     void setAspectRatio(int ratio);
+    void setHorizontalAspectRatio(int ratio);
     void start();
     void massiveDataTest();
     void massiveTestScroll();

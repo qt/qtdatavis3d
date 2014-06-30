@@ -109,6 +109,7 @@ Window {
             orthoProjection: true
             flipHorizontalGrid: true
             radialLabelOffset: 0.01  // Add little offset so the labels do not overlap
+            horizontalAspectRatio: 1
 
             Surface3DSeries {
                 id: surfaceSeries

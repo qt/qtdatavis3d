@@ -33,8 +33,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-//#define USE_UNIFORM_SCALING // Scale x and z uniformly, or based on autoscaled values
-
 const GLfloat defaultMinSize = 0.01f;
 const GLfloat defaultMaxSize = 0.1f;
 const GLfloat itemScaler = 3.0f;
@@ -2025,30 +2023,33 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
     }
 
     m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min()) / 2.0f;
-#ifndef USE_UNIFORM_SCALING // Use this if we want to use autoscaling for x and z
+
+    float horizontalAspectRatio;
+    if (m_polarGraph)
+        horizontalAspectRatio = 1.0f;
+    else
+        horizontalAspectRatio = m_graphHorizontalAspectRatio;
+
     QSizeF areaSize;
-    areaSize.setHeight((m_axisCacheZ.max() - m_axisCacheZ.min()));
-    areaSize.setWidth((m_axisCacheX.max() - m_axisCacheX.min()));
-    float scaleFactor = qMax(areaSize.width(), areaSize.height());
-    if (m_polarGraph) {
-        m_scaleX = m_graphAspectRatio;
-        m_scaleZ = m_graphAspectRatio;
+    if (horizontalAspectRatio == 0.0f) {
+        areaSize.setHeight(m_axisCacheZ.max() -  m_axisCacheZ.min());
+        areaSize.setWidth(m_axisCacheX.max() - m_axisCacheX.min());
     } else {
-        m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
-        m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
+        areaSize.setHeight(1.0f);
+        areaSize.setWidth(horizontalAspectRatio);
     }
-    float factorScaler = 2.0f * m_graphAspectRatio / scaleFactor;
-    m_axisCacheX.setScale(factorScaler * areaSize.width());
-    m_axisCacheZ.setScale(-factorScaler * areaSize.height());
-#else // ..and this if we want uniform scaling based on largest dimension
-    m_scaleX = m_graphAspectRatio;
-    m_scaleZ = m_graphAspectRatio;
-    m_axisCacheX.setScale(2.0f * m_graphAspectRatio);
-    m_axisCacheZ.setScale(-m_axisCacheX.scale());
-#endif
+
+    float scaleFactor = qMax(areaSize.width(), areaSize.height());
+    m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
+    m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
+
     m_scaleXWithBackground = m_scaleX + m_hBackgroundMargin;
     m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
     m_scaleYWithBackground = m_vBackgroundMargin + 1.0f;
+
+    float factorScaler = 2.0f * m_graphAspectRatio / scaleFactor;
+    m_axisCacheX.setScale(factorScaler * areaSize.width());
+    m_axisCacheZ.setScale(-factorScaler * areaSize.height());
     m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
     m_axisCacheZ.setTranslate(-m_axisCacheZ.scale() / 2.0f);
 }

@@ -235,6 +235,13 @@ int main(int argc, char **argv)
     aspectRatioSlider->setValue(20);
     aspectRatioSlider->setMaximum(100);
 
+    QSlider *horizontalAspectRatioSlider = new QSlider(Qt::Horizontal, widget);
+    horizontalAspectRatioSlider->setTickInterval(30);
+    horizontalAspectRatioSlider->setTickPosition(QSlider::TicksBelow);
+    horizontalAspectRatioSlider->setMinimum(0);
+    horizontalAspectRatioSlider->setValue(0);
+    horizontalAspectRatioSlider->setMaximum(300);
+
     QCheckBox *optimizationStaticCB = new QCheckBox(widget);
     optimizationStaticCB->setText(QStringLiteral("Static optimization"));
     optimizationStaticCB->setChecked(false);
@@ -315,8 +322,10 @@ int main(int argc, char **argv)
     vLayout2->addWidget(fontList);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")));
     vLayout2->addWidget(fontSizeSlider);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
-    vLayout2->addWidget(aspectRatioSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust vertical aspect ratio")));
+    vLayout2->addWidget(aspectRatioSlider);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust horizontal aspect ratio")));
+    vLayout2->addWidget(horizontalAspectRatioSlider, 1, Qt::AlignTop);
     vLayout2->addWidget(optimizationStaticCB);
     vLayout2->addWidget(orthoCB);
     vLayout2->addWidget(polarCB);
@@ -427,6 +436,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changeLabelRotation);
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setAspectRatio);
+    QObject::connect(horizontalAspectRatioSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setHorizontalAspectRatio);
     QObject::connect(radialLabelSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::changeRadialLabelOffset);
 

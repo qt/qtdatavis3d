@@ -1042,8 +1042,14 @@ void ScatterDataModifier::setMaxZ(int max)
 
 void ScatterDataModifier::setAspectRatio(int ratio)
 {
-    float aspectRatio = float(ratio) / 10.0f;
+    qreal aspectRatio = qreal(ratio) / 10.0;
     m_chart->setAspectRatio(aspectRatio);
+}
+
+void ScatterDataModifier::setHorizontalAspectRatio(int ratio)
+{
+    qreal aspectRatio = qreal(ratio) / 100.0;
+    m_chart->setHorizontalAspectRatio(aspectRatio);
 }
 
 QVector3D ScatterDataModifier::randVector()

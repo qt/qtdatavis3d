@@ -37,7 +37,8 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_selectionMode(QAbstract3DGraph::SelectionItem),
     m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
     m_useOrthoProjection(false),
-    m_aspectRatio(2.0f),
+    m_aspectRatio(2.0),
+    m_horizontalAspectRatio(0.0),
     m_optimizationHints(QAbstract3DGraph::OptimizationDefault),
     m_scene(scene),
     m_activeInputHandler(0),
@@ -204,8 +205,13 @@ void Abstract3DController::synchDataToRenderer()
     }
 
     if (m_changeTracker.aspectRatioChanged) {
-        m_renderer->updateAspectRatio(m_aspectRatio);
+        m_renderer->updateAspectRatio(float(m_aspectRatio));
         m_changeTracker.aspectRatioChanged = false;
+    }
+
+    if (m_changeTracker.horizontalAspectRatioChanged) {
+        m_renderer->updateHorizontalAspectRatio(float(m_horizontalAspectRatio));
+        m_changeTracker.horizontalAspectRatioChanged = false;
     }
 
     if (m_changeTracker.optimizationHintChanged) {
@@ -1517,7 +1523,7 @@ bool Abstract3DController::isOrthoProjection() const
     return m_useOrthoProjection;
 }
 
-void Abstract3DController::setAspectRatio(float ratio)
+void Abstract3DController::setAspectRatio(qreal ratio)
 {
     if (m_aspectRatio != ratio) {
         m_aspectRatio = ratio;
@@ -1528,9 +1534,25 @@ void Abstract3DController::setAspectRatio(float ratio)
     }
 }
 
-float Abstract3DController::aspectRatio()
+qreal Abstract3DController::aspectRatio()
 {
     return m_aspectRatio;
+}
+
+void Abstract3DController::setHorizontalAspectRatio(qreal ratio)
+{
+    if (m_horizontalAspectRatio != ratio) {
+        m_horizontalAspectRatio = ratio;
+        m_changeTracker.horizontalAspectRatioChanged = true;
+        emit horizontalAspectRatioChanged(m_horizontalAspectRatio);
+        m_isDataDirty = true;
+        emitNeedRender();
+    }
+}
+
+qreal Abstract3DController::horizontalAspectRatio() const
+{
+    return m_horizontalAspectRatio;
 }
 
 void Abstract3DController::setPolar(bool enable)
