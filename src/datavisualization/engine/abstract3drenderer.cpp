@@ -69,6 +69,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_graphHorizontalAspectRatio(0.0f),
       m_polarGraph(false),
       m_radialLabelOffset(1.0f),
+      m_polarRadius(2.0f),
       m_xRightAngleRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f)),
       m_yRightAngleRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f)),
       m_zRightAngleRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, 90.0f)),
@@ -313,8 +314,6 @@ void Abstract3DRenderer::updateSelectionMode(QAbstract3DGraph::SelectionFlags mo
 void Abstract3DRenderer::updateAspectRatio(float ratio)
 {
     m_graphAspectRatio = ratio;
-    calculateZoomLevel();
-    m_cachedScene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
     updateCustomItemPositions();
@@ -369,9 +368,9 @@ void Abstract3DRenderer::calculateZoomLevel()
     GLfloat div;
     GLfloat zoomAdjustment;
     div = qMin(m_primarySubViewport.width(), m_primarySubViewport.height());
-    zoomAdjustment = 2.0f * defaultRatio
+    zoomAdjustment = defaultRatio
             * ((m_primarySubViewport.width() / div)
-               / (m_primarySubViewport.height() / div)) / m_graphAspectRatio;
+               / (m_primarySubViewport.height() / div));
     m_autoScaleAdjustment = qMin(zoomAdjustment, 1.0f); // clamp to 1.0f
 }
 
@@ -1206,8 +1205,8 @@ void Abstract3DRenderer::calculatePolarXZ(const QVector3D &dataPos, float &x, fl
     qreal radius = m_axisCacheZ.formatter()->positionAt(dataPos.z());
 
     // Convert angle & radius to X and Z coords
-    x = float(radius * qSin(angle)) * m_graphAspectRatio;
-    z = -float(radius * qCos(angle)) * m_graphAspectRatio;
+    x = float(radius * qSin(angle)) * m_polarRadius;
+    z = -float(radius * qCos(angle)) * m_polarRadius;
 }
 
 void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePos,
@@ -1234,10 +1233,10 @@ void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePo
     for (int i = 0; i < gridLineCount; i++) {
         float gridPosition = (i >= mainSize)
                 ? subGridPositions.at(i - mainSize) : gridPositions.at(i);
-        float radiusFraction = m_graphAspectRatio * gridPosition;
+        float radiusFraction = m_polarRadius * gridPosition;
         QVector3D gridLineScaler(radiusFraction * float(qSin(polarGridHalfAngle)),
                                  gridLineWidth, gridLineWidth);
-        translateVector.setZ(gridPosition * m_graphAspectRatio);
+        translateVector.setZ(gridPosition * m_polarRadius);
         for (int j = 0; j < polarGridRoundness; j++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 itModelMatrix;
@@ -1275,7 +1274,7 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
                                          const QMatrix4x4 &projectionViewMatrix,
                                          const QMatrix4x4 &depthMatrix)
 {
-    float halfRatio((m_graphAspectRatio + (labelMargin / 2.0f)) / 2.0f);
+    float halfRatio((m_polarRadius + (labelMargin / 2.0f)) / 2.0f);
     QVector3D gridLineScaler(gridLineWidth, gridLineWidth, halfRatio);
     int gridLineCount = m_axisCacheX.gridLineCount();
     const QVector<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
@@ -1337,10 +1336,10 @@ float Abstract3DRenderer::calculatePolarBackgroundMargin()
         float actualLabelWidth = actualLabelHeight / labelSize.height() * labelSize.width();
         float labelPosition = labelPositions.at(label);
         qreal angle = labelPosition * M_PI * 2.0;
-        float x = qAbs((m_graphAspectRatio + labelMargin) * float(qSin(angle)))
-                + actualLabelWidth - m_graphAspectRatio + labelMargin;
-        float z = qAbs(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)))
-                + actualLabelHeight - m_graphAspectRatio + labelMargin;
+        float x = qAbs((m_polarRadius + labelMargin) * float(qSin(angle)))
+                + actualLabelWidth - m_polarRadius + labelMargin;
+        float z = qAbs(-(m_polarRadius + labelMargin) * float(qCos(angle)))
+                + actualLabelHeight - m_polarRadius + labelMargin;
         float neededMargin = qMax(x, z);
         maxNeededMargin = qMax(maxNeededMargin, neededMargin);
     }

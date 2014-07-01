@@ -70,6 +70,8 @@ public:
     GLuint gridIndexCount();
     QVector3D vertexAt(int column, int row);
     void clear();
+    float minYValue() const { return m_minY; }
+    float maxYValue() const { return m_maxY; }
 
 private:
     QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c, bool flipNormal);
@@ -77,6 +79,8 @@ private:
                        const QVector<QVector3D> &normals, const GLint *indices,
                        bool changeGeometry);
     bool checkFlipNormal(const QSurfaceDataArray &array);
+    inline void getNormalizedVertex(const QSurfaceDataItem &data, QVector3D &vertex, bool polar,
+                                    bool flipXZ);
 
 private:
     SurfaceType m_surfaceType;
@@ -91,6 +95,8 @@ private:
     AxisRenderCache &m_axisCacheY;
     AxisRenderCache &m_axisCacheZ;
     Surface3DRenderer *m_renderer;
+    float m_minY;
+    float m_maxY;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

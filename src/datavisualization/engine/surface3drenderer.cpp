@@ -50,6 +50,7 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_labelShader(0),
       m_heightNormalizer(0.0f),
       m_scaleX(0.0f),
+      m_scaleY(0.0f),
       m_scaleZ(0.0f),
       m_scaleXWithBackground(0.0f),
       m_scaleYWithBackground(0.0f),
@@ -70,9 +71,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_selectionTexturesDirty(false),
       m_noShadowTexture(0)
 {
-    m_axisCacheY.setScale(2.0f);
-    m_axisCacheY.setTranslate(-1.0f);
-
     // Check if flat feature is supported
     ShaderHelper tester(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
                         QStringLiteral(":/shaders/fragmentSurfaceFlat"));
@@ -834,7 +832,7 @@ void Surface3DRenderer::drawSlicedScene()
     glCullFace(GL_BACK);
 
     // Grid lines
-    if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
+    if (m_cachedTheme->isGridEnabled()) {
 #if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
 #else
@@ -1257,7 +1255,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Draw the surface
     if (!m_renderCacheList.isEmpty()) {
-        // For surface we can see climpses from underneath
+        // For surface we can see glimpses from underneath
         glDisable(GL_CULL_FACE);
 
         bool drawGrid = false;
@@ -1303,10 +1301,24 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     shader->setUniformValue(shader->lightColor(), lightColor);
 
                     GLuint gradientTexture;
-                    if (cache->colorStyle() == Q3DTheme::ColorStyleUniform)
+                    if (cache->colorStyle() == Q3DTheme::ColorStyleUniform) {
                         gradientTexture = cache->baseUniformTexture();
-                    else
+                        shader->setUniformValue(shader->gradientMin(), 0.0f);
+                        shader->setUniformValue(shader->gradientHeight(), 0.0f);
+                    } else {
                         gradientTexture = cache->baseGradientTexture();
+                        if (cache->colorStyle() == Q3DTheme::ColorStyleObjectGradient) {
+                            float objMin = cache->surfaceObject()->minYValue();
+                            float objMax = cache->surfaceObject()->maxYValue();
+                            float objRange = objMax - objMin;
+                            shader->setUniformValue(shader->gradientMin(), -(objMin / objRange));
+                            shader->setUniformValue(shader->gradientHeight(), 1.0f / objRange);
+                        } else {
+                            shader->setUniformValue(shader->gradientMin(), 0.5f);
+                            shader->setUniformValue(shader->gradientHeight(),
+                                                    1.0f / (m_scaleY * 2.0f));
+                        }
+                    }
 
 #if !defined(QT_OPENGL_ES_2)
                     if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
@@ -1433,7 +1445,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
     QVector3D gridLineScaleZ(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
     QVector3D gridLineScaleY(gridLineWidth, m_scaleYWithBackground, gridLineWidth);
 
-    if (m_cachedTheme->isGridEnabled() && m_heightNormalizer) {
+    if (m_cachedTheme->isGridEnabled()) {
 #if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
 #else
@@ -1947,7 +1959,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             if (m_polarGraph) {
                 float direction = m_zFlipped ? -1.0f : 1.0f;
                 labelTrans.setZ((m_axisCacheZ.formatter()->labelPositions().at(label)
-                                 * -m_graphAspectRatio
+                                 * -m_polarRadius
                                  + m_drawer->scaledFontSize() + gridLineWidth) * direction);
             } else {
                 labelTrans.setZ(m_axisCacheZ.labelPosition(label));
@@ -1968,7 +1980,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         if (!drawSelection && m_axisCacheZ.isTitleVisible()) {
             if (m_polarGraph) {
-                float titleZ = -m_graphAspectRatio / 2.0f;
+                float titleZ = -m_polarRadius / 2.0f;
                 if (m_zFlipped)
                     titleZ = -titleZ;
                 labelTrans.setZ(titleZ);
@@ -2106,8 +2118,8 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                     continue;
                 float labelPosition = labelPositions.at(label);
                 qreal angle = labelPosition * M_PI * 2.0;
-                labelTrans.setX((m_graphAspectRatio + labelMargin) * float(qSin(angle)));
-                labelTrans.setZ(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)));
+                labelTrans.setX((m_polarRadius + labelMargin) * float(qSin(angle)));
+                labelTrans.setZ(-(m_polarRadius + labelMargin) * float(qCos(angle)));
                 // Alignment depends on label angular position, as well as flips
                 Qt::AlignmentFlag vAlignment = Qt::AlignCenter;
                 Qt::AlignmentFlag hAlignment = Qt::AlignCenter;
@@ -2152,7 +2164,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                     totalRotation *= m_zRightAngleRotationNeg;
                 if (m_yFlippedForGrid)
                     totalRotation *= QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f);
-                labelTrans.setZ(-m_graphAspectRatio);
+                labelTrans.setZ(-m_polarRadius);
                 radial = true;
             }
             drawAxisTitleX(labelRotation, labelTrans, totalRotation, m_dummyRenderItem,
@@ -2415,19 +2427,31 @@ void Surface3DRenderer::calculateSceneScalingFactors()
         areaSize.setWidth(horizontalAspectRatio);
     }
 
+    float horizontalMaxDimension;
+    if (m_graphAspectRatio > 2.0f) {
+        horizontalMaxDimension = 2.0f;
+        m_scaleY = 2.0f / m_graphAspectRatio;
+    } else {
+        horizontalMaxDimension = m_graphAspectRatio;
+        m_scaleY = 1.0f;
+    }
+    if (m_polarGraph)
+        m_polarRadius = horizontalMaxDimension;
+
     float scaleFactor = qMax(areaSize.width(), areaSize.height());
-    m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
-    m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
+    m_scaleX = horizontalMaxDimension * areaSize.width() / scaleFactor;
+    m_scaleZ = horizontalMaxDimension * areaSize.height() / scaleFactor;
 
     m_scaleXWithBackground = m_scaleX + m_hBackgroundMargin;
+    m_scaleYWithBackground = m_scaleY + m_vBackgroundMargin;
     m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
-    m_scaleYWithBackground = m_vBackgroundMargin + 1.0f;
 
-    float factorScaler = 2.0f * m_graphAspectRatio / scaleFactor;
-    m_axisCacheX.setScale(factorScaler * areaSize.width());
-    m_axisCacheZ.setScale(-factorScaler * areaSize.height());
-    m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
-    m_axisCacheZ.setTranslate(-m_axisCacheZ.scale() / 2.0f);
+    m_axisCacheX.setScale(m_scaleX * 2.0f);
+    m_axisCacheY.setScale(m_scaleY * 2.0f);
+    m_axisCacheZ.setScale(m_scaleZ * 2.0f);
+    m_axisCacheX.setTranslate(-m_scaleX);
+    m_axisCacheY.setTranslate(-m_scaleY);
+    m_axisCacheZ.setTranslate(-m_scaleZ);
 }
 
 void Surface3DRenderer::checkFlatSupport(SurfaceSeriesRenderCache *cache)
@@ -2848,7 +2872,7 @@ QVector3D Surface3DRenderer::convertPositionToTranslation(const QVector3D &posit
         yTrans = m_axisCacheY.positionAt(position.y());
     } else {
         xTrans = position.x() * m_scaleX;
-        yTrans = position.y();
+        yTrans = position.y() * m_scaleY;
         zTrans = position.z() * m_scaleZ;
     }
     return QVector3D(xTrans, yTrans, zTrans);

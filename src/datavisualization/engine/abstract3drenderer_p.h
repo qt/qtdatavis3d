@@ -260,6 +260,7 @@ protected:
     float m_graphHorizontalAspectRatio;
     bool m_polarGraph;
     float m_radialLabelOffset;
+    float m_polarRadius;
 
     QQuaternion m_xRightAngleRotation;
     QQuaternion m_yRightAngleRotation;

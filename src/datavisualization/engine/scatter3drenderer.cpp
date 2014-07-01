@@ -57,8 +57,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_selectionDepthBuffer(0),
       m_shadowQualityToShader(100.0f),
       m_shadowQualityMultiplier(3),
-      m_heightNormalizer(1.0f),
       m_scaleX(0.0f),
+      m_scaleY(0.0f),
       m_scaleZ(0.0f),
       m_scaleXWithBackground(0.0f),
       m_scaleYWithBackground(0.0f),
@@ -75,9 +75,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_haveUniformColorMeshSeries(false),
       m_haveGradientMeshSeries(false)
 {
-    m_axisCacheY.setScale(2.0f);
-    m_axisCacheY.setTranslate(-1.0f);
-
     initializeOpenGLFunctions();
     initializeOpenGL();
 }
@@ -707,6 +704,9 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         dotShader->bind();
     }
 
+    float rangeGradientYScaler = 0.5f / m_scaleY;
+    float rangeGradientYScalerForPoints = rangeGradientYScaler * 100.0f;
+
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
         if (baseCache->isVisible()) {
             ScatterSeriesRenderCache *cache =
@@ -808,7 +808,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     if (rangeGradientPoints) {
                         // Drawing points with range gradient
                         // Get color from gradient based on items y position converted to percent
-                        int position = int(item.translation().y() * 50.0f) + 50;
+                        int position = int(item.translation().y() * rangeGradientYScalerForPoints)
+                                + 50;
                         dotColor = Utils::vectorFromColor(
                                     cache->gradientImage().pixel(0, position));
                     } else {
@@ -825,13 +826,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     else
                         gradientTexture = cache->singleHighlightGradientTexture();
                     lightStrength = m_cachedTheme->highlightLightStrength();
-                    // Insert data to ScatterRenderItem
-                    // We don't have ownership, so don't delete the previous one
+                    // Save the reference to the item to be used in label drawing
                     selectedItem = &item;
                     dotSelectionFound = true;
                     // Save selected item size (adjusted with font size) for selection label
                     // positioning
-                    selectedItemSize = itemSize + (m_cachedTheme->font().pointSizeF() / 500.0f);
+                    selectedItemSize = itemSize + m_drawer->scaledFontSize() - 0.05f;
                 }
 
                 if (!drawingPoints) {
@@ -846,7 +846,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     dotShader->setUniformValue(dotShader->color(), dotColor);
                 } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
                     dotShader->setUniformValue(dotShader->gradientMin(),
-                                               (item.translation().y() + 1.0f) / 2.0f);
+                                               (item.translation().y() + m_scaleY)
+                                               * rangeGradientYScaler);
                 }
 #if !defined(QT_OPENGL_ES_2)
                 if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
@@ -925,12 +926,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 else
                     gradientTexture = cache->singleHighlightGradientTexture();
                 GLfloat lightStrength = m_cachedTheme->highlightLightStrength();
-                // Save the reference to the item to be used on label drawing
+                // Save the reference to the item to be used in label drawing
                 selectedItem = &item;
                 dotSelectionFound = true;
                 // Save selected item size (adjusted with font size) for selection label
                 // positioning
-                selectedItemSize = itemSize + (m_cachedTheme->font().pointSizeF() / 500.0f);
+                selectedItemSize = itemSize + m_drawer->scaledFontSize() - 0.05f;
 
                 if (!drawingPoints) {
                     // Set shader bindings
@@ -944,7 +945,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     dotShader->setUniformValue(dotShader->color(), dotColor);
                 } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
                     dotShader->setUniformValue(dotShader->gradientMin(),
-                                               (item.translation().y() + 1.0f) / 2.0f);
+                                               (item.translation().y() + m_scaleY)
+                                               * rangeGradientYScaler);
                 }
 
                 if (!drawingPoints) {
@@ -1575,7 +1577,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             if (m_polarGraph) {
                 float direction = m_zFlipped ? -1.0f : 1.0f;
                 labelTrans.setZ((m_axisCacheZ.formatter()->labelPositions().at(label)
-                                 * -m_graphAspectRatio
+                                 * -m_polarRadius
                                  + m_drawer->scaledFontSize() + gridLineWidth) * direction);
             } else {
                 labelTrans.setZ(m_axisCacheZ.labelPosition(label));
@@ -1596,7 +1598,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         if (!drawSelection && m_axisCacheZ.isTitleVisible()) {
             if (m_polarGraph) {
-                float titleZ = -m_graphAspectRatio / 2.0f;
+                float titleZ = -m_polarRadius / 2.0f;
                 if (m_zFlipped)
                     titleZ = -titleZ;
                 labelTrans.setZ(titleZ);
@@ -1730,8 +1732,8 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                     continue;
                 float labelPosition = labelPositions.at(label);
                 qreal angle = labelPosition * M_PI * 2.0;
-                labelTrans.setX((m_graphAspectRatio + labelMargin) * float(qSin(angle)));
-                labelTrans.setZ(-(m_graphAspectRatio + labelMargin) * float(qCos(angle)));
+                labelTrans.setX((m_polarRadius + labelMargin) * float(qSin(angle)));
+                labelTrans.setZ(-(m_polarRadius + labelMargin) * float(qCos(angle)));
                 // Alignment depends on label angular position, as well as flips
                 Qt::AlignmentFlag vAlignment = Qt::AlignCenter;
                 Qt::AlignmentFlag hAlignment = Qt::AlignCenter;
@@ -1776,7 +1778,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                     totalRotation *= m_zRightAngleRotationNeg;
                 if (m_yFlippedForGrid)
                     totalRotation *= QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f);
-                labelTrans.setZ(-m_graphAspectRatio);
+                labelTrans.setZ(-m_polarRadius);
                 radial = true;
             }
             drawAxisTitleX(labelRotation, labelTrans, totalRotation, m_dummyRenderItem,
@@ -2022,8 +2024,6 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
         m_hBackgroundMargin = qMax(m_hBackgroundMargin, polarMargin);
     }
 
-    m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min()) / 2.0f;
-
     float horizontalAspectRatio;
     if (m_polarGraph)
         horizontalAspectRatio = 1.0f;
@@ -2039,19 +2039,31 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
         areaSize.setWidth(horizontalAspectRatio);
     }
 
+    float horizontalMaxDimension;
+    if (m_graphAspectRatio > 2.0f) {
+        horizontalMaxDimension = 2.0f;
+        m_scaleY = 2.0f / m_graphAspectRatio;
+    } else {
+        horizontalMaxDimension = m_graphAspectRatio;
+        m_scaleY = 1.0f;
+    }
+    if (m_polarGraph)
+        m_polarRadius = horizontalMaxDimension;
+
     float scaleFactor = qMax(areaSize.width(), areaSize.height());
-    m_scaleX = m_graphAspectRatio * areaSize.width() / scaleFactor;
-    m_scaleZ = m_graphAspectRatio * areaSize.height() / scaleFactor;
+    m_scaleX = horizontalMaxDimension * areaSize.width() / scaleFactor;
+    m_scaleZ = horizontalMaxDimension * areaSize.height() / scaleFactor;
 
     m_scaleXWithBackground = m_scaleX + m_hBackgroundMargin;
+    m_scaleYWithBackground = m_scaleY + m_vBackgroundMargin;
     m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
-    m_scaleYWithBackground = m_vBackgroundMargin + 1.0f;
 
-    float factorScaler = 2.0f * m_graphAspectRatio / scaleFactor;
-    m_axisCacheX.setScale(factorScaler * areaSize.width());
-    m_axisCacheZ.setScale(-factorScaler * areaSize.height());
-    m_axisCacheX.setTranslate(-m_axisCacheX.scale() / 2.0f);
-    m_axisCacheZ.setTranslate(-m_axisCacheZ.scale() / 2.0f);
+    m_axisCacheX.setScale(m_scaleX * 2.0f);
+    m_axisCacheY.setScale(m_scaleY * 2.0f);
+    m_axisCacheZ.setScale(m_scaleZ * 2.0f);
+    m_axisCacheX.setTranslate(-m_scaleX);
+    m_axisCacheY.setTranslate(-m_scaleY);
+    m_axisCacheZ.setTranslate(-m_scaleZ);
 }
 
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
@@ -2237,7 +2249,7 @@ QVector3D Scatter3DRenderer::convertPositionToTranslation(const QVector3D &posit
         yTrans = m_axisCacheY.positionAt(position.y());
     } else {
         xTrans = position.x() * m_scaleX;
-        yTrans = position.y();
+        yTrans = position.y() * m_scaleY;
         zTrans = position.z() * m_scaleZ;
     }
     return QVector3D(xTrans, yTrans, zTrans);

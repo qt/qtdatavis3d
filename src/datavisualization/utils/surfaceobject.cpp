@@ -69,24 +69,14 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
         uvs.resize(totalSize);
     int totalIndex = 0;
 
-    AxisRenderCache &xCache = flipXZ ? m_axisCacheZ : m_axisCacheX;
-    AxisRenderCache &zCache = flipXZ ? m_axisCacheX : m_axisCacheZ;
+    // Init min and max to ridiculous values
+    m_minY = 10000000.0;
+    m_maxY = -10000000.0f;
 
     for (int i = 0; i < m_rows; i++) {
         const QSurfaceDataRow &p = *dataArray.at(i);
         for (int j = 0; j < m_columns; j++) {
-            const QSurfaceDataItem &data = p.at(j);
-            float normalizedX;
-            float normalizedZ;
-            if (polar) {
-                // Slice don't use polar, so don't care about flip
-                m_renderer->calculatePolarXZ(data.position(), normalizedX, normalizedZ);
-            } else {
-                normalizedX = xCache.positionAt(data.x());
-                normalizedZ = zCache.positionAt(data.z());
-            }
-            float normalizedY = m_axisCacheY.positionAt(data.y());
-            m_vertices[totalIndex] = QVector3D(normalizedX, normalizedY, normalizedZ);
+            getNormalizedVertex(p.at(j), m_vertices[totalIndex], polar, flipXZ);
             if (changeGeometry)
                 uvs[totalIndex] = QVector2D(GLfloat(j) * uvX, GLfloat(i) * uvY);
             totalIndex++;
@@ -151,19 +141,8 @@ void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowI
     int p = rowIndex * m_columns;
     const QSurfaceDataRow &dataRow = *dataArray.at(rowIndex);
 
-    for (int j = 0; j < m_columns; j++) {
-        const QSurfaceDataItem &data = dataRow.at(j);
-        float normalizedX;
-        float normalizedZ;
-        if (polar) {
-            m_renderer->calculatePolarXZ(data.position(), normalizedX, normalizedZ);
-        } else {
-            normalizedX = m_axisCacheX.positionAt(data.x());
-            normalizedZ = m_axisCacheZ.positionAt(data.z());
-        }
-        float normalizedY = m_axisCacheY.positionAt(data.y());
-        m_vertices[p++] = QVector3D(normalizedX, normalizedY, normalizedZ);
-    }
+    for (int j = 0; j < m_columns; j++)
+        getNormalizedVertex(dataRow.at(j), m_vertices[p++], polar, false);
 
     // Create normals
     int colLimit = m_columns - 1;
@@ -214,17 +193,8 @@ void SurfaceObject::updateSmoothItem(const QSurfaceDataArray &dataArray, int row
                                      bool polar)
 {
     // Update a vertice
-    const QSurfaceDataItem &data = dataArray.at(row)->at(column);
-    float normalizedX;
-    float normalizedZ;
-    if (polar) {
-        m_renderer->calculatePolarXZ(data.position(), normalizedX, normalizedZ);
-    } else {
-        normalizedX = m_axisCacheX.positionAt(data.x());
-        normalizedZ = m_axisCacheZ.positionAt(data.z());
-    }
-    float normalizedY = m_axisCacheY.positionAt(data.y());
-    m_vertices[row * m_columns + column] = QVector3D(normalizedX, normalizedY, normalizedZ);
+    getNormalizedVertex(dataArray.at(row)->at(column),
+                        m_vertices[row * m_columns + column], polar, false);
 
     // Create normals
     int startRow = row;
@@ -376,24 +346,14 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     int doubleColumns = m_columns * 2 - 2;
     int rowColLimit = rowLimit * doubleColumns;
 
-    AxisRenderCache &xCache = flipXZ ? m_axisCacheZ : m_axisCacheX;
-    AxisRenderCache &zCache = flipXZ ? m_axisCacheX : m_axisCacheZ;
+    // Init min and max to ridiculous values
+    m_minY = 10000000.0;
+    m_maxY = -10000000.0f;
 
     for (int i = 0; i < m_rows; i++) {
         const QSurfaceDataRow &row = *dataArray.at(i);
         for (int j = 0; j < m_columns; j++) {
-            const QSurfaceDataItem &data = row.at(j);
-            float normalizedX;
-            float normalizedZ;
-            if (polar) {
-                // Slice don't use polar, so don't care about flip
-                m_renderer->calculatePolarXZ(data.position(), normalizedX, normalizedZ);
-            } else {
-                normalizedX = xCache.positionAt(data.x());
-                normalizedZ = zCache.positionAt(data.z());
-            }
-            float normalizedY = m_axisCacheY.positionAt(data.y());
-            m_vertices[totalIndex] = QVector3D(normalizedX, normalizedY, normalizedZ);
+            getNormalizedVertex(row.at(j), m_vertices[totalIndex], polar, flipXZ);
             if (changeGeometry)
                 uvs[totalIndex] = QVector2D(GLfloat(j) * uvX, GLfloat(i) * uvY);
 
@@ -475,18 +435,7 @@ void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowI
     const QSurfaceDataRow &dataRow = *dataArray.at(rowIndex);
 
     for (int j = 0; j < m_columns; j++) {
-        const QSurfaceDataItem &data = dataRow.at(j);
-        float normalizedX;
-        float normalizedZ;
-        if (polar) {
-            m_renderer->calculatePolarXZ(data.position(), normalizedX, normalizedZ);
-        } else {
-            normalizedX = m_axisCacheX.positionAt(data.x());
-            normalizedZ = m_axisCacheZ.positionAt(data.z());
-        }
-        float normalizedY = m_axisCacheY.positionAt(data.y());
-        m_vertices[p++] = QVector3D(normalizedX, normalizedY, normalizedZ);
-
+        getNormalizedVertex(dataRow.at(j), m_vertices[p++], polar, false);
         if (j > 0 && j < colLimit) {
             m_vertices[p] = m_vertices[p - 1];
             p++;
@@ -528,18 +477,7 @@ void SurfaceObject::updateCoarseItem(const QSurfaceDataArray &dataArray, int row
 
     // Update a vertice
     int p = row * doubleColumns + column * 2 - (column > 0);
-    const QSurfaceDataItem &data = dataArray.at(row)->at(column);
-    float normalizedX;
-    float normalizedZ;
-    if (polar) {
-        m_renderer->calculatePolarXZ(data.position(), normalizedX, normalizedZ);
-    } else {
-        normalizedX = m_axisCacheX.positionAt(data.x());
-        normalizedZ = m_axisCacheZ.positionAt(data.z());
-    }
-    float normalizedY = m_axisCacheY.positionAt(data.y());
-    m_vertices[p] = QVector3D(normalizedX, normalizedY, normalizedZ);
-    p++;
+    getNormalizedVertex(dataArray.at(row)->at(column), m_vertices[p++], polar, false);
 
     if (column > 0 && column < colLimit)
         m_vertices[p] = m_vertices[p - 1];
@@ -712,6 +650,31 @@ bool SurfaceObject::checkFlipNormal(const QSurfaceDataArray &array)
     const bool ascendingX = array.at(0)->at(0).x() < array.at(0)->at(array.at(0)->size() - 1).x();
     const bool ascendingZ = array.at(0)->at(0).z() < array.at(array.size() - 1)->at(0).z();
     return ascendingX != ascendingZ;
+}
+
+void SurfaceObject::getNormalizedVertex(const QSurfaceDataItem &data, QVector3D &vertex,
+                                        bool polar, bool flipXZ)
+{
+    float normalizedX;
+    float normalizedZ;
+    if (polar) {
+        // Slice don't use polar, so don't care about flip
+        m_renderer->calculatePolarXZ(data.position(), normalizedX, normalizedZ);
+    } else {
+        if (flipXZ) {
+            normalizedX = m_axisCacheZ.positionAt(data.x());
+            normalizedZ = m_axisCacheX.positionAt(data.z());
+        } else {
+            normalizedX = m_axisCacheX.positionAt(data.x());
+            normalizedZ = m_axisCacheZ.positionAt(data.z());
+        }
+    }
+    float normalizedY = m_axisCacheY.positionAt(data.y());
+    m_minY = qMin(normalizedY, m_minY);
+    m_maxY = qMax(normalizedY, m_maxY);
+    vertex.setX(normalizedX);
+    vertex.setY(normalizedY);
+    vertex.setZ(normalizedZ);
 }
 
 GLuint SurfaceObject::gridElementBuf()

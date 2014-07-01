@@ -606,19 +606,30 @@ void GraphModifier::adjustZMin(int min)
 
 void GraphModifier::gradientPressed()
 {
+    static Q3DTheme::ColorStyle colorStyle = Q3DTheme::ColorStyleUniform;
+
+    if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
+        colorStyle = Q3DTheme::ColorStyleObjectGradient;
+        qDebug() << "Color style: ColorStyleObjectGradient";
+    } else if (colorStyle == Q3DTheme::ColorStyleObjectGradient) {
+        colorStyle = Q3DTheme::ColorStyleUniform;
+        qDebug() << "Color style: ColorStyleUniform";
+    } else {
+        colorStyle = Q3DTheme::ColorStyleRangeGradient;
+        qDebug() << "Color style: ColorStyleRangeGradient";
+    }
+
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-//    m_graph->seriesList().at(0)->setBaseGradient(gradient);
-//    m_graph->seriesList().at(0)->setSingleHighlightColor(Qt::red);
-//    m_graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
 
     QList<QLinearGradient> gradients;
     gradients << gradient;
     m_graph->activeTheme()->setBaseGradients(gradients);
-    m_graph->activeTheme()->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+    m_graph->activeTheme()->setColorStyle(colorStyle);
+
 }
 
 void GraphModifier::changeFont(const QFont &font)

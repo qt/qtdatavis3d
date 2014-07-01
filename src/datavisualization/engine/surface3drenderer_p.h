@@ -58,6 +58,7 @@ private:
     ShaderHelper *m_labelShader;
     float m_heightNormalizer;
     float m_scaleX;
+    float m_scaleY;
     float m_scaleZ;
     float m_scaleXWithBackground;
     float m_scaleYWithBackground;
