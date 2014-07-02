@@ -41,7 +41,6 @@ Window {
         anchors.top: mainview.top
         anchors.left: mainview.left
 
-        //! [0]
         ColorGradient {
             id: surfaceGradient
             ColorGradientStop { position: 0.0; color: "black" }
@@ -50,7 +49,6 @@ Window {
             ColorGradientStop { position: 0.8; color: "yellow" }
             ColorGradientStop { position: 1.0; color: "white" }
         }
-        //! [0]
 
         ValueAxis3D {
             id: xAxis
@@ -91,6 +89,7 @@ Window {
             font.pointSize: 25
         }
 
+        //! [0]
         Surface3D {
             id: surfaceGraph
             width: surfaceView.width
@@ -98,18 +97,28 @@ Window {
 
             shadowQuality: AbstractGraph3D.ShadowQualityNone
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
-            scene.activeCamera.cameraPreset: Camera3D.CameraPresetDirectlyAbove
-            scene.activeCamera.zoomLevel: 85
             axisX: xAxis
             axisY: yAxis
             axisZ: zAxis
 
             theme: customTheme
 
+            // Remove the perspective and view the graph from top down to achieve 2D effect
+            //! [1]
             orthoProjection: true
+            scene.activeCamera.cameraPreset: Camera3D.CameraPresetDirectlyAbove
+            //! [1]
+
+            //! [2]
             flipHorizontalGrid: true
-            radialLabelOffset: 0.01  // Add little offset so the labels do not overlap
+            //! [2]
+
+            //! [4]
+            radialLabelOffset: 0.01
+            //! [4]
+
             horizontalAspectRatio: 1
+            scene.activeCamera.zoomLevel: 85
 
             Surface3DSeries {
                 id: surfaceSeries
@@ -126,6 +135,7 @@ Window {
                 }
             }
         }
+        //! [0]
     }
 
     RowLayout {
@@ -135,12 +145,12 @@ Window {
         anchors.right: parent.right
         opacity: 0.5
 
+        //! [3]
         NewButton {
             id: polarToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
             text: "Switch to polar"
-            //! [1]
             onClicked: {
                 if (surfaceGraph.polar === false) {
                     surfaceGraph.polar = true
@@ -150,8 +160,8 @@ Window {
                     text = "Switch to polar"
                 }
             }
-            //! [1]
         }
+        //! [3]
 
         NewButton {
             id: orthoToggle

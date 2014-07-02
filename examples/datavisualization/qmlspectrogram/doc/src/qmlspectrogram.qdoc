@@ -22,20 +22,58 @@
     \ingroup qtdatavisualization_examples
     \brief Showing spectrogram graph in a QML application.
 
-    The Qt Quick 2 surface example demonstrates how to show a polar and cartesian spectrograms
+    The Qt Quick 2 Spectrogram example demonstrates how to show a polar and cartesian spectrograms
     and how to utilize orthographic projection to show them in 2D.
 
-    TODO!!!
-
     \image qmlspectrogram-example.png
+
+    Spectrogram is simply a surface graph with a range gradient used to emphasize the different
+    values. Typically spectrograms are shown with two dimensional surfaces, which we simulate
+    with a top down orthographic view of the graph. In this example, the default input handler
+    is enabled, so you can also rotate the graph to see how it looks in three dimensions. In
+    a real application you may want to disable the default input handling if you wish to show
+    only the two dimensional graph. See \l{Qt Quick 2 Custom Input Example} for guidelines on
+    customizing input handling.
 
     The focus in this example is on showing how to display spectrograms, so the basic
     functionality is not explained. For more detailed QML example documentation,
     see \l{Qt Quick 2 Scatter Example}.
 
-    \section1 TODO
+    \section1 Creating a spectrogram
+
+    To create a 2D spectrogram, we define a Surface3D item:
 
     \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 0
+
+    The key properties for enabling the 2D effect are
+    \l{AbstractGraph3D::orthoProjection}{orthoProjection} and
+    \l{Camera3D::cameraPreset}{scene.activeCamera.cameraPreset}. We remove the perspective by
+    enabling orthographic projection for the graph, and then we eliminate the Y-dimension by
+    viewing the graph directly from above:
+
+    \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 1
+
+    Since this viewpoint causes the horizontal axis grid to be mostly obscured by the surface,
+    we also specify that the horizontal grid should be drawn on top of the graph:
+
+    \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 2
+
+    \section1 Polar spectrogram
+
+    Depending on the data, it is sometimes more natural to use a polar graph instead of a cartesian
+    one. Qt Data Visualization supports this via \l{AbstractGraph3D::polar}{polar} property.
+    In this example we provide a button to switch between polar and cartesian modes:
+
+    \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 3
+
+    In the polar mode, the X-axis is converted into the angular polar axis, and the Z-axis is
+    converted into the radial polar axis. The surface points are recalculated according to new axes.
+
+    The radial axis labels are drawn outside the graph by default, but in this example we want to
+    draw them right next to the 0 degree angular axis inside the graph, so we define only a tiny
+    offset for them:
+
+    \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 4
 
     \section1 Example contents
 */

@@ -235,6 +235,11 @@ QSurface3DSeries *Q3DSurface::selectedSeries() const
  * \property Q3DSurface::flipHorizontalGrid
  * \since QtDataVisualization 1.2
  *
+ * In some use cases the horizontal axis grid is mostly covered by the surface, so it can be more
+ * useful to display the horizontal axis grid on top of the graph rather than on the bottom.
+ * A typical use case for this is showing 2D spectrograms using orthoGraphic projection with
+ * a top-down viewpoint.
+ *
  * If \c{false}, the horizontal axis grid and labels are drawn on the horizontal background
  * of the graph.
  * If \c{true}, the horizontal axis grid and labels are drawn on the opposite side of the graph
