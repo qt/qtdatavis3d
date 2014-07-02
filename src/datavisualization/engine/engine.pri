@@ -57,3 +57,5 @@ SOURCES += $$PWD/qabstract3dgraph.cpp \
 RESOURCES += engine/engine.qrc
 
 OTHER_FILES += $$PWD/meshes/* $$PWD/shaders/*
+
+INCLUDEPATH += $$PWD

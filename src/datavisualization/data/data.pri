@@ -70,3 +70,5 @@ SOURCES += \
     $$PWD/customrenderitem.cpp \
     $$PWD/qcustom3ditem.cpp \
     $$PWD/qcustom3dlabel.cpp
+
+INCLUDEPATH += $$PWD

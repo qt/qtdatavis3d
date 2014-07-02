@@ -6,3 +6,5 @@ HEADERS += \
 SOURCES += \
     $$PWD/q3dtheme.cpp \
     $$PWD/thememanager.cpp
+
+INCLUDEPATH += $$PWD

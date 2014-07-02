@@ -22,3 +22,5 @@ SOURCES += $$PWD/meshloader.cpp \
            $$PWD/surfaceobject.cpp \
            $$PWD/scatterobjectbufferhelper.cpp \
            $$PWD/scatterpointbufferhelper.cpp
+
+INCLUDEPATH += $$PWD

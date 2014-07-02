@@ -19,9 +19,8 @@ QMAKE_DOCS = $$PWD/doc/qtdatavisualization.qdocconf
 
 load(qt_module)
 
-include($$PWD/common.pri)
-include($$PWD/engine/engine.pri)
 include($$PWD/global/global.pri)
+include($$PWD/engine/engine.pri)
 include($$PWD/utils/utils.pri)
 include($$PWD/theme/theme.pri)
 include($$PWD/axis/axis.pri)
