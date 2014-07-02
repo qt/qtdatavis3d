@@ -898,92 +898,94 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             if (!optimizationDefault && selectedSeries
                     && m_selectedItemIndex != Scatter3DController::invalidSelectionIndex()) {
                 ScatterRenderItem &item = renderArray[m_selectedItemIndex];
-                ObjectHelper *dotObj = cache->object();
+                if (item.isVisible()) {
+                    ObjectHelper *dotObj = cache->object();
 
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 itModelMatrix;
+                    QMatrix4x4 modelMatrix;
+                    QMatrix4x4 itModelMatrix;
 
-                modelMatrix.translate(item.translation());
-                if (!drawingPoints) {
-                    if (!seriesRotation.isIdentity() || !item.rotation().isIdentity()) {
-                        QQuaternion totalRotation = seriesRotation * item.rotation();
-                        modelMatrix.rotate(totalRotation);
-                        itModelMatrix.rotate(totalRotation);
+                    modelMatrix.translate(item.translation());
+                    if (!drawingPoints) {
+                        if (!seriesRotation.isIdentity() || !item.rotation().isIdentity()) {
+                            QQuaternion totalRotation = seriesRotation * item.rotation();
+                            modelMatrix.rotate(totalRotation);
+                            itModelMatrix.rotate(totalRotation);
+                        }
+                        modelMatrix.scale(modelScaler);
+                        itModelMatrix.scale(modelScaler);
                     }
-                    modelMatrix.scale(modelScaler);
-                    itModelMatrix.scale(modelScaler);
-                }
 
-                QMatrix4x4 MVPMatrix;
+                    QMatrix4x4 MVPMatrix;
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
-                MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                    MVPMatrix = depthProjectionViewMatrix * modelMatrix;
 #else
-                MVPMatrix = projectionViewMatrix * modelMatrix;
+                    MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
 
-                if (useColor)
-                    dotColor = cache->singleHighlightColor();
-                else
-                    gradientTexture = cache->singleHighlightGradientTexture();
-                GLfloat lightStrength = m_cachedTheme->highlightLightStrength();
-                // Save the reference to the item to be used in label drawing
-                selectedItem = &item;
-                dotSelectionFound = true;
-                // Save selected item size (adjusted with font size) for selection label
-                // positioning
-                selectedItemSize = itemSize + m_drawer->scaledFontSize() - 0.05f;
+                    if (useColor)
+                        dotColor = cache->singleHighlightColor();
+                    else
+                        gradientTexture = cache->singleHighlightGradientTexture();
+                    GLfloat lightStrength = m_cachedTheme->highlightLightStrength();
+                    // Save the reference to the item to be used in label drawing
+                    selectedItem = &item;
+                    dotSelectionFound = true;
+                    // Save selected item size (adjusted with font size) for selection label
+                    // positioning
+                    selectedItemSize = itemSize + m_drawer->scaledFontSize() - 0.05f;
 
-                if (!drawingPoints) {
-                    // Set shader bindings
-                    dotShader->setUniformValue(dotShader->model(), modelMatrix);
-                    dotShader->setUniformValue(dotShader->nModel(),
-                                               itModelMatrix.inverted().transposed());
-                }
+                    if (!drawingPoints) {
+                        // Set shader bindings
+                        dotShader->setUniformValue(dotShader->model(), modelMatrix);
+                        dotShader->setUniformValue(dotShader->nModel(),
+                                                   itModelMatrix.inverted().transposed());
+                    }
 
-                dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
-                if (useColor) {
-                    dotShader->setUniformValue(dotShader->color(), dotColor);
-                } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
-                    dotShader->setUniformValue(dotShader->gradientMin(),
-                                               (item.translation().y() + m_scaleY)
-                                               * rangeGradientYScaler);
-                }
+                    dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
+                    if (useColor) {
+                        dotShader->setUniformValue(dotShader->color(), dotColor);
+                    } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
+                        dotShader->setUniformValue(dotShader->gradientMin(),
+                                                   (item.translation().y() + m_scaleY)
+                                                   * rangeGradientYScaler);
+                    }
 
-                if (!drawingPoints) {
-                    glEnable(GL_POLYGON_OFFSET_FILL);
-                    glPolygonOffset(-1.0f, 1.0f);
-                }
+                    if (!drawingPoints) {
+                        glEnable(GL_POLYGON_OFFSET_FILL);
+                        glPolygonOffset(-1.0f, 1.0f);
+                    }
 
 #if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    if (!drawingPoints) {
-                        // Set shadow shader bindings
-                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                        dotShader->setUniformValue(dotShader->depth(), depthMVPMatrix);
-                        dotShader->setUniformValue(dotShader->lightS(), lightStrength / 10.0f);
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        if (!drawingPoints) {
+                            // Set shadow shader bindings
+                            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                            dotShader->setUniformValue(dotShader->depth(), depthMVPMatrix);
+                            dotShader->setUniformValue(dotShader->lightS(), lightStrength / 10.0f);
 
-                        // Draw the object
-                        m_drawer->drawObject(dotShader, dotObj, gradientTexture, m_depthTexture);
-                    } else {
-                        // Draw the object
-                        m_drawer->drawPoint(dotShader);
-                    }
-                } else
+                            // Draw the object
+                            m_drawer->drawObject(dotShader, dotObj, gradientTexture, m_depthTexture);
+                        } else {
+                            // Draw the object
+                            m_drawer->drawPoint(dotShader);
+                        }
+                    } else
 #endif
-                {
-                    if (!drawingPoints) {
-                        // Set shadowless shader bindings
-                        dotShader->setUniformValue(dotShader->lightS(), lightStrength);
-                        // Draw the object
-                        m_drawer->drawObject(dotShader, dotObj, gradientTexture);
-                    } else {
-                        // Draw the object
-                        m_drawer->drawPoint(dotShader);
+                    {
+                        if (!drawingPoints) {
+                            // Set shadowless shader bindings
+                            dotShader->setUniformValue(dotShader->lightS(), lightStrength);
+                            // Draw the object
+                            m_drawer->drawObject(dotShader, dotObj, gradientTexture);
+                        } else {
+                            // Draw the object
+                            m_drawer->drawPoint(dotShader);
+                        }
                     }
-                }
 
-                if (!drawingPoints)
-                    glDisable(GL_POLYGON_OFFSET_FILL);
+                    if (!drawingPoints)
+                        glDisable(GL_POLYGON_OFFSET_FILL);
+                }
             }
         }
     }
