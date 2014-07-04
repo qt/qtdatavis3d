@@ -74,8 +74,8 @@ Please refer to the generated documentation for more information:
 Known Issues
 ============
 
-- Android doesn't support both widgets and OpenGL simultaneously, so only
-  the Qt Quick 2 API is usable in practice in Android.
+- Some platforms like Android and WinRT cannot handle multiple native windows properly,
+  so only the Qt Quick 2 versions of graphs are available in practice for those platforms.
 - Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
 - Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
 - Surfaces with non-straight rows and columns do not always render properly.

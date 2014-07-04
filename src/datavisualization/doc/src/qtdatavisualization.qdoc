@@ -323,8 +323,8 @@
     \title Qt Data Visualization Known Issues
 
     \list
-        \li Android doesn't support both widgets and OpenGL simultaneously, so only
-            the Qt Quick 2 API is usable in practice in Android.
+        \li Some platforms like Android and WinRT cannot handle multiple native windows properly,
+            so only the Qt Quick 2 graphs are available in practice for those platforms.
         \li Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
         \li Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
         \li Surfaces with non-straight rows and columns do not always render properly.
