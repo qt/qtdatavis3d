@@ -2917,8 +2917,6 @@ void Surface3DRenderer::updateDepthBuffer()
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
         if (m_depthTexture) {
-            m_textureHelper->fillDepthTexture(m_depthTexture, m_primarySubViewport.size(),
-                                              m_shadowQualityMultiplier, 1.0f);
             m_depthModelTexture = m_textureHelper->createDepthTexture(m_primarySubViewport.size(),
                                                                       m_shadowQualityMultiplier);
         }

@@ -53,7 +53,6 @@ class TextureHelper : protected QOpenGLFunctions
     GLuint createDepthTexture(const QSize &size, GLuint textureSize);
     // Returns depth texture and inserts generated framebuffer to parameter
     GLuint createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize);
-    void fillDepthTexture(GLuint texture, const QSize &size, GLuint textureSize, GLfloat value);
 #endif
     void deleteTexture(GLuint *texture);
 
