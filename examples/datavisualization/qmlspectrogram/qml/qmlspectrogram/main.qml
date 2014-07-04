@@ -85,8 +85,6 @@ Window {
             lightStrength: 0.0
             ambientLightStrength: 0.9
             backgroundEnabled: false
-            font.family: "Lucida Handwriting"
-            font.pointSize: 25
         }
 
         //! [0]
