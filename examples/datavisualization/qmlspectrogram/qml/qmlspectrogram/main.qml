@@ -83,8 +83,10 @@ Window {
             type: Theme3D.ThemeQt
             // Don't show specular spotlight as we don't want it to distort the colors
             lightStrength: 0.0
-            ambientLightStrength: 0.9
+            ambientLightStrength: 1.0
             backgroundEnabled: false
+            gridLineColor: "#AAAAAA"
+            windowColor: "#EEEEEE"
         }
 
 

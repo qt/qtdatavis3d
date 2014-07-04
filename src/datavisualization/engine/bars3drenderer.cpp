@@ -493,7 +493,8 @@ void Bars3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(),
-                                    m_cachedTheme->ambientLightStrength() * 2.3f);
+                                    m_cachedTheme->ambientLightStrength()
+                                    + m_cachedTheme->lightStrength() / 7.0f);
         lineShader->setUniformValue(lineShader->lightS(), 0.0f);
         lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 
@@ -601,14 +602,16 @@ void Bars3DRenderer::drawSlicedScene()
     m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
     m_barShader->setUniformValue(m_barShader->lightS(), 0.15f);
     m_barShader->setUniformValue(m_barShader->ambientS(),
-                                 m_cachedTheme->ambientLightStrength() * 2.3f);
+                                 m_cachedTheme->ambientLightStrength()
+                                 + m_cachedTheme->lightStrength() / 7.0f);
     m_barShader->setUniformValue(m_barShader->lightColor(), lightColor);
     m_barGradientShader->bind();
     m_barGradientShader->setUniformValue(m_barGradientShader->lightP(), lightPos);
     m_barGradientShader->setUniformValue(m_barGradientShader->view(), viewMatrix);
     m_barGradientShader->setUniformValue(m_barGradientShader->lightS(), 0.15f);
     m_barGradientShader->setUniformValue(m_barGradientShader->ambientS(),
-                                         m_cachedTheme->ambientLightStrength() * 2.3f);
+                                         m_cachedTheme->ambientLightStrength()
+                                         + m_cachedTheme->lightStrength() / 7.0f);
     m_barGradientShader->setUniformValue(m_barGradientShader->gradientMin(), 0.0f);
     m_barGradientShader->setUniformValue(m_barGradientShader->lightColor(), lightColor);
 

@@ -277,7 +277,7 @@ void Surface3DRenderer::updateSurfaceTextures(QVector<QSurface3DSeries *> series
 
             if (!series->texture().isNull()) {
                 cache->setSurfaceTexture(m_textureHelper->create2DTexture(
-                                         series->texture(), true, true, true));
+                                             series->texture(), true, true, true));
 
                 if (cache->isFlatShadingEnabled())
                     cache->surfaceObject()->coarseUVs(array, cache->dataArray());
@@ -780,6 +780,19 @@ void Surface3DRenderer::drawSlicedScene()
     AxisRenderCache &sliceCache = rowMode ? m_axisCacheX : m_axisCacheZ;
 
     GLfloat scaleXBackground = 0.0f;
+    if (rowMode) {
+        // Don't use the regular margin for polar, as the graph is not going to be to scale anyway,
+        // and polar graphs often have quite a bit of margin, resulting in ugly slices.
+        if (m_polarGraph)
+            scaleXBackground = m_scaleX + 0.1f;
+        else
+            scaleXBackground = m_scaleXWithBackground;
+    } else {
+        if (m_polarGraph)
+            scaleXBackground = m_scaleZ + 0.1f;
+        else
+            scaleXBackground = m_scaleZWithBackground;
+    }
 
     // Disable culling to avoid ugly conditionals with reversed axes and data
     glDisable(GL_CULL_FACE);
@@ -795,11 +808,6 @@ void Surface3DRenderer::drawSlicedScene()
                     glPolygonOffset(0.5f, 1.0f);
                     drawGrid = true;
                 }
-
-                if (rowMode)
-                    scaleXBackground = m_scaleXWithBackground;
-                else
-                    scaleXBackground = m_scaleZWithBackground;
 
                 QMatrix4x4 MVPMatrix;
                 QMatrix4x4 modelMatrix;
@@ -819,9 +827,27 @@ void Surface3DRenderer::drawSlicedScene()
 
                     surfaceShader->bind();
 
-                    GLuint colorTexture = cache->baseUniformTexture();;
-                    if (cache->colorStyle() != Q3DTheme::ColorStyleUniform)
+                    GLuint colorTexture = cache->baseUniformTexture();
+                    if (cache->colorStyle() == Q3DTheme::ColorStyleUniform) {
+                        colorTexture = cache->baseUniformTexture();
+                        surfaceShader->setUniformValue(surfaceShader->gradientMin(), 0.0f);
+                        surfaceShader->setUniformValue(surfaceShader->gradientHeight(), 0.0f);
+                    } else {
                         colorTexture = cache->baseGradientTexture();
+                        if (cache->colorStyle() == Q3DTheme::ColorStyleObjectGradient) {
+                            float objMin = cache->surfaceObject()->minYValue();
+                            float objMax = cache->surfaceObject()->maxYValue();
+                            float objRange = objMax - objMin;
+                            surfaceShader->setUniformValue(surfaceShader->gradientMin(),
+                                                           -(objMin / objRange));
+                            surfaceShader->setUniformValue(surfaceShader->gradientHeight(),
+                                                           1.0f / objRange);
+                        } else {
+                            surfaceShader->setUniformValue(surfaceShader->gradientMin(), 0.5f);
+                            surfaceShader->setUniformValue(surfaceShader->gradientHeight(),
+                                                           1.0f / (m_scaleY * 2.0f));
+                        }
+                    }
 
                     // Set shader bindings
                     surfaceShader->setUniformValue(surfaceShader->lightP(), lightPos);
@@ -830,9 +856,10 @@ void Surface3DRenderer::drawSlicedScene()
                     surfaceShader->setUniformValue(surfaceShader->nModel(),
                                                    itModelMatrix.inverted().transposed());
                     surfaceShader->setUniformValue(surfaceShader->MVP(), MVPMatrix);
-                    surfaceShader->setUniformValue(surfaceShader->lightS(), 0.15f);
+                    surfaceShader->setUniformValue(surfaceShader->lightS(), 0.0f);
                     surfaceShader->setUniformValue(surfaceShader->ambientS(),
-                                                   m_cachedTheme->ambientLightStrength() * 2.3f);
+                                                   m_cachedTheme->ambientLightStrength()
+                                                   + m_cachedTheme->lightStrength() / 10.0f);
                     surfaceShader->setUniformValue(surfaceShader->lightColor(), lightColor);
 
                     m_drawer->drawObject(surfaceShader, cache->sliceSurfaceObject(), colorTexture);
@@ -879,7 +906,8 @@ void Surface3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(),
-                                    m_cachedTheme->ambientLightStrength() * 2.3f);
+                                    m_cachedTheme->ambientLightStrength()
+                                    + m_cachedTheme->lightStrength() / 10.0f);
         lineShader->setUniformValue(lineShader->lightS(), 0.0f);
         lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 
@@ -989,7 +1017,10 @@ void Surface3DRenderer::drawSlicedScene()
     for (int label = 0; label < labelCount; label++) {
         if (countLabelItems > labelNbr) {
             // Draw the label here
-            labelTrans.setX(sliceCache.labelPosition(label));
+            if (rowMode)
+                labelTrans.setX(sliceCache.labelPosition(label));
+            else
+                labelTrans.setX(-sliceCache.labelPosition(label));
 
             m_dummyRenderItem.setTranslation(labelTrans);
 
