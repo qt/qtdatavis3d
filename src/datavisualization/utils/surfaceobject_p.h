@@ -57,6 +57,8 @@ public:
                    bool changeGeometry, bool polar, bool flipXZ = false);
     void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
                          bool changeGeometry, bool polar, bool flipXZ = false);
+    void smoothUVs(const QSurfaceDataArray &dataArray, const QSurfaceDataArray &modelArray);
+    void coarseUVs(const QSurfaceDataArray &dataArray, const QSurfaceDataArray &modelArray);
     void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex, bool polar);
     void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow, bool polar);
     void updateSmoothItem(const QSurfaceDataArray &dataArray, int row, int column, bool polar);
@@ -67,11 +69,13 @@ public:
     void createCoarseGridlineIndices(int x, int y, int endX, int endY);
     void uploadBuffers();
     GLuint gridElementBuf();
+    GLuint uvBuf();
     GLuint gridIndexCount();
     QVector3D vertexAt(int column, int row);
     void clear();
     float minYValue() const { return m_minY; }
     float maxYValue() const { return m_maxY; }
+    inline void activateSurfaceTexture(bool value) { m_returnTextureBuffer = value; }
 
 private:
     QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c, bool flipNormal);
@@ -97,6 +101,8 @@ private:
     Surface3DRenderer *m_renderer;
     float m_minY;
     float m_maxY;
+    GLuint m_uvTextureBuffer;
+    bool m_returnTextureBuffer;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

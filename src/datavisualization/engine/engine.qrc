@@ -57,5 +57,7 @@
         <file alias="fragmentTexture">shaders/texture.frag</file>
         <file alias="fragmentTextureES2">shaders/texture_ES2.frag</file>
         <file alias="vertexTexture">shaders/texture.vert</file>
+        <file alias="fragmentTexturedSurfaceShadowFlat">shaders/surfaceTexturedShadowFlat.frag</file>
+        <file alias="fragmentSurfaceTexturedFlat">shaders/surfaceTexturedFlat.frag</file>
     </qresource>
 </RCC>

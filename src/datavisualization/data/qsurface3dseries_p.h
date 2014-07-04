@@ -48,6 +48,7 @@ public:
     void setSelectedPoint(const QPoint &position);
     void setFlatShadingEnabled(bool enabled);
     void setDrawMode(QSurface3DSeries::DrawFlags mode);
+    void setTexture(const QImage &texture);
 
 private:
     QSurface3DSeries *qptr();
@@ -55,6 +56,8 @@ private:
     QPoint m_selectedPoint;
     bool m_flatShadingEnabled;
     QSurface3DSeries::DrawFlags m_drawMode;
+    QImage m_texture;
+    QString m_textureFile;
 
 private:
     friend class QSurface3DSeries;

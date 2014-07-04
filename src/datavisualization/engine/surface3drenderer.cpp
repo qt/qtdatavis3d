@@ -43,6 +43,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_backgroundShader(0),
       m_surfaceFlatShader(0),
       m_surfaceSmoothShader(0),
+      m_surfaceTexturedSmoothShader(0),
+      m_surfaceTexturedFlatShader(0),
       m_surfaceGridShader(0),
       m_surfaceSliceFlatShader(0),
       m_surfaceSliceSmoothShader(0),
@@ -104,6 +106,8 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_selectionShader;
     delete m_surfaceFlatShader;
     delete m_surfaceSmoothShader;
+    delete m_surfaceTexturedSmoothShader;
+    delete m_surfaceTexturedFlatShader;
     delete m_surfaceGridShader;
     delete m_surfaceSliceFlatShader;
     delete m_surfaceSliceSmoothShader;
@@ -252,6 +256,33 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
                 mainPointer->setHighlightColor(highlightColor);
                 mainPointer->setPointerObject(cache->object());
                 mainPointer->setRotation(cache->meshRotation());
+            }
+        }
+    }
+}
+
+void Surface3DRenderer::updateSurfaceTextures(QVector<QSurface3DSeries *> seriesList)
+{
+    foreach (QSurface3DSeries *series, seriesList) {
+        SurfaceSeriesRenderCache *cache =
+                static_cast<SurfaceSeriesRenderCache *>(m_renderCacheList.value(series));
+        if (cache) {
+            GLuint oldTexture = cache->surfaceTexture();
+            m_textureHelper->deleteTexture(&oldTexture);
+            cache->setSurfaceTexture(0);
+
+            const QSurface3DSeries *currentSeries = cache->series();
+            QSurfaceDataProxy *dataProxy = currentSeries->dataProxy();
+            const QSurfaceDataArray &array = *dataProxy->array();
+
+            if (!series->texture().isNull()) {
+                cache->setSurfaceTexture(m_textureHelper->create2DTexture(
+                                         series->texture(), true, true, true));
+
+                if (cache->isFlatShadingEnabled())
+                    cache->surfaceObject()->coarseUVs(array, cache->dataArray());
+                else
+                    cache->surfaceObject()->smoothUVs(array, cache->dataArray());
             }
         }
     }
@@ -1191,6 +1222,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glCullFace(GL_BACK);
     }
 #endif
+
     // Draw selection buffer
     if (!m_cachedIsSlicingActivated && (!m_renderCacheList.isEmpty()
                                         || !m_customRenderCache.isEmpty())
@@ -1219,6 +1251,8 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
                 m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
+
+                cache->surfaceObject()->activateSurfaceTexture(false);
 
                 m_drawer->drawObject(m_selectionShader, cache->surfaceObject(),
                                      cache->selectionTexture());
@@ -1285,8 +1319,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                 if (cache->surfaceVisible()) {
                     ShaderHelper *shader = m_surfaceFlatShader;
-                    if (!cache->isFlatShadingEnabled())
+                    if (cache->surfaceTexture())
+                        shader = m_surfaceTexturedFlatShader;
+                    if (!cache->isFlatShadingEnabled()) {
                         shader = m_surfaceSmoothShader;
+                        if (cache->surfaceTexture())
+                            shader = m_surfaceTexturedSmoothShader;
+                    }
                     shader->bind();
 
                     // Set shader bindings
@@ -1300,23 +1339,30 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                             m_cachedTheme->ambientLightStrength());
                     shader->setUniformValue(shader->lightColor(), lightColor);
 
-                    GLuint gradientTexture;
-                    if (cache->colorStyle() == Q3DTheme::ColorStyleUniform) {
-                        gradientTexture = cache->baseUniformTexture();
-                        shader->setUniformValue(shader->gradientMin(), 0.0f);
-                        shader->setUniformValue(shader->gradientHeight(), 0.0f);
+                    // Set the surface texturing
+                    cache->surfaceObject()->activateSurfaceTexture(false);
+                    GLuint texture;
+                    if (cache->surfaceTexture()) {
+                        texture = cache->surfaceTexture();
+                        cache->surfaceObject()->activateSurfaceTexture(true);
                     } else {
-                        gradientTexture = cache->baseGradientTexture();
-                        if (cache->colorStyle() == Q3DTheme::ColorStyleObjectGradient) {
-                            float objMin = cache->surfaceObject()->minYValue();
-                            float objMax = cache->surfaceObject()->maxYValue();
-                            float objRange = objMax - objMin;
-                            shader->setUniformValue(shader->gradientMin(), -(objMin / objRange));
-                            shader->setUniformValue(shader->gradientHeight(), 1.0f / objRange);
+                        if (cache->colorStyle() == Q3DTheme::ColorStyleUniform) {
+                            texture = cache->baseUniformTexture();
+                            shader->setUniformValue(shader->gradientMin(), 0.0f);
+                            shader->setUniformValue(shader->gradientHeight(), 0.0f);
                         } else {
-                            shader->setUniformValue(shader->gradientMin(), 0.5f);
-                            shader->setUniformValue(shader->gradientHeight(),
-                                                    1.0f / (m_scaleY * 2.0f));
+                            texture = cache->baseGradientTexture();
+                            if (cache->colorStyle() == Q3DTheme::ColorStyleObjectGradient) {
+                                float objMin = cache->surfaceObject()->minYValue();
+                                float objMax = cache->surfaceObject()->maxYValue();
+                                float objRange = objMax - objMin;
+                                shader->setUniformValue(shader->gradientMin(), -(objMin / objRange));
+                                shader->setUniformValue(shader->gradientHeight(), 1.0f / objRange);
+                            } else {
+                                shader->setUniformValue(shader->gradientMin(), 0.5f);
+                                shader->setUniformValue(shader->gradientHeight(),
+                                                        1.0f / (m_scaleY * 2.0f));
+                            }
                         }
                     }
 
@@ -1329,7 +1375,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                         shader->setUniformValue(shader->lightS(), adjustedLightStrength);
 
                         // Draw the objects
-                        m_drawer->drawObject(shader, cache->surfaceObject(), gradientTexture,
+                        m_drawer->drawObject(shader, cache->surfaceObject(), texture,
                                              m_depthModelTexture);
                     } else
 #endif
@@ -1339,7 +1385,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                                 m_cachedTheme->lightStrength());
 
                         // Draw the objects
-                        m_drawer->drawObject(shader, cache->surfaceObject(), gradientTexture);
+                        m_drawer->drawObject(shader, cache->surfaceObject(), texture);
                     }
                 }
             }
@@ -2448,10 +2494,10 @@ void Surface3DRenderer::calculateSceneScalingFactors()
 
     m_axisCacheX.setScale(m_scaleX * 2.0f);
     m_axisCacheY.setScale(m_scaleY * 2.0f);
-    m_axisCacheZ.setScale(m_scaleZ * 2.0f);
+    m_axisCacheZ.setScale(-m_scaleZ * 2.0f);
     m_axisCacheX.setTranslate(-m_scaleX);
     m_axisCacheY.setTranslate(-m_scaleY);
-    m_axisCacheZ.setTranslate(-m_scaleZ);
+    m_axisCacheZ.setTranslate(m_scaleZ);
 }
 
 void Surface3DRenderer::checkFlatSupport(SurfaceSeriesRenderCache *cache)
@@ -2470,11 +2516,19 @@ void Surface3DRenderer::updateObjects(SurfaceSeriesRenderCache *cache, bool dime
     QSurfaceDataArray &dataArray = cache->dataArray();
     const QRect &sampleSpace = cache->sampleSpace();
 
+    const QSurface3DSeries *currentSeries = cache->series();
+    QSurfaceDataProxy *dataProxy = currentSeries->dataProxy();
+    const QSurfaceDataArray &array = *dataProxy->array();
+
     if (cache->isFlatShadingEnabled()) {
         cache->surfaceObject()->setUpData(dataArray, sampleSpace, dimensionChanged, m_polarGraph);
+        if (cache->surfaceTexture())
+            cache->surfaceObject()->coarseUVs(array, dataArray);
     } else {
         cache->surfaceObject()->setUpSmoothData(dataArray, sampleSpace, dimensionChanged,
                                                 m_polarGraph);
+        if (cache->surfaceTexture())
+            cache->surfaceObject()->smoothUVs(array, dataArray);
     }
 }
 
@@ -2736,6 +2790,10 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         delete m_surfaceFlatShader;
     if (m_surfaceSmoothShader)
         delete m_surfaceSmoothShader;
+    if (m_surfaceTexturedSmoothShader)
+        delete m_surfaceTexturedSmoothShader;
+    if (m_surfaceTexturedFlatShader)
+        delete m_surfaceTexturedFlatShader;
     if (m_surfaceSliceFlatShader)
         delete m_surfaceSliceFlatShader;
     if (m_surfaceSliceSmoothShader)
@@ -2745,9 +2803,13 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
     if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
         m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexShadow"),
                                                  QStringLiteral(":/shaders/fragmentSurfaceShadowNoTex"));
+        m_surfaceTexturedSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexShadow"),
+                                                         QStringLiteral(":/shaders/fragmentShadow"));
     } else {
         m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                                  QStringLiteral(":/shaders/fragmentSurface"));
+        m_surfaceTexturedSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexTexture"),
+                                                         QStringLiteral(":/shaders/fragmentTexture"));
     }
     m_surfaceSliceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                                   QStringLiteral(":/shaders/fragmentSurface"));
@@ -2755,9 +2817,13 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceShadowFlat"),
                                                    QStringLiteral(":/shaders/fragmentSurfaceShadowFlat"));
+            m_surfaceTexturedFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceShadowFlat"),
+                                                           QStringLiteral(":/shaders/fragmentTexturedSurfaceShadowFlat"));
         } else {
             m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
                                                    QStringLiteral(":/shaders/fragmentSurfaceFlat"));
+            m_surfaceTexturedFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
+                                                           QStringLiteral(":/shaders/fragmentSurfaceTexturedFlat"));
         }
         m_surfaceSliceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexSurfaceFlat"),
                                                     QStringLiteral(":/shaders/fragmentSurfaceFlat"));
@@ -2770,6 +2836,10 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
                                              QStringLiteral(":/shaders/fragmentSurfaceES2"));
     m_surfaceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                            QStringLiteral(":/shaders/fragmentSurfaceES2"));
+    m_surfaceTexturedSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexTexture"),
+                                                     QStringLiteral(":/shaders/fragmentTextureES2"));
+    m_surfaceTexturedFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexTexture"),
+                                                   QStringLiteral(":/shaders/fragmentTextureES2"));
     m_surfaceSliceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                                   QStringLiteral(":/shaders/fragmentSurfaceES2"));
     m_surfaceSliceFlatShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
@@ -2777,9 +2847,11 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
 #endif
     m_surfaceSmoothShader->initialize();
     m_surfaceSliceSmoothShader->initialize();
+    m_surfaceTexturedSmoothShader->initialize();
     if (m_flatSupported) {
         m_surfaceFlatShader->initialize();
         m_surfaceSliceFlatShader->initialize();
+        m_surfaceTexturedFlatShader->initialize();
     }
 }
 

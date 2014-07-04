@@ -56,7 +56,7 @@ int main(int argc, char *argv[])
     surfaceGraph->activeTheme()->setType(Q3DTheme::Theme(initialTheme));
 
     QWidget *container = QWidget::createWindowContainer(surfaceGraph);
-    container->setMinimumSize(QSize(screenSize.width() / 4, screenSize.height() / 4));
+    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 4));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
@@ -183,7 +183,7 @@ int main(int argc, char *argv[])
     QSlider *axisRangeSliderX = new QSlider(Qt::Horizontal, widget);
     axisRangeSliderX->setTickInterval(1);
     axisRangeSliderX->setMinimum(1);
-    axisRangeSliderX->setValue(16);
+    axisRangeSliderX->setValue(34);
     axisRangeSliderX->setMaximum(100);
     axisRangeSliderX->setEnabled(true);
     QSlider *axisRangeSliderY = new QSlider(Qt::Horizontal, widget);
@@ -195,14 +195,14 @@ int main(int argc, char *argv[])
     QSlider *axisRangeSliderZ = new QSlider(Qt::Horizontal, widget);
     axisRangeSliderZ->setTickInterval(1);
     axisRangeSliderZ->setMinimum(1);
-    axisRangeSliderZ->setValue(16);
+    axisRangeSliderZ->setValue(34);
     axisRangeSliderZ->setMaximum(100);
     axisRangeSliderZ->setEnabled(true);
 
     QSlider *axisMinSliderX = new QSlider(Qt::Horizontal, widget);
     axisMinSliderX->setTickInterval(1);
     axisMinSliderX->setMinimum(-100);
-    axisMinSliderX->setValue(-8);
+    axisMinSliderX->setValue(-17);
     axisMinSliderX->setMaximum(100);
     axisMinSliderX->setEnabled(true);
     QSlider *axisMinSliderY = new QSlider(Qt::Horizontal, widget);
@@ -214,7 +214,7 @@ int main(int argc, char *argv[])
     QSlider *axisMinSliderZ = new QSlider(Qt::Horizontal, widget);
     axisMinSliderZ->setTickInterval(1);
     axisMinSliderZ->setMinimum(-100);
-    axisMinSliderZ->setValue(-8);
+    axisMinSliderZ->setValue(-17);
     axisMinSliderZ->setMaximum(100);
     axisMinSliderZ->setEnabled(true);
 
@@ -402,6 +402,10 @@ int main(int argc, char *argv[])
     polarCB->setText(QStringLiteral("Polar"));
     polarCB->setChecked(false);
 
+    QCheckBox *surfaceTextureCB = new QCheckBox(widget);
+    surfaceTextureCB->setText(QStringLiteral("Map texture"));
+    surfaceTextureCB->setChecked(false);
+
     // Add controls to the layout
 #ifdef MULTI_SERIES
     vLayout->addWidget(series1CB);
@@ -429,6 +433,7 @@ int main(int argc, char *argv[])
     vLayout->addWidget(surfaceGridS4CB);
     vLayout->addWidget(surfaceS4CB);
     vLayout->addWidget(series4VisibleCB);
+    vLayout->addWidget(surfaceTextureCB);
 #endif
 #ifndef MULTI_SERIES
     vLayout->addWidget(new QLabel(QStringLiteral("Select surface sample")));
@@ -669,6 +674,8 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::setAspectRatio);
     QObject::connect(horizontalAspectRatioSlider, &QSlider::valueChanged,
                      modifier, &GraphModifier::setHorizontalAspectRatio);
+    QObject::connect(surfaceTextureCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::setSurfaceTexture);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

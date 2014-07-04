@@ -48,12 +48,12 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_zCount(24),
       m_activeSample(0),
       m_fontSize(40),
-      m_rangeX(16.0),
+      m_rangeX(34.0),
       m_rangeY(16.0),
-      m_rangeZ(16.0),
-      m_minX(-8.0),
+      m_rangeZ(34.0),
+      m_minX(-17.0),
       m_minY(-8.0),
-      m_minZ(-8.0),
+      m_minZ(-17.0),
       m_addRowCounter(m_zCount),
       m_insertTestZPos(0),
       m_insertTestIndexPos(1),
@@ -1244,12 +1244,12 @@ void GraphModifier::resetArray()
 
 void GraphModifier::resetArrayEmpty()
 {
-    QSurfaceDataArray *emptryArray = new QSurfaceDataArray;
+    QSurfaceDataArray *emptyArray = new QSurfaceDataArray;
 #ifdef MULTI_SERIES
     int series = rand() % 4;
-    m_multiseries[series]->dataProxy()->resetArray(emptryArray);
+    m_multiseries[series]->dataProxy()->resetArray(emptyArray);
 #else
-    m_theSeries->dataProxy()->resetArray(emptryArray);
+    m_theSeries->dataProxy()->resetArray(emptyArray);
 #endif
 }
 
@@ -1593,4 +1593,12 @@ void GraphModifier::setHorizontalAspectRatio(int ratio)
 {
     qreal aspectRatio = qreal(ratio) / 100.0;
     m_graph->setHorizontalAspectRatio(aspectRatio);
+}
+
+void GraphModifier::setSurfaceTexture(bool enabled)
+{
+    if (enabled)
+        m_multiseries[3]->setTexture(QImage(":/maps/mapimage"));
+    else
+        m_multiseries[3]->setTexture(QImage());
 }

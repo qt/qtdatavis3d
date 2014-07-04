@@ -2062,10 +2062,10 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
 
     m_axisCacheX.setScale(m_scaleX * 2.0f);
     m_axisCacheY.setScale(m_scaleY * 2.0f);
-    m_axisCacheZ.setScale(m_scaleZ * 2.0f);
+    m_axisCacheZ.setScale(-m_scaleZ * 2.0f);
     m_axisCacheX.setTranslate(-m_scaleX);
     m_axisCacheY.setTranslate(-m_scaleY);
-    m_axisCacheZ.setTranslate(-m_scaleZ);
+    m_axisCacheZ.setTranslate(m_scaleZ);
 }
 
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)

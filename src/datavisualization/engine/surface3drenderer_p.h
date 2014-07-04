@@ -51,6 +51,8 @@ private:
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_surfaceFlatShader;
     ShaderHelper *m_surfaceSmoothShader;
+    ShaderHelper *m_surfaceTexturedSmoothShader;
+    ShaderHelper *m_surfaceTexturedFlatShader;
     ShaderHelper *m_surfaceGridShader;
     ShaderHelper *m_surfaceSliceFlatShader;
     ShaderHelper *m_surfaceSliceSmoothShader;
@@ -87,6 +89,7 @@ public:
 
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    void updateSurfaceTextures(QVector<QSurface3DSeries *> seriesList);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void cleanCache(SeriesRenderCache *cache);
     void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode);

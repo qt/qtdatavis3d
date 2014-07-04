@@ -42,12 +42,14 @@ struct Surface3DChangeBitField {
     bool rowsChanged               : 1;
     bool itemChanged               : 1;
     bool flipHorizontalGridChanged : 1;
+    bool surfaceTextureChanged     : 1;
 
     Surface3DChangeBitField() :
         selectedPointChanged(true),
         rowsChanged(false),
         itemChanged(false),
-        flipHorizontalGridChanged(true)
+        flipHorizontalGridChanged(true),
+        surfaceTextureChanged(true)
     {
     }
 };
@@ -76,6 +78,7 @@ private:
     QVector<ChangeItem> m_changedItems;
     QVector<ChangeRow> m_changedRows;
     bool m_flipHorizontalGrid;
+    QVector<QSurface3DSeries *> m_changedTextures;
 
 public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
@@ -106,6 +109,8 @@ public:
 
     void setFlipHorizontalGrid(bool flip);
     bool flipHorizontalGrid() const;
+
+    void updateSurfaceTexture(QSurface3DSeries *series);
 
 public slots:
     void handleArrayReset();

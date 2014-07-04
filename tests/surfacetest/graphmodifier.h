@@ -112,9 +112,9 @@ public:
     void massiveTestAppendAndScroll();
     void testAxisReverse();
     void testDataOrdering();
-
     void setAspectRatio(int ratio);
     void setHorizontalAspectRatio(int ratio);
+    void setSurfaceTexture(bool enabled);
 
 public slots:
     void changeShadowQuality(int quality);

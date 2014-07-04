@@ -42,7 +42,7 @@ public:
 
     GLuint vertexBuf();
     GLuint normalBuf();
-    GLuint uvBuf();
+    virtual GLuint uvBuf();
     GLuint elementBuf();
     GLuint indexCount();
     GLuint indicesType();

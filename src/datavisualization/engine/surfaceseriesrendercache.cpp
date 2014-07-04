@@ -39,7 +39,8 @@ SurfaceSeriesRenderCache::SurfaceSeriesRenderCache(QAbstract3DSeries *series,
       m_sliceSelectionPointer(0),
       m_mainSelectionPointer(0),
       m_slicePointerActive(false),
-      m_mainPointerActive(false)
+      m_mainPointerActive(false),
+      m_surfaceTexture(0)
 {
 }
 
@@ -62,8 +63,10 @@ void SurfaceSeriesRenderCache::populate(bool newSeries)
 
 void SurfaceSeriesRenderCache::cleanup(TextureHelper *texHelper)
 {
-    if (QOpenGLContext::currentContext())
+    if (QOpenGLContext::currentContext()) {
         texHelper->deleteTexture(&m_selectionTexture);
+        texHelper->deleteTexture(&m_surfaceTexture);
+    }
 
     delete m_surfaceObj;
     delete m_sliceSurfaceObj;

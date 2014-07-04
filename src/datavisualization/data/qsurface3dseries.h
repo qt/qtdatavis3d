@@ -35,6 +35,8 @@ class QT_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
     Q_PROPERTY(bool flatShadingEnabled READ isFlatShadingEnabled WRITE setFlatShadingEnabled NOTIFY flatShadingEnabledChanged)
     Q_PROPERTY(bool flatShadingSupported READ isFlatShadingSupported NOTIFY flatShadingSupportedChanged)
     Q_PROPERTY(DrawFlags drawMode READ drawMode WRITE setDrawMode NOTIFY drawModeChanged)
+    Q_PROPERTY(QImage texture READ texture WRITE setTexture NOTIFY textureChanged)
+    Q_PROPERTY(QString textureFile READ textureFile WRITE setTextureFile NOTIFY textureFileChanged)
 
 public:
     enum DrawFlag {
@@ -63,12 +65,19 @@ public:
 
     bool isFlatShadingSupported() const;
 
+    void setTexture(const QImage &texture);
+    QImage texture() const;
+    void setTextureFile(const QString &filename);
+    QString textureFile() const;
+
 signals:
     void dataProxyChanged(QSurfaceDataProxy *proxy);
     void selectedPointChanged(const QPoint &position);
     void flatShadingEnabledChanged(bool enable);
     void flatShadingSupportedChanged(bool enable);
     void drawModeChanged(QSurface3DSeries::DrawFlags mode);
+    void textureChanged(const QImage &image);
+    void textureFileChanged(const QString &filename);
 
 protected:
     explicit QSurface3DSeries(QSurface3DSeriesPrivate *d, QObject *parent = 0);

@@ -85,6 +85,12 @@ void Surface3DController::synchDataToRenderer()
         m_renderer->updateFlipHorizontalGrid(m_flipHorizontalGrid);
         m_changeTracker.flipHorizontalGridChanged = false;
     }
+
+    if (m_changeTracker.surfaceTextureChanged) {
+        m_renderer->updateSurfaceTextures(m_changedTextures);
+        m_changeTracker.surfaceTextureChanged = false;
+        m_changedTextures.clear();
+    }
 }
 
 void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(
@@ -146,6 +152,9 @@ void Surface3DController::addSeries(QAbstract3DSeries *series)
     QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
     if (surfaceSeries->selectedPoint() != invalidSelectionPosition())
         setSelectedPoint(surfaceSeries->selectedPoint(), surfaceSeries, false);
+
+    if (!surfaceSeries->texture().isNull())
+        updateSurfaceTexture(surfaceSeries);
 }
 
 void Surface3DController::removeSeries(QAbstract3DSeries *series)
@@ -446,6 +455,16 @@ void Surface3DController::handleRowsRemoved(int startIndex, int count)
     }
     if (!m_changedSeriesList.contains(series))
         m_changedSeriesList.append(series);
+
+    emitNeedRender();
+}
+
+void Surface3DController::updateSurfaceTexture(QSurface3DSeries *series)
+{
+    m_changeTracker.surfaceTextureChanged = true;
+
+    if (!m_changedTextures.contains(series))
+        m_changedTextures.append(series);
 
     emitNeedRender();
 }

@@ -31,8 +31,8 @@ SurfaceObject::SurfaceObject(Surface3DRenderer *renderer)
       m_axisCacheX(renderer->m_axisCacheX),
       m_axisCacheY(renderer->m_axisCacheY),
       m_axisCacheZ(renderer->m_axisCacheZ),
-      m_renderer(renderer)
-
+      m_renderer(renderer),
+      m_returnTextureBuffer(false)
 {
     m_indicesType = GL_UNSIGNED_INT;
     initializeOpenGLFunctions();
@@ -41,12 +41,15 @@ SurfaceObject::SurfaceObject(Surface3DRenderer *renderer)
     glGenBuffers(1, &m_uvbuffer);
     glGenBuffers(1, &m_elementbuffer);
     glGenBuffers(1, &m_gridElementbuffer);
+    glGenBuffers(1, &m_uvTextureBuffer);
 }
 
 SurfaceObject::~SurfaceObject()
 {
-    if (QOpenGLContext::currentContext())
+    if (QOpenGLContext::currentContext()) {
         glDeleteBuffers(1, &m_gridElementbuffer);
+        glDeleteBuffers(1, &m_uvTextureBuffer);
+    }
 }
 
 void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
@@ -133,6 +136,37 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
         createSmoothGridlineIndices(0, 0, colLimit, rowLimit);
 
     createBuffers(m_vertices, uvs, m_normals, 0, changeGeometry);
+}
+
+void SurfaceObject::smoothUVs(const QSurfaceDataArray &dataArray,
+                              const QSurfaceDataArray &modelArray)
+{
+    int columns = dataArray.at(0)->size();
+    int rows = dataArray.size();
+    float xRangeNormalizer = dataArray.at(0)->at(columns - 1).x() - dataArray.at(0)->at(0).x();
+    float zRangeNormalizer = dataArray.at(rows - 1)->at(0).z() - dataArray.at(0)->at(0).z();
+    float xMin = dataArray.at(0)->at(0).x();
+    float zMin = dataArray.at(0)->at(0).z();
+
+    QVector<QVector2D> uvs;
+    uvs.resize(m_rows * m_columns);
+    int index = 0;
+    for (int i = 0; i < m_rows; i++) {
+        float y = (modelArray.at(i)->at(0).z() - zMin) / zRangeNormalizer;
+        const QSurfaceDataRow &p = *modelArray.at(i);
+        for (int j = 0; j < m_columns; j++) {
+            float x = (p.at(j).x() - xMin) / xRangeNormalizer;
+            uvs[index] = QVector2D(x, y);
+            index++;
+        }
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_uvTextureBuffer);
+    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
+                 &uvs.at(0), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    m_returnTextureBuffer = true;
 }
 
 void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowIndex, bool polar)
@@ -426,6 +460,42 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     delete[] indices;
 }
 
+void SurfaceObject::coarseUVs(const QSurfaceDataArray &dataArray,
+                              const QSurfaceDataArray &modelArray)
+{
+    int columns = dataArray.at(0)->size();
+    int rows = dataArray.size();
+    float xRangeNormalizer = dataArray.at(0)->at(columns - 1).x() - dataArray.at(0)->at(0).x();
+    float zRangeNormalizer = dataArray.at(rows - 1)->at(0).z() - dataArray.at(0)->at(0).z();
+    float xMin = dataArray.at(0)->at(0).x();
+    float zMin = dataArray.at(0)->at(0).z();
+
+    QVector<QVector2D> uvs;
+    uvs.resize(m_rows * m_columns * 2);
+    int index = 0;
+    int colLimit = m_columns - 1;
+    for (int i = 0; i < m_rows; i++) {
+        float y = (modelArray.at(i)->at(0).z() - zMin) / zRangeNormalizer;
+        const QSurfaceDataRow &p = *modelArray.at(i);
+        for (int j = 0; j < m_columns; j++) {
+            float x = (p.at(j).x() - xMin) / xRangeNormalizer;
+            uvs[index] = QVector2D(x, y);
+            index++;
+            if (j > 0 && j < colLimit) {
+                uvs[index] = uvs[index - 1];
+                index++;
+            }
+        }
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_uvTextureBuffer);
+    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
+                 &uvs.at(0), GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+    m_returnTextureBuffer = true;
+}
+
 void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex, bool polar)
 {
     int colLimit = m_columns - 1;
@@ -682,6 +752,17 @@ GLuint SurfaceObject::gridElementBuf()
     if (!m_meshDataLoaded)
         qFatal("No loaded object");
     return m_gridElementbuffer;
+}
+
+GLuint SurfaceObject::uvBuf()
+{
+    if (!m_meshDataLoaded)
+        qFatal("No loaded object");
+
+    if (m_returnTextureBuffer)
+        return m_uvTextureBuffer;
+    else
+        return m_uvbuffer;
 }
 
 GLuint SurfaceObject::gridIndexCount()
