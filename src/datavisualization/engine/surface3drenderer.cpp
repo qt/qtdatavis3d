@@ -2477,13 +2477,12 @@ void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a
 
 void Surface3DRenderer::calculateSceneScalingFactors()
 {
+    // Margin for background (0.10 make it 10% larger to avoid
+    // selection ball being drawn inside background)
+    m_hBackgroundMargin = 0.1f;
     if (m_polarGraph) {
         float polarMargin = calculatePolarBackgroundMargin();
         m_hBackgroundMargin = qMax(m_hBackgroundMargin, polarMargin);
-    } else {
-        // Margin for background (0.10 make it 10% larger to avoid
-        // selection ball being drawn inside background)
-        m_hBackgroundMargin = 0.1f;
     }
 
     // Calculate scene scaling and translation factors
