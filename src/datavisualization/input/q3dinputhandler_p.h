@@ -40,9 +40,15 @@ public:
     Q3DInputHandlerPrivate(Q3DInputHandler *q);
     ~Q3DInputHandlerPrivate();
 
-public:
+protected:
     Q3DInputHandler *q_ptr;
     QAbstract3DInputHandlerPrivate::InputState m_inputState;
+
+    bool m_rotationEnabled;
+    bool m_zoomEnabled;
+    bool m_selectionEnabled;
+
+    friend class Q3DInputHandler;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -66,6 +66,22 @@ const int maxZoomLevel = 500;
  *          \li Closes the secondary view.
  *          \note Secondary view is available only for Q3DBars and Q3DSurface graphs.
  * \endtable
+ *
+ * Rotation, zoom, and selection can each be individually disabled using
+ * corresponding Q3DInputHandler properties.
+ */
+
+/*!
+ * \qmltype TouchInputHandler3D
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.2
+ * \ingroup datavisualization_qml
+ * \instantiates QTouch3DInputHandler
+ * \brief Basic touch display based input handler.
+ *
+ * TouchInputHandler3D is the basic input handler for touch screen devices.
+ *
+ * See QTouch3DInputHandler documentation for more details.
  */
 
 /*!
@@ -104,29 +120,38 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
             // Flush input state
             d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateNone;
             if (scene()->isSlicingActive()) {
-                if (scene()->isPointInPrimarySubView(pointerPos.toPoint()))
-                    setInputView(InputViewOnPrimary);
-                else if (scene()->isPointInSecondarySubView(pointerPos.toPoint()))
-                    setInputView(InputViewOnSecondary);
-                else
-                    setInputView(InputViewNone);
+                if (isSelectionEnabled()) {
+                    if (scene()->isPointInPrimarySubView(pointerPos.toPoint()))
+                        setInputView(InputViewOnPrimary);
+                    else if (scene()->isPointInSecondarySubView(pointerPos.toPoint()))
+                        setInputView(InputViewOnSecondary);
+                    else
+                        setInputView(InputViewNone);
+                }
             } else {
                 // Handle possible tap-and-hold selection
-                d_ptr->m_startHoldPos = pointerPos;
-                d_ptr->m_touchHoldPos = d_ptr->m_startHoldPos;
-                d_ptr->m_holdTimer->start();
-                setInputView(InputViewOnPrimary);
+                if (isSelectionEnabled()) {
+                    d_ptr->m_startHoldPos = pointerPos;
+                    d_ptr->m_touchHoldPos = d_ptr->m_startHoldPos;
+                    d_ptr->m_holdTimer->start();
+                    setInputView(InputViewOnPrimary);
+                }
                 // Start rotating
-                d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateRotating;
-                setInputPosition(pointerPos.toPoint());
+                if (isRotationEnabled()) {
+                    d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateRotating;
+                    setInputPosition(pointerPos.toPoint());
+                    setInputView(InputViewOnPrimary);
+                }
             }
         } else if (event->type() == QEvent::TouchEnd) {
             setInputView(InputViewNone);
             d_ptr->m_holdTimer->stop();
             // Handle possible selection
             if (!scene()->isSlicingActive()
-                    && QAbstract3DInputHandlerPrivate::InputStatePinching != d_ptr->m_inputState)
+                    && QAbstract3DInputHandlerPrivate::InputStatePinching
+                    != d_ptr->m_inputState) {
                 d_ptr->handleSelection(pointerPos);
+            }
         } else if (event->type() == QEvent::TouchUpdate) {
             if (!scene()->isSlicingActive()) {
                 d_ptr->m_touchHoldPos = pointerPos;
@@ -158,52 +183,59 @@ QTouch3DInputHandlerPrivate::~QTouch3DInputHandlerPrivate()
 
 void QTouch3DInputHandlerPrivate::handlePinchZoom(float distance)
 {
-    int newDistance = distance;
-    int prevDist = q_ptr->prevDistance();
-    if (prevDist > 0 && qAbs(prevDist - newDistance) < maxPinchJitter)
-        return;
-    m_inputState = QAbstract3DInputHandlerPrivate::InputStatePinching;
-    Q3DCamera *camera = q_ptr->scene()->activeCamera();
-    int zoomLevel = camera->zoomLevel();
-    float zoomRate = qSqrt(qSqrt(zoomLevel));
-    if (newDistance > prevDist)
-        zoomLevel += zoomRate;
-    else
-        zoomLevel -= zoomRate;
-    if (zoomLevel > maxZoomLevel)
-        zoomLevel = maxZoomLevel;
-    else if (zoomLevel < minZoomLevel)
-        zoomLevel = minZoomLevel;
-    camera->setZoomLevel(zoomLevel);
-    q_ptr->setPrevDistance(newDistance);
+    if (q_ptr->isZoomEnabled()) {
+        int newDistance = distance;
+        int prevDist = q_ptr->prevDistance();
+        if (prevDist > 0 && qAbs(prevDist - newDistance) < maxPinchJitter)
+            return;
+        m_inputState = QAbstract3DInputHandlerPrivate::InputStatePinching;
+        Q3DCamera *camera = q_ptr->scene()->activeCamera();
+        int zoomLevel = camera->zoomLevel();
+        float zoomRate = qSqrt(qSqrt(zoomLevel));
+        if (newDistance > prevDist)
+            zoomLevel += zoomRate;
+        else
+            zoomLevel -= zoomRate;
+        if (zoomLevel > maxZoomLevel)
+            zoomLevel = maxZoomLevel;
+        else if (zoomLevel < minZoomLevel)
+            zoomLevel = minZoomLevel;
+        camera->setZoomLevel(zoomLevel);
+        q_ptr->setPrevDistance(newDistance);
+    }
 }
 
 void QTouch3DInputHandlerPrivate::handleTapAndHold()
 {
-    QPointF distance = m_startHoldPos - m_touchHoldPos;
-    if (distance.manhattanLength() < maxTapAndHoldJitter) {
-        q_ptr->setInputPosition(m_touchHoldPos.toPoint());
-        q_ptr->scene()->setSelectionQueryPosition(m_touchHoldPos.toPoint());
-        m_inputState = QAbstract3DInputHandlerPrivate::InputStateSelecting;
+    if (q_ptr->isSelectionEnabled()) {
+        QPointF distance = m_startHoldPos - m_touchHoldPos;
+        if (distance.manhattanLength() < maxTapAndHoldJitter) {
+            q_ptr->setInputPosition(m_touchHoldPos.toPoint());
+            q_ptr->scene()->setSelectionQueryPosition(m_touchHoldPos.toPoint());
+            m_inputState = QAbstract3DInputHandlerPrivate::InputStateSelecting;
+        }
     }
 }
 
 void QTouch3DInputHandlerPrivate::handleSelection(const QPointF &position)
 {
-    QPointF distance = m_startHoldPos - position;
-    if (distance.manhattanLength() < maxSelectionJitter) {
-        m_inputState = QAbstract3DInputHandlerPrivate::InputStateSelecting;
-        q_ptr->scene()->setSelectionQueryPosition(position.toPoint());
-    } else {
-        m_inputState = QAbstract3DInputHandlerPrivate::InputStateNone;
-        q_ptr->setInputView(QAbstract3DInputHandler::InputViewNone);
+    if (q_ptr->isSelectionEnabled()) {
+        QPointF distance = m_startHoldPos - position;
+        if (distance.manhattanLength() < maxSelectionJitter) {
+            m_inputState = QAbstract3DInputHandlerPrivate::InputStateSelecting;
+            q_ptr->scene()->setSelectionQueryPosition(position.toPoint());
+        } else {
+            m_inputState = QAbstract3DInputHandlerPrivate::InputStateNone;
+            q_ptr->setInputView(QAbstract3DInputHandler::InputViewNone);
+        }
+        q_ptr->setPreviousInputPos(position.toPoint());
     }
-    q_ptr->setPreviousInputPos(position.toPoint());
 }
 
 void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
 {
-    if (QAbstract3DInputHandlerPrivate::InputStateRotating == m_inputState) {
+    if (q_ptr->isRotationEnabled()
+            && QAbstract3DInputHandlerPrivate::InputStateRotating == m_inputState) {
         Q3DScene *scene = q_ptr->scene();
         Q3DCamera *camera = scene->activeCamera();
         float xRotation = camera->xRotation();

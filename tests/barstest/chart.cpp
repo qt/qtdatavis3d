@@ -203,7 +203,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_graph->activeTheme()->setFont(QFont("Times Roman", 20));
 
     // Release and store the default input handler.
-    m_defaultInputHandler = m_graph->activeInputHandler();
+    m_defaultInputHandler = static_cast<Q3DInputHandler *>(m_graph->activeInputHandler());
     m_graph->releaseInputHandler(m_defaultInputHandler);
     m_graph->setActiveInputHandler(m_defaultInputHandler);
 
@@ -1404,6 +1404,21 @@ void GraphModifier::testItemAndRowChanges()
 void GraphModifier::reverseValueAxis(int enabled)
 {
     m_graph->valueAxis()->setReversed(enabled);
+}
+
+void GraphModifier::setInputHandlerRotationEnabled(int enabled)
+{
+    m_defaultInputHandler->setRotationEnabled(enabled);
+}
+
+void GraphModifier::setInputHandlerZoomEnabled(int enabled)
+{
+    m_defaultInputHandler->setZoomEnabled(enabled);
+}
+
+void GraphModifier::setInputHandlerSelectionEnabled(int enabled)
+{
+    m_defaultInputHandler->setSelectionEnabled(enabled);
 }
 
 void GraphModifier::changeValueAxisSegments(int value)

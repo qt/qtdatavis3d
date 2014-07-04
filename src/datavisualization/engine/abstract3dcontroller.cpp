@@ -75,10 +75,6 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     inputHandler = new QTouch3DInputHandler();
     inputHandler->d_ptr->m_isDefaultHandler = true;
     setActiveInputHandler(inputHandler);
-    connect(inputHandler, &QAbstract3DInputHandler::inputViewChanged, this,
-            &Abstract3DController::handleInputViewChanged);
-    connect(inputHandler, &QAbstract3DInputHandler::positionChanged, this,
-            &Abstract3DController::handleInputPositionChanged);
     connect(m_scene->d_ptr.data(), &Q3DScenePrivate::needRender, this,
             &Abstract3DController::emitNeedRender);
 }
@@ -783,8 +779,9 @@ void Abstract3DController::setActiveInputHandler(QAbstract3DInputHandler *inputH
             m_inputHandlers.removeAll(m_activeInputHandler);
             delete m_activeInputHandler;
         } else {
-            // Disconnect the old input handler from the scene
+            // Disconnect the old input handler
             m_activeInputHandler->setScene(0);
+            QObject::disconnect(m_activeInputHandler, 0, this, 0);
         }
     }
 
@@ -795,6 +792,12 @@ void Abstract3DController::setActiveInputHandler(QAbstract3DInputHandler *inputH
     m_activeInputHandler = inputHandler;
     if (m_activeInputHandler)
         m_activeInputHandler->setScene(m_scene);
+
+    // Connect the input handler
+    QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::inputViewChanged, this,
+                     &Abstract3DController::handleInputViewChanged);
+    QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::positionChanged, this,
+                     &Abstract3DController::handleInputPositionChanged);
 
     // Notify change of input handler
     emit activeInputHandlerChanged(m_activeInputHandler);

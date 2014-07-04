@@ -61,6 +61,43 @@ const float rotationSpeed      = 100.0f;
  *          \li Closes the secondary view.
  *          \note Secondary view is available only for Q3DBars and Q3DSurface graphs.
  * \endtable
+ *
+ * Rotation, zoom, and selection can each be individually disabled using
+ * corresponding properties of this class.
+ */
+
+/*!
+ * \qmltype InputHandler3D
+ * \inqmlmodule QtDataVisualization
+ * \since QtDataVisualization 1.2
+ * \ingroup datavisualization_qml
+ * \instantiates Q3DInputHandler
+ * \brief Basic wheel mouse based input handler.
+ *
+ * InputHandler3D is the basic input handler for wheel mouse type of input devices.
+ *
+ * See Q3DInputHandler documentation for more details.
+ */
+
+/*!
+ * \qmlproperty bool InputHandler3D::rotationEnabled
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies if this input handler allows graph rotation.
+ */
+
+/*!
+ * \qmlproperty bool InputHandler3D::zoomEnabled
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies if this input handler allows graph zooming.
+ */
+
+/*!
+ * \qmlproperty bool InputHandler3D::selectionEnabled
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies if this input handler allows selection from the graph.
  */
 
 /*!
@@ -92,29 +129,35 @@ void Q3DInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mousePos
     Q_UNUSED(mousePos);
 #else
     if (Qt::LeftButton == event->button()) {
-        if (scene()->isSlicingActive()) {
-            if (scene()->isPointInPrimarySubView(mousePos))
+        if (isSelectionEnabled()) {
+            if (scene()->isSlicingActive()) {
+                if (scene()->isPointInPrimarySubView(mousePos))
+                    setInputView(InputViewOnPrimary);
+                else if (scene()->isPointInSecondarySubView(mousePos))
+                    setInputView(InputViewOnSecondary);
+                else
+                    setInputView(InputViewNone);
+            } else {
+                // update mouse positions to prevent jumping when releasing or repressing a button
+                setInputPosition(mousePos);
+                scene()->setSelectionQueryPosition(mousePos);
                 setInputView(InputViewOnPrimary);
-            else if (scene()->isPointInSecondarySubView(mousePos))
-                setInputView(InputViewOnSecondary);
-            else
-                setInputView(InputViewNone);
-        } else {
-            // update mouse positions to prevent jumping when releasing or repressing a button
-            setInputPosition(mousePos);
-            scene()->setSelectionQueryPosition(mousePos);
-            setInputView(InputViewOnPrimary);
-            d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateSelecting;
+                d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateSelecting;
+            }
         }
     } else if (Qt::MiddleButton == event->button()) {
-        // reset rotations
-        setInputPosition(QPoint(0, 0));
+        if (isRotationEnabled()) {
+            // reset rotations
+            setInputPosition(QPoint(0, 0));
+        }
     } else if (Qt::RightButton == event->button()) {
-        // disable rotating when in slice view
-        if (!scene()->isSlicingActive())
-            d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateRotating;
-        // update mouse positions to prevent jumping when releasing or repressing a button
-        setInputPosition(mousePos);
+        if (isRotationEnabled()) {
+            // disable rotating when in slice view
+            if (!scene()->isSlicingActive())
+                d_ptr->m_inputState = QAbstract3DInputHandlerPrivate::InputStateRotating;
+            // update mouse positions to prevent jumping when releasing or repressing a button
+            setInputPosition(mousePos);
+        }
     }
 #endif
 }
@@ -148,7 +191,8 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 #if defined(Q_OS_IOS)
     Q_UNUSED(mousePos);
 #else
-    if (QAbstract3DInputHandlerPrivate::InputStateRotating == d_ptr->m_inputState) {
+    if (QAbstract3DInputHandlerPrivate::InputStateRotating == d_ptr->m_inputState
+            && isRotationEnabled()) {
         // Calculate mouse movement since last frame
         float xRotation = scene()->activeCamera()->xRotation();
         float yRotation = scene()->activeCamera()->yRotation();
@@ -174,29 +218,91 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
  */
 void Q3DInputHandler::wheelEvent(QWheelEvent *event)
 {
-    // disable zooming if in slice view
-    if (scene()->isSlicingActive())
-        return;
+    if (isZoomEnabled()) {
+        // disable zooming if in slice view
+        if (scene()->isSlicingActive())
+            return;
 
-    // Adjust zoom level based on what zoom range we're in.
-    int zoomLevel = scene()->activeCamera()->zoomLevel();
-    if (zoomLevel > oneToOneZoomLevel)
-        zoomLevel += event->angleDelta().y() / nearZoomRangeDivider;
-    else if (zoomLevel > halfSizeZoomLevel)
-        zoomLevel += event->angleDelta().y() / midZoomRangeDivider;
-    else
-        zoomLevel += event->angleDelta().y() / farZoomRangeDivider;
-    if (zoomLevel > maxZoomLevel)
-        zoomLevel = maxZoomLevel;
-    else if (zoomLevel < minZoomLevel)
-        zoomLevel = minZoomLevel;
+        // Adjust zoom level based on what zoom range we're in.
+        int zoomLevel = scene()->activeCamera()->zoomLevel();
+        if (zoomLevel > oneToOneZoomLevel)
+            zoomLevel += event->angleDelta().y() / nearZoomRangeDivider;
+        else if (zoomLevel > halfSizeZoomLevel)
+            zoomLevel += event->angleDelta().y() / midZoomRangeDivider;
+        else
+            zoomLevel += event->angleDelta().y() / farZoomRangeDivider;
+        if (zoomLevel > maxZoomLevel)
+            zoomLevel = maxZoomLevel;
+        else if (zoomLevel < minZoomLevel)
+            zoomLevel = minZoomLevel;
 
-    scene()->activeCamera()->setZoomLevel(zoomLevel);
+        scene()->activeCamera()->setZoomLevel(zoomLevel);
+    }
+}
+
+/*!
+ * \property Q3DInputHandler::rotationEnabled
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies if this input handler allows graph rotation.
+ */
+void Q3DInputHandler::setRotationEnabled(bool enable)
+{
+    if (d_ptr->m_rotationEnabled != enable) {
+        d_ptr->m_rotationEnabled = enable;
+        emit rotationEnabledChanged(enable);
+    }
+}
+
+bool Q3DInputHandler::isRotationEnabled() const
+{
+    return d_ptr->m_rotationEnabled;
+}
+
+/*!
+ * \property Q3DInputHandler::zoomEnabled
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies if this input handler allows graph zooming.
+ */
+void Q3DInputHandler::setZoomEnabled(bool enable)
+{
+    if (d_ptr->m_zoomEnabled != enable) {
+        d_ptr->m_zoomEnabled = enable;
+        emit zoomEnabledChanged(enable);
+    }
+}
+
+bool Q3DInputHandler::isZoomEnabled() const
+{
+    return d_ptr->m_zoomEnabled;
+}
+
+/*!
+ * \property Q3DInputHandler::selectionEnabled
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies if this input handler allows selection from the graph.
+ */
+void Q3DInputHandler::setSelectionEnabled(bool enable)
+{
+    if (d_ptr->m_selectionEnabled != enable) {
+        d_ptr->m_selectionEnabled = enable;
+        emit selectionEnabledChanged(enable);
+    }
+}
+
+bool Q3DInputHandler::isSelectionEnabled() const
+{
+    return d_ptr->m_selectionEnabled;
 }
 
 Q3DInputHandlerPrivate::Q3DInputHandlerPrivate(Q3DInputHandler *q)
     : q_ptr(q),
-      m_inputState(QAbstract3DInputHandlerPrivate::InputStateNone)
+      m_inputState(QAbstract3DInputHandlerPrivate::InputStateNone),
+      m_rotationEnabled(true),
+      m_zoomEnabled(true),
+      m_selectionEnabled(true)
 {
 }
 

@@ -29,11 +29,8 @@
 
     Spectrogram is simply a surface graph with a range gradient used to emphasize the different
     values. Typically spectrograms are shown with two dimensional surfaces, which we simulate
-    with a top down orthographic view of the graph. In this example, the default input handler
-    is enabled, so you can also rotate the graph to see how it looks in three dimensions. In
-    a real application you may want to disable the default input handling if you wish to show
-    only the two dimensional graph. See \l{Qt Quick 2 Custom Input Example} for guidelines on
-    customizing input handling.
+    with a top down orthographic view of the graph. To enforce the 2D effect, we disable the
+    graph rotation via mouse or touch when in the orthographic mode.
 
     The focus in this example is on showing how to display spectrograms, so the basic
     functionality is not explained. For more detailed QML example documentation,
@@ -74,6 +71,19 @@
     offset for them:
 
     \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 4
+
+    To enforce the 2D effect, graph rotation via user input is disabled when in orthographic mode.
+    We do this by specifying a new input handler:
+
+    \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 5
+    \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 7
+    \dots 0
+    \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 6
+    \dots 0
+
+    When the projection mode changes, we adjust the value of the
+    \l{InputHandler3D::rotationEnabled}{rotationEnabled} property of the \c{customInputHandler}
+    to control the rotation.
 
     \section1 Example contents
 */

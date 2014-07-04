@@ -141,6 +141,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty string Surface3DSeries::textureFile
+ *
+ * Holds the texture file name for the surface texture. To clear the texture, set empty
+ * file name.
+ */
+
+
+/*!
  * \enum QSurface3DSeries::DrawFlag
  *
  * Drawing mode of the surface. Values of this enumeration can be combined with OR operator.
@@ -300,6 +308,8 @@ QSurface3DSeries::DrawFlags QSurface3DSeries::drawMode() const
 }
 
 /*!
+ * \property QSurface3DSeries::texture
+ *
  * Set the \a texture as a QImage for the surface. To clear the texture, set empty
  * QImage as texture.
  */
@@ -318,7 +328,8 @@ QImage QSurface3DSeries::texture() const
     return dptrc()->m_texture;
 }
 
-/*! \property QSurface3DSeries::textureFile
+/*!
+ * \property QSurface3DSeries::textureFile
  *
  * Holds the texture file name for the surface texture. To clear the texture, set empty
  * file name.

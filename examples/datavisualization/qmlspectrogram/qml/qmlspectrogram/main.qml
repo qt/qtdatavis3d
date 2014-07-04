@@ -53,7 +53,7 @@ Window {
         ValueAxis3D {
             id: xAxis
             segmentCount: 8
-            labelFormat: "%i"
+            labelFormat: "%i\u00B0"
             title: "Angle"
             titleVisible: true
             titleFixed: false
@@ -72,7 +72,7 @@ Window {
         ValueAxis3D {
             id: zAxis
             segmentCount: 5
-            labelFormat: "%i"
+            labelFormat: "%i nm"
             title: "Radius"
             titleVisible: true
             titleFixed: false
@@ -87,19 +87,32 @@ Window {
             backgroundEnabled: false
         }
 
+
+        //! [5]
+        TouchInputHandler3D {
+            id: customInputHandler
+            rotationEnabled: false
+        }
+        //! [5]
+
         //! [0]
+        //! [7]
         Surface3D {
+            //! [7]
             id: surfaceGraph
             width: surfaceView.width
             height: surfaceView.height
 
             shadowQuality: AbstractGraph3D.ShadowQualityNone
-            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
+            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndColumn
             axisX: xAxis
             axisY: yAxis
             axisZ: zAxis
 
             theme: customTheme
+            //! [6]
+            inputHandler: customInputHandler
+            //! [6]
 
             // Remove the perspective and view the graph from top down to achieve 2D effect
             //! [1]
@@ -124,6 +137,7 @@ Window {
                 drawMode: Surface3DSeries.DrawSurface
                 baseGradient: surfaceGradient
                 colorStyle: Theme3D.ColorStyleRangeGradient
+                itemLabelFormat: "(@xLabel, @zLabel): @yLabel"
 
                 ItemModelSurfaceDataProxy {
                     itemModel: surfaceData.model
@@ -172,6 +186,7 @@ Window {
                     xAxis.labelAutoRotation = 30
                     yAxis.labelAutoRotation = 30
                     zAxis.labelAutoRotation = 30
+                    customInputHandler.rotationEnabled = true
                     text = "Switch to orthographic"
                 } else {
                     surfaceGraph.orthoProjection = true;
@@ -180,6 +195,7 @@ Window {
                     xAxis.labelAutoRotation = 0
                     yAxis.labelAutoRotation = 0
                     zAxis.labelAutoRotation = 0
+                    customInputHandler.rotationEnabled = false
                     text = "Switch to perspective"
                 }
             }
@@ -238,7 +254,7 @@ Window {
         anchors.margins: 20
         anchors.bottom: parent.bottom
         anchors.top: buttonLayout.bottom
-        anchors.left: parent.left
+        anchors.right: parent.right
         border.color: "black"
         border.width: 1
         width: 50
@@ -254,21 +270,21 @@ Window {
 
     Text {
         anchors.verticalCenter: legend.bottom
-        anchors.left: legend.right
+        anchors.right: legend.left
         anchors.margins: 2
         text: surfaceGraph.axisY.min  + "%"
     }
 
     Text {
         anchors.verticalCenter: legend.verticalCenter
-        anchors.left: legend.right
+        anchors.right: legend.left
         anchors.margins: 2
         text: (surfaceGraph.axisY.max + surfaceGraph.axisY.min) / 2  + "%"
     }
 
     Text {
         anchors.verticalCenter: legend.top
-        anchors.left: legend.right
+        anchors.right: legend.left
         anchors.margins: 2
         text: surfaceGraph.axisY.max + "%"
     }

@@ -20,7 +20,7 @@
 #define CHARTMODIFIER_H
 
 #include <QtDataVisualization/q3dbars.h>
-#include <QtDataVisualization/qabstract3dinputhandler.h>
+#include <QtDataVisualization/q3dinputhandler.h>
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
@@ -94,6 +94,9 @@ public:
     void addRemoveSeries();
     void testItemAndRowChanges();
     void reverseValueAxis(int enabled);
+    void setInputHandlerRotationEnabled(int enabled);
+    void setInputHandlerZoomEnabled(int enabled);
+    void setInputHandlerSelectionEnabled(int enabled);
 
 public slots:
     void flipViews();
@@ -159,7 +162,7 @@ private:
     QValue3DAxis *m_currentAxis;
     bool m_negativeValuesOn;
     bool m_useNullInputHandler;
-    QAbstract3DInputHandler *m_defaultInputHandler;
+    Q3DInputHandler *m_defaultInputHandler;
     Q3DTheme *m_ownTheme;
     Q3DTheme *m_builtinTheme;
     QTimer m_insertRemoveTimer;
