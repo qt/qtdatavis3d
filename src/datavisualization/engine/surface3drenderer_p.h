@@ -144,7 +144,7 @@ private:
     void updateSelectionTextures();
     void createSelectionTexture(SurfaceSeriesRenderCache *cache, uint &lastSelectionId);
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
-    void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
+    void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a);
     void surfacePointSelected(const QPoint &point);
     void updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point, bool label);
     QPoint selectionIdToSurfacePoint(uint id);

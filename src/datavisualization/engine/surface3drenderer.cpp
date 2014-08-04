@@ -2389,11 +2389,12 @@ void Surface3DRenderer::updateSelectionTextures()
 void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
                                                uint &lastSelectionId)
 {
-    // Create the selection ID image. Each grid corner gets 2x2 pixel area of
-    // ID color so that each vertex (data point) has 4x4 pixel area of ID color
+    // Create the selection ID image. Each grid corner gets 1 pixel area of
+    // ID color so that each vertex (data point) has 2x2 pixel area of ID color,
+    // except the vertices on the edges.
     const QRect &sampleSpace = cache->sampleSpace();
-    int idImageWidth = (sampleSpace.width() - 1) * 4;
-    int idImageHeight = (sampleSpace.height() - 1) * 4;
+    int idImageWidth = (sampleSpace.width() - 1) * 2;
+    int idImageHeight = (sampleSpace.height() - 1) * 2;
 
     if (idImageHeight <= 0 || idImageWidth <= 0) {
         cache->setSelectionIdRange(-1, -1);
@@ -2405,21 +2406,21 @@ void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
 
     uint idStart = lastSelectionId;
     uchar *bits = new uchar[idImageWidth * idImageHeight * 4 * sizeof(uchar)];
-    for (int i = 0; i < idImageHeight; i += 4) {
-        for (int j = 0; j < idImageWidth; j += 4) {
+    for (int i = 0; i < idImageHeight; i += 2) {
+        for (int j = 0; j < idImageWidth; j += 2) {
             int p = (i * idImageWidth + j) * 4;
             uchar r, g, b, a;
             idToRGBA(lastSelectionId, &r, &g, &b, &a);
-            fillIdCorner(&bits[p], r, g, b, a, stride);
+            fillIdCorner(&bits[p], r, g, b, a);
 
             idToRGBA(lastSelectionId + 1, &r, &g, &b, &a);
-            fillIdCorner(&bits[p + 8], r, g, b, a, stride);
+            fillIdCorner(&bits[p + 4], r, g, b, a);
 
             idToRGBA(lastSelectionId + sampleSpace.width(), &r, &g, &b, &a);
-            fillIdCorner(&bits[p + 2 * stride], r, g, b, a, stride);
+            fillIdCorner(&bits[p + stride], r, g, b, a);
 
             idToRGBA(lastSelectionId + sampleSpace.width() + 1, &r, &g, &b, &a);
-            fillIdCorner(&bits[p + 2 * stride + 8], r, g, b, a, stride);
+            fillIdCorner(&bits[p + stride + 4], r, g, b, a);
 
             lastSelectionId++;
         }
@@ -2447,24 +2448,12 @@ void Surface3DRenderer::initSelectionBuffer()
                                                                        m_selectionDepthBuffer);
 }
 
-void Surface3DRenderer::fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride)
+void Surface3DRenderer::fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a)
 {
     p[0] = r;
     p[1] = g;
     p[2] = b;
     p[3] = a;
-    p[4] = r;
-    p[5] = g;
-    p[6] = b;
-    p[7] = a;
-    p[stride + 0] = r;
-    p[stride + 1] = g;
-    p[stride + 2] = b;
-    p[stride + 3] = a;
-    p[stride + 4] = r;
-    p[stride + 5] = g;
-    p[stride + 6] = b;
-    p[stride + 7] = a;
 }
 
 void Surface3DRenderer::idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a)
