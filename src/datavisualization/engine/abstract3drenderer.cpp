@@ -79,7 +79,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_xFlipRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -180.0f)),
       m_zFlipRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f)),
       m_vBackgroundMargin(0.1f),
-      m_hBackgroundMargin(0.1f)
+      m_hBackgroundMargin(0.1f),
+      m_oldCameraTarget(QVector3D(2000.0f, 2000.0f, 2000.0f)) // Just random invalid target
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,
@@ -220,16 +221,14 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
         handleResize();
     }
 
-    scene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
-    // Set light position (rotate light with activeCamera, a bit above it (as set in defaultLightPos))
-    scene->d_ptr->setLightPositionRelativeToCamera(defaultLightPos);
-
     QPoint logicalPixelPosition = scene->selectionQueryPosition();
     updateInputPosition(QPoint(logicalPixelPosition.x() * m_devicePixelRatio,
                                logicalPixelPosition.y() * m_devicePixelRatio));
 
     // Synchronize the renderer scene to controller scene
     scene->d_ptr->sync(*m_cachedScene->d_ptr);
+
+    updateCameraViewport();
 
     if (Q3DScene::invalidSelectionPoint() == logicalPixelPosition) {
         updateSelectionState(SelectNone);
@@ -316,7 +315,6 @@ void Abstract3DRenderer::updateAspectRatio(float ratio)
     m_graphAspectRatio = ratio;
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
-    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updateHorizontalAspectRatio(float ratio)
@@ -324,7 +322,6 @@ void Abstract3DRenderer::updateHorizontalAspectRatio(float ratio)
     m_graphHorizontalAspectRatio = ratio;
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
-    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updatePolar(bool enable)
@@ -332,7 +329,6 @@ void Abstract3DRenderer::updatePolar(bool enable)
     m_polarGraph = enable;
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
-    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updateRadialLabelOffset(float offset)
@@ -401,8 +397,6 @@ void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orient
 
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
-
-    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updateAxisSegmentCount(QAbstract3DAxis::AxisOrientation orientation,
@@ -431,8 +425,6 @@ void Abstract3DRenderer::updateAxisReversed(QAbstract3DAxis::AxisOrientation ori
     axisCacheForOrientation(orientation).setReversed(enable);
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
-
-    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation orientation,
@@ -449,8 +441,6 @@ void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation or
 
     foreach (SeriesRenderCache *cache, m_renderCacheList)
         cache->setDataDirty(true);
-
-    updateCustomItemPositions();
 }
 
 void Abstract3DRenderer::updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientation orientation,
@@ -1345,6 +1335,23 @@ float Abstract3DRenderer::calculatePolarBackgroundMargin()
     }
 
     return maxNeededMargin;
+}
+
+void Abstract3DRenderer::updateCameraViewport()
+{
+    QVector3D adjustedTarget = m_cachedScene->activeCamera()->target();
+    fixCameraTarget(adjustedTarget);
+    if (m_oldCameraTarget != adjustedTarget) {
+        QVector3D cameraBase = cameraDistanceVector + adjustedTarget;
+
+        m_cachedScene->activeCamera()->d_ptr->setBaseOrientation(cameraBase,
+                                                                 adjustedTarget,
+                                                                 upVector);
+        m_oldCameraTarget = adjustedTarget;
+    }
+    m_cachedScene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
+    // Set light position (i.e rotate light with activeCamera, a bit above it)
+    m_cachedScene->d_ptr->setLightPositionRelativeToCamera(defaultLightPos);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

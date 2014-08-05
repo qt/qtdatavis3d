@@ -66,7 +66,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_flatSupported(true),
       m_selectionActive(false),
       m_shadowQualityMultiplier(3),
-      m_hasHeightAdjustmentChanged(true),
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),
       m_selectedSeries(0),
       m_clickedPosition(Surface3DController::invalidSelectionPosition()),
@@ -150,6 +149,13 @@ void Surface3DRenderer::initializeOpenGL()
     QImage image(2, 2, QImage::Format_RGB32);
     image.fill(Qt::white);
     m_noShadowTexture = m_textureHelper->create2DTexture(image, false, true, false, true);
+}
+
+void Surface3DRenderer::fixCameraTarget(QVector3D &target)
+{
+    target.setX(target.x() * m_scaleX);
+    target.setY(target.y() * m_scaleY);
+    target.setZ(target.z() * -m_scaleZ);
 }
 
 void Surface3DRenderer::updateData()
@@ -693,15 +699,6 @@ QRect Surface3DRenderer::calculateSampleRect(const QSurfaceDataArray &array)
 
 void Surface3DRenderer::updateScene(Q3DScene *scene)
 {
-    // Set initial camera position
-    // X must be 0 for rotation to work - we can use "setCameraRotation" for setting it later
-    if (m_hasHeightAdjustmentChanged) {
-        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector, zeroVector,
-                                                         upVector);
-        // For now this is used just to make things once. Proper use will come
-        m_hasHeightAdjustmentChanged = false;
-    }
-
     Abstract3DRenderer::updateScene(scene);
 
     if (m_selectionActive
@@ -1111,7 +1108,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                     / activeCamera->zoomLevel() / m_autoScaleAdjustment * 100.0f;
             qreal cameraAngle = qreal(activeCamera->yRotation()) / 180.0 * M_PI;
             float cameraYPos = float(qSin(cameraAngle)) * distanceToCenter;
-            m_yFlippedForGrid = cameraYPos < (m_scaleYWithBackground);
+            m_yFlippedForGrid = cameraYPos < (m_scaleYWithBackground - m_oldCameraTarget.y());
         } else if (m_useOrthoProjection && activeCamera->yRotation() == 0.0f) {
             // With ortho we only need to flip at angle zero, to fix label autorotation angles
             m_yFlippedForGrid = !m_yFlipped;
@@ -2517,6 +2514,9 @@ void Surface3DRenderer::calculateSceneScalingFactors()
     m_axisCacheX.setTranslate(-m_scaleX);
     m_axisCacheY.setTranslate(-m_scaleY);
     m_axisCacheZ.setTranslate(m_scaleZ);
+
+    updateCameraViewport();
+    updateCustomItemPositions();
 }
 
 void Surface3DRenderer::checkFlatSupport(SurfaceSeriesRenderCache *cache)
@@ -2962,7 +2962,7 @@ QVector3D Surface3DRenderer::convertPositionToTranslation(const QVector3D &posit
     } else {
         xTrans = position.x() * m_scaleX;
         yTrans = position.y() * m_scaleY;
-        zTrans = position.z() * m_scaleZ;
+        zTrans = position.z() * -m_scaleZ;
     }
     return QVector3D(xTrans, yTrans, zTrans);
 }

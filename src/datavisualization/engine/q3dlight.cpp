@@ -68,13 +68,8 @@ Q3DLightPrivate::~Q3DLightPrivate()
 
 void Q3DLightPrivate::sync(Q3DLight &other)
 {
-    // Copies changed values from this light to the other light. If the other light had same changes,
-    // those changes are discarded.
-    if (q_ptr->isDirty()) {
-        other.copyValuesFrom(*q_ptr);
-        q_ptr->setDirty(false);
-        other.setDirty(false);
-    }
+    Q_UNUSED(other);
+    // Do nothing. Only value light has to sync is the position, which we handle internally.
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

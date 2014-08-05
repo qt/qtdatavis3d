@@ -137,6 +137,19 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty vector3d Camera3D::target
+ * \since QtDataVisualization 1.2
+ *
+ * Holds the camera \a target as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
+ *
+ * Valid coordinate values are between \c{-1.0...1.0}, where the edge values indicate
+ * the edges of the corresponding axis range. Any values outside this range are clamped to the edge.
+ *
+ * \note For bar graphs, the Y-coordinate is ignored and camera always targets a point on
+ * the horizontal background.
+ */
+
+/*!
  * Constructs a new 3D camera with position set to origin, up direction facing towards the Y-axis
  * and looking at origin by default. An optional \a parent parameter can be given and is then passed
  * to QObject constructor.
@@ -160,22 +173,11 @@ Q3DCamera::~Q3DCamera()
  */
 void Q3DCamera::copyValuesFrom(const Q3DObject &source)
 {
-    Q3DObject::copyValuesFrom(source);
+    // Note: Do not copy values from parent, as we are handling the position internally
 
     const Q3DCamera &sourceCamera = static_cast<const Q3DCamera &>(source);
 
-    d_ptr->m_target.setX(sourceCamera.d_ptr->m_target.x());
-    d_ptr->m_target.setY(sourceCamera.d_ptr->m_target.y());
-    d_ptr->m_target.setZ(sourceCamera.d_ptr->m_target.z());
-
-    d_ptr->m_up.setX(sourceCamera.d_ptr->m_up.x());
-    d_ptr->m_up.setY(sourceCamera.d_ptr->m_up.y());
-    d_ptr->m_up.setZ(sourceCamera.d_ptr->m_up.z());
-
-    float *values = new float[16];
-    sourceCamera.d_ptr->m_viewMatrix.copyDataTo(values);
-    d_ptr->m_viewMatrix = QMatrix4x4(values);
-    delete[] values;
+    d_ptr->m_requestedTarget = sourceCamera.d_ptr->m_requestedTarget;
 
     d_ptr->m_xRotation = sourceCamera.d_ptr->m_xRotation;
     d_ptr->m_yRotation = sourceCamera.d_ptr->m_yRotation;
@@ -469,6 +471,49 @@ void Q3DCamera::setCameraPosition(float horizontal, float vertical, float zoom)
     setYRotation(vertical);
 }
 
+/*!
+ * \property Q3DCamera::target
+ * \since QtDataVisualization 1.2
+ *
+ * Holds the camera \a target as a QVector3D. Defaults to \c {QVector3D(0.0, 0.0, 0.0)}.
+ *
+ * Valid coordinate values are between \c{-1.0...1.0}, where the edge values indicate
+ * the edges of the corresponding axis range. Any values outside this range are clamped to the edge.
+ *
+ * \note For bar graphs, the Y-coordinate is ignored and camera always targets a point on
+ * the horizontal background.
+ */
+QVector3D Q3DCamera::target() const
+{
+    return d_ptr->m_requestedTarget;
+}
+
+void Q3DCamera::setTarget(const QVector3D &target)
+{
+    QVector3D newTarget = target;
+
+    if (newTarget.x() < -1.0f)
+        newTarget.setX(-1.0f);
+    else if (newTarget.x() > 1.0f)
+        newTarget.setX(1.0f);
+
+    if (newTarget.y() < -1.0f)
+        newTarget.setY(-1.0f);
+    else if (newTarget.y() > 1.0f)
+        newTarget.setY(1.0f);
+
+    if (newTarget.z() < -1.0f)
+        newTarget.setZ(-1.0f);
+    else if (newTarget.z() > 1.0f)
+        newTarget.setZ(1.0f);
+
+    if (d_ptr->m_requestedTarget != newTarget) {
+        d_ptr->m_requestedTarget = newTarget;
+        setDirty(true);
+        emit targetChanged(newTarget);
+    }
+}
+
 Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     q_ptr(q),
     m_isViewMatrixUpdateActive(true),
@@ -645,9 +690,9 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     QMatrix4x4 viewMatrix;
 
     // Apply to view matrix
-    viewMatrix.lookAt(q_ptr->position(), m_target, m_up);
+    viewMatrix.lookAt(q_ptr->position(), m_actualTarget, m_up);
     // Compensate for translation (if d_ptr->m_target is off origin)
-    viewMatrix.translate(m_target.x(), m_target.y(), m_target.z());
+    viewMatrix.translate(m_actualTarget.x(), m_actualTarget.y(), m_actualTarget.z());
     // Apply rotations
     // Handle x and z rotation when y -angle is other than 0
     viewMatrix.rotate(m_xRotation, 0, qCos(qDegreesToRadians(m_yRotation)),
@@ -657,7 +702,7 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     // handle zoom by scaling
     viewMatrix.scale(zoom / 100.0f);
     // Compensate for translation (if d_ptr->m_target is off origin)
-    viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
+    viewMatrix.translate(-m_actualTarget.x(), -m_actualTarget.y(), -m_actualTarget.z());
 
     setViewMatrix(viewMatrix);
 }
@@ -713,9 +758,9 @@ void Q3DCameraPrivate::setBaseOrientation(const QVector3D &basePosition,
                                           const QVector3D &target,
                                           const QVector3D &baseUp)
 {
-    if (q_ptr->position() != basePosition || m_target != target || m_up != baseUp) {
+    if (q_ptr->position() != basePosition || m_actualTarget != target || m_up != baseUp) {
         q_ptr->setPosition(basePosition);
-        m_target = target;
+        m_actualTarget = target;
         m_up = baseUp;
         q_ptr->setDirty(true);
     }

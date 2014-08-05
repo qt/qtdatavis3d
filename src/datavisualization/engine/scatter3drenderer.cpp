@@ -67,7 +67,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_selectedSeriesCache(0),
       m_oldSelectedSeriesCache(0),
       m_dotSizeScale(1.0f),
-      m_hasHeightAdjustmentChanged(true),
       m_maxItemSize(0.0f),
       m_clickedIndex(Scatter3DController::invalidSelectionIndex()),
       m_havePointSeries(false),
@@ -131,6 +130,13 @@ void Scatter3DRenderer::initializeOpenGL()
 
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
+}
+
+void Scatter3DRenderer::fixCameraTarget(QVector3D &target)
+{
+    target.setX(target.x() * m_scaleX);
+    target.setY(target.y() * m_scaleY);
+    target.setZ(target.z() * -m_scaleZ);
 }
 
 void Scatter3DRenderer::updateData()
@@ -283,13 +289,6 @@ void Scatter3DRenderer::updateItems(const QVector<Scatter3DController::ChangeIte
 void Scatter3DRenderer::updateScene(Q3DScene *scene)
 {
     scene->activeCamera()->d_ptr->setMinYRotation(-90.0f);
-
-    if (m_hasHeightAdjustmentChanged) {
-        // Set initial camera position. Also update if height adjustment has changed.
-        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector, zeroVector,
-                                                         upVector);
-        m_hasHeightAdjustmentChanged = false;
-    }
 
     Abstract3DRenderer::updateScene(scene);
 }
@@ -2066,6 +2065,9 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
     m_axisCacheX.setTranslate(-m_scaleX);
     m_axisCacheY.setTranslate(-m_scaleY);
     m_axisCacheZ.setTranslate(m_scaleZ);
+
+    updateCameraViewport();
+    updateCustomItemPositions();
 }
 
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
@@ -2252,7 +2254,7 @@ QVector3D Scatter3DRenderer::convertPositionToTranslation(const QVector3D &posit
     } else {
         xTrans = position.x() * m_scaleX;
         yTrans = position.y() * m_scaleY;
-        zTrans = position.z() * m_scaleZ;
+        zTrans = position.z() * -m_scaleZ;
     }
     return QVector3D(xTrans, yTrans, zTrans);
 }

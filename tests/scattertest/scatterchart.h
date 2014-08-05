@@ -98,6 +98,9 @@ public slots:
     void togglePolar(bool enable);
     void toggleStatic(bool enable);
     void toggleOrtho(bool enable);
+    void setCameraTargetX(int value);
+    void setCameraTargetY(int value);
+    void setCameraTargetZ(int value);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -118,6 +121,8 @@ private:
     QScatter3DSeries *m_targetSeries;
     QScatterDataArray m_massiveTestCacheArray;
     QLabel *m_fpsLabel;
+    QVector3D m_cameraTarget;
+
 };
 
 #endif

@@ -114,12 +114,10 @@ void Bars3DController::synchDataToRenderer()
         m_changeTracker.selectedBarChanged = false;
     }
 
-    if (needSceneUpdate) {
-        // Since scene is updated before axis updates are handled,
-        // do another render pass for scene update
-        m_scene->d_ptr->m_sceneDirty = true;
-        emitNeedRender();
-    }
+    // Since scene is updated before axis updates are handled, do another render pass to
+    // properly update controller side camera limits.
+    if (needSceneUpdate)
+        m_scene->d_ptr->markDirty();
 }
 
 void Bars3DController::handleArrayReset()

@@ -331,6 +331,22 @@ int main(int argc, char **argv)
     valueAxisSegmentsSpin->setMaximum(100);
     valueAxisSegmentsSpin->setValue(10);
 
+    QSlider *cameraTargetSliderX = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderX->setTickInterval(1);
+    cameraTargetSliderX->setMinimum(-100);
+    cameraTargetSliderX->setValue(0);
+    cameraTargetSliderX->setMaximum(100);
+    QSlider *cameraTargetSliderY = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderY->setTickInterval(1);
+    cameraTargetSliderY->setMinimum(-100);
+    cameraTargetSliderY->setValue(0);
+    cameraTargetSliderY->setMaximum(100);
+    QSlider *cameraTargetSliderZ = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderZ->setTickInterval(1);
+    cameraTargetSliderZ->setMinimum(-100);
+    cameraTargetSliderZ->setValue(0);
+    cameraTargetSliderZ->setMaximum(100);
+
     vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(addDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addMultiDataButton, 0, Qt::AlignTop);
@@ -400,7 +416,11 @@ int main(int argc, char **argv)
     vLayout3->addWidget(new QLabel(QStringLiteral("Log axis base")), 0, Qt::AlignTop);
     vLayout3->addWidget(logBaseEdit, 0, Qt::AlignTop);
     vLayout3->addWidget(new QLabel(QStringLiteral("Value axis segments")), 0, Qt::AlignTop);
-    vLayout3->addWidget(valueAxisSegmentsSpin, 1, Qt::AlignTop);
+    vLayout3->addWidget(valueAxisSegmentsSpin, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Camera target")), 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderX, 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderY, 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderZ, 1, Qt::AlignTop);
     // TODO: Add example for setMeshFileName
 
     widget->show();
@@ -429,6 +449,12 @@ int main(int argc, char **argv)
                      &GraphModifier::setMinY);
     QObject::connect(maxSliderY, &QSlider::valueChanged, modifier,
                      &GraphModifier::setMaxY);
+    QObject::connect(cameraTargetSliderX, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetX);
+    QObject::connect(cameraTargetSliderY, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetY);
+    QObject::connect(cameraTargetSliderZ, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetZ);
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));

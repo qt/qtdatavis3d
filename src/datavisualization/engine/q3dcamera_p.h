@@ -84,7 +84,7 @@ signals:
 public:
     Q3DCamera *q_ptr;
 
-    QVector3D m_target;
+    QVector3D m_actualTarget;
     QVector3D m_up;
 
     QMatrix4x4 m_viewMatrix;
@@ -100,6 +100,7 @@ public:
     bool m_wrapXRotation;
     bool m_wrapYRotation;
     Q3DCamera::CameraPreset m_activePreset;
+    QVector3D m_requestedTarget;
 
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;

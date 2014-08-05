@@ -41,6 +41,7 @@ int main(int argc, char **argv)
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
     QVBoxLayout *vLayout2 = new QVBoxLayout();
+    QVBoxLayout *vLayout3 = new QVBoxLayout();
 
     Q3DScatter *chart = new Q3DScatter();
     QSize screenSize = chart->screen()->size();
@@ -56,6 +57,7 @@ int main(int argc, char **argv)
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
+    hLayout->addLayout(vLayout3);
 
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
@@ -276,6 +278,22 @@ int main(int argc, char **argv)
     radialLabelSlider->setValue(100);
     radialLabelSlider->setMaximum(150);
 
+    QSlider *cameraTargetSliderX = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderX->setTickInterval(1);
+    cameraTargetSliderX->setMinimum(-100);
+    cameraTargetSliderX->setValue(0);
+    cameraTargetSliderX->setMaximum(100);
+    QSlider *cameraTargetSliderY = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderY->setTickInterval(1);
+    cameraTargetSliderY->setMinimum(-100);
+    cameraTargetSliderY->setValue(0);
+    cameraTargetSliderY->setMaximum(100);
+    QSlider *cameraTargetSliderZ = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderZ->setTickInterval(1);
+    cameraTargetSliderZ->setMinimum(-100);
+    cameraTargetSliderZ->setValue(0);
+    cameraTargetSliderZ->setMaximum(100);
+
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -326,15 +344,20 @@ int main(int argc, char **argv)
     vLayout2->addWidget(aspectRatioSlider);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust horizontal aspect ratio")));
     vLayout2->addWidget(horizontalAspectRatioSlider, 1, Qt::AlignTop);
-    vLayout2->addWidget(optimizationStaticCB);
-    vLayout2->addWidget(orthoCB);
-    vLayout2->addWidget(polarCB);
-    vLayout2->addWidget(axisTitlesVisibleCB);
-    vLayout2->addWidget(axisTitlesFixedCB);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
-    vLayout2->addWidget(axisLabelRotationSlider);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Radial label offset")));
-    vLayout2->addWidget(radialLabelSlider, 1, Qt::AlignTop);
+
+    vLayout3->addWidget(optimizationStaticCB);
+    vLayout3->addWidget(orthoCB);
+    vLayout3->addWidget(polarCB);
+    vLayout3->addWidget(axisTitlesVisibleCB);
+    vLayout3->addWidget(axisTitlesFixedCB);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
+    vLayout3->addWidget(axisLabelRotationSlider);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Radial label offset")));
+    vLayout3->addWidget(radialLabelSlider, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Camera target")), 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderX, 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderY, 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderZ, 1, Qt::AlignTop);
 
     ScatterDataModifier *modifier = new ScatterDataModifier(chart);
 
@@ -440,6 +463,12 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::setHorizontalAspectRatio);
     QObject::connect(radialLabelSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::changeRadialLabelOffset);
+    QObject::connect(cameraTargetSliderX, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setCameraTargetX);
+    QObject::connect(cameraTargetSliderY, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setCameraTargetY);
+    QObject::connect(cameraTargetSliderZ, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setCameraTargetZ);
 
     modifier->setFpsLabel(fpsLabel);
 

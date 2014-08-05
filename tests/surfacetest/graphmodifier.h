@@ -133,6 +133,9 @@ public slots:
     void toggleXAscending(bool enabled);
     void toggleZAscending(bool enabled);
     void togglePolar(bool enabled);
+    void setCameraTargetX(int value);
+    void setCameraTargetY(int value);
+    void setCameraTargetZ(int value);
 
 private:
     void fillSeries();
@@ -186,6 +189,7 @@ private:
     float m_multiSampleOffsetX[4];
     float m_multiSampleOffsetZ[4];
     QSurfaceDataArray m_massiveTestCacheArray;
+    QVector3D m_cameraTarget;
 };
 
 #endif

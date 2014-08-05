@@ -85,7 +85,6 @@ private:
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
     QPoint m_visualSelectedBarPos;
-    bool m_resetCameraBaseOrientation;
     QPoint m_selectedBarPos;
     BarSeriesRenderCache *m_selectedSeriesCache;
     BarRenderItem m_dummyBarRenderItem;
@@ -99,6 +98,8 @@ private:
     bool m_haveUniformColorSeries;
     bool m_haveGradientSeries;
     float m_zeroPosition;
+    float m_xScaleFactor;
+    float m_zScaleFactor;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
@@ -118,6 +119,7 @@ public:
 
 protected:
     virtual void initializeOpenGL();
+    virtual void fixCameraTarget(QVector3D &target);
 
 public slots:
     void updateMultiSeriesScaling(bool uniform);
@@ -145,16 +147,14 @@ private:
     void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
     void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
-                    const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
-                    GLfloat rowScaleFactor, GLfloat columnScaleFactor);
+                    const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
 
 #ifdef USE_REFLECTIONS
     bool drawBars(BarRenderItem **selectedBar, const QMatrix4x4 &depthProjectionViewMatrix,
                   const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
                   GLint startRow, GLint stopRow, GLint stepRow,
                   GLint startBar, GLint stopBar, GLint stepBar, GLfloat reflection = 1.0f);
-    void drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
-                        GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
+    void drawBackground(GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
                         const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
                         GLfloat reflection = 1.0f);
 #else
@@ -162,12 +162,10 @@ private:
                   const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
                   GLint startRow, GLint stopRow, GLint stepRow,
                   GLint startBar, GLint stopBar, GLint stepBar);
-    void drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
-                        GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
+    void drawBackground(GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
                         const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix);
 #endif
-    void drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
-                       const QMatrix4x4 &depthProjectionViewMatrix,
+    void drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
                        const QMatrix4x4 &projectionViewMatrix,
                        const QMatrix4x4 &viewMatrix);
 

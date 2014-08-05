@@ -649,4 +649,10 @@ void Q3DScenePrivate::setLightPositionRelativeToCamera(const QVector3D &relative
                                                                             distanceModifier));
 }
 
+void Q3DScenePrivate::markDirty()
+{
+    m_sceneDirty = true;
+    emit needRender();
+}
+
 QT_END_NAMESPACE_DATAVISUALIZATION

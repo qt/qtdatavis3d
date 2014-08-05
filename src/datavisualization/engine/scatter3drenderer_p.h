@@ -77,7 +77,6 @@ private:
     ScatterSeriesRenderCache *m_selectedSeriesCache;
     ScatterSeriesRenderCache *m_oldSelectedSeriesCache;
     GLfloat m_dotSizeScale;
-    bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
     GLfloat m_maxItemSize;
     int m_clickedIndex;
@@ -112,6 +111,7 @@ public slots:
 
 protected:
     virtual void initializeOpenGL();
+    virtual void fixCameraTarget(QVector3D &target);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);

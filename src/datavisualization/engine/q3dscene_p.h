@@ -89,6 +89,8 @@ public:
                                           float fixedRotation = 0.0f,
                                           float distanceModifier = 0.0f);
 
+    void markDirty();
+
 signals:
     void needRender();
 

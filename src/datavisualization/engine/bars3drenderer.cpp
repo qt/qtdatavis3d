@@ -65,7 +65,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_scaleFactor(0),
       m_maxSceneSize(40.0f),
       m_visualSelectedBarPos(Bars3DController::invalidSelectionPosition()),
-      m_resetCameraBaseOrientation(true),
       m_selectedBarPos(Bars3DController::invalidSelectionPosition()),
       m_selectedSeriesCache(0),
       m_noZeroInRange(false),
@@ -77,7 +76,9 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_keepSeriesUniform(false),
       m_haveUniformColorSeries(false),
       m_haveGradientSeries(false),
-      m_zeroPosition(0.0f)
+      m_zeroPosition(0.0f),
+      m_xScaleFactor(1.0f),
+      m_zScaleFactor(1.0f)
 {
     m_axisCacheY.setScale(2.0f);
     m_axisCacheY.setTranslate(-1.0f);
@@ -130,6 +131,13 @@ void Bars3DRenderer::initializeOpenGL()
     loadBackgroundMesh();
 }
 
+void Bars3DRenderer::fixCameraTarget(QVector3D &target)
+{
+    target.setX(target.x() * m_xScaleFactor);
+    target.setY(0.0f);
+    target.setZ(target.z() * -m_zScaleFactor);
+}
+
 void Bars3DRenderer::updateData()
 {
     int minRow = m_axisCacheZ.min();
@@ -161,9 +169,9 @@ void Bars3DRenderer::updateData()
         GLfloat sceneRatio = qMin(GLfloat(newColumns) / GLfloat(newRows),
                                   GLfloat(newRows) / GLfloat(newColumns));
         m_maxSceneSize = 2.0f * qSqrt(sceneRatio * newColumns * newRows);
-        // Calculate here and at setting bar specs
-        calculateSceneScalingFactors();
     }
+
+    calculateSceneScalingFactors();
 
     m_zeroPosition = m_axisCacheY.formatter()->positionAt(0.0f);
 
@@ -386,14 +394,6 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
             scene->activeCamera()->d_ptr->setMinYRotation(0.0f);
             scene->activeCamera()->d_ptr->setMaxYRotation(90.0);
         }
-    }
-
-    if (m_resetCameraBaseOrientation) {
-        // Set initial camera position. Also update if height adjustment has changed.
-        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector,
-                                                         zeroVector,
-                                                         upVector);
-        m_resetCameraBaseOrientation = false;
     }
 
     Abstract3DRenderer::updateScene(scene);
@@ -986,9 +986,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
-    GLfloat rowScaleFactor = m_rowWidth / m_scaleFactor;
-    GLfloat columnScaleFactor = m_columnDepth / m_scaleFactor;
-
     BarRenderItem *selectedBar(0);
 
 #if !defined(QT_OPENGL_ES_2)
@@ -1185,8 +1182,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         Abstract3DRenderer::drawCustomItems(RenderingSelection, m_selectionShader, viewMatrix,
                                             projectionViewMatrix, depthProjectionViewMatrix,
                                             m_depthTexture, m_shadowQualityToShader);
-        drawLabels(true, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
-                   columnScaleFactor);
+        drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
         glEnable(GL_DITHER);
 
         // Read color under cursor
@@ -1216,8 +1212,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
 
     // Draw background stencil
-    drawBackground(rowScaleFactor, columnScaleFactor, backgroundRotation,
-                   depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
+    drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
 
     glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
     glEnable(GL_DEPTH_TEST);
@@ -1255,12 +1250,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 #ifdef USE_REFLECTIONS
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    drawBackground(rowScaleFactor, columnScaleFactor, backgroundRotation,
-                   depthProjectionViewMatrix, projectionViewMatrix, viewMatrix, 0.5f);
+    drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix, viewMatrix,
+                   0.5f);
     glDisable(GL_BLEND);
 #else
-    drawBackground(rowScaleFactor, columnScaleFactor, backgroundRotation,
-                   depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
+    drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
 #endif
 
     // Draw bars
@@ -1270,8 +1264,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                       startBar, stopBar, stepBar);
 
     // Draw grid lines
-    drawGridLines(rowScaleFactor, columnScaleFactor, depthProjectionViewMatrix,
-                  projectionViewMatrix, viewMatrix);
+    drawGridLines(depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
 
     // Draw custom items
     Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
@@ -1279,8 +1272,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                         m_depthTexture, m_shadowQualityToShader);
 
     // Draw labels
-    drawLabels(false, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
-               columnScaleFactor);
+    drawLabels(false, activeCamera, viewMatrix, projectionMatrix);
 
     // Handle selected bar label generation
     if (barSelectionFound) {
@@ -1657,14 +1649,12 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
 }
 
 #ifdef USE_REFLECTIONS
-void Bars3DRenderer::drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
-                                    GLfloat backgroundRotation,
+void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
                                     const QMatrix4x4 &depthProjectionViewMatrix,
                                     const QMatrix4x4 &projectionViewMatrix,
                                     const QMatrix4x4 &viewMatrix, GLfloat reflection)
 #else
-void Bars3DRenderer::drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
-                                    GLfloat backgroundRotation,
+void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
                                     const QMatrix4x4 &depthProjectionViewMatrix,
                                     const QMatrix4x4 &projectionViewMatrix,
                                     const QMatrix4x4 &viewMatrix)
@@ -1683,7 +1673,7 @@ void Bars3DRenderer::drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleF
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        QVector3D backgroundScaler(rowScaleFactor, 1.0f, columnScaleFactor);
+        QVector3D backgroundScaler(m_xScaleFactor, 1.0f, m_zScaleFactor);
         QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 #ifdef USE_REFLECTIONS
         backgroundColor.setW(backgroundColor.w() * reflection);
@@ -1787,8 +1777,7 @@ void Bars3DRenderer::drawBackground(GLfloat rowScaleFactor, GLfloat columnScaleF
     }
 }
 
-void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFactor,
-                                   const QMatrix4x4 &depthProjectionViewMatrix,
+void Bars3DRenderer::drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
                                    const QMatrix4x4 &projectionViewMatrix,
                                    const QMatrix4x4 &viewMatrix)
 {
@@ -1832,7 +1821,7 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
         if (m_yFlipped)
             yFloorLinePosition = -yFloorLinePosition;
 
-        QVector3D gridLineScaler(rowScaleFactor, gridLineWidth, gridLineWidth);
+        QVector3D gridLineScaler(m_xScaleFactor, gridLineWidth, gridLineWidth);
 
         if (m_yFlipped)
             lineRotation = m_xRightAngleRotation;
@@ -1881,7 +1870,7 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
 #if defined(QT_OPENGL_ES_2)
         lineRotation = m_yRightAngleRotation;
 #endif
-        gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, columnScaleFactor);
+        gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, m_zScaleFactor);
         for (GLfloat bar = 0.0f; bar <= m_cachedColumnCount; bar++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -1923,11 +1912,11 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
             // Wall lines: back wall
             int gridLineCount = m_axisCacheY.gridLineCount();
 
-            GLfloat zWallLinePosition = -columnScaleFactor + gridLineOffset;
+            GLfloat zWallLinePosition = -m_zScaleFactor + gridLineOffset;
             if (m_zFlipped)
                 zWallLinePosition = -zWallLinePosition;
 
-            gridLineScaler = QVector3D(rowScaleFactor, gridLineWidth, gridLineWidth);
+            gridLineScaler = QVector3D(m_xScaleFactor, gridLineWidth, gridLineWidth);
             for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
@@ -1968,7 +1957,7 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
             }
 
             // Wall lines: side wall
-            GLfloat xWallLinePosition = -rowScaleFactor + gridLineOffset;
+            GLfloat xWallLinePosition = -m_xScaleFactor + gridLineOffset;
             if (m_xFlipped)
                 xWallLinePosition = -xWallLinePosition;
 
@@ -1977,7 +1966,7 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
             else
                 lineRotation = m_yRightAngleRotation;
 
-            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, columnScaleFactor);
+            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, m_zScaleFactor);
             for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
@@ -2019,8 +2008,7 @@ void Bars3DRenderer::drawGridLines(GLfloat rowScaleFactor, GLfloat columnScaleFa
 }
 
 void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
-                                const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
-                                GLfloat rowScaleFactor, GLfloat columnScaleFactor) {
+                                const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix) {
     ShaderHelper *shader = 0;
     GLfloat alphaForValueSelection = labelValueAlpha / 255.0f;
     GLfloat alphaForRowSelection = labelRowAlpha / 255.0f;
@@ -2052,8 +2040,8 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     int labelCount = m_axisCacheY.labelCount();
     GLfloat labelMarginXTrans = labelMargin;
     GLfloat labelMarginZTrans = labelMargin;
-    GLfloat labelXTrans = rowScaleFactor;
-    GLfloat labelZTrans = columnScaleFactor;
+    GLfloat labelXTrans = m_xScaleFactor;
+    GLfloat labelZTrans = m_zScaleFactor;
     QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
     QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
     Qt::AlignmentFlag backAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
@@ -2157,8 +2145,8 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     fractionCamY = activeCamera->yRotation() * labelAngleFraction;
     fractionCamX = activeCamera->xRotation() * labelAngleFraction;
     GLfloat labelYAdjustment = 0.005f;
-    GLfloat scaledRowWidth = rowScaleFactor;
-    GLfloat scaledColumnDepth = columnScaleFactor;
+    GLfloat scaledRowWidth = m_xScaleFactor;
+    GLfloat scaledColumnDepth = m_zScaleFactor;
     GLfloat colPosValue = scaledRowWidth + labelMargin;
     GLfloat rowPosValue = scaledColumnDepth + labelMargin;
     GLfloat rowPos = 0.0f;
@@ -2580,8 +2568,17 @@ void Bars3DRenderer::calculateSceneScalingFactors()
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);
     m_scaleFactor = qMin((m_cachedColumnCount * (m_maxDimension / m_maxSceneSize)),
                          (m_cachedRowCount * (m_maxDimension / m_maxSceneSize)));
+
+    // Single bar scaling
     m_scaleX = m_cachedBarThickness.width() / m_scaleFactor;
     m_scaleZ = m_cachedBarThickness.height() / m_scaleFactor;
+
+    // Whole graph scale factors
+    m_xScaleFactor = m_rowWidth / m_scaleFactor;
+    m_zScaleFactor = m_columnDepth / m_scaleFactor;
+
+    updateCameraViewport();
+    updateCustomItemPositions();
 }
 
 void Bars3DRenderer::calculateHeightAdjustment()
@@ -2815,9 +2812,9 @@ QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position
                 / m_scaleFactor;
         yTrans = m_axisCacheY.positionAt(position.y());
     } else {
-        xTrans = position.x() * m_scaleX;
+        xTrans = position.x() * m_xScaleFactor;
         yTrans = position.y() + m_backgroundAdjustment;
-        zTrans = position.z() * m_scaleZ;
+        zTrans = position.z() * -m_zScaleFactor;
     }
     return QVector3D(xTrans, yTrans, zTrans);
 }

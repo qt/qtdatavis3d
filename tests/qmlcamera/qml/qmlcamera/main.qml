@@ -18,7 +18,7 @@
 
 import QtQuick 2.1
 import QtQuick.Controls 1.0
-import QtDataVisualization 1.1
+import QtDataVisualization 1.2
 import "."
 
 Rectangle {
@@ -33,6 +33,15 @@ Rectangle {
 
     Axes {
         id: chartAxes
+    }
+
+    Camera3D {
+        id: customCamera
+        wrapXRotation: false
+        xRotation: camControlArea.xValue
+        yRotation: camControlArea.yValue
+        zoomLevel: zoomSlider.value
+        target: Qt.vector3d(1.0, 1.0, 1.0)
     }
 
     Item {
@@ -60,21 +69,18 @@ Rectangle {
             columnAxis: chartAxes.column
             valueAxis: chartAxes.expenses
 
-            // Bind UI controls to the camera
-            scene.activeCamera.wrapXRotation: false
-            scene.activeCamera.xRotation: camControlArea.xValue
-            scene.activeCamera.yRotation: camControlArea.yValue
-            scene.activeCamera.zoomLevel: zoomSlider.value
+            scene.activeCamera: customCamera
             inputHandler: null
 
             customItemList: [shuttleItem, labelItem]
+            orthoProjection: true
         }
 
         Custom3DItem {
             id: shuttleItem
             meshFile: ":/items/shuttle.obj"
             textureFile: ":/items/shuttle.png"
-            position: Qt.vector3d(5.0,29.0,3.0)
+            position: Qt.vector3d(2.0,29.0,2.0)
             scaling: Qt.vector3d(0.2,0.2,0.2)
         }
 
@@ -82,7 +88,7 @@ Rectangle {
             id: labelItem
             facingCamera: true
             positionAbsolute: true
-            position: Qt.vector3d(0.0,1.5,0.0)
+            position: Qt.vector3d(-1.0,1.5,-1.0)
             scaling: Qt.vector3d(1.0,1.0,1.0)
             text: "Qt Shuttle"
         }
@@ -162,6 +168,11 @@ Rectangle {
             currentAngle += 5
             chartData.series.meshAngle = currentAngle
             shuttleItem.setRotationAxisAndAngle(Qt.vector3d(0.0, 1.0, 1.0), currentAngle)
+            console.log("label pos:", labelItem.position)
+            labelItem.position.x += 0.1
+            labelItem.position.z += 0.1
+            customCamera.target.x -= 0.1
+            customCamera.target.z -= 0.1
         }
     }
 

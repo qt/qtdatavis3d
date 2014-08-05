@@ -793,6 +793,30 @@ void GraphModifier::togglePolar(bool enabled)
     m_graph->setPolar(enabled);
 }
 
+void GraphModifier::setCameraTargetX(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setX(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void GraphModifier::setCameraTargetY(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setY(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void GraphModifier::setCameraTargetZ(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setZ(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);

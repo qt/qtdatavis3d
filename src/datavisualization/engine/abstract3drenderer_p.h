@@ -207,6 +207,8 @@ protected:
                          const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &depthMatrix);
 
     float calculatePolarBackgroundMargin();
+    virtual void fixCameraTarget(QVector3D &target) = 0;
+    void updateCameraViewport();
 
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
@@ -273,6 +275,8 @@ protected:
 
     float m_vBackgroundMargin;
     float m_hBackgroundMargin;
+
+    QVector3D m_oldCameraTarget;
 
 private:
     friend class Abstract3DController;

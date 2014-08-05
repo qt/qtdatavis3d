@@ -993,6 +993,30 @@ void ScatterDataModifier::toggleOrtho(bool enable)
     m_chart->setOrthoProjection(enable);
 }
 
+void ScatterDataModifier::setCameraTargetX(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setX(float(value) / 100.0f);
+    m_chart->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void ScatterDataModifier::setCameraTargetY(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setY(float(value) / 100.0f);
+    m_chart->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void ScatterDataModifier::setCameraTargetZ(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setZ(float(value) / 100.0f);
+    m_chart->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);

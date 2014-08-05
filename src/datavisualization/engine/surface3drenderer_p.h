@@ -75,7 +75,6 @@ private:
     bool m_selectionActive;
     AbstractRenderItem m_dummyRenderItem;
     GLint m_shadowQualityMultiplier;
-    bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedPoint;
     QSurface3DSeries *m_selectedSeries;
     QPoint m_clickedPosition;
@@ -111,6 +110,7 @@ public:
 
 protected:
     void initializeOpenGL();
+    virtual void fixCameraTarget(QVector3D &target);
 
 signals:
     void flatShadingSupportedChanged(bool supported);

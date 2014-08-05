@@ -118,6 +118,9 @@ public slots:
     void triggerRotation();
     void handleValueAxisLabelsChanged();
     void handleFpsChange(qreal fps);
+    void setCameraTargetX(int value);
+    void setCameraTargetY(int value);
+    void setCameraTargetZ(int value);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -172,6 +175,7 @@ private:
     QTimer m_rotationTimer;
     QLabel *m_fpsLabel;
     QBar3DSeries *m_extraSeries;
+    QVector3D m_cameraTarget;
 };
 
 #endif
