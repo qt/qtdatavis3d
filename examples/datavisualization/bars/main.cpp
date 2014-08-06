@@ -84,6 +84,9 @@ int main(int argc, char **argv)
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
 
+    QPushButton *zoomToSelectedButton = new QPushButton(widget);
+    zoomToSelectedButton->setText(QStringLiteral("Zoom to selected bar"));
+
     QComboBox *selectionModeList = new QComboBox(widget);
     selectionModeList->addItem(QStringLiteral("None"),
                                int(QAbstract3DGraph::SelectionNone));
@@ -206,6 +209,7 @@ int main(int argc, char **argv)
     //! [5]
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
+    vLayout->addWidget(zoomToSelectedButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(smoothCheckBox);
@@ -243,6 +247,8 @@ int main(int argc, char **argv)
                      &GraphModifier::changeLabelBackground);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changePresetCamera);
+    QObject::connect(zoomToSelectedButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::zoomToSelectedBar);
 
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setBackgroundEnabled);

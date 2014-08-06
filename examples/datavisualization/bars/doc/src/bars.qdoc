@@ -188,6 +188,30 @@
     You can use the same method with \c SelectionSlice and \c SelectionItem flags, as long as
     you have either \c SelectionRow or \c SelectionColumn set as well.
 
+    \section1 Zooming to selection
+
+    As an example of adjusting camera target we have implemented an animation of zooming to
+    selection via a button press. Animation initializations are done in the constructor:
+
+    \snippet bars/graphmodifier.cpp 12
+
+    The function \c{GraphModifier::zoomToSelectedBar()} contains the rest of the functionality:
+
+    \snippet bars/graphmodifier.cpp 11
+
+    The QPropertyAnimation \c m_animationCameraTarget targets Q3DCamera::target property,
+    which takes a value normalized to the range (-1, 1). We figure out where the selected bar
+    is relative to axes, and use that as the end value for \c{m_animationCameraTarget}:
+
+    \snippet bars/graphmodifier.cpp 13
+    \dots
+    \snippet bars/graphmodifier.cpp 14
+
+    Likewise, we want to angle the camera so that it always points approximately to the center of
+    the graph at the end of the animation:
+
+    \snippet bars/graphmodifier.cpp 15
+
     \section1 Example contents
 
 */
