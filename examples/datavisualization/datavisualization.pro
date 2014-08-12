@@ -20,7 +20,8 @@ SUBDIRS += qmlbars \
                surface \
                rotations \
                draggableaxes \
-               customitems
+               customitems \
+               texturesurface
 }
 
 qtHaveModule(multimedia):!android:!ios: SUBDIRS += audiolevels
