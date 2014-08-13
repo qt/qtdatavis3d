@@ -44,6 +44,11 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     m_graph->axisX()->setLabelAutoRotation(30);
     m_graph->axisY()->setLabelAutoRotation(90);
     m_graph->axisZ()->setLabelAutoRotation(30);
+    m_graph->activeTheme()->setType(Q3DTheme::ThemeStoneMoss);
+
+    QFont font = m_graph->activeTheme()->font();
+    font.setPointSize(20);
+    m_graph->activeTheme()->setFont(font);
 
     m_topography = new TopographicSeries();
     m_topography->setTopographyFile(":/maps/topography", areaWidth, areaHeight);
