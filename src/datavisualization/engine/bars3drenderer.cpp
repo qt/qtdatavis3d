@@ -1093,9 +1093,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
 
-        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
-                                            projectionViewMatrix, depthProjectionViewMatrix,
-                                            m_depthTexture, m_shadowQualityToShader);
+        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, m_volumeTextureShader,
+                                            m_volumeTextureSliceShader, viewMatrix,
+                                            projectionViewMatrix,
+                                            depthProjectionViewMatrix, m_depthTexture,
+                                            m_shadowQualityToShader);
 
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -1179,7 +1181,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
         glCullFace(GL_BACK);
-        Abstract3DRenderer::drawCustomItems(RenderingSelection, m_selectionShader, viewMatrix,
+        Abstract3DRenderer::drawCustomItems(RenderingSelection, m_selectionShader,
+                                            m_volumeTextureShader, m_volumeTextureSliceShader,
+                                            viewMatrix,
                                             projectionViewMatrix, depthProjectionViewMatrix,
                                             m_depthTexture, m_shadowQualityToShader);
         drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
@@ -1267,7 +1271,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     drawGridLines(depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
 
     // Draw custom items
-    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
+    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, m_volumeTextureShader,
+                                        m_volumeTextureSliceShader, viewMatrix,
                                         projectionViewMatrix, depthProjectionViewMatrix,
                                         m_depthTexture, m_shadowQualityToShader);
 

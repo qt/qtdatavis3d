@@ -31,6 +31,8 @@
 
 #include "abstractrenderitem_p.h"
 #include "objecthelper_p.h"
+#include <QtGui/QRgb>
+#include <QtGui/QImage>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -69,6 +71,28 @@ public:
     inline bool isFacingCamera() const { return m_isFacingCamera; }
     inline void setRenderer(Abstract3DRenderer *renderer) { m_renderer = renderer; }
 
+    // Volume specific
+    inline void setTextureWidth(int width) { m_textureWidth = width; }
+    inline int textureWidth() const { return m_textureWidth; }
+    inline void setTextureHeight(int height) { m_textureHeight = height; }
+    inline int textureHeight() const { return m_textureHeight; }
+    inline void setTextureDepth(int depth) { m_textureDepth = depth; }
+    inline int textureDepth() const { return m_textureDepth; }
+    inline int textureSize() const { return m_textureWidth * m_textureHeight * m_textureDepth; }
+    inline void setColorTable(const QVector<QVector4D> &colors) { m_colorTable = colors; }
+    void setColorTable(const QVector<QRgb> &colors);
+    inline const QVector<QVector4D> &colorTable() const { return m_colorTable; }
+    inline void setVolume(bool volume) { m_isVolume = volume; }
+    inline bool isVolume() const { return m_isVolume; }
+    inline void setTextureFormat(QImage::Format format) { m_textureFormat = format; }
+    inline QImage::Format textureFormat() const { return m_textureFormat; }
+    inline void setSliceIndexX(int index) { m_sliceIndexX = index; }
+    inline void setSliceIndexY(int index) { m_sliceIndexY = index; }
+    inline void setSliceIndexZ(int index) { m_sliceIndexZ = index; }
+    int sliceIndexX() const { return m_sliceIndexX; }
+    int sliceIndexY() const { return m_sliceIndexY; }
+    int sliceIndexZ() const { return m_sliceIndexZ; }
+
 private:
     Q_DISABLE_COPY(CustomRenderItem)
 
@@ -85,6 +109,17 @@ private:
     bool m_isFacingCamera;
     QCustom3DItem *m_item;
     Abstract3DRenderer *m_renderer;
+
+    // Volume specific
+    int m_textureWidth;
+    int m_textureHeight;
+    int m_textureDepth;
+    QVector<QVector4D> m_colorTable;
+    bool m_isVolume;
+    QImage::Format m_textureFormat;
+    int m_sliceIndexX;
+    int m_sliceIndexY;
+    int m_sliceIndexZ;
 };
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 

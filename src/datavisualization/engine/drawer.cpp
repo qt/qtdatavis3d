@@ -93,8 +93,11 @@ QFont Drawer::font() const
 }
 
 void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId,
-                        GLuint depthTextureId)
+                        GLuint depthTextureId, GLuint textureId3D)
 {
+#if defined(QT_OPENGL_ES_2)
+    Q_UNUSED(textureId3D)
+#endif
     if (textureId) {
         // Activate texture
         glActiveTexture(GL_TEXTURE0);
@@ -108,6 +111,14 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
         glBindTexture(GL_TEXTURE_2D, depthTextureId);
         shader->setUniformValue(shader->shadow(), 1);
     }
+#if !defined(QT_OPENGL_ES_2)
+    if (textureId3D) {
+        // Activate texture
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, textureId3D);
+        shader->setUniformValue(shader->texture(), 2);
+    }
+#endif
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(shader->posAtt());
@@ -139,6 +150,12 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glDisableVertexAttribArray(shader->posAtt());
 
     // Release textures
+#if !defined(QT_OPENGL_ES_2)
+    if (textureId3D) {
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, 0);
+    }
+#endif
     if (depthTextureId) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, 0);

@@ -93,6 +93,10 @@ void ShaderHelper::initialize()
     m_gradientMinUniform = m_program->uniformLocation("gradMin");
     m_gradientHeightUniform = m_program->uniformLocation("gradHeight");
     m_lightColorUniform = m_program->uniformLocation("lightColor");
+    m_volumeSliceIndices = m_program->uniformLocation("volumeSliceIndices");
+    m_colorIndex = m_program->uniformLocation("colorIndex");
+    m_cameraPositionRelativeToModel = m_program->uniformLocation("cameraPositionRelativeToModel");
+    m_color8Bit = m_program->uniformLocation("color8Bit");
     m_initialized = true;
 }
 
@@ -148,6 +152,11 @@ void ShaderHelper::setUniformValue(GLuint uniform, GLfloat value)
 void ShaderHelper::setUniformValue(GLuint uniform, GLint value)
 {
     m_program->setUniformValue(uniform, value);
+}
+
+void ShaderHelper::setUniformValueArray(GLuint uniform, const QVector4D *values, int count)
+{
+    m_program->setUniformValueArray(uniform, values, count);
 }
 
 GLuint ShaderHelper::MVP()
@@ -253,6 +262,34 @@ GLuint ShaderHelper::lightColor()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_lightColorUniform;
+}
+
+GLuint ShaderHelper::volumeSliceIndices()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_volumeSliceIndices;
+}
+
+GLuint ShaderHelper::colorIndex()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_colorIndex;
+}
+
+GLuint ShaderHelper::cameraPositionRelativeToModel()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_cameraPositionRelativeToModel;
+}
+
+GLuint ShaderHelper::color8Bit()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_color8Bit;
 }
 
 GLuint ShaderHelper::posAtt()

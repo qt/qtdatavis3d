@@ -373,7 +373,8 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q) :
     m_rotation(QQuaternion(0.0f, 0.0f, 0.0f, 0.0f)),
     m_visible(true),
     m_shadowCasting(true),
-    m_isLabelItem(false)
+    m_isLabelItem(false),
+    m_isVolumeItem(false)
 {
 }
 
@@ -388,7 +389,8 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, const QString &mesh
     m_rotation(rotation),
     m_visible(true),
     m_shadowCasting(true),
-    m_isLabelItem(false)
+    m_isLabelItem(false),
+    m_isVolumeItem(false)
 {
 }
 

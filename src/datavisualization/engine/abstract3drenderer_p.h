@@ -94,6 +94,9 @@ public:
                                        const QString &fragmentShader) = 0;
     virtual void initCustomItemShaders(const QString &vertexShader,
                                        const QString &fragmentShader);
+    virtual void initVolumeTextureShaders(const QString &vertexShader,
+                                          const QString &fragmentShader,
+                                          const QString &sliceShader);
     virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
                                 QAbstract3DAxis::AxisType type);
     virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation,
@@ -145,13 +148,15 @@ public:
     QString &selectionLabel();
 
 #ifdef USE_REFLECTIONS
-    void drawCustomItems(RenderingState state, ShaderHelper *shader,
+    void drawCustomItems(RenderingState state, ShaderHelper *regularShader,
+                         ShaderHelper *volumeShader, ShaderHelper *volumeSliceShader,
                          const QMatrix4x4 &viewMatrix,
                          const QMatrix4x4 &projectionViewMatrix,
                          const QMatrix4x4 &depthProjectionViewMatrix,
                          GLuint depthTexture, GLfloat shadowQuality, GLfloat reflection = 1.0f);
 #else
-    void drawCustomItems(RenderingState state, ShaderHelper *shader,
+    void drawCustomItems(RenderingState state, ShaderHelper *regularShader,
+                         ShaderHelper *volumeShader, ShaderHelper *volumeSliceShader,
                          const QMatrix4x4 &viewMatrix,
                          const QMatrix4x4 &projectionViewMatrix,
                          const QMatrix4x4 &depthProjectionViewMatrix,
@@ -247,6 +252,8 @@ protected:
     int m_visibleSeriesCount;
 
     ShaderHelper *m_customItemShader;
+    ShaderHelper *m_volumeTextureShader;
+    ShaderHelper *m_volumeTextureSliceShader;
 
     bool m_useOrthoProjection;
     bool m_xFlipped;

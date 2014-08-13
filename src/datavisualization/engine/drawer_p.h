@@ -75,7 +75,7 @@ public:
     inline GLfloat scaledFontSize() const { return m_scaledFontSize; }
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
-                    GLuint depthTextureId = 0);
+                    GLuint depthTextureId = 0, GLuint textureId3D = 0);
     void drawSelectionObject(ShaderHelper *shader, AbstractObjectHelper *object);
     void drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object);
     void drawPoint(ShaderHelper *shader);

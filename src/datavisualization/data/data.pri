@@ -41,7 +41,9 @@ HEADERS += \
     $$PWD/qcustom3ditem.h \
     $$PWD/qcustom3ditem_p.h \
     $$PWD/qcustom3dlabel.h \
-    $$PWD/qcustom3dlabel_p.h
+    $$PWD/qcustom3dlabel_p.h \
+    $$PWD/qcustom3dvolume.h \
+    $$PWD/qcustom3dvolume_p.h
 
 SOURCES += \
     $$PWD/labelitem.cpp \
@@ -69,6 +71,7 @@ SOURCES += \
     $$PWD/qsurface3dseries.cpp \
     $$PWD/customrenderitem.cpp \
     $$PWD/qcustom3ditem.cpp \
-    $$PWD/qcustom3dlabel.cpp
+    $$PWD/qcustom3dlabel.cpp \
+    $$PWD/qcustom3dvolume.cpp
 
 INCLUDEPATH += $$PWD

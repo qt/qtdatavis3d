@@ -57,6 +57,7 @@ class ShaderHelper
     void setUniformValue(GLuint uniform, const QMatrix4x4 &value);
     void setUniformValue(GLuint uniform, GLfloat value);
     void setUniformValue(GLuint uniform, GLint value);
+    void setUniformValueArray(GLuint uniform,  const QVector4D *values, int count);
 
     GLuint MVP();
     GLuint view();
@@ -73,6 +74,10 @@ class ShaderHelper
     GLuint gradientMin();
     GLuint gradientHeight();
     GLuint lightColor();
+    GLuint volumeSliceIndices();
+    GLuint colorIndex();
+    GLuint cameraPositionRelativeToModel();
+    GLuint color8Bit();
 
     GLuint posAtt();
     GLuint uvAtt();
@@ -107,6 +112,10 @@ class ShaderHelper
     GLuint m_gradientMinUniform;
     GLuint m_gradientHeightUniform;
     GLuint m_lightColorUniform;
+    GLuint m_volumeSliceIndices;
+    GLuint m_colorIndex;
+    GLuint m_cameraPositionRelativeToModel;
+    GLuint m_color8Bit;
 
     GLboolean m_initialized;
 };

@@ -82,6 +82,7 @@ public:
     bool m_shadowCasting;
 
     bool m_isLabelItem;
+    bool m_isVolumeItem;
 
     QCustomItemDirtyBitField m_dirtyBits;
 

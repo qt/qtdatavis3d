@@ -21,11 +21,25 @@
 
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
+#include <QtCore/QTime>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+// Defined in shaderhelper.cpp
+extern void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+
 TextureHelper::TextureHelper()
 {
+#if !defined(QT_OPENGL_ES_2)
+    // Discard warnings about deprecated functions
+    QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
+
+    m_openGlFunctions_2_1 = new QOpenGLFunctions_2_1;
+    m_openGlFunctions_2_1->initializeOpenGLFunctions();
+
+    // Restore original message handler
+    qInstallMessageHandler(handler);
+#endif
     initializeOpenGLFunctions();
 }
 
@@ -73,8 +87,54 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     if (clampY)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
+
     return textureId;
 }
+
+#if !defined(QT_OPENGL_ES_2)
+GLuint TextureHelper::create3DTexture(const QVector<uchar> *data, int width, int height, int depth,
+                                      QImage::Format dataFormat)
+{
+    if (!width || !height || !depth)
+        return 0;
+
+    glEnable(GL_TEXTURE_3D);
+
+    GLuint textureId;
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_3D, textureId);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    GLenum status = glGetError();
+    // glGetError docs advise to call glGetError in loop to clear all error flags
+    while (status)
+        status = glGetError();
+
+    GLint internalFormat = 4;
+    GLint format = GL_BGRA;
+    if (dataFormat == QImage::Format_Indexed8) {
+        internalFormat = 1;
+        format = GL_RED;
+        // Align width to 32bits
+        width = width + width % 4;
+    }
+    m_openGlFunctions_2_1->glTexImage3D(GL_TEXTURE_3D, 0, internalFormat, width, height, depth, 0,
+                                        format, GL_UNSIGNED_BYTE, data->constData());
+
+    status = glGetError();
+    if (status)
+        qWarning() << __FUNCTION__ << "3D texture creation failed:" << status;
+
+    glBindTexture(GL_TEXTURE_3D, 0);
+    glDisable(GL_TEXTURE_3D);
+
+    return textureId;
+}
+#endif
 
 GLuint TextureHelper::createCubeMapTexture(const QImage &image, bool useTrilinearFiltering)
 {

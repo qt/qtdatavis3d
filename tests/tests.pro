@@ -16,7 +16,8 @@ SUBDIRS += barstest \
            directional \
            qmlmultiwindow \
            itemmodeltest \
-           qmlmultitest
+           qmlmultitest \
+           volumetrictest
 
 #SUBDIRS += kinectsurface
 

@@ -24,6 +24,7 @@
 #include "shaderhelper_p.h"
 #include "qcustom3ditem_p.h"
 #include "qcustom3dlabel_p.h"
+#include "qcustom3dvolume_p.h"
 
 #include <QtCore/qmath.h>
 
@@ -57,6 +58,8 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_selectionLabelItem(0),
       m_visibleSeriesCount(0),
       m_customItemShader(0),
+      m_volumeTextureShader(0),
+      m_volumeTextureSliceShader(0),
       m_useOrthoProjection(false),
       m_xFlipped(false),
       m_yFlipped(false),
@@ -96,6 +99,8 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_cachedTheme;
     delete m_selectionLabelItem;
     delete m_customItemShader;
+    delete m_volumeTextureShader;
+    delete m_volumeTextureSliceShader;
 
     foreach (SeriesRenderCache *cache, m_renderCacheList) {
         cache->cleanup(m_textureHelper);
@@ -196,6 +201,20 @@ void Abstract3DRenderer::initCustomItemShaders(const QString &vertexShader,
     m_customItemShader->initialize();
 }
 
+void Abstract3DRenderer::initVolumeTextureShaders(const QString &vertexShader,
+                                                  const QString &fragmentShader,
+                                                  const QString &sliceShader)
+{
+    if (m_volumeTextureShader)
+        delete m_volumeTextureShader;
+    m_volumeTextureShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_volumeTextureShader->initialize();
+    if (m_volumeTextureSliceShader)
+        delete m_volumeTextureSliceShader;
+    m_volumeTextureSliceShader = new ShaderHelper(this, vertexShader, sliceShader);
+    m_volumeTextureSliceShader->initialize();
+}
+
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 {
     // Synchronize the controller theme with renderer
@@ -279,6 +298,9 @@ void Abstract3DRenderer::reInitShaders()
         initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
                               QStringLiteral(":/shaders/fragmentTexture"));
     }
+    initVolumeTextureShaders(QStringLiteral(":/shaders/vertexTexture3D"),
+                             QStringLiteral(":/shaders/fragmentTexture3D"),
+                             QStringLiteral(":/shaders/fragmentTexture3DSlice"));
 #else
     initGradientShaders(QStringLiteral(":/shaders/vertex"),
                         QStringLiteral(":/shaders/fragmentColorOnYES2"));
@@ -906,6 +928,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     QVector3D scaling = item->scaling();
     QImage textureImage = item->d_ptr->textureImage();
     bool facingCamera = false;
+    GLuint texture;
     if (item->d_ptr->m_isLabelItem) {
         QCustom3DLabel *labelItem = static_cast<QCustom3DLabel *>(item);
         float pointSize = labelItem->font().pointSizeF();
@@ -925,13 +948,39 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         scaling.setY(scaling.y() * textureImage.height() * scaledFontSize);
         // Check if facing camera
         facingCamera = labelItem->isFacingCamera();
+#if !defined(QT_OPENGL_ES_2)
+    } else if (item->d_ptr->m_isVolumeItem) {
+        QCustom3DVolume *volumeItem = static_cast<QCustom3DVolume *>(item);
+        newItem->setTextureWidth(volumeItem->textureWidth());
+        newItem->setTextureHeight(volumeItem->textureHeight());
+        newItem->setTextureDepth(volumeItem->textureDepth());
+        if (volumeItem->textureFormat() == QImage::Format_Indexed8)
+            newItem->setColorTable(volumeItem->colorTable());
+        newItem->setTextureFormat(volumeItem->textureFormat());
+        newItem->setVolume(true);
+        newItem->setBlendNeeded(true);
+        texture = m_textureHelper->create3DTexture(volumeItem->textureData(),
+                                                   volumeItem->textureWidth(),
+                                                   volumeItem->textureHeight(),
+                                                   volumeItem->textureDepth(),
+                                                   volumeItem->textureFormat());
+        newItem->setSliceIndexX(volumeItem->sliceIndexX());
+        newItem->setSliceIndexY(volumeItem->sliceIndexY());
+        newItem->setSliceIndexZ(volumeItem->sliceIndexZ());
+#endif
     }
     newItem->setScaling(scaling);
     newItem->setRotation(item->rotation());
     newItem->setPosition(item->position());
     newItem->setPositionAbsolute(item->isPositionAbsolute());
-    newItem->setBlendNeeded(textureImage.hasAlphaChannel());
-    GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
+#if !defined(QT_OPENGL_ES_2)
+    // In OpenGL ES we simply draw volumes as regular custom item placeholders.
+    if (!item->d_ptr->m_isVolumeItem)
+#endif
+    {
+        newItem->setBlendNeeded(textureImage.hasAlphaChannel());
+        texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
+    }
     newItem->setTexture(texture);
     item->d_ptr->clearTextureImage();
     QVector3D translation = convertPositionToTranslation(item->position(),
@@ -996,12 +1045,17 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
                                                       m_cachedTheme->isLabelBorderEnabled());
                 textureImage = item->d_ptr->textureImage();
             }
+        } else
+#if !defined(QT_OPENGL_ES_2)
+            if (!item->d_ptr->m_isVolumeItem)
+#endif
+        {
+            renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
+            GLuint oldTexture = renderItem->texture();
+            m_textureHelper->deleteTexture(&oldTexture);
+            GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
+            renderItem->setTexture(texture);
         }
-        renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
-        GLuint oldTexture = renderItem->texture();
-        m_textureHelper->deleteTexture(&oldTexture);
-        GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
-        renderItem->setTexture(texture);
         item->d_ptr->clearTextureImage();
         item->d_ptr->m_dirtyBits.textureDirty = false;
     }
@@ -1028,6 +1082,39 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             renderItem->setFacingCamera(labelItem->isFacingCamera());
             labelItem->dptr()->m_facingCameraDirty = false;
         }
+#if !defined(QT_OPENGL_ES_2)
+    } else if (item->d_ptr->m_isVolumeItem) {
+        QCustom3DVolume *volumeItem = static_cast<QCustom3DVolume *>(item);
+        if (volumeItem->dptr()->m_dirtyBitsVolume.colorTableDirty) {
+            renderItem->setColorTable(volumeItem->colorTable());
+            volumeItem->dptr()->m_dirtyBitsVolume.colorTableDirty = false;
+        }
+        if (volumeItem->dptr()->m_dirtyBitsVolume.textureDimensionsDirty
+                || volumeItem->dptr()->m_dirtyBitsVolume.textureDataDirty
+                || volumeItem->dptr()->m_dirtyBitsVolume.textureFormatDirty) {
+            GLuint oldTexture = renderItem->texture();
+            m_textureHelper->deleteTexture(&oldTexture);
+            GLuint texture = m_textureHelper->create3DTexture(volumeItem->textureData(),
+                                                       volumeItem->textureWidth(),
+                                                       volumeItem->textureHeight(),
+                                                       volumeItem->textureDepth(),
+                                                       volumeItem->textureFormat());
+            renderItem->setTexture(texture);
+            renderItem->setTextureWidth(volumeItem->textureWidth());
+            renderItem->setTextureHeight(volumeItem->textureHeight());
+            renderItem->setTextureDepth(volumeItem->textureDepth());
+            renderItem->setTextureFormat(volumeItem->textureFormat());
+            volumeItem->dptr()->m_dirtyBitsVolume.textureDimensionsDirty = false;
+            volumeItem->dptr()->m_dirtyBitsVolume.textureDataDirty = false;
+            volumeItem->dptr()->m_dirtyBitsVolume.textureFormatDirty = false;
+        }
+        if (volumeItem->dptr()->m_dirtyBitsVolume.sliceIndicesDirty) {
+            renderItem->setSliceIndexX(volumeItem->sliceIndexX());
+            renderItem->setSliceIndexY(volumeItem->sliceIndexY());
+            renderItem->setSliceIndexZ(volumeItem->sliceIndexZ());
+            volumeItem->dptr()->m_dirtyBitsVolume.sliceIndicesDirty = false;
+        }
+#endif
     }
 }
 
@@ -1042,7 +1129,9 @@ void Abstract3DRenderer::updateCustomItemPositions()
 
 #ifdef USE_REFLECTIONS
 void Abstract3DRenderer::drawCustomItems(RenderingState state,
-                                         ShaderHelper *shader,
+                                         ShaderHelper *regularShader,
+                                         ShaderHelper *volumeShader,
+                                         ShaderHelper *volumeSliceShader,
                                          const QMatrix4x4 &viewMatrix,
                                          const QMatrix4x4 &projectionViewMatrix,
                                          const QMatrix4x4 &depthProjectionViewMatrix,
@@ -1051,7 +1140,9 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          GLfloat reflection)
 #else
 void Abstract3DRenderer::drawCustomItems(RenderingState state,
-                                         ShaderHelper *shader,
+                                         ShaderHelper *regularShader,
+                                         ShaderHelper *volumeShader,
+                                         ShaderHelper *volumeSliceShader,
                                          const QMatrix4x4 &viewMatrix,
                                          const QMatrix4x4 &projectionViewMatrix,
                                          const QMatrix4x4 &depthProjectionViewMatrix,
@@ -1059,11 +1150,17 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          GLfloat shadowQuality)
 #endif
 {
+#if defined(QT_OPENGL_ES_2)
+    Q_UNUSED(volumeShader)
+    Q_UNUSED(volumeSliceShader)
+#endif
     if (m_customRenderCache.isEmpty())
         return;
 
+    ShaderHelper *shader = regularShader;
+    shader->bind();
+
     if (RenderingNormal == state) {
-        shader->bind();
         shader->setUniformValue(shader->lightP(), m_cachedScene->activeLight()->position());
         shader->setUniformValue(shader->ambientS(), m_cachedTheme->ambientLightStrength());
         shader->setUniformValue(shader->lightColor(),
@@ -1137,6 +1234,22 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
 
         if (RenderingNormal == state) {
             // Normal render
+#if !defined(QT_OPENGL_ES_2)
+            ShaderHelper *prevShader = shader;
+            if (item->isVolume()) {
+                if (item->sliceIndexX() >= 0
+                        || item->sliceIndexY() >= 0
+                        || item->sliceIndexZ() >= 0) {
+                    shader = volumeSliceShader;
+                } else {
+                    shader = volumeShader;
+                }
+            } else {
+                shader = regularShader;
+            }
+            if (shader != prevShader)
+                shader->bind();
+#endif
             shader->setUniformValue(shader->model(), modelMatrix);
             shader->setUniformValue(shader->MVP(), MVPMatrix);
             shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
@@ -1144,14 +1257,17 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
             if (item->isBlendNeeded()) {
                 glEnable(GL_BLEND);
                 glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-                glDisable(GL_CULL_FACE);
+#if !defined(QT_OPENGL_ES_2)
+                if (!item->isVolume())
+#endif
+                    glDisable(GL_CULL_FACE);
             } else {
                 glDisable(GL_BLEND);
                 glEnable(GL_CULL_FACE);
             }
 
 #if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !item->isVolume()) {
                 // Set shadow shader bindings
                 shader->setUniformValue(shader->shadowQ(), shadowQuality);
                 shader->setUniformValue(shader->depth(), depthProjectionViewMatrix * modelMatrix);
@@ -1164,8 +1280,34 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
 #endif
             {
                 // Set shadowless shader bindings
-                shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
-                m_drawer->drawObject(shader, item->mesh(), item->texture());
+#if !defined(QT_OPENGL_ES_2)
+                if (item->isVolume()) {
+                    // Volume shaders repurpose light position for camera position relative to item
+                    QVector3D cameraPos = m_cachedScene->activeCamera()->position();
+                    cameraPos = MVPMatrix.inverted().map(cameraPos);
+                    shader->setUniformValue(shader->cameraPositionRelativeToModel(), -cameraPos);
+                    GLint color8Bit = (item->textureFormat() == QImage::Format_Indexed8) ? 1 : 0;
+                    if (color8Bit) {
+                        shader->setUniformValueArray(shader->colorIndex(),
+                                                     item->colorTable().constData(), 256);
+                    }
+                    shader->setUniformValue(shader->color8Bit(), color8Bit);
+                    if (shader == volumeSliceShader) {
+                        QVector3D slices((float(item->sliceIndexX()) + 0.5f)
+                                         / float(item->textureWidth()) * 2.0 - 1.0,
+                                         (float(item->sliceIndexY()) + 0.5f)
+                                         / float(item->textureHeight()) * 2.0 - 1.0,
+                                         (float(item->sliceIndexZ()) + 0.5f)
+                                         / float(item->textureDepth()) * 2.0 - 1.0);
+                        shader->setUniformValue(shader->volumeSliceIndices(), slices);
+                    }
+                    m_drawer->drawObject(shader, item->mesh(), 0, 0, item->texture());
+                } else
+#endif
+                {
+                    shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
+                    m_drawer->drawObject(shader, item->mesh(), item->texture());
+                }
             }
         } else if (RenderingSelection == state) {
             // Selection render
@@ -1203,6 +1345,9 @@ void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePo
                                         const QMatrix4x4 &projectionViewMatrix,
                                         const QMatrix4x4 &depthMatrix)
 {
+#if defined(QT_OPENGL_ES_2)
+    Q_UNUSED(depthMatrix)
+#endif
     static QVector<QQuaternion> lineRotations;
     if (!lineRotations.size()) {
         lineRotations.resize(polarGridRoundness);
@@ -1264,6 +1409,9 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
                                          const QMatrix4x4 &projectionViewMatrix,
                                          const QMatrix4x4 &depthMatrix)
 {
+#if defined(QT_OPENGL_ES_2)
+    Q_UNUSED(depthMatrix)
+#endif
     float halfRatio((m_polarRadius + (labelMargin / 2.0f)) / 2.0f);
     QVector3D gridLineScaler(gridLineWidth, gridLineWidth, halfRatio);
     int gridLineCount = m_axisCacheX.gridLineCount();

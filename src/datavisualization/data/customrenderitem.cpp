@@ -23,9 +23,20 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 CustomRenderItem::CustomRenderItem()
     : AbstractRenderItem(),
       m_texture(0),
+      m_absolute(false),
       m_object(0),
+      m_needBlend(true),
       m_visible(true),
-      m_renderer(0)
+      m_valid(true),
+      m_index(0),
+      m_shadowCasting(false),
+      m_isFacingCamera(false),
+      m_item(0),
+      m_renderer(0),
+      m_textureWidth(0),
+      m_textureHeight(0),
+      m_textureDepth(0),
+      m_isVolume(false)
 {
 }
 
@@ -37,6 +48,18 @@ CustomRenderItem::~CustomRenderItem()
 void CustomRenderItem::setMesh(const QString &meshFile)
 {
     ObjectHelper::resetObjectHelper(m_renderer, m_object, meshFile);
+}
+
+void CustomRenderItem::setColorTable(const QVector<QRgb> &colors)
+{
+    m_colorTable.resize(colors.size());
+    for (int i = 0; i < m_colorTable.size(); i++) {
+        const QRgb &rgb = colors.at(i);
+        m_colorTable[i] = QVector4D(float(qRed(rgb)) / 255.0f,
+                                    float(qGreen(rgb)) / 255.0f,
+                                    float(qBlue(rgb)) / 255.0f,
+                                    float(qAlpha(rgb)) / 255.0f);
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
