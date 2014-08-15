@@ -35,6 +35,7 @@ HighlightSeries::~HighlightSeries()
 {
 }
 
+//! [0]
 void HighlightSeries::setTopographicSeries(TopographicSeries *series)
 {
     m_topographicSeries = series;
@@ -44,7 +45,9 @@ void HighlightSeries::setTopographicSeries(TopographicSeries *series)
     QObject::connect(m_topographicSeries, &QSurface3DSeries::selectedPointChanged,
                      this, &HighlightSeries::handlePositionChange);
 }
+//! [0]
 
+//! [1]
 void HighlightSeries::handlePositionChange(const QPoint &position)
 {
     m_position = position;
@@ -89,3 +92,4 @@ void HighlightSeries::handlePositionChange(const QPoint &position)
     dataProxy()->resetArray(dataArray);
     setVisible(true);
 }
+//! [1]

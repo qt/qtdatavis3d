@@ -46,6 +46,7 @@ void CustomInputHandler::mousePressEvent(QMouseEvent *event, const QPoint &mouse
     Q3DInputHandler::mousePressEvent(event, mousePos);
 }
 
+//! [1]
 void CustomInputHandler::wheelEvent(QWheelEvent *event)
 {
     float delta = float(event->delta());
@@ -62,6 +63,7 @@ void CustomInputHandler::wheelEvent(QWheelEvent *event)
     m_axisY->setRange(100.0f, y);
     m_axisZ->setRange(m_axisZMinValue, m_axisZMaxValue);
 }
+//! [1]
 
 void CustomInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
@@ -115,6 +117,7 @@ void CustomInputHandler::handleAxisDragging()
 
     // Adjust axes
     switch (m_state) {
+//! [0]
     case StateDraggingX:
         distance = (move.x() * xMulX - move.y() * xMulY) * m_speedModifier;
         m_axisXMinValue -= distance;
@@ -131,6 +134,7 @@ void CustomInputHandler::handleAxisDragging()
         }
         m_axisX->setRange(m_axisXMinValue, m_axisXMaxValue);
         break;
+//! [0]
     case StateDraggingZ:
         distance = (move.x() * zMulX + move.y() * zMulY) * m_speedModifier;
         m_axisZMinValue += distance;
@@ -154,6 +158,7 @@ void CustomInputHandler::handleAxisDragging()
 
 void CustomInputHandler::checkConstraints()
 {
+//! [2]
     if (m_axisXMinValue < m_areaMinValue)
         m_axisXMinValue = m_areaMinValue;
     if (m_axisXMaxValue > m_areaMaxValue)
@@ -164,6 +169,7 @@ void CustomInputHandler::checkConstraints()
         m_axisXMinValue -= adjust;
         m_axisXMaxValue += adjust;
     }
+//! [2]
 
     if (m_axisZMinValue < m_areaMinValue)
         m_axisZMinValue = m_areaMinValue;

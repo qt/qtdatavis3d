@@ -74,6 +74,7 @@ SurfaceGraph::~SurfaceGraph()
     delete m_graph;
 }
 
+//! [0]
 void SurfaceGraph::toggleSurfaceTexture(bool enable)
 {
     if (enable)
@@ -81,3 +82,4 @@ void SurfaceGraph::toggleSurfaceTexture(bool enable)
     else
         m_topography->setTextureFile("");
 }
+//! [0]

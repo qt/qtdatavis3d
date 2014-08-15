@@ -22,8 +22,10 @@
 
 using namespace QtDataVisualization;
 
+//! [0]
 // Value used to encode height data as RGB value on PNG file
 const float packingFactor = 11983.0f;
+//! [0]
 
 TopographicSeries::TopographicSeries()
 {
@@ -37,6 +39,7 @@ TopographicSeries::~TopographicSeries()
 
 void TopographicSeries::setTopographyFile(const QString file, float width, float height)
 {
+//! [1]
     QImage heightMapImage(file);
     uchar *bits = heightMapImage.bits();
     int imageHeight = heightMapImage.height();
@@ -62,8 +65,9 @@ void TopographicSeries::setTopographyFile(const QString file, float width, float
         *dataArray << newRow;
     }
 
+    dataProxy()->resetArray(dataArray);
+//! [1]
+
     m_sampleCountX = float(imageWidth);
     m_sampleCountZ = float(imageHeight);
-
-    dataProxy()->resetArray(dataArray);
 }
