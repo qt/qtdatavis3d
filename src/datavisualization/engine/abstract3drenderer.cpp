@@ -1300,6 +1300,18 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          (float(item->sliceIndexZ()) + 0.5f)
                                          / float(item->textureDepth()) * 2.0 - 1.0);
                         shader->setUniformValue(shader->volumeSliceIndices(), slices);
+                    } else {
+                        // Precalculate texture dimensions so we can optimize
+                        // ray stepping to hit every texture layer.
+                        QVector3D textureDimensions(float(item->textureWidth()),
+                                                    float(item->textureHeight()),
+                                                    float(item->textureDepth()));
+                        shader->setUniformValue(shader->textureDimensions(), textureDimensions);
+
+                        int sampleCount = qMax(item->textureWidth(), item->textureHeight());
+                        sampleCount = qMax(sampleCount, item->textureDepth());
+                        shader->setUniformValue(shader->sampleCount(), sampleCount);
+
                     }
                     m_drawer->drawObject(shader, item->mesh(), 0, 0, item->texture());
                 } else

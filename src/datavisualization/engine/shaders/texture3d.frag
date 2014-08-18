@@ -6,10 +6,11 @@ uniform highp sampler3D textureSampler;
 uniform highp vec3 cameraPositionRelativeToModel;
 uniform highp vec4 colorIndex[256];
 uniform highp int color8Bit;
+uniform highp vec3 textureDimensions;
+uniform highp int sampleCount; // This is the maximum sample count
 
-const float maxDist = sqrt(2.0);
-const int sampleCount = 1024;
 const float alphaThreshold = 0.001;
+
 void main() {
     // Raytrace into volume, need to sample pixels along the eye ray until we hit opacity 1
 
@@ -35,10 +36,21 @@ void main() {
     rayStart = 0.5 * (rayStart + 1.0);
     rayStop = 0.5 * (rayStop + 1.0);
 
-    highp vec3 curPos = rayStart;
-    highp float fullDist = distance(rayStop, rayStart);
-    highp float stepSize = maxDist / float(sampleCount); // TODO: Stepsize needs to be improved
-    highp vec3 step = normalize(rayStop - rayStart) * stepSize;
+    highp vec3 ray = rayStop - rayStart;
+    highp float fullDist = length(ray);
+    highp float rayX = abs(ray.x) * textureDimensions.x;
+    highp float rayY = abs(ray.y) * textureDimensions.y;
+    highp float rayZ = abs(ray.z) * textureDimensions.z;
+
+    highp float maxRayDim = max(rayX, rayY);
+    maxRayDim = max(maxRayDim, rayZ);
+
+    highp vec3 step = ray / maxRayDim;
+    highp float stepSize = abs(fullDist / maxRayDim);
+
+    // Offset a fraction of a step so we are not exactly on a texel boundary.
+    highp vec3 curPos = rayStart - (0.5 * step);
+
     highp float totalDist = 0.0;
     highp float totalAlpha = 0.0;
     highp vec4 destColor = vec4(0, 0, 0, 0);

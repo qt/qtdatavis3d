@@ -78,6 +78,8 @@ class ShaderHelper
     GLuint colorIndex();
     GLuint cameraPositionRelativeToModel();
     GLuint color8Bit();
+    GLuint textureDimensions();
+    GLuint sampleCount();
 
     GLuint posAtt();
     GLuint uvAtt();
@@ -112,10 +114,12 @@ class ShaderHelper
     GLuint m_gradientMinUniform;
     GLuint m_gradientHeightUniform;
     GLuint m_lightColorUniform;
-    GLuint m_volumeSliceIndices;
-    GLuint m_colorIndex;
-    GLuint m_cameraPositionRelativeToModel;
-    GLuint m_color8Bit;
+    GLuint m_volumeSliceIndicesUniform;
+    GLuint m_colorIndexUniform;
+    GLuint m_cameraPositionRelativeToModelUniform;
+    GLuint m_color8BitUniform;
+    GLuint m_textureDimensionsUniform;
+    GLuint m_sampleCountUniform;
 
     GLboolean m_initialized;
 };

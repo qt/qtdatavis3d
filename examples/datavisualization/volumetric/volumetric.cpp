@@ -102,8 +102,8 @@ void VolumetricModifier::adjustSliceZ(int value)
 void VolumetricModifier::handleZoomLevelChange()
 {
     // Zooming inside volumetric object causes ugly clipping issues, so restrict zoom level a bit
-    if (m_graph->scene()->activeCamera()->zoomLevel() > 220)
-        m_graph->scene()->activeCamera()->setZoomLevel(220);
+    if (m_graph->scene()->activeCamera()->zoomLevel() > 200)
+        m_graph->scene()->activeCamera()->setZoomLevel(200);
 }
 
 void VolumetricModifier::handleFpsChange(qreal fps)
@@ -161,7 +161,7 @@ void VolumetricModifier::createVolume()
                 // Take a slice out of the ellipsoid
                 if (i >= textureSize / 2 || j >= textureSize / 4 || k >= textureSize / 2) {
                     QVector3D distVec = QVector3D(float(k), float(j * 2), float(i)) - midPoint;
-                    float adjLen = qMin(255.0f, (distVec.length() * float(textureSize / 128)));
+                    float adjLen = qMin(255.0f, (distVec.length() * 512.0f / float(textureSize)));
                     if (adjLen < 230)
                         colorIndex = 255 - int(adjLen);
                     else
