@@ -21,6 +21,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/qcustom3dlabel.h>
 #include <QtCore/qmath.h>
 #include <QtGui/QRgb>
 #include <QtWidgets/QLabel>
@@ -42,15 +43,29 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_graph->setOrthoProjection(true);
 
+#if !defined(QT_OPENGL_ES_2)
     createVolume();
-
     m_graph->addCustomItem(m_volumeItem);
+#else
+    // OpenGL ES2 doesn't support 3D textures, so show a warning label instead
+    QCustom3DLabel *warningLabel = new QCustom3DLabel(
+                "QCustom3DVolume is not supported with OpenGL ES2",
+                QFont(),
+                QVector3D(0.0f, 0.5f, 0.0f),
+                QVector3D(1.5f, 1.5f, 0.0f),
+                QQuaternion());
+    warningLabel->setPositionAbsolute(true);
+    warningLabel->setFacingCamera(true);
+    m_graph->addCustomItem(warningLabel);
+    m_graph->activeTheme()->setLightStrength(1.0f);
+#endif
     m_graph->setMeasureFps(true);
 
     QObject::connect(m_graph->scene()->activeCamera(), &Q3DCamera::zoomLevelChanged, this,
                      &VolumetricModifier::handleZoomLevelChange);
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &VolumetricModifier::handleFpsChange);
+
 }
 
 VolumetricModifier::~VolumetricModifier()
@@ -65,37 +80,40 @@ void VolumetricModifier::setFpsLabel(QLabel *fpsLabel)
 
 void VolumetricModifier::sliceX(int enabled)
 {
-    m_volumeItem->setSliceIndexX(enabled ? m_sliceIndexX : -1);
+    if (m_volumeItem)
+        m_volumeItem->setSliceIndexX(enabled ? m_sliceIndexX : -1);
 }
 
 void VolumetricModifier::sliceY(int enabled)
 {
-    m_volumeItem->setSliceIndexY(enabled ? m_sliceIndexY : -1);
+    if (m_volumeItem)
+        m_volumeItem->setSliceIndexY(enabled ? m_sliceIndexY : -1);
 }
 
 void VolumetricModifier::sliceZ(int enabled)
 {
-    m_volumeItem->setSliceIndexZ(enabled ? m_sliceIndexZ : -1);
+    if (m_volumeItem)
+        m_volumeItem->setSliceIndexZ(enabled ? m_sliceIndexZ : -1);
 }
 
 void VolumetricModifier::adjustSliceX(int value)
 {
     m_sliceIndexX = value / (1024 / textureSize);
-    if (m_volumeItem->sliceIndexX() != -1)
+    if (m_volumeItem && m_volumeItem->sliceIndexX() != -1)
         m_volumeItem->setSliceIndexX(m_sliceIndexX);
 }
 
 void VolumetricModifier::adjustSliceY(int value)
 {
     m_sliceIndexY = value / (1024 / textureSize * 2);
-    if (m_volumeItem->sliceIndexY() != -1)
+    if (m_volumeItem && m_volumeItem->sliceIndexY() != -1)
         m_volumeItem->setSliceIndexY(m_sliceIndexY);
 }
 
 void VolumetricModifier::adjustSliceZ(int value)
 {
     m_sliceIndexZ = value / (1024 / textureSize);
-    if (m_volumeItem->sliceIndexZ() != -1)
+    if (m_volumeItem && m_volumeItem->sliceIndexZ() != -1)
         m_volumeItem->setSliceIndexZ(m_sliceIndexZ);
 }
 
