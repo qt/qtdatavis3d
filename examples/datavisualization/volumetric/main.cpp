@@ -26,6 +26,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QGroupBox>
 #include <QtGui/QScreen>
 
 int main(int argc, char **argv)
@@ -74,9 +75,41 @@ int main(int argc, char **argv)
     sliceZSlider->setValue(512);
     sliceZSlider->setEnabled(true);
 
-    QLabel *fpsLabel = new QLabel(QStringLiteral("Fps: "), widget);
+    QCheckBox *fpsCheckBox = new QCheckBox(widget);
+    fpsCheckBox->setText(QStringLiteral("Show FPS"));
+    fpsCheckBox->setChecked(false);
+    QLabel *fpsLabel = new QLabel(QStringLiteral(""), widget);
 
+    QGroupBox *textureDetailGroupBox = new QGroupBox(QStringLiteral("Texture detail"));
+
+    QRadioButton *lowDetailRB = new QRadioButton(widget);
+    lowDetailRB->setText(QStringLiteral("Low (128x64x128)"));
+    lowDetailRB->setChecked(true);
+
+    QRadioButton *mediumDetailRB = new QRadioButton(widget);
+    mediumDetailRB->setText(QStringLiteral("Generating..."));
+    mediumDetailRB->setChecked(false);
+    mediumDetailRB->setEnabled(false);
+
+    QRadioButton *highDetailRB = new QRadioButton(widget);
+    highDetailRB->setText(QStringLiteral("Generating..."));
+    highDetailRB->setChecked(false);
+    highDetailRB->setEnabled(false);
+
+    QVBoxLayout *textureDetailVBox = new QVBoxLayout;
+    textureDetailVBox->addWidget(lowDetailRB);
+    textureDetailVBox->addWidget(mediumDetailRB);
+    textureDetailVBox->addWidget(highDetailRB);
+    textureDetailGroupBox->setLayout(textureDetailVBox);
+
+    QCheckBox *colorTableCheckBox = new QCheckBox(widget);
+    colorTableCheckBox->setText(QStringLiteral("Alternate color table"));
+    colorTableCheckBox->setChecked(false);
+
+    vLayout->addWidget(fpsCheckBox);
     vLayout->addWidget(fpsLabel);
+    vLayout->addWidget(textureDetailGroupBox);
+    vLayout->addWidget(colorTableCheckBox);
     vLayout->addWidget(sliceXCheckBox);
     vLayout->addWidget(sliceXSlider);
     vLayout->addWidget(sliceYCheckBox);
@@ -86,7 +119,12 @@ int main(int argc, char **argv)
 
     VolumetricModifier *modifier = new VolumetricModifier(graph);
     modifier->setFpsLabel(fpsLabel);
+    modifier->setMediumDetailRB(mediumDetailRB);
+    modifier->setHighDetailRB(highDetailRB);
+    modifier->setSliceSliders(sliceXSlider, sliceYSlider, sliceZSlider);
 
+    QObject::connect(fpsCheckBox, &QCheckBox::stateChanged, modifier,
+                     &VolumetricModifier::setFpsMeasurement);
     QObject::connect(sliceXCheckBox, &QCheckBox::stateChanged, modifier,
                      &VolumetricModifier::sliceX);
     QObject::connect(sliceYCheckBox, &QCheckBox::stateChanged, modifier,
@@ -99,6 +137,14 @@ int main(int argc, char **argv)
                      &VolumetricModifier::adjustSliceY);
     QObject::connect(sliceZSlider, &QSlider::valueChanged, modifier,
                      &VolumetricModifier::adjustSliceZ);
+    QObject::connect(lowDetailRB,  &QRadioButton::toggled, modifier,
+                     &VolumetricModifier::toggleLowDetail);
+    QObject::connect(mediumDetailRB,  &QRadioButton::toggled, modifier,
+                     &VolumetricModifier::toggleMediumDetail);
+    QObject::connect(highDetailRB,  &QRadioButton::toggled, modifier,
+                     &VolumetricModifier::toggleHighDetail);
+    QObject::connect(colorTableCheckBox,  &QCheckBox::stateChanged, modifier,
+                     &VolumetricModifier::changeColorTable);
 
     widget->show();
     return app.exec();

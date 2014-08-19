@@ -21,8 +21,12 @@
 
 #include <QtDataVisualization/q3dscatter.h>
 #include <QtDataVisualization/qcustom3dvolume.h>
+#include <QtCore/QTimer>
+#include <QtGui/QRgb>
 
 class QLabel;
+class QRadioButton;
+class QSlider;
 
 using namespace QtDataVisualization;
 
@@ -34,6 +38,8 @@ public:
     ~VolumetricModifier();
 
     void setFpsLabel(QLabel *fpsLabel);
+    void setMediumDetailRB(QRadioButton *button);
+    void setHighDetailRB(QRadioButton *button);
 
 public slots:
     void sliceX(int enabled);
@@ -44,9 +50,18 @@ public slots:
     void adjustSliceZ(int value);
     void handleZoomLevelChange();
     void handleFpsChange(qreal fps);
+    void handleTimeout();
+    void toggleLowDetail(bool enabled);
+    void toggleMediumDetail(bool enabled);
+    void toggleHighDetail(bool enabled);
+    void setFpsMeasurement(bool enabled);
+    void setSliceSliders(QSlider *sliderX, QSlider *sliderY, QSlider *sliderZ);
+    void changeColorTable(int enabled);
 
 private:
-    void createVolume();
+
+    int createVolume(int textureSize, int startIndex, int count,
+                      QVector<uchar> *textureData);
 
     Q3DScatter *m_graph;
     QCustom3DVolume *m_volumeItem;
@@ -54,6 +69,19 @@ private:
     int m_sliceIndexY;
     int m_sliceIndexZ;
     QLabel *m_fpsLabel;
+    QRadioButton *m_mediumDetailRB;
+    QRadioButton *m_highDetailRB;
+    QVector<uchar> *m_lowDetailData;
+    QVector<uchar> *m_mediumDetailData;
+    QVector<uchar> *m_highDetailData;
+    QTimer m_timer;
+    int m_mediumDetailIndex;
+    int m_highDetailIndex;
+    QSlider *m_sliceSliderX;
+    QSlider *m_sliceSliderY;
+    QSlider *m_sliceSliderZ;
+    QVector<QRgb> m_colorTable1;
+    QVector<QRgb> m_colorTable2;
 };
 
 #endif

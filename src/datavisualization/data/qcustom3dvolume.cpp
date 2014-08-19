@@ -239,8 +239,8 @@ int QCustom3DVolume::textureDepth() const
 void QCustom3DVolume::setTextureDimensions(int width, int height, int depth)
 {
     setTextureWidth(width);
-    setTextureWidth(height);
-    setTextureWidth(depth);
+    setTextureHeight(height);
+    setTextureDepth(depth);
 }
 
 /*!

@@ -23,20 +23,35 @@
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/qcustom3dlabel.h>
 #include <QtCore/qmath.h>
-#include <QtGui/QRgb>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QRadioButton>
+#include <QtWidgets/QSlider>
 #include <QtCore/QDebug>
 
 using namespace QtDataVisualization;
 
-const int textureSize = 256;
+const int lowDetailSize(128);
+const int mediumDetailSize(256);
+const int highDetailSize(512);
+const int colorTableSize(256);
+const int cutOffColorIndex(15);
 
 VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_volumeItem(0),
-      m_sliceIndexX(textureSize / 2),
-      m_sliceIndexY(textureSize / 4),
-      m_sliceIndexZ(textureSize / 2)
+      m_sliceIndexX(lowDetailSize / 2),
+      m_sliceIndexY(lowDetailSize / 4),
+      m_sliceIndexZ(lowDetailSize / 2),
+      m_mediumDetailRB(0),
+      m_highDetailRB(0),
+      m_lowDetailData(0),
+      m_mediumDetailData(0),
+      m_highDetailData(0),
+      m_mediumDetailIndex(0),
+      m_highDetailIndex(0),
+      m_sliceSliderX(0),
+      m_sliceSliderY(0),
+      m_sliceSliderZ(0)
 {
     m_graph->activeTheme()->setType(Q3DTheme::ThemeQt);
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
@@ -44,8 +59,56 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->setOrthoProjection(true);
 
 #if !defined(QT_OPENGL_ES_2)
-    createVolume();
+    m_lowDetailData = new QVector<uchar>(lowDetailSize * lowDetailSize * lowDetailSize / 2);
+    m_mediumDetailData = new QVector<uchar>(mediumDetailSize * mediumDetailSize * mediumDetailSize / 2);
+    m_highDetailData = new QVector<uchar>(highDetailSize * highDetailSize * highDetailSize / 2);
+
+    createVolume(lowDetailSize, 0, lowDetailSize, m_lowDetailData);
+
+    m_volumeItem = new QCustom3DVolume;
+    m_volumeItem->setScaling(QVector3D(2.0f, 1.0f, 2.0f));
+    m_volumeItem->setTextureWidth(lowDetailSize);
+    m_volumeItem->setTextureHeight(lowDetailSize / 2);
+    m_volumeItem->setTextureDepth(lowDetailSize);
+    m_volumeItem->setTextureFormat(QImage::Format_Indexed8);
+    m_volumeItem->setTextureData(new QVector<uchar>(*m_lowDetailData));
+
+    // Generate color tables.
+    // Both tables have a fully transparent colors to fill outer portions of the volume.
+
+    // The primary color table.
+    // The first visible layer, red, is somewhat transparent. Rest of to colors are opaque.
+    m_colorTable1.resize(colorTableSize);
+    m_colorTable2.resize(colorTableSize);
+
+    for (int i = 1; i < colorTableSize; i++) {
+        if (i < cutOffColorIndex)
+            m_colorTable1[i] = qRgba(0, 0, 0, 0);
+        else if (i < 60)
+            m_colorTable1[i] = qRgba((i * 2) + 120, 0, 0, 50);
+        else if (i < 120)
+            m_colorTable1[i] = qRgba(0, ((i - 60) * 2) + 120, 0, 255);
+        else if (i < 180)
+            m_colorTable1[i] = qRgba(0, 0, ((i - 120) * 2) + 120, 255);
+        else
+            m_colorTable1[i] = qRgba(i, i, i, 255);
+    }
+
+    // The alternate color table.
+    // The first visible layer is a thin yellow one, and rest of the volume uses a smooth gradient.
+    for (int i = 1; i < colorTableSize; i++) {
+        if (i < cutOffColorIndex)
+            m_colorTable2[i] = qRgba(0, 0, 0, 0);
+        else if (i < cutOffColorIndex + 4)
+            m_colorTable2[i] = qRgba(255, 255, 0, 255);
+        else
+            m_colorTable2[i] = qRgba(i, 0, 255 - i, 255);
+    }
+
+    m_volumeItem->setColorTable(m_colorTable1);
+
     m_graph->addCustomItem(m_volumeItem);
+    m_timer.start(0);
 #else
     // OpenGL ES2 doesn't support 3D textures, so show a warning label instead
     QCustom3DLabel *warningLabel = new QCustom3DLabel(
@@ -59,12 +122,13 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->addCustomItem(warningLabel);
     m_graph->activeTheme()->setLightStrength(1.0f);
 #endif
-    m_graph->setMeasureFps(true);
 
     QObject::connect(m_graph->scene()->activeCamera(), &Q3DCamera::zoomLevelChanged, this,
                      &VolumetricModifier::handleZoomLevelChange);
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &VolumetricModifier::handleFpsChange);
+    QObject::connect(&m_timer, &QTimer::timeout, this,
+                     &VolumetricModifier::handleTimeout);
 
 }
 
@@ -76,6 +140,16 @@ VolumetricModifier::~VolumetricModifier()
 void VolumetricModifier::setFpsLabel(QLabel *fpsLabel)
 {
     m_fpsLabel = fpsLabel;
+}
+
+void VolumetricModifier::setMediumDetailRB(QRadioButton *button)
+{
+    m_mediumDetailRB = button;
+}
+
+void VolumetricModifier::setHighDetailRB(QRadioButton *button)
+{
+    m_highDetailRB = button;
 }
 
 void VolumetricModifier::sliceX(int enabled)
@@ -98,21 +172,21 @@ void VolumetricModifier::sliceZ(int enabled)
 
 void VolumetricModifier::adjustSliceX(int value)
 {
-    m_sliceIndexX = value / (1024 / textureSize);
+    m_sliceIndexX = value / (1024 / m_volumeItem->textureWidth());
     if (m_volumeItem && m_volumeItem->sliceIndexX() != -1)
         m_volumeItem->setSliceIndexX(m_sliceIndexX);
 }
 
 void VolumetricModifier::adjustSliceY(int value)
 {
-    m_sliceIndexY = value / (1024 / textureSize * 2);
+    m_sliceIndexY = value / (1024 / m_volumeItem->textureHeight());
     if (m_volumeItem && m_volumeItem->sliceIndexY() != -1)
         m_volumeItem->setSliceIndexY(m_sliceIndexY);
 }
 
 void VolumetricModifier::adjustSliceZ(int value)
 {
-    m_sliceIndexZ = value / (1024 / textureSize);
+    m_sliceIndexZ = value / (1024 / m_volumeItem->textureDepth());
     if (m_volumeItem && m_volumeItem->sliceIndexZ() != -1)
         m_volumeItem->setSliceIndexZ(m_sliceIndexZ);
 }
@@ -126,64 +200,113 @@ void VolumetricModifier::handleZoomLevelChange()
 
 void VolumetricModifier::handleFpsChange(qreal fps)
 {
-    const QString fpsFormat = QStringLiteral("Fps: %1");
+    const QString fpsFormat = QStringLiteral("FPS: %1");
     int fps10 = int(fps * 10.0);
-    m_fpsLabel->setText(fpsFormat.arg(QString::number(qreal(fps10) / 10.0)));
+    m_fpsLabel->setText(fpsFormat.arg(qreal(fps10) / 10.0));
 }
 
-void VolumetricModifier::createVolume()
+void VolumetricModifier::handleTimeout()
 {
-    m_volumeItem = new QCustom3DVolume;
-    m_volumeItem->setScaling(QVector3D(2.0f, 1.0f, 2.0f));
-    m_volumeItem->setTextureWidth(textureSize);
-    m_volumeItem->setTextureHeight(textureSize / 2);
-    m_volumeItem->setTextureDepth(textureSize);
-    m_volumeItem->setTextureFormat(QImage::Format_Indexed8);
-
-    // Generate color table. First color is fully transparent used to fill outer
-    // portions of the volume. The second, red layer, is somewhat transparent.
-    // Rest of to colors are opaque.
-    QVector<QRgb> colors;
-    colors.resize(256);
-
-    colors[0] = qRgba(0, 0, 0, 0);
-    for (int i = 1; i < 256; i++) {
-        if (i < 60) {
-            colors[i] = qRgba((i * 2) + 120, 0, 0, 100);
-        } else if (i < 120) {
-            colors[i] = qRgba(0, ((i - 60) * 2) + 120, 0, 255);
-        } else if (i < 180) {
-            colors[i] = qRgba(0, 0, ((i - 120) * 2) + 120, 255);
-        } else {
-            colors[i] = qRgba(i, i, i, 255);
+    if (m_mediumDetailIndex < mediumDetailSize) {
+        m_mediumDetailIndex = createVolume(mediumDetailSize, m_mediumDetailIndex, 4,
+                                           m_mediumDetailData);
+        if (m_mediumDetailIndex == mediumDetailSize) {
+            m_mediumDetailRB->setEnabled(true);
+            QString label = QStringLiteral("Medium (%1x%2x%1)");
+            m_mediumDetailRB->setText(label.arg(mediumDetailSize).arg(mediumDetailSize / 2));
+        }
+    } else if (m_highDetailIndex < highDetailSize) {
+        m_highDetailIndex = createVolume(highDetailSize, m_highDetailIndex, 1,
+                                         m_highDetailData);
+        if (m_highDetailIndex == highDetailSize) {
+            m_highDetailRB->setEnabled(true);
+            QString label = QStringLiteral("High (%1x%2x%1)");
+            m_highDetailRB->setText(label.arg(highDetailSize).arg(highDetailSize / 2));
+            m_timer.stop();
         }
     }
-    m_volumeItem->setColorTable(colors);
+}
 
-    // Generate texture data for an half-ellipsoid.
-    // This can take a while if the dimensions are large.
-    // Note that in real world cases, the texture data is usually be supplied
-    // as a stack of slice images.
+void VolumetricModifier::toggleLowDetail(bool enabled)
+{
+    if (enabled) {
+        m_volumeItem->setTextureData(new QVector<uchar>(*m_lowDetailData));
+        m_volumeItem->setTextureDimensions(lowDetailSize, lowDetailSize / 2, lowDetailSize);
+        adjustSliceX(m_sliceSliderX->value());
+        adjustSliceY(m_sliceSliderY->value());
+        adjustSliceZ(m_sliceSliderZ->value());
+    }
+}
 
-    QVector<uchar> *textureData = new QVector<uchar>(textureSize * textureSize * textureSize / 2);
+void VolumetricModifier::toggleMediumDetail(bool enabled)
+{
+    if (enabled) {
+        m_volumeItem->setTextureData(new QVector<uchar>(*m_mediumDetailData));
+        m_volumeItem->setTextureDimensions(mediumDetailSize, mediumDetailSize / 2, mediumDetailSize);
+        adjustSliceX(m_sliceSliderX->value());
+        adjustSliceY(m_sliceSliderY->value());
+        adjustSliceZ(m_sliceSliderZ->value());
+    }
+}
+
+void VolumetricModifier::toggleHighDetail(bool enabled)
+{
+    if (enabled) {
+        m_volumeItem->setTextureData(new QVector<uchar>(*m_highDetailData));
+        m_volumeItem->setTextureDimensions(highDetailSize, highDetailSize / 2, highDetailSize);
+        adjustSliceX(m_sliceSliderX->value());
+        adjustSliceY(m_sliceSliderY->value());
+        adjustSliceZ(m_sliceSliderZ->value());
+    }
+}
+
+void VolumetricModifier::setFpsMeasurement(bool enabled)
+{
+    m_graph->setMeasureFps(enabled);
+    if (enabled)
+        m_fpsLabel->setText(QStringLiteral("Measuring..."));
+    else
+        m_fpsLabel->setText(QString());
+}
+
+void VolumetricModifier::setSliceSliders(QSlider *sliderX, QSlider *sliderY, QSlider *sliderZ)
+{
+    m_sliceSliderX = sliderX;
+    m_sliceSliderY = sliderY;
+    m_sliceSliderZ = sliderZ;
+}
+
+void VolumetricModifier::changeColorTable(int enabled)
+{
+    if (enabled)
+        m_volumeItem->setColorTable(m_colorTable2);
+    else
+        m_volumeItem->setColorTable(m_colorTable1);
+}
+
+int VolumetricModifier::createVolume(int textureSize, int startIndex, int count,
+                                     QVector<uchar> *textureData)
+{
+    // Generate example texture data for an half-ellipsoid with a section missing.
+    // This can take a while if the dimensions are large, so we support incremental data generation.
 
     QVector3D midPoint(float(textureSize) / 2.0f,
                        float(textureSize) / 2.0f,
                        float(textureSize) / 2.0f);
 
-    int index = 0;
-    for (int i = 0; i < textureSize; i++) {
+    int index = startIndex * textureSize * textureSize / 2.0f;
+    int endIndex = startIndex + count;
+    if (endIndex > textureSize)
+        endIndex = textureSize;
+    for (int i = startIndex; i < endIndex; i++) {
         for (int j = 0; j < textureSize / 2; j++) {
             for (int k = 0; k < textureSize; k++) {
                 int colorIndex = 0;
-                // Take a slice out of the ellipsoid
+                // Take a section out of the ellipsoid
                 if (i >= textureSize / 2 || j >= textureSize / 4 || k >= textureSize / 2) {
                     QVector3D distVec = QVector3D(float(k), float(j * 2), float(i)) - midPoint;
                     float adjLen = qMin(255.0f, (distVec.length() * 512.0f / float(textureSize)));
-                    if (adjLen < 230)
-                        colorIndex = 255 - int(adjLen);
-                    else
-                        colorIndex = 0;
+                    colorIndex = 255 - int(adjLen);
                 }
 
                 (*textureData)[index] = colorIndex;
@@ -192,6 +315,6 @@ void VolumetricModifier::createVolume()
         }
     }
 
-    m_volumeItem->setTextureData(textureData);
+    return endIndex;
 }
 
