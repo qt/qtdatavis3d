@@ -37,7 +37,8 @@ SeriesRenderCache::SeriesRenderCache(QAbstract3DSeries *series, Abstract3DRender
       m_valid(false),
       m_visible(false),
       m_renderer(renderer),
-      m_objectDirty(true)
+      m_objectDirty(true),
+      m_staticObjectUVDirty(false)
 {
 }
 

@@ -637,7 +637,7 @@ qreal QAbstract3DGraph::aspectRatio() const
  *
  * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
  * reasonable performance. Static is a beta level feature and currently supports only a subset of the
- * features on the Scatter graph. Missing features are object gradient for mesh objects, both gradients
+ * features on the Scatter graph. Missing features are both gradient color styles
  * for points, and diffuse and specular color on rotations. At this point static is intended just for
  * introducing a new feature. It optimizes graph rendering and is ideal for large non-changing data
  * sets. It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it

@@ -190,6 +190,7 @@ void Scatter3DRenderer::updateData()
                     }
                     if (renderArraySize != cache->oldArraySize()
                             || cache->object()->objectFile() != cache->oldMeshFileName()) {
+                        object->setScaleY(m_scaleY);
                         object->fullLoad(cache, m_dotSizeScale);
                         cache->setOldArraySize(renderArraySize);
                         cache->setOldMeshFileName(cache->object()->objectFile());
@@ -207,9 +208,26 @@ void Scatter3DRenderer::updateData()
 
 void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
 {
+    int seriesCount = seriesList.size();
+
+    // Check OptimizationStatic specific issues before populate marks changeTracker done
+    if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)) {
+        for (int i = 0; i < seriesCount; i++) {
+            QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(seriesList[i]);
+            if (scatterSeries->isVisible()) {
+                QAbstract3DSeriesChangeBitField &changeTracker = scatterSeries->d_ptr->m_changeTracker;
+                if (changeTracker.baseGradientChanged || changeTracker.colorStyleChanged) {
+                    ScatterSeriesRenderCache *cache =
+                            static_cast<ScatterSeriesRenderCache *>(m_renderCacheList.value(scatterSeries));
+                    if (cache && cache->mesh() != QAbstract3DSeries::MeshPoint)
+                        cache->setStaticObjectUVDirty(true);
+                }
+            }
+        }
+    }
+
     Abstract3DRenderer::updateSeries(seriesList);
 
-    int seriesCount = seriesList.size();
     float maxItemSize = 0.0f;
     float itemSize = 0.0f;
     bool noSelection = true;
@@ -244,6 +262,12 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
                     m_haveUniformColorMeshSeries = true;
                 else
                     m_haveGradientMeshSeries = true;
+            }
+
+            if (cache->staticObjectUVDirty()) {
+                ScatterObjectBufferHelper *object = cache->bufferObject();
+                object->updateUVs(cache);
+                cache->setStaticObjectUVDirty(false);
             }
         }
     }
@@ -311,6 +335,28 @@ void Scatter3DRenderer::updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientati
     // Angular axis title existence affects the chart dimensions
     if (m_polarGraph && orientation == QAbstract3DAxis::AxisOrientationX)
         calculateSceneScalingFactors();
+}
+
+void Scatter3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint)
+{
+    Abstract3DRenderer::updateOptimizationHint(hint);
+
+    if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)) {
+#if !defined(QT_OPENGL_ES_2)
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                QStringLiteral(":/shaders/fragmentShadow"));
+        } else {
+            initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
+                                QStringLiteral(":/shaders/fragmentTexture"));
+        }
+#else
+        initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
+                            QStringLiteral(":/shaders/fragmentTexture"));
+#endif
+    } else {
+        Abstract3DRenderer::reInitShaders();
+    }
 }
 
 void Scatter3DRenderer::resetClickedStatus()
@@ -2088,6 +2134,7 @@ void Scatter3DRenderer::initGradientShaders(const QString &vertexShader,
 {
     if (m_dotGradientShader)
         delete m_dotGradientShader;
+
     m_dotGradientShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_dotGradientShader->initialize();
 }

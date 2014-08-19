@@ -43,6 +43,17 @@ public:
 
     void fullLoad(ScatterSeriesRenderCache *cache, qreal dotScale);
     void update(ScatterSeriesRenderCache *cache, qreal dotScale);
+    void updateUVs(ScatterSeriesRenderCache *cache);
+    void setScaleY(float scale) { m_scaleY = scale; }
+
+private:
+    uint createRangeGradientUVs(ScatterSeriesRenderCache *cache,
+                                QVector<QVector2D> &buffered_uvs);
+    uint createObjectGradientUVs(ScatterSeriesRenderCache *cache,
+                                 QVector<QVector2D> &buffered_uvs,
+                                 const QVector<QVector3D> &indexed_vertices);
+
+    float m_scaleY;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

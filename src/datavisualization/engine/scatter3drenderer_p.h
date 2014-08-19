@@ -98,6 +98,7 @@ public:
                           const QStringList &labels);
     void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
                                    bool visible);
+    void updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint);
 
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
