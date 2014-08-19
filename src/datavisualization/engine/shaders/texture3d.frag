@@ -9,7 +9,7 @@ uniform highp int color8Bit;
 uniform highp vec3 textureDimensions;
 uniform highp int sampleCount; // This is the maximum sample count
 
-const float alphaThreshold = 0.001;
+const highp float alphaThreshold = 0.0001;
 
 void main() {
     // Raytrace into volume, need to sample pixels along the eye ray until we hit opacity 1
@@ -51,6 +51,10 @@ void main() {
     // Offset a fraction of a step so we are not exactly on a texel boundary.
     highp vec3 curPos = rayStart - (0.5 * step);
 
+    // Adjust alpha multiplier according to the step size to get uniform alpha effect
+    // regardless of the ray angle.
+    highp float alphaMultiplier = stepSize / (1.0 / sampleCount);
+
     highp float totalDist = 0.0;
     highp float totalAlpha = 0.0;
     highp vec4 destColor = vec4(0, 0, 0, 0);
@@ -63,7 +67,10 @@ void main() {
         if (color8Bit != 0)
             curColor = colorIndex[int(curColor.r * 255.0)];
 
-        curAlpha = curColor.a;
+        if (curColor.a == 1.0)
+            curAlpha = 1.0;
+        else
+            curAlpha = clamp(curColor.a * alphaMultiplier, 0.0, 1.0);
         if (curAlpha > alphaThreshold) {
             curRgb = curColor.rgb * curAlpha * (1.0 - totalAlpha);
             destColor.rgb += curRgb;

@@ -12,7 +12,8 @@ const highp vec3 xPlaneNormal = vec3(1.0, 0, 0);
 const highp vec3 yPlaneNormal = vec3(0, 1.0, 0);
 const highp vec3 zPlaneNormal = vec3(0, 0, 1.0);
 
-const float alphaThreshold = 0.001;
+const highp float alphaThreshold = 0.0001;
+
 void main() {
     // Raytrace into volume, need to sample pixels along the eye ray until we hit opacity 1
 

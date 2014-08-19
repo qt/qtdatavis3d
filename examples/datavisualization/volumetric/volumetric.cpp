@@ -85,7 +85,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
         if (i < cutOffColorIndex)
             m_colorTable1[i] = qRgba(0, 0, 0, 0);
         else if (i < 60)
-            m_colorTable1[i] = qRgba((i * 2) + 120, 0, 0, 50);
+            m_colorTable1[i] = qRgba((i * 2) + 120, 0, 0, 20);
         else if (i < 120)
             m_colorTable1[i] = qRgba(0, ((i - 60) * 2) + 120, 0, 255);
         else if (i < 180)
