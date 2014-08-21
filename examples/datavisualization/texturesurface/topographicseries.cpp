@@ -18,8 +18,6 @@
 
 #include "topographicseries.h"
 
-#include <QDebug>
-
 using namespace QtDataVisualization;
 
 //! [0]

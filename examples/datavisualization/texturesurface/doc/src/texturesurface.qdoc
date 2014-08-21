@@ -21,14 +21,15 @@
     \title Textured Surface Example
     \ingroup qtdatavisualization_examples
     \brief Using texture with Q3DSurface.
+    \since QtDataVisualization 1.2
 
     The textured surface example shows how to add an image as a texture for a surface. The example
     shows also how to:
 
     \list
         \li Create a surface series from an image
-        \li Highlight an area of the surface
         \li Use custom input handler to enable zooming and panning
+        \li Highlight an area of the surface
     \endlist
 
     \image texturesurface-example.png
@@ -64,23 +65,6 @@
     And then the actual decoding.
     \snippet texturesurface/topographicseries.cpp 1
 
-    \section1 Highlight an area of the surface
-
-    The main idea on creating a highlight on the surface is to create a copy of the series and add
-    a bit of offset to the y value. On this example the class \c HighlightSeries implements the
-    creation of the copy on its \c handlePositionChange method. Firstly the \c HighlightSeries
-    needs to get the pointer to the original series and then it starts to listen the
-    QSurface3DSeries::selectedPointChanged signal.
-
-    \snippet texturesurface/highlightseries.cpp 0
-
-    When the signal arrives, first thing is to check that the position is valid. Then the ranges
-    for the  copied area are calculated and checked that they stay within the bounds. Finally
-    we simply fill the data array of the highlight series with the range from the data array of
-    topography series.
-
-    \snippet texturesurface/highlightseries.cpp 1
-
     \section1 Use custom input handler to enable zooming and panning
 
     For the panning the implementation is similar to the \l{Axis Range Dragging With Labels Example}.
@@ -102,4 +86,41 @@
     minimum, both ends of the axis are adjusted so that the range stays at the limit.
 
     \snippet texturesurface/custominputhandler.cpp 2
+
+    \section1 Highlight an area of the surface
+
+    The main idea on creating a highlight on the surface is to create a copy of the series and add
+    a bit of offset to the y value. On this example the class \c HighlightSeries implements the
+    creation of the copy on its \c handlePositionChange method. Firstly the \c HighlightSeries
+    needs to get the pointer to the original series and then it starts to listen the
+    QSurface3DSeries::selectedPointChanged signal.
+
+    \snippet texturesurface/highlightseries.cpp 0
+
+    When the signal arrives, first thing is to check that the position is valid. Then the ranges
+    for the  copied area are calculated and checked that they stay within the bounds. Finally
+    we simply fill the data array of the highlight series with the range from the data array of
+    topography series.
+
+    \snippet texturesurface/highlightseries.cpp 1
+
+    \section1 A gradient to the highlight series
+
+    Since the \c HighlightSeries is QSurface3DSeries, we can use all the decoration methods series can
+    have. In this example we added a gradient to emphasize the elevation. Because the suitable gradient
+    style depends on the range of the Y axis and we change the range when zooming, we need to adjust
+    the gradient color positions as the range change.
+
+    For the gradient color positions we define proportional values.
+
+    \snippet texturesurface/highlightseries.cpp 2
+
+    The gradient modification is done on \c handleGradientChange method and we connect it to react to
+    changes on Y axis.
+
+    \snippet texturesurface/surfacegraph.cpp 1
+
+    When a change on Y axis max value happens, we calculate the gradient color positions.
+
+    \snippet texturesurface/highlightseries.cpp 3
 */

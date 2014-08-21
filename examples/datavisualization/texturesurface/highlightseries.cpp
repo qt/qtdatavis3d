@@ -18,9 +18,15 @@
 
 #include "highlightseries.h"
 
-#include <QDebug>
-
 using namespace QtDataVisualization;
+
+//! [2]
+const float darkRedPos = 1.0f;
+const float redPos = 0.8f;
+const float yellowPos = 0.6f;
+const float greenPos = 0.4f;
+const float darkGreenPos = 0.2f;
+//! [2]
 
 HighlightSeries::HighlightSeries()
     : m_width(100),
@@ -93,3 +99,21 @@ void HighlightSeries::handlePositionChange(const QPoint &position)
     setVisible(true);
 }
 //! [1]
+
+//! [3]
+void HighlightSeries::handleGradientChange(float value)
+{
+    float ratio = m_minHeight / value;
+
+    QLinearGradient gr;
+    gr.setColorAt(0.0f, Qt::black);
+    gr.setColorAt(darkGreenPos * ratio, Qt::darkGreen);
+    gr.setColorAt(greenPos * ratio, Qt::green);
+    gr.setColorAt(yellowPos * ratio, Qt::yellow);
+    gr.setColorAt(redPos * ratio, Qt::red);
+    gr.setColorAt(darkRedPos * ratio, Qt::darkRed);
+
+    setBaseGradient(gr);
+    setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+}
+//! [3]

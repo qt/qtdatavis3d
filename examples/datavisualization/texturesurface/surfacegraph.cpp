@@ -22,13 +22,12 @@
 #include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/Q3DTheme>
 
-#include <QDebug>
-
 using namespace QtDataVisualization;
 
 const float areaWidth = 8000.0f;
 const float areaHeight = 8000.0f;
 const float aspectRatio = 0.1389f;
+const float minRange = areaWidth * 0.49f;
 
 SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     : m_graph(surface)
@@ -56,6 +55,12 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
 
     m_highlight = new HighlightSeries();
     m_highlight->setTopographicSeries(m_topography);
+    m_highlight->setMinHeight(minRange * aspectRatio);
+    m_highlight->handleGradientChange(areaWidth * aspectRatio);
+//! [1]
+    QObject::connect(m_graph->axisY(), &QValue3DAxis::maxChanged,
+                     m_highlight, &HighlightSeries::handleGradientChange);
+//! [1]
 
     m_graph->addSeries(m_topography);
     m_graph->addSeries(m_highlight);
@@ -63,7 +68,7 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     m_inputHandler = new CustomInputHandler(m_graph);
     m_inputHandler->setHighlightSeries(m_highlight);
     m_inputHandler->setAxes(m_graph->axisX(), m_graph->axisY(), m_graph->axisZ());
-    m_inputHandler->setLimits(0.0f, areaWidth);
+    m_inputHandler->setLimits(0.0f, areaWidth, minRange);
     m_inputHandler->setAspectRatio(aspectRatio);
 
     m_graph->setActiveInputHandler(m_inputHandler);

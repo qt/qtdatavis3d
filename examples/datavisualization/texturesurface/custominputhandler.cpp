@@ -21,8 +21,6 @@
 #include <QtDataVisualization/Q3DCamera>
 #include <QtCore/qmath.h>
 
-#include <QDebug>
-
 CustomInputHandler::CustomInputHandler(QAbstract3DGraph *graph, QObject *parent) :
     Q3DInputHandler(parent),
     m_highlight(0),

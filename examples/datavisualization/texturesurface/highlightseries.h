@@ -33,9 +33,11 @@ public:
     ~HighlightSeries();
 
     void setTopographicSeries(TopographicSeries *series);
+    inline void setMinHeight(float height) { m_minHeight = height; }
 
 public slots:
     void handlePositionChange(const QPoint &position);
+    void handleGradientChange(float value);
 
 private:
     int m_width;
@@ -44,6 +46,7 @@ private:
     int m_srcHeight;
     QPoint m_position;
     TopographicSeries *m_topographicSeries;
+    float m_minHeight;
 };
 
 #endif // HIGHLIGHTSERIES_H

@@ -40,15 +40,15 @@ class CustomInputHandler : public Q3DInputHandler
 public:
     explicit CustomInputHandler(QAbstract3DGraph *graph, QObject *parent = 0);
 
-    inline void setLimits(float min, float max) {
+    inline void setLimits(float min, float max, float minRange) {
         m_areaMinValue = min;
         m_areaMaxValue = max;
         m_axisXMinValue = m_areaMinValue;
         m_axisXMaxValue = m_areaMaxValue;
         m_axisZMinValue = m_areaMinValue;
         m_axisZMaxValue = m_areaMaxValue;
-        m_axisXMinRange = (m_areaMaxValue - m_areaMinValue) * 0.49f;
-        m_axisZMinRange = (m_areaMaxValue - m_areaMinValue) * 0.49f;
+        m_axisXMinRange = minRange;
+        m_axisZMinRange = minRange;
     }
     inline void setAxes(QValue3DAxis *axisX, QValue3DAxis *axisY, QValue3DAxis *axisZ) {
         m_axisX = axisX;
