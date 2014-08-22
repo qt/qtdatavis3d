@@ -33,8 +33,8 @@ void main() {
         if (rayDir.z < 0)
             boxBounds.z = -1.0;
         highp vec3 t = (boxBounds - rayStart) * invRayDir;
-        tFar = max(t.x, t.y);
-        tFar = max(tFar, t.z);
+        tFar = min(t.x, t.y);
+        tFar = min(tFar, t.z);
     }
 
     highp vec3 xPoint = vec3(volumeSliceIndices.x, 0, 0);

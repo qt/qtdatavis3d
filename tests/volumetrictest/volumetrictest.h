@@ -35,6 +35,7 @@ public:
     ~VolumetricModifier();
 
     void setFpsLabel(QLabel *fpsLabel);
+    void setSliceLabels(QLabel *xLabel, QLabel *yLabel, QLabel *zLabel);
 
 public slots:
     void sliceX(int enabled);
@@ -59,6 +60,9 @@ private:
     int m_sliceIndexY;
     int m_sliceIndexZ;
     QLabel *m_fpsLabel;
+    QLabel *m_sliceLabelX;
+    QLabel *m_sliceLabelY;
+    QLabel *m_sliceLabelZ;
 };
 
 #endif

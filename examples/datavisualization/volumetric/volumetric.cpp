@@ -51,7 +51,10 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
       m_highDetailIndex(0),
       m_sliceSliderX(0),
       m_sliceSliderY(0),
-      m_sliceSliderZ(0)
+      m_sliceSliderZ(0),
+      m_sliceLabelX(0),
+      m_sliceLabelY(0),
+      m_sliceLabelZ(0)
 {
     m_graph->activeTheme()->setType(Q3DTheme::ThemeQt);
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
@@ -95,12 +98,12 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     }
 
     // The alternate color table.
-    // The first visible layer is a thin yellow one, and rest of the volume uses a smooth gradient.
+    // The first visible layer is a thin single color, and rest of the volume uses a smooth gradient.
     for (int i = 1; i < colorTableSize; i++) {
         if (i < cutOffColorIndex)
             m_colorTable2[i] = qRgba(0, 0, 0, 0);
         else if (i < cutOffColorIndex + 4)
-            m_colorTable2[i] = qRgba(255, 255, 0, 255);
+            m_colorTable2[i] = qRgba(75, 150, 0, 255);
         else
             m_colorTable2[i] = qRgba(i, 0, 255 - i, 255);
     }
@@ -108,6 +111,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_volumeItem->setColorTable(m_colorTable1);
 
     m_graph->addCustomItem(m_volumeItem);
+
     m_timer.start(0);
 #else
     // OpenGL ES2 doesn't support 3D textures, so show a warning label instead
@@ -152,6 +156,17 @@ void VolumetricModifier::setHighDetailRB(QRadioButton *button)
     m_highDetailRB = button;
 }
 
+void VolumetricModifier::setSliceLabels(QLabel *xLabel, QLabel *yLabel, QLabel *zLabel)
+{
+    m_sliceLabelX = xLabel;
+    m_sliceLabelY = yLabel;
+    m_sliceLabelZ = zLabel;
+
+    adjustSliceX(m_sliceSliderX->value());
+    adjustSliceY(m_sliceSliderY->value());
+    adjustSliceZ(m_sliceSliderZ->value());
+}
+
 void VolumetricModifier::sliceX(int enabled)
 {
     if (m_volumeItem)
@@ -173,22 +188,40 @@ void VolumetricModifier::sliceZ(int enabled)
 void VolumetricModifier::adjustSliceX(int value)
 {
     m_sliceIndexX = value / (1024 / m_volumeItem->textureWidth());
-    if (m_volumeItem && m_volumeItem->sliceIndexX() != -1)
-        m_volumeItem->setSliceIndexX(m_sliceIndexX);
+    if (m_sliceIndexX == m_volumeItem->textureWidth())
+        m_sliceIndexX--;
+    if (m_volumeItem) {
+        if (m_volumeItem->sliceIndexX() != -1)
+            m_volumeItem->setSliceIndexX(m_sliceIndexX);
+        m_sliceLabelX->setPixmap(QPixmap::fromImage(
+                                     m_volumeItem->renderSlice(Qt::XAxis, m_sliceIndexX)));
+    }
 }
 
 void VolumetricModifier::adjustSliceY(int value)
 {
     m_sliceIndexY = value / (1024 / m_volumeItem->textureHeight());
-    if (m_volumeItem && m_volumeItem->sliceIndexY() != -1)
-        m_volumeItem->setSliceIndexY(m_sliceIndexY);
+    if (m_sliceIndexY == m_volumeItem->textureHeight())
+        m_sliceIndexY--;
+    if (m_volumeItem) {
+        if (m_volumeItem->sliceIndexY() != -1)
+            m_volumeItem->setSliceIndexY(m_sliceIndexY);
+        m_sliceLabelY->setPixmap(QPixmap::fromImage(
+                                     m_volumeItem->renderSlice(Qt::YAxis, m_sliceIndexY)));
+    }
 }
 
 void VolumetricModifier::adjustSliceZ(int value)
 {
     m_sliceIndexZ = value / (1024 / m_volumeItem->textureDepth());
-    if (m_volumeItem && m_volumeItem->sliceIndexZ() != -1)
-        m_volumeItem->setSliceIndexZ(m_sliceIndexZ);
+    if (m_sliceIndexZ == m_volumeItem->textureDepth())
+        m_sliceIndexZ--;
+    if (m_volumeItem)  {
+        if (m_volumeItem->sliceIndexZ() != -1)
+            m_volumeItem->setSliceIndexZ(m_sliceIndexZ);
+        m_sliceLabelZ->setPixmap(QPixmap::fromImage(
+                                     m_volumeItem->renderSlice(Qt::ZAxis, m_sliceIndexZ)));
+    }
 }
 
 void VolumetricModifier::handleZoomLevelChange()
@@ -282,6 +315,11 @@ void VolumetricModifier::changeColorTable(int enabled)
         m_volumeItem->setColorTable(m_colorTable2);
     else
         m_volumeItem->setColorTable(m_colorTable1);
+
+    // Rerender image labels
+    adjustSliceX(m_sliceSliderX->value());
+    adjustSliceY(m_sliceSliderY->value());
+    adjustSliceZ(m_sliceSliderZ->value());
 }
 
 int VolumetricModifier::createVolume(int textureSize, int startIndex, int count,

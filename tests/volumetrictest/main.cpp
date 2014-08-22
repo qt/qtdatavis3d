@@ -77,16 +77,37 @@ int main(int argc, char **argv)
 
     QLabel *fpsLabel = new QLabel(QStringLiteral("Fps: "), widget);
 
+    QLabel *sliceImageXLabel = new QLabel(widget);
+    QLabel *sliceImageYLabel = new QLabel(widget);
+    QLabel *sliceImageZLabel = new QLabel(widget);
+    sliceImageXLabel->setMinimumSize(QSize(200, 100));
+    sliceImageYLabel->setMinimumSize(QSize(200, 200));
+    sliceImageZLabel->setMinimumSize(QSize(200, 100));
+    sliceImageXLabel->setMaximumSize(QSize(200, 100));
+    sliceImageYLabel->setMaximumSize(QSize(200, 200));
+    sliceImageZLabel->setMaximumSize(QSize(200, 100));
+    sliceImageXLabel->setFrameShape(QFrame::Box);
+    sliceImageYLabel->setFrameShape(QFrame::Box);
+    sliceImageZLabel->setFrameShape(QFrame::Box);
+    sliceImageXLabel->setScaledContents(true);
+    sliceImageYLabel->setScaledContents(true);
+    sliceImageZLabel->setScaledContents(true);
+
     vLayout->addWidget(fpsLabel);
     vLayout->addWidget(sliceXCheckBox);
     vLayout->addWidget(sliceXSlider);
+    vLayout->addWidget(sliceImageXLabel);
     vLayout->addWidget(sliceYCheckBox);
     vLayout->addWidget(sliceYSlider);
+    vLayout->addWidget(sliceImageYLabel);
     vLayout->addWidget(sliceZCheckBox);
-    vLayout->addWidget(sliceZSlider, 1, Qt::AlignTop);
+    vLayout->addWidget(sliceZSlider);
+    vLayout->addWidget(sliceImageZLabel, 1, Qt::AlignTop);
+
 
     VolumetricModifier *modifier = new VolumetricModifier(graph);
     modifier->setFpsLabel(fpsLabel);
+    modifier->setSliceLabels(sliceImageXLabel, sliceImageYLabel, sliceImageZLabel);
 
     QObject::connect(sliceXCheckBox, &QCheckBox::stateChanged, modifier,
                      &VolumetricModifier::sliceX);

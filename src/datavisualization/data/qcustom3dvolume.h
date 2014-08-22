@@ -80,6 +80,8 @@ public:
     void setTextureFormat(QImage::Format format);
     QImage::Format textureFormat() const;
 
+    QImage renderSlice(Qt::Axis axis, int index);
+
 signals:
     void textureWidthChanged(int value);
     void textureHeightChanged(int value);

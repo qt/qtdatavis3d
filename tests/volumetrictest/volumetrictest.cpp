@@ -66,6 +66,8 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->addCustomItem(m_plainItem);
     //m_graph->setMeasureFps(true);
 
+
+
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &VolumetricModifier::handleFpsChange);
 //    QObject::connect(m_graph->scene(), &Q3DScene::viewportChanged, this,
@@ -110,6 +112,9 @@ void VolumetricModifier::adjustSliceX(int value)
         m_volumeItem->setSliceIndexX(m_sliceIndexX);
         m_volumeItem2->setSliceIndexX(m_sliceIndexX);
     }
+    m_sliceLabelX->setPixmap(QPixmap::fromImage(
+                                 m_volumeItem2->renderSlice(Qt::XAxis, m_sliceIndexX)));
+
 }
 
 void VolumetricModifier::adjustSliceY(int value)
@@ -122,6 +127,8 @@ void VolumetricModifier::adjustSliceY(int value)
         m_volumeItem->setSliceIndexY(m_sliceIndexY);
         m_volumeItem2->setSliceIndexY(m_sliceIndexY);
     }
+    m_sliceLabelY->setPixmap(QPixmap::fromImage(
+                                 m_volumeItem2->renderSlice(Qt::YAxis, m_sliceIndexY)));
 }
 
 void VolumetricModifier::adjustSliceZ(int value)
@@ -134,6 +141,8 @@ void VolumetricModifier::adjustSliceZ(int value)
         m_volumeItem->setSliceIndexZ(m_sliceIndexZ);
         m_volumeItem2->setSliceIndexZ(m_sliceIndexZ);
     }
+    m_sliceLabelZ->setPixmap(QPixmap::fromImage(
+                                 m_volumeItem2->renderSlice(Qt::ZAxis, m_sliceIndexZ)));
 }
 
 void VolumetricModifier::handleFpsChange()
@@ -208,8 +217,8 @@ void VolumetricModifier::createVolume()
     uchar *p = data;
 
     // Change one picture using subtexture replacement
-//    QImage flipped = logo.mirrored();
-//    m_volumeItem->setSubTextureData(101, flipped);
+    QImage flipped = logo.mirrored();
+    m_volumeItem->setSubTextureData(100, flipped);
 
     // Clean up the two extra pixels
     p = data + width - 1;
@@ -337,7 +346,7 @@ void VolumetricModifier::createAnotherVolume()
 
     // Change one picture using subtexture replacement
     QImage flipped = logo.mirrored();
-    m_volumeItem2->setSubTextureData(101, flipped);
+    m_volumeItem2->setSubTextureData(100, flipped);
 }
 
 void VolumetricModifier::createYetAnotherVolume()
@@ -485,3 +494,13 @@ void VolumetricModifier::createYetAnotherVolume()
 
 }
 
+void VolumetricModifier::setSliceLabels(QLabel *xLabel, QLabel *yLabel, QLabel *zLabel)
+{
+    m_sliceLabelX = xLabel;
+    m_sliceLabelY = yLabel;
+    m_sliceLabelZ = zLabel;
+
+    adjustSliceX(512);
+    adjustSliceY(512);
+    adjustSliceZ(512);
+}

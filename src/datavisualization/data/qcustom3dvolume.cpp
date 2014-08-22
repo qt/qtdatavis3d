@@ -577,6 +577,86 @@ QImage::Format QCustom3DVolume::textureFormat() const
     return dptrc()->m_textureFormat;
 }
 
+/*!
+ * Renders the slice specified by \a index along \a axis into an image.
+ * The texture format of this object is used.
+ *
+ * \return the rendered image of the slice, or a null image if invalid index is specified.
+ *
+ * \sa textureFormat
+ */
+QImage QCustom3DVolume::renderSlice(Qt::Axis axis, int index)
+{
+    if (index < 0)
+        return QImage();
+
+    int x;
+    int y;
+    if (axis == Qt::XAxis) {
+        if (index >= textureWidth())
+            return QImage();
+        x = textureDepth();
+        y = textureHeight();
+    } else if (axis == Qt::YAxis) {
+        if (index >= textureHeight())
+            return QImage();
+        x = textureWidth();
+        y = textureDepth();
+    } else {
+        if (index >= textureDepth())
+            return QImage();
+        x = textureWidth();
+        y = textureHeight();
+    }
+
+    int padding = 0;
+    int pixelWidth = 4;
+    if (textureFormat() == QImage::Format_Indexed8) {
+        padding = x % 4;
+        pixelWidth = 1;
+    }
+    QVector<uchar> data((x + padding) * y * pixelWidth);
+    int frameSize = textureDataWidth() * textureHeight();
+
+    int dataIndex = 0;
+    if (axis == Qt::XAxis) {
+        for (int i = 0; i < y; i++) {
+            const uchar *p = textureData()->constData()
+                    + (index * pixelWidth) + (textureDataWidth() * i);
+            for (int j = 0; j < x; j++) {
+                data[dataIndex++] = *p;
+                for (int k = 1; k < pixelWidth; k++)
+                    data[dataIndex++] = *(p + k);
+                p += frameSize;
+            }
+        }
+    } else if (axis == Qt::YAxis) {
+        for (int i = 0; i < y; i++) {
+            const uchar *p = textureData()->constData() + (index * textureDataWidth())
+                    + (frameSize * i);
+            for (int j = 0; j < (x * pixelWidth); j++) {
+                data[dataIndex++] = *p;
+                p++;
+            }
+        }
+    } else {
+        for (int i = 0; i < y; i++) {
+            const uchar *p = textureData()->constData() + (index * frameSize)
+                    + (textureDataWidth() * i);
+            for (int j = 0; j < (x * pixelWidth); j++) {
+                data[dataIndex++] = *p;
+                p++;
+            }
+        }
+    }
+
+    QImage image(data.constData(), x, y, x * pixelWidth, textureFormat());
+    image.bits(); // Call bits() to detach the new image from local data
+    if (textureFormat() == QImage::Format_Indexed8)
+        image.setColorTable(colorTable());
+
+    return image;
+}
 
 /*!
  * \internal
@@ -636,9 +716,6 @@ QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q, const QVector
         m_textureHeight = 0;
     if (m_textureDepth < 0)
         m_textureDepth = 0;
-
-    if (m_colorTable.size() != 256)
-        m_colorTable.clear();
 
     if (m_textureFormat != QImage::Format_Indexed8)
         m_textureFormat = QImage::Format_ARGB32;

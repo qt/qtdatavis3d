@@ -40,6 +40,7 @@ public:
     void setFpsLabel(QLabel *fpsLabel);
     void setMediumDetailRB(QRadioButton *button);
     void setHighDetailRB(QRadioButton *button);
+    void setSliceLabels(QLabel *xLabel, QLabel *yLabel, QLabel *zLabel);
 
 public slots:
     void sliceX(int enabled);
@@ -82,6 +83,9 @@ private:
     QSlider *m_sliceSliderZ;
     QVector<QRgb> m_colorTable1;
     QVector<QRgb> m_colorTable2;
+    QLabel *m_sliceLabelX;
+    QLabel *m_sliceLabelY;
+    QLabel *m_sliceLabelZ;
 };
 
 #endif
