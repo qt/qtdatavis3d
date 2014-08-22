@@ -21,6 +21,7 @@
 
 #include <QtDataVisualization/q3dscatter.h>
 #include <QtDataVisualization/qcustom3dvolume.h>
+#include <QtDataVisualization/qcustom3ditem.h>
 
 class QLabel;
 
@@ -42,16 +43,18 @@ public slots:
     void adjustSliceX(int value);
     void adjustSliceY(int value);
     void adjustSliceZ(int value);
-    void handleZoomLevelChange();
-    void handleFpsChange(qreal fps);
+    void handleFpsChange();
 
 private:
     void createVolume();
     void createAnotherVolume();
+    void createYetAnotherVolume();
 
     Q3DScatter *m_graph;
     QCustom3DVolume *m_volumeItem;
     QCustom3DVolume *m_volumeItem2;
+    QCustom3DVolume *m_volumeItem3;
+    QCustom3DItem *m_plainItem;
     int m_sliceIndexX;
     int m_sliceIndexY;
     int m_sliceIndexZ;

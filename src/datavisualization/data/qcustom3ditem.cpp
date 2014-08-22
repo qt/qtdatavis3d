@@ -367,6 +367,7 @@ QString QCustom3DItem::textureFile() const
 
 QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q) :
     q_ptr(q),
+    m_textureImage(QImage(1, 1, QImage::Format_ARGB32)),
     m_position(QVector3D(0.0f, 0.0f, 0.0f)),
     m_positionAbsolute(false),
     m_scaling(QVector3D(0.1f, 0.1f, 0.1f)),
@@ -382,6 +383,7 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, const QString &mesh
                                            const QVector3D &position, const QVector3D &scaling,
                                            const QQuaternion &rotation) :
     q_ptr(q),
+    m_textureImage(QImage(1, 1, QImage::Format_ARGB32)),
     m_meshFile(meshFile),
     m_position(position),
     m_positionAbsolute(false),

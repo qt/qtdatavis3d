@@ -35,7 +35,7 @@ int main(int argc, char **argv)
     QWidget *container = QWidget::createWindowContainer(graph);
 
     QSize screenSize = graph->screen()->size();
-    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
+    container->setMinimumSize(QSize(screenSize.width() / 4, screenSize.height() / 4));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
@@ -47,6 +47,7 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
 
     widget->setWindowTitle(QStringLiteral("Volumetric TEST"));
+    widget->resize(QSize(screenSize.width() / 1.5, screenSize.height() / 1.5));
 
     QCheckBox *sliceXCheckBox = new QCheckBox(widget);
     sliceXCheckBox->setText(QStringLiteral("Slice volume on X axis"));

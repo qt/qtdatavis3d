@@ -15,24 +15,27 @@ const highp vec3 zPlaneNormal = vec3(0, 0, 1.0);
 const highp float alphaThreshold = 0.0001;
 
 void main() {
-    // Raytrace into volume, need to sample pixels along the eye ray until we hit opacity 1
-
     // Find out where ray intersects the slice planes
     highp vec3 rayDir = -(cameraPositionRelativeToModel - pos);
+    rayDir = normalize(rayDir);
     highp vec3 rayStart = pos;
     // Flip Y and Z so QImage bits work directly for texture and first image is in the front
     rayStart.yz = -rayStart.yz;
     rayDir.yz = -rayDir.yz;
-    highp vec3 invRayDir = 1.0 / rayDir;
-    highp vec3 minCorner = vec3(-1.0);
-    highp vec3 maxCorner = vec3(1.0);
-    highp vec3 t1 = invRayDir * (minCorner - rayStart);
-    highp vec3 t2 = invRayDir * (maxCorner - rayStart);
-    highp vec3 tmin = min(t1, t2);
-    highp vec3 tmax = max(t1, t2);
-    highp vec2 t = max(tmin.xx, tmin.yz);
-    t = min(tmax.xx, tmax.yz);
-    float tFar = min(t.x, t.y);
+    highp float tFar = 2.0f;
+    if (rayDir.x != 0.0 && rayDir.y != 0.0 && rayDir.z != 0.0) {
+        highp vec3 boxBounds = vec3(1.0, 1.0, 1.0);
+        highp vec3 invRayDir = 1.0 / rayDir;
+        if (rayDir.x < 0)
+            boxBounds.x = -1.0;
+        if (rayDir.y < 0)
+            boxBounds.y = -1.0;
+        if (rayDir.z < 0)
+            boxBounds.z = -1.0;
+        highp vec3 t = (boxBounds - rayStart) * invRayDir;
+        tFar = max(t.x, t.y);
+        tFar = max(tFar, t.z);
+    }
 
     highp vec3 xPoint = vec3(volumeSliceIndices.x, 0, 0);
     highp vec3 yPoint = vec3(0, volumeSliceIndices.y, 0);

@@ -52,13 +52,17 @@ void CustomRenderItem::setMesh(const QString &meshFile)
 
 void CustomRenderItem::setColorTable(const QVector<QRgb> &colors)
 {
-    m_colorTable.resize(colors.size());
-    for (int i = 0; i < m_colorTable.size(); i++) {
-        const QRgb &rgb = colors.at(i);
-        m_colorTable[i] = QVector4D(float(qRed(rgb)) / 255.0f,
-                                    float(qGreen(rgb)) / 255.0f,
-                                    float(qBlue(rgb)) / 255.0f,
-                                    float(qAlpha(rgb)) / 255.0f);
+    m_colorTable.resize(256);
+    for (int i = 0; i < 256; i++) {
+        if (i < colors.size()) {
+            const QRgb &rgb = colors.at(i);
+            m_colorTable[i] = QVector4D(float(qRed(rgb)) / 255.0f,
+                                        float(qGreen(rgb)) / 255.0f,
+                                        float(qBlue(rgb)) / 255.0f,
+                                        float(qAlpha(rgb)) / 255.0f);
+        } else {
+            m_colorTable[i] = QVector4D(0.0f, 0.0f, 0.0f, 0.0f);
+        }
     }
 }
 

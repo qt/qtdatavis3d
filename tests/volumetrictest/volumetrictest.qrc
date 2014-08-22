@@ -1,5 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>logo.png</file>
+        <file alias="mesh">cubeFilledFlat.obj</file>
     </qresource>
 </RCC>

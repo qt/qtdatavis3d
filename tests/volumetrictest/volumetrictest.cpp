@@ -34,11 +34,14 @@ const int imageCount = 512;
 VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_volumeItem(0),
+      m_volumeItem2(0),
+      m_volumeItem3(0),
       m_sliceIndexX(0),
       m_sliceIndexY(0),
       m_sliceIndexZ(0)
 {
     m_graph->activeTheme()->setType(Q3DTheme::ThemeQt);
+    //m_graph->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_graph->setOrthoProjection(true);
@@ -46,15 +49,27 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
 
     createVolume();
     createAnotherVolume();
+    createYetAnotherVolume();
+
+    m_plainItem = new QCustom3DItem;
+    QImage texture(2, 2, QImage::Format_ARGB32);
+    texture.fill(QColor(200, 200, 200, 130));
+    m_plainItem->setMeshFile(QStringLiteral(":/mesh"));
+    m_plainItem->setTextureImage(texture);
+    m_plainItem->setRotation(m_volumeItem->rotation());
+    m_plainItem->setPosition(m_volumeItem->position() + QVector3D(0.8f, 0.0f, 0.0f));
+    m_plainItem->setScaling(m_volumeItem->scaling());
 
     m_graph->addCustomItem(m_volumeItem);
     m_graph->addCustomItem(m_volumeItem2);
-    m_graph->setMeasureFps(true);
+    m_graph->addCustomItem(m_volumeItem3);
+    m_graph->addCustomItem(m_plainItem);
+    //m_graph->setMeasureFps(true);
 
-    QObject::connect(m_graph->scene()->activeCamera(), &Q3DCamera::zoomLevelChanged, this,
-                     &VolumetricModifier::handleZoomLevelChange);
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &VolumetricModifier::handleFpsChange);
+//    QObject::connect(m_graph->scene(), &Q3DScene::viewportChanged, this,
+//                     &VolumetricModifier::handleFpsChange);
 }
 
 VolumetricModifier::~VolumetricModifier()
@@ -121,26 +136,23 @@ void VolumetricModifier::adjustSliceZ(int value)
     }
 }
 
-void VolumetricModifier::handleZoomLevelChange()
-{
-    // Zooming inside volumetric object causes ugly clipping issues, so restrict zoom level a bit
-    if (m_graph->scene()->activeCamera()->zoomLevel() > 220)
-        m_graph->scene()->activeCamera()->setZoomLevel(220);
-}
-
-void VolumetricModifier::handleFpsChange(qreal fps)
+void VolumetricModifier::handleFpsChange()
 {
     const QString fpsFormat = QStringLiteral("Fps: %1");
-    int fps10 = int(fps * 10.0);
+    int fps10 = int(m_graph->currentFps() * 10.0);
     m_fpsLabel->setText(fpsFormat.arg(QString::number(qreal(fps10) / 10.0)));
+//    const QString sceneDimensionsFormat = QStringLiteral("%1 x %2");
+//    m_fpsLabel->setText(sceneDimensionsFormat
+//                        .arg(m_graph->scene()->viewport().width())
+//                        .arg(m_graph->scene()->viewport().height()));
 }
 
 void VolumetricModifier::createVolume()
 {
     m_volumeItem = new QCustom3DVolume;
     m_volumeItem->setTextureFormat(QImage::Format_ARGB32);
-    m_volumeItem->setRotation(QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 0.0f, 10.0f));
-    m_volumeItem->setPosition(QVector3D(-0.5f, 0.0f, 0.0f));
+//    m_volumeItem->setRotation(QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 0.0f, 10.0f));
+    m_volumeItem->setPosition(QVector3D(-0.5f, 0.6f, 0.0f));
 
     QImage logo;
     logo.load(QStringLiteral(":/logo.png"));
@@ -161,10 +173,24 @@ void VolumetricModifier::createVolume()
     m_sliceIndexZ = m_volumeItem->textureWidth() / 2;
 
     QVector<QRgb> colorTable = m_volumeItem->colorTable();
+
+    // Hack some alpha to the picture
+    for (int i = 0; i < colorTable.size(); i++) {
+        if (qAlpha(colorTable.at(i)) > 0) {
+            colorTable[i] = qRgba(qRed(colorTable.at(i)),
+                                  qGreen(colorTable.at(i)),
+                                  qBlue(colorTable.at(i)),
+                                  50);
+        }
+    }
+
+    colorTable.append(qRgba(0, 0, 0, 0));
     colorTable.append(qRgba(255, 0, 0, 255));
     colorTable.append(qRgba(0, 255, 0, 255));
     colorTable.append(qRgba(0, 0, 255, 255));
+
     m_volumeItem->setColorTable(colorTable);
+    int alphaIndex = colorTable.size() - 4;
     int redIndex = colorTable.size() - 3;
     int greenIndex = colorTable.size() - 2;
     int blueIndex = colorTable.size() - 1;
@@ -173,27 +199,35 @@ void VolumetricModifier::createVolume()
     int depth = m_volumeItem->textureDepth();
     int frameSize = width * height;
     qDebug() << width << height << depth << m_volumeItem->textureData()->size();
-    m_volumeItem->setScaling(QVector3D(float(width) / float(depth) * 2.0f,
-                                       float(height) / float(depth) * 2.0f,
-                                       2.0f));
+//    m_volumeItem->setScaling(QVector3D(float(width) / float(depth) * 2.0f,
+//                                       float(height) / float(depth) * 2.0f,
+//                                       2.0f));
+    m_volumeItem->setScaling(QVector3D(0.4f, 0.4f, 0.4f));
 
     uchar *data = m_volumeItem->textureData()->data();
     uchar *p = data;
 
     // Change one picture using subtexture replacement
-    QImage flipped = logo.mirrored();
-    m_volumeItem->setSubTextureData(101, flipped);
+//    QImage flipped = logo.mirrored();
+//    m_volumeItem->setSubTextureData(101, flipped);
 
+    // Clean up the two extra pixels
+    p = data + width - 1;
+    for (int k = 0; k < depth; k++) {
+        for (int j = 0; j < height; j++) {
+            *p = alphaIndex;
+            p += width;
+        }
+    }
+    p = data + width - 2;
+    for (int k = 0; k < depth; k++) {
+        for (int j = 0; j < height; j++) {
+            *p = alphaIndex;
+            p += width;
+        }
+    }
     // Red first subtexture
-//    for (int j = 0; j < height; j++) {
-//        for (int i = 0; i < width; i++) {
-//            *p = redIndex;
-//            p++;
-//        }
-//    }
-
-    // Red last subtexture
-    p = data + frameSize * (imageCount - 1);
+    p = data;
     for (int j = 0; j < height; j++) {
         for (int i = 0; i < width; i++) {
             *p = redIndex;
@@ -201,14 +235,32 @@ void VolumetricModifier::createVolume()
         }
     }
 
+    // Red last subtexture
+//    p = data + frameSize * (imageCount - 1);
+//    for (int j = 0; j < height; j++) {
+//        for (int i = 0; i < width; i++) {
+//            *p = redIndex;
+//            p++;
+//        }
+//    }
+
+//    // Blue second to last subtexture
+//    p = data + frameSize * (imageCount - 2);
+//    for (int j = 0; j < height; j++) {
+//        for (int i = 0; i < width; i++) {
+//            *p = blueIndex;
+//            p++;
+//        }
+//    }
+
     // Blue x = 0
-    p = data;
-    for (int k = 0; k < depth; k++) {
-        for (int j = 0; j < height; j++) {
-            *p = blueIndex;
-            p += width;
-        }
-    }
+//    p = data;
+//    for (int k = 0; k < depth; k++) {
+//        for (int j = 0; j < height; j++) {
+//            *p = blueIndex;
+//            p += width;
+//        }
+//    }
 
     // Blue x = max
     p = data + width - 1;
@@ -218,19 +270,17 @@ void VolumetricModifier::createVolume()
             p += width;
         }
     }
+    // green x = max - 1
+    p = data + width - 2;
+    for (int k = 0; k < depth; k++) {
+        for (int j = 0; j < height; j++) {
+            *p = greenIndex;
+            p += width;
+        }
+    }
 
     // Green y = 0
-//    p = data;
-//    for (int k = 0; k < depth; k++) {
-//        for (int i = 0; i < width; i++) {
-//            *p = greenIndex;
-//            p++;
-//        }
-//        p += (frameSize - width);
-//    }
-
-    // Green y = max
-    p = data + frameSize - width;
+    p = data;
     for (int k = 0; k < depth; k++) {
         for (int i = 0; i < width; i++) {
             *p = greenIndex;
@@ -238,13 +288,23 @@ void VolumetricModifier::createVolume()
         }
         p += (frameSize - width);
     }
+
+    // Green y = max
+//    p = data + frameSize - width;
+//    for (int k = 0; k < depth; k++) {
+//        for (int i = 0; i < width; i++) {
+//            *p = greenIndex;
+//            p++;
+//        }
+//        p += (frameSize - width);
+//    }
 }
 
 void VolumetricModifier::createAnotherVolume()
 {
     m_volumeItem2 = new QCustom3DVolume;
     m_volumeItem2->setTextureFormat(QImage::Format_ARGB32);
-    m_volumeItem2->setPosition(QVector3D(0.5f, 0.0f, 0.0f));
+    m_volumeItem2->setPosition(QVector3D(0.5f, -0.5f, 0.0f));
 
     QImage logo;
     logo.load(QStringLiteral(":/logo.png"));
@@ -278,5 +338,150 @@ void VolumetricModifier::createAnotherVolume()
     // Change one picture using subtexture replacement
     QImage flipped = logo.mirrored();
     m_volumeItem2->setSubTextureData(101, flipped);
+}
+
+void VolumetricModifier::createYetAnotherVolume()
+{
+    m_volumeItem3 = new QCustom3DVolume;
+    m_volumeItem3->setTextureFormat(QImage::Format_Indexed8);
+//    m_volumeItem2->setRotation(QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 0.0f, 10.0f));
+    m_volumeItem3->setPosition(QVector3D(-0.5f, -0.6f, 0.0f));
+
+//    m_volumeItem3->setTextureDimensions(m_volumeItem->textureDataWidth(),
+//                                        m_volumeItem->textureHeight(),
+//                                        m_volumeItem->textureDepth());
+    m_volumeItem3->setTextureDimensions(200, 200, 200);
+
+    QVector<uchar> *tdata = new QVector<uchar>(m_volumeItem3->textureDataWidth()
+                                               * m_volumeItem3->textureHeight()
+                                               * m_volumeItem3->textureDepth());
+    tdata->fill(0);
+    m_volumeItem3->setTextureData(tdata);
+
+    m_sliceIndexX = m_volumeItem3->textureWidth() / 2;
+    m_sliceIndexY = m_volumeItem3->textureWidth() / 2;
+    m_sliceIndexZ = m_volumeItem3->textureWidth() / 2;
+
+    QVector<QRgb> colorTable = m_volumeItem->colorTable();
+    colorTable[0] = qRgba(0, 0, 0, 0);
+    m_volumeItem3->setColorTable(colorTable);
+    int redIndex = colorTable.size() - 3;
+    int greenIndex = colorTable.size() - 2;
+    int blueIndex = colorTable.size() - 1;
+    int width = m_volumeItem3->textureDataWidth();
+    int height = m_volumeItem3->textureHeight();
+    int depth = m_volumeItem3->textureDepth();
+    int frameSize = width * height;
+    qDebug() << width << height << depth << m_volumeItem3->textureData()->size();
+    m_volumeItem3->setScaling(m_volumeItem->scaling());
+
+    uchar *data = tdata->data();
+    uchar *p = data;
+
+    // Red first subtexture
+//    for (int j = 0; j < height; j++) {
+//        for (int i = 0; i < width; i++) {
+//            *p = redIndex;
+//            p++;
+//        }
+//    }
+
+    // Red last subtexture
+    p = data + frameSize * (depth - 1);
+    for (int j = 0; j < height; j++) {
+        for (int i = 0; i < width; i++) {
+            *p = redIndex;
+            p++;
+        }
+    }
+
+    // green edge
+    p = data + frameSize * (depth - 1);
+    for (int i = 0; i < width; i++) {
+        *p = greenIndex;
+        p++;
+    }
+    for (int j = 2; j < height; j++) {
+        *p = greenIndex;
+        p += width - 1;
+        *p = j % 7 ? greenIndex : blueIndex;
+        p++;
+    }
+    for (int i = 0; i < width; i++) {
+        *p = greenIndex;
+        p++;
+    }
+
+//    // Blue second to last subtexture
+//    p = data + frameSize * (depth - 2);
+//    for (int j = 0; j < height; j++) {
+//        for (int i = 0; i < width; i++) {
+//            *p = blueIndex;
+//            p++;
+//        }
+//    }
+
+//    // green third to last subtexture
+//    p = data + frameSize * (depth - 3);
+//    for (int j = 0; j < height; j++) {
+//        for (int i = 0; i < width; i++) {
+//            *p = greenIndex;
+//            p++;
+//        }
+//    }
+
+    // Blue x = 0
+    p = data;
+    for (int k = 0; k < depth; k++) {
+        for (int j = 0; j < height; j++) {
+            *p = blueIndex;
+            p += width;
+        }
+    }
+
+//    // Blue x = max
+//    p = data + width - 1;
+//    for (int k = 0; k < depth; k++) {
+//        for (int j = 0; j < height; j++) {
+//            *p = blueIndex;
+//            p += width;
+//        }
+//    }
+
+    // Green y = 0
+//    p = data;
+//    for (int k = 0; k < depth; k++) {
+//        for (int i = 0; i < width; i++) {
+//            *p = greenIndex;
+//            p++;
+//        }
+//        p += (frameSize - width);
+//    }
+
+//    // Green y = max
+    p = data + frameSize - width;
+    for (int k = 0; k < depth; k++) {
+        for (int i = 0; i < width; i++) {
+            *p = greenIndex;
+            p++;
+        }
+        p += (frameSize - width);
+    }
+
+
+//    // Fill with alternating pixels
+//    p = data;
+//    for (int k = 0; k < (depth * width * height / 4); k++) {
+//        *p = greenIndex;
+//        p++;
+//        *p = greenIndex;
+//        p++;
+//        *p = blueIndex;
+//        p++;
+//        *p = redIndex;
+//        p++;
+//    }
+
+
 }
 
