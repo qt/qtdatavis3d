@@ -80,6 +80,8 @@ class ShaderHelper
     GLuint color8Bit();
     GLuint textureDimensions();
     GLuint sampleCount();
+    GLuint alphaMultiplier();
+    GLuint preserveOpacity();
 
     GLuint posAtt();
     GLuint uvAtt();
@@ -120,6 +122,8 @@ class ShaderHelper
     GLuint m_color8BitUniform;
     GLuint m_textureDimensionsUniform;
     GLuint m_sampleCountUniform;
+    GLuint m_alphaMultiplierUniform;
+    GLuint m_preserveOpacityUniform;
 
     GLboolean m_initialized;
 };

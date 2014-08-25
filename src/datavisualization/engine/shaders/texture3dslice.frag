@@ -7,6 +7,8 @@ uniform highp vec3 cameraPositionRelativeToModel;
 uniform highp vec3 volumeSliceIndices;
 uniform highp vec4 colorIndex[256];
 uniform highp int color8Bit;
+uniform highp float alphaMultiplier;
+uniform highp int preserveOpacity;
 
 const highp vec3 xPlaneNormal = vec3(1.0, 0, 0);
 const highp vec3 yPlaneNormal = vec3(0, 1.0, 0);
@@ -76,47 +78,67 @@ void main() {
     }
 
     highp vec4 destColor = vec4(0.0, 0.0, 0.0, 0.0);
+    highp vec4 curColor = vec4(0.0, 0.0, 0.0, 0.0);
     highp float totalAlpha = 0.0;
     highp vec3 curRgb = vec3(0, 0, 0);
+    highp float curAlpha = 0.0;
 
     // Convert intersection to texture coords
 
     if (firstD <= tFar) {
         highp vec3 firstTex = rayStart + rayDir * firstD;
         firstTex = 0.5 * (firstTex + 1.0);
-        highp vec4 firstColor = texture3D(textureSampler, firstTex);
+        curColor = texture3D(textureSampler, firstTex);
         if (color8Bit != 0)
-            firstColor = colorIndex[int(firstColor.r * 255.0)];
+            curColor = colorIndex[int(curColor.r * 255.0)];
 
-        if (firstColor.a > alphaThreshold) {
-            destColor.rgb = firstColor.rgb * firstColor.a;
-            totalAlpha = firstColor.a;
+        if (curColor.a > alphaThreshold) {
+            curAlpha = curColor.a;
+            if (curColor.a == 1.0 && preserveOpacity != 0)
+                curAlpha = 1.0;
+            else
+                curAlpha = clamp(curColor.a * alphaMultiplier, 0.0, 1.0);
+            destColor.rgb = curColor.rgb * curAlpha;
+            totalAlpha = curAlpha;
         }
         if (secondD <= tFar && totalAlpha < 1.0) {
             highp vec3 secondTex = rayStart + rayDir * secondD;
             secondTex = 0.5 * (secondTex + 1.0);
-            highp vec4 secondColor = texture3D(textureSampler, secondTex);
+            curColor = texture3D(textureSampler, secondTex);
             if (color8Bit != 0)
-                secondColor = colorIndex[int(secondColor.r * 255.0)];
-            if (secondColor.a > alphaThreshold) {
-                curRgb = secondColor.rgb * secondColor.a * (1.0 - totalAlpha);
+                curColor = colorIndex[int(curColor.r * 255.0)];
+            if (curColor.a > alphaThreshold) {
+                if (curColor.a == 1.0 && preserveOpacity != 0)
+                    curAlpha = 1.0;
+                else
+                    curAlpha = clamp(curColor.a * alphaMultiplier, 0.0, 1.0);
+                curRgb = curColor.rgb * curAlpha * (1.0 - totalAlpha);
                 destColor.rgb += curRgb;
-                totalAlpha += secondColor.a;
+                totalAlpha += curAlpha;
             }
             if (thirdD <= tFar && totalAlpha < 1.0) {
                 highp vec3 thirdTex = rayStart + rayDir * thirdD;
                 thirdTex = 0.5 * (thirdTex + 1.0);
-                highp vec4 thirdColor = texture3D(textureSampler, thirdTex);
-                if (color8Bit != 0)
-                    thirdColor = colorIndex[int(thirdColor.r * 255.0)];
-                if (thirdColor.a > alphaThreshold) {
-                    curRgb = thirdColor.rgb * thirdColor.a * (1.0 - totalAlpha);
+                curColor = texture3D(textureSampler, thirdTex);
+                if (curColor.a > alphaThreshold) {
+                    if (color8Bit != 0)
+                        curColor = colorIndex[int(curColor.r * 255.0)];
+                    if (curColor.a == 1.0 && preserveOpacity != 0)
+                        curAlpha = 1.0;
+                    else
+                        curAlpha = clamp(curColor.a * alphaMultiplier, 0.0, 1.0);
+                    curRgb = curColor.rgb * curAlpha * (1.0 - totalAlpha);
                     destColor.rgb += curRgb;
-                    totalAlpha += thirdColor.a;
+                    totalAlpha += curAlpha;
                 }
             }
         }
     }
+
+    // Brighten up the final color if there is some transparency left
+    if (totalAlpha > alphaThreshold && totalAlpha < 1.0)
+        destColor *= 1.0 / totalAlpha;
+
     destColor.a = totalAlpha;
     gl_FragColor = clamp(destColor, 0.0, 1.0);
 }

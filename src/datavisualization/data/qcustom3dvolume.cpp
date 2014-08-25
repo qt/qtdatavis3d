@@ -112,6 +112,30 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty real Custom3DVolume::alphaMultiplier
+ *
+ * The alpha value of every texel of the volume texture is multiplied with this value at
+ * the render time. This can be used to introduce uniform transparency to the volume.
+ * If preserveOpacity is \c{true}, only texels with at least some transparency to begin with are
+ * affected, and fully opaque texels are not affected.
+ * The value must not be negative.
+ * Defaults to \c{1.0}.
+ *
+ * \sa preserveOpacity
+ */
+
+/*!
+ * \qmlproperty bool Custom3DVolume::preserveOpacity
+ *
+ * If this property value is \c{true}, alphaMultiplier is only applied to texels that already have
+ * some transparency. If it is \c{false}, the multiplier is applied to the alpha value of all
+ * texels.
+ * Defaults to \c{true}.
+ *
+ * \sa alphaMultiplier
+ */
+
+/*!
  * Constructs QCustom3DVolume with given \a parent.
  */
 QCustom3DVolume::QCustom3DVolume(QObject *parent) :
@@ -578,6 +602,62 @@ QImage::Format QCustom3DVolume::textureFormat() const
 }
 
 /*!
+ * \property QCustom3DVolume::alphaMultiplier
+ *
+ * The alpha value of every texel of the volume texture is multiplied with this value at
+ * the render time. This can be used to introduce uniform transparency to the volume.
+ * If preserveOpacity is \c{true}, only texels with at least some transparency to begin with are
+ * affected, and fully opaque texels are not affected.
+ * The value must not be negative.
+ * Defaults to \c{1.0f}.
+ *
+ * \sa preserveOpacity, textureData
+ */
+void QCustom3DVolume::setAlphaMultiplier(float mult)
+{
+    if (mult >= 0.0f) {
+        if (dptr()->m_alphaMultiplier != mult) {
+            dptr()->m_alphaMultiplier = mult;
+            dptr()->m_dirtyBitsVolume.alphaDirty = true;
+            emit alphaMultiplierChanged(mult);
+            emit dptr()->needUpdate();
+        }
+    } else {
+        qWarning() << __FUNCTION__ << "Attempted to set negative multiplier.";
+    }
+}
+
+float QCustom3DVolume::alphaMultiplier() const
+{
+    return dptrc()->m_alphaMultiplier;
+}
+
+/*!
+ * \property QCustom3DVolume::preserveOpacity
+ *
+ * If this property value is \c{true}, alphaMultiplier is only applied to texels that already have
+ * some transparency. If it is \c{false}, the multiplier is applied to the alpha value of all
+ * texels.
+ * Defaults to \c{true}.
+ *
+ * \sa alphaMultiplier
+ */
+void QCustom3DVolume::setPreserveOpacity(bool enable)
+{
+    if (dptr()->m_preserveOpacity != enable) {
+        dptr()->m_preserveOpacity = enable;
+        dptr()->m_dirtyBitsVolume.alphaDirty = true;
+        emit preserveOpacityChanged(enable);
+        emit dptr()->needUpdate();
+    }
+}
+
+bool QCustom3DVolume::preserveOpacity() const
+{
+    return dptrc()->m_preserveOpacity;
+}
+
+/*!
  * Renders the slice specified by \a index along \a axis into an image.
  * The texture format of this object is used.
  *
@@ -587,75 +667,7 @@ QImage::Format QCustom3DVolume::textureFormat() const
  */
 QImage QCustom3DVolume::renderSlice(Qt::Axis axis, int index)
 {
-    if (index < 0)
-        return QImage();
-
-    int x;
-    int y;
-    if (axis == Qt::XAxis) {
-        if (index >= textureWidth())
-            return QImage();
-        x = textureDepth();
-        y = textureHeight();
-    } else if (axis == Qt::YAxis) {
-        if (index >= textureHeight())
-            return QImage();
-        x = textureWidth();
-        y = textureDepth();
-    } else {
-        if (index >= textureDepth())
-            return QImage();
-        x = textureWidth();
-        y = textureHeight();
-    }
-
-    int padding = 0;
-    int pixelWidth = 4;
-    if (textureFormat() == QImage::Format_Indexed8) {
-        padding = x % 4;
-        pixelWidth = 1;
-    }
-    QVector<uchar> data((x + padding) * y * pixelWidth);
-    int frameSize = textureDataWidth() * textureHeight();
-
-    int dataIndex = 0;
-    if (axis == Qt::XAxis) {
-        for (int i = 0; i < y; i++) {
-            const uchar *p = textureData()->constData()
-                    + (index * pixelWidth) + (textureDataWidth() * i);
-            for (int j = 0; j < x; j++) {
-                data[dataIndex++] = *p;
-                for (int k = 1; k < pixelWidth; k++)
-                    data[dataIndex++] = *(p + k);
-                p += frameSize;
-            }
-        }
-    } else if (axis == Qt::YAxis) {
-        for (int i = 0; i < y; i++) {
-            const uchar *p = textureData()->constData() + (index * textureDataWidth())
-                    + (frameSize * i);
-            for (int j = 0; j < (x * pixelWidth); j++) {
-                data[dataIndex++] = *p;
-                p++;
-            }
-        }
-    } else {
-        for (int i = 0; i < y; i++) {
-            const uchar *p = textureData()->constData() + (index * frameSize)
-                    + (textureDataWidth() * i);
-            for (int j = 0; j < (x * pixelWidth); j++) {
-                data[dataIndex++] = *p;
-                p++;
-            }
-        }
-    }
-
-    QImage image(data.constData(), x, y, x * pixelWidth, textureFormat());
-    image.bits(); // Call bits() to detach the new image from local data
-    if (textureFormat() == QImage::Format_Indexed8)
-        image.setColorTable(colorTable());
-
-    return image;
+    return dptr()->renderSlice(axis, index);
 }
 
 /*!
@@ -683,7 +695,9 @@ QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q) :
     m_textureHeight(0),
     m_textureDepth(0),
     m_textureFormat(QImage::Format_ARGB32),
-    m_textureData(0)
+    m_textureData(0),
+    m_alphaMultiplier(1.0f),
+    m_preserveOpacity(true)
 {
     m_isVolumeItem = true;
     m_meshFile = QStringLiteral(":/defaultMeshes/barFull");
@@ -705,7 +719,9 @@ QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q, const QVector
     m_textureDepth(textureDepth),
     m_textureFormat(textureFormat),
     m_colorTable(colorTable),
-    m_textureData(textureData)
+    m_textureData(textureData),
+    m_alphaMultiplier(1.0f),
+    m_preserveOpacity(true)
 {
     m_isVolumeItem = true;
     m_shadowCasting = false;
@@ -736,6 +752,103 @@ void QCustom3DVolumePrivate::resetDirtyBits()
     m_dirtyBitsVolume.colorTableDirty = false;
     m_dirtyBitsVolume.textureDataDirty = false;
     m_dirtyBitsVolume.textureFormatDirty = false;
+}
+
+QImage QCustom3DVolumePrivate::renderSlice(Qt::Axis axis, int index)
+{
+    if (index < 0)
+        return QImage();
+
+    int x;
+    int y;
+    if (axis == Qt::XAxis) {
+        if (index >= m_textureWidth)
+            return QImage();
+        x = m_textureDepth;
+        y = m_textureHeight;
+    } else if (axis == Qt::YAxis) {
+        if (index >= m_textureHeight)
+            return QImage();
+        x = m_textureWidth;
+        y = m_textureDepth;
+    } else {
+        if (index >= m_textureDepth)
+            return QImage();
+        x = m_textureWidth;
+        y = m_textureHeight;
+    }
+
+    int padding = 0;
+    int pixelWidth = 4;
+    int dataWidth = qptr()->textureDataWidth();
+    if (m_textureFormat == QImage::Format_Indexed8) {
+        padding = x % 4;
+        pixelWidth = 1;
+    }
+    QVector<uchar> data((x + padding) * y * pixelWidth);
+    int frameSize = qptr()->textureDataWidth() * m_textureHeight;
+
+    int dataIndex = 0;
+    if (axis == Qt::XAxis) {
+        for (int i = 0; i < y; i++) {
+            const uchar *p = m_textureData->constData()
+                    + (index * pixelWidth) + (dataWidth * i);
+            for (int j = 0; j < x; j++) {
+                for (int k = 0; k < pixelWidth; k++)
+                    data[dataIndex++] = *(p + k);
+                p += frameSize;
+            }
+        }
+    } else if (axis == Qt::YAxis) {
+        for (int i = 0; i < y; i++) {
+            const uchar *p = m_textureData->constData() + (index * dataWidth)
+                    + (frameSize * i);
+            for (int j = 0; j < (x * pixelWidth); j++) {
+                data[dataIndex++] = *p;
+                p++;
+            }
+        }
+    } else {
+        for (int i = 0; i < y; i++) {
+            const uchar *p = m_textureData->constData() + (index * frameSize) + (dataWidth * i);
+            for (int j = 0; j < (x * pixelWidth); j++) {
+                data[dataIndex++] = *p;
+                p++;
+            }
+        }
+    }
+
+    if (m_textureFormat != QImage::Format_Indexed8 && m_alphaMultiplier != 1.0f) {
+        for (int i = pixelWidth - 1; i < data.size(); i += pixelWidth)
+            data[i] = static_cast<uchar>(multipliedAlphaValue(data.at(i)));
+    }
+
+    QImage image(data.constData(), x, y, x * pixelWidth, m_textureFormat);
+    image.bits(); // Call bits() to detach the new image from local data
+    if (m_textureFormat == QImage::Format_Indexed8) {
+        QVector<QRgb> colorTable = m_colorTable;
+        if (m_alphaMultiplier != 1.0f) {
+            for (int i = 0; i < colorTable.size(); i++) {
+                QRgb curCol = colorTable.at(i);
+                int alpha = multipliedAlphaValue(qAlpha(curCol));
+                if (alpha != qAlpha(curCol))
+                    colorTable[i] = qRgba(qRed(curCol), qGreen(curCol), qBlue(curCol), alpha);
+            }
+        }
+        image.setColorTable(colorTable);
+    }
+
+    return image;
+}
+
+int QCustom3DVolumePrivate::multipliedAlphaValue(int alpha)
+{
+    int modifiedAlpha = alpha;
+    if (!m_preserveOpacity || alpha != 255) {
+        modifiedAlpha = int(m_alphaMultiplier * float(alpha));
+        modifiedAlpha = qMin(modifiedAlpha, 255);
+    }
+    return modifiedAlpha;
 }
 
 QCustom3DVolume *QCustom3DVolumePrivate::qptr()

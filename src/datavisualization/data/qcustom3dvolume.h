@@ -40,7 +40,8 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem
     Q_PROPERTY(QVector<QRgb> colorTable READ colorTable WRITE setColorTable NOTIFY colorTableChanged)
     Q_PROPERTY(QVector<uchar> *textureData READ textureData WRITE setTextureData NOTIFY textureDataChanged)
     Q_PROPERTY(QImage::Format textureFormat READ textureFormat WRITE setTextureFormat NOTIFY textureFormatChanged)
-
+    Q_PROPERTY(float alphaMultiplier READ alphaMultiplier WRITE setAlphaMultiplier NOTIFY alphaMultiplierChanged)
+    Q_PROPERTY(bool preserveOpacity READ preserveOpacity WRITE setPreserveOpacity NOTIFY preserveOpacityChanged)
 public:
 
     explicit QCustom3DVolume(QObject *parent = 0);
@@ -80,6 +81,11 @@ public:
     void setTextureFormat(QImage::Format format);
     QImage::Format textureFormat() const;
 
+    void setAlphaMultiplier(float mult);
+    float alphaMultiplier() const;
+    void setPreserveOpacity(bool enable);
+    bool preserveOpacity() const;
+
     QImage renderSlice(Qt::Axis axis, int index);
 
 signals:
@@ -92,6 +98,8 @@ signals:
     void colorTableChanged();
     void textureDataChanged(QVector<uchar> *data);
     void textureFormatChanged(QImage::Format format);
+    void alphaMultiplierChanged(float mult);
+    void preserveOpacityChanged(bool enabled);
 
 protected:
     QCustom3DVolumePrivate *dptr();

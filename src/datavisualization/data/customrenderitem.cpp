@@ -36,7 +36,13 @@ CustomRenderItem::CustomRenderItem()
       m_textureWidth(0),
       m_textureHeight(0),
       m_textureDepth(0),
-      m_isVolume(false)
+      m_isVolume(false),
+      m_textureFormat(QImage::Format_ARGB32),
+      m_sliceIndexX(-1),
+      m_sliceIndexY(-1),
+      m_sliceIndexZ(-1),
+      m_alphaMultiplier(1.0f),
+      m_preserveOpacity(true)
 {
 }
 

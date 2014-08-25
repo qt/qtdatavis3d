@@ -40,13 +40,15 @@ struct QCustomVolumeDirtyBitField {
     bool colorTableDirty        : 1;
     bool textureDataDirty       : 1;
     bool textureFormatDirty     : 1;
+    bool alphaDirty             : 1;
 
     QCustomVolumeDirtyBitField()
         : textureDimensionsDirty(false),
           sliceIndicesDirty(false),
           colorTableDirty(false),
           textureDataDirty(false),
-          textureFormatDirty(false)
+          textureFormatDirty(false),
+          alphaDirty(false)
     {
     }
 };
@@ -64,6 +66,7 @@ public:
     virtual ~QCustom3DVolumePrivate();
 
     void resetDirtyBits();
+    QImage renderSlice(Qt::Axis axis, int index);
 
     QCustom3DVolume *qptr();
 
@@ -79,9 +82,14 @@ public:
     QVector<QRgb> m_colorTable;
     QVector<uchar> *m_textureData;
 
+    float m_alphaMultiplier;
+    bool m_preserveOpacity;
+
     QCustomVolumeDirtyBitField m_dirtyBitsVolume;
 
 private:
+    int multipliedAlphaValue(int alpha);
+
     friend class QCustom3DVolume;
 };
 

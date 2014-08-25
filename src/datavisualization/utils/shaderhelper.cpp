@@ -99,6 +99,8 @@ void ShaderHelper::initialize()
     m_color8BitUniform = m_program->uniformLocation("color8Bit");
     m_textureDimensionsUniform = m_program->uniformLocation("textureDimensions");
     m_sampleCountUniform = m_program->uniformLocation("sampleCount");
+    m_alphaMultiplierUniform = m_program->uniformLocation("alphaMultiplier");
+    m_preserveOpacityUniform = m_program->uniformLocation("preserveOpacity");
     m_initialized = true;
 }
 
@@ -306,6 +308,20 @@ GLuint ShaderHelper::sampleCount()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_sampleCountUniform;
+}
+
+GLuint ShaderHelper::alphaMultiplier()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_alphaMultiplierUniform;
+}
+
+GLuint ShaderHelper::preserveOpacity()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_preserveOpacityUniform;
 }
 
 GLuint ShaderHelper::posAtt()

@@ -89,9 +89,13 @@ public:
     inline void setSliceIndexX(int index) { m_sliceIndexX = index; }
     inline void setSliceIndexY(int index) { m_sliceIndexY = index; }
     inline void setSliceIndexZ(int index) { m_sliceIndexZ = index; }
-    int sliceIndexX() const { return m_sliceIndexX; }
-    int sliceIndexY() const { return m_sliceIndexY; }
-    int sliceIndexZ() const { return m_sliceIndexZ; }
+    inline int sliceIndexX() const { return m_sliceIndexX; }
+    inline int sliceIndexY() const { return m_sliceIndexY; }
+    inline int sliceIndexZ() const { return m_sliceIndexZ; }
+    inline void setAlphaMultiplier(float mult) { m_alphaMultiplier = mult; }
+    inline float alphaMultiplier() const { return m_alphaMultiplier; }
+    inline void setPreserveOpacity(bool enable) { m_preserveOpacity = enable; }
+    inline bool preserveOpacity() const { return m_preserveOpacity; }
 
 private:
     Q_DISABLE_COPY(CustomRenderItem)
@@ -120,6 +124,8 @@ private:
     int m_sliceIndexX;
     int m_sliceIndexY;
     int m_sliceIndexZ;
+    float m_alphaMultiplier;
+    bool m_preserveOpacity;
 };
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 

@@ -41,6 +41,7 @@ public:
     void setMediumDetailRB(QRadioButton *button);
     void setHighDetailRB(QRadioButton *button);
     void setSliceLabels(QLabel *xLabel, QLabel *yLabel, QLabel *zLabel);
+    void setAlphaMultiplierLabel(QLabel *label);
 
 public slots:
     void sliceX(int enabled);
@@ -58,6 +59,8 @@ public slots:
     void setFpsMeasurement(bool enabled);
     void setSliceSliders(QSlider *sliderX, QSlider *sliderY, QSlider *sliderZ);
     void changeColorTable(int enabled);
+    void setPreserveOpacity(bool enabled);
+    void adjustAlphaMultiplier(int value);
 
 private:
 
@@ -86,6 +89,7 @@ private:
     QLabel *m_sliceLabelX;
     QLabel *m_sliceLabelY;
     QLabel *m_sliceLabelZ;
+    QLabel *m_alphaMultiplierLabel;
 };
 
 #endif

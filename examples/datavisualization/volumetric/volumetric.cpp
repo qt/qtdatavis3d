@@ -80,7 +80,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     // Both tables have a fully transparent colors to fill outer portions of the volume.
 
     // The primary color table.
-    // The first visible layer, red, is somewhat transparent. Rest of to colors are opaque.
+    // The top two layers are transparent.
     m_colorTable1.resize(colorTableSize);
     m_colorTable2.resize(colorTableSize);
 
@@ -88,9 +88,9 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
         if (i < cutOffColorIndex)
             m_colorTable1[i] = qRgba(0, 0, 0, 0);
         else if (i < 60)
-            m_colorTable1[i] = qRgba((i * 2) + 120, 0, 0, 20);
+            m_colorTable1[i] = qRgba((i * 2) + 120, 0, 0, 15);
         else if (i < 120)
-            m_colorTable1[i] = qRgba(0, ((i - 60) * 2) + 120, 0, 255);
+            m_colorTable1[i] = qRgba(0, ((i - 60) * 2) + 120, 0, 50);
         else if (i < 180)
             m_colorTable1[i] = qRgba(0, 0, ((i - 120) * 2) + 120, 255);
         else
@@ -98,14 +98,15 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     }
 
     // The alternate color table.
-    // The first visible layer is a thin single color, and rest of the volume uses a smooth gradient.
+    // The first visible layer is a thin opaque color, and rest of the volume uses a smooth
+    // transparent gradient.
     for (int i = 1; i < colorTableSize; i++) {
         if (i < cutOffColorIndex)
             m_colorTable2[i] = qRgba(0, 0, 0, 0);
         else if (i < cutOffColorIndex + 4)
             m_colorTable2[i] = qRgba(75, 150, 0, 255);
         else
-            m_colorTable2[i] = qRgba(i, 0, 255 - i, 255);
+            m_colorTable2[i] = qRgba(i, 0, 255 - i, i);
     }
 
     m_volumeItem->setColorTable(m_colorTable1);
@@ -165,6 +166,11 @@ void VolumetricModifier::setSliceLabels(QLabel *xLabel, QLabel *yLabel, QLabel *
     adjustSliceX(m_sliceSliderX->value());
     adjustSliceY(m_sliceSliderY->value());
     adjustSliceZ(m_sliceSliderZ->value());
+}
+
+void VolumetricModifier::setAlphaMultiplierLabel(QLabel *label)
+{
+    m_alphaMultiplierLabel = label;
 }
 
 void VolumetricModifier::sliceX(int enabled)
@@ -315,6 +321,34 @@ void VolumetricModifier::changeColorTable(int enabled)
         m_volumeItem->setColorTable(m_colorTable2);
     else
         m_volumeItem->setColorTable(m_colorTable1);
+
+    // Rerender image labels
+    adjustSliceX(m_sliceSliderX->value());
+    adjustSliceY(m_sliceSliderY->value());
+    adjustSliceZ(m_sliceSliderZ->value());
+}
+
+void VolumetricModifier::setPreserveOpacity(bool enabled)
+{
+    m_volumeItem->setPreserveOpacity(enabled);
+
+    // Rerender image labels
+    adjustSliceX(m_sliceSliderX->value());
+    adjustSliceY(m_sliceSliderY->value());
+    adjustSliceZ(m_sliceSliderZ->value());
+}
+
+void VolumetricModifier::adjustAlphaMultiplier(int value)
+{
+    float mult;
+    if (value > 100)
+        mult = float(value - 99) / 2.0f;
+    else
+        mult = float(value) / float(500 - value * 4);
+    m_volumeItem->setAlphaMultiplier(mult);
+    QString labelFormat = QStringLiteral("Alpha multiplier: %1");
+    m_alphaMultiplierLabel->setText(labelFormat.arg(
+                                        QString::number(m_volumeItem->alphaMultiplier(), 'f', 3)));
 
     // Rerender image labels
     adjustSliceX(m_sliceSliderX->value());

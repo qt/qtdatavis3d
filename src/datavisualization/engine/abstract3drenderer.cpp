@@ -967,6 +967,8 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         newItem->setSliceIndexX(volumeItem->sliceIndexX());
         newItem->setSliceIndexY(volumeItem->sliceIndexY());
         newItem->setSliceIndexZ(volumeItem->sliceIndexZ());
+        newItem->setAlphaMultiplier(volumeItem->alphaMultiplier());
+        newItem->setPreserveOpacity(volumeItem->preserveOpacity());
 #endif
     }
     newItem->setScaling(scaling);
@@ -1113,6 +1115,11 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             renderItem->setSliceIndexY(volumeItem->sliceIndexY());
             renderItem->setSliceIndexZ(volumeItem->sliceIndexZ());
             volumeItem->dptr()->m_dirtyBitsVolume.sliceIndicesDirty = false;
+        }
+        if (volumeItem->dptr()->m_dirtyBitsVolume.alphaDirty) {
+            renderItem->setAlphaMultiplier(volumeItem->alphaMultiplier());
+            renderItem->setPreserveOpacity(volumeItem->preserveOpacity());
+            volumeItem->dptr()->m_dirtyBitsVolume.alphaDirty = false;
         }
 #endif
     }
@@ -1292,6 +1299,9 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                                      item->colorTable().constData(), 256);
                     }
                     shader->setUniformValue(shader->color8Bit(), color8Bit);
+                    shader->setUniformValue(shader->alphaMultiplier(), item->alphaMultiplier());
+                    shader->setUniformValue(shader->preserveOpacity(),
+                                            item->preserveOpacity() ? 1 : 0);
                     if (shader == volumeSliceShader) {
                         QVector3D slices((float(item->sliceIndexX()) + 0.5f)
                                          / float(item->textureWidth()) * 2.0 - 1.0,

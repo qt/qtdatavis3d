@@ -8,6 +8,8 @@ uniform highp vec4 colorIndex[256];
 uniform highp int color8Bit;
 uniform highp vec3 textureDimensions;
 uniform highp int sampleCount; // This is the maximum sample count
+uniform highp float alphaMultiplier;
+uniform highp int preserveOpacity;
 
 const highp float alphaThreshold = 0.0001;
 
@@ -69,7 +71,7 @@ void main() {
 
         // Adjust alpha multiplier according to the step size to get uniform alpha effect
         // regardless of the ray angle.
-        highp float alphaMultiplier = stepSize / (1.0 / sampleCount);
+        highp float totalAlphaMultiplier = (stepSize / (1.0 / sampleCount)) * alphaMultiplier;
 
         highp vec4 curColor = vec4(0, 0, 0, 0);
         highp vec3 curRgb = vec3(0, 0, 0);
@@ -81,10 +83,12 @@ void main() {
             if (color8Bit != 0)
                 curColor = colorIndex[int(curColor.r * 255.0)];
 
-            if (curColor.a == 1.0)
+            // Unless we have explicit alpha multiplier, we want to preserve opacity anyway
+            if (curColor.a == 1.0 && (preserveOpacity != 0 || alphaMultiplier == 1.0))
                 curAlpha = 1.0;
             else
-                curAlpha = clamp(curColor.a * alphaMultiplier, 0.0, 1.0);
+                curAlpha = clamp(curColor.a * totalAlphaMultiplier, 0.0, 1.0);
+
             if (curAlpha > alphaThreshold) {
                 curRgb = curColor.rgb * curAlpha * (1.0 - totalAlpha);
                 destColor.rgb += curRgb;
@@ -95,6 +99,10 @@ void main() {
             curPos += step;
         }
     }
+
+    // Brighten up the final color if there is some transparency left
+    if (totalAlpha > alphaThreshold && totalAlpha < 1.0)
+        destColor *= 1.0 / totalAlpha;
 
     destColor.a = totalAlpha;
     gl_FragColor = clamp(destColor, 0.0, 1.0);

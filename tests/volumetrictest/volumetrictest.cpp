@@ -317,7 +317,7 @@ void VolumetricModifier::createAnotherVolume()
 
     QImage logo;
     logo.load(QStringLiteral(":/logo.png"));
-    //logo = logo.convertToFormat(QImage::Format_ARGB8555_Premultiplied);
+    logo = logo.convertToFormat(QImage::Format_ARGB8555_Premultiplied);
     qDebug() << "second image dimensions:" << logo.width() << logo.height()
              << logo.byteCount() << (logo.width() * logo.height())
              << logo.bytesPerLine();
@@ -347,6 +347,8 @@ void VolumetricModifier::createAnotherVolume()
     // Change one picture using subtexture replacement
     QImage flipped = logo.mirrored();
     m_volumeItem2->setSubTextureData(100, flipped);
+    m_volumeItem2->setAlphaMultiplier(0.2f);
+    m_volumeItem2->setPreserveOpacity(false);
 }
 
 void VolumetricModifier::createYetAnotherVolume()

@@ -36,16 +36,18 @@ int main(int argc, char **argv)
     QWidget *container = QWidget::createWindowContainer(graph);
 
     QSize screenSize = graph->screen()->size();
-    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
+    container->setMinimumSize(QSize(screenSize.width() / 3, screenSize.height() / 3));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
 
-    QWidget *widget = new QWidget;
+    QWidget *widget = new QWidget();
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
+    QVBoxLayout *vLayout2 = new QVBoxLayout();
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
+    hLayout->addLayout(vLayout2);
 
     widget->setWindowTitle(QStringLiteral("Volumetric Object Example"));
 
@@ -122,10 +124,17 @@ int main(int argc, char **argv)
     sliceImageYLabel->setScaledContents(true);
     sliceImageZLabel->setScaledContents(true);
 
-    vLayout->addWidget(fpsCheckBox);
-    vLayout->addWidget(fpsLabel);
-    vLayout->addWidget(textureDetailGroupBox);
-    vLayout->addWidget(colorTableCheckBox);
+    QSlider *alphaMultiplierSlider = new QSlider(Qt::Horizontal, widget);
+    alphaMultiplierSlider->setMinimum(0);
+    alphaMultiplierSlider->setMaximum(139);
+    alphaMultiplierSlider->setValue(100);
+    alphaMultiplierSlider->setEnabled(true);
+    QLabel *alphaMultiplierLabel = new QLabel(QStringLiteral("Alpha multiplier: 1.0"));
+
+    QCheckBox *preserveOpacityCheckBox = new QCheckBox(widget);
+    preserveOpacityCheckBox->setText(QStringLiteral("Preserve opacity"));
+    preserveOpacityCheckBox->setChecked(true);
+
     vLayout->addWidget(sliceXCheckBox);
     vLayout->addWidget(sliceXSlider);
     vLayout->addWidget(sliceImageXLabel);
@@ -135,6 +144,13 @@ int main(int argc, char **argv)
     vLayout->addWidget(sliceZCheckBox);
     vLayout->addWidget(sliceZSlider);
     vLayout->addWidget(sliceImageZLabel, 1, Qt::AlignTop);
+    vLayout2->addWidget(fpsCheckBox);
+    vLayout2->addWidget(fpsLabel);
+    vLayout2->addWidget(textureDetailGroupBox);
+    vLayout2->addWidget(colorTableCheckBox);
+    vLayout2->addWidget(alphaMultiplierLabel);
+    vLayout2->addWidget(alphaMultiplierSlider);
+    vLayout2->addWidget(preserveOpacityCheckBox, 1, Qt::AlignTop);
 
     VolumetricModifier *modifier = new VolumetricModifier(graph);
     modifier->setFpsLabel(fpsLabel);
@@ -142,6 +158,7 @@ int main(int argc, char **argv)
     modifier->setHighDetailRB(highDetailRB);
     modifier->setSliceSliders(sliceXSlider, sliceYSlider, sliceZSlider);
     modifier->setSliceLabels(sliceImageXLabel, sliceImageYLabel, sliceImageZLabel);
+    modifier->setAlphaMultiplierLabel(alphaMultiplierLabel);
 
     QObject::connect(fpsCheckBox, &QCheckBox::stateChanged, modifier,
                      &VolumetricModifier::setFpsMeasurement);
@@ -157,14 +174,18 @@ int main(int argc, char **argv)
                      &VolumetricModifier::adjustSliceY);
     QObject::connect(sliceZSlider, &QSlider::valueChanged, modifier,
                      &VolumetricModifier::adjustSliceZ);
-    QObject::connect(lowDetailRB,  &QRadioButton::toggled, modifier,
+    QObject::connect(lowDetailRB, &QRadioButton::toggled, modifier,
                      &VolumetricModifier::toggleLowDetail);
-    QObject::connect(mediumDetailRB,  &QRadioButton::toggled, modifier,
+    QObject::connect(mediumDetailRB, &QRadioButton::toggled, modifier,
                      &VolumetricModifier::toggleMediumDetail);
-    QObject::connect(highDetailRB,  &QRadioButton::toggled, modifier,
+    QObject::connect(highDetailRB, &QRadioButton::toggled, modifier,
                      &VolumetricModifier::toggleHighDetail);
-    QObject::connect(colorTableCheckBox,  &QCheckBox::stateChanged, modifier,
+    QObject::connect(colorTableCheckBox, &QCheckBox::stateChanged, modifier,
                      &VolumetricModifier::changeColorTable);
+    QObject::connect(preserveOpacityCheckBox, &QCheckBox::stateChanged, modifier,
+                     &VolumetricModifier::setPreserveOpacity);
+    QObject::connect(alphaMultiplierSlider, &QSlider::valueChanged, modifier,
+                     &VolumetricModifier::adjustAlphaMultiplier);
 
     widget->show();
     return app.exec();
