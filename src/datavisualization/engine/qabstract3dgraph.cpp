@@ -723,6 +723,47 @@ qreal QAbstract3DGraph::horizontalAspectRatio() const
 }
 
 /*!
+ * \property QAbstract3DGraph::reflection
+ * \since QtDataVisualization 1.2
+ *
+ * Sets floor reflections on or off. Defaults to \c{false}.
+ *
+ * \note Affects only Q3DBars.
+ *
+ * \sa reflectivity
+ */
+void QAbstract3DGraph::setReflection(bool enable)
+{
+    d_ptr->m_visualController->setReflection(enable);
+}
+
+bool QAbstract3DGraph::isReflection() const
+{
+    return d_ptr->m_visualController->reflection();
+}
+
+/*!
+ * \property QAbstract3DGraph::reflectivity
+ * \since QtDataVisualization 1.2
+ *
+ * Adjusts floor reflectivity, larger number being more reflective. Valid range is \c{[0...1]}.
+ * Defaults to \c{0.5}.
+ *
+ * \note Affects only Q3DBars.
+ *
+ * \sa reflection
+ */
+void QAbstract3DGraph::setReflectivity(qreal reflectivity)
+{
+    d_ptr->m_visualController->setReflectivity(reflectivity);
+}
+
+qreal QAbstract3DGraph::reflectivity() const
+{
+    return d_ptr->m_visualController->reflectivity();
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)
@@ -878,6 +919,11 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::radialLabelOffsetChanged);
     QObject::connect(m_visualController, &Abstract3DController::horizontalAspectRatioChanged, q_ptr,
                      &QAbstract3DGraph::horizontalAspectRatioChanged);
+
+    QObject::connect(m_visualController, &Abstract3DController::reflectionChanged, q_ptr,
+                     &QAbstract3DGraph::reflectionChanged);
+    QObject::connect(m_visualController, &Abstract3DController::reflectivityChanged, q_ptr,
+                     &QAbstract3DGraph::reflectivityChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

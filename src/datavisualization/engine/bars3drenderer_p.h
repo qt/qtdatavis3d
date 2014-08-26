@@ -149,22 +149,13 @@ private:
     void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
                     const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
 
-#ifdef USE_REFLECTIONS
     bool drawBars(BarRenderItem **selectedBar, const QMatrix4x4 &depthProjectionViewMatrix,
                   const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
                   GLint startRow, GLint stopRow, GLint stepRow,
                   GLint startBar, GLint stopBar, GLint stepBar, GLfloat reflection = 1.0f);
     void drawBackground(GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
                         const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
-                        GLfloat reflection = 1.0f);
-#else
-    bool drawBars(BarRenderItem **selectedBar, const QMatrix4x4 &depthProjectionViewMatrix,
-                  const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
-                  GLint startRow, GLint stopRow, GLint stepRow,
-                  GLint startBar, GLint stopBar, GLint stepBar);
-    void drawBackground(GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
-                        const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix);
-#endif
+                        bool reflectingDraw = false);
     void drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
                        const QMatrix4x4 &projectionViewMatrix,
                        const QMatrix4x4 &viewMatrix);

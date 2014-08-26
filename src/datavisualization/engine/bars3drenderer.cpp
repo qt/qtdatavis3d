@@ -1043,12 +1043,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                 shadowOffset = -0.015f;
                         }
 
-#ifdef USE_REFLECTIONS
-                        if (m_yFlipped && item.height() > 0.0
-                                || !m_yFlipped && item.height() < 0.0) {
+                        if (m_reflectionEnabled && (m_yFlipped && item.height() > 0.0
+                                                     || !m_yFlipped && item.height() < 0.0)) {
                             continue;
                         }
-#endif
+
                         QMatrix4x4 modelMatrix;
                         QMatrix4x4 MVPMatrix;
 
@@ -1205,61 +1204,65 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                    m_primarySubViewport.height());
     }
 
-#ifdef USE_REFLECTIONS
-    //
-    // Draw reflections
-    //
-    glDisable(GL_DEPTH_TEST);
-    glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
-    glEnable(GL_STENCIL_TEST);
-    glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
-    glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
+    if (m_reflectionEnabled) {
+        //
+        // Draw reflections
+        //
+        glDisable(GL_DEPTH_TEST);
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        glEnable(GL_STENCIL_TEST);
+        glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
 
-    // Draw background stencil
-    drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
+        // Draw background stencil
+        drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix,
+                       viewMatrix);
 
-    glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
-    glEnable(GL_DEPTH_TEST);
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
 
-    glStencilFunc(GL_EQUAL, 1, 0xffffffff);
-    glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+        glStencilFunc(GL_EQUAL, 1, 0xffffffff);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
 
-    // Set light
-    QVector3D reflectionLightPos = lightPos;
-    reflectionLightPos.setY(-(lightPos.y()));
-    m_cachedScene->activeLight()->setPosition(reflectionLightPos);
+        // Set light
+        QVector3D reflectionLightPos = lightPos;
+        reflectionLightPos.setY(-(lightPos.y()));
+        m_cachedScene->activeLight()->setPosition(reflectionLightPos);
 
-    // Draw bar reflections
-    (void)drawBars(&selectedBar, depthProjectionViewMatrix,
-                   projectionViewMatrix, viewMatrix,
-                   startRow, stopRow, stepRow,
-                   startBar, stopBar, stepBar, -1.0f);
+        // Draw bar reflections
+        (void)drawBars(&selectedBar, depthProjectionViewMatrix,
+                       projectionViewMatrix, viewMatrix,
+                       startRow, stopRow, stepRow,
+                       startBar, stopBar, stepBar, -1.0f);
 
-    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
-                                        projectionViewMatrix, depthProjectionViewMatrix,
-                                        m_depthTexture, m_shadowQualityToShader, -1.0f);
+        Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader,
+                                            m_volumeTextureShader, m_volumeTextureSliceShader,
+                                            viewMatrix, projectionViewMatrix,
+                                            depthProjectionViewMatrix, m_depthTexture,
+                                            m_shadowQualityToShader, -1.0f);
 
-    // Reset light
-    m_cachedScene->activeLight()->setPosition(lightPos);
+        // Reset light
+        m_cachedScene->activeLight()->setPosition(lightPos);
 
-    glDisable(GL_STENCIL_TEST);
+        glDisable(GL_STENCIL_TEST);
 
-    glCullFace(GL_BACK);
-#endif
+        glCullFace(GL_BACK);
+    }
 
     //
     // Draw the real scene
     //
     // Draw background
-#ifdef USE_REFLECTIONS
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-    drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix, viewMatrix,
-                   0.5f);
-    glDisable(GL_BLEND);
-#else
-    drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
-#endif
+    if (m_reflectionEnabled) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix,
+                       viewMatrix, true);
+        glDisable(GL_BLEND);
+    } else {
+        drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix,
+                       viewMatrix);
+    }
 
     // Draw bars
     bool barSelectionFound = drawBars(&selectedBar, depthProjectionViewMatrix,
@@ -1320,19 +1323,11 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     m_selectionDirty = false;
 }
 
-#ifdef USE_REFLECTIONS
 bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
                               const QMatrix4x4 &depthProjectionViewMatrix,
                               const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
                               GLint startRow, GLint stopRow, GLint stepRow,
                               GLint startBar, GLint stopBar, GLint stepBar, GLfloat reflection)
-#else
-bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
-                              const QMatrix4x4 &depthProjectionViewMatrix,
-                              const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
-                              GLint startRow, GLint stopRow, GLint stepRow,
-                              GLint startBar, GLint stopBar, GLint stepBar)
-#endif
 {
     QVector3D lightPos =  m_cachedScene->activeLight()->position();
     QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
@@ -1437,11 +1432,8 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
                 BarRenderItemRow &renderRow = renderArray[row];
                 for (int bar = startBar; bar != stopBar; bar += stepBar) {
                     BarRenderItem &item = renderRow[bar];
-#ifdef USE_REFLECTIONS
-                    if (reflection * item.height() < 0)
-#else
-                    if (item.height() < 0)
-#endif
+                    float adjustedHeight = reflection * item.height();
+                    if (adjustedHeight < 0)
                         glCullFace(GL_FRONT);
                     else
                         glCullFace(GL_BACK);
@@ -1453,17 +1445,10 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
                     GLfloat colPos = (bar + seriesPos) * (m_cachedBarSpacing.width());
                     GLfloat rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
 
-#ifdef USE_REFLECTIONS
                     modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
-                                          reflection * item.height(),
+                                          adjustedHeight,
                                           (m_columnDepth - rowPos) / m_scaleFactor);
-                    modelScaler.setY(reflection * item.height());
-#else
-                    modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
-                                          item.height(),
-                                          (m_columnDepth - rowPos) / m_scaleFactor);
-                    modelScaler.setY(item.height());
-#endif
+                    modelScaler.setY(adjustedHeight);
                     if (!seriesRotation.isIdentity() || !item.rotation().isIdentity()) {
                         QQuaternion totalRotation = seriesRotation * item.rotation();
                         modelMatrix.rotate(totalRotation);
@@ -1579,16 +1564,15 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
                         }
                     }
 
-#ifdef USE_REFLECTIONS
-                    // Skip drawing of 0-height bars and reflections of bars on the "wrong side"
-                    if (item.height() != 0
-                            && (reflection == 1.0f || (reflection != 1.0f
-                                                       && (m_yFlipped && item.height() < 0.0)
-                                                       || (!m_yFlipped && item.height() > 0.0)))) {
-#else
-                    // Skip drawing of 0-height bars
-                    if (item.height() != 0) {
-#endif
+                    if (item.height() == 0) {
+                        continue;
+                    } else if ((m_reflectionEnabled
+                                && (reflection == 1.0f
+                                    || (reflection != 1.0f
+                                        && (m_yFlipped && item.height() < 0.0)
+                                        || (!m_yFlipped && item.height() > 0.0))))
+                               || !m_reflectionEnabled) {
+                        // Skip drawing of 0-height bars and reflections of bars on the "wrong side"
                         // Set shader bindings
                         barShader->setUniformValue(barShader->model(), modelMatrix);
                         barShader->setUniformValue(barShader->nModel(),
@@ -1602,12 +1586,9 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
                         }
 
 #if !defined(QT_OPENGL_ES_2)
-#ifdef USE_REFLECTIONS
-                        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone
-                                && reflection == 1.0f) {
-#else
-                        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-#endif
+                        if ((m_reflectionEnabled && reflection == 1.0f
+                             && m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone)
+                                || m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                             // Set shadow shader bindings
                             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                             barShader->setUniformValue(barShader->shadowQ(),
@@ -1626,14 +1607,11 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
 #endif
                         {
                             // Set shadowless shader bindings
-#ifdef USE_REFLECTIONS
-                            if (reflection != 1.0f
+                            if (m_reflectionEnabled && reflection != 1.0f
                                     && m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                                 barShader->setUniformValue(barShader->lightS(),
                                                            adjustedLightStrength);
-                            } else
-#endif
-                            {
+                            } else {
                                 barShader->setUniformValue(barShader->lightS(), lightStrength);
                             }
 
@@ -1653,17 +1631,10 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
     return barSelectionFound;
 }
 
-#ifdef USE_REFLECTIONS
 void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
                                     const QMatrix4x4 &depthProjectionViewMatrix,
                                     const QMatrix4x4 &projectionViewMatrix,
-                                    const QMatrix4x4 &viewMatrix, GLfloat reflection)
-#else
-void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
-                                    const QMatrix4x4 &depthProjectionViewMatrix,
-                                    const QMatrix4x4 &projectionViewMatrix,
-                                    const QMatrix4x4 &viewMatrix)
-#endif
+                                    const QMatrix4x4 &viewMatrix, bool reflectingDraw)
 {
     QVector3D lightPos =  m_cachedScene->activeLight()->position();
     QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
@@ -1680,9 +1651,8 @@ void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
 
         QVector3D backgroundScaler(m_xScaleFactor, 1.0f, m_zScaleFactor);
         QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
-#ifdef USE_REFLECTIONS
-        backgroundColor.setW(backgroundColor.w() * reflection);
-#endif
+        if (m_reflectionEnabled)
+            backgroundColor.setW(backgroundColor.w() * m_reflectivity);
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -1748,9 +1718,7 @@ void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
         m_backgroundShader->setUniformValue(m_backgroundShader->nModel(),
                                             itModelMatrix.inverted().transposed());
         m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
-#ifdef USE_REFLECTIONS
-        if (reflection != 1.0f) {
-#endif
+        if (!m_reflectionEnabled || (m_reflectionEnabled && reflectingDraw)) {
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                 // Set shadow shader bindings
@@ -1776,9 +1744,7 @@ void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
                 // Draw the object
                 m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
             }
-#ifdef USE_REFLECTIONS
         }
-#endif
     }
 }
 
@@ -2539,6 +2505,10 @@ void Bars3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality
     // Re-init depth buffer
     updateDepthBuffer();
 #endif
+
+    // Redraw to handle both reflections and shadows on background
+    if (m_reflectionEnabled)
+        needRender();
 }
 
 void Bars3DRenderer::loadBackgroundMesh()

@@ -93,6 +93,8 @@ struct Abstract3DChangeBitField {
     bool axisZTitleFixedChanged        : 1;
     bool polarChanged                  : 1;
     bool radialLabelOffsetChanged      : 1;
+    bool reflectionChanged             : 1;
+    bool reflectivityChanged           : 1;
 
     Abstract3DChangeBitField() :
         themeChanged(true),
@@ -139,7 +141,9 @@ struct Abstract3DChangeBitField {
         axisYTitleFixedChanged(true),
         axisZTitleFixedChanged(true),
         polarChanged(true),
-        radialLabelOffsetChanged(true)
+        radialLabelOffsetChanged(true),
+        reflectionChanged(true),
+        reflectivityChanged(true)
     {
     }
 };
@@ -165,6 +169,8 @@ private:
     qreal m_aspectRatio;
     qreal m_horizontalAspectRatio;
     QAbstract3DGraph::OptimizationHints m_optimizationHints;
+    bool m_reflectionEnabled;
+    qreal m_reflectivity;
 
 protected:
     Q3DScene *m_scene;
@@ -281,6 +287,11 @@ public:
     void setHorizontalAspectRatio(qreal ratio);
     qreal horizontalAspectRatio() const;
 
+    void setReflection(bool enable);
+    bool reflection() const;
+    void setReflectivity(qreal reflectivity);
+    qreal reflectivity() const;
+
     void setPolar(bool enable);
     bool isPolar() const;
     void setRadialLabelOffset(float offset);
@@ -365,6 +376,8 @@ signals:
     void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
     void polarChanged(bool enabled);
     void radialLabelOffsetChanged(float offset);
+    void reflectionChanged(bool enabled);
+    void reflectivityChanged(qreal reflectivity);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

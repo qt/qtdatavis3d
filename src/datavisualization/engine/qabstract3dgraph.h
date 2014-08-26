@@ -53,6 +53,8 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(bool polar READ isPolar WRITE setPolar NOTIFY polarChanged)
     Q_PROPERTY(float radialLabelOffset READ radialLabelOffset WRITE setRadialLabelOffset NOTIFY radialLabelOffsetChanged)
     Q_PROPERTY(qreal horizontalAspectRatio READ horizontalAspectRatio WRITE setHorizontalAspectRatio NOTIFY horizontalAspectRatioChanged)
+    Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged)
+    Q_PROPERTY(qreal reflectivity READ reflectivity WRITE setReflectivity NOTIFY reflectivityChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -162,6 +164,12 @@ public:
     void setHorizontalAspectRatio(qreal ratio);
     qreal horizontalAspectRatio() const;
 
+    void setReflection(bool enable);
+    bool isReflection() const;
+
+    void setReflectivity(qreal reflectivity);
+    qreal reflectivity() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -188,6 +196,8 @@ signals:
     void polarChanged(bool enabled);
     void radialLabelOffsetChanged(float offset);
     void horizontalAspectRatioChanged(qreal ratio);
+    void reflectionChanged(bool enabled);
+    void reflectivityChanged(qreal reflectivity);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)

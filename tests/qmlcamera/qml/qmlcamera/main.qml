@@ -41,7 +41,7 @@ Rectangle {
         xRotation: camControlArea.xValue
         yRotation: camControlArea.yValue
         zoomLevel: zoomSlider.value
-        target: Qt.vector3d(1.0, 1.0, 1.0)
+        target: Qt.vector3d(0.5, 0.5, 0.5)
     }
 
     Item {
@@ -211,6 +211,22 @@ Rectangle {
                 testChart.releaseCustomItem(shuttleItem)
                 text = "Add Shuttle"
                 addObject = true
+            }
+        }
+    }
+
+    Button {
+        id: reflectionToggle
+        anchors.bottom: shuttleAdd.top
+        width: camControlArea.width
+        text: "Show reflections"
+        onClicked: {
+            if (testChart.reflection === true) {
+                text = "Show reflections"
+                testChart.reflection = false
+            } else {
+                text = "Hide reflections"
+                testChart.reflection = true
             }
         }
     }

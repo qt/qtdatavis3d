@@ -340,7 +340,7 @@
 
 /*!
  * \qmlproperty AbstractGraph3D.OptimizationHints AbstractGraph3D::optimizationHints
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
  * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
  * reasonable performance. Static is a beta level feature and currently supports only a subset of the
@@ -350,4 +350,27 @@
  * sets. It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it
  * with massive data sets is not advisable.
  * Defaults to \c{OptimizationDefault}
+ */
+
+/*!
+ * \qmlproperty bool AbstractGraph3D::reflection
+ * \since QtDataVisualization 1.2
+ *
+ * Sets floor reflections on or off. Defaults to \c{false}.
+ *
+ * \note Affects only Bars3D.
+ *
+ * \sa reflectivity
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::reflectivity
+ * \since QtDataVisualization 1.2
+ *
+ * Adjusts floor reflectivity, larger number being more reflective. Valid range is \c{[0...1]}.
+ * Defaults to \c{0.5}.
+ *
+ * \note Affects only Bars3D.
+ *
+ * \sa reflection
  */

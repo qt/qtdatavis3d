@@ -40,6 +40,8 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_aspectRatio(2.0),
     m_horizontalAspectRatio(0.0),
     m_optimizationHints(QAbstract3DGraph::OptimizationDefault),
+    m_reflectionEnabled(false),
+    m_reflectivity(0.5),
     m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -213,6 +215,17 @@ void Abstract3DController::synchDataToRenderer()
     if (m_changeTracker.optimizationHintChanged) {
         m_renderer->updateOptimizationHint(m_optimizationHints);
         m_changeTracker.optimizationHintChanged = false;
+    }
+
+    if (m_changeTracker.reflectionChanged) {
+        m_renderer->m_reflectionEnabled = m_reflectionEnabled;
+        m_changeTracker.reflectionChanged = false;
+    }
+
+    if (m_changeTracker.reflectivityChanged) {
+        // Invert value to match functionality to the property description
+        m_renderer->m_reflectivity = -(m_reflectivity - 1.0);
+        m_changeTracker.reflectivityChanged = false;
     }
 
     if (m_changeTracker.axisXFormatterChanged) {
@@ -1556,6 +1569,36 @@ void Abstract3DController::setHorizontalAspectRatio(qreal ratio)
 qreal Abstract3DController::horizontalAspectRatio() const
 {
     return m_horizontalAspectRatio;
+}
+
+void Abstract3DController::setReflection(bool enable)
+{
+    if (m_reflectionEnabled != enable) {
+        m_reflectionEnabled = enable;
+        m_changeTracker.reflectionChanged = true;
+        emit reflectionChanged(m_reflectionEnabled);
+        emitNeedRender();
+    }
+}
+
+bool Abstract3DController::reflection() const
+{
+    return m_reflectionEnabled;
+}
+
+void Abstract3DController::setReflectivity(qreal reflectivity)
+{
+    if (m_reflectivity != reflectivity) {
+        m_reflectivity = reflectivity;
+        m_changeTracker.reflectivityChanged = true;
+        emit reflectivityChanged(m_reflectivity);
+        emitNeedRender();
+    }
+}
+
+qreal Abstract3DController::reflectivity() const
+{
+    return m_reflectivity;
 }
 
 void Abstract3DController::setPolar(bool enable)

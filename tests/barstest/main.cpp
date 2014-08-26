@@ -253,6 +253,15 @@ int main(int argc, char **argv)
     ratioSlider->setValue(30);
     ratioSlider->setMaximum(100);
 
+    QCheckBox *reflectionCheckBox = new QCheckBox(widget);
+    reflectionCheckBox->setText(QStringLiteral("Show reflections"));
+    reflectionCheckBox->setChecked(false);
+
+    QSlider *reflectivitySlider = new QSlider(Qt::Horizontal, widget);
+    reflectivitySlider->setMinimum(0);
+    reflectivitySlider->setValue(50);
+    reflectivitySlider->setMaximum(100);
+
     QSlider *spacingSliderX = new QSlider(Qt::Horizontal, widget);
     spacingSliderX->setTickInterval(1);
     spacingSliderX->setMinimum(0);
@@ -420,8 +429,9 @@ int main(int argc, char **argv)
     vLayout3->addWidget(new QLabel(QStringLiteral("Camera target")), 0, Qt::AlignTop);
     vLayout3->addWidget(cameraTargetSliderX, 0, Qt::AlignTop);
     vLayout3->addWidget(cameraTargetSliderY, 0, Qt::AlignTop);
-    vLayout3->addWidget(cameraTargetSliderZ, 1, Qt::AlignTop);
-    // TODO: Add example for setMeshFileName
+    vLayout3->addWidget(cameraTargetSliderZ, 0, Qt::AlignTop);
+    vLayout3->addWidget(reflectionCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(reflectivitySlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -549,6 +559,11 @@ int main(int argc, char **argv)
                      &QSlider::setEnabled);
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderY,
                      &QSlider::setValue);
+
+    QObject::connect(reflectionCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setReflection);
+    QObject::connect(reflectivitySlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setReflectivity);
 
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, addDataButton,
                      &QPushButton::setEnabled);

@@ -83,7 +83,9 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_zFlipRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f)),
       m_vBackgroundMargin(0.1f),
       m_hBackgroundMargin(0.1f),
-      m_oldCameraTarget(QVector3D(2000.0f, 2000.0f, 2000.0f)) // Just random invalid target
+      m_oldCameraTarget(QVector3D(2000.0f, 2000.0f, 2000.0f)), // Just random invalid target
+      m_reflectionEnabled(false),
+      m_reflectivity(0.5)
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,
@@ -1049,7 +1051,7 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             }
         } else
 #if !defined(QT_OPENGL_ES_2)
-            if (!item->d_ptr->m_isVolumeItem)
+         if (!item->d_ptr->m_isVolumeItem)
 #endif
         {
             renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
@@ -1097,10 +1099,10 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             GLuint oldTexture = renderItem->texture();
             m_textureHelper->deleteTexture(&oldTexture);
             GLuint texture = m_textureHelper->create3DTexture(volumeItem->textureData(),
-                                                       volumeItem->textureWidth(),
-                                                       volumeItem->textureHeight(),
-                                                       volumeItem->textureDepth(),
-                                                       volumeItem->textureFormat());
+                                                              volumeItem->textureWidth(),
+                                                              volumeItem->textureHeight(),
+                                                              volumeItem->textureDepth(),
+                                                              volumeItem->textureFormat());
             renderItem->setTexture(texture);
             renderItem->setTextureWidth(volumeItem->textureWidth());
             renderItem->setTextureHeight(volumeItem->textureHeight());
@@ -1134,7 +1136,6 @@ void Abstract3DRenderer::updateCustomItemPositions()
     }
 }
 
-#ifdef USE_REFLECTIONS
 void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          ShaderHelper *regularShader,
                                          ShaderHelper *volumeShader,
@@ -1145,17 +1146,6 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          GLuint depthTexture,
                                          GLfloat shadowQuality,
                                          GLfloat reflection)
-#else
-void Abstract3DRenderer::drawCustomItems(RenderingState state,
-                                         ShaderHelper *regularShader,
-                                         ShaderHelper *volumeShader,
-                                         ShaderHelper *volumeSliceShader,
-                                         const QMatrix4x4 &viewMatrix,
-                                         const QMatrix4x4 &projectionViewMatrix,
-                                         const QMatrix4x4 &depthProjectionViewMatrix,
-                                         GLuint depthTexture,
-                                         GLfloat shadowQuality)
-#endif
 {
 #if defined(QT_OPENGL_ES_2)
     Q_UNUSED(volumeShader)
@@ -1205,36 +1195,36 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                     * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -camRotationY);
         }
 
-#ifdef USE_REFLECTIONS
-        if (reflection < 0.0f) {
-            if (item->itemPointer()->d_ptr->m_isLabelItem)
-                continue;
-            else
-                glCullFace(GL_FRONT);
+        if (m_reflectionEnabled) {
+            if (reflection < 0.0f) {
+                if (item->itemPointer()->d_ptr->m_isLabelItem)
+                    continue;
+                else
+                    glCullFace(GL_FRONT);
+            } else {
+                glCullFace(GL_BACK);
+            }
+            QVector3D trans = item->translation();
+            trans.setY(reflection * trans.y());
+            modelMatrix.translate(trans);
+            if (reflection < 0.0f) {
+                QQuaternion mirror = QQuaternion(rotation.scalar(),
+                                                 -rotation.x(), rotation.y(), -rotation.z());
+                modelMatrix.rotate(mirror);
+                itModelMatrix.rotate(mirror);
+            } else {
+                modelMatrix.rotate(rotation);
+                itModelMatrix.rotate(rotation);
+            }
+            QVector3D scale = item->scaling();
+            scale.setY(reflection * scale.y());
+            modelMatrix.scale(scale);
         } else {
-            glCullFace(GL_BACK);
-        }
-        QVector3D trans = item->translation();
-        trans.setY(reflection * trans.y());
-        modelMatrix.translate(trans);
-        if (reflection < 0.0f) {
-            QQuaternion mirror = QQuaternion(rotation.scalar(),
-                                             -rotation.x(), rotation.y(), -rotation.z());
-            modelMatrix.rotate(mirror);
-            itModelMatrix.rotate(mirror);
-        } else {
+            modelMatrix.translate(item->translation());
             modelMatrix.rotate(rotation);
+            modelMatrix.scale(item->scaling());
             itModelMatrix.rotate(rotation);
         }
-        QVector3D scale = item->scaling();
-        scale.setY(reflection * scale.y());
-        modelMatrix.scale(scale);
-#else
-        modelMatrix.translate(item->translation());
-        modelMatrix.rotate(rotation);
-        modelMatrix.scale(item->scaling());
-        itModelMatrix.rotate(rotation);
-#endif
         if (!item->isFacingCamera())
             itModelMatrix.scale(item->scaling());
         MVPMatrix = projectionViewMatrix * modelMatrix;

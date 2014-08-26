@@ -760,6 +760,26 @@ qreal AbstractDeclarative::horizontalAspectRatio() const
     return m_controller->horizontalAspectRatio();
 }
 
+void AbstractDeclarative::setReflection(bool enable)
+{
+    m_controller->setReflection(enable);
+}
+
+bool AbstractDeclarative::isReflection() const
+{
+    return m_controller->reflection();
+}
+
+void AbstractDeclarative::setReflectivity(qreal reflectivity)
+{
+    m_controller->setReflectivity(reflectivity);
+}
+
+qreal AbstractDeclarative::reflectivity() const
+{
+    return m_controller->reflectivity();
+}
+
 void AbstractDeclarative::windowDestroyed(QObject *obj)
 {
     // Remove destroyed window from window lists
