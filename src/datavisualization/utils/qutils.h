@@ -28,6 +28,7 @@ inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
     QSurfaceFormat surfaceFormat;
 
     surfaceFormat.setDepthBufferSize(24);
+    surfaceFormat.setStencilBufferSize(8);
     surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
 #if !defined(QT_OPENGL_ES_2)
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);

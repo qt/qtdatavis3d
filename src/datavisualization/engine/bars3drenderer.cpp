@@ -908,8 +908,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     GLfloat colPos = 0;
     GLfloat rowPos = 0;
 
-    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
-
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
     glViewport(m_primarySubViewport.x(),
@@ -1043,8 +1041,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                 shadowOffset = -0.015f;
                         }
 
-                        if (m_reflectionEnabled && (m_yFlipped && item.height() > 0.0
-                                                     || !m_yFlipped && item.height() < 0.0)) {
+                        if (m_reflectionEnabled && ((m_yFlipped && item.height() > 0.0)
+                                                     || (!m_yFlipped && item.height() < 0.0))) {
                             continue;
                         }
 
@@ -1569,8 +1567,8 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
                     } else if ((m_reflectionEnabled
                                 && (reflection == 1.0f
                                     || (reflection != 1.0f
-                                        && (m_yFlipped && item.height() < 0.0)
-                                        || (!m_yFlipped && item.height() > 0.0))))
+                                        && ((m_yFlipped && item.height() < 0.0)
+                                        || (!m_yFlipped && item.height() > 0.0)))))
                                || !m_reflectionEnabled) {
                         // Skip drawing of 0-height bars and reflections of bars on the "wrong side"
                         // Set shader bindings
