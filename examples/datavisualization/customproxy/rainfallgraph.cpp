@@ -49,7 +49,7 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     // Set up bar specifications; make the bars as wide as they are deep,
     // and add a small space between the bars
     m_graph->setBarThickness(1.0f);
-    m_graph->setBarSpacing(QSizeF(0.2, 0.2));
+    m_graph->setBarSpacing(QSizeF(1.1, 1.1));
 
     // Set axis labels and titles
     QStringList months;
@@ -85,6 +85,9 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
 
     // Set window title
     m_graph->setTitle(QStringLiteral("Monthly rainfall in Northern Finland"));
+
+    // Set reflections on
+    m_graph->setReflection(true);
 }
 
 RainfallGraph::~RainfallGraph()

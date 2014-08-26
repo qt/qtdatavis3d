@@ -43,7 +43,7 @@ SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     m_graph->axisX()->setLabelAutoRotation(30);
     m_graph->axisY()->setLabelAutoRotation(90);
     m_graph->axisZ()->setLabelAutoRotation(30);
-    m_graph->activeTheme()->setType(Q3DTheme::ThemeStoneMoss);
+    m_graph->activeTheme()->setType(Q3DTheme::ThemePrimaryColors);
 
     QFont font = m_graph->activeTheme()->font();
     font.setPointSize(20);

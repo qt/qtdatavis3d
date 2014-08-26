@@ -72,6 +72,7 @@ int main(int argc, char **argv)
     smoothCheckBox->setText(QStringLiteral("Smooth bars"));
     smoothCheckBox->setChecked(false);
 
+
     QComboBox *barStyleList = new QComboBox(widget);
     barStyleList->addItem(QStringLiteral("Bar"), int(QAbstract3DSeries::MeshBar));
     barStyleList->addItem(QStringLiteral("Pyramid"), int(QAbstract3DSeries::MeshPyramid));
@@ -138,6 +139,10 @@ int main(int argc, char **argv)
     QCheckBox *reverseValueAxisCheckBox = new QCheckBox(widget);
     reverseValueAxisCheckBox->setText(QStringLiteral("Reverse value axis"));
     reverseValueAxisCheckBox->setChecked(false);
+
+    QCheckBox *reflectionCheckBox = new QCheckBox(widget);
+    reflectionCheckBox->setText(QStringLiteral("Show reflections"));
+    reflectionCheckBox->setChecked(false);
 
     //! [4]
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
@@ -213,6 +218,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(smoothCheckBox);
+    vLayout->addWidget(reflectionCheckBox);
     vLayout->addWidget(seriesCheckBox);
     vLayout->addWidget(reverseValueAxisCheckBox);
     vLayout->addWidget(axisTitlesVisibleCB);
@@ -260,6 +266,8 @@ int main(int argc, char **argv)
                      &GraphModifier::setSeriesVisibility);
     QObject::connect(reverseValueAxisCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setReverseValueAxis);
+    QObject::connect(reflectionCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setReflection);
 
     QObject::connect(modifier, &GraphModifier::backgroundEnabledChanged,
                      backgroundCheckBox, &QCheckBox::setChecked);

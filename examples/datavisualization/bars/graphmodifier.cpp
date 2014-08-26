@@ -420,3 +420,8 @@ void GraphModifier::setReverseValueAxis(int enabled)
 {
     m_graph->valueAxis()->setReversed(enabled);
 }
+
+void GraphModifier::setReflection(bool enabled)
+{
+    m_graph->setReflection(enabled);
+}

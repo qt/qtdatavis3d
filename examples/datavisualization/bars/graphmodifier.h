@@ -50,6 +50,7 @@ public:
     void setSmoothBars(int smooth);
     void setSeriesVisibility(int enabled);
     void setReverseValueAxis(int enabled);
+    void setReflection(bool enabled);
 
 public slots:
     void changeRange(int range);
