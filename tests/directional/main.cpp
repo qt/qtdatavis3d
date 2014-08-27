@@ -80,6 +80,9 @@ int main(int argc, char **argv)
     backgroundCheckBox->setText(QStringLiteral("Show background"));
     backgroundCheckBox->setChecked(true);
 
+    QCheckBox *optimizationCheckBox = new QCheckBox(widget);
+    optimizationCheckBox->setText(QStringLiteral("Optimization static"));
+
     QCheckBox *gridCheckBox = new QCheckBox(widget);
     gridCheckBox->setText(QStringLiteral("Show grid"));
     gridCheckBox->setChecked(true);
@@ -100,6 +103,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
     vLayout->addWidget(toggleRotationButton, 0, Qt::AlignTop);
+    vLayout->addWidget(optimizationCheckBox);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Change dot style")));
@@ -127,6 +131,8 @@ int main(int argc, char **argv)
 
     QObject::connect(modifier, &ScatterDataModifier::backgroundEnabledChanged,
                      backgroundCheckBox, &QCheckBox::setChecked);
+    QObject::connect(optimizationCheckBox, &QCheckBox::stateChanged,
+                     modifier, &ScatterDataModifier::enableOptimization);
     QObject::connect(modifier, &ScatterDataModifier::gridEnabledChanged,
                      gridCheckBox, &QCheckBox::setChecked);
     QObject::connect(itemStyleList, SIGNAL(currentIndexChanged(int)), modifier,
@@ -150,6 +156,7 @@ int main(int argc, char **argv)
                      &QFontComboBox::setCurrentFont);
 
     itemStyleList->setCurrentIndex(0);
+    optimizationCheckBox->setChecked(true);
 
     widget->show();
     return app.exec();

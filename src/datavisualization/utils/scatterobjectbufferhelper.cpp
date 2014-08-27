@@ -114,22 +114,24 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
 
         int offset = pos * verticeCount;
         if (item.rotation().isIdentity()) {
-            for (int j = 0; j < verticeCount; j++)
+            for (int j = 0; j < verticeCount; j++) {
                 buffered_vertices[j + offset] = scaled_vertices[j] + item.translation();
+                buffered_normals[j + offset] = indexed_normals[j];
+            }
         } else {
             QMatrix4x4 matrix;
-            matrix.rotate(seriesRotation * item.rotation());
-            modelMatrix = matrix.transposed();
-            modelMatrix.scale(modelScaler);
+            QQuaternion totalRotation = seriesRotation * item.rotation();
+            matrix.rotate(totalRotation);
+            matrix.scale(modelScaler);
+            QMatrix4x4 itModelMatrix = matrix.inverted();
+            modelMatrix = matrix.transposed(); // Because of row-column major difference
 
-            for (int j = 0; j < verticeCount; j++)
+            for (int j = 0; j < verticeCount; j++) {
                 buffered_vertices[j + offset] = indexed_vertices[j] * modelMatrix
                         + item.translation();
+                buffered_normals[j + offset] = indexed_normals[j] * itModelMatrix;
+            }
         }
-
-        offset = pos * normalsCount;
-        for (int j = 0; j < normalsCount; j++)
-            buffered_normals[j + offset] = indexed_normals[j];
 
         if (cache->colorStyle() == Q3DTheme::ColorStyleUniform) {
             offset = pos * uvsCount;

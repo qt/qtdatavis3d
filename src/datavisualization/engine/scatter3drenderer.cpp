@@ -341,22 +341,7 @@ void Scatter3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHin
 {
     Abstract3DRenderer::updateOptimizationHint(hint);
 
-    if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)) {
-#if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-            initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                QStringLiteral(":/shaders/fragmentShadow"));
-        } else {
-            initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
-                                QStringLiteral(":/shaders/fragmentTexture"));
-        }
-#else
-        initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
-                            QStringLiteral(":/shaders/fragmentTexture"));
-#endif
-    } else {
-        Abstract3DRenderer::reInitShaders();
-    }
+    Abstract3DRenderer::reInitShaders();
 }
 
 void Scatter3DRenderer::resetClickedStatus()

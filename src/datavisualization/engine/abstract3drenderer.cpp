@@ -25,6 +25,7 @@
 #include "qcustom3ditem_p.h"
 #include "qcustom3dlabel_p.h"
 #include "qcustom3dvolume_p.h"
+#include "scatter3drenderer_p.h"
 
 #include <QtCore/qmath.h>
 
@@ -282,19 +283,35 @@ void Abstract3DRenderer::reInitShaders()
 {
 #if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-        initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
-                            QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-        initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                    QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
+                && qobject_cast<Scatter3DRenderer *>(this)) {
+            initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                QStringLiteral(":/shaders/fragmentShadow"));
+            initShaders(QStringLiteral(":/shaders/vertexShadowNoMatrices"),
+                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        } else {
+            initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+            initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
+        }
         initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadowNoTex"));
         initCustomItemShaders(QStringLiteral(":/shaders/vertexShadow"),
                               QStringLiteral(":/shaders/fragmentShadow"));
     } else {
-        initGradientShaders(QStringLiteral(":/shaders/vertex"),
-                            QStringLiteral(":/shaders/fragmentColorOnY"));
-        initShaders(QStringLiteral(":/shaders/vertex"),
-                    QStringLiteral(":/shaders/fragment"));
+        if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
+                && qobject_cast<Scatter3DRenderer *>(this)) {
+            initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
+                                QStringLiteral(":/shaders/fragmentTexture"));
+            initShaders(QStringLiteral(":/shaders/vertexNoMatrices"),
+                        QStringLiteral(":/shaders/fragment"));
+        } else {
+            initGradientShaders(QStringLiteral(":/shaders/vertex"),
+                                QStringLiteral(":/shaders/fragmentColorOnY"));
+            initShaders(QStringLiteral(":/shaders/vertex"),
+                        QStringLiteral(":/shaders/fragment"));
+        }
         initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                               QStringLiteral(":/shaders/fragment"));
         initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
