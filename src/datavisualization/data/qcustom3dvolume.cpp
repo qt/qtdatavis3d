@@ -148,7 +148,7 @@ QCustom3DVolume::QCustom3DVolume(QObject *parent) :
  * \a textureWidth, \a textureHeight, \a textureDepth, \a textureData, \a textureFormat,
  * \a colorTable, and optional \a parent.
  *
- * \sa textureData, textureFormat, colorTable
+ * \sa textureData, setTextureFormat(), colorTable
  */
 QCustom3DVolume::QCustom3DVolume(const QVector3D &position, const QVector3D &scaling,
                                  const QQuaternion &rotation, int textureWidth,
@@ -176,7 +176,7 @@ QCustom3DVolume::~QCustom3DVolume()
  * \note The textureData may need to be resized or recreated if this value is changed.
  * Defaults to \c{0}.
  *
- * \sa textureData, textureHeight, textureDepth, textureFormat, textureDataWidth()
+ * \sa textureData, textureHeight, textureDepth, setTextureFormat(), textureDataWidth()
  */
 void QCustom3DVolume::setTextureWidth(int value)
 {
@@ -204,7 +204,7 @@ int QCustom3DVolume::textureWidth() const
  * \note The textureData may need to be resized or recreated if this value is changed.
  * Defaults to \c{0}.
  *
- * \sa textureData, textureWidth, textureDepth, textureFormat
+ * \sa textureData, textureWidth, textureDepth, setTextureFormat()
  */
 void QCustom3DVolume::setTextureHeight(int value)
 {
@@ -233,7 +233,7 @@ int QCustom3DVolume::textureHeight() const
  * \note The textureData may need to be resized or recreated if this value is changed.
  * Defaults to \c{0}.
  *
- * \sa textureData, textureWidth, textureHeight, textureFormat
+ * \sa textureData, textureWidth, textureHeight, setTextureFormat()
  */
 void QCustom3DVolume::setTextureDepth(int value)
 {
@@ -374,7 +374,7 @@ void QCustom3DVolume::setSliceIndices(int x, int y, int z)
  *
  * Defaults to \c{0}.
  *
- * \sa textureData, textureFormat, QImage::colorTable()
+ * \sa textureData, setTextureFormat(), QImage::colorTable()
  */
 void QCustom3DVolume::setColorTable(const QVector<QRgb> &colors)
 {
@@ -414,7 +414,7 @@ QVector<QRgb> QCustom3DVolume::colorTable() const
  *
  * Defaults to \c{0}.
  *
- * \sa colorTable, textureFormat, setSubTextureData(), textureDataWidth()
+ * \sa colorTable, setTextureFormat(), setSubTextureData(), textureDataWidth()
  */
 void QCustom3DVolume::setTextureData(QVector<uchar> *data)
 {
@@ -439,7 +439,7 @@ void QCustom3DVolume::setTextureData(QVector<uchar> *data)
  *
  * \return pointer to the newly created array.
  *
- * \sa textureData, textureWidth, textureHeight, textureDepth, textureFormat
+ * \sa textureData, textureWidth, textureHeight, textureDepth, setTextureFormat()
  */
 QVector<uchar> *QCustom3DVolume::createTextureData(const QVector<QImage *> &images)
 {
@@ -573,9 +573,11 @@ void QCustom3DVolume::setSubTextureData(int depthIndex, const QImage &image)
     }
 }
 
-/*! \property QCustom3DVolume::textureFormat
- *
- * The format of the textureData. Only two formats are supported currently:
+// Note: textureFormat is not a Q_PROPERTY to work around an issue in meta object system that
+// doesn't allow QImage::format to be a property type. Qt 5.2.1 at least has this problem.
+
+/*!
+ * Sets the format of the textureData to \a format. Only two formats are supported currently:
  * QImage::Format_Indexed8 and QImage::Format_ARGB32. If an indexed format is specified, colorTable
  * must also be set.
  * Defaults to QImage::Format_ARGB32.
@@ -596,10 +598,23 @@ void QCustom3DVolume::setTextureFormat(QImage::Format format)
     }
 }
 
+/*!
+ * \return the format of the textureData.
+ *
+ * \sa setTextureFormat()
+ */
 QImage::Format QCustom3DVolume::textureFormat() const
 {
     return dptrc()->m_textureFormat;
 }
+
+/*!
+ * \fn void QCustom3DVolume::textureFormatChanged(QImage::Format format)
+ *
+ * This signal is emitted when the textureData \a format changes.
+ *
+ * \sa setTextureFormat()
+ */
 
 /*!
  * \property QCustom3DVolume::alphaMultiplier
@@ -663,7 +678,7 @@ bool QCustom3DVolume::preserveOpacity() const
  *
  * \return the rendered image of the slice, or a null image if invalid index is specified.
  *
- * \sa textureFormat
+ * \sa setTextureFormat()
  */
 QImage QCustom3DVolume::renderSlice(Qt::Axis axis, int index)
 {
@@ -688,12 +703,12 @@ const QCustom3DVolumePrivate *QCustom3DVolume::dptrc() const
 
 QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q) :
     QCustom3DItemPrivate(q),
-    m_sliceIndexX(-1),
-    m_sliceIndexY(-1),
-    m_sliceIndexZ(-1),
     m_textureWidth(0),
     m_textureHeight(0),
     m_textureDepth(0),
+    m_sliceIndexX(-1),
+    m_sliceIndexY(-1),
+    m_sliceIndexZ(-1),
     m_textureFormat(QImage::Format_ARGB32),
     m_textureData(0),
     m_alphaMultiplier(1.0f),
@@ -711,12 +726,12 @@ QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q, const QVector
                                                QImage::Format textureFormat,
                                                const QVector<QRgb> &colorTable) :
     QCustom3DItemPrivate(q, QStringLiteral(":/defaultMeshes/barFull"), position, scaling, rotation),
-    m_sliceIndexX(-1),
-    m_sliceIndexY(-1),
-    m_sliceIndexZ(-1),
     m_textureWidth(textureWidth),
     m_textureHeight(textureHeight),
     m_textureDepth(textureDepth),
+    m_sliceIndexX(-1),
+    m_sliceIndexY(-1),
+    m_sliceIndexZ(-1),
     m_textureFormat(textureFormat),
     m_colorTable(colorTable),
     m_textureData(textureData),

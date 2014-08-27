@@ -187,7 +187,7 @@ void ScatterObjectBufferHelper::updateUVs(ScatterSeriesRenderCache *cache)
     QVector<QVector2D> buffered_uvs;
     buffered_uvs.resize(uvsCount * renderArraySize);
 
-    uint itemCount;
+    uint itemCount = 0;
     if (cache->colorStyle() == Q3DTheme::ColorStyleRangeGradient) {
         itemCount = createRangeGradientUVs(cache, buffered_uvs);
     } else if (cache->colorStyle() == Q3DTheme::ColorStyleObjectGradient) {

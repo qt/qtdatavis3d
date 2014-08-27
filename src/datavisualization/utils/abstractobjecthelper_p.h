@@ -38,7 +38,7 @@ class AbstractObjectHelper: protected QOpenGLFunctions
 protected:
     AbstractObjectHelper();
 public:
-    ~AbstractObjectHelper();
+    virtual ~AbstractObjectHelper();
 
     GLuint vertexBuf();
     GLuint normalBuf();

@@ -51,7 +51,7 @@ public:
 
 public:
     SurfaceObject(Surface3DRenderer *renderer);
-    ~SurfaceObject();
+    virtual ~SurfaceObject();
 
     void setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
                    bool changeGeometry, bool polar, bool flipXZ = false);

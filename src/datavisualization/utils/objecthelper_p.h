@@ -41,7 +41,7 @@ class ObjectHelper : public AbstractObjectHelper
 private:
     ObjectHelper(const QString &objectFile);
 public:
-    ~ObjectHelper();
+    virtual ~ObjectHelper();
 
     static void resetObjectHelper(const Abstract3DRenderer *cacheId, ObjectHelper *&obj,
                                   const QString &meshFile);

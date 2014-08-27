@@ -39,7 +39,7 @@ class ScatterObjectBufferHelper : public AbstractObjectHelper
 {
 public:
     ScatterObjectBufferHelper();
-    ~ScatterObjectBufferHelper();
+    virtual ~ScatterObjectBufferHelper();
 
     void fullLoad(ScatterSeriesRenderCache *cache, qreal dotScale);
     void update(ScatterSeriesRenderCache *cache, qreal dotScale);

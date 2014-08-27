@@ -1748,8 +1748,8 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
 
         QQuaternion totalRotation = Utils::calculateRotation(labelRotation);
         if (m_polarGraph) {
-            if (!m_yFlippedForGrid && (m_zFlipped != m_xFlipped)
-                    || m_yFlippedForGrid && (m_zFlipped == m_xFlipped)) {
+            if ((!m_yFlippedForGrid && (m_zFlipped != m_xFlipped))
+                    || (m_yFlippedForGrid && (m_zFlipped == m_xFlipped))) {
                 totalRotation *= m_zRightAngleRotation;
             } else {
                 totalRotation *= m_zRightAngleRotationNeg;

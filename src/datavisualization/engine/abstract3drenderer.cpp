@@ -930,7 +930,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     QVector3D scaling = item->scaling();
     QImage textureImage = item->d_ptr->textureImage();
     bool facingCamera = false;
-    GLuint texture;
+    GLuint texture = 0;
     if (item->d_ptr->m_isLabelItem) {
         QCustom3DLabel *labelItem = static_cast<QCustom3DLabel *>(item);
         float pointSize = labelItem->font().pointSizeF();

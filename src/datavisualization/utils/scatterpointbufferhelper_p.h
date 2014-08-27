@@ -39,7 +39,7 @@ class ScatterPointBufferHelper : public AbstractObjectHelper
 {
 public:
     ScatterPointBufferHelper();
-    ~ScatterPointBufferHelper();
+    virtual ~ScatterPointBufferHelper();
 
     GLuint pointBuf();
 
