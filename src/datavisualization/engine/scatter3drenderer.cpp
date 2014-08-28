@@ -181,6 +181,7 @@ void Scatter3DRenderer::updateData()
                         points = new ScatterPointBufferHelper();
                         cache->setBufferPoints(points);
                     }
+                    points->setScaleY(m_scaleY);
                     points->load(cache);
                 } else {
                     ScatterObjectBufferHelper *object = cache->bufferObject();
@@ -219,7 +220,7 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
                 if (changeTracker.baseGradientChanged || changeTracker.colorStyleChanged) {
                     ScatterSeriesRenderCache *cache =
                             static_cast<ScatterSeriesRenderCache *>(m_renderCacheList.value(scatterSeries));
-                    if (cache && cache->mesh() != QAbstract3DSeries::MeshPoint)
+                    if (cache)
                         cache->setStaticObjectUVDirty(true);
                 }
             }
@@ -265,8 +266,13 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
             }
 
             if (cache->staticObjectUVDirty()) {
-                ScatterObjectBufferHelper *object = cache->bufferObject();
-                object->updateUVs(cache);
+                if (cache->mesh() == QAbstract3DSeries::MeshPoint) {
+                    ScatterPointBufferHelper *object = cache->bufferPoints();
+                    object->updateUVs(cache);
+                } else {
+                    ScatterObjectBufferHelper *object = cache->bufferObject();
+                    object->updateUVs(cache);
+                }
                 cache->setStaticObjectUVDirty(false);
             }
         }
@@ -522,7 +528,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                         if (optimizationDefault)
                             m_drawer->drawPoint(m_depthShader);
                         else
-                            m_drawer->drawPoints(m_depthShader, cache->bufferPoints());
+                            m_drawer->drawPoints(m_depthShader, cache->bufferPoints(), 0);
                     } else {
                         if (optimizationDefault) {
                             // 1st attribute buffer : vertices
@@ -853,6 +859,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     gradientTexture = cache->baseGradientTexture();
                 }
 
+                if (!optimizationDefault && rangeGradientPoints) {
+                    dotShader = m_labelShader;
+                    dotShader->bind();
+                    gradientTexture = cache->baseGradientTexture();
+                }
+
                 GLfloat lightStrength = m_cachedTheme->lightStrength();
                 if (optimizationDefault && selectedSeries && (m_selectedItemIndex == i)) {
                     if (useColor)
@@ -905,7 +917,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                         if (optimizationDefault)
                             m_drawer->drawPoint(dotShader);
                         else
-                            m_drawer->drawPoints(dotShader, cache->bufferPoints());
+                            m_drawer->drawPoints(dotShader, cache->bufferPoints(), gradientTexture);
                     }
                 } else
 #endif
@@ -923,7 +935,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                         if (optimizationDefault)
                             m_drawer->drawPoint(dotShader);
                         else
-                            m_drawer->drawPoints(dotShader, cache->bufferPoints());
+                            m_drawer->drawPoints(dotShader, cache->bufferPoints(), gradientTexture);
                     }
                 }
             }

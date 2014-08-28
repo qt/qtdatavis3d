@@ -46,14 +46,21 @@ public:
     void pushPoint(uint pointIndex);
     void popPoint();
     void load(ScatterSeriesRenderCache *cache);
+    void setScaleY(float scale) { m_scaleY = scale; }
+    void updateUVs(ScatterSeriesRenderCache *cache);
 
 public:
     GLuint m_pointbuffer;
 
 private:
+    void createRangeGradientUVs(ScatterSeriesRenderCache *cache,
+                                QVector<QVector2D> &buffered_uvs);
+
+private:
     QVector<QVector3D> m_bufferedPoints;
     uint m_oldRemoveIndex;
     bool m_oldRemove;
+    float m_scaleY;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

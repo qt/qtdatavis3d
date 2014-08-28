@@ -638,8 +638,7 @@ qreal QAbstract3DGraph::aspectRatio() const
  * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
  * reasonable performance. Static optimizes graph rendering and is ideal for large non-changing data sets.
  * It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it with
- * massive data sets is not advisable. Static works only on the Scatter graph and lacks the range gradient
- * color style for points.
+ * massive data sets is not advisable. Static works only on the Scatter graph.
  * Defaults to \c{OptimizationDefault}.
  */
 void QAbstract3DGraph::setOptimizationHints(OptimizationHints hints)

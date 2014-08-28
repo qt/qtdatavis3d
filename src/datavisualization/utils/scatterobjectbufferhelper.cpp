@@ -220,7 +220,7 @@ uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache 
         if (!item.isVisible())
             continue;
 
-        float y = ((item.translation().y() + m_scaleY) * 0.5f ) / m_scaleY;
+        float y = ((item.translation().y() + m_scaleY) * 0.5f) / m_scaleY;
         uv.setY(y);
         int offset = pos * uvsCount;
         for (int j = 0; j < uvsCount; j++)

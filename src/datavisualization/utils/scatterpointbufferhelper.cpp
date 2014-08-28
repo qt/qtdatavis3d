@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "scatterpointbufferhelper_p.h"
+#include <QtGui/QVector2D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -86,8 +87,13 @@ void ScatterPointBufferHelper::load(ScatterSeriesRenderCache *cache)
     if (m_meshDataLoaded) {
         // Delete old data
         glDeleteBuffers(1, &m_pointbuffer);
+        glDeleteBuffers(1, &m_uvbuffer);
         m_bufferedPoints.clear();
     }
+
+    QVector<QVector2D> buffered_uvs;
+    if (cache->colorStyle() == Q3DTheme::ColorStyleRangeGradient)
+        createRangeGradientUVs(cache, buffered_uvs);
 
     bool itemsVisible = false;
     m_bufferedPoints.resize(renderArraySize);
@@ -110,9 +116,53 @@ void ScatterPointBufferHelper::load(ScatterSeriesRenderCache *cache)
         glBufferData(GL_ARRAY_BUFFER, m_bufferedPoints.size() * sizeof(QVector3D),
                      &m_bufferedPoints.at(0),
                      GL_DYNAMIC_DRAW);
+
+        if (buffered_uvs.size()) {
+            glGenBuffers(1, &m_uvbuffer);
+            glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+            glBufferData(GL_ARRAY_BUFFER, buffered_uvs.size() * sizeof(QVector2D),
+                         &buffered_uvs.at(0), GL_STATIC_DRAW);
+        }
+
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         m_meshDataLoaded = true;
+    }
+}
+
+void ScatterPointBufferHelper::updateUVs(ScatterSeriesRenderCache *cache)
+{
+    QVector<QVector2D> buffered_uvs;
+
+    createRangeGradientUVs(cache, buffered_uvs);
+
+    if (buffered_uvs.size()) {
+        if (!m_uvbuffer)
+            glGenBuffers(1, &m_uvbuffer);
+
+        glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+        glBufferData(GL_ARRAY_BUFFER, buffered_uvs.size() * sizeof(QVector2D),
+                     &buffered_uvs.at(0), GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+    }
+}
+
+void ScatterPointBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache *cache,
+                                                      QVector<QVector2D> &buffered_uvs)
+{
+    const ScatterRenderItemArray &renderArray = cache->renderArray();
+    const uint renderArraySize = renderArray.size();
+    buffered_uvs.resize(renderArraySize);
+
+    QVector2D uv;
+    uv.setX(0.0f);
+    for (uint i = 0; i < renderArraySize; i++) {
+        const ScatterRenderItem &item = renderArray.at(i);
+
+        float y = ((item.translation().y() + m_scaleY) * 0.5f) / m_scaleY;
+        uv.setY(y);
+        buffered_uvs[i] = uv;
     }
 }
 
