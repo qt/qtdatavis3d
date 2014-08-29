@@ -57,7 +57,7 @@ public:
                                    bool borders = false,
                                    int maxLabelWidth = 0);
     static QVector4D getSelection(QPoint mousepos, int height);
-    static QImage getGradientImage(const QLinearGradient &gradient);
+    static QImage getGradientImage(QLinearGradient &gradient);
 
     static ParamType findFormatParamType(const QString &format);
     static QString formatLabel(const QByteArray &format, ParamType paramType, qreal value);

@@ -745,7 +745,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     }
 
     float rangeGradientYScaler = 0.5f / m_scaleY;
-    float rangeGradientYScalerForPoints = rangeGradientYScaler * 100.0f;
 
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
         if (baseCache->isVisible()) {
@@ -771,6 +770,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
 #endif
             QVector3D modelScaler(itemSize, itemSize, itemSize);
+            int gradientImageHeight = cache->gradientImage().height();
+            int maxGradientPositition = gradientImageHeight - 1;
 
             if (!optimizationDefault
                     && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
@@ -848,8 +849,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     if (rangeGradientPoints) {
                         // Drawing points with range gradient
                         // Get color from gradient based on items y position converted to percent
-                        int position = int(item.translation().y() * rangeGradientYScalerForPoints)
-                                + 50;
+                        int position = ((item.translation().y() + m_scaleY) * rangeGradientYScaler) * gradientImageHeight;
+                        position = qMin(maxGradientPositition, position); // clamp to edge
                         dotColor = Utils::vectorFromColor(
                                     cache->gradientImage().pixel(0, position));
                     } else {

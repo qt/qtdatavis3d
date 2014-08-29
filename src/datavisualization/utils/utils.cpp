@@ -139,13 +139,16 @@ QVector4D Utils::getSelection(QPoint mousepos, int height)
     return selectedColor;
 }
 
-QImage Utils::getGradientImage(const QLinearGradient &gradient)
+QImage Utils::getGradientImage(QLinearGradient &gradient)
 {
-    QImage image(QSize(1, 101), QImage::Format_RGB32);
+    QImage image(QSize(gradientTextureWidth, gradientTextureHeight), QImage::Format_RGB32);
+    gradient.setFinalStop(qreal(gradientTextureWidth), qreal(gradientTextureHeight));
+    gradient.setStart(0.0, 0.0);
+
     QPainter pmp(&image);
     pmp.setBrush(QBrush(gradient));
     pmp.setPen(Qt::NoPen);
-    pmp.drawRect(0, 0, 1, 101);
+    pmp.drawRect(0, 0, int(gradientTextureWidth), int(gradientTextureHeight));
     return image;
 }
 
