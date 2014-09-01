@@ -338,6 +338,11 @@ void VolumetricModifier::setPreserveOpacity(bool enabled)
     adjustSliceZ(m_sliceSliderZ->value());
 }
 
+void VolumetricModifier::setUseHighDefShader(bool enabled)
+{
+    m_volumeItem->setUseHighDefShader(enabled);
+}
+
 void VolumetricModifier::adjustAlphaMultiplier(int value)
 {
     float mult;

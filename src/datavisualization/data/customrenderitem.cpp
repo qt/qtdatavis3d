@@ -42,7 +42,8 @@ CustomRenderItem::CustomRenderItem()
       m_sliceIndexY(-1),
       m_sliceIndexZ(-1),
       m_alphaMultiplier(1.0f),
-      m_preserveOpacity(true)
+      m_preserveOpacity(true),
+      m_useHighDefShader(true)
 {
 }
 

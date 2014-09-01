@@ -41,6 +41,7 @@ struct QCustomVolumeDirtyBitField {
     bool textureDataDirty       : 1;
     bool textureFormatDirty     : 1;
     bool alphaDirty             : 1;
+    bool shaderDirty            : 1;
 
     QCustomVolumeDirtyBitField()
         : textureDimensionsDirty(false),
@@ -48,7 +49,8 @@ struct QCustomVolumeDirtyBitField {
           colorTableDirty(false),
           textureDataDirty(false),
           textureFormatDirty(false),
-          alphaDirty(false)
+          alphaDirty(false),
+          shaderDirty(false)
     {
     }
 };
@@ -84,6 +86,7 @@ public:
 
     float m_alphaMultiplier;
     bool m_preserveOpacity;
+    bool m_useHighDefShader;
 
     QCustomVolumeDirtyBitField m_dirtyBitsVolume;
 

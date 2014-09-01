@@ -96,6 +96,8 @@ public:
     inline float alphaMultiplier() const { return m_alphaMultiplier; }
     inline void setPreserveOpacity(bool enable) { m_preserveOpacity = enable; }
     inline bool preserveOpacity() const { return m_preserveOpacity; }
+    inline void setUseHighDefShader(bool enable) { m_useHighDefShader = enable; }
+    inline bool useHighDefShader() const {return m_useHighDefShader; }
 
 private:
     Q_DISABLE_COPY(CustomRenderItem)
@@ -126,6 +128,7 @@ private:
     int m_sliceIndexZ;
     float m_alphaMultiplier;
     bool m_preserveOpacity;
+    bool m_useHighDefShader;
 };
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 

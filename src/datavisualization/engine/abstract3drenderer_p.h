@@ -94,6 +94,7 @@ public:
                                        const QString &fragmentShader);
     virtual void initVolumeTextureShaders(const QString &vertexShader,
                                           const QString &fragmentShader,
+                                          const QString &fragmentLowDefShader,
                                           const QString &sliceShader);
     virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
                                 QAbstract3DAxis::AxisType type);
@@ -146,7 +147,6 @@ public:
     QString &selectionLabel();
 
     void drawCustomItems(RenderingState state, ShaderHelper *regularShader,
-                         ShaderHelper *volumeShader, ShaderHelper *volumeSliceShader,
                          const QMatrix4x4 &viewMatrix,
                          const QMatrix4x4 &projectionViewMatrix,
                          const QMatrix4x4 &depthProjectionViewMatrix,
@@ -243,6 +243,7 @@ protected:
 
     ShaderHelper *m_customItemShader;
     ShaderHelper *m_volumeTextureShader;
+    ShaderHelper *m_volumeTextureLowDefShader;
     ShaderHelper *m_volumeTextureSliceShader;
 
     bool m_useOrthoProjection;

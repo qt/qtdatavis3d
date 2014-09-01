@@ -60,6 +60,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_visibleSeriesCount(0),
       m_customItemShader(0),
       m_volumeTextureShader(0),
+      m_volumeTextureLowDefShader(0),
       m_volumeTextureSliceShader(0),
       m_useOrthoProjection(false),
       m_xFlipped(false),
@@ -103,6 +104,7 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_selectionLabelItem;
     delete m_customItemShader;
     delete m_volumeTextureShader;
+    delete m_volumeTextureLowDefShader;
     delete m_volumeTextureSliceShader;
 
     foreach (SeriesRenderCache *cache, m_renderCacheList) {
@@ -198,22 +200,27 @@ void Abstract3DRenderer::initGradientShaders(const QString &vertexShader,
 void Abstract3DRenderer::initCustomItemShaders(const QString &vertexShader,
                                                const QString &fragmentShader)
 {
-    if (m_customItemShader)
-        delete m_customItemShader;
+    delete m_customItemShader;
     m_customItemShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_customItemShader->initialize();
 }
 
 void Abstract3DRenderer::initVolumeTextureShaders(const QString &vertexShader,
                                                   const QString &fragmentShader,
+                                                  const QString &fragmentLowDefShader,
                                                   const QString &sliceShader)
 {
-    if (m_volumeTextureShader)
-        delete m_volumeTextureShader;
+
+    delete m_volumeTextureShader;
     m_volumeTextureShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_volumeTextureShader->initialize();
-    if (m_volumeTextureSliceShader)
-        delete m_volumeTextureSliceShader;
+
+    delete m_volumeTextureLowDefShader;
+    m_volumeTextureLowDefShader = new ShaderHelper(this, vertexShader,
+                                                   fragmentLowDefShader);
+    m_volumeTextureLowDefShader->initialize();
+
+    delete m_volumeTextureSliceShader;
     m_volumeTextureSliceShader = new ShaderHelper(this, vertexShader, sliceShader);
     m_volumeTextureSliceShader->initialize();
 }
@@ -319,6 +326,7 @@ void Abstract3DRenderer::reInitShaders()
     }
     initVolumeTextureShaders(QStringLiteral(":/shaders/vertexTexture3D"),
                              QStringLiteral(":/shaders/fragmentTexture3D"),
+                             QStringLiteral(":/shaders/fragmentTexture3DLowDef"),
                              QStringLiteral(":/shaders/fragmentTexture3DSlice"));
 #else
     initGradientShaders(QStringLiteral(":/shaders/vertex"),
@@ -988,6 +996,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         newItem->setSliceIndexZ(volumeItem->sliceIndexZ());
         newItem->setAlphaMultiplier(volumeItem->alphaMultiplier());
         newItem->setPreserveOpacity(volumeItem->preserveOpacity());
+        newItem->setUseHighDefShader(volumeItem->useHighDefShader());
 #endif
     }
     newItem->setScaling(scaling);
@@ -1068,15 +1077,15 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             }
         } else
 #if !defined(QT_OPENGL_ES_2)
-         if (!item->d_ptr->m_isVolumeItem)
+            if (!item->d_ptr->m_isVolumeItem)
 #endif
-        {
-            renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
-            GLuint oldTexture = renderItem->texture();
-            m_textureHelper->deleteTexture(&oldTexture);
-            GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
-            renderItem->setTexture(texture);
-        }
+            {
+                renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
+                GLuint oldTexture = renderItem->texture();
+                m_textureHelper->deleteTexture(&oldTexture);
+                GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
+                renderItem->setTexture(texture);
+            }
         item->d_ptr->clearTextureImage();
         item->d_ptr->m_dirtyBits.textureDirty = false;
     }
@@ -1140,6 +1149,10 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             renderItem->setPreserveOpacity(volumeItem->preserveOpacity());
             volumeItem->dptr()->m_dirtyBitsVolume.alphaDirty = false;
         }
+        if (volumeItem->dptr()->m_dirtyBitsVolume.shaderDirty) {
+            renderItem->setUseHighDefShader(volumeItem->useHighDefShader());
+            volumeItem->dptr()->m_dirtyBitsVolume.shaderDirty = false;
+        }
 #endif
     }
 }
@@ -1155,8 +1168,6 @@ void Abstract3DRenderer::updateCustomItemPositions()
 
 void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          ShaderHelper *regularShader,
-                                         ShaderHelper *volumeShader,
-                                         ShaderHelper *volumeSliceShader,
                                          const QMatrix4x4 &viewMatrix,
                                          const QMatrix4x4 &projectionViewMatrix,
                                          const QMatrix4x4 &depthProjectionViewMatrix,
@@ -1254,9 +1265,11 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                 if (item->sliceIndexX() >= 0
                         || item->sliceIndexY() >= 0
                         || item->sliceIndexZ() >= 0) {
-                    shader = volumeSliceShader;
+                    shader = m_volumeTextureSliceShader;
+                } else if (item->useHighDefShader()) {
+                    shader = m_volumeTextureShader;
                 } else {
-                    shader = volumeShader;
+                    shader = m_volumeTextureLowDefShader;
                 }
             } else {
                 shader = regularShader;
@@ -1309,7 +1322,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                     shader->setUniformValue(shader->alphaMultiplier(), item->alphaMultiplier());
                     shader->setUniformValue(shader->preserveOpacity(),
                                             item->preserveOpacity() ? 1 : 0);
-                    if (shader == volumeSliceShader) {
+                    if (shader == m_volumeTextureSliceShader) {
                         QVector3D slices((float(item->sliceIndexX()) + 0.5f)
                                          / float(item->textureWidth()) * 2.0 - 1.0,
                                          (float(item->sliceIndexY()) + 0.5f)
@@ -1323,11 +1336,21 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                         QVector3D textureDimensions(1.0f / float(item->textureWidth()),
                                                     1.0f / float(item->textureHeight()),
                                                     1.0f / float(item->textureDepth()));
-                        shader->setUniformValue(shader->textureDimensions(), textureDimensions);
 
                         // Worst case scenario sample count
-                        int sampleCount = item->textureWidth() + item->textureHeight()
-                                + item->textureDepth();
+                        int sampleCount;
+                        if (shader == m_volumeTextureLowDefShader) {
+                            sampleCount = qMax(item->textureWidth(),
+                                               qMax(item->textureDepth(), item->textureHeight()));
+                            // Further improve speed with big textures by simply dropping every
+                            // other sample:
+                            if (sampleCount > 256)
+                                sampleCount /= 2;
+                        } else {
+                            sampleCount = item->textureWidth() + item->textureHeight()
+                                    + item->textureDepth();
+                        }
+                        shader->setUniformValue(shader->textureDimensions(), textureDimensions);
                         shader->setUniformValue(shader->sampleCount(), sampleCount);
                     }
                     m_drawer->drawObject(shader, item->mesh(), 0, 0, item->texture());

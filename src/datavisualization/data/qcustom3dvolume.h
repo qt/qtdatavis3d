@@ -41,6 +41,7 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem
     Q_PROPERTY(QVector<uchar> *textureData READ textureData WRITE setTextureData NOTIFY textureDataChanged)
     Q_PROPERTY(float alphaMultiplier READ alphaMultiplier WRITE setAlphaMultiplier NOTIFY alphaMultiplierChanged)
     Q_PROPERTY(bool preserveOpacity READ preserveOpacity WRITE setPreserveOpacity NOTIFY preserveOpacityChanged)
+    Q_PROPERTY(bool useHighDefShader READ useHighDefShader WRITE setUseHighDefShader NOTIFY useHighDefShaderChanged)
 
 public:
 
@@ -86,6 +87,9 @@ public:
     void setPreserveOpacity(bool enable);
     bool preserveOpacity() const;
 
+    void setUseHighDefShader(bool enable);
+    bool useHighDefShader() const;
+
     QImage renderSlice(Qt::Axis axis, int index);
 
 signals:
@@ -100,6 +104,7 @@ signals:
     void textureFormatChanged(QImage::Format format);
     void alphaMultiplierChanged(float mult);
     void preserveOpacityChanged(bool enabled);
+    void useHighDefShaderChanged(bool enabled);
 
 protected:
     QCustom3DVolumePrivate *dptr();

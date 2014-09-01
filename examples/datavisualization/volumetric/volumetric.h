@@ -60,6 +60,7 @@ public slots:
     void setSliceSliders(QSlider *sliderX, QSlider *sliderY, QSlider *sliderZ);
     void changeColorTable(int enabled);
     void setPreserveOpacity(bool enabled);
+    void setUseHighDefShader(bool enabled);
     void adjustAlphaMultiplier(int value);
 
 private:

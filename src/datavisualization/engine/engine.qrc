@@ -64,5 +64,6 @@
         <file alias="fragmentTexture3DSlice">shaders/texture3dslice.frag</file>
         <file alias="vertexShadowNoMatrices">shaders/shadowNoMatrices.vert</file>
         <file alias="vertexNoMatrices">shaders/defaultNoMatrices.vert</file>
+        <file alias="fragmentTexture3DLowDef">shaders/texture3dlowdef.frag</file>
     </qresource>
 </RCC>

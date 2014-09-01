@@ -135,6 +135,10 @@ int main(int argc, char **argv)
     preserveOpacityCheckBox->setText(QStringLiteral("Preserve opacity"));
     preserveOpacityCheckBox->setChecked(true);
 
+    QCheckBox *useHighDefShaderCheckBox = new QCheckBox(widget);
+    useHighDefShaderCheckBox->setText(QStringLiteral("Use HD shader"));
+    useHighDefShaderCheckBox->setChecked(true);
+
     vLayout->addWidget(sliceXCheckBox);
     vLayout->addWidget(sliceXSlider);
     vLayout->addWidget(sliceImageXLabel);
@@ -150,7 +154,8 @@ int main(int argc, char **argv)
     vLayout2->addWidget(colorTableCheckBox);
     vLayout2->addWidget(alphaMultiplierLabel);
     vLayout2->addWidget(alphaMultiplierSlider);
-    vLayout2->addWidget(preserveOpacityCheckBox, 1, Qt::AlignTop);
+    vLayout2->addWidget(preserveOpacityCheckBox);
+    vLayout2->addWidget(useHighDefShaderCheckBox, 1, Qt::AlignTop);
 
     VolumetricModifier *modifier = new VolumetricModifier(graph);
     modifier->setFpsLabel(fpsLabel);
@@ -184,6 +189,8 @@ int main(int argc, char **argv)
                      &VolumetricModifier::changeColorTable);
     QObject::connect(preserveOpacityCheckBox, &QCheckBox::stateChanged, modifier,
                      &VolumetricModifier::setPreserveOpacity);
+    QObject::connect(useHighDefShaderCheckBox, &QCheckBox::stateChanged, modifier,
+                     &VolumetricModifier::setUseHighDefShader);
     QObject::connect(alphaMultiplierSlider, &QSlider::valueChanged, modifier,
                      &VolumetricModifier::adjustAlphaMultiplier);
 

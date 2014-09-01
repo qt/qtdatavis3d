@@ -1090,8 +1090,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
 
-        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, m_volumeTextureShader,
-                                            m_volumeTextureSliceShader, viewMatrix,
+        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
                                             projectionViewMatrix,
                                             depthProjectionViewMatrix, m_depthTexture,
                                             m_shadowQualityToShader);
@@ -1179,7 +1178,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
         glCullFace(GL_BACK);
         Abstract3DRenderer::drawCustomItems(RenderingSelection, m_selectionShader,
-                                            m_volumeTextureShader, m_volumeTextureSliceShader,
                                             viewMatrix,
                                             projectionViewMatrix, depthProjectionViewMatrix,
                                             m_depthTexture, m_shadowQualityToShader);
@@ -1234,7 +1232,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                        startBar, stopBar, stepBar, -1.0f);
 
         Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader,
-                                            m_volumeTextureShader, m_volumeTextureSliceShader,
                                             viewMatrix, projectionViewMatrix,
                                             depthProjectionViewMatrix, m_depthTexture,
                                             m_shadowQualityToShader, -1.0f);
@@ -1272,8 +1269,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
     drawGridLines(depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
 
     // Draw custom items
-    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, m_volumeTextureShader,
-                                        m_volumeTextureSliceShader, viewMatrix,
+    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
                                         projectionViewMatrix, depthProjectionViewMatrix,
                                         m_depthTexture, m_shadowQualityToShader);
 

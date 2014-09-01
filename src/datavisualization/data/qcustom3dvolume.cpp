@@ -136,6 +136,24 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty bool Custom3DVolume::useHighDefShader
+ *
+ * If this property value is \c{true}, a high definition shader is used to render the volume.
+ * If it is \c{false}, a low definition shader is used.
+ *
+ * The high definition shader guarantees that every visible texel of the volume texture is sampled
+ * when the volume is rendered.
+ * The low definition shader renders only a rough approximation of the volume contents,
+ * but at much higher frame rate. The low definition shader doesn't guarantee every texel of the
+ * volume texture is sampled, so there may be flickering if the volume contains distinct thin
+ * features.
+ *
+ * \note This value doesn't affect the level of detail when rendering the slices of the volume.
+ *
+ * Defaults to \c{true}.
+ */
+
+/*!
  * Constructs QCustom3DVolume with given \a parent.
  */
 QCustom3DVolume::QCustom3DVolume(QObject *parent) :
@@ -673,6 +691,40 @@ bool QCustom3DVolume::preserveOpacity() const
 }
 
 /*!
+ * \property QCustom3DVolume::useHighDefShader
+ *
+ * If this property value is \c{true}, a high definition shader is used to render the volume.
+ * If it is \c{false}, a low definition shader is used.
+ *
+ * The high definition shader guarantees that every visible texel of the volume texture is sampled
+ * when the volume is rendered.
+ * The low definition shader renders only a rough approximation of the volume contents,
+ * but at much higher frame rate. The low definition shader doesn't guarantee every texel of the
+ * volume texture is sampled, so there may be flickering if the volume contains distinct thin
+ * features.
+ *
+ * \note This value doesn't affect the level of detail when rendering the slices of the volume.
+ *
+ * Defaults to \c{true}.
+ *
+ * \sa renderSlice()
+ */
+void QCustom3DVolume::setUseHighDefShader(bool enable)
+{
+    if (dptr()->m_useHighDefShader != enable) {
+        dptr()->m_useHighDefShader = enable;
+        dptr()->m_dirtyBitsVolume.shaderDirty = true;
+        emit useHighDefShaderChanged(enable);
+        emit dptr()->needUpdate();
+    }
+}
+
+bool QCustom3DVolume::useHighDefShader() const
+{
+    return dptrc()->m_useHighDefShader;
+}
+
+/*!
  * Renders the slice specified by \a index along \a axis into an image.
  * The texture format of this object is used.
  *
@@ -712,7 +764,8 @@ QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q) :
     m_textureFormat(QImage::Format_ARGB32),
     m_textureData(0),
     m_alphaMultiplier(1.0f),
-    m_preserveOpacity(true)
+    m_preserveOpacity(true),
+    m_useHighDefShader(true)
 {
     m_isVolumeItem = true;
     m_meshFile = QStringLiteral(":/defaultMeshes/barFull");
@@ -736,7 +789,8 @@ QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q, const QVector
     m_colorTable(colorTable),
     m_textureData(textureData),
     m_alphaMultiplier(1.0f),
-    m_preserveOpacity(true)
+    m_preserveOpacity(true),
+    m_useHighDefShader(true)
 {
     m_isVolumeItem = true;
     m_shadowCasting = false;

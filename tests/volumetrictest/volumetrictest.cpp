@@ -51,6 +51,10 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     createAnotherVolume();
     createYetAnotherVolume();
 
+//    m_volumeItem->setUseHighDefShader(false);
+//    m_volumeItem2->setUseHighDefShader(false);
+//    m_volumeItem3->setUseHighDefShader(false);
+
     m_plainItem = new QCustom3DItem;
     QImage texture(2, 2, QImage::Format_ARGB32);
     texture.fill(QColor(200, 200, 200, 130));
