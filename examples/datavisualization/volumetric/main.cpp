@@ -49,7 +49,7 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
 
-    widget->setWindowTitle(QStringLiteral("Volumetric Object Example"));
+    widget->setWindowTitle(QStringLiteral("Volumetric object example - 3D terrain"));
 
     QCheckBox *sliceXCheckBox = new QCheckBox(widget);
     sliceXCheckBox->setText(QStringLiteral("Slice volume on X axis"));
@@ -135,6 +135,10 @@ int main(int argc, char **argv)
     preserveOpacityCheckBox->setText(QStringLiteral("Preserve opacity"));
     preserveOpacityCheckBox->setChecked(true);
 
+    QCheckBox *transparentGroundCheckBox = new QCheckBox(widget);
+    transparentGroundCheckBox->setText(QStringLiteral("Transparent ground"));
+    transparentGroundCheckBox->setChecked(false);
+
     QCheckBox *useHighDefShaderCheckBox = new QCheckBox(widget);
     useHighDefShaderCheckBox->setText(QStringLiteral("Use HD shader"));
     useHighDefShaderCheckBox->setChecked(true);
@@ -155,6 +159,7 @@ int main(int argc, char **argv)
     vLayout2->addWidget(alphaMultiplierLabel);
     vLayout2->addWidget(alphaMultiplierSlider);
     vLayout2->addWidget(preserveOpacityCheckBox);
+    vLayout2->addWidget(transparentGroundCheckBox);
     vLayout2->addWidget(useHighDefShaderCheckBox, 1, Qt::AlignTop);
 
     VolumetricModifier *modifier = new VolumetricModifier(graph);
@@ -164,6 +169,7 @@ int main(int argc, char **argv)
     modifier->setSliceSliders(sliceXSlider, sliceYSlider, sliceZSlider);
     modifier->setSliceLabels(sliceImageXLabel, sliceImageYLabel, sliceImageZLabel);
     modifier->setAlphaMultiplierLabel(alphaMultiplierLabel);
+    modifier->setTransparentGround(transparentGroundCheckBox->isChecked());
 
     QObject::connect(fpsCheckBox, &QCheckBox::stateChanged, modifier,
                      &VolumetricModifier::setFpsMeasurement);
@@ -189,6 +195,8 @@ int main(int argc, char **argv)
                      &VolumetricModifier::changeColorTable);
     QObject::connect(preserveOpacityCheckBox, &QCheckBox::stateChanged, modifier,
                      &VolumetricModifier::setPreserveOpacity);
+    QObject::connect(transparentGroundCheckBox, &QCheckBox::stateChanged, modifier,
+                     &VolumetricModifier::setTransparentGround);
     QObject::connect(useHighDefShaderCheckBox, &QCheckBox::stateChanged, modifier,
                      &VolumetricModifier::setUseHighDefShader);
     QObject::connect(alphaMultiplierSlider, &QSlider::valueChanged, modifier,

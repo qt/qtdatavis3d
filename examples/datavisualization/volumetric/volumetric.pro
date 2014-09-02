@@ -13,3 +13,5 @@ QT += widgets
 
 OTHER_FILES += doc/src/* \
                doc/images/*
+
+RESOURCES += volumetric.qrc

@@ -60,13 +60,19 @@ public slots:
     void setSliceSliders(QSlider *sliderX, QSlider *sliderY, QSlider *sliderZ);
     void changeColorTable(int enabled);
     void setPreserveOpacity(bool enabled);
+    void setTransparentGround(bool enabled);
     void setUseHighDefShader(bool enabled);
     void adjustAlphaMultiplier(int value);
 
 private:
 
+    void initHeightMap(QString fileName, QVector<uchar> &layerData);
+    void initMineShaftArray();
     int createVolume(int textureSize, int startIndex, int count,
                       QVector<uchar> *textureData);
+    int excavateMineShaft(int textureSize, int startIndex, int count,
+                          QVector<uchar> *textureData);
+    void excavateMineBlock(int textureSize, int dataIndex, int size, QVector<uchar> *textureData);
 
     Q3DScatter *m_graph;
     QCustom3DVolume *m_volumeItem;
@@ -82,15 +88,22 @@ private:
     QTimer m_timer;
     int m_mediumDetailIndex;
     int m_highDetailIndex;
+    int m_mediumDetailShaftIndex;
+    int m_highDetailShaftIndex;
     QSlider *m_sliceSliderX;
     QSlider *m_sliceSliderY;
     QSlider *m_sliceSliderZ;
     QVector<QRgb> m_colorTable1;
     QVector<QRgb> m_colorTable2;
+    bool m_usingPrimaryTable;
     QLabel *m_sliceLabelX;
     QLabel *m_sliceLabelY;
     QLabel *m_sliceLabelZ;
     QLabel *m_alphaMultiplierLabel;
+    QVector<uchar> m_magmaLayer;
+    QVector<uchar> m_waterLayer;
+    QVector<uchar> m_groundLayer;
+    QVector<QPair<QVector3D, QVector3D> > m_mineShaftArray;
 };
 
 #endif

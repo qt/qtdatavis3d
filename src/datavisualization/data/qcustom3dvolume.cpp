@@ -869,7 +869,7 @@ QImage QCustom3DVolumePrivate::renderSlice(Qt::Axis axis, int index)
             }
         }
     } else if (axis == Qt::YAxis) {
-        for (int i = 0; i < y; i++) {
+        for (int i = y - 1; i >= 0; i--) {
             const uchar *p = m_textureData->constData() + (index * dataWidth)
                     + (frameSize * i);
             for (int j = 0; j < (x * pixelWidth); j++) {

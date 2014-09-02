@@ -117,7 +117,7 @@ void VolumetricModifier::adjustSliceX(int value)
         m_volumeItem2->setSliceIndexX(m_sliceIndexX);
     }
     m_sliceLabelX->setPixmap(QPixmap::fromImage(
-                                 m_volumeItem2->renderSlice(Qt::XAxis, m_sliceIndexX)));
+                                 m_volumeItem->renderSlice(Qt::XAxis, m_sliceIndexX)));
 
 }
 
@@ -132,7 +132,7 @@ void VolumetricModifier::adjustSliceY(int value)
         m_volumeItem2->setSliceIndexY(m_sliceIndexY);
     }
     m_sliceLabelY->setPixmap(QPixmap::fromImage(
-                                 m_volumeItem2->renderSlice(Qt::YAxis, m_sliceIndexY)));
+                                 m_volumeItem->renderSlice(Qt::YAxis, m_sliceIndexY)));
 }
 
 void VolumetricModifier::adjustSliceZ(int value)
@@ -146,7 +146,7 @@ void VolumetricModifier::adjustSliceZ(int value)
         m_volumeItem2->setSliceIndexZ(m_sliceIndexZ);
     }
     m_sliceLabelZ->setPixmap(QPixmap::fromImage(
-                                 m_volumeItem2->renderSlice(Qt::ZAxis, m_sliceIndexZ)));
+                                 m_volumeItem->renderSlice(Qt::ZAxis, m_sliceIndexZ)));
 }
 
 void VolumetricModifier::handleFpsChange()
