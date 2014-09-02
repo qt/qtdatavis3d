@@ -119,6 +119,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     // New types
     qmlRegisterType<Q3DInputHandler>(uri, 1, 2, "InputHandler3D");
     qmlRegisterType<QTouch3DInputHandler>(uri, 1, 2, "TouchInputHandler3D");
+    qmlRegisterType<QCustom3DVolume>(uri, 1, 2, "Custom3DVolume");
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -48,6 +48,7 @@
 #include "declarativescene_p.h"
 #include "qcustom3ditem.h"
 #include "qcustom3dlabel.h"
+#include "qcustom3dvolume.h"
 
 #include <QtQml/QQmlExtensionPlugin>
 
@@ -103,6 +104,7 @@ QML_DECLARE_TYPE(QTouch3DInputHandler)
 
 QML_DECLARE_TYPE(QCustom3DItem)
 QML_DECLARE_TYPE(QCustom3DLabel)
+QML_DECLARE_TYPE(QCustom3DVolume)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
