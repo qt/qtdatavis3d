@@ -60,6 +60,7 @@ private:
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_labelShader;
+    ShaderHelper *m_staticGradientPointShader;
     GLuint m_bgrTexture;
     GLuint m_selectionTexture;
     GLuint m_depthFrameBuffer;
@@ -129,6 +130,7 @@ private:
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initStaticPointShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
 #if !defined(QT_OPENGL_ES_2)
     void initDepthShader();

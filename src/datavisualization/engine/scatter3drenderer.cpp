@@ -50,6 +50,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_selectionShader(0),
       m_backgroundShader(0),
       m_labelShader(0),
+      m_staticGradientPointShader(0),
       m_bgrTexture(0),
       m_selectionTexture(0),
       m_depthFrameBuffer(0),
@@ -93,6 +94,7 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_selectionShader;
     delete m_backgroundShader;
     delete m_labelShader;
+    delete m_staticGradientPointShader;
 }
 
 void Scatter3DRenderer::initializeOpenGL()
@@ -348,6 +350,13 @@ void Scatter3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHin
     Abstract3DRenderer::updateOptimizationHint(hint);
 
     Abstract3DRenderer::reInitShaders();
+
+#if defined(QT_OPENGL_ES_2)
+    if (hint.testFlag(QAbstract3DGraph::OptimizationStatic) && !m_staticGradientPointShader) {
+        initStaticPointShaders(QStringLiteral(":/shaders/vertexPointES2_UV"),
+                               QStringLiteral(":/shaders/fragmentLabel"));
+    }
+#endif
 }
 
 void Scatter3DRenderer::resetClickedStatus()
@@ -859,7 +868,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 }
 
                 if (!optimizationDefault && rangeGradientPoints) {
+#if !defined(QT_OPENGL_ES_2)
                     dotShader = m_labelShader;
+#else
+                    dotShader = m_staticGradientPointShader;
+#endif
                     dotShader->bind();
                     gradientTexture = cache->baseGradientTexture();
                 }
@@ -2207,6 +2220,16 @@ void Scatter3DRenderer::initLabelShaders(const QString &vertexShader, const QStr
     m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_labelShader->initialize();
 }
+
+void Scatter3DRenderer::initStaticPointShaders(const QString &vertexShader,
+                                               const QString &fragmentShader)
+{
+    if (m_staticGradientPointShader)
+        delete m_staticGradientPointShader;
+    m_staticGradientPointShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_staticGradientPointShader->initialize();
+}
+
 
 void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
                                                        int &index,

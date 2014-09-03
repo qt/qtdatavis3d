@@ -329,10 +329,18 @@ void Abstract3DRenderer::reInitShaders()
                              QStringLiteral(":/shaders/fragmentTexture3DLowDef"),
                              QStringLiteral(":/shaders/fragmentTexture3DSlice"));
 #else
-    initGradientShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragmentColorOnYES2"));
-    initShaders(QStringLiteral(":/shaders/vertex"),
-                QStringLiteral(":/shaders/fragmentES2"));
+    if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
+            && qobject_cast<Scatter3DRenderer *>(this)) {
+        initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
+                            QStringLiteral(":/shaders/fragmentTextureES2"));
+        initBackgroundShaders(QStringLiteral(":/shaders/vertexNoMatrices"),
+                              QStringLiteral(":/shaders/fragmentES2"));
+    } else {
+        initGradientShaders(QStringLiteral(":/shaders/vertex"),
+                            QStringLiteral(":/shaders/fragmentColorOnYES2"));
+        initShaders(QStringLiteral(":/shaders/vertex"),
+                    QStringLiteral(":/shaders/fragmentES2"));
+    }
     initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
                           QStringLiteral(":/shaders/fragmentES2"));
     initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
