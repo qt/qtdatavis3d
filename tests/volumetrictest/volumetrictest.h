@@ -45,11 +45,14 @@ public slots:
     void adjustSliceY(int value);
     void adjustSliceZ(int value);
     void handleFpsChange();
+    void testSubtextureSetting();
 
 private:
     void createVolume();
     void createAnotherVolume();
     void createYetAnotherVolume();
+    void checkRenderCase(int id, Qt::Axis axis, int index, const QVector<uchar> &dataBefore,
+                         QCustom3DVolume *volumeItem);
 
     Q3DScatter *m_graph;
     QCustom3DVolume *m_volumeItem;

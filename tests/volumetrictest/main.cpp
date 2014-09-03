@@ -26,6 +26,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QPushButton>
 #include <QtGui/QScreen>
 
 int main(int argc, char **argv)
@@ -93,6 +94,9 @@ int main(int argc, char **argv)
     sliceImageYLabel->setScaledContents(true);
     sliceImageZLabel->setScaledContents(true);
 
+    QPushButton *testSubTextureSetting = new QPushButton(widget);
+    testSubTextureSetting->setText(QStringLiteral("Test subtexture settings"));
+
     vLayout->addWidget(fpsLabel);
     vLayout->addWidget(sliceXCheckBox);
     vLayout->addWidget(sliceXSlider);
@@ -102,8 +106,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(sliceImageYLabel);
     vLayout->addWidget(sliceZCheckBox);
     vLayout->addWidget(sliceZSlider);
-    vLayout->addWidget(sliceImageZLabel, 1, Qt::AlignTop);
-
+    vLayout->addWidget(sliceImageZLabel);
+    vLayout->addWidget(testSubTextureSetting, 1, Qt::AlignTop);
 
     VolumetricModifier *modifier = new VolumetricModifier(graph);
     modifier->setFpsLabel(fpsLabel);
@@ -121,6 +125,8 @@ int main(int argc, char **argv)
                      &VolumetricModifier::adjustSliceY);
     QObject::connect(sliceZSlider, &QSlider::valueChanged, modifier,
                      &VolumetricModifier::adjustSliceZ);
+    QObject::connect(testSubTextureSetting, &QPushButton::clicked, modifier,
+                     &VolumetricModifier::testSubtextureSetting);
 
     widget->show();
     return app.exec();

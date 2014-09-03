@@ -76,8 +76,8 @@ public:
     void setTextureData(QVector<uchar> *data);
     QVector<uchar> *createTextureData(const QVector<QImage *> &images);
     QVector<uchar> *textureData() const;
-    void setSubTextureData(int depthIndex, const uchar *data);
-    void setSubTextureData(int depthIndex, const QImage &image);
+    void setSubTextureData(Qt::Axis axis, int index, const uchar *data);
+    void setSubTextureData(Qt::Axis axis, int index, const QImage &image);
 
     void setTextureFormat(QImage::Format format);
     QImage::Format textureFormat() const;

@@ -168,7 +168,67 @@ void VolumetricModifier::handleFpsChange()
 //    const QString sceneDimensionsFormat = QStringLiteral("%1 x %2");
 //    m_fpsLabel->setText(sceneDimensionsFormat
 //                        .arg(m_graph->scene()->viewport().width())
-//                        .arg(m_graph->scene()->viewport().height()));
+    //                        .arg(m_graph->scene()->viewport().height()));
+}
+
+void VolumetricModifier::testSubtextureSetting()
+{
+    // Setting the rendered Slice as subtexture should result in identical volume
+    QVector<uchar> dataBefore = *m_volumeItem->textureData();
+    dataBefore[0] = dataBefore.at(0);    // Make sure we are detached
+
+    checkRenderCase(1, Qt::XAxis, 56, dataBefore, m_volumeItem);
+    checkRenderCase(2, Qt::YAxis, 64, dataBefore, m_volumeItem);
+    checkRenderCase(3, Qt::ZAxis, 87, dataBefore, m_volumeItem);
+
+    checkRenderCase(4, Qt::XAxis, 0, dataBefore, m_volumeItem);
+    checkRenderCase(5, Qt::YAxis, 0, dataBefore, m_volumeItem);
+    checkRenderCase(6, Qt::ZAxis, 0, dataBefore, m_volumeItem);
+
+    checkRenderCase(7, Qt::XAxis, m_volumeItem->textureWidth() - 1, dataBefore, m_volumeItem);
+    checkRenderCase(8, Qt::YAxis, m_volumeItem->textureHeight() - 1, dataBefore, m_volumeItem);
+    checkRenderCase(9, Qt::ZAxis, m_volumeItem->textureDepth() - 1, dataBefore, m_volumeItem);
+
+    dataBefore = *m_volumeItem2->textureData();
+    dataBefore[0] = dataBefore.at(0);    // Make sure we are detached
+
+    checkRenderCase(11, Qt::XAxis, 56, dataBefore, m_volumeItem2);
+    checkRenderCase(12, Qt::YAxis, 64, dataBefore, m_volumeItem2);
+    checkRenderCase(13, Qt::ZAxis, 87, dataBefore, m_volumeItem2);
+
+    checkRenderCase(14, Qt::XAxis, 0, dataBefore, m_volumeItem2);
+    checkRenderCase(15, Qt::YAxis, 0, dataBefore, m_volumeItem2);
+    checkRenderCase(16, Qt::ZAxis, 0, dataBefore, m_volumeItem2);
+
+    checkRenderCase(17, Qt::XAxis, m_volumeItem2->textureWidth() - 1, dataBefore, m_volumeItem2);
+    checkRenderCase(18, Qt::YAxis, m_volumeItem2->textureHeight() - 1, dataBefore, m_volumeItem2);
+    checkRenderCase(19, Qt::ZAxis, m_volumeItem2->textureDepth() - 1, dataBefore, m_volumeItem2);
+
+    // Do some visible swaps on volume 3
+    QImage slice = m_volumeItem3->renderSlice(Qt::XAxis, 144);
+    slice = slice.mirrored();
+    m_volumeItem3->setSubTextureData(Qt::XAxis, 144, slice);
+
+    slice = m_volumeItem3->renderSlice(Qt::YAxis, 80);
+    slice = slice.mirrored();
+    m_volumeItem3->setSubTextureData(Qt::YAxis, 80, slice);
+
+    slice = m_volumeItem3->renderSlice(Qt::ZAxis, 190);
+    slice = slice.mirrored(true, false);
+    m_volumeItem3->setSubTextureData(Qt::ZAxis, 190, slice);
+}
+
+void VolumetricModifier::checkRenderCase(int id, Qt::Axis axis, int index,
+                                         const QVector<uchar> &dataBefore,
+                                         QCustom3DVolume *volumeItem)
+{
+    QImage slice = volumeItem->renderSlice(axis, index);
+    volumeItem->setSubTextureData(axis, index, slice);
+
+    if (dataBefore == *volumeItem->textureData())
+        qDebug() << __FUNCTION__ << "Case:" << id << "Vectors identical";
+    else
+        qDebug() << __FUNCTION__ << "Case:" << id << "BUG: VECTORS DIFFER!";
 }
 
 void VolumetricModifier::createVolume()
@@ -179,7 +239,8 @@ void VolumetricModifier::createVolume()
     m_volumeItem->setPosition(QVector3D(-0.5f, 0.6f, 0.0f));
 
     QImage logo;
-    logo.load(QStringLiteral(":/logo.png"));
+    logo.load(QStringLiteral(":/logo_no_padding.png"));
+    //logo.load(QStringLiteral(":/logo.png"));
     qDebug() << "image dimensions:" << logo.width() << logo.height()
              << logo.byteCount() << (logo.width() * logo.height())
              << logo.bytesPerLine();
@@ -233,7 +294,7 @@ void VolumetricModifier::createVolume()
 
     // Change one picture using subtexture replacement
     QImage flipped = logo.mirrored();
-    m_volumeItem->setSubTextureData(100, flipped);
+    m_volumeItem->setSubTextureData(Qt::ZAxis, 100, flipped);
 
     // Clean up the two extra pixels
     p = data + width - 1;
@@ -331,7 +392,8 @@ void VolumetricModifier::createAnotherVolume()
     m_volumeItem2->setPosition(QVector3D(0.5f, -0.5f, 0.0f));
 
     QImage logo;
-    logo.load(QStringLiteral(":/logo.png"));
+    logo.load(QStringLiteral(":/logo_no_padding.png"));
+    //logo.load(QStringLiteral(":/logo.png"));
     logo = logo.convertToFormat(QImage::Format_ARGB8555_Premultiplied);
     qDebug() << "second image dimensions:" << logo.width() << logo.height()
              << logo.byteCount() << (logo.width() * logo.height())
@@ -361,8 +423,8 @@ void VolumetricModifier::createAnotherVolume()
 
     // Change one picture using subtexture replacement
     QImage flipped = logo.mirrored();
-    m_volumeItem2->setSubTextureData(100, flipped);
-    m_volumeItem2->setAlphaMultiplier(0.2f);
+    m_volumeItem2->setSubTextureData(Qt::ZAxis, 100, flipped);
+    //m_volumeItem2->setAlphaMultiplier(0.2f);
     m_volumeItem2->setPreserveOpacity(false);
 }
 

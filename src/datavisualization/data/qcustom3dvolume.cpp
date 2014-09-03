@@ -428,7 +428,8 @@ QVector<QRgb> QCustom3DVolume::colorTable() const
  * \note Each X-line of the data needs to be 32bit aligned. If the textureFormat is
  * QImage::Format_Indexed8 and textureWidth is not divisible by four, padding bytes need
  * to be added to each X-line of the \a data. You can get the padded byte count with
- * textureDataWidth() function.
+ * textureDataWidth() function. The padding bytes should indicate an fully transparent color
+ * to avoid rendering artifacts.
  *
  * Defaults to \c{0}.
  *
@@ -531,29 +532,76 @@ QVector<uchar> *QCustom3DVolume::textureData() const
 }
 
 /*!
- * This function allows setting a single 2D subtexture of the 3D texture.
- * The \a depthIndex parameter specifies the subtexture to set.
- * The texture\a data must be in the format specified by textureFormat property and have size of
- * (\c{textureDataWidth * textureHeight * texture format color depth in bytes}).
+ * This function allows setting a single 2D subtexture of the 3D texture along the specified
+ * \a axis of the volume.
+ * The \a index parameter specifies the subtexture to set.
+ * The texture \a data must be in the format specified by textureFormat property and have size of
+ * the cross-section of the volume texture along the specified axis multiplied by
+ * the texture format color depth in bytes.
+ * The \a data is expected to be ordered similarly to the data in images produced by renderSlice()
+ * method along the same axis.
  *
- * \note Each X-line of the data needs to be 32bit aligned. If the textureFormat is
- * QImage::Format_Indexed8 and textureWidth is not divisible by four, padding bytes need
- * to be added to each X-line of the \a data.
+ * \note Each X-line of the data needs to be 32bit aligned when targeting Y-axis or Z-axis.
+ * If the textureFormat is QImage::Format_Indexed8 and textureWidth is not divisible by four,
+ * padding bytes need to be added to each X-line of the \a data in cases it is not already
+ * properly aligned. The padding bytes should indicate an fully transparent color to avoid
+ * rendering artifacts.
  *
- * \sa textureData
+ * \sa textureData, renderSlice()
  */
-void QCustom3DVolume::setSubTextureData(int depthIndex, const uchar *data)
+void QCustom3DVolume::setSubTextureData(Qt::Axis axis, int index, const uchar *data)
 {
     if (data) {
-        int frameSize = textureDataWidth() * dptr()->m_textureHeight;
-        int startIndex = depthIndex * frameSize;
+        int lineSize = textureDataWidth();
+        int frameSize = lineSize * dptr()->m_textureHeight;
+        int dataSize = dptr()->m_textureData->size();
+        int pixelWidth = (dptr()->m_textureFormat == QImage::Format_Indexed8) ? 1 : 4;
+        int targetIndex;
+        uchar *dataPtr = dptr()->m_textureData->data();
+        bool invalid = (index < 0);
+        if (axis == Qt::XAxis) {
+            targetIndex = index * pixelWidth;
+            if (index >= dptr()->m_textureWidth
+                    || (frameSize * (dptr()->m_textureDepth - 1) + targetIndex) > dataSize) {
+                invalid = true;
+            }
+        } else if (axis == Qt::YAxis) {
+            targetIndex = (index * lineSize) + (frameSize * (dptr()->m_textureDepth - 1));
+            if (index >= dptr()->m_textureHeight || (targetIndex + lineSize > dataSize))
+                invalid = true;
+        } else {
+            targetIndex = index * frameSize;
+            if (index >= dptr()->m_textureDepth || ((targetIndex + frameSize) > dataSize))
+                invalid = true;
+        }
 
-        if (depthIndex >= dptr()->m_textureDepth
-                || (startIndex + frameSize) > dptr()->m_textureData->size()) {
+        if (invalid) {
             qWarning() << __FUNCTION__ << "Attempted to set invalid subtexture.";
         } else {
-            void *subTexPtr = dptr()->m_textureData->data() + startIndex;
-            memcpy(subTexPtr, static_cast<const void *>(data), frameSize);
+            const uchar *sourcePtr = data;
+            uchar *targetPtr = dataPtr + targetIndex;
+            if (axis == Qt::XAxis) {
+                int targetWidth = dptr()->m_textureDepth;
+                int targetHeight = dptr()->m_textureHeight;
+                for (int i = 0; i < targetHeight; i++) {
+                    targetPtr = dataPtr + targetIndex + (lineSize * i);
+                    for (int j = 0; j < targetWidth; j++) {
+                        for (int k = 0; k < pixelWidth; k++)
+                            *targetPtr++ = *sourcePtr++;
+                        targetPtr += (frameSize - pixelWidth);
+                    }
+                }
+            } else if (axis == Qt::YAxis) {
+                int targetHeight = dptr()->m_textureDepth;
+                for (int i = 0; i < targetHeight; i++){
+                    for (int j = 0; j < lineSize; j++)
+                        *targetPtr++ = *sourcePtr++;
+                    targetPtr -= (frameSize + lineSize);
+                }
+            } else {
+                void *subTexPtr = dataPtr + targetIndex;
+                memcpy(subTexPtr, static_cast<const void *>(data), frameSize);
+            }
             dptr()->m_dirtyBitsVolume.textureDataDirty = true;
             emit textureDataChanged(dptr()->m_textureData);
             emit dptr()->needUpdate();
@@ -564,18 +612,42 @@ void QCustom3DVolume::setSubTextureData(int depthIndex, const uchar *data)
 }
 
 /*!
- * This function allows setting a single 2D subtexture of the 3D texture to a source \a image;
- * The \a depthIndex parameter specifies the subtexture to set.
- * The image must be in the format specified by the textureFormat property if the textureFormat
- * is indexed. If the textureFormat is QImage::Format_ARGB32, the image is converted to that format.
- * The image must have the size of (\c{textureWidth * textureHeight}).
+ * This function allows setting a single 2D subtexture of the 3D texture along the specified
+ * \a axis of the volume.
+ * The \a index parameter specifies the subtexture to set.
+ * The source \a image must be in the format specified by the textureFormat property if the
+ * textureFormat is indexed. If the textureFormat is QImage::Format_ARGB32, the image is converted
+ * to that format. The image must have the size of the cross-section of the volume texture along
+ * the specified axis. The orientation of the image should correspond to the orientation of
+ * the slice image produced by renderSlice() method along the same axis.
  *
- * \sa textureData
+ * \note Each X-line of the data needs to be 32bit aligned when targeting Y-axis or Z-axis.
+ * If the textureFormat is QImage::Format_Indexed8 and textureWidth is not divisible by four,
+ * padding bytes need to be added to each X-line of the \a data in cases it is not already
+ * properly aligned. The padding bytes should indicate an fully transparent color to avoid
+ * rendering artifacts. It is not guaranteed QImage will do this automatically.
+ *
+ * \sa textureData, renderSlice()
  */
-void QCustom3DVolume::setSubTextureData(int depthIndex, const QImage &image)
+void QCustom3DVolume::setSubTextureData(Qt::Axis axis, int index, const QImage &image)
 {
-    if (image.width() == dptr()->m_textureWidth
-            && image.height() == dptr()->m_textureHeight
+    int sourceWidth = image.width();
+    int sourceHeight = image.height();
+    int targetWidth;
+    int targetHeight;
+    if (axis == Qt::XAxis) {
+        targetWidth = dptr()->m_textureDepth;
+        targetHeight = dptr()->m_textureHeight;
+    } else if (axis == Qt::YAxis) {
+        targetWidth = dptr()->m_textureWidth;
+        targetHeight = dptr()->m_textureDepth;
+    } else {
+        targetWidth = dptr()->m_textureWidth;
+        targetHeight = dptr()->m_textureHeight;
+    }
+
+    if (sourceWidth == targetWidth
+            && sourceHeight == targetHeight
             && (image.format() == dptr()->m_textureFormat
                 || dptr()->m_textureFormat == QImage::Format_ARGB32)) {
         QImage convertedImage;
@@ -585,7 +657,7 @@ void QCustom3DVolume::setSubTextureData(int depthIndex, const QImage &image)
         } else {
             convertedImage = image;
         }
-        setSubTextureData(depthIndex, convertedImage.bits());
+        setSubTextureData(axis, index, convertedImage.bits());
     } else {
         qWarning() << __FUNCTION__ << "Invalid image size or format.";
     }
