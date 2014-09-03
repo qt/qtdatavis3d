@@ -1175,10 +1175,6 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                                          GLfloat shadowQuality,
                                          GLfloat reflection)
 {
-#if defined(QT_OPENGL_ES_2)
-    Q_UNUSED(volumeShader)
-    Q_UNUSED(volumeSliceShader)
-#endif
     if (m_customRenderCache.isEmpty())
         return;
 
