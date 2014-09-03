@@ -1193,187 +1193,203 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
         shader->setUniformValue(shader->view(), viewMatrix);
     }
 
-    // Draw custom items
-    foreach (CustomRenderItem *item, m_customRenderCache) {
-        // Check that the render item is visible, and skip drawing if not
-        if (!item->isVisible())
-            continue;
-
-        // Check if the render item is in data coordinates and not within axis ranges, and skip drawing if it is
-        if (!item->isPositionAbsolute()
-                && (item->position().x() < m_axisCacheX.min()
-                    || item->position().x() > m_axisCacheX.max()
-                    || item->position().z() < m_axisCacheZ.min()
-                    || item->position().z() > m_axisCacheZ.max()
-                    || item->position().y() < m_axisCacheY.min()
-                    || item->position().y() > m_axisCacheY.max())) {
-            continue;
-        }
-
-        QMatrix4x4 modelMatrix;
-        QMatrix4x4 itModelMatrix;
-        QMatrix4x4 MVPMatrix;
-
-        QQuaternion rotation = item->rotation();
-        // Check if the (label) item should be facing camera, and adjust rotation accordingly
-        if (item->isFacingCamera()) {
-            float camRotationX = m_cachedScene->activeCamera()->xRotation();
-            float camRotationY = m_cachedScene->activeCamera()->yRotation();
-            rotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -camRotationX)
-                    * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -camRotationY);
-        }
-
-        if (m_reflectionEnabled) {
-            if (reflection < 0.0f) {
-                if (item->itemPointer()->d_ptr->m_isLabelItem)
+    // Draw custom items - first regular and then volumes
+    bool volumeDetected = false;
+    int loopCount = 0;
+    while (loopCount < 2) {
+        foreach (CustomRenderItem *item, m_customRenderCache) {
+            // Check that the render item is visible, and skip drawing if not
+            if (!item->isVisible())
+                continue;
+            if (loopCount == 0) {
+                if (item->isVolume()) {
+                    volumeDetected = true;
                     continue;
-                else
-                    glCullFace(GL_FRONT);
+                }
             } else {
-                glCullFace(GL_BACK);
+                if (!item->isVolume())
+                    continue;
             }
-            QVector3D trans = item->translation();
-            trans.setY(reflection * trans.y());
-            modelMatrix.translate(trans);
-            if (reflection < 0.0f) {
-                QQuaternion mirror = QQuaternion(rotation.scalar(),
-                                                 -rotation.x(), rotation.y(), -rotation.z());
-                modelMatrix.rotate(mirror);
-                itModelMatrix.rotate(mirror);
+
+            // Check if the render item is in data coordinates and not within axis ranges, and skip drawing if it is
+            if (!item->isPositionAbsolute()
+                    && (item->position().x() < m_axisCacheX.min()
+                        || item->position().x() > m_axisCacheX.max()
+                        || item->position().z() < m_axisCacheZ.min()
+                        || item->position().z() > m_axisCacheZ.max()
+                        || item->position().y() < m_axisCacheY.min()
+                        || item->position().y() > m_axisCacheY.max())) {
+                continue;
+            }
+
+            QMatrix4x4 modelMatrix;
+            QMatrix4x4 itModelMatrix;
+            QMatrix4x4 MVPMatrix;
+
+            QQuaternion rotation = item->rotation();
+            // Check if the (label) item should be facing camera, and adjust rotation accordingly
+            if (item->isFacingCamera()) {
+                float camRotationX = m_cachedScene->activeCamera()->xRotation();
+                float camRotationY = m_cachedScene->activeCamera()->yRotation();
+                rotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -camRotationX)
+                        * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -camRotationY);
+            }
+
+            if (m_reflectionEnabled) {
+                if (reflection < 0.0f) {
+                    if (item->itemPointer()->d_ptr->m_isLabelItem)
+                        continue;
+                    else
+                        glCullFace(GL_FRONT);
+                } else {
+                    glCullFace(GL_BACK);
+                }
+                QVector3D trans = item->translation();
+                trans.setY(reflection * trans.y());
+                modelMatrix.translate(trans);
+                if (reflection < 0.0f) {
+                    QQuaternion mirror = QQuaternion(rotation.scalar(),
+                                                     -rotation.x(), rotation.y(), -rotation.z());
+                    modelMatrix.rotate(mirror);
+                    itModelMatrix.rotate(mirror);
+                } else {
+                    modelMatrix.rotate(rotation);
+                    itModelMatrix.rotate(rotation);
+                }
+                QVector3D scale = item->scaling();
+                scale.setY(reflection * scale.y());
+                modelMatrix.scale(scale);
             } else {
+                modelMatrix.translate(item->translation());
                 modelMatrix.rotate(rotation);
+                modelMatrix.scale(item->scaling());
                 itModelMatrix.rotate(rotation);
             }
-            QVector3D scale = item->scaling();
-            scale.setY(reflection * scale.y());
-            modelMatrix.scale(scale);
-        } else {
-            modelMatrix.translate(item->translation());
-            modelMatrix.rotate(rotation);
-            modelMatrix.scale(item->scaling());
-            itModelMatrix.rotate(rotation);
-        }
-        if (!item->isFacingCamera())
-            itModelMatrix.scale(item->scaling());
-        MVPMatrix = projectionViewMatrix * modelMatrix;
+            if (!item->isFacingCamera())
+                itModelMatrix.scale(item->scaling());
+            MVPMatrix = projectionViewMatrix * modelMatrix;
 
-        if (RenderingNormal == state) {
-            // Normal render
+            if (RenderingNormal == state) {
+                // Normal render
 #if !defined(QT_OPENGL_ES_2)
-            ShaderHelper *prevShader = shader;
-            if (item->isVolume()) {
-                if (item->sliceIndexX() >= 0
-                        || item->sliceIndexY() >= 0
-                        || item->sliceIndexZ() >= 0) {
-                    shader = m_volumeTextureSliceShader;
-                } else if (item->useHighDefShader()) {
-                    shader = m_volumeTextureShader;
-                } else {
-                    shader = m_volumeTextureLowDefShader;
-                }
-            } else {
-                shader = regularShader;
-            }
-            if (shader != prevShader)
-                shader->bind();
-#endif
-            shader->setUniformValue(shader->model(), modelMatrix);
-            shader->setUniformValue(shader->MVP(), MVPMatrix);
-            shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
-
-            if (item->isBlendNeeded()) {
-                glEnable(GL_BLEND);
-                glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-#if !defined(QT_OPENGL_ES_2)
-                if (!item->isVolume())
-#endif
-                    glDisable(GL_CULL_FACE);
-            } else {
-                glDisable(GL_BLEND);
-                glEnable(GL_CULL_FACE);
-            }
-
-#if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !item->isVolume()) {
-                // Set shadow shader bindings
-                shader->setUniformValue(shader->shadowQ(), shadowQuality);
-                shader->setUniformValue(shader->depth(), depthProjectionViewMatrix * modelMatrix);
-                shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength() / 10.0f);
-                m_drawer->drawObject(shader, item->mesh(), item->texture(), depthTexture);
-            } else
-#else
-            Q_UNUSED(depthTexture)
-            Q_UNUSED(shadowQuality)
-#endif
-            {
-                // Set shadowless shader bindings
-#if !defined(QT_OPENGL_ES_2)
+                ShaderHelper *prevShader = shader;
                 if (item->isVolume()) {
-                    // Volume shaders repurpose light position for camera position relative to item
-                    QVector3D cameraPos = m_cachedScene->activeCamera()->position();
-                    cameraPos = MVPMatrix.inverted().map(cameraPos);
-                    shader->setUniformValue(shader->cameraPositionRelativeToModel(), -cameraPos);
-                    GLint color8Bit = (item->textureFormat() == QImage::Format_Indexed8) ? 1 : 0;
-                    if (color8Bit) {
-                        shader->setUniformValueArray(shader->colorIndex(),
-                                                     item->colorTable().constData(), 256);
-                    }
-                    shader->setUniformValue(shader->color8Bit(), color8Bit);
-                    shader->setUniformValue(shader->alphaMultiplier(), item->alphaMultiplier());
-                    shader->setUniformValue(shader->preserveOpacity(),
-                                            item->preserveOpacity() ? 1 : 0);
-                    if (shader == m_volumeTextureSliceShader) {
-                        QVector3D slices((float(item->sliceIndexX()) + 0.5f)
-                                         / float(item->textureWidth()) * 2.0 - 1.0,
-                                         (float(item->sliceIndexY()) + 0.5f)
-                                         / float(item->textureHeight()) * 2.0 - 1.0,
-                                         (float(item->sliceIndexZ()) + 0.5f)
-                                         / float(item->textureDepth()) * 2.0 - 1.0);
-                        shader->setUniformValue(shader->volumeSliceIndices(), slices);
+                    if (item->sliceIndexX() >= 0
+                            || item->sliceIndexY() >= 0
+                            || item->sliceIndexZ() >= 0) {
+                        shader = m_volumeTextureSliceShader;
+                    } else if (item->useHighDefShader()) {
+                        shader = m_volumeTextureShader;
                     } else {
-                        // Precalculate texture dimensions so we can optimize
-                        // ray stepping to hit every texture layer.
-                        QVector3D textureDimensions(1.0f / float(item->textureWidth()),
-                                                    1.0f / float(item->textureHeight()),
-                                                    1.0f / float(item->textureDepth()));
-
-                        // Worst case scenario sample count
-                        int sampleCount;
-                        if (shader == m_volumeTextureLowDefShader) {
-                            sampleCount = qMax(item->textureWidth(),
-                                               qMax(item->textureDepth(), item->textureHeight()));
-                            // Further improve speed with big textures by simply dropping every
-                            // other sample:
-                            if (sampleCount > 256)
-                                sampleCount /= 2;
-                        } else {
-                            sampleCount = item->textureWidth() + item->textureHeight()
-                                    + item->textureDepth();
-                        }
-                        shader->setUniformValue(shader->textureDimensions(), textureDimensions);
-                        shader->setUniformValue(shader->sampleCount(), sampleCount);
+                        shader = m_volumeTextureLowDefShader;
                     }
-                    m_drawer->drawObject(shader, item->mesh(), 0, 0, item->texture());
+                } else {
+                    shader = regularShader;
+                }
+                if (shader != prevShader)
+                    shader->bind();
+#endif
+                shader->setUniformValue(shader->model(), modelMatrix);
+                shader->setUniformValue(shader->MVP(), MVPMatrix);
+                shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+
+                if (item->isBlendNeeded()) {
+                    glEnable(GL_BLEND);
+                    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+#if !defined(QT_OPENGL_ES_2)
+                    if (!item->isVolume())
+#endif
+                        glDisable(GL_CULL_FACE);
+                } else {
+                    glDisable(GL_BLEND);
+                    glEnable(GL_CULL_FACE);
+                }
+
+#if !defined(QT_OPENGL_ES_2)
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !item->isVolume()) {
+                    // Set shadow shader bindings
+                    shader->setUniformValue(shader->shadowQ(), shadowQuality);
+                    shader->setUniformValue(shader->depth(), depthProjectionViewMatrix * modelMatrix);
+                    shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength() / 10.0f);
+                    m_drawer->drawObject(shader, item->mesh(), item->texture(), depthTexture);
                 } else
+#else
+                Q_UNUSED(depthTexture)
+                Q_UNUSED(shadowQuality)
 #endif
                 {
-                    shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
-                    m_drawer->drawObject(shader, item->mesh(), item->texture());
+                    // Set shadowless shader bindings
+#if !defined(QT_OPENGL_ES_2)
+                    if (item->isVolume()) {
+                        // Volume shaders repurpose light position for camera position relative to item
+                        QVector3D cameraPos = m_cachedScene->activeCamera()->position();
+                        cameraPos = MVPMatrix.inverted().map(cameraPos);
+                        shader->setUniformValue(shader->cameraPositionRelativeToModel(), -cameraPos);
+                        GLint color8Bit = (item->textureFormat() == QImage::Format_Indexed8) ? 1 : 0;
+                        if (color8Bit) {
+                            shader->setUniformValueArray(shader->colorIndex(),
+                                                         item->colorTable().constData(), 256);
+                        }
+                        shader->setUniformValue(shader->color8Bit(), color8Bit);
+                        shader->setUniformValue(shader->alphaMultiplier(), item->alphaMultiplier());
+                        shader->setUniformValue(shader->preserveOpacity(),
+                                                item->preserveOpacity() ? 1 : 0);
+                        if (shader == m_volumeTextureSliceShader) {
+                            QVector3D slices((float(item->sliceIndexX()) + 0.5f)
+                                             / float(item->textureWidth()) * 2.0 - 1.0,
+                                             (float(item->sliceIndexY()) + 0.5f)
+                                             / float(item->textureHeight()) * 2.0 - 1.0,
+                                             (float(item->sliceIndexZ()) + 0.5f)
+                                             / float(item->textureDepth()) * 2.0 - 1.0);
+                            shader->setUniformValue(shader->volumeSliceIndices(), slices);
+                        } else {
+                            // Precalculate texture dimensions so we can optimize
+                            // ray stepping to hit every texture layer.
+                            QVector3D textureDimensions(1.0f / float(item->textureWidth()),
+                                                        1.0f / float(item->textureHeight()),
+                                                        1.0f / float(item->textureDepth()));
+
+                            // Worst case scenario sample count
+                            int sampleCount;
+                            if (shader == m_volumeTextureLowDefShader) {
+                                sampleCount = qMax(item->textureWidth(),
+                                                   qMax(item->textureDepth(), item->textureHeight()));
+                                // Further improve speed with big textures by simply dropping every
+                                // other sample:
+                                if (sampleCount > 256)
+                                    sampleCount /= 2;
+                            } else {
+                                sampleCount = item->textureWidth() + item->textureHeight()
+                                        + item->textureDepth();
+                            }
+                            shader->setUniformValue(shader->textureDimensions(), textureDimensions);
+                            shader->setUniformValue(shader->sampleCount(), sampleCount);
+                        }
+                        m_drawer->drawObject(shader, item->mesh(), 0, 0, item->texture());
+                    } else
+#endif
+                    {
+                        shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
+                        m_drawer->drawObject(shader, item->mesh(), item->texture());
+                    }
                 }
+            } else if (RenderingSelection == state) {
+                // Selection render
+                shader->setUniformValue(shader->MVP(), MVPMatrix);
+                QVector4D itemColor = indexToSelectionColor(item->index());
+                itemColor.setW(customItemAlpha);
+                itemColor /= 255.0f;
+                shader->setUniformValue(shader->color(), itemColor);
+                m_drawer->drawObject(shader, item->mesh());
+            } else if (item->isShadowCasting()) {
+                // Depth render
+                shader->setUniformValue(shader->MVP(), depthProjectionViewMatrix * modelMatrix);
+                m_drawer->drawObject(shader, item->mesh());
             }
-        } else if (RenderingSelection == state) {
-            // Selection render
-            shader->setUniformValue(shader->MVP(), MVPMatrix);
-            QVector4D itemColor = indexToSelectionColor(item->index());
-            itemColor.setW(customItemAlpha);
-            itemColor /= 255.0f;
-            shader->setUniformValue(shader->color(), itemColor);
-            m_drawer->drawObject(shader, item->mesh());
-        } else if (item->isShadowCasting()) {
-            // Depth render
-            shader->setUniformValue(shader->MVP(), depthProjectionViewMatrix * modelMatrix);
-            m_drawer->drawObject(shader, item->mesh());
         }
+        loopCount++;
+        if (!volumeDetected)
+            loopCount++; // Skip second run if no volumes detected
     }
 
     if (RenderingNormal == state) {

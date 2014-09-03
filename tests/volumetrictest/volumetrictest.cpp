@@ -21,6 +21,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/qcustom3dlabel.h>
 #include <QtCore/qmath.h>
 #include <QtGui/QRgb>
 #include <QtGui/QImage>
@@ -70,7 +71,17 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->addCustomItem(m_plainItem);
     //m_graph->setMeasureFps(true);
 
-
+    // Create label to cut through the volume 3
+    QCustom3DLabel *label = new QCustom3DLabel;
+    label->setText(QStringLiteral("FOO BAR - FOO BAR - FOO BAR"));
+    QFont font;
+    font.setPixelSize(100);
+    label->setFont(font);
+    label->setScaling(QVector3D(2.0f, 2.0f, 0.0f));
+    label->setRotationAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 45.0f);
+    label->setPosition(m_volumeItem3->position());
+    label->setPositionAbsolute(true);
+    m_graph->addCustomItem(label);
 
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &VolumetricModifier::handleFpsChange);
