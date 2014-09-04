@@ -46,6 +46,10 @@ public slots:
     void adjustSliceZ(int value);
     void handleFpsChange();
     void testSubtextureSetting();
+    void adjustRangeX(int value);
+    void adjustRangeY(int value);
+    void adjustRangeZ(int value);
+    void testBoundsSetting();
 
 private:
     void createVolume();

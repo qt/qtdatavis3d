@@ -623,7 +623,7 @@ void QCustom3DVolume::setSubTextureData(Qt::Axis axis, int index, const uchar *d
  *
  * \note Each X-line of the data needs to be 32bit aligned when targeting Y-axis or Z-axis.
  * If the textureFormat is QImage::Format_Indexed8 and textureWidth is not divisible by four,
- * padding bytes need to be added to each X-line of the \a data in cases it is not already
+ * padding bytes need to be added to each X-line of the \a image in cases it is not already
  * properly aligned. The padding bytes should indicate an fully transparent color to avoid
  * rendering artifacts. It is not guaranteed QImage will do this automatically.
  *
@@ -893,6 +893,8 @@ void QCustom3DVolumePrivate::resetDirtyBits()
     m_dirtyBitsVolume.colorTableDirty = false;
     m_dirtyBitsVolume.textureDataDirty = false;
     m_dirtyBitsVolume.textureFormatDirty = false;
+    m_dirtyBitsVolume.alphaDirty = false;
+    m_dirtyBitsVolume.shaderDirty = false;
 }
 
 QImage QCustom3DVolumePrivate::renderSlice(Qt::Axis axis, int index)

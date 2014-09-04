@@ -31,6 +31,12 @@
 using namespace QtDataVisualization;
 
 const int imageCount = 512;
+const float xMiddle = 10.0f;
+const float yMiddle = 12.5f;
+const float zMiddle = -40.0f;
+const float xRange = 40.0f;
+const float yRange = 7.5f;
+const float zRange = 20.0f;
 
 VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     : m_graph(scatter),
@@ -47,6 +53,12 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_graph->setOrthoProjection(true);
     //m_graph->scene()->activeCamera()->setTarget(QVector3D(0.5f, 0.5f, 0.5f));
+    m_graph->axisX()->setRange(xMiddle - xRange, xMiddle + xRange);
+    m_graph->axisX()->setSegmentCount(8);
+    m_graph->axisY()->setRange(yMiddle - yRange, yMiddle + yRange);
+    m_graph->axisY()->setSegmentCount(3);
+    m_graph->axisZ()->setRange(zMiddle - zRange, zMiddle + zRange);
+    m_graph->axisZ()->setSegmentCount(8);
 
     createVolume();
     createAnotherVolume();
@@ -55,6 +67,13 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
 //    m_volumeItem->setUseHighDefShader(false);
 //    m_volumeItem2->setUseHighDefShader(false);
 //    m_volumeItem3->setUseHighDefShader(false);
+    m_volumeItem->setScalingAbsolute(false);
+    m_volumeItem2->setScalingAbsolute(false);
+    m_volumeItem3->setScalingAbsolute(false);
+    m_volumeItem->setPositionAbsolute(false);
+    m_volumeItem2->setPositionAbsolute(false);
+    m_volumeItem3->setPositionAbsolute(false);
+
 
     m_plainItem = new QCustom3DItem;
     QImage texture(2, 2, QImage::Format_ARGB32);
@@ -62,8 +81,9 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_plainItem->setMeshFile(QStringLiteral(":/mesh"));
     m_plainItem->setTextureImage(texture);
     m_plainItem->setRotation(m_volumeItem->rotation());
-    m_plainItem->setPosition(m_volumeItem->position() + QVector3D(0.8f, 0.0f, 0.0f));
-    m_plainItem->setScaling(m_volumeItem->scaling());
+    m_plainItem->setPosition(QVector3D(30.0f, 17.5f, -30.0f));
+    m_plainItem->setScaling(QVector3D(20.0f, 5.0f, 10.0f));
+    m_plainItem->setScalingAbsolute(false);
 
     m_graph->addCustomItem(m_volumeItem);
     m_graph->addCustomItem(m_volumeItem2);
@@ -80,7 +100,9 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     label->setScaling(QVector3D(2.0f, 2.0f, 0.0f));
     label->setRotationAxisAndAngle(QVector3D(0.0f, 1.0f, 0.0f), 45.0f);
     label->setPosition(m_volumeItem3->position());
-    label->setPositionAbsolute(true);
+    label->setPositionAbsolute(false);
+    label->setScalingAbsolute(true);
+
     m_graph->addCustomItem(label);
 
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
@@ -218,6 +240,50 @@ void VolumetricModifier::testSubtextureSetting()
     m_volumeItem3->setSubTextureData(Qt::ZAxis, 190, slice);
 }
 
+void VolumetricModifier::adjustRangeX(int value)
+{
+    float adjustment = float(value - 512) / 10.0f;
+    m_graph->axisX()->setRange(xMiddle + adjustment - xRange, xMiddle + adjustment + xRange);
+}
+
+void VolumetricModifier::adjustRangeY(int value)
+{
+    float adjustment = float(value - 512) / 10.0f;
+    m_graph->axisY()->setRange(yMiddle + adjustment - yRange, yMiddle + adjustment + yRange);
+}
+
+void VolumetricModifier::adjustRangeZ(int value)
+{
+    float adjustment = float(value - 512) / 10.0f;
+    m_graph->axisZ()->setRange(zMiddle + adjustment - zRange, zMiddle + adjustment + zRange);
+}
+
+void VolumetricModifier::testBoundsSetting()
+{
+    static QVector3D scaling1 = m_volumeItem->scaling();
+    static QVector3D scaling2 = m_volumeItem2->scaling();
+    static QVector3D scaling3 = m_volumeItem3->scaling();
+    static QVector3D scaleVector = QVector3D(0.5f, 0.3f, 0.2f);
+
+    if (m_volumeItem->isScalingAbsolute()) {
+        m_volumeItem->setScalingAbsolute(false);
+        m_volumeItem2->setScalingAbsolute(false);
+        m_volumeItem3->setScalingAbsolute(false);
+
+        m_volumeItem->setScaling(scaling1);
+        m_volumeItem2->setScaling(scaling2);
+        m_volumeItem3->setScaling(scaling3);
+    } else {
+        m_volumeItem->setScalingAbsolute(true);
+        m_volumeItem2->setScalingAbsolute(true);
+        m_volumeItem3->setScalingAbsolute(true);
+
+        m_volumeItem->setScaling(scaleVector);
+        m_volumeItem2->setScaling(scaleVector);
+        m_volumeItem3->setScaling(scaleVector);
+    }
+}
+
 void VolumetricModifier::checkRenderCase(int id, Qt::Axis axis, int index,
                                          const QVector<uchar> &dataBefore,
                                          QCustom3DVolume *volumeItem)
@@ -236,7 +302,7 @@ void VolumetricModifier::createVolume()
     m_volumeItem = new QCustom3DVolume;
     m_volumeItem->setTextureFormat(QImage::Format_ARGB32);
 //    m_volumeItem->setRotation(QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 0.0f, 10.0f));
-    m_volumeItem->setPosition(QVector3D(-0.5f, 0.6f, 0.0f));
+    m_volumeItem->setPosition(QVector3D(xMiddle - (xRange / 2.0f), yMiddle + (yRange / 2.0f), zMiddle));
 
     QImage logo;
     logo.load(QStringLiteral(":/logo_no_padding.png"));
@@ -284,10 +350,7 @@ void VolumetricModifier::createVolume()
     int depth = m_volumeItem->textureDepth();
     int frameSize = width * height;
     qDebug() << width << height << depth << m_volumeItem->textureData()->size();
-//    m_volumeItem->setScaling(QVector3D(float(width) / float(depth) * 2.0f,
-//                                       float(height) / float(depth) * 2.0f,
-//                                       2.0f));
-    m_volumeItem->setScaling(QVector3D(0.4f, 0.4f, 0.4f));
+    m_volumeItem->setScaling(QVector3D(xRange, yRange, zRange) / 2.0f);
 
     uchar *data = m_volumeItem->textureData()->data();
     uchar *p = data;
@@ -389,7 +452,7 @@ void VolumetricModifier::createAnotherVolume()
 {
     m_volumeItem2 = new QCustom3DVolume;
     m_volumeItem2->setTextureFormat(QImage::Format_ARGB32);
-    m_volumeItem2->setPosition(QVector3D(0.5f, -0.5f, 0.0f));
+    m_volumeItem2->setPosition(QVector3D(xMiddle + (xRange / 2.0f), yMiddle - (yRange / 2.0f), zMiddle));
 
     QImage logo;
     logo.load(QStringLiteral(":/logo_no_padding.png"));
@@ -417,9 +480,9 @@ void VolumetricModifier::createAnotherVolume()
     int height = m_volumeItem2->textureHeight();
     int depth = m_volumeItem2->textureDepth();
     qDebug() << width << height << depth << m_volumeItem2->textureData()->size();
-    m_volumeItem2->setScaling(QVector3D(float(width) / float(depth) * 2.0f,
-                                       float(height) / float(depth) * 2.0f,
-                                       2.0f));
+    m_volumeItem2->setScaling(QVector3D(float(width) / float(depth) * xRange * 2.0f,
+                                       float(height) / float(depth) * yRange * 2.0f,
+                                       zRange * 2.0f));
 
     // Change one picture using subtexture replacement
     QImage flipped = logo.mirrored();
@@ -433,7 +496,7 @@ void VolumetricModifier::createYetAnotherVolume()
     m_volumeItem3 = new QCustom3DVolume;
     m_volumeItem3->setTextureFormat(QImage::Format_Indexed8);
 //    m_volumeItem2->setRotation(QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 0.0f, 10.0f));
-    m_volumeItem3->setPosition(QVector3D(-0.5f, -0.6f, 0.0f));
+    m_volumeItem3->setPosition(QVector3D(xMiddle - (xRange / 2.0f), yMiddle - (yRange / 2.0f), zMiddle));
 
 //    m_volumeItem3->setTextureDimensions(m_volumeItem->textureDataWidth(),
 //                                        m_volumeItem->textureHeight(),

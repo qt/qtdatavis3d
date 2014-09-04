@@ -960,12 +960,16 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     newItem->setRenderer(this);
     newItem->setItemPointer(item); // Store pointer for render item updates
     newItem->setMesh(item->meshFile());
-    QVector3D scaling = item->scaling();
+    newItem->setPosition(item->position());
+    newItem->setOrigScaling(item->scaling());
+    newItem->setScalingAbsolute(item->isScalingAbsolute());
+    newItem->setPositionAbsolute(item->isPositionAbsolute());
     QImage textureImage = item->d_ptr->textureImage();
     bool facingCamera = false;
     GLuint texture = 0;
     if (item->d_ptr->m_isLabelItem) {
         QCustom3DLabel *labelItem = static_cast<QCustom3DLabel *>(item);
+        newItem->setLabelItem(true);
         float pointSize = labelItem->font().pointSizeF();
         // Check do we have custom visuals or need to use theme
         if (!labelItem->dptr()->m_customVisuals) {
@@ -979,8 +983,10 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         }
         // Calculate scaling based on text (texture size), font size and asked scaling
         float scaledFontSize = (0.05f + pointSize / 500.0f) / float(textureImage.height());
+        QVector3D scaling = newItem->origScaling();
         scaling.setX(scaling.x() * textureImage.width() * scaledFontSize);
         scaling.setY(scaling.y() * textureImage.height() * scaledFontSize);
+        newItem->setOrigScaling(scaling);
         // Check if facing camera
         facingCamera = labelItem->isFacingCamera();
 #if !defined(QT_OPENGL_ES_2)
@@ -1007,10 +1013,8 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         newItem->setUseHighDefShader(volumeItem->useHighDefShader());
 #endif
     }
-    newItem->setScaling(scaling);
+    recalculateCustomItemScaling(newItem);
     newItem->setRotation(item->rotation());
-    newItem->setPosition(item->position());
-    newItem->setPositionAbsolute(item->isPositionAbsolute());
 #if !defined(QT_OPENGL_ES_2)
     // In OpenGL ES we simply draw volumes as regular custom item placeholders.
     if (!item->d_ptr->m_isVolumeItem)
@@ -1021,14 +1025,35 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     }
     newItem->setTexture(texture);
     item->d_ptr->clearTextureImage();
-    QVector3D translation = convertPositionToTranslation(item->position(),
-                                                         item->isPositionAbsolute());
+    QVector3D translation = convertPositionToTranslation(newItem->position(),
+                                                         newItem->isPositionAbsolute());
     newItem->setTranslation(translation);
     newItem->setVisible(item->isVisible());
     newItem->setShadowCasting(item->isShadowCasting());
     newItem->setFacingCamera(facingCamera);
     m_customRenderCache.insert(item, newItem);
     return newItem;
+}
+
+void Abstract3DRenderer::recalculateCustomItemScaling(CustomRenderItem *item)
+{
+    if (!m_polarGraph && !item->isLabel() && !item->isScalingAbsolute()
+            && !item->isPositionAbsolute()) {
+        QVector3D scale = item->origScaling() / 2.0f;
+        QVector3D pos = item->position();
+        QVector3D minBounds(pos.x() - scale.x(),
+                            pos.y() - scale.y(),
+                            pos.z() - scale.z());
+        QVector3D maxBounds(pos.x() + scale.x(),
+                            pos.y() + scale.y(),
+                            pos.z() + scale.z());
+        QVector3D min = convertPositionToTranslation(minBounds, false);
+        QVector3D max = convertPositionToTranslation(maxBounds, false);
+        item->setScaling(QVector3D(qAbs(max.x() - min.x()), qAbs(max.y() - min.y()),
+                                   qAbs(max.z() - min.z())) / 2.0f);
+    } else {
+        item->setScaling(item->origScaling());
+    }
 }
 
 void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
@@ -1038,8 +1063,18 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
         renderItem->setMesh(item->meshFile());
         item->d_ptr->m_dirtyBits.meshDirty = false;
     }
+    if (item->d_ptr->m_dirtyBits.positionDirty) {
+        renderItem->setPosition(item->position());
+        renderItem->setPositionAbsolute(item->isPositionAbsolute());
+        QVector3D translation = convertPositionToTranslation(renderItem->position(),
+                                                             renderItem->isPositionAbsolute());
+        renderItem->setTranslation(translation);
+        item->d_ptr->m_dirtyBits.positionDirty = false;
+    }
     if (item->d_ptr->m_dirtyBits.scalingDirty) {
         QVector3D scaling = item->scaling();
+        renderItem->setOrigScaling(scaling);
+        renderItem->setScalingAbsolute(item->isScalingAbsolute());
         // In case we have label item, we need to recreate texture for scaling adjustment
         if (item->d_ptr->m_isLabelItem) {
             QCustom3DLabel *labelItem = static_cast<QCustom3DLabel *>(item);
@@ -1062,8 +1097,9 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             scaling.setX(scaling.x() * textureImage.width() * scaledFontSize);
             scaling.setY(scaling.y() * textureImage.height() * scaledFontSize);
             item->d_ptr->clearTextureImage();
+            renderItem->setOrigScaling(scaling);
         }
-        renderItem->setScaling(scaling);
+        recalculateCustomItemScaling(renderItem);
         item->d_ptr->m_dirtyBits.scalingDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.rotationDirty) {
@@ -1096,15 +1132,6 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             }
         item->d_ptr->clearTextureImage();
         item->d_ptr->m_dirtyBits.textureDirty = false;
-    }
-    if (item->d_ptr->m_dirtyBits.positionDirty || item->d_ptr->m_dirtyBits.positionAbsoluteDirty) {
-        renderItem->setPosition(item->position());
-        renderItem->setPositionAbsolute(item->isPositionAbsolute());
-        QVector3D translation = convertPositionToTranslation(item->position(),
-                                                             item->isPositionAbsolute());
-        renderItem->setTranslation(translation);
-        item->d_ptr->m_dirtyBits.positionDirty = false;
-        item->d_ptr->m_dirtyBits.positionAbsoluteDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.visibleDirty) {
         renderItem->setVisible(item->isVisible());
@@ -1168,6 +1195,7 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
 void Abstract3DRenderer::updateCustomItemPositions()
 {
     foreach (CustomRenderItem *renderItem, m_customRenderCache) {
+        recalculateCustomItemScaling(renderItem);
         QVector3D translation = convertPositionToTranslation(renderItem->position(),
                                                              renderItem->isPositionAbsolute());
         renderItem->setTranslation(translation);

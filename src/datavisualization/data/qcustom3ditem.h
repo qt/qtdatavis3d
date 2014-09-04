@@ -39,6 +39,7 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
     Q_PROPERTY(QQuaternion rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
     Q_PROPERTY(bool shadowCasting READ isShadowCasting WRITE setShadowCasting NOTIFY shadowCastingChanged)
+    Q_PROPERTY(bool scalingAbsolute READ isScalingAbsolute WRITE setScalingAbsolute NOTIFY scalingAbsoluteChanged REVISION 1)
 
 public:
     explicit QCustom3DItem(QObject *parent = 0);
@@ -62,6 +63,9 @@ public:
     void setScaling(const QVector3D &scaling);
     QVector3D scaling() const;
 
+    void setScalingAbsolute(bool scalingAbsolute);
+    bool isScalingAbsolute() const;
+
     void setRotation(const QQuaternion &rotation);
     QQuaternion rotation();
 
@@ -84,6 +88,7 @@ signals:
     void rotationChanged(const QQuaternion &rotation);
     void visibleChanged(bool visible);
     void shadowCastingChanged(bool shadowCasting);
+    Q_REVISION(1) void scalingAbsoluteChanged(bool scalingAbsolute);
 
 protected:
     QCustom3DItem(QCustom3DItemPrivate *d, QObject *parent = 0);

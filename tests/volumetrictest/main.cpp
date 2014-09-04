@@ -97,6 +97,27 @@ int main(int argc, char **argv)
     QPushButton *testSubTextureSetting = new QPushButton(widget);
     testSubTextureSetting->setText(QStringLiteral("Test subtexture settings"));
 
+    QLabel *rangeSliderLabel = new QLabel(QStringLiteral("Adjust ranges:"), widget);
+
+    QSlider *rangeXSlider = new QSlider(Qt::Horizontal, widget);
+    rangeXSlider->setMinimum(0);
+    rangeXSlider->setMaximum(1024);
+    rangeXSlider->setValue(512);
+    rangeXSlider->setEnabled(true);
+    QSlider *rangeYSlider = new QSlider(Qt::Horizontal, widget);
+    rangeYSlider->setMinimum(0);
+    rangeYSlider->setMaximum(1024);
+    rangeYSlider->setValue(512);
+    rangeYSlider->setEnabled(true);
+    QSlider *rangeZSlider = new QSlider(Qt::Horizontal, widget);
+    rangeZSlider->setMinimum(0);
+    rangeZSlider->setMaximum(1024);
+    rangeZSlider->setValue(512);
+    rangeZSlider->setEnabled(true);
+
+    QPushButton *testBoundsSetting = new QPushButton(widget);
+    testBoundsSetting->setText(QStringLiteral("Test data bounds"));
+
     vLayout->addWidget(fpsLabel);
     vLayout->addWidget(sliceXCheckBox);
     vLayout->addWidget(sliceXSlider);
@@ -107,6 +128,11 @@ int main(int argc, char **argv)
     vLayout->addWidget(sliceZCheckBox);
     vLayout->addWidget(sliceZSlider);
     vLayout->addWidget(sliceImageZLabel);
+    vLayout->addWidget(rangeSliderLabel);
+    vLayout->addWidget(rangeXSlider);
+    vLayout->addWidget(rangeYSlider);
+    vLayout->addWidget(rangeZSlider);
+    vLayout->addWidget(testBoundsSetting);
     vLayout->addWidget(testSubTextureSetting, 1, Qt::AlignTop);
 
     VolumetricModifier *modifier = new VolumetricModifier(graph);
@@ -127,6 +153,14 @@ int main(int argc, char **argv)
                      &VolumetricModifier::adjustSliceZ);
     QObject::connect(testSubTextureSetting, &QPushButton::clicked, modifier,
                      &VolumetricModifier::testSubtextureSetting);
+    QObject::connect(rangeXSlider, &QSlider::valueChanged, modifier,
+                     &VolumetricModifier::adjustRangeX);
+    QObject::connect(rangeYSlider, &QSlider::valueChanged, modifier,
+                     &VolumetricModifier::adjustRangeY);
+    QObject::connect(rangeZSlider, &QSlider::valueChanged, modifier,
+                     &VolumetricModifier::adjustRangeZ);
+    QObject::connect(testBoundsSetting, &QPushButton::clicked, modifier,
+                     &VolumetricModifier::testBoundsSetting);
 
     widget->show();
     return app.exec();

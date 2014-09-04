@@ -205,6 +205,8 @@ protected:
     virtual void fixCameraTarget(QVector3D &target) = 0;
     void updateCameraViewport();
 
+    void recalculateCustomItemScaling(CustomRenderItem *item);
+
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
     Drawer *m_drawer;

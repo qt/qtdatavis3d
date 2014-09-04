@@ -51,10 +51,14 @@ public:
     inline ObjectHelper *mesh() const { return m_object; }
     inline void setScaling(const QVector3D &scaling) { m_scaling = scaling; }
     inline QVector3D scaling() const { return m_scaling; }
+    inline void setOrigScaling(const QVector3D &scaling) { m_origScaling = scaling; }
+    inline QVector3D origScaling() const { return m_origScaling; }
     inline void setPosition(const QVector3D &position) { m_position = position; }
     inline QVector3D position() const { return m_position; }
-    inline void setPositionAbsolute(bool absolute) { m_absolute = absolute; }
-    inline bool isPositionAbsolute() const { return m_absolute; }
+    inline void setPositionAbsolute(bool absolute) { m_positionAbsolute = absolute; }
+    inline bool isPositionAbsolute() const { return m_positionAbsolute; }
+    inline void setScalingAbsolute(bool absolute) { m_scalingAbsolute = absolute; }
+    inline bool isScalingAbsolute() const { return m_scalingAbsolute; }
     inline void setBlendNeeded(bool blend) { m_needBlend = blend; }
     inline bool isBlendNeeded() const { return m_needBlend; }
     inline void setVisible(bool visible) { m_visible = visible; }
@@ -70,6 +74,8 @@ public:
     inline void setFacingCamera(bool facing) { m_isFacingCamera = facing; }
     inline bool isFacingCamera() const { return m_isFacingCamera; }
     inline void setRenderer(Abstract3DRenderer *renderer) { m_renderer = renderer; }
+    inline void setLabelItem(bool isLabel) { m_labelItem = isLabel; }
+    inline bool isLabel() const { return m_labelItem; }
 
     // Volume specific
     inline void setTextureWidth(int width) { m_textureWidth = width; }
@@ -104,8 +110,10 @@ private:
 
     GLuint m_texture;
     QVector3D m_scaling;
+    QVector3D m_origScaling;
     QVector3D m_position;
-    bool m_absolute;
+    bool m_positionAbsolute;
+    bool m_scalingAbsolute;
     ObjectHelper *m_object; // shared reference
     bool m_needBlend;
     bool m_visible;
@@ -115,6 +123,7 @@ private:
     bool m_isFacingCamera;
     QCustom3DItem *m_item;
     Abstract3DRenderer *m_renderer;
+    bool m_labelItem;
 
     // Volume specific
     int m_textureWidth;

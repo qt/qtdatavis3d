@@ -22,6 +22,7 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/qcustom3dlabel.h>
+#include <QtDataVisualization/q3dscatter.h>
 #include <QtCore/qmath.h>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QRadioButton>
@@ -40,6 +41,7 @@ const int mineShaftDiameter(1);
 const int airColorIndex(254);
 const int mineShaftColorIndex(255);
 const int layerColorThickness(60);
+const int heightToColorDiv(128);
 const int magmaColorsMin(0);
 const int magmaColorsMax(layerColorThickness);
 const int aboveWaterGroundColorsMin(magmaColorsMax + 1);
@@ -93,7 +95,10 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     excavateMineShaft(lowDetailSize, 0, m_mineShaftArray.size(), m_lowDetailData);
 
     m_volumeItem = new QCustom3DVolume;
-    m_volumeItem->setScaling(QVector3D(2.0f, 1.0f, 2.0f));
+    m_volumeItem->setScaling(QVector3D(m_graph->axisX()->max() - m_graph->axisX()->min(),
+                                       m_graph->axisY()->max() - m_graph->axisY()->min(),
+                                       m_graph->axisZ()->max() - m_graph->axisZ()->min()));
+    m_volumeItem->setScalingAbsolute(false);
     m_volumeItem->setTextureWidth(lowDetailSize);
     m_volumeItem->setTextureHeight(lowDetailSize / 2);
     m_volumeItem->setTextureDepth(lowDetailSize);
@@ -108,11 +113,14 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
         if (i < magmaColorsMax) {
             m_colorTable1[i] = qRgba(130 - (i * 2), 0, 0, 255);
         } else if (i < aboveWaterGroundColorsMax) {
-            m_colorTable1[i] = qRgba(0, ((i - magmaColorsMax) * 2) + 120, 0, terrainTransparency);
+            m_colorTable1[i] = qRgba((i - magmaColorsMax) * 4,
+                                     ((i - magmaColorsMax) * 2) + 120,
+                                     (i - magmaColorsMax) * 5, terrainTransparency);
         } else if (i < underWaterGroundColorsMax) {
-            m_colorTable1[i] = qRgba(((i - aboveWaterGroundColorsMax) * 2) + 30,
-                                     ((i - aboveWaterGroundColorsMax) * 2) + 100,
-                                     ((i - aboveWaterGroundColorsMax) * 2) + 30, terrainTransparency);
+            m_colorTable1[i] = qRgba(((layerColorThickness - i - aboveWaterGroundColorsMax)) + 70,
+                                     ((layerColorThickness - i - aboveWaterGroundColorsMax) * 2) + 20,
+                                     ((layerColorThickness - i - aboveWaterGroundColorsMax)) + 50,
+                                     terrainTransparency);
         } else if (i < waterColorsMax) {
             m_colorTable1[i] = qRgba(0, 0, ((i - underWaterGroundColorsMax) * 2) + 120,
                                      terrainTransparency);
@@ -471,19 +479,19 @@ int VolumetricModifier::createVolume(int textureSize, int startIndex, int count,
                 int height((layerDataSize - (j * 2 * multiplier)) / 2);
                 if (height < magmaHeights.at(k)) {
                     // Magma layer
-                    colorIndex = int((float(height) / colorTableSize)
+                    colorIndex = int((float(height) / heightToColorDiv)
                                      * float(layerColorThickness)) + magmaColorsMin;
-                } else if (height <= groundHeights.at(k) && height <= waterHeights.at(k)) {
+                } else if (height < groundHeights.at(k) && height < waterHeights.at(k)) {
                     // Ground layer below water
-                    colorIndex = int((float(waterHeights.at(k) - height) / colorTableSize)
+                    colorIndex = int((float(waterHeights.at(k) - height) / heightToColorDiv)
                                      * float(layerColorThickness)) + underWaterGroundColorsMin;
                 } else if (height <= waterHeights.at(k)) {
                     // Water layer where water goes over ground
-                    colorIndex = int((float(height - magmaHeights.at(k)) / colorTableSize)
+                    colorIndex = int((float(height - magmaHeights.at(k)) / heightToColorDiv)
                                      * float(layerColorThickness)) + waterColorsMin;
                 } else if (height <= groundHeights.at(k)) {
                     // Ground above water
-                    colorIndex = int((float(height - waterHeights.at(k)) / colorTableSize)
+                    colorIndex = int((float(height - waterHeights.at(k)) / heightToColorDiv)
                                      * float(layerColorThickness)) + aboveWaterGroundColorsMin;
                 } else {
                     // Rest is air
@@ -499,7 +507,7 @@ int VolumetricModifier::createVolume(int textureSize, int startIndex, int count,
 }
 
 int VolumetricModifier::excavateMineShaft(int textureSize, int startIndex, int count,
-                                           QVector<uchar> *textureData)
+                                          QVector<uchar> *textureData)
 {
     int endIndex = startIndex + count;
     if (endIndex > m_mineShaftArray.size())

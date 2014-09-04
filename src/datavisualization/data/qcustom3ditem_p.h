@@ -29,6 +29,7 @@
 #ifndef QCUSTOM3DITEM_P_H
 #define QCUSTOM3DITEM_P_H
 
+#include "datavisualizationglobal_p.h"
 #include "qcustom3ditem.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -37,7 +38,6 @@ struct QCustomItemDirtyBitField {
     bool textureDirty               : 1;
     bool meshDirty                  : 1;
     bool positionDirty              : 1;
-    bool positionAbsoluteDirty      : 1;
     bool scalingDirty               : 1;
     bool rotationDirty              : 1;
     bool visibleDirty               : 1;
@@ -47,7 +47,6 @@ struct QCustomItemDirtyBitField {
         : textureDirty(false),
           meshDirty(false),
           positionDirty(false),
-          positionAbsoluteDirty(false),
           scalingDirty(false),
           rotationDirty(false),
           visibleDirty(false),
@@ -77,6 +76,7 @@ public:
     QVector3D m_position;
     bool m_positionAbsolute;
     QVector3D m_scaling;
+    bool m_scalingAbsolute;
     QQuaternion m_rotation;
     bool m_visible;
     bool m_shadowCasting;

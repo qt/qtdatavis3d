@@ -23,7 +23,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 CustomRenderItem::CustomRenderItem()
     : AbstractRenderItem(),
       m_texture(0),
-      m_absolute(false),
+      m_positionAbsolute(false),
+      m_scalingAbsolute(true),
       m_object(0),
       m_needBlend(true),
       m_visible(true),
@@ -33,6 +34,7 @@ CustomRenderItem::CustomRenderItem()
       m_isFacingCamera(false),
       m_item(0),
       m_renderer(0),
+      m_labelItem(false),
       m_textureWidth(0),
       m_textureHeight(0),
       m_textureDepth(0),
