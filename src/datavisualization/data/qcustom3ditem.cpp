@@ -67,10 +67,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * within axis ranges.
  *
  * \note Items positioned outside any axis range are not rendered if positionAbsolute is \c{false},
- * unless the item is a Custom3DVolume that would be partially visible. In that case, the visible
- * portion of the volume will be rendered.
+ * unless the item is a Custom3DVolume that would be partially visible and scalingAbsolute is also
+ * \c{false}. In that case, the visible portion of the volume will be rendered.
  *
- * \sa positionAbsolute
+ * \sa positionAbsolute, scalingAbsolute
  */
 
 /*! \qmlproperty bool Custom3DItem::positionAbsolute
@@ -206,8 +206,8 @@ QString QCustom3DItem::meshFile() const
  * within axis ranges.
  *
  * \note Items positioned outside any axis range are not rendered if positionAbsolute is \c{false},
- * unless the item is a QCustom3DVolume that would be partially visible. In that case, the visible
- * portion of the volume will be rendered.
+ * unless the item is a QCustom3DVolume that would be partially visible and scalingAbsolute is also
+ * \c{false}. In that case, the visible portion of the volume will be rendered.
  *
  * \sa positionAbsolute
  */

@@ -55,6 +55,8 @@ public:
     inline QVector3D origScaling() const { return m_origScaling; }
     inline void setPosition(const QVector3D &position) { m_position = position; }
     inline QVector3D position() const { return m_position; }
+    inline void setOrigPosition(const QVector3D &position) { m_origPosition = position; }
+    inline QVector3D origPosition() const { return m_origPosition; }
     inline void setPositionAbsolute(bool absolute) { m_positionAbsolute = absolute; }
     inline bool isPositionAbsolute() const { return m_positionAbsolute; }
     inline void setScalingAbsolute(bool absolute) { m_scalingAbsolute = absolute; }
@@ -104,6 +106,25 @@ public:
     inline bool preserveOpacity() const { return m_preserveOpacity; }
     inline void setUseHighDefShader(bool enable) { m_useHighDefShader = enable; }
     inline bool useHighDefShader() const {return m_useHighDefShader; }
+    inline void setMinBounds(const QVector3D &bounds) {
+        m_minBounds = bounds;
+        m_minBoundsNormal = m_minBounds;
+        m_minBoundsNormal.setY(-m_minBoundsNormal.y());
+        m_minBoundsNormal.setZ(-m_minBoundsNormal.z());
+        m_minBoundsNormal = 0.5f * (m_minBoundsNormal + oneVector);
+
+    }
+    inline QVector3D minBounds() const { return m_minBounds; }
+    inline void setMaxBounds(const QVector3D &bounds) {
+        m_maxBounds = bounds;
+        m_maxBoundsNormal = m_maxBounds;
+        m_maxBoundsNormal.setY(-m_maxBoundsNormal.y());
+        m_maxBoundsNormal.setZ(-m_maxBoundsNormal.z());
+        m_maxBoundsNormal = 0.5f * (m_maxBoundsNormal + oneVector);
+    }
+    inline QVector3D maxBounds() const { return m_maxBounds; }
+    inline QVector3D minBoundsNormal() const { return m_minBoundsNormal; }
+    inline QVector3D maxBoundsNormal() const { return m_maxBoundsNormal; }
 
 private:
     Q_DISABLE_COPY(CustomRenderItem)
@@ -112,6 +133,7 @@ private:
     QVector3D m_scaling;
     QVector3D m_origScaling;
     QVector3D m_position;
+    QVector3D m_origPosition;
     bool m_positionAbsolute;
     bool m_scalingAbsolute;
     ObjectHelper *m_object; // shared reference
@@ -138,6 +160,10 @@ private:
     float m_alphaMultiplier;
     bool m_preserveOpacity;
     bool m_useHighDefShader;
+    QVector3D m_minBounds;
+    QVector3D m_maxBounds;
+    QVector3D m_minBoundsNormal;
+    QVector3D m_maxBoundsNormal;
 };
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 

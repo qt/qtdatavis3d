@@ -327,6 +327,7 @@
             so only the Qt Quick 2 graphs are available in practice for those platforms.
         \li Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
         \li Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
+        \li QCustom3DVolume items are not supported with OpenGL ES2 (including Angle builds in Windows).
         \li Surfaces with non-straight rows and columns do not always render properly.
         \li Q3DLight class (and Light3D QML item) are currently not usable for anything.
         \li Changing any of Q3DScene properties affecting subviewports currently has no effect.

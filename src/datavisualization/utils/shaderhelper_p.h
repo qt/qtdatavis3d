@@ -82,6 +82,8 @@ class ShaderHelper
     GLuint sampleCount();
     GLuint alphaMultiplier();
     GLuint preserveOpacity();
+    GLuint maxBounds();
+    GLuint minBounds();
 
     GLuint posAtt();
     GLuint uvAtt();
@@ -124,6 +126,8 @@ class ShaderHelper
     GLuint m_sampleCountUniform;
     GLuint m_alphaMultiplierUniform;
     GLuint m_preserveOpacityUniform;
+    GLuint m_minBoundsUniform;
+    GLuint m_maxBoundsUniform;
 
     GLboolean m_initialized;
 };

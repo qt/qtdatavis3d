@@ -19,9 +19,11 @@
 #ifndef VOLUMETRICMODIFIER_H
 #define VOLUMETRICMODIFIER_H
 
-#include <QtDataVisualization/q3dscatter.h>
 #include <QtDataVisualization/qcustom3dvolume.h>
 #include <QtDataVisualization/qcustom3ditem.h>
+#include <QtDataVisualization/q3dscatter.h>
+#include <QtDataVisualization/q3dsurface.h>
+#include <QtDataVisualization/q3dbars.h>
 
 class QLabel;
 
@@ -31,7 +33,7 @@ class VolumetricModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit VolumetricModifier(Q3DScatter *scatter);
+    explicit VolumetricModifier(QAbstract3DGraph *scatter);
     ~VolumetricModifier();
 
     void setFpsLabel(QLabel *fpsLabel);
@@ -58,7 +60,10 @@ private:
     void checkRenderCase(int id, Qt::Axis axis, int index, const QVector<uchar> &dataBefore,
                          QCustom3DVolume *volumeItem);
 
-    Q3DScatter *m_graph;
+    QAbstract3DGraph *m_graph;
+    Q3DScatter *m_scatterGraph;
+    Q3DSurface *m_surfaceGraph;
+    Q3DBars *m_barGraph;
     QCustom3DVolume *m_volumeItem;
     QCustom3DVolume *m_volumeItem2;
     QCustom3DVolume *m_volumeItem3;

@@ -138,6 +138,46 @@ void Bars3DRenderer::fixCameraTarget(QVector3D &target)
     target.setZ(target.z() * -m_zScaleFactor);
 }
 
+void Bars3DRenderer::getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds)
+{
+    // The inputs are the item bounds in OpenGL coordinates.
+    // The outputs limit these bounds to visible ranges, normalized to range [-1, 1]
+    // Volume shader flips the Y and Z axes, so we need to set negatives of actual values to those
+    float itemRangeX = (maxBounds.x() - minBounds.x());
+    float itemRangeY = (maxBounds.y() - minBounds.y());
+    float itemRangeZ = (maxBounds.z() - minBounds.z());
+
+    if (minBounds.x() < -m_xScaleFactor)
+        minBounds.setX(-1.0f + (2.0f * qAbs(minBounds.x() + m_xScaleFactor) / itemRangeX));
+    else
+        minBounds.setX(-1.0f);
+
+    if (minBounds.y() < -1.0f + m_backgroundAdjustment)
+        minBounds.setY(-(-1.0f + (2.0f * qAbs(minBounds.y() + 1.0f - m_backgroundAdjustment) / itemRangeY)));
+    else
+        minBounds.setY(1.0f);
+
+    if (minBounds.z() < -m_zScaleFactor)
+        minBounds.setZ(-(-1.0f + (2.0f * qAbs(minBounds.z() + m_zScaleFactor) / itemRangeZ)));
+    else
+        minBounds.setZ(1.0f);
+
+    if (maxBounds.x() > m_xScaleFactor)
+        maxBounds.setX(1.0f - (2.0f * qAbs(maxBounds.x() - m_xScaleFactor) / itemRangeX));
+    else
+        maxBounds.setX(1.0f);
+
+    if (maxBounds.y() > 1.0f + m_backgroundAdjustment)
+        maxBounds.setY(-(1.0f - (2.0f * qAbs(maxBounds.y() - 1.0f - m_backgroundAdjustment) / itemRangeY)));
+    else
+        maxBounds.setY(-1.0f);
+
+    if (maxBounds.z() > m_zScaleFactor)
+        maxBounds.setZ(-(1.0f - (2.0f * qAbs(maxBounds.z() - m_zScaleFactor) / itemRangeZ)));
+    else
+        maxBounds.setZ(-1.0f);
+}
+
 void Bars3DRenderer::updateData()
 {
     int minRow = m_axisCacheZ.min();
@@ -1042,7 +1082,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         }
 
                         if (m_reflectionEnabled && ((m_yFlipped && item.height() > 0.0)
-                                                     || (!m_yFlipped && item.height() < 0.0))) {
+                                                    || (!m_yFlipped && item.height() < 0.0))) {
                             continue;
                         }
 
@@ -1564,7 +1604,7 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
                                 && (reflection == 1.0f
                                     || (reflection != 1.0f
                                         && ((m_yFlipped && item.height() < 0.0)
-                                        || (!m_yFlipped && item.height() > 0.0)))))
+                                            || (!m_yFlipped && item.height() > 0.0)))))
                                || !m_reflectionEnabled) {
                         // Skip drawing of 0-height bars and reflections of bars on the "wrong side"
                         // Set shader bindings
@@ -2775,10 +2815,10 @@ QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position
     float zTrans = 0.0f;
     if (!isAbsolute) {
         // Convert row and column to translation on graph
-        xTrans = (((position.x() + 0.5f) * m_cachedBarSpacing.width()) - m_rowWidth)
-                / m_scaleFactor;
-        zTrans = (m_columnDepth - ((position.z() + 0.5f) * m_cachedBarSpacing.height()))
-                / m_scaleFactor;
+        xTrans = (((position.x() - m_axisCacheX.min() + 0.5f) * m_cachedBarSpacing.width())
+                  - m_rowWidth) / m_scaleFactor;
+        zTrans = (m_columnDepth - ((position.z() - m_axisCacheZ.min() + 0.5f)
+                                   * m_cachedBarSpacing.height())) / m_scaleFactor;
         yTrans = m_axisCacheY.positionAt(position.y());
     } else {
         xTrans = position.x() * m_xScaleFactor;

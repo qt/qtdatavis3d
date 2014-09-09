@@ -960,7 +960,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     newItem->setRenderer(this);
     newItem->setItemPointer(item); // Store pointer for render item updates
     newItem->setMesh(item->meshFile());
-    newItem->setPosition(item->position());
+    newItem->setOrigPosition(item->position());
     newItem->setOrigScaling(item->scaling());
     newItem->setScalingAbsolute(item->isScalingAbsolute());
     newItem->setPositionAbsolute(item->isPositionAbsolute());
@@ -1013,7 +1013,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         newItem->setUseHighDefShader(volumeItem->useHighDefShader());
 #endif
     }
-    recalculateCustomItemScaling(newItem);
+    recalculateCustomItemScalingAndPos(newItem);
     newItem->setRotation(item->rotation());
 #if !defined(QT_OPENGL_ES_2)
     // In OpenGL ES we simply draw volumes as regular custom item placeholders.
@@ -1025,9 +1025,6 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     }
     newItem->setTexture(texture);
     item->d_ptr->clearTextureImage();
-    QVector3D translation = convertPositionToTranslation(newItem->position(),
-                                                         newItem->isPositionAbsolute());
-    newItem->setTranslation(translation);
     newItem->setVisible(item->isVisible());
     newItem->setShadowCasting(item->isShadowCasting());
     newItem->setFacingCamera(facingCamera);
@@ -1035,25 +1032,71 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     return newItem;
 }
 
-void Abstract3DRenderer::recalculateCustomItemScaling(CustomRenderItem *item)
+void Abstract3DRenderer::recalculateCustomItemScalingAndPos(CustomRenderItem *item)
 {
     if (!m_polarGraph && !item->isLabel() && !item->isScalingAbsolute()
             && !item->isPositionAbsolute()) {
         QVector3D scale = item->origScaling() / 2.0f;
-        QVector3D pos = item->position();
+        QVector3D pos = item->origPosition();
         QVector3D minBounds(pos.x() - scale.x(),
                             pos.y() - scale.y(),
-                            pos.z() - scale.z());
+                            pos.z() + scale.z());
         QVector3D maxBounds(pos.x() + scale.x(),
                             pos.y() + scale.y(),
-                            pos.z() + scale.z());
-        QVector3D min = convertPositionToTranslation(minBounds, false);
-        QVector3D max = convertPositionToTranslation(maxBounds, false);
-        item->setScaling(QVector3D(qAbs(max.x() - min.x()), qAbs(max.y() - min.y()),
-                                   qAbs(max.z() - min.z())) / 2.0f);
+                            pos.z() - scale.z());
+        QVector3D minCorner = convertPositionToTranslation(minBounds, false);
+        QVector3D maxCorner = convertPositionToTranslation(maxBounds, false);
+        scale = QVector3D(qAbs(maxCorner.x() - minCorner.x()),
+                          qAbs(maxCorner.y() - minCorner.y()),
+                          qAbs(maxCorner.z() - minCorner.z())) / 2.0f;
+        if (item->isVolume()) {
+            // Only volume items need to scale and reposition according to bounds
+            QVector3D minBoundsNormal = minCorner;
+            QVector3D maxBoundsNormal = maxCorner;
+            // getVisibleItemBounds returns bounds normalized for fragment shader [-1,1]
+            // Y and Z are also flipped.
+            getVisibleItemBounds(minBoundsNormal, maxBoundsNormal);
+            item->setMinBounds(minBoundsNormal);
+            item->setMaxBounds(maxBoundsNormal);
+            // For scaling calculations, we want [0,1] normalized values
+            minBoundsNormal = item->minBoundsNormal();
+            maxBoundsNormal = item->maxBoundsNormal();
+
+            // Rescale and reposition the item so that it doesn't go over the edges
+            QVector3D adjScaling =
+                    QVector3D(scale.x() * (maxBoundsNormal.x() - minBoundsNormal.x()),
+                              scale.y() * (maxBoundsNormal.y() - minBoundsNormal.y()),
+                              scale.z() * (maxBoundsNormal.z() - minBoundsNormal.z()));
+
+            item->setScaling(adjScaling);
+
+            QVector3D adjPos = item->origPosition();
+            QVector3D dataExtents = QVector3D(maxBounds.x() - minBounds.x(),
+                                              maxBounds.y() - minBounds.y(),
+                                              maxBounds.z() - minBounds.z()) / 2.0f;
+            adjPos.setX(adjPos.x() + (dataExtents.x() * minBoundsNormal.x())
+                        - (dataExtents.x() * (1.0f - maxBoundsNormal.x())));
+            adjPos.setY(adjPos.y() + (dataExtents.y() * minBoundsNormal.y())
+                        - (dataExtents.y() * (1.0f - maxBoundsNormal.y())));
+            adjPos.setZ(adjPos.z() + (dataExtents.z() * minBoundsNormal.z())
+                        - (dataExtents.z() * (1.0f - maxBoundsNormal.z())));
+            item->setPosition(adjPos);
+        } else {
+            // Only scale for non-volume items, and do not readjust position
+            item->setScaling(scale);
+            item->setPosition(item->origPosition());
+        }
     } else {
         item->setScaling(item->origScaling());
+        item->setPosition(item->origPosition());
+        if (item->isVolume()) {
+            item->setMinBounds(-1.0f * zeroVector);
+            item->setMaxBounds(oneVector);
+        }
     }
+    QVector3D translation = convertPositionToTranslation(item->position(),
+                                                         item->isPositionAbsolute());
+    item->setTranslation(translation);
 }
 
 void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
@@ -1064,11 +1107,10 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
         item->d_ptr->m_dirtyBits.meshDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.positionDirty) {
-        renderItem->setPosition(item->position());
+        renderItem->setOrigPosition(item->position());
         renderItem->setPositionAbsolute(item->isPositionAbsolute());
-        QVector3D translation = convertPositionToTranslation(renderItem->position(),
-                                                             renderItem->isPositionAbsolute());
-        renderItem->setTranslation(translation);
+        if (!item->d_ptr->m_dirtyBits.scalingDirty)
+            recalculateCustomItemScalingAndPos(renderItem);
         item->d_ptr->m_dirtyBits.positionDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.scalingDirty) {
@@ -1099,7 +1141,7 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             item->d_ptr->clearTextureImage();
             renderItem->setOrigScaling(scaling);
         }
-        recalculateCustomItemScaling(renderItem);
+        recalculateCustomItemScalingAndPos(renderItem);
         item->d_ptr->m_dirtyBits.scalingDirty = false;
     }
     if (item->d_ptr->m_dirtyBits.rotationDirty) {
@@ -1195,10 +1237,7 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
 void Abstract3DRenderer::updateCustomItemPositions()
 {
     foreach (CustomRenderItem *renderItem, m_customRenderCache) {
-        recalculateCustomItemScaling(renderItem);
-        QVector3D translation = convertPositionToTranslation(renderItem->position(),
-                                                             renderItem->isPositionAbsolute());
-        renderItem->setTranslation(translation);
+        recalculateCustomItemScalingAndPos(renderItem);
     }
 }
 
@@ -1243,7 +1282,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                     continue;
             }
 
-            // Check if the render item is in data coordinates and not within axis ranges, and skip drawing if it is
+            // If the render item is in data coordinates and not within axis ranges, skip it
             if (!item->isPositionAbsolute()
                     && (item->position().x() < m_axisCacheX.min()
                         || item->position().x() > m_axisCacheX.max()
@@ -1353,9 +1392,12 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                     // Set shadowless shader bindings
 #if !defined(QT_OPENGL_ES_2)
                     if (item->isVolume()) {
-                        // Volume shaders repurpose light position for camera position relative to item
                         QVector3D cameraPos = m_cachedScene->activeCamera()->position();
                         cameraPos = MVPMatrix.inverted().map(cameraPos);
+                        // Adjust camera position according to min/max bounds
+                        cameraPos = cameraPos
+                                + ((oneVector - cameraPos) * item->minBoundsNormal())
+                                - ((oneVector + cameraPos) * (oneVector - item->maxBoundsNormal()));
                         shader->setUniformValue(shader->cameraPositionRelativeToModel(), -cameraPos);
                         GLint color8Bit = (item->textureFormat() == QImage::Format_Indexed8) ? 1 : 0;
                         if (color8Bit) {
@@ -1366,6 +1408,10 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                         shader->setUniformValue(shader->alphaMultiplier(), item->alphaMultiplier());
                         shader->setUniformValue(shader->preserveOpacity(),
                                                 item->preserveOpacity() ? 1 : 0);
+
+                        shader->setUniformValue(shader->minBounds(), item->minBounds());
+                        shader->setUniformValue(shader->maxBounds(), item->maxBounds());
+
                         if (shader == m_volumeTextureSliceShader) {
                             QVector3D slices((float(item->sliceIndexX()) + 0.5f)
                                              / float(item->textureWidth()) * 2.0 - 1.0,

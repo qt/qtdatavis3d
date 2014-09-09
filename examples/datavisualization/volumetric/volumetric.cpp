@@ -80,6 +80,8 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_graph->setOrthoProjection(true);
 
+    toggleAreaAll(true);
+
 #if !defined(QT_OPENGL_ES_2)
     m_lowDetailData = new QVector<uchar>(lowDetailSize * lowDetailSize * lowDetailSize / 2);
     m_mediumDetailData = new QVector<uchar>(mediumDetailSize * mediumDetailSize * mediumDetailSize / 2);
@@ -95,9 +97,16 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     excavateMineShaft(lowDetailSize, 0, m_mineShaftArray.size(), m_lowDetailData);
 
     m_volumeItem = new QCustom3DVolume;
-    m_volumeItem->setScaling(QVector3D(m_graph->axisX()->max() - m_graph->axisX()->min(),
-                                       m_graph->axisY()->max() - m_graph->axisY()->min(),
-                                       m_graph->axisZ()->max() - m_graph->axisZ()->min()));
+    // Adjust water level to zero with a minor tweak to y-coordinate position and scaling
+    m_volumeItem->setScaling(
+                QVector3D(m_graph->axisX()->max() - m_graph->axisX()->min(),
+                          (m_graph->axisY()->max() - m_graph->axisY()->min()) * 0.91f,
+                          m_graph->axisZ()->max() - m_graph->axisZ()->min()));
+    m_volumeItem->setPosition(
+                QVector3D((m_graph->axisX()->max() + m_graph->axisX()->min()) / 2.0f,
+                          -0.045f * (m_graph->axisY()->max() - m_graph->axisY()->min()) +
+                          (m_graph->axisY()->max() + m_graph->axisY()->min()) / 2.0f,
+                          (m_graph->axisZ()->max() + m_graph->axisZ()->min()) / 2.0f));
     m_volumeItem->setScalingAbsolute(false);
     m_volumeItem->setTextureWidth(lowDetailSize);
     m_volumeItem->setTextureHeight(lowDetailSize / 2);
@@ -437,6 +446,42 @@ void VolumetricModifier::adjustAlphaMultiplier(int value)
     adjustSliceZ(m_sliceSliderZ->value());
 }
 
+void VolumetricModifier::toggleAreaAll(bool enabled)
+{
+    if (enabled) {
+        m_graph->axisX()->setRange(0.0f, 1000.0f);
+        m_graph->axisY()->setRange(-600.0f, 600.0f);
+        m_graph->axisZ()->setRange(0.0f, 1000.0f);
+        m_graph->axisX()->setSegmentCount(5);
+        m_graph->axisY()->setSegmentCount(6);
+        m_graph->axisZ()->setSegmentCount(5);
+    }
+}
+
+void VolumetricModifier::toggleAreaMine(bool enabled)
+{
+    if (enabled) {
+        m_graph->axisX()->setRange(350.0f, 850.0f);
+        m_graph->axisY()->setRange(-500.0f, 100.0f);
+        m_graph->axisZ()->setRange(350.0f, 900.0f);
+        m_graph->axisX()->setSegmentCount(10);
+        m_graph->axisY()->setSegmentCount(6);
+        m_graph->axisZ()->setSegmentCount(11);
+    }
+}
+
+void VolumetricModifier::toggleAreaMountain(bool enabled)
+{
+    if (enabled) {
+        m_graph->axisX()->setRange(300.0f, 600.0f);
+        m_graph->axisY()->setRange(-100.0f, 400.0f);
+        m_graph->axisZ()->setRange(300.0f, 600.0f);
+        m_graph->axisX()->setSegmentCount(9);
+        m_graph->axisY()->setSegmentCount(5);
+        m_graph->axisZ()->setSegmentCount(9);
+    }
+}
+
 void VolumetricModifier::initHeightMap(QString fileName, QVector<uchar> &layerData)
 {
     QImage heightImage(fileName);
@@ -485,7 +530,7 @@ int VolumetricModifier::createVolume(int textureSize, int startIndex, int count,
                     // Ground layer below water
                     colorIndex = int((float(waterHeights.at(k) - height) / heightToColorDiv)
                                      * float(layerColorThickness)) + underWaterGroundColorsMin;
-                } else if (height <= waterHeights.at(k)) {
+                } else if (height < waterHeights.at(k)) {
                     // Water layer where water goes over ground
                     colorIndex = int((float(height - magmaHeights.at(k)) / heightToColorDiv)
                                      * float(layerColorThickness)) + waterColorsMin;

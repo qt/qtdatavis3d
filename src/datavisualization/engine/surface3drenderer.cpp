@@ -158,6 +158,46 @@ void Surface3DRenderer::fixCameraTarget(QVector3D &target)
     target.setZ(target.z() * -m_scaleZ);
 }
 
+void Surface3DRenderer::getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds)
+{
+    // The inputs are the item bounds in OpenGL coordinates.
+    // The outputs limit these bounds to visible ranges, normalized to range [-1, 1]
+    // Volume shader flips the Y and Z axes, so we need to set negatives of actual values to those
+    float itemRangeX = (maxBounds.x() - minBounds.x());
+    float itemRangeY = (maxBounds.y() - minBounds.y());
+    float itemRangeZ = (maxBounds.z() - minBounds.z());
+
+    if (minBounds.x() < -m_scaleX)
+        minBounds.setX(-1.0f + (2.0f * qAbs(minBounds.x() + m_scaleX) / itemRangeX));
+    else
+        minBounds.setX(-1.0f);
+
+    if (minBounds.y() < -m_scaleY)
+        minBounds.setY(-(-1.0f + (2.0f * qAbs(minBounds.y() + m_scaleY) / itemRangeY)));
+    else
+        minBounds.setY(1.0f);
+
+    if (minBounds.z() < -m_scaleZ)
+        minBounds.setZ(-(-1.0f + (2.0f * qAbs(minBounds.z() + m_scaleZ) / itemRangeZ)));
+    else
+        minBounds.setZ(1.0f);
+
+    if (maxBounds.x() > m_scaleX)
+        maxBounds.setX(1.0f - (2.0f * qAbs(maxBounds.x() - m_scaleX) / itemRangeX));
+    else
+        maxBounds.setX(1.0f);
+
+    if (maxBounds.y() > m_scaleY)
+        maxBounds.setY(-(1.0f - (2.0f * qAbs(maxBounds.y() - m_scaleY) / itemRangeY)));
+    else
+        maxBounds.setY(-1.0f);
+
+    if (maxBounds.z() > m_scaleZ)
+        maxBounds.setZ(-(1.0f - (2.0f * qAbs(maxBounds.z() - m_scaleZ) / itemRangeZ)));
+    else
+        maxBounds.setZ(-1.0f);
+}
+
 void Surface3DRenderer::updateData()
 {
     calculateSceneScalingFactors();

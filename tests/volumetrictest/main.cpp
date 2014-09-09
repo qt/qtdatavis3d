@@ -17,7 +17,6 @@
 ****************************************************************************/
 
 #include "volumetrictest.h"
-
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QWidget>
 #include <QtWidgets/QHBoxLayout>
@@ -32,7 +31,9 @@
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
-    Q3DScatter *graph = new Q3DScatter();
+    //Q3DScatter *graph = new Q3DScatter();
+    //Q3DSurface *graph = new Q3DSurface();
+    Q3DBars *graph = new Q3DBars();
     QWidget *container = QWidget::createWindowContainer(graph);
 
     QSize screenSize = graph->screen()->size();

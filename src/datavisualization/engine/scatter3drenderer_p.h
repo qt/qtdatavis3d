@@ -114,6 +114,7 @@ public slots:
 protected:
     virtual void initializeOpenGL();
     virtual void fixCameraTarget(QVector3D &target);
+    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);

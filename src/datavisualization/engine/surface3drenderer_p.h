@@ -111,6 +111,7 @@ public:
 protected:
     void initializeOpenGL();
     virtual void fixCameraTarget(QVector3D &target);
+    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
 
 signals:
     void flatShadingSupportedChanged(bool supported);

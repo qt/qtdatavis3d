@@ -31,9 +31,19 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * object is a box with a 3D texture. Three slice planes are supported for the volume, one along
  * each main axis of the volume.
  *
+ * Rendering volume objects is very performance intensive, especially when the volume is largely
+ * transparent, as the contents of the volume are ray-traced. The performance scales nearly linearly
+ * with the amount of pixels that the volume occupies on the screen, so showing the volume in a
+ * smaller view or limiting the zoom level of the graph are easy ways to improve performance.
+ * Similarly, the volume texture dimensions have a large impact on performance.
+ * If the frame rate is more important than pixel-perfect rendering of the volume contents, consider
+ * turning the high definition shader off by setting useHighDefShader property to \c{false}.
+ *
  * \note Volumetric objects are only supported with orthographic projection.
  *
- * \sa QAbstract3DGraph::addCustomItem(), QAbstract3DGraph::orthoProjection
+ * \note Volumetric objects utilize 3D textures, which are not supported in OpenGL ES2 environments.
+ *
+ * \sa QAbstract3DGraph::addCustomItem(), QAbstract3DGraph::orthoProjection, useHighDefShader
  */
 
 /*!
@@ -48,13 +58,23 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * object is a box with a 3D texture. Three slice planes are supported for the volume, one along
  * each main axis of the volume.
  *
+ * Rendering volume objects is very performance intensive, especially when the volume is largely
+ * transparent, as the contents of the volume are ray-traced. The performance scales nearly linearly
+ * with the amount of pixels that the volume occupies on the screen, so showing the volume in a
+ * smaller view or limiting the zoom level of the graph are easy ways to improve performance.
+ * Similarly, the volume texture dimensions have a large impact on performance.
+ * If the frame rate is more important than pixel-perfect rendering of the volume contents, consider
+ * turning the high definition shader off by setting useHighDefShader property to \c{false}.
+ *
  * \note: Filling in the volume data would not typically be efficient or practical from pure QML,
  * so properties directly related to that are not fully supported from QML.
- * Make a hybrid QML/C++ application if you want to use volume objects with QML ui.
+ * Make a hybrid QML/C++ application if you want to use volume objects with a QML UI.
  *
  * \note Volumetric objects are only supported with orthographic projection.
  *
- * \sa AbstractGraph3D::orthoProjection
+ * \note Volumetric objects utilize 3D textures, which are not supported in OpenGL ES2 environments.
+ *
+ * \sa AbstractGraph3D::orthoProjection, useHighDefShader
  */
 
 /*! \qmlproperty int Custom3DVolume::textureWidth

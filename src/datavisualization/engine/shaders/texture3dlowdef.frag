@@ -1,15 +1,17 @@
 #version 120
 
 varying highp vec3 pos;
+varying highp vec3 rayDir;
 
 uniform highp sampler3D textureSampler;
-uniform highp vec3 cameraPositionRelativeToModel;
 uniform highp vec4 colorIndex[256];
 uniform highp int color8Bit;
 uniform highp vec3 textureDimensions;
 uniform highp int sampleCount; // This is the maximum sample count
 uniform highp float alphaMultiplier;
 uniform highp int preserveOpacity;
+uniform highp vec3 minBounds;
+uniform highp vec3 maxBounds;
 
 // Ray traveling straight through a single 'alpha thickness' applies 100% of the encountered alpha.
 // Rays traveling shorter distances apply a fraction. This is used to normalize the alpha over
@@ -18,51 +20,36 @@ const highp float alphaThicknesses = 32.0;
 const highp float SQRT3 = 1.73205081;
 
 void main() {
-    highp vec3 rayDir = -(cameraPositionRelativeToModel - pos);
     vec3 rayStart = pos;
-    // Flip Y and Z so QImage bits work directly for texture and first image is in the front
-    rayDir.yz = -rayDir.yz;
-    rayStart.yz = -rayStart.yz;
+    highp vec3 startBounds = minBounds;
+    highp vec3 endBounds = maxBounds;
+    if (rayDir.x < 0.0) {
+        startBounds.x = maxBounds.x;
+        endBounds.x = minBounds.x;
+    }
+    if (rayDir.y > 0.0) {
+        startBounds.y = maxBounds.y;
+        endBounds.y = minBounds.y;
+    }
+    if (rayDir.z > 0.0) {
+        startBounds.z = maxBounds.z;
+        endBounds.z = minBounds.z;
+    }
 
     // Calculate ray intersection endpoint
-    vec3 rayStop;
-    if (rayDir.x == 0.0) {
-        rayStop.yz = rayStart.yz;
-        rayStop.x = -rayStart.x;
-    } else if (rayDir.y == 0.0) {
-        rayStop.xz = rayStart.xz;
-        rayStop.y = -rayStart.y;
-    } else if (rayDir.z == 0.0) {
-        rayStop.xy = rayStart.xy;
-        rayStop.z = -rayStart.z;
-    } else {
-        highp vec3 boxBounds = vec3(1.0, 1.0, 1.0);
-        highp vec3 invRayDir = 1.0 / rayDir;
-        if (rayDir.x < 0)
-            boxBounds.x = -1.0;
-        if (rayDir.y < 0)
-            boxBounds.y = -1.0;
-        if (rayDir.z < 0)
-            boxBounds.z = -1.0;
-        highp vec3 t = (boxBounds - rayStart) * invRayDir;
-        highp float minT = min(t.x, min(t.y, t.z));
-        rayStop = rayStart + minT * rayDir;
-    }
+    highp vec3 rayStop;
+    highp vec3 invRayDir = 1.0 / rayDir;
+    highp vec3 t = (endBounds - rayStart) * invRayDir;
+    highp float endT = min(t.x, min(t.y, t.z));
+    if (endT <= 0.0)
+        discard;
+    rayStop = rayStart + endT * rayDir;
 
     // Convert intersections to texture coords
     rayStart = 0.5 * (rayStart + 1.0);
     rayStop = 0.5 * (rayStop + 1.0);
 
     highp vec3 ray = rayStop - rayStart;
-
-    // Avoid artifacts from divisions by zero
-    if (ray.x == 0)
-        ray.x = 0.000000001;
-    if (ray.y == 0)
-        ray.y = 0.000000001;
-    if (ray.z == 0)
-        ray.z = 0.000000001;
-
 
     highp float fullDist = length(ray);
     highp float stepSize = SQRT3 / sampleCount;
@@ -109,6 +96,9 @@ void main() {
         if (curLen >= fullDist || totalOpacity <= 0.0)
             break;
     }
+
+    if (totalOpacity == 1.0)
+        discard;
 
     // Brighten up the final color if there is some transparency left
     if (totalOpacity >= 0.0 && totalOpacity < 1.0)

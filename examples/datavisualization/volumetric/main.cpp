@@ -104,6 +104,26 @@ int main(int argc, char **argv)
     textureDetailVBox->addWidget(highDetailRB);
     textureDetailGroupBox->setLayout(textureDetailVBox);
 
+    QGroupBox *areaGroupBox = new QGroupBox(QStringLiteral("Show area"));
+
+    QRadioButton *areaAllRB = new QRadioButton(widget);
+    areaAllRB->setText(QStringLiteral("Whole region"));
+    areaAllRB->setChecked(true);
+
+    QRadioButton *areaMineRB = new QRadioButton(widget);
+    areaMineRB->setText(QStringLiteral("The mine"));
+    areaMineRB->setChecked(false);
+
+    QRadioButton *areaMountainRB = new QRadioButton(widget);
+    areaMountainRB->setText(QStringLiteral("The mountain"));
+    areaMountainRB->setChecked(false);
+
+    QVBoxLayout *areaVBox = new QVBoxLayout;
+    areaVBox->addWidget(areaAllRB);
+    areaVBox->addWidget(areaMineRB);
+    areaVBox->addWidget(areaMountainRB);
+    areaGroupBox->setLayout(areaVBox);
+
     QCheckBox *colorTableCheckBox = new QCheckBox(widget);
     colorTableCheckBox->setText(QStringLiteral("Alternate color table"));
     colorTableCheckBox->setChecked(false);
@@ -143,6 +163,11 @@ int main(int argc, char **argv)
     useHighDefShaderCheckBox->setText(QStringLiteral("Use HD shader"));
     useHighDefShaderCheckBox->setChecked(true);
 
+    QLabel *performanceNoteLabel =
+            new QLabel(QStringLiteral(
+                           "Note: A high end graphics card is\nrecommended with the HD shader\nwhen the volume contains a lot of\ntransparent areas."));
+    performanceNoteLabel->setFrameShape(QFrame::Box);
+
     vLayout->addWidget(sliceXCheckBox);
     vLayout->addWidget(sliceXSlider);
     vLayout->addWidget(sliceImageXLabel);
@@ -155,12 +180,14 @@ int main(int argc, char **argv)
     vLayout2->addWidget(fpsCheckBox);
     vLayout2->addWidget(fpsLabel);
     vLayout2->addWidget(textureDetailGroupBox);
+    vLayout2->addWidget(areaGroupBox);
     vLayout2->addWidget(colorTableCheckBox);
     vLayout2->addWidget(alphaMultiplierLabel);
     vLayout2->addWidget(alphaMultiplierSlider);
     vLayout2->addWidget(preserveOpacityCheckBox);
     vLayout2->addWidget(transparentGroundCheckBox);
-    vLayout2->addWidget(useHighDefShaderCheckBox, 1, Qt::AlignTop);
+    vLayout2->addWidget(useHighDefShaderCheckBox);
+    vLayout2->addWidget(performanceNoteLabel, 1, Qt::AlignTop);
 
     VolumetricModifier *modifier = new VolumetricModifier(graph);
     modifier->setFpsLabel(fpsLabel);
@@ -201,6 +228,12 @@ int main(int argc, char **argv)
                      &VolumetricModifier::setUseHighDefShader);
     QObject::connect(alphaMultiplierSlider, &QSlider::valueChanged, modifier,
                      &VolumetricModifier::adjustAlphaMultiplier);
+    QObject::connect(areaAllRB, &QRadioButton::toggled, modifier,
+                     &VolumetricModifier::toggleAreaAll);
+    QObject::connect(areaMineRB, &QRadioButton::toggled, modifier,
+                     &VolumetricModifier::toggleAreaMine);
+    QObject::connect(areaMountainRB, &QRadioButton::toggled, modifier,
+                     &VolumetricModifier::toggleAreaMountain);
 
     widget->show();
     return app.exec();

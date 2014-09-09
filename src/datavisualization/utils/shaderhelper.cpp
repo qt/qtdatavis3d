@@ -101,6 +101,8 @@ void ShaderHelper::initialize()
     m_sampleCountUniform = m_program->uniformLocation("sampleCount");
     m_alphaMultiplierUniform = m_program->uniformLocation("alphaMultiplier");
     m_preserveOpacityUniform = m_program->uniformLocation("preserveOpacity");
+    m_minBoundsUniform = m_program->uniformLocation("minBounds");
+    m_maxBoundsUniform = m_program->uniformLocation("maxBounds");
     m_initialized = true;
 }
 
@@ -322,6 +324,20 @@ GLuint ShaderHelper::preserveOpacity()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_preserveOpacityUniform;
+}
+
+GLuint ShaderHelper::maxBounds()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_maxBoundsUniform;
+}
+
+GLuint ShaderHelper::minBounds()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_minBoundsUniform;
 }
 
 GLuint ShaderHelper::posAtt()

@@ -205,7 +205,8 @@ protected:
     virtual void fixCameraTarget(QVector3D &target) = 0;
     void updateCameraViewport();
 
-    void recalculateCustomItemScaling(CustomRenderItem *item);
+    void recalculateCustomItemScalingAndPos(CustomRenderItem *item);
+    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds) = 0;
 
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;

@@ -63,6 +63,9 @@ public slots:
     void setTransparentGround(bool enabled);
     void setUseHighDefShader(bool enabled);
     void adjustAlphaMultiplier(int value);
+    void toggleAreaAll(bool enabled);
+    void toggleAreaMine(bool enabled);
+    void toggleAreaMountain(bool enabled);
 
 private:
 

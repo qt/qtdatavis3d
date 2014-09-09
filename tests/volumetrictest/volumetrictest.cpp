@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "volumetrictest.h"
+#include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
@@ -31,14 +32,14 @@
 using namespace QtDataVisualization;
 
 const int imageCount = 512;
-const float xMiddle = 10.0f;
-const float yMiddle = 12.5f;
-const float zMiddle = -40.0f;
+const float xMiddle = 100.0f;
+const float yMiddle = 2.5f;
+const float zMiddle = 100.0f;
 const float xRange = 40.0f;
 const float yRange = 7.5f;
 const float zRange = 20.0f;
 
-VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
+VolumetricModifier::VolumetricModifier(QAbstract3DGraph *scatter)
     : m_graph(scatter),
       m_volumeItem(0),
       m_volumeItem2(0),
@@ -52,13 +53,55 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_graph->setOrthoProjection(true);
-    //m_graph->scene()->activeCamera()->setTarget(QVector3D(0.5f, 0.5f, 0.5f));
-    m_graph->axisX()->setRange(xMiddle - xRange, xMiddle + xRange);
-    m_graph->axisX()->setSegmentCount(8);
-    m_graph->axisY()->setRange(yMiddle - yRange, yMiddle + yRange);
-    m_graph->axisY()->setSegmentCount(3);
-    m_graph->axisZ()->setRange(zMiddle - zRange, zMiddle + zRange);
-    m_graph->axisZ()->setSegmentCount(8);
+    //m_graph->scene()->activeCamera()->setTarget(QVector3D(-2.0f, 1.0f, 2.0f));
+    m_scatterGraph = qobject_cast<Q3DScatter *>(m_graph);
+    m_surfaceGraph = qobject_cast<Q3DSurface *>(m_graph);
+    m_barGraph = qobject_cast<Q3DBars *>(m_graph);
+    if (m_scatterGraph) {
+        m_scatterGraph->axisX()->setRange(xMiddle - xRange, xMiddle + xRange);
+        m_scatterGraph->axisX()->setSegmentCount(8);
+        m_scatterGraph->axisY()->setRange(yMiddle - yRange, yMiddle + yRange);
+        m_scatterGraph->axisY()->setSegmentCount(3);
+        m_scatterGraph->axisZ()->setRange(zMiddle - zRange, zMiddle + zRange);
+        m_scatterGraph->axisZ()->setSegmentCount(8);
+    } else if (m_surfaceGraph) {
+        m_surfaceGraph->axisX()->setRange(xMiddle - xRange, xMiddle + xRange);
+        m_surfaceGraph->axisX()->setSegmentCount(8);
+        m_surfaceGraph->axisY()->setRange(yMiddle - yRange, yMiddle + yRange);
+        m_surfaceGraph->axisY()->setSegmentCount(3);
+        m_surfaceGraph->axisZ()->setRange(zMiddle - zRange, zMiddle + zRange);
+        m_surfaceGraph->axisZ()->setSegmentCount(8);
+    } else if (m_barGraph) {
+        QStringList rowLabels;
+        QStringList columnLabels;
+        for (int i = 0; i < xMiddle + xRange; i++) {
+            if (i % 5 == 0)
+                columnLabels << QString::number(i);
+            else
+                columnLabels << QString();
+        }
+        for (int i = 0; i < zMiddle + zRange; i++) {
+            if (i % 5 == 0)
+                rowLabels << QString::number(i);
+            else
+                rowLabels << QString();
+        }
+
+        QBar3DSeries *series = new QBar3DSeries;
+        QBarDataArray *array = new QBarDataArray();
+        array->reserve(zRange * 2 + 1);
+        for (int i = 0; i < zRange * 2 + 1; i++)
+            array->append(new QBarDataRow(xRange * 2 + 1));
+
+        series->dataProxy()->resetArray(array, rowLabels, columnLabels);
+        m_barGraph->addSeries(series);
+
+        m_barGraph->columnAxis()->setRange(xMiddle - xRange, xMiddle + xRange);
+        m_barGraph->valueAxis()->setRange(yMiddle - yRange, yMiddle + yRange);
+        m_barGraph->rowAxis()->setRange(zMiddle - zRange, zMiddle + zRange);
+        //m_barGraph->setReflection(true);
+    }
+    m_graph->activeTheme()->setBackgroundEnabled(false);
 
     createVolume();
     createAnotherVolume();
@@ -67,6 +110,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
 //    m_volumeItem->setUseHighDefShader(false);
 //    m_volumeItem2->setUseHighDefShader(false);
 //    m_volumeItem3->setUseHighDefShader(false);
+
     m_volumeItem->setScalingAbsolute(false);
     m_volumeItem2->setScalingAbsolute(false);
     m_volumeItem3->setScalingAbsolute(false);
@@ -81,7 +125,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_plainItem->setMeshFile(QStringLiteral(":/mesh"));
     m_plainItem->setTextureImage(texture);
     m_plainItem->setRotation(m_volumeItem->rotation());
-    m_plainItem->setPosition(QVector3D(30.0f, 17.5f, -30.0f));
+    m_plainItem->setPosition(QVector3D(xMiddle + xRange / 2.0f, yMiddle + yRange / 2.0f, zMiddle));
     m_plainItem->setScaling(QVector3D(20.0f, 5.0f, 10.0f));
     m_plainItem->setScalingAbsolute(false);
 
@@ -243,19 +287,34 @@ void VolumetricModifier::testSubtextureSetting()
 void VolumetricModifier::adjustRangeX(int value)
 {
     float adjustment = float(value - 512) / 10.0f;
-    m_graph->axisX()->setRange(xMiddle + adjustment - xRange, xMiddle + adjustment + xRange);
+    if (m_scatterGraph)
+        m_scatterGraph->axisX()->setRange(xMiddle + adjustment - xRange, xMiddle + adjustment + xRange);
+    if (m_surfaceGraph)
+        m_surfaceGraph->axisX()->setRange(xMiddle + adjustment - xRange, xMiddle + adjustment + xRange);
+    if (m_barGraph)
+        m_barGraph->columnAxis()->setRange(xMiddle + adjustment - xRange, xMiddle + adjustment + xRange);
 }
 
 void VolumetricModifier::adjustRangeY(int value)
 {
     float adjustment = float(value - 512) / 10.0f;
-    m_graph->axisY()->setRange(yMiddle + adjustment - yRange, yMiddle + adjustment + yRange);
+    if (m_scatterGraph)
+        m_scatterGraph->axisY()->setRange(yMiddle + adjustment - yRange, yMiddle + adjustment + yRange);
+    if (m_surfaceGraph)
+        m_surfaceGraph->axisY()->setRange(yMiddle + adjustment - yRange, yMiddle + adjustment + yRange);
+    if (m_barGraph)
+        m_barGraph->valueAxis()->setRange(yMiddle + adjustment - yRange, yMiddle + adjustment + yRange);
 }
 
 void VolumetricModifier::adjustRangeZ(int value)
 {
     float adjustment = float(value - 512) / 10.0f;
-    m_graph->axisZ()->setRange(zMiddle + adjustment - zRange, zMiddle + adjustment + zRange);
+    if (m_scatterGraph)
+        m_scatterGraph->axisZ()->setRange(zMiddle + adjustment - zRange, zMiddle + adjustment + zRange);
+    if (m_surfaceGraph)
+        m_surfaceGraph->axisZ()->setRange(zMiddle + adjustment - zRange, zMiddle + adjustment + zRange);
+    if (m_barGraph)
+        m_barGraph->rowAxis()->setRange(zMiddle + adjustment - zRange, zMiddle + adjustment + zRange);
 }
 
 void VolumetricModifier::testBoundsSetting()
@@ -303,6 +362,7 @@ void VolumetricModifier::createVolume()
     m_volumeItem->setTextureFormat(QImage::Format_ARGB32);
 //    m_volumeItem->setRotation(QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 0.0f, 10.0f));
     m_volumeItem->setPosition(QVector3D(xMiddle - (xRange / 2.0f), yMiddle + (yRange / 2.0f), zMiddle));
+    //m_volumeItem->setPosition(QVector3D(xMiddle, yMiddle, zMiddle));
 
     QImage logo;
     logo.load(QStringLiteral(":/logo_no_padding.png"));
