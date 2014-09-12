@@ -168,6 +168,10 @@ int main(int argc, char **argv)
                            "Note: A high end graphics card is\nrecommended with the HD shader\nwhen the volume contains a lot of\ntransparent areas."));
     performanceNoteLabel->setFrameShape(QFrame::Box);
 
+    QCheckBox *drawSliceFramesCheckBox = new QCheckBox(widget);
+    drawSliceFramesCheckBox->setText(QStringLiteral("Draw slice frames"));
+    drawSliceFramesCheckBox->setChecked(false);
+
     vLayout->addWidget(sliceXCheckBox);
     vLayout->addWidget(sliceXSlider);
     vLayout->addWidget(sliceImageXLabel);
@@ -176,7 +180,8 @@ int main(int argc, char **argv)
     vLayout->addWidget(sliceImageYLabel);
     vLayout->addWidget(sliceZCheckBox);
     vLayout->addWidget(sliceZSlider);
-    vLayout->addWidget(sliceImageZLabel, 1, Qt::AlignTop);
+    vLayout->addWidget(sliceImageZLabel);
+    vLayout->addWidget(drawSliceFramesCheckBox, 1, Qt::AlignTop);
     vLayout2->addWidget(fpsCheckBox);
     vLayout2->addWidget(fpsLabel);
     vLayout2->addWidget(textureDetailGroupBox);
@@ -234,6 +239,8 @@ int main(int argc, char **argv)
                      &VolumetricModifier::toggleAreaMine);
     QObject::connect(areaMountainRB, &QRadioButton::toggled, modifier,
                      &VolumetricModifier::toggleAreaMountain);
+    QObject::connect(drawSliceFramesCheckBox, &QCheckBox::stateChanged, modifier,
+                     &VolumetricModifier::setDrawSliceFrames);
 
     widget->show();
     return app.exec();

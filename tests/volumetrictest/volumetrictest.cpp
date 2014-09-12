@@ -360,9 +360,11 @@ void VolumetricModifier::createVolume()
 {
     m_volumeItem = new QCustom3DVolume;
     m_volumeItem->setTextureFormat(QImage::Format_ARGB32);
-//    m_volumeItem->setRotation(QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 0.0f, 10.0f));
+    m_volumeItem->setRotation(QQuaternion::fromAxisAndAngle(1.0f, 1.0f, 0.0f, 20.0f));
     m_volumeItem->setPosition(QVector3D(xMiddle - (xRange / 2.0f), yMiddle + (yRange / 2.0f), zMiddle));
     //m_volumeItem->setPosition(QVector3D(xMiddle, yMiddle, zMiddle));
+    m_volumeItem->setDrawSliceFrames(true);
+    m_volumeItem->setDrawSlices(true);
 
     QImage logo;
     logo.load(QStringLiteral(":/logo_no_padding.png"));

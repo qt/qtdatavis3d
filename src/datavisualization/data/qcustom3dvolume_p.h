@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 struct QCustomVolumeDirtyBitField {
     bool textureDimensionsDirty : 1;
-    bool sliceIndicesDirty      : 1;
+    bool slicesDirty            : 1;
     bool colorTableDirty        : 1;
     bool textureDataDirty       : 1;
     bool textureFormatDirty     : 1;
@@ -45,7 +45,7 @@ struct QCustomVolumeDirtyBitField {
 
     QCustomVolumeDirtyBitField()
         : textureDimensionsDirty(false),
-          sliceIndicesDirty(false),
+          slicesDirty(false),
           colorTableDirty(false),
           textureDataDirty(false),
           textureFormatDirty(false),
@@ -87,6 +87,13 @@ public:
     float m_alphaMultiplier;
     bool m_preserveOpacity;
     bool m_useHighDefShader;
+
+    bool m_drawSlices;
+    bool m_drawSliceFrames;
+    QColor m_sliceFrameColor;
+    QVector3D m_sliceFrameWidths;
+    QVector3D m_sliceFrameGaps;
+    QVector3D m_sliceFrameThicknesses;
 
     QCustomVolumeDirtyBitField m_dirtyBitsVolume;
 

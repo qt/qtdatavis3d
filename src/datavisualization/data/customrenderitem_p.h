@@ -33,6 +33,7 @@
 #include "objecthelper_p.h"
 #include <QtGui/QRgb>
 #include <QtGui/QImage>
+#include <QtGui/QColor>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -50,13 +51,13 @@ public:
     void setMesh(const QString &meshFile);
     inline ObjectHelper *mesh() const { return m_object; }
     inline void setScaling(const QVector3D &scaling) { m_scaling = scaling; }
-    inline QVector3D scaling() const { return m_scaling; }
+    inline const QVector3D &scaling() const { return m_scaling; }
     inline void setOrigScaling(const QVector3D &scaling) { m_origScaling = scaling; }
-    inline QVector3D origScaling() const { return m_origScaling; }
+    inline const QVector3D &origScaling() const { return m_origScaling; }
     inline void setPosition(const QVector3D &position) { m_position = position; }
-    inline QVector3D position() const { return m_position; }
+    inline const QVector3D &position() const { return m_position; }
     inline void setOrigPosition(const QVector3D &position) { m_origPosition = position; }
-    inline QVector3D origPosition() const { return m_origPosition; }
+    inline const QVector3D &origPosition() const { return m_origPosition; }
     inline void setPositionAbsolute(bool absolute) { m_positionAbsolute = absolute; }
     inline bool isPositionAbsolute() const { return m_positionAbsolute; }
     inline void setScalingAbsolute(bool absolute) { m_scalingAbsolute = absolute; }
@@ -80,11 +81,11 @@ public:
     inline bool isLabel() const { return m_labelItem; }
 
     // Volume specific
-    inline void setTextureWidth(int width) { m_textureWidth = width; }
+    inline void setTextureWidth(int width) { m_textureWidth = width; setSliceIndexX(m_sliceIndexX); }
     inline int textureWidth() const { return m_textureWidth; }
-    inline void setTextureHeight(int height) { m_textureHeight = height; }
+    inline void setTextureHeight(int height) { m_textureHeight = height; setSliceIndexY(m_sliceIndexY); }
     inline int textureHeight() const { return m_textureHeight; }
-    inline void setTextureDepth(int depth) { m_textureDepth = depth; }
+    inline void setTextureDepth(int depth) { m_textureDepth = depth; setSliceIndexZ(m_sliceIndexZ); }
     inline int textureDepth() const { return m_textureDepth; }
     inline int textureSize() const { return m_textureWidth * m_textureHeight * m_textureDepth; }
     inline void setColorTable(const QVector<QVector4D> &colors) { m_colorTable = colors; }
@@ -94,9 +95,22 @@ public:
     inline bool isVolume() const { return m_isVolume; }
     inline void setTextureFormat(QImage::Format format) { m_textureFormat = format; }
     inline QImage::Format textureFormat() const { return m_textureFormat; }
-    inline void setSliceIndexX(int index) { m_sliceIndexX = index; }
-    inline void setSliceIndexY(int index) { m_sliceIndexY = index; }
-    inline void setSliceIndexZ(int index) { m_sliceIndexZ = index; }
+    inline void setSliceIndexX(int index)
+    {
+        m_sliceIndexX = index;
+        m_sliceFractions.setX((float(index) + 0.5f) / float(m_textureWidth) * 2.0 - 1.0);
+    }
+    inline void setSliceIndexY(int index)
+    {
+        m_sliceIndexY = index;
+        m_sliceFractions.setY((float(index) + 0.5f) / float(m_textureHeight) * 2.0 - 1.0);
+    }
+    inline void setSliceIndexZ(int index)
+    {
+        m_sliceIndexZ = index;
+        m_sliceFractions.setZ((float(index) + 0.5f) / float(m_textureDepth) * 2.0 - 1.0);
+    }
+    inline const QVector3D &sliceFractions() const { return m_sliceFractions; }
     inline int sliceIndexX() const { return m_sliceIndexX; }
     inline int sliceIndexY() const { return m_sliceIndexY; }
     inline int sliceIndexZ() const { return m_sliceIndexZ; }
@@ -106,25 +120,24 @@ public:
     inline bool preserveOpacity() const { return m_preserveOpacity; }
     inline void setUseHighDefShader(bool enable) { m_useHighDefShader = enable; }
     inline bool useHighDefShader() const {return m_useHighDefShader; }
-    inline void setMinBounds(const QVector3D &bounds) {
-        m_minBounds = bounds;
-        m_minBoundsNormal = m_minBounds;
-        m_minBoundsNormal.setY(-m_minBoundsNormal.y());
-        m_minBoundsNormal.setZ(-m_minBoundsNormal.z());
-        m_minBoundsNormal = 0.5f * (m_minBoundsNormal + oneVector);
-
-    }
-    inline QVector3D minBounds() const { return m_minBounds; }
-    inline void setMaxBounds(const QVector3D &bounds) {
-        m_maxBounds = bounds;
-        m_maxBoundsNormal = m_maxBounds;
-        m_maxBoundsNormal.setY(-m_maxBoundsNormal.y());
-        m_maxBoundsNormal.setZ(-m_maxBoundsNormal.z());
-        m_maxBoundsNormal = 0.5f * (m_maxBoundsNormal + oneVector);
-    }
-    inline QVector3D maxBounds() const { return m_maxBounds; }
-    inline QVector3D minBoundsNormal() const { return m_minBoundsNormal; }
-    inline QVector3D maxBoundsNormal() const { return m_maxBoundsNormal; }
+    void setMinBounds(const QVector3D &bounds);
+    inline const QVector3D &minBounds() const { return m_minBounds; }
+    void setMaxBounds(const QVector3D &bounds);
+    inline const QVector3D &maxBounds() const { return m_maxBounds; }
+    inline const QVector3D &minBoundsNormal() const { return m_minBoundsNormal; }
+    inline const QVector3D &maxBoundsNormal() const { return m_maxBoundsNormal; }
+    inline void setDrawSlices(bool enable) { m_drawSlices = enable; }
+    inline bool drawSlices() const {return m_drawSlices; }
+    inline void setDrawSliceFrames(bool enable) { m_drawSliceFrames = enable; }
+    inline bool drawSliceFrames() const {return m_drawSliceFrames; }
+    void setSliceFrameColor(const QColor &color);
+    inline const QVector4D &sliceFrameColor() const { return m_sliceFrameColor; }
+    inline void setSliceFrameWidths(const QVector3D &widths) { m_sliceFrameWidths = widths * 2.0f; }
+    inline const QVector3D &sliceFrameWidths() const { return m_sliceFrameWidths; }
+    inline void setSliceFrameGaps(const QVector3D &gaps) { m_sliceFrameGaps = gaps * 2.0f; }
+    inline const QVector3D &sliceFrameGaps() const { return m_sliceFrameGaps; }
+    inline void setSliceFrameThicknesses(const QVector3D &thicknesses) { m_sliceFrameThicknesses = thicknesses; }
+    inline const QVector3D &sliceFrameThicknesses() const { return m_sliceFrameThicknesses; }
 
 private:
     Q_DISABLE_COPY(CustomRenderItem)
@@ -157,6 +170,7 @@ private:
     int m_sliceIndexX;
     int m_sliceIndexY;
     int m_sliceIndexZ;
+    QVector3D m_sliceFractions;
     float m_alphaMultiplier;
     bool m_preserveOpacity;
     bool m_useHighDefShader;
@@ -164,6 +178,12 @@ private:
     QVector3D m_maxBounds;
     QVector3D m_minBoundsNormal;
     QVector3D m_maxBoundsNormal;
+    bool m_drawSlices;
+    bool m_drawSliceFrames;
+    QVector4D m_sliceFrameColor;
+    QVector3D m_sliceFrameWidths;
+    QVector3D m_sliceFrameGaps;
+    QVector3D m_sliceFrameThicknesses;
 };
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 

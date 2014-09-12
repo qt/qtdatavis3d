@@ -52,6 +52,7 @@ class ShaderHelper
     bool testCompile();
     void bind();
     void release();
+    void setUniformValue(GLuint uniform, const QVector2D &value);
     void setUniformValue(GLuint uniform, const QVector3D &value);
     void setUniformValue(GLuint uniform, const QVector4D &value);
     void setUniformValue(GLuint uniform, const QMatrix4x4 &value);
@@ -84,6 +85,7 @@ class ShaderHelper
     GLuint preserveOpacity();
     GLuint maxBounds();
     GLuint minBounds();
+    GLuint sliceFrameWidth();
 
     GLuint posAtt();
     GLuint uvAtt();
@@ -128,6 +130,7 @@ class ShaderHelper
     GLuint m_preserveOpacityUniform;
     GLuint m_minBoundsUniform;
     GLuint m_maxBoundsUniform;
+    GLuint m_sliceFrameWidthUniform;
 
     GLboolean m_initialized;
 };

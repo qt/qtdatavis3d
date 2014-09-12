@@ -45,7 +45,10 @@ CustomRenderItem::CustomRenderItem()
       m_sliceIndexZ(-1),
       m_alphaMultiplier(1.0f),
       m_preserveOpacity(true),
-      m_useHighDefShader(true)
+      m_useHighDefShader(true),
+      m_drawSlices(false),
+      m_drawSliceFrames(false)
+
 {
 }
 
@@ -73,6 +76,33 @@ void CustomRenderItem::setColorTable(const QVector<QRgb> &colors)
             m_colorTable[i] = QVector4D(0.0f, 0.0f, 0.0f, 0.0f);
         }
     }
+}
+
+void CustomRenderItem::setMinBounds(const QVector3D &bounds)
+{
+    m_minBounds = bounds;
+    m_minBoundsNormal = m_minBounds;
+    m_minBoundsNormal.setY(-m_minBoundsNormal.y());
+    m_minBoundsNormal.setZ(-m_minBoundsNormal.z());
+    m_minBoundsNormal = 0.5f * (m_minBoundsNormal + oneVector);
+}
+
+void CustomRenderItem::setMaxBounds(const QVector3D &bounds)
+{
+    m_maxBounds = bounds;
+    m_maxBoundsNormal = m_maxBounds;
+    m_maxBoundsNormal.setY(-m_maxBoundsNormal.y());
+    m_maxBoundsNormal.setZ(-m_maxBoundsNormal.z());
+    m_maxBoundsNormal = 0.5f * (m_maxBoundsNormal + oneVector);
+}
+
+void CustomRenderItem::setSliceFrameColor(const QColor &color)
+{
+    const QRgb &rgb = color.rgba();
+    m_sliceFrameColor = QVector4D(float(qRed(rgb)) / 255.0f,
+                                  float(qGreen(rgb)) / 255.0f,
+                                  float(qBlue(rgb)) / 255.0f,
+                                  float(1.0f)); // Alpha not supported for frames
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

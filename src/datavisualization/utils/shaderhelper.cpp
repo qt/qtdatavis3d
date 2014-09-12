@@ -103,6 +103,7 @@ void ShaderHelper::initialize()
     m_preserveOpacityUniform = m_program->uniformLocation("preserveOpacity");
     m_minBoundsUniform = m_program->uniformLocation("minBounds");
     m_maxBoundsUniform = m_program->uniformLocation("maxBounds");
+    m_sliceFrameWidthUniform = m_program->uniformLocation("sliceFrameWidth");
     m_initialized = true;
 }
 
@@ -133,6 +134,11 @@ void ShaderHelper::bind()
 void ShaderHelper::release()
 {
     m_program->release();
+}
+
+void ShaderHelper::setUniformValue(GLuint uniform, const QVector2D &value)
+{
+    m_program->setUniformValue(uniform, value);
 }
 
 void ShaderHelper::setUniformValue(GLuint uniform, const QVector3D &value)
@@ -338,6 +344,14 @@ GLuint ShaderHelper::minBounds()
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_minBoundsUniform;
+}
+
+GLuint ShaderHelper::sliceFrameWidth()
+{
+
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_sliceFrameWidthUniform;
 }
 
 GLuint ShaderHelper::posAtt()

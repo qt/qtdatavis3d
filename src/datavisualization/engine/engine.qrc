@@ -66,5 +66,7 @@
         <file alias="vertexNoMatrices">shaders/defaultNoMatrices.vert</file>
         <file alias="fragmentTexture3DLowDef">shaders/texture3dlowdef.frag</file>
         <file alias="vertexPointES2_UV">shaders/point_ES2_UV.vert</file>
+        <file alias="fragment3DSliceFrames">shaders/3dsliceframes.frag</file>
+        <file alias="colorAndPosition">shaders/colorandposition.vert</file>
     </qresource>
 </RCC>

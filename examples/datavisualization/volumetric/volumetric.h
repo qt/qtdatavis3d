@@ -66,6 +66,7 @@ public slots:
     void toggleAreaAll(bool enabled);
     void toggleAreaMine(bool enabled);
     void toggleAreaMountain(bool enabled);
+    void setDrawSliceFrames(int enabled);
 
 private:
 
@@ -76,12 +77,16 @@ private:
     int excavateMineShaft(int textureSize, int startIndex, int count,
                           QVector<uchar> *textureData);
     void excavateMineBlock(int textureSize, int dataIndex, int size, QVector<uchar> *textureData);
+    void handleSlicingChanges();
 
     Q3DScatter *m_graph;
     QCustom3DVolume *m_volumeItem;
     int m_sliceIndexX;
     int m_sliceIndexY;
     int m_sliceIndexZ;
+    bool m_slicingX;
+    bool m_slicingY;
+    bool m_slicingZ;
     QLabel *m_fpsLabel;
     QRadioButton *m_mediumDetailRB;
     QRadioButton *m_highDetailRB;

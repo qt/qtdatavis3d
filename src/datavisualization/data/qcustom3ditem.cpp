@@ -101,7 +101,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * values. Defaults to \c{true}. Items with absolute scaling will be rendered at the same
  * size, regardless of axis ranges. Items with data scaling will change their apparent size
  * according to the axis ranges. If positionAbsolute value is \c{true}, this property is ignored
- * and scaling is interpreted as an absolute value.
+ * and scaling is interpreted as an absolute value. If the item has rotation, the data scaling
+ * is calculated on the unrotated item. Similarly, for Custom3DVolume items, the range clipping
+ * is calculated on the unrotated item.
  *
  * \note: Only absolute scaling is supported for Custom3DLabel items or for custom items used in
  * \l{AbstractGraph3D::polar}{polar} graphs.
@@ -282,7 +284,9 @@ QVector3D QCustom3DItem::scaling() const
  * values. Defaults to \c{true}. Items with absolute scaling will be rendered at the same
  * size, regardless of axis ranges. Items with data scaling will change their apparent size
  * according to the axis ranges. If positionAbsolute value is \c{true}, this property is ignored
- * and scaling is interpreted as an absolute value.
+ * and scaling is interpreted as an absolute value. If the item has rotation, the data scaling
+ * is calculated on the unrotated item. Similarly, for QCustom3DVolume items, the range clipping
+ * is calculated on the unrotated item.
  *
  * \note: Only absolute scaling is supported for QCustom3DLabel items or for custom items used in
  * \l{QAbstract3DGraph::polar}{polar} graphs.
@@ -438,7 +442,7 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q) :
     m_positionAbsolute(false),
     m_scaling(QVector3D(0.1f, 0.1f, 0.1f)),
     m_scalingAbsolute(true),
-    m_rotation(QQuaternion(0.0f, 0.0f, 0.0f, 0.0f)),
+    m_rotation(identityQuaternion),
     m_visible(true),
     m_shadowCasting(true),
     m_isLabelItem(false),

@@ -62,6 +62,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_volumeTextureShader(0),
       m_volumeTextureLowDefShader(0),
       m_volumeTextureSliceShader(0),
+      m_volumeSliceFrameShader(0),
       m_useOrthoProjection(false),
       m_xFlipped(false),
       m_yFlipped(false),
@@ -105,6 +106,7 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_customItemShader;
     delete m_volumeTextureShader;
     delete m_volumeTextureLowDefShader;
+    delete m_volumeSliceFrameShader;
     delete m_volumeTextureSliceShader;
 
     foreach (SeriesRenderCache *cache, m_renderCacheList) {
@@ -208,7 +210,9 @@ void Abstract3DRenderer::initCustomItemShaders(const QString &vertexShader,
 void Abstract3DRenderer::initVolumeTextureShaders(const QString &vertexShader,
                                                   const QString &fragmentShader,
                                                   const QString &fragmentLowDefShader,
-                                                  const QString &sliceShader)
+                                                  const QString &sliceShader,
+                                                  const QString &sliceFrameVertexShader,
+                                                  const QString &sliceFrameShader)
 {
 
     delete m_volumeTextureShader;
@@ -216,13 +220,16 @@ void Abstract3DRenderer::initVolumeTextureShaders(const QString &vertexShader,
     m_volumeTextureShader->initialize();
 
     delete m_volumeTextureLowDefShader;
-    m_volumeTextureLowDefShader = new ShaderHelper(this, vertexShader,
-                                                   fragmentLowDefShader);
+    m_volumeTextureLowDefShader = new ShaderHelper(this, vertexShader, fragmentLowDefShader);
     m_volumeTextureLowDefShader->initialize();
 
     delete m_volumeTextureSliceShader;
     m_volumeTextureSliceShader = new ShaderHelper(this, vertexShader, sliceShader);
     m_volumeTextureSliceShader->initialize();
+
+    delete m_volumeSliceFrameShader;
+    m_volumeSliceFrameShader = new ShaderHelper(this, sliceFrameVertexShader, sliceFrameShader);
+    m_volumeSliceFrameShader->initialize();
 }
 
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
@@ -327,7 +334,9 @@ void Abstract3DRenderer::reInitShaders()
     initVolumeTextureShaders(QStringLiteral(":/shaders/vertexTexture3D"),
                              QStringLiteral(":/shaders/fragmentTexture3D"),
                              QStringLiteral(":/shaders/fragmentTexture3DLowDef"),
-                             QStringLiteral(":/shaders/fragmentTexture3DSlice"));
+                             QStringLiteral(":/shaders/fragmentTexture3DSlice"),
+                             QStringLiteral(":/shaders/colorAndPosition"),
+                             QStringLiteral(":/shaders/fragment3DSliceFrames"));
 #else
     if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
             && qobject_cast<Scatter3DRenderer *>(this)) {
@@ -1011,6 +1020,13 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         newItem->setAlphaMultiplier(volumeItem->alphaMultiplier());
         newItem->setPreserveOpacity(volumeItem->preserveOpacity());
         newItem->setUseHighDefShader(volumeItem->useHighDefShader());
+
+        newItem->setDrawSlices(volumeItem->drawSlices());
+        newItem->setDrawSliceFrames(volumeItem->drawSliceFrames());
+        newItem->setSliceFrameColor(volumeItem->sliceFrameColor());
+        newItem->setSliceFrameWidths(volumeItem->sliceFrameWidths());
+        newItem->setSliceFrameGaps(volumeItem->sliceFrameGaps());
+        newItem->setSliceFrameThicknesses(volumeItem->sliceFrameThicknesses());
 #endif
     }
     recalculateCustomItemScalingAndPos(newItem);
@@ -1215,11 +1231,17 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             volumeItem->dptr()->m_dirtyBitsVolume.textureDataDirty = false;
             volumeItem->dptr()->m_dirtyBitsVolume.textureFormatDirty = false;
         }
-        if (volumeItem->dptr()->m_dirtyBitsVolume.sliceIndicesDirty) {
+        if (volumeItem->dptr()->m_dirtyBitsVolume.slicesDirty) {
+            renderItem->setDrawSlices(volumeItem->drawSlices());
+            renderItem->setDrawSliceFrames(volumeItem->drawSliceFrames());
+            renderItem->setSliceFrameColor(volumeItem->sliceFrameColor());
+            renderItem->setSliceFrameWidths(volumeItem->sliceFrameWidths());
+            renderItem->setSliceFrameGaps(volumeItem->sliceFrameGaps());
+            renderItem->setSliceFrameThicknesses(volumeItem->sliceFrameThicknesses());
             renderItem->setSliceIndexX(volumeItem->sliceIndexX());
             renderItem->setSliceIndexY(volumeItem->sliceIndexY());
             renderItem->setSliceIndexZ(volumeItem->sliceIndexZ());
-            volumeItem->dptr()->m_dirtyBitsVolume.sliceIndicesDirty = false;
+            volumeItem->dptr()->m_dirtyBitsVolume.slicesDirty = false;
         }
         if (volumeItem->dptr()->m_dirtyBitsVolume.alphaDirty) {
             renderItem->setAlphaMultiplier(volumeItem->alphaMultiplier());
@@ -1236,9 +1258,8 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
 
 void Abstract3DRenderer::updateCustomItemPositions()
 {
-    foreach (CustomRenderItem *renderItem, m_customRenderCache) {
+    foreach (CustomRenderItem *renderItem, m_customRenderCache)
         recalculateCustomItemScalingAndPos(renderItem);
-    }
 }
 
 void Abstract3DRenderer::drawCustomItems(RenderingState state,
@@ -1345,9 +1366,10 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
 #if !defined(QT_OPENGL_ES_2)
                 ShaderHelper *prevShader = shader;
                 if (item->isVolume()) {
-                    if (item->sliceIndexX() >= 0
-                            || item->sliceIndexY() >= 0
-                            || item->sliceIndexZ() >= 0) {
+                    if (item->drawSlices() &&
+                            (item->sliceIndexX() >= 0
+                             || item->sliceIndexY() >= 0
+                             || item->sliceIndexZ() >= 0)) {
                         shader = m_volumeTextureSliceShader;
                     } else if (item->useHighDefShader()) {
                         shader = m_volumeTextureShader;
@@ -1395,10 +1417,10 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                         QVector3D cameraPos = m_cachedScene->activeCamera()->position();
                         cameraPos = MVPMatrix.inverted().map(cameraPos);
                         // Adjust camera position according to min/max bounds
-                        cameraPos = cameraPos
-                                + ((oneVector - cameraPos) * item->minBoundsNormal())
-                                - ((oneVector + cameraPos) * (oneVector - item->maxBoundsNormal()));
-                        shader->setUniformValue(shader->cameraPositionRelativeToModel(), -cameraPos);
+                        cameraPos = -(cameraPos
+                                      + ((oneVector - cameraPos) * item->minBoundsNormal())
+                                      - ((oneVector + cameraPos) * (oneVector - item->maxBoundsNormal())));
+                        shader->setUniformValue(shader->cameraPositionRelativeToModel(), cameraPos);
                         GLint color8Bit = (item->textureFormat() == QImage::Format_Indexed8) ? 1 : 0;
                         if (color8Bit) {
                             shader->setUniformValueArray(shader->colorIndex(),
@@ -1412,14 +1434,10 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                         shader->setUniformValue(shader->minBounds(), item->minBounds());
                         shader->setUniformValue(shader->maxBounds(), item->maxBounds());
 
+                        QVector3D slices;
                         if (shader == m_volumeTextureSliceShader) {
-                            QVector3D slices((float(item->sliceIndexX()) + 0.5f)
-                                             / float(item->textureWidth()) * 2.0 - 1.0,
-                                             (float(item->sliceIndexY()) + 0.5f)
-                                             / float(item->textureHeight()) * 2.0 - 1.0,
-                                             (float(item->sliceIndexZ()) + 0.5f)
-                                             / float(item->textureDepth()) * 2.0 - 1.0);
-                            shader->setUniformValue(shader->volumeSliceIndices(), slices);
+                            shader->setUniformValue(shader->volumeSliceIndices(),
+                                                    item->sliceFractions());
                         } else {
                             // Precalculate texture dimensions so we can optimize
                             // ray stepping to hit every texture layer.
@@ -1442,6 +1460,24 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                             }
                             shader->setUniformValue(shader->textureDimensions(), textureDimensions);
                             shader->setUniformValue(shader->sampleCount(), sampleCount);
+                        }
+                        if (item->drawSliceFrames()) {
+                            // Set up the slice frame shader
+                            glDisable(GL_CULL_FACE);
+                            m_volumeSliceFrameShader->bind();
+                            m_volumeSliceFrameShader->setUniformValue(
+                                        m_volumeSliceFrameShader->color(), item->sliceFrameColor());
+
+                            // Draw individual slice frames.
+                            if (item->sliceIndexX() >= 0)
+                                drawVolumeSliceFrame(item, Qt::XAxis, projectionViewMatrix);
+                            if (item->sliceIndexY() >= 0)
+                                drawVolumeSliceFrame(item, Qt::YAxis, projectionViewMatrix);
+                            if (item->sliceIndexZ() >= 0)
+                                drawVolumeSliceFrame(item, Qt::ZAxis, projectionViewMatrix);
+
+                            glEnable(GL_CULL_FACE);
+                            shader->bind();
                         }
                         m_drawer->drawObject(shader, item->mesh(), 0, 0, item->texture());
                     } else
@@ -1474,6 +1510,105 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
         glDisable(GL_BLEND);
         glEnable(GL_CULL_FACE);
     }
+}
+
+void Abstract3DRenderer::drawVolumeSliceFrame(const CustomRenderItem *item, Qt::Axis axis,
+                                              const QMatrix4x4 &projectionViewMatrix)
+{
+    QVector2D frameWidth;
+    QVector3D frameScaling;
+    QVector3D translation = item->translation();
+    QQuaternion rotation = item->rotation();
+    float fracTrans;
+    bool needRotate = !rotation.isIdentity();
+    QMatrix4x4 rotationMatrix;
+    if (needRotate)
+        rotationMatrix.rotate(rotation);
+
+    if (axis == Qt::XAxis) {
+        fracTrans = item->sliceFractions().x();
+        float range = item->maxBoundsNormal().x() - item->minBoundsNormal().x();
+        float minMult = item->minBoundsNormal().x() / range;
+        float maxMult = (1.0f - item->maxBoundsNormal().x()) / range;
+        fracTrans = fracTrans - ((1.0f - fracTrans) * minMult) + ((1.0f + fracTrans) * maxMult);
+        if (needRotate)
+            translation -= rotationMatrix.map(QVector3D(fracTrans * item->scaling().x(), 0.0f, 0.0f));
+        else
+            translation.setX(translation.x() + fracTrans * item->scaling().x());
+        frameScaling = QVector3D(item->scaling().z()
+                                + (item->scaling().z() * item->sliceFrameGaps().z())
+                                + (item->scaling().z() * item->sliceFrameWidths().z()),
+                                item->scaling().y()
+                                + (item->scaling().y() * item->sliceFrameGaps().y())
+                                + (item->scaling().y() * item->sliceFrameWidths().y()),
+                                item->scaling().x() * item->sliceFrameThicknesses().x());
+        frameWidth = QVector2D(item->scaling().z() * item->sliceFrameWidths().z(),
+                               item->scaling().y() * item->sliceFrameWidths().y());
+        rotation *= m_yRightAngleRotation;
+    } else if (axis == Qt::YAxis) {
+        fracTrans = item->sliceFractions().y();
+        float range = item->maxBoundsNormal().y() - item->minBoundsNormal().y();
+        // Y axis is logically flipped, so we need to swam min and max bounds
+        float minMult = (1.0f - item->maxBoundsNormal().y()) / range;
+        float maxMult = item->minBoundsNormal().y() / range;
+        fracTrans = fracTrans - ((1.0f - fracTrans) * minMult) + ((1.0f + fracTrans) * maxMult);
+        if (needRotate)
+            translation -= rotationMatrix.map(QVector3D(0.0f, fracTrans * item->scaling().y(), 0.0f));
+        else
+            translation.setY(translation.y() - fracTrans * item->scaling().y());
+        frameScaling = QVector3D(item->scaling().x()
+                                + (item->scaling().x() * item->sliceFrameGaps().x())
+                                + (item->scaling().x() * item->sliceFrameWidths().x()),
+                                item->scaling().z()
+                                + (item->scaling().z() * item->sliceFrameGaps().z())
+                                + (item->scaling().z() * item->sliceFrameWidths().z()),
+                                item->scaling().y() * item->sliceFrameThicknesses().y());
+        frameWidth = QVector2D(item->scaling().x() * item->sliceFrameWidths().x(),
+                               item->scaling().z() * item->sliceFrameWidths().z());
+        rotation *= m_xRightAngleRotation;
+    } else { // Z axis
+        fracTrans = item->sliceFractions().z();
+        float range = item->maxBoundsNormal().z() - item->minBoundsNormal().z();
+        // Z axis is logically flipped, so we need to swam min and max bounds
+        float minMult = (1.0f - item->maxBoundsNormal().z()) / range;
+        float maxMult = item->minBoundsNormal().z() / range;
+        fracTrans = fracTrans - ((1.0f - fracTrans) * minMult) + ((1.0f + fracTrans) * maxMult);
+        if (needRotate)
+            translation -= rotationMatrix.map(QVector3D(0.0f, 0.0f, fracTrans * item->scaling().z()));
+        else
+            translation.setZ(translation.z() - fracTrans * item->scaling().z());
+        frameScaling = QVector3D(item->scaling().x()
+                                + (item->scaling().x() * item->sliceFrameGaps().x())
+                                + (item->scaling().x() * item->sliceFrameWidths().x()),
+                                item->scaling().y()
+                                + (item->scaling().y() * item->sliceFrameGaps().y())
+                                + (item->scaling().y() * item->sliceFrameWidths().y()),
+                                item->scaling().z() * item->sliceFrameThicknesses().z());
+        frameWidth = QVector2D(item->scaling().x() * item->sliceFrameWidths().x(),
+                               item->scaling().y() * item->sliceFrameWidths().y());
+    }
+
+    // If the slice is outside the shown area, don't show the frame
+    if (fracTrans < -1.0 || fracTrans > 1.0)
+        return;
+
+    // Shader needs the width of clear space in the middle.
+    frameWidth.setX(1.0f - (frameWidth.x() / frameScaling.x()));
+    frameWidth.setY(1.0f - (frameWidth.y() / frameScaling.y()));
+
+    QMatrix4x4 modelMatrix;
+    QMatrix4x4 mvpMatrix;
+
+    modelMatrix.translate(translation);
+    modelMatrix.rotate(rotation);
+    modelMatrix.scale(frameScaling);
+    mvpMatrix = projectionViewMatrix * modelMatrix;
+    m_volumeSliceFrameShader->setUniformValue(m_volumeSliceFrameShader->MVP(), mvpMatrix);
+    m_volumeSliceFrameShader->setUniformValue(m_volumeSliceFrameShader->sliceFrameWidth(),
+                                              frameWidth);
+
+    m_drawer->drawObject(m_volumeSliceFrameShader, item->mesh());
+
 }
 
 void Abstract3DRenderer::calculatePolarXZ(const QVector3D &dataPos, float &x, float &z) const

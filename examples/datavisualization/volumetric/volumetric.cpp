@@ -58,6 +58,9 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
       m_sliceIndexX(lowDetailSize / 2),
       m_sliceIndexY(lowDetailSize / 4),
       m_sliceIndexZ(lowDetailSize / 2),
+      m_slicingX(false),
+      m_slicingY(false),
+      m_slicingZ(false),
       m_mediumDetailRB(0),
       m_highDetailRB(0),
       m_lowDetailData(0),
@@ -79,6 +82,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     m_graph->setOrthoProjection(true);
+    m_graph->activeTheme()->setBackgroundEnabled(false);
 
     toggleAreaAll(true);
 
@@ -162,6 +166,12 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
 
     m_volumeItem->setColorTable(m_colorTable1);
 
+    m_volumeItem->setSliceFrameGaps(QVector3D(0.01f, 0.02f, 0.01f));
+    m_volumeItem->setSliceFrameThicknesses(QVector3D(0.0025f, 0.005f, 0.0025f));
+    m_volumeItem->setSliceFrameWidths(QVector3D(0.0025f, 0.005f, 0.0025f));
+    m_volumeItem->setDrawSliceFrames(false);
+    handleSlicingChanges();
+
     m_graph->addCustomItem(m_volumeItem);
 
     m_timer.start(0);
@@ -226,20 +236,20 @@ void VolumetricModifier::setAlphaMultiplierLabel(QLabel *label)
 
 void VolumetricModifier::sliceX(int enabled)
 {
-    if (m_volumeItem)
-        m_volumeItem->setSliceIndexX(enabled ? m_sliceIndexX : -1);
+    m_slicingX = enabled;
+    handleSlicingChanges();
 }
 
 void VolumetricModifier::sliceY(int enabled)
 {
-    if (m_volumeItem)
-        m_volumeItem->setSliceIndexY(enabled ? m_sliceIndexY : -1);
+    m_slicingY = enabled;
+    handleSlicingChanges();
 }
 
 void VolumetricModifier::sliceZ(int enabled)
 {
-    if (m_volumeItem)
-        m_volumeItem->setSliceIndexZ(enabled ? m_sliceIndexZ : -1);
+    m_slicingZ = enabled;
+    handleSlicingChanges();
 }
 
 void VolumetricModifier::adjustSliceX(int value)
@@ -482,6 +492,12 @@ void VolumetricModifier::toggleAreaMountain(bool enabled)
     }
 }
 
+void VolumetricModifier::setDrawSliceFrames(int enabled)
+{
+    if (m_volumeItem)
+        m_volumeItem->setDrawSliceFrames(enabled);
+}
+
 void VolumetricModifier::initHeightMap(QString fileName, QVector<uchar> &layerData)
 {
     QImage heightImage(fileName);
@@ -603,6 +619,25 @@ void VolumetricModifier::excavateMineBlock(int textureSize, int dataIndex, int s
                 curIndex++;
             }
 
+        }
+    }
+}
+
+void VolumetricModifier::handleSlicingChanges()
+{
+    if (m_volumeItem) {
+        if (m_slicingX || m_slicingY || m_slicingZ) {
+            // Only show slices of selected dimensions
+            m_volumeItem->setDrawSlices(true);
+            m_volumeItem->setSliceIndexX(m_slicingX ? m_sliceIndexX : -1);
+            m_volumeItem->setSliceIndexY(m_slicingY ? m_sliceIndexY : -1);
+            m_volumeItem->setSliceIndexZ(m_slicingZ ? m_sliceIndexZ : -1);
+        } else {
+            // Show slice frames for all dimenstions when not actually slicing
+            m_volumeItem->setDrawSlices(false);
+            m_volumeItem->setSliceIndexX(m_sliceIndexX);
+            m_volumeItem->setSliceIndexY(m_sliceIndexY);
+            m_volumeItem->setSliceIndexZ(m_sliceIndexZ);
         }
     }
 }

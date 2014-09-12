@@ -104,31 +104,34 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*! \qmlproperty int Custom3DVolume::sliceIndexX
  *
  * The X dimension index into the texture data indicating which vertical slice to show.
- * Setting any dimension to negative indicates no slice for that dimension is drawn.
- * If all dimensions are negative, no slices are drawn and the volume is drawn normally.
+ * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
+ * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
+ * normally.
  * Defaults to \c{-1}.
  *
- * \sa QCustom3DVolume::textureData
+ * \sa QCustom3DVolume::textureData, drawSlices, drawSliceFrames
  */
 
 /*! \qmlproperty int Custom3DVolume::sliceIndexY
  *
  * The Y dimension index into the texture data indicating which horizontal slice to show.
- * Setting any dimension to negative indicates no slice for that dimension is drawn.
- * If all dimensions are negative, no slices are drawn and the volume is drawn normally.
+ * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
+ * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
+ * normally.
  * Defaults to \c{-1}.
  *
- * \sa QCustom3DVolume::textureData
+ * \sa QCustom3DVolume::textureData, drawSlices, drawSliceFrames
  */
 
 /*! \qmlproperty int Custom3DVolume::sliceIndexZ
  *
  * The Z dimension index into the texture data indicating which vertical slice to show.
- * Setting any dimension to negative indicates no slice for that dimension is drawn.
- * If all dimensions are negative, no slices are drawn and the volume is drawn normally.
+ * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
+ * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
+ * normally.
  * Defaults to \c{-1}.
  *
- * \sa QCustom3DVolume::textureData
+ * \sa QCustom3DVolume::textureData, drawSlices, drawSliceFrames
  */
 
 /*!
@@ -171,6 +174,79 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \note This value doesn't affect the level of detail when rendering the slices of the volume.
  *
  * Defaults to \c{true}.
+ */
+
+/*!
+ * \qmlproperty bool Custom3DVolume::drawSlices
+ *
+ * If this property value is \c{true}, the slices indicated by slice index properties
+ * will be drawn instead of the full volume.
+ * If it is \c{false}, the full volume will always be drawn.
+ * Defaults to \c{false}.
+ *
+ * \note The slices are always drawn along the item axes, so if the item is rotated, the slices are
+ * rotated as well.
+ *
+ * \sa sliceIndexX, sliceIndexY, sliceIndexZ
+ */
+
+/*!
+ * \qmlproperty bool Custom3DVolume::drawSliceFrames
+ *
+ * If this property value is \c{true}, the frames of slices indicated by slice index properties
+ * will be drawn around the volume.
+ * If it is \c{false}, no slice frames will be drawn.
+ * Drawing slice frames is independent of drawing slices, so you can show the full volume and
+ * still draw the slice frames around it.
+ * Defaults to \c{false}.
+ *
+ * \sa sliceIndexX, sliceIndexY, sliceIndexZ, drawSlices
+ */
+
+/*!
+ * \qmlproperty color Custom3DVolume::sliceFrameColor
+ *
+ * Indicates the color of the slice frame. Transparent slice frame color is not supported.
+ *
+ * Defaults to black.
+ *
+ * \sa drawSliceFrames
+ */
+
+/*!
+ * \qmlproperty vector3d Custom3DVolume::sliceFrameWidths
+ *
+ * Indicates the widths of the slice frame. The width can be different on different dimensions,
+ * so you can for example omit drawing the frames on certain sides of the volume by setting the
+ * value for that dimension to zero. The values are fractions of the volume thickness in the same
+ * dimension. The values cannot be negative.
+ *
+ * Defaults to \c{vector3d(0.01, 0.01, 0.01)}.
+ *
+ * \sa drawSliceFrames
+ */
+
+/*!
+ * \qmlproperty vector3d Custom3DVolume::sliceFrameGaps
+ *
+ * Indicates the amount of air gap left between the volume itself and the frame in each dimension.
+ * The gap can be different on different dimensions. The values are fractions of the volume
+ * thickness in the same dimension. The values cannot be negative.
+ *
+ * Defaults to \c{vector3d(0.01, 0.01, 0.01)}.
+ *
+ * \sa drawSliceFrames
+ */
+
+/*!
+ * \qmlproperty vector3d Custom3DVolume::sliceFrameThicknesses
+ *
+ * Indicates the thickness of the slice frames for each dimension. The values are fractions of
+ * the volume thickness in the same dimension. The values cannot be negative.
+ *
+ * Defaults to \c{vector3d(0.01, 0.01, 0.01)}.
+ *
+ * \sa drawSliceFrames
  */
 
 /*!
@@ -324,17 +400,18 @@ int QCustom3DVolume::textureDataWidth() const
 /*! \property QCustom3DVolume::sliceIndexX
  *
  * The X dimension index into the texture data indicating which vertical slice to show.
- * Setting any dimension to negative indicates no slice for that dimension is drawn.
- * If all dimensions are negative, no slices are drawn and the volume is drawn normally.
+ * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
+ * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
+ * normally.
  * Defaults to \c{-1}.
  *
- * \sa textureData
+ * \sa textureData, drawSlices, drawSliceFrames
  */
 void QCustom3DVolume::setSliceIndexX(int value)
 {
     if (dptr()->m_sliceIndexX != value) {
         dptr()->m_sliceIndexX = value;
-        dptr()->m_dirtyBitsVolume.sliceIndicesDirty = true;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
         emit sliceIndexXChanged(value);
         emit dptr()->needUpdate();
     }
@@ -348,17 +425,18 @@ int QCustom3DVolume::sliceIndexX() const
 /*! \property QCustom3DVolume::sliceIndexY
  *
  * The Y dimension index into the texture data indicating which horizontal slice to show.
- * Setting any dimension to negative indicates no slice for that dimension is drawn.
- * If all dimensions are negative, no slices are drawn and the volume is drawn normally.
+ * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
+ * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
+ * normally.
  * Defaults to \c{-1}.
  *
- * \sa textureData
+ * \sa textureData, drawSlices, drawSliceFrames
  */
 void QCustom3DVolume::setSliceIndexY(int value)
 {
     if (dptr()->m_sliceIndexY != value) {
         dptr()->m_sliceIndexY = value;
-        dptr()->m_dirtyBitsVolume.sliceIndicesDirty = true;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
         emit sliceIndexYChanged(value);
         emit dptr()->needUpdate();
     }
@@ -372,17 +450,18 @@ int QCustom3DVolume::sliceIndexY() const
 /*! \property QCustom3DVolume::sliceIndexZ
  *
  * The Z dimension index into the texture data indicating which vertical slice to show.
- * Setting any dimension to negative indicates no slice for that dimension is drawn.
- * If all dimensions are negative, no slices are drawn and the volume is drawn normally.
+ * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
+ * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
+ * normally.
  * Defaults to \c{-1}.
  *
- * \sa textureData
+ * \sa textureData, drawSlices, drawSliceFrames
  */
 void QCustom3DVolume::setSliceIndexZ(int value)
 {
     if (dptr()->m_sliceIndexZ != value) {
         dptr()->m_sliceIndexZ = value;
-        dptr()->m_dirtyBitsVolume.sliceIndicesDirty = true;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
         emit sliceIndexZChanged(value);
         emit dptr()->needUpdate();
     }
@@ -817,6 +896,170 @@ bool QCustom3DVolume::useHighDefShader() const
 }
 
 /*!
+ * \property QCustom3DVolume::drawSlices
+ *
+ * If this property value is \c{true}, the slices indicated by slice index properties
+ * will be drawn instead of the full volume.
+ * If it is \c{false}, the full volume will always be drawn.
+ * Defaults to \c{false}.
+ *
+ * \note The slices are always drawn along the item axes, so if the item is rotated, the slices are
+ * rotated as well.
+ *
+ * \sa sliceIndexX, sliceIndexY, sliceIndexZ
+ */
+void QCustom3DVolume::setDrawSlices(bool enable)
+{
+    if (dptr()->m_drawSlices != enable) {
+        dptr()->m_drawSlices = enable;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
+        emit drawSlicesChanged(enable);
+        emit dptr()->needUpdate();
+    }
+}
+
+bool QCustom3DVolume::drawSlices() const
+{
+    return dptrc()->m_drawSlices;
+}
+
+/*!
+ * \property QCustom3DVolume::drawSliceFrames
+ *
+ * If this property value is \c{true}, the frames of slices indicated by slice index properties
+ * will be drawn around the volume.
+ * If it is \c{false}, no slice frames will be drawn.
+ * Drawing slice frames is independent of drawing slices, so you can show the full volume and
+ * still draw the slice frames around it. This is useful when using renderSlice() to display the
+ * slices outside the graph itself.
+ * Defaults to \c{false}.
+ *
+ * \sa sliceIndexX, sliceIndexY, sliceIndexZ, drawSlices, renderSlice()
+ */
+void QCustom3DVolume::setDrawSliceFrames(bool enable)
+{
+    if (dptr()->m_drawSliceFrames != enable) {
+        dptr()->m_drawSliceFrames = enable;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
+        emit drawSliceFramesChanged(enable);
+        emit dptr()->needUpdate();
+    }
+}
+
+bool QCustom3DVolume::drawSliceFrames() const
+{
+    return dptrc()->m_drawSliceFrames;
+}
+
+/*!
+ * \property QCustom3DVolume::sliceFrameColor
+ *
+ * Indicates the color of the slice frame. Transparent slice frame color is not supported.
+ *
+ * Defaults to black.
+ *
+ * \sa drawSliceFrames
+ */
+void QCustom3DVolume::setSliceFrameColor(const QColor &color)
+{
+    if (dptr()->m_sliceFrameColor != color) {
+        dptr()->m_sliceFrameColor = color;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
+        emit sliceFrameColorChanged(color);
+        emit dptr()->needUpdate();
+    }
+}
+
+QColor QCustom3DVolume::sliceFrameColor() const
+{
+    return dptrc()->m_sliceFrameColor;
+}
+
+/*!
+ * \property QCustom3DVolume::sliceFrameWidths
+ *
+ * Indicates the widths of the slice frame. The width can be different on different dimensions,
+ * so you can for example omit drawing the frames on certain sides of the volume by setting the
+ * value for that dimension to zero. The values are fractions of the volume thickness in the same
+ * dimension. The values cannot be negative.
+ *
+ * Defaults to \c{QVector3D(0.01, 0.01, 0.01)}.
+ *
+ * \sa drawSliceFrames
+ */
+void QCustom3DVolume::setSliceFrameWidths(const QVector3D &values)
+{
+    if (values.x() < 0.0f || values.y() < 0.0f || values.z() < 0.0f) {
+        qWarning() << __FUNCTION__ << "Attempted to set negative values.";
+    } else if (dptr()->m_sliceFrameWidths != values) {
+        dptr()->m_sliceFrameWidths = values;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
+        emit sliceFrameWidthsChanged(values);
+        emit dptr()->needUpdate();
+    }
+}
+
+QVector3D QCustom3DVolume::sliceFrameWidths() const
+{
+    return dptrc()->m_sliceFrameWidths;
+}
+
+/*!
+ * \property QCustom3DVolume::sliceFrameGaps
+ *
+ * Indicates the amount of air gap left between the volume itself and the frame in each dimension.
+ * The gap can be different on different dimensions. The values are fractions of the volume
+ * thickness in the same dimension. The values cannot be negative.
+ *
+ * Defaults to \c{QVector3D(0.01, 0.01, 0.01)}.
+ *
+ * \sa drawSliceFrames
+ */
+void QCustom3DVolume::setSliceFrameGaps(const QVector3D &values)
+{
+    if (values.x() < 0.0f || values.y() < 0.0f || values.z() < 0.0f) {
+        qWarning() << __FUNCTION__ << "Attempted to set negative values.";
+    } else if (dptr()->m_sliceFrameGaps != values) {
+        dptr()->m_sliceFrameGaps = values;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
+        emit sliceFrameGapsChanged(values);
+        emit dptr()->needUpdate();
+    }
+}
+
+QVector3D QCustom3DVolume::sliceFrameGaps() const
+{
+    return dptrc()->m_sliceFrameGaps;
+}
+
+/*!
+ * \property QCustom3DVolume::sliceFrameThicknesses
+ *
+ * Indicates the thickness of the slice frames for each dimension. The values are fractions of
+ * the volume thickness in the same dimension. The values cannot be negative.
+ *
+ * Defaults to \c{QVector3D(0.01, 0.01, 0.01)}.
+ *
+ * \sa drawSliceFrames
+ */
+void QCustom3DVolume::setSliceFrameThicknesses(const QVector3D &values)
+{
+    if (values.x() < 0.0f || values.y() < 0.0f || values.z() < 0.0f) {
+        qWarning() << __FUNCTION__ << "Attempted to set negative values.";
+    } else if (dptr()->m_sliceFrameThicknesses != values) {
+        dptr()->m_sliceFrameThicknesses = values;
+        dptr()->m_dirtyBitsVolume.slicesDirty = true;
+        emit sliceFrameThicknessesChanged(values);
+        emit dptr()->needUpdate();
+    }
+}
+
+QVector3D QCustom3DVolume::sliceFrameThicknesses() const
+{
+    return dptrc()->m_sliceFrameThicknesses;
+}
+
+/*!
  * Renders the slice specified by \a index along \a axis into an image.
  * The texture format of this object is used.
  *
@@ -857,7 +1100,13 @@ QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q) :
     m_textureData(0),
     m_alphaMultiplier(1.0f),
     m_preserveOpacity(true),
-    m_useHighDefShader(true)
+    m_useHighDefShader(true),
+    m_drawSlices(false),
+    m_drawSliceFrames(false),
+    m_sliceFrameColor(Qt::black),
+    m_sliceFrameWidths(QVector3D(0.01f, 0.01f, 0.01f)),
+    m_sliceFrameGaps(QVector3D(0.01f, 0.01f, 0.01f)),
+    m_sliceFrameThicknesses(QVector3D(0.01f, 0.01f, 0.01f))
 {
     m_isVolumeItem = true;
     m_meshFile = QStringLiteral(":/defaultMeshes/barFull");
@@ -882,7 +1131,13 @@ QCustom3DVolumePrivate::QCustom3DVolumePrivate(QCustom3DVolume *q, const QVector
     m_textureData(textureData),
     m_alphaMultiplier(1.0f),
     m_preserveOpacity(true),
-    m_useHighDefShader(true)
+    m_useHighDefShader(true),
+    m_drawSlices(false),
+    m_drawSliceFrames(false),
+    m_sliceFrameColor(Qt::black),
+    m_sliceFrameWidths(QVector3D(0.01f, 0.01f, 0.01f)),
+    m_sliceFrameGaps(QVector3D(0.01f, 0.01f, 0.01f)),
+    m_sliceFrameThicknesses(QVector3D(0.01f, 0.01f, 0.01f))
 {
     m_isVolumeItem = true;
     m_shadowCasting = false;
@@ -909,7 +1164,7 @@ void QCustom3DVolumePrivate::resetDirtyBits()
     QCustom3DItemPrivate::resetDirtyBits();
 
     m_dirtyBitsVolume.textureDimensionsDirty = false;
-    m_dirtyBitsVolume.sliceIndicesDirty = false;
+    m_dirtyBitsVolume.slicesDirty = false;
     m_dirtyBitsVolume.colorTableDirty = false;
     m_dirtyBitsVolume.textureDataDirty = false;
     m_dirtyBitsVolume.textureFormatDirty = false;

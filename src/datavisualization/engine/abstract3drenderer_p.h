@@ -95,7 +95,9 @@ public:
     virtual void initVolumeTextureShaders(const QString &vertexShader,
                                           const QString &fragmentShader,
                                           const QString &fragmentLowDefShader,
-                                          const QString &sliceShader);
+                                          const QString &sliceShader,
+                                          const QString &sliceFrameVertexShader,
+                                          const QString &sliceFrameShader);
     virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
                                 QAbstract3DAxis::AxisType type);
     virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation,
@@ -207,6 +209,8 @@ protected:
 
     void recalculateCustomItemScalingAndPos(CustomRenderItem *item);
     virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds) = 0;
+    void drawVolumeSliceFrame(const CustomRenderItem *item, Qt::Axis axis,
+                              const QMatrix4x4 &projectionViewMatrix);
 
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
@@ -248,6 +252,7 @@ protected:
     ShaderHelper *m_volumeTextureShader;
     ShaderHelper *m_volumeTextureLowDefShader;
     ShaderHelper *m_volumeTextureSliceShader;
+    ShaderHelper *m_volumeSliceFrameShader;
 
     bool m_useOrthoProjection;
     bool m_xFlipped;

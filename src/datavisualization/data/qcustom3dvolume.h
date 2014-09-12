@@ -42,6 +42,12 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem
     Q_PROPERTY(float alphaMultiplier READ alphaMultiplier WRITE setAlphaMultiplier NOTIFY alphaMultiplierChanged)
     Q_PROPERTY(bool preserveOpacity READ preserveOpacity WRITE setPreserveOpacity NOTIFY preserveOpacityChanged)
     Q_PROPERTY(bool useHighDefShader READ useHighDefShader WRITE setUseHighDefShader NOTIFY useHighDefShaderChanged)
+    Q_PROPERTY(bool drawSlices READ drawSlices WRITE setDrawSlices NOTIFY drawSlicesChanged)
+    Q_PROPERTY(bool drawSliceFrames READ drawSliceFrames WRITE setDrawSliceFrames NOTIFY drawSliceFramesChanged)
+    Q_PROPERTY(QColor sliceFrameColor READ sliceFrameColor WRITE setSliceFrameColor NOTIFY sliceFrameColorChanged)
+    Q_PROPERTY(QVector3D sliceFrameWidths READ sliceFrameWidths WRITE setSliceFrameWidths NOTIFY sliceFrameWidthsChanged)
+    Q_PROPERTY(QVector3D sliceFrameGaps READ sliceFrameGaps WRITE setSliceFrameGaps NOTIFY sliceFrameGapsChanged)
+    Q_PROPERTY(QVector3D sliceFrameThicknesses READ sliceFrameThicknesses WRITE setSliceFrameThicknesses NOTIFY sliceFrameThicknessesChanged)
 
 public:
 
@@ -90,6 +96,20 @@ public:
     void setUseHighDefShader(bool enable);
     bool useHighDefShader() const;
 
+    void setDrawSlices(bool enable);
+    bool drawSlices() const;
+    void setDrawSliceFrames(bool enable);
+    bool drawSliceFrames() const;
+
+    void setSliceFrameColor(const QColor &color);
+    QColor sliceFrameColor() const;
+    void setSliceFrameWidths(const QVector3D &values);
+    QVector3D sliceFrameWidths() const;
+    void setSliceFrameGaps(const QVector3D &values);
+    QVector3D sliceFrameGaps() const;
+    void setSliceFrameThicknesses(const QVector3D &values);
+    QVector3D sliceFrameThicknesses() const;
+
     QImage renderSlice(Qt::Axis axis, int index);
 
 signals:
@@ -105,6 +125,12 @@ signals:
     void alphaMultiplierChanged(float mult);
     void preserveOpacityChanged(bool enabled);
     void useHighDefShaderChanged(bool enabled);
+    void drawSlicesChanged(bool enabled);
+    void drawSliceFramesChanged(bool enabled);
+    void sliceFrameColorChanged(const QColor &color);
+    void sliceFrameWidthsChanged(const QVector3D &values);
+    void sliceFrameGapsChanged(const QVector3D &values);
+    void sliceFrameThicknessesChanged(const QVector3D &values);
 
 protected:
     QCustom3DVolumePrivate *dptr();
