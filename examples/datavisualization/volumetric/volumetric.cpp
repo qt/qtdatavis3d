@@ -81,7 +81,9 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->activeTheme()->setType(Q3DTheme::ThemeQt);
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
+    //! [6]
     m_graph->setOrthoProjection(true);
+    //! [6]
     m_graph->activeTheme()->setBackgroundEnabled(false);
 
     toggleAreaAll(true);
@@ -100,6 +102,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     createVolume(lowDetailSize, 0, lowDetailSize, m_lowDetailData);
     excavateMineShaft(lowDetailSize, 0, m_mineShaftArray.size(), m_lowDetailData);
 
+    //! [0]
     m_volumeItem = new QCustom3DVolume;
     // Adjust water level to zero with a minor tweak to y-coordinate position and scaling
     m_volumeItem->setScaling(
@@ -112,11 +115,14 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
                           (m_graph->axisY()->max() + m_graph->axisY()->min()) / 2.0f,
                           (m_graph->axisZ()->max() + m_graph->axisZ()->min()) / 2.0f));
     m_volumeItem->setScalingAbsolute(false);
+    //! [0]
+    //! [1]
     m_volumeItem->setTextureWidth(lowDetailSize);
     m_volumeItem->setTextureHeight(lowDetailSize / 2);
     m_volumeItem->setTextureDepth(lowDetailSize);
     m_volumeItem->setTextureFormat(QImage::Format_Indexed8);
     m_volumeItem->setTextureData(new QVector<uchar>(*m_lowDetailData));
+    //! [1]
 
     // Generate color tables.
     m_colorTable1.resize(colorTableSize);
@@ -164,15 +170,21 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_colorTable2[airColorIndex] = qRgba(0, 0, 0, 0);
     m_colorTable2[mineShaftColorIndex] = qRgba(255, 255, 0, 255);
 
+    //! [2]
     m_volumeItem->setColorTable(m_colorTable1);
+    //! [2]
 
+    //! [5]
     m_volumeItem->setSliceFrameGaps(QVector3D(0.01f, 0.02f, 0.01f));
     m_volumeItem->setSliceFrameThicknesses(QVector3D(0.0025f, 0.005f, 0.0025f));
     m_volumeItem->setSliceFrameWidths(QVector3D(0.0025f, 0.005f, 0.0025f));
     m_volumeItem->setDrawSliceFrames(false);
+    //! [5]
     handleSlicingChanges();
 
+    //! [3]
     m_graph->addCustomItem(m_volumeItem);
+    //! [3]
 
     m_timer.start(0);
 #else
@@ -259,9 +271,13 @@ void VolumetricModifier::adjustSliceX(int value)
         m_sliceIndexX--;
     if (m_volumeItem) {
         if (m_volumeItem->sliceIndexX() != -1)
+            //! [7]
             m_volumeItem->setSliceIndexX(m_sliceIndexX);
-        m_sliceLabelX->setPixmap(QPixmap::fromImage(
-                                     m_volumeItem->renderSlice(Qt::XAxis, m_sliceIndexX)));
+            //! [7]
+        //! [9]
+        m_sliceLabelX->setPixmap(
+                    QPixmap::fromImage(m_volumeItem->renderSlice(Qt::XAxis, m_sliceIndexX)));
+        //! [9]
     }
 }
 
@@ -273,8 +289,8 @@ void VolumetricModifier::adjustSliceY(int value)
     if (m_volumeItem) {
         if (m_volumeItem->sliceIndexY() != -1)
             m_volumeItem->setSliceIndexY(m_sliceIndexY);
-        m_sliceLabelY->setPixmap(QPixmap::fromImage(
-                                     m_volumeItem->renderSlice(Qt::YAxis, m_sliceIndexY)));
+        m_sliceLabelY->setPixmap(
+                    QPixmap::fromImage(m_volumeItem->renderSlice(Qt::YAxis, m_sliceIndexY)));
     }
 }
 
@@ -286,8 +302,8 @@ void VolumetricModifier::adjustSliceZ(int value)
     if (m_volumeItem)  {
         if (m_volumeItem->sliceIndexZ() != -1)
             m_volumeItem->setSliceIndexZ(m_sliceIndexZ);
-        m_sliceLabelZ->setPixmap(QPixmap::fromImage(
-                                     m_volumeItem->renderSlice(Qt::ZAxis, m_sliceIndexZ)));
+        m_sliceLabelZ->setPixmap(
+                    QPixmap::fromImage(m_volumeItem->renderSlice(Qt::ZAxis, m_sliceIndexZ)));
     }
 }
 
@@ -406,7 +422,9 @@ void VolumetricModifier::changeColorTable(int enabled)
 
 void VolumetricModifier::setPreserveOpacity(bool enabled)
 {
+    //! [10]
     m_volumeItem->setPreserveOpacity(enabled);
+    //! [10]
 
     // Rerender image labels
     adjustSliceX(m_sliceSliderX->value());
@@ -416,6 +434,7 @@ void VolumetricModifier::setPreserveOpacity(bool enabled)
 
 void VolumetricModifier::setTransparentGround(bool enabled)
 {
+    //! [12]
     int newAlpha = enabled ? terrainTransparency : 255;
     for (int i = aboveWaterGroundColorsMin; i < underWaterGroundColorsMax; i++) {
         QRgb oldColor1 = m_colorTable1.at(i);
@@ -427,7 +446,7 @@ void VolumetricModifier::setTransparentGround(bool enabled)
         m_volumeItem->setColorTable(m_colorTable1);
     else
         m_volumeItem->setColorTable(m_colorTable2);
-
+    //! [12]
     adjustSliceX(m_sliceSliderX->value());
     adjustSliceY(m_sliceSliderY->value());
     adjustSliceZ(m_sliceSliderZ->value());
@@ -435,7 +454,9 @@ void VolumetricModifier::setTransparentGround(bool enabled)
 
 void VolumetricModifier::setUseHighDefShader(bool enabled)
 {
+    //! [13]
     m_volumeItem->setUseHighDefShader(enabled);
+    //! [13]
 }
 
 void VolumetricModifier::adjustAlphaMultiplier(int value)
@@ -445,7 +466,9 @@ void VolumetricModifier::adjustAlphaMultiplier(int value)
         mult = float(value - 99) / 2.0f;
     else
         mult = float(value) / float(500 - value * 4);
+    //! [11]
     m_volumeItem->setAlphaMultiplier(mult);
+    //! [11]
     QString labelFormat = QStringLiteral("Alpha multiplier: %1");
     m_alphaMultiplierLabel->setText(labelFormat.arg(
                                         QString::number(m_volumeItem->alphaMultiplier(), 'f', 3)));
@@ -628,7 +651,9 @@ void VolumetricModifier::handleSlicingChanges()
     if (m_volumeItem) {
         if (m_slicingX || m_slicingY || m_slicingZ) {
             // Only show slices of selected dimensions
+            //! [8]
             m_volumeItem->setDrawSlices(true);
+            //! [8]
             m_volumeItem->setSliceIndexX(m_slicingX ? m_sliceIndexX : -1);
             m_volumeItem->setSliceIndexY(m_slicingY ? m_sliceIndexY : -1);
             m_volumeItem->setSliceIndexZ(m_slicingZ ? m_sliceIndexZ : -1);
