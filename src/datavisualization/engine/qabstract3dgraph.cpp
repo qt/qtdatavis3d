@@ -545,6 +545,8 @@ QAbstract3DGraph::ElementType QAbstract3DGraph::selectedElement() const
  * \since QtDataVisualization 1.1
  *
  * \return rendered image.
+ *
+ * \note OpenGL ES2 does not support anitialiasing, so \a msaaSamples is always forced to \c{0}.
  */
 QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
 {
@@ -975,8 +977,12 @@ QImage QAbstract3DGraphPrivate::renderToImage(int msaaSamples, const QSize &imag
     // Render the wanted frame offscreen
     m_context->makeCurrent(m_offscreenSurface);
     fboFormat.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
+#ifdef QT_OPENGL_ES_2
+    Q_UNUSED(msaaSamples);
+#else
     fboFormat.setInternalTextureFormat(GL_RGB);
     fboFormat.setSamples(msaaSamples);
+#endif
     fbo = new QOpenGLFramebufferObject(imageSize, fboFormat);
     if (fbo->isValid()) {
         QRect originalViewport = m_visualController->m_scene->viewport();
