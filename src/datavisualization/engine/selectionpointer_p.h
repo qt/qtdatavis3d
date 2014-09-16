@@ -49,7 +49,7 @@ public:
 
     void render(GLuint defaultFboHandle = 0, bool useOrtho = false);
     void setPosition(const QVector3D &position);
-    void setLabel(const QString &label);
+    void setLabel(const QString &label, bool themeChange = false);
     void setPointerObject(ObjectHelper *object);
     void setLabelObject(ObjectHelper *object);
     void handleDrawerChange();

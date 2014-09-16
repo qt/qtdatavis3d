@@ -211,10 +211,12 @@ void SelectionPointer::setRotation(const QQuaternion &rotation)
     m_rotation = rotation;
 }
 
-void SelectionPointer::setLabel(const QString &label)
+void SelectionPointer::setLabel(const QString &label, bool themeChange)
 {
-    m_label = label;
-    m_drawer->generateLabelItem(m_labelItem, m_label);
+    if (themeChange || m_label != label) {
+        m_label = label;
+        m_drawer->generateLabelItem(m_labelItem, m_label);
+    }
 }
 
 void SelectionPointer::setPointerObject(ObjectHelper *object)
@@ -230,7 +232,7 @@ void SelectionPointer::setLabelObject(ObjectHelper *object)
 void SelectionPointer::handleDrawerChange()
 {
     m_cachedTheme = m_drawer->theme();
-    setLabel(m_label);
+    setLabel(m_label, true);
 }
 
 void SelectionPointer::updateBoundingRect(const QRect &rect)
