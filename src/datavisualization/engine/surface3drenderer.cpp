@@ -782,8 +782,11 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
 
 void Surface3DRenderer::drawSlicedScene()
 {
-    if (!m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
-        qWarning("Selection mode QAbstract3DGraph::SelectionSlice not set. It must be set before calling setSlicingActive(true).");
+    if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)
+            == m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
+        qWarning("Invalid selection mode. Either QAbstract3DGraph::SelectionRow or"
+                 " QAbstract3DGraph::SelectionColumn must be set before calling"
+                 " setSlicingActive(true).");
         return;
     }
 
