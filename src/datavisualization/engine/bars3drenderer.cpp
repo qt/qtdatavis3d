@@ -456,6 +456,11 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
 
 void Bars3DRenderer::drawSlicedScene()
 {
+    if (!m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
+        qWarning("Selection mode QAbstract3DGraph::SelectionSlice not set. It must be set before calling setSlicingActive(true).");
+        return;
+    }
+
     GLfloat barPosX = 0;
     QVector3D lightPos;
     QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
@@ -815,6 +820,12 @@ void Bars3DRenderer::drawSlicedScene()
     int labelCount = m_sliceCache->labelItems().size();
 
     for (int labelNo = 0; labelNo < labelCount; labelNo++) {
+        // Check for invalid usage (no selection when setting slicing active)
+        if (!firstVisualSliceArray) {
+            qWarning("No slice data found. Make sure there is a valid selection.");
+            continue;
+        }
+
         // Get labels from first series only
         const BarRenderSliceItem &item = firstVisualSliceArray->at(labelNo);
         m_dummyBarRenderItem.setTranslation(QVector3D(item.translation().x(),

@@ -98,7 +98,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty bool Scene3D::slicingActive
  *
- * This property contains whether 2D slicing view is currently active or not.
+ * This property contains whether 2D slicing view is currently active or not. If setting it, you
+ * must make sure AbstractGraph3D::selectionMode has
+ * \l{QAbstract3DGraph::SelectionSlice}{AbstractGraph3D.SelectionSlice} flag set in conjunction
+ * with either row or column selection mode, and there is a valid selection.
  * \note Not all visualizations support the 2D slicing view.
  */
 
@@ -291,7 +294,9 @@ QPoint Q3DScene::invalidSelectionPoint()
 /*!
  * \property Q3DScene::slicingActive
  *
- * This property contains whether 2D slicing view is currently active or not.
+ * This property contains whether 2D slicing view is currently active or not. If setting it, you
+ * must make sure QAbstract3DGraph::selectionMode has QAbstract3DGraph::SelectionSlice flag set
+ * in conjunction with either row or column selection mode, and there is a valid selection.
  * \note Not all visualizations support the 2D slicing view.
  */
 bool Q3DScene::isSlicingActive() const

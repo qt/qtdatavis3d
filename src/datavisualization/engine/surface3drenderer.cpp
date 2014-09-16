@@ -782,6 +782,11 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
 
 void Surface3DRenderer::drawSlicedScene()
 {
+    if (!m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
+        qWarning("Selection mode QAbstract3DGraph::SelectionSlice not set. It must be set before calling setSlicingActive(true).");
+        return;
+    }
+
     QVector3D lightPos;
 
     QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
