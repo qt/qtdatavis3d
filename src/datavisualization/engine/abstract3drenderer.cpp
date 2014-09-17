@@ -1532,7 +1532,7 @@ void Abstract3DRenderer::drawVolumeSliceFrame(const CustomRenderItem *item, Qt::
         float maxMult = (1.0f - item->maxBoundsNormal().x()) / range;
         fracTrans = fracTrans - ((1.0f - fracTrans) * minMult) + ((1.0f + fracTrans) * maxMult);
         if (needRotate)
-            translation -= rotationMatrix.map(QVector3D(fracTrans * item->scaling().x(), 0.0f, 0.0f));
+            translation += rotationMatrix.map(QVector3D(fracTrans * item->scaling().x(), 0.0f, 0.0f));
         else
             translation.setX(translation.x() + fracTrans * item->scaling().x());
         frameScaling = QVector3D(item->scaling().z()
