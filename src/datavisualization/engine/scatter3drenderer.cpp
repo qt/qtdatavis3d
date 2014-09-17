@@ -200,6 +200,10 @@ void Scatter3DRenderer::updateData()
 
             for (int i = 0; i < dataSize; i++)
                 updateRenderItem(dataArray.at(i), renderArray[i]);
+
+            if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic))
+                cache->setStaticBufferDirty(true);
+
             cache->setDataDirty(false);
         }
     }
@@ -232,7 +236,8 @@ void Scatter3DRenderer::updateData()
                         cache->setBufferObject(object);
                     }
                     if (renderArraySize != cache->oldArraySize()
-                            || cache->object()->objectFile() != cache->oldMeshFileName()) {
+                            || cache->object()->objectFile() != cache->oldMeshFileName()
+                            || cache->staticBufferDirty()) {
                         object->setScaleY(m_scaleY);
                         object->fullLoad(cache, m_dotSizeScale);
                         cache->setOldArraySize(renderArraySize);
@@ -241,6 +246,8 @@ void Scatter3DRenderer::updateData()
                         object->update(cache, m_dotSizeScale);
                     }
                 }
+
+                cache->setStaticBufferDirty(false);
             }
         }
     }

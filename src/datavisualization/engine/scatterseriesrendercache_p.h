@@ -53,6 +53,8 @@ public:
     inline float itemSize() const { return m_itemSize; }
     inline void setSelectionIndexOffset(int offset) { m_selectionIndexOffset = offset; }
     inline int selectionIndexOffset() const { return m_selectionIndexOffset; }
+    inline void setStaticBufferDirty(bool state) { m_staticBufferDirty = state; }
+    inline bool staticBufferDirty() const { return m_staticBufferDirty; }
     inline int oldArraySize() const { return m_oldRenderArraySize; }
     inline void setOldArraySize(int size) { m_oldRenderArraySize = size; }
     inline const QString &oldMeshFileName() const { return m_oldMeshFileName; }
@@ -66,6 +68,7 @@ protected:
     ScatterRenderItemArray m_renderArray;
     float m_itemSize;
     int m_selectionIndexOffset; // Temporarily cached value for selection color calculations
+    bool m_staticBufferDirty;
     int m_oldRenderArraySize; // Used to detect if full buffer change needed
     QString m_oldMeshFileName; // Used to detect if full buffer change needed
     ScatterObjectBufferHelper *m_scatterBufferObj;
