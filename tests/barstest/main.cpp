@@ -262,6 +262,9 @@ int main(int argc, char **argv)
     reflectivitySlider->setValue(50);
     reflectivitySlider->setMaximum(100);
 
+    QPushButton *toggleCustomItemButton = new QPushButton(widget);
+    toggleCustomItemButton->setText(QStringLiteral("Toggle Custom Item"));
+
     QSlider *spacingSliderX = new QSlider(Qt::Horizontal, widget);
     spacingSliderX->setTickInterval(1);
     spacingSliderX->setMinimum(0);
@@ -431,7 +434,8 @@ int main(int argc, char **argv)
     vLayout3->addWidget(cameraTargetSliderY, 0, Qt::AlignTop);
     vLayout3->addWidget(cameraTargetSliderZ, 0, Qt::AlignTop);
     vLayout3->addWidget(reflectionCheckBox, 0, Qt::AlignTop);
-    vLayout3->addWidget(reflectivitySlider, 1, Qt::AlignTop);
+    vLayout3->addWidget(reflectivitySlider, 0, Qt::AlignTop);
+    vLayout3->addWidget(toggleCustomItemButton, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -564,6 +568,8 @@ int main(int argc, char **argv)
                      &GraphModifier::setReflection);
     QObject::connect(reflectivitySlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::setReflectivity);
+    QObject::connect(toggleCustomItemButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::toggleCustomItem);
 
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, addDataButton,
                      &QPushButton::setEnabled);

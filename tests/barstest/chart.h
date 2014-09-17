@@ -99,6 +99,7 @@ public:
     void setInputHandlerSelectionEnabled(int enabled);
     void setReflection(bool enabled);
     void setReflectivity(int value);
+    void toggleCustomItem();
 
 public slots:
     void flipViews();

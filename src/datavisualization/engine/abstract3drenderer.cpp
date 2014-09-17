@@ -1291,8 +1291,11 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
     while (loopCount < 2) {
         foreach (CustomRenderItem *item, m_customRenderCache) {
             // Check that the render item is visible, and skip drawing if not
-            if (!item->isVisible())
+            // Also check if reflected item is on the "wrong" side, and skip drawing if it is
+            if (!item->isVisible() || ((m_reflectionEnabled && reflection < 0.0f)
+                    && (m_yFlipped == item->translation().y() >= 0.0))) {
                 continue;
+            }
             if (loopCount == 0) {
                 if (item->isVolume()) {
                     volumeDetected = true;
@@ -1434,7 +1437,6 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                         shader->setUniformValue(shader->minBounds(), item->minBounds());
                         shader->setUniformValue(shader->maxBounds(), item->maxBounds());
 
-                        QVector3D slices;
                         if (shader == m_volumeTextureSliceShader) {
                             shader->setUniformValue(shader->volumeSliceIndices(),
                                                     item->sliceFractions());

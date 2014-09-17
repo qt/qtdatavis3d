@@ -729,6 +729,10 @@ qreal QAbstract3DGraph::horizontalAspectRatio() const
  *
  * \note Affects only Q3DBars.
  *
+ * \note In Q3DBars graphs holding both positive and negative values, reflections are not supported
+ * for custom items that intersect the floor plane. In that case, reflections should be turned off
+ * to avoid incorrect rendering.
+ *
  * \sa reflectivity
  */
 void QAbstract3DGraph::setReflection(bool enable)

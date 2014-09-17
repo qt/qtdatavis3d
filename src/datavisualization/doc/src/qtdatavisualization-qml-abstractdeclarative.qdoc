@@ -357,6 +357,10 @@
  *
  * \note Affects only Bars3D.
  *
+ * \note In Bars3D graphs holding both positive and negative values, reflections are not supported
+ * for custom items that intersect the floor plane. In that case, reflections should be turned off
+ * to avoid incorrect rendering.
+ *
  * \sa reflectivity
  */
 

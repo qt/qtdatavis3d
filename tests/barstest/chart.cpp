@@ -26,6 +26,7 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/q3dinputhandler.h>
+#include <QtDataVisualization/qcustom3ditem.h>
 #include <QtCore/QTime>
 #include <QtCore/qmath.h>
 
@@ -240,7 +241,6 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
 
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &GraphModifier::handleFpsChange);
-
 
     resetTemperatureData();
 }
@@ -626,33 +626,33 @@ void GraphModifier::changeTheme()
         m_graph->setActiveTheme(m_builtinTheme);
 
     switch (theme) {
-        case Q3DTheme::ThemeQt:
-            qDebug() << __FUNCTION__ << "ThemeQt";
-            break;
-        case Q3DTheme::ThemePrimaryColors:
-            qDebug() << __FUNCTION__ << "ThemePrimaryColors";
-            break;
-        case Q3DTheme::ThemeDigia:
-            qDebug() << __FUNCTION__ << "ThemeDigia";
-            break;
-        case Q3DTheme::ThemeStoneMoss:
-            qDebug() << __FUNCTION__ << "ThemeStoneMoss";
-            break;
-        case Q3DTheme::ThemeArmyBlue:
-            qDebug() << __FUNCTION__ << "ThemeArmyBlue";
-            break;
-        case Q3DTheme::ThemeRetro:
-            qDebug() << __FUNCTION__ << "ThemeRetro";
-            break;
-        case Q3DTheme::ThemeEbony:
-            qDebug() << __FUNCTION__ << "ThemeEbony";
-            break;
-        case Q3DTheme::ThemeIsabelle:
-            qDebug() << __FUNCTION__ << "ThemeIsabelle";
-            break;
-        default:
-            qDebug() << __FUNCTION__ << "Unknown theme";
-            break;
+    case Q3DTheme::ThemeQt:
+        qDebug() << __FUNCTION__ << "ThemeQt";
+        break;
+    case Q3DTheme::ThemePrimaryColors:
+        qDebug() << __FUNCTION__ << "ThemePrimaryColors";
+        break;
+    case Q3DTheme::ThemeDigia:
+        qDebug() << __FUNCTION__ << "ThemeDigia";
+        break;
+    case Q3DTheme::ThemeStoneMoss:
+        qDebug() << __FUNCTION__ << "ThemeStoneMoss";
+        break;
+    case Q3DTheme::ThemeArmyBlue:
+        qDebug() << __FUNCTION__ << "ThemeArmyBlue";
+        break;
+    case Q3DTheme::ThemeRetro:
+        qDebug() << __FUNCTION__ << "ThemeRetro";
+        break;
+    case Q3DTheme::ThemeEbony:
+        qDebug() << __FUNCTION__ << "ThemeEbony";
+        break;
+    case Q3DTheme::ThemeIsabelle:
+        qDebug() << __FUNCTION__ << "ThemeIsabelle";
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Unknown theme";
+        break;
     }
 
     if (++theme > Q3DTheme::ThemeIsabelle)
@@ -1128,7 +1128,7 @@ void GraphModifier::changeValueAxisFormat(const QString & text)
 void GraphModifier::changeLogBase(const QString &text)
 {
     QLogValue3DAxisFormatter *formatter =
-        qobject_cast<QLogValue3DAxisFormatter *>(m_graph->valueAxis()->formatter());
+            qobject_cast<QLogValue3DAxisFormatter *>(m_graph->valueAxis()->formatter());
     if (formatter)
         formatter->setBase(qreal(text.toDouble()));
 }
@@ -1722,4 +1722,34 @@ void GraphModifier::setReflectivity(int value)
 {
     qreal reflectivity = (qreal)value / 100.0;
     m_graph->setReflectivity(reflectivity);
+}
+
+void GraphModifier::toggleCustomItem()
+{
+    static int counter = 0;
+    int state = ++counter % 3;
+
+    QVector3D positionOne = QVector3D(6.0f, -15.0f, 3.0f);
+    QVector3D positionTwo = QVector3D(2.0f, 18.0f, 3.0f);
+
+    if (state == 0) {
+        m_graph->removeCustomItemAt(positionTwo);
+    } else if (state == 1) {
+        QCustom3DItem *item = new QCustom3DItem();
+        item->setMeshFile(":/shuttle.obj");
+        item->setPosition(positionOne);
+        item->setScaling(QVector3D(0.1f, 0.1f, 0.1f));
+        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rand()));
+        item->setTextureImage(QImage(":/shuttle.png"));
+        m_graph->addCustomItem(item);
+    } else {
+        m_graph->removeCustomItemAt(positionOne);
+        QCustom3DItem *item = new QCustom3DItem();
+        item->setMeshFile(":/shuttle.obj");
+        item->setPosition(positionTwo);
+        item->setScaling(QVector3D(0.1f, 0.1f, 0.1f));
+        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rand()));
+        item->setTextureImage(QImage(":/shuttle.png"));
+        m_graph->addCustomItem(item);
+    }
 }
