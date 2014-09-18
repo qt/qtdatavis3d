@@ -152,46 +152,54 @@ QImage Utils::getGradientImage(QLinearGradient &gradient)
     return image;
 }
 
-Utils::ParamType Utils::mapFormatCharToParamType(const QChar &formatChar)
+Utils::ParamType Utils::preParseFormat(const QString &format, QString &preStr, QString &postStr,
+                                       int &precision, char &formatSpec)
+{
+    static QRegExp formatMatcher(QStringLiteral("^([^%]*)%([\\-\\+#\\s\\d\\.lhjztL]*)([dicuoxfegXFEG])(.*)$"));
+    static QRegExp precisionMatcher(QStringLiteral("\\.(\\d+)"));
+
+    Utils::ParamType retVal;
+
+    if (formatMatcher.indexIn(format, 0) != -1) {
+        preStr = formatMatcher.cap(1);
+        // Six and 'g' are defaults in Qt API
+        precision = 6;
+        if (!formatMatcher.cap(2).isEmpty()) {
+            if (precisionMatcher.indexIn(formatMatcher.cap(2), 0) != -1)
+                precision = precisionMatcher.cap(1).toInt();
+        }
+        if (formatMatcher.cap(3).isEmpty())
+            formatSpec = 'g';
+        else
+            formatSpec = formatMatcher.cap(3).at(0).toLatin1();
+        postStr = formatMatcher.cap(4);
+        retVal = mapFormatCharToParamType(formatSpec);
+    } else {
+        retVal = ParamTypeUnknown;
+        // The out parameters are irrelevant in unknown case
+    }
+
+    return retVal;
+}
+
+Utils::ParamType Utils::mapFormatCharToParamType(char formatSpec)
 {
     ParamType retVal = ParamTypeUnknown;
-    if (formatChar == QLatin1Char('d')
-            || formatChar == QLatin1Char('i')
-            || formatChar == QLatin1Char('c')) {
+    if (formatSpec == 'd' || formatSpec == 'i' || formatSpec == 'c') {
         retVal = ParamTypeInt;
-    } else if (formatChar == QLatin1Char('u')
-               || formatChar == QLatin1Char('o')
-               || formatChar == QLatin1Char('x')
-               || formatChar == QLatin1Char('X')) {
+    } else if (formatSpec == 'u' || formatSpec == 'o'
+               || formatSpec == 'x'|| formatSpec == 'X') {
         retVal = ParamTypeUInt;
-    } else if (formatChar == QLatin1Char('f')
-               || formatChar == QLatin1Char('F')
-               || formatChar == QLatin1Char('e')
-               || formatChar == QLatin1Char('E')
-               || formatChar == QLatin1Char('g')
-               || formatChar == QLatin1Char('G')) {
+    } else if (formatSpec == 'f' || formatSpec == 'F'
+               || formatSpec == 'e' || formatSpec == 'E'
+               || formatSpec == 'g' || formatSpec == 'G') {
         retVal = ParamTypeReal;
     }
 
     return retVal;
 }
 
-Utils::ParamType Utils::findFormatParamType(const QString &format)
-{
-    static QRegExp formatMatcher(QStringLiteral("%[\\-\\+#\\s\\d\\.lhjztL]*([dicuoxfegXFEG])"));
-
-    if (formatMatcher.indexIn(format, 0) != -1) {
-        QString capStr = formatMatcher.cap(1);
-        if (capStr.isEmpty())
-            return ParamTypeUnknown;
-        else
-            return mapFormatCharToParamType(capStr.at(0));
-    }
-
-    return ParamTypeUnknown;
-}
-
-QString Utils::formatLabel(const QByteArray &format, ParamType paramType, qreal value)
+QString Utils::formatLabelSprintf(const QByteArray &format, Utils::ParamType paramType, qreal value)
 {
     switch (paramType) {
     case ParamTypeInt:
@@ -201,7 +209,24 @@ QString Utils::formatLabel(const QByteArray &format, ParamType paramType, qreal 
     case ParamTypeReal:
         return QString().sprintf(format, value);
     default:
-        return QString::fromUtf8(format); // To detect errors
+        // Return format string to detect errors. Bars selection label logic also depends on this.
+        return QString::fromUtf8(format);
+    }
+}
+
+QString Utils::formatLabelLocalized(Utils::ParamType paramType, qreal value,
+                           const QLocale &locale, const QString &preStr, const QString &postStr,
+                           int precision, char formatSpec, const QByteArray &format)
+{
+    switch (paramType) {
+    case ParamTypeInt:
+    case ParamTypeUInt:
+        return preStr + locale.toString(qint64(value)) + postStr;
+    case ParamTypeReal:
+        return preStr + locale.toString(value, formatSpec, precision) + postStr;
+    default:
+        // Return format string to detect errors. Bars selection label logic also depends on this.
+        return QString::fromUtf8(format);
     }
 }
 

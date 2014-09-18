@@ -24,6 +24,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
+#include <QtCore/QLocale>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -59,6 +60,9 @@ protected:
     QVector<float> &subGridPositions() const;
     QVector<float> &labelPositions() const;
     QStringList &labelStrings() const;
+
+    void setLocale(const QLocale &locale);
+    QLocale locale() const;
 
     QScopedPointer<QValue3DAxisFormatterPrivate> d_ptr;
 

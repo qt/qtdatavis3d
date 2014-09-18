@@ -59,15 +59,19 @@ public:
     static QVector4D getSelection(QPoint mousepos, int height);
     static QImage getGradientImage(QLinearGradient &gradient);
 
-    static ParamType findFormatParamType(const QString &format);
-    static QString formatLabel(const QByteArray &format, ParamType paramType, qreal value);
+    static ParamType preParseFormat(const QString &format, QString &preStr, QString &postStr,
+                                    int &precision, char &formatSpec);
+    static QString formatLabelSprintf(const QByteArray &format, ParamType paramType, qreal value);
+    static QString formatLabelLocalized(ParamType paramType, qreal value,
+                               const QLocale &locale, const QString &preStr, const QString &postStr,
+                               int precision, char formatSpec, const QByteArray &format);
     static QString defaultLabelFormat();
 
     static float wrapValue(float value, float min, float max);
     static QQuaternion calculateRotation(const QVector3D &xyzRotations);
 
 private:
-    static ParamType mapFormatCharToParamType(const QChar &formatChar);
+    static ParamType mapFormatCharToParamType(char formatSpec);
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

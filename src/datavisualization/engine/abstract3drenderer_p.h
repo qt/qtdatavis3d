@@ -287,6 +287,8 @@ protected:
     bool m_reflectionEnabled;
     qreal m_reflectivity;
 
+    QLocale m_locale;
+
 private:
     friend class Abstract3DController;
 };

@@ -767,6 +767,25 @@ qreal QAbstract3DGraph::reflectivity() const
 }
 
 /*!
+ * \property QAbstract3DGraph::locale
+ * \since QtDataVisualization 1.2
+ *
+ * Sets the locale used for formatting various numeric labels.
+ * Defaults to \c{"C"} locale.
+ *
+ * \sa QValue3DAxis::labelFormat
+ */
+void QAbstract3DGraph::setLocale(const QLocale &locale)
+{
+    d_ptr->m_visualController->setLocale(locale);
+}
+
+QLocale QAbstract3DGraph::locale() const
+{
+    return d_ptr->m_visualController->locale();
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)
@@ -927,6 +946,8 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::reflectionChanged);
     QObject::connect(m_visualController, &Abstract3DController::reflectivityChanged, q_ptr,
                      &QAbstract3DGraph::reflectivityChanged);
+    QObject::connect(m_visualController, &Abstract3DController::localeChanged, q_ptr,
+                     &QAbstract3DGraph::localeChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

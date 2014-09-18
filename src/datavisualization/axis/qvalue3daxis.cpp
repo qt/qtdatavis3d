@@ -18,6 +18,7 @@
 
 #include "qvalue3daxis_p.h"
 #include "qvalue3daxisformatter_p.h"
+#include "abstract3dcontroller_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -68,8 +69,16 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string ValueAxis3D::labelFormat
  *
- * Defines the label format to be used for the labels on this axis. Supported specifiers are:
+ * Defines the label format to be used for the labels on this axis. How the format is interpreted
+ * depends on the axis formatter and the locale in use. Using the default formatter and default
+ * locale (\c{"C"}), the formatting uses QString::sprintf(). Supported specifiers are:
  * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
+ * For other locales, the default formatter uses reduced set of printf format specifiers:
+ * \c {d, i, f, F, e, E, g, G}. In these cases, the only supported modifier is the precision
+ * modifier for the floating point and exponential formats. The decimal point and other locale
+ * dependent formatting is done according to the graph locale.
+ *
+ * \sa AbstractGraph3D::locale
  */
 
 /*!
@@ -164,12 +173,20 @@ int QValue3DAxis::subSegmentCount() const
 /*!
  * \property QValue3DAxis::labelFormat
  *
- * Defines the label \a format to be used for the labels on this axis. Supported specifiers are:
+ * Defines the label format to be used for the labels on this axis. How the format is interpreted
+ * depends on the axis formatter and the locale in use. Using the default formatter and default
+ * locale (\c{"C"}), the formatting uses QString::sprintf(). Supported specifiers are:
  * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
+ * For other locales, the default formatter uses reduced set of printf format specifiers:
+ * \c {d, i, f, F, e, E, g, G}. In these cases, the only supported modifier is the precision
+ * modifier for the floating point and exponential formats. The decimal point and other locale
+ * dependent formatting is done according to the graph locale.
  *
  * Usage example:
  *
  * \c {axis->setLabelFormat("%.2f mm");}
+ *
+ * \sa formatter, QAbstract3DGraph::locale
  */
 void QValue3DAxis::setLabelFormat(const QString &format)
 {
@@ -201,6 +218,9 @@ void QValue3DAxis::setFormatter(QValue3DAxisFormatter *formatter)
         dptr()->m_formatter = formatter;
         formatter->setParent(this);
         formatter->d_ptr->setAxis(this);
+        Abstract3DController *controller = qobject_cast<Abstract3DController *>(parent());
+        if (controller)
+            formatter->setLocale(controller->locale());
         emit formatterChanged(formatter);
         emit dptr()->formatterDirty();
     }

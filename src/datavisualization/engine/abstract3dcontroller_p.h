@@ -38,6 +38,7 @@
 #include "qcustom3ditem.h"
 #include <QtGui/QLinearGradient>
 #include <QtCore/QTime>
+#include <QtCore/QLocale>
 
 class QOpenGLFramebufferObject;
 
@@ -171,6 +172,7 @@ private:
     QAbstract3DGraph::OptimizationHints m_optimizationHints;
     bool m_reflectionEnabled;
     qreal m_reflectivity;
+    QLocale m_locale;
 
 protected:
     Q3DScene *m_scene;
@@ -297,6 +299,9 @@ public:
     void setRadialLabelOffset(float offset);
     float radialLabelOffset() const;
 
+    void setLocale(const QLocale &locale);
+    QLocale locale() const;
+
     void emitNeedRender();
 
     virtual void clearSelection() = 0;
@@ -378,6 +383,7 @@ signals:
     void radialLabelOffsetChanged(float offset);
     void reflectionChanged(bool enabled);
     void reflectivityChanged(qreal reflectivity);
+    void localeChanged(const QLocale &locale);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

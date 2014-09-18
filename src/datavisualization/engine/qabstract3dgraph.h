@@ -25,6 +25,7 @@
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
+#include <QtCore/QLocale>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -55,6 +56,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(qreal horizontalAspectRatio READ horizontalAspectRatio WRITE setHorizontalAspectRatio NOTIFY horizontalAspectRatioChanged)
     Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged)
     Q_PROPERTY(qreal reflectivity READ reflectivity WRITE setReflectivity NOTIFY reflectivityChanged)
+    Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -170,6 +172,9 @@ public:
     void setReflectivity(qreal reflectivity);
     qreal reflectivity() const;
 
+    void setLocale(const QLocale &locale);
+    QLocale locale() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -198,6 +203,7 @@ signals:
     void horizontalAspectRatioChanged(qreal ratio);
     void reflectionChanged(bool enabled);
     void reflectivityChanged(qreal reflectivity);
+    void localeChanged(const QLocale &locale);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)

@@ -335,6 +335,12 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::radialLabelOffsetChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::horizontalAspectRatioChanged, this,
                      &AbstractDeclarative::horizontalAspectRatioChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::reflectionChanged, this,
+                     &AbstractDeclarative::reflectionChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::reflectivityChanged, this,
+                     &AbstractDeclarative::reflectivityChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::localeChanged, this,
+                     &AbstractDeclarative::localeChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -778,6 +784,16 @@ void AbstractDeclarative::setReflectivity(qreal reflectivity)
 qreal AbstractDeclarative::reflectivity() const
 {
     return m_controller->reflectivity();
+}
+
+void AbstractDeclarative::setLocale(const QLocale &locale)
+{
+    m_controller->setLocale(locale);
+}
+
+QLocale AbstractDeclarative::locale() const
+{
+    return m_controller->locale();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

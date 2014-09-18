@@ -42,6 +42,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_optimizationHints(QAbstract3DGraph::OptimizationDefault),
     m_reflectionEnabled(false),
     m_reflectivity(0.5),
+    m_locale(QLocale::c()),
     m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -1415,6 +1416,8 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
         handleAxisLabelFormatChangedBySender(valueAxis);
         handleAxisReversedChangedBySender(valueAxis);
         handleAxisFormatterDirtyBySender(valueAxis->dptr());
+
+        valueAxis->formatter()->setLocale(m_locale);
     }
 }
 
@@ -1630,6 +1633,30 @@ void Abstract3DController::setRadialLabelOffset(float offset)
 float Abstract3DController::radialLabelOffset() const
 {
     return m_radialLabelOffset;
+}
+
+void Abstract3DController::setLocale(const QLocale &locale)
+{
+    if (m_locale != locale) {
+        m_locale = locale;
+
+        // Value axis formatters need to be updated
+        QValue3DAxis *axis = qobject_cast<QValue3DAxis *>(m_axisX);
+        if (axis)
+            axis->formatter()->setLocale(m_locale);
+        axis = qobject_cast<QValue3DAxis *>(m_axisY);
+        if (axis)
+            axis->formatter()->setLocale(m_locale);
+        axis = qobject_cast<QValue3DAxis *>(m_axisZ);
+        if (axis)
+            axis->formatter()->setLocale(m_locale);
+        emit localeChanged(m_locale);
+    }
+}
+
+QLocale Abstract3DController::locale() const
+{
+    return m_locale;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

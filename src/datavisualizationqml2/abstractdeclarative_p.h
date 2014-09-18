@@ -77,6 +77,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(qreal horizontalAspectRatio READ horizontalAspectRatio WRITE setHorizontalAspectRatio NOTIFY horizontalAspectRatioChanged REVISION 2)
     Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged REVISION 2)
     Q_PROPERTY(qreal reflectivity READ reflectivity WRITE setReflectivity NOTIFY reflectivityChanged REVISION 2)
+    Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged REVISION 2)
 
 public:
     enum SelectionFlag {
@@ -213,6 +214,9 @@ public:
     void setReflectivity(qreal reflectivity);
     qreal reflectivity() const;
 
+    void setLocale(const QLocale &locale);
+    QLocale locale() const;
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -255,6 +259,7 @@ signals:
     Q_REVISION(2) void horizontalAspectRatioChanged(qreal ratio);
     Q_REVISION(2) void reflectionChanged(bool enabled);
     Q_REVISION(2) void reflectivityChanged(qreal reflectivity);
+    Q_REVISION(2) void localeChanged(const QLocale &locale);
 
 private:
     QPointer<Abstract3DController> m_controller;

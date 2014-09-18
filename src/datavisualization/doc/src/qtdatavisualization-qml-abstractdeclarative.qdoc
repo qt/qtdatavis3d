@@ -375,3 +375,13 @@
  *
  * \sa reflection
  */
+
+/*!
+ * \qmlproperty locale AbstractGraph3D::locale
+ * \since QtDataVisualization 1.2
+ *
+ * Sets the locale used for formatting various numeric labels.
+ * Defaults to \c{"C"} locale.
+ *
+ * \sa ValueAxis3D::labelFormat
+ */
