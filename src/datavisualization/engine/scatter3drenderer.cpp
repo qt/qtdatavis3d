@@ -49,7 +49,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
-      m_labelShader(0),
       m_staticGradientPointShader(0),
       m_bgrTexture(0),
       m_selectionTexture(0),
@@ -93,7 +92,6 @@ Scatter3DRenderer::~Scatter3DRenderer()
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
-    delete m_labelShader;
     delete m_staticGradientPointShader;
 }
 
@@ -102,8 +100,6 @@ void Scatter3DRenderer::initializeOpenGL()
     Abstract3DRenderer::initializeOpenGL();
 
     // Initialize shaders
-    initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
-                     QStringLiteral(":/shaders/fragmentLabel"));
 
 #if !defined(QT_OPENGL_ES_2)
     // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
@@ -2260,14 +2256,6 @@ void Scatter3DRenderer::initBackgroundShaders(const QString &vertexShader,
     m_backgroundShader->initialize();
 }
 
-void Scatter3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
-{
-    if (m_labelShader)
-        delete m_labelShader;
-    m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
-    m_labelShader->initialize();
-}
-
 void Scatter3DRenderer::initStaticPointShaders(const QString &vertexShader,
                                                const QString &fragmentShader)
 {
@@ -2276,7 +2264,6 @@ void Scatter3DRenderer::initStaticPointShaders(const QString &vertexShader,
     m_staticGradientPointShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_staticGradientPointShader->initialize();
 }
-
 
 void Scatter3DRenderer::selectionColorToSeriesAndIndex(const QVector4D &color,
                                                        int &index,

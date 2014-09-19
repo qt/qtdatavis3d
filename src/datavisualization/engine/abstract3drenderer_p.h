@@ -98,6 +98,8 @@ public:
                                           const QString &sliceShader,
                                           const QString &sliceFrameVertexShader,
                                           const QString &sliceFrameShader);
+    virtual void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
+
     virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
                                 QAbstract3DAxis::AxisType type);
     virtual void updateAxisTitle(QAbstract3DAxis::AxisOrientation orientation,
@@ -253,6 +255,7 @@ protected:
     ShaderHelper *m_volumeTextureLowDefShader;
     ShaderHelper *m_volumeTextureSliceShader;
     ShaderHelper *m_volumeSliceFrameShader;
+    ShaderHelper *m_labelShader;
 
     bool m_useOrthoProjection;
     bool m_xFlipped;

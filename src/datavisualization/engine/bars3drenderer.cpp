@@ -47,7 +47,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
-      m_labelShader(0),
       m_bgrTexture(0),
       m_selectionTexture(0),
       m_depthFrameBuffer(0),
@@ -102,7 +101,6 @@ Bars3DRenderer::~Bars3DRenderer()
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
-    delete m_labelShader;
 }
 
 void Bars3DRenderer::initializeOpenGL()
@@ -110,8 +108,6 @@ void Bars3DRenderer::initializeOpenGL()
     Abstract3DRenderer::initializeOpenGL();
 
     // Initialize shaders
-    initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
-                     QStringLiteral(":/shaders/fragmentLabel"));
 
 #if !defined(QT_OPENGL_ES_2)
     // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
@@ -2812,14 +2808,6 @@ void Bars3DRenderer::initBackgroundShaders(const QString &vertexShader,
         delete m_backgroundShader;
     m_backgroundShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_backgroundShader->initialize();
-}
-
-void Bars3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
-{
-    if (m_labelShader)
-        delete m_labelShader;
-    m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
-    m_labelShader->initialize();
 }
 
 QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position, bool isAbsolute)

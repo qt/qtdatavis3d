@@ -49,7 +49,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_surfaceSliceFlatShader(0),
       m_surfaceSliceSmoothShader(0),
       m_selectionShader(0),
-      m_labelShader(0),
       m_heightNormalizer(0.0f),
       m_scaleX(0.0f),
       m_scaleY(0.0f),
@@ -110,7 +109,6 @@ Surface3DRenderer::~Surface3DRenderer()
     delete m_surfaceGridShader;
     delete m_surfaceSliceFlatShader;
     delete m_surfaceSliceSmoothShader;
-    delete m_labelShader;
 }
 
 void Surface3DRenderer::initializeOpenGL()
@@ -119,8 +117,6 @@ void Surface3DRenderer::initializeOpenGL()
 
     // Initialize shaders
     initSurfaceShaders();
-    initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
-                     QStringLiteral(":/shaders/fragmentLabel"));
 
 #if !defined(QT_OPENGL_ES_2)
     // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
@@ -2954,14 +2950,6 @@ void Surface3DRenderer::initSurfaceShaders()
 
     // Triggers surface shader selection by shadow setting
     handleShadowQualityChange();
-}
-
-void Surface3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
-{
-    if (m_labelShader)
-        delete m_labelShader;
-    m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
-    m_labelShader->initialize();
 }
 
 #if !defined(QT_OPENGL_ES_2)

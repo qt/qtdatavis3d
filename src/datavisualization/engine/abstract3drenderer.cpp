@@ -63,6 +63,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_volumeTextureLowDefShader(0),
       m_volumeTextureSliceShader(0),
       m_volumeSliceFrameShader(0),
+      m_labelShader(0),
       m_useOrthoProjection(false),
       m_xFlipped(false),
       m_yFlipped(false),
@@ -108,6 +109,7 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_volumeTextureLowDefShader;
     delete m_volumeSliceFrameShader;
     delete m_volumeTextureSliceShader;
+    delete m_labelShader;
 
     foreach (SeriesRenderCache *cache, m_renderCacheList) {
         cache->cleanup(m_textureHelper);
@@ -152,6 +154,9 @@ void Abstract3DRenderer::initializeOpenGL()
     axisCacheForOrientation(QAbstract3DAxis::AxisOrientationX).setDrawer(m_drawer);
     axisCacheForOrientation(QAbstract3DAxis::AxisOrientationY).setDrawer(m_drawer);
     axisCacheForOrientation(QAbstract3DAxis::AxisOrientationZ).setDrawer(m_drawer);
+
+    initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
+                     QStringLiteral(":/shaders/fragmentLabel"));
 }
 
 void Abstract3DRenderer::render(const GLuint defaultFboHandle)
@@ -230,6 +235,13 @@ void Abstract3DRenderer::initVolumeTextureShaders(const QString &vertexShader,
     delete m_volumeSliceFrameShader;
     m_volumeSliceFrameShader = new ShaderHelper(this, sliceFrameVertexShader, sliceFrameShader);
     m_volumeSliceFrameShader->initialize();
+}
+
+void Abstract3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
+{
+    delete m_labelShader;
+    m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_labelShader->initialize();
 }
 
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
@@ -1366,8 +1378,8 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
 
             if (RenderingNormal == state) {
                 // Normal render
-#if !defined(QT_OPENGL_ES_2)
                 ShaderHelper *prevShader = shader;
+#if !defined(QT_OPENGL_ES_2)
                 if (item->isVolume()) {
                     if (item->drawSlices() &&
                             (item->sliceIndexX() >= 0
@@ -1379,12 +1391,14 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                     } else {
                         shader = m_volumeTextureLowDefShader;
                     }
-                } else {
+                } else
+#endif
+                if (item->isLabel())
+                    shader = m_labelShader;
+                else
                     shader = regularShader;
-                }
                 if (shader != prevShader)
                     shader->bind();
-#endif
                 shader->setUniformValue(shader->model(), modelMatrix);
                 shader->setUniformValue(shader->MVP(), MVPMatrix);
                 shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());

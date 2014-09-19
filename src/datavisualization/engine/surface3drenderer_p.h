@@ -57,7 +57,6 @@ private:
     ShaderHelper *m_surfaceSliceFlatShader;
     ShaderHelper *m_surfaceSliceSmoothShader;
     ShaderHelper *m_selectionShader;
-    ShaderHelper *m_labelShader;
     float m_heightNormalizer;
     float m_scaleX;
     float m_scaleY;
@@ -137,7 +136,6 @@ private:
 
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShaders();
     void initSurfaceShaders();
     void initSelectionBuffer();

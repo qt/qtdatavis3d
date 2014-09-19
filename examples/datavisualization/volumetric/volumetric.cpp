@@ -198,7 +198,6 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     warningLabel->setPositionAbsolute(true);
     warningLabel->setFacingCamera(true);
     m_graph->addCustomItem(warningLabel);
-    m_graph->activeTheme()->setLightStrength(1.0f);
 #endif
 
     QObject::connect(m_graph->scene()->activeCamera(), &Q3DCamera::zoomLevelChanged, this,
@@ -266,10 +265,10 @@ void VolumetricModifier::sliceZ(int enabled)
 
 void VolumetricModifier::adjustSliceX(int value)
 {
-    m_sliceIndexX = value / (1024 / m_volumeItem->textureWidth());
-    if (m_sliceIndexX == m_volumeItem->textureWidth())
-        m_sliceIndexX--;
     if (m_volumeItem) {
+        m_sliceIndexX = value / (1024 / m_volumeItem->textureWidth());
+        if (m_sliceIndexX == m_volumeItem->textureWidth())
+            m_sliceIndexX--;
         if (m_volumeItem->sliceIndexX() != -1)
             //! [7]
             m_volumeItem->setSliceIndexX(m_sliceIndexX);
@@ -283,10 +282,10 @@ void VolumetricModifier::adjustSliceX(int value)
 
 void VolumetricModifier::adjustSliceY(int value)
 {
-    m_sliceIndexY = value / (1024 / m_volumeItem->textureHeight());
-    if (m_sliceIndexY == m_volumeItem->textureHeight())
-        m_sliceIndexY--;
     if (m_volumeItem) {
+        m_sliceIndexY = value / (1024 / m_volumeItem->textureHeight());
+        if (m_sliceIndexY == m_volumeItem->textureHeight())
+            m_sliceIndexY--;
         if (m_volumeItem->sliceIndexY() != -1)
             m_volumeItem->setSliceIndexY(m_sliceIndexY);
         m_sliceLabelY->setPixmap(
@@ -296,10 +295,10 @@ void VolumetricModifier::adjustSliceY(int value)
 
 void VolumetricModifier::adjustSliceZ(int value)
 {
-    m_sliceIndexZ = value / (1024 / m_volumeItem->textureDepth());
-    if (m_sliceIndexZ == m_volumeItem->textureDepth())
-        m_sliceIndexZ--;
-    if (m_volumeItem)  {
+    if (m_volumeItem) {
+        m_sliceIndexZ = value / (1024 / m_volumeItem->textureDepth());
+        if (m_sliceIndexZ == m_volumeItem->textureDepth())
+            m_sliceIndexZ--;
         if (m_volumeItem->sliceIndexZ() != -1)
             m_volumeItem->setSliceIndexZ(m_sliceIndexZ);
         m_sliceLabelZ->setPixmap(
@@ -353,7 +352,7 @@ void VolumetricModifier::handleTimeout()
 
 void VolumetricModifier::toggleLowDetail(bool enabled)
 {
-    if (enabled) {
+    if (enabled && m_volumeItem) {
         m_volumeItem->setTextureData(new QVector<uchar>(*m_lowDetailData));
         m_volumeItem->setTextureDimensions(lowDetailSize, lowDetailSize / 2, lowDetailSize);
         adjustSliceX(m_sliceSliderX->value());
@@ -364,7 +363,7 @@ void VolumetricModifier::toggleLowDetail(bool enabled)
 
 void VolumetricModifier::toggleMediumDetail(bool enabled)
 {
-    if (enabled) {
+    if (enabled && m_volumeItem) {
         m_volumeItem->setTextureData(new QVector<uchar>(*m_mediumDetailData));
         m_volumeItem->setTextureDimensions(mediumDetailSize, mediumDetailSize / 2, mediumDetailSize);
         adjustSliceX(m_sliceSliderX->value());
@@ -375,7 +374,7 @@ void VolumetricModifier::toggleMediumDetail(bool enabled)
 
 void VolumetricModifier::toggleHighDetail(bool enabled)
 {
-    if (enabled) {
+    if (enabled && m_volumeItem) {
         m_volumeItem->setTextureData(new QVector<uchar>(*m_highDetailData));
         m_volumeItem->setTextureDimensions(highDetailSize, highDetailSize / 2, highDetailSize);
         adjustSliceX(m_sliceSliderX->value());
@@ -407,76 +406,87 @@ void VolumetricModifier::setSliceSliders(QSlider *sliderX, QSlider *sliderY, QSl
 
 void VolumetricModifier::changeColorTable(int enabled)
 {
-    if (enabled)
-        m_volumeItem->setColorTable(m_colorTable2);
-    else
-        m_volumeItem->setColorTable(m_colorTable1);
+    if (m_volumeItem) {
+        if (enabled)
+            m_volumeItem->setColorTable(m_colorTable2);
+        else
+            m_volumeItem->setColorTable(m_colorTable1);
 
-    m_usingPrimaryTable = !enabled;
+        m_usingPrimaryTable = !enabled;
 
-    // Rerender image labels
-    adjustSliceX(m_sliceSliderX->value());
-    adjustSliceY(m_sliceSliderY->value());
-    adjustSliceZ(m_sliceSliderZ->value());
+        // Rerender image labels
+        adjustSliceX(m_sliceSliderX->value());
+        adjustSliceY(m_sliceSliderY->value());
+        adjustSliceZ(m_sliceSliderZ->value());
+    }
 }
 
 void VolumetricModifier::setPreserveOpacity(bool enabled)
 {
-    //! [10]
-    m_volumeItem->setPreserveOpacity(enabled);
-    //! [10]
 
-    // Rerender image labels
-    adjustSliceX(m_sliceSliderX->value());
-    adjustSliceY(m_sliceSliderY->value());
-    adjustSliceZ(m_sliceSliderZ->value());
+    if (m_volumeItem) {
+        //! [10]
+        m_volumeItem->setPreserveOpacity(enabled);
+        //! [10]
+
+        // Rerender image labels
+        adjustSliceX(m_sliceSliderX->value());
+        adjustSliceY(m_sliceSliderY->value());
+        adjustSliceZ(m_sliceSliderZ->value());
+    }
 }
 
 void VolumetricModifier::setTransparentGround(bool enabled)
 {
-    //! [12]
-    int newAlpha = enabled ? terrainTransparency : 255;
-    for (int i = aboveWaterGroundColorsMin; i < underWaterGroundColorsMax; i++) {
-        QRgb oldColor1 = m_colorTable1.at(i);
-        QRgb oldColor2 = m_colorTable2.at(i);
-        m_colorTable1[i] = qRgba(qRed(oldColor1), qGreen(oldColor1), qBlue(oldColor1), newAlpha);
-        m_colorTable2[i] = qRgba(qRed(oldColor2), qGreen(oldColor2), qBlue(oldColor2), newAlpha);
+    if (m_volumeItem) {
+        //! [12]
+        int newAlpha = enabled ? terrainTransparency : 255;
+        for (int i = aboveWaterGroundColorsMin; i < underWaterGroundColorsMax; i++) {
+            QRgb oldColor1 = m_colorTable1.at(i);
+            QRgb oldColor2 = m_colorTable2.at(i);
+            m_colorTable1[i] = qRgba(qRed(oldColor1), qGreen(oldColor1), qBlue(oldColor1), newAlpha);
+            m_colorTable2[i] = qRgba(qRed(oldColor2), qGreen(oldColor2), qBlue(oldColor2), newAlpha);
+        }
+        if (m_usingPrimaryTable)
+            m_volumeItem->setColorTable(m_colorTable1);
+        else
+            m_volumeItem->setColorTable(m_colorTable2);
+        //! [12]
+        adjustSliceX(m_sliceSliderX->value());
+        adjustSliceY(m_sliceSliderY->value());
+        adjustSliceZ(m_sliceSliderZ->value());
     }
-    if (m_usingPrimaryTable)
-        m_volumeItem->setColorTable(m_colorTable1);
-    else
-        m_volumeItem->setColorTable(m_colorTable2);
-    //! [12]
-    adjustSliceX(m_sliceSliderX->value());
-    adjustSliceY(m_sliceSliderY->value());
-    adjustSliceZ(m_sliceSliderZ->value());
 }
 
 void VolumetricModifier::setUseHighDefShader(bool enabled)
 {
-    //! [13]
-    m_volumeItem->setUseHighDefShader(enabled);
-    //! [13]
+    if (m_volumeItem) {
+        //! [13]
+        m_volumeItem->setUseHighDefShader(enabled);
+        //! [13]
+    }
 }
 
 void VolumetricModifier::adjustAlphaMultiplier(int value)
 {
-    float mult;
-    if (value > 100)
-        mult = float(value - 99) / 2.0f;
-    else
-        mult = float(value) / float(500 - value * 4);
-    //! [11]
-    m_volumeItem->setAlphaMultiplier(mult);
-    //! [11]
-    QString labelFormat = QStringLiteral("Alpha multiplier: %1");
-    m_alphaMultiplierLabel->setText(labelFormat.arg(
-                                        QString::number(m_volumeItem->alphaMultiplier(), 'f', 3)));
+    if (m_volumeItem) {
+        float mult;
+        if (value > 100)
+            mult = float(value - 99) / 2.0f;
+        else
+            mult = float(value) / float(500 - value * 4);
+        //! [11]
+        m_volumeItem->setAlphaMultiplier(mult);
+        //! [11]
+        QString labelFormat = QStringLiteral("Alpha multiplier: %1");
+        m_alphaMultiplierLabel->setText(labelFormat.arg(
+                                            QString::number(m_volumeItem->alphaMultiplier(), 'f', 3)));
 
-    // Rerender image labels
-    adjustSliceX(m_sliceSliderX->value());
-    adjustSliceY(m_sliceSliderY->value());
-    adjustSliceZ(m_sliceSliderZ->value());
+        // Rerender image labels
+        adjustSliceX(m_sliceSliderX->value());
+        adjustSliceY(m_sliceSliderY->value());
+        adjustSliceZ(m_sliceSliderZ->value());
+    }
 }
 
 void VolumetricModifier::toggleAreaAll(bool enabled)
