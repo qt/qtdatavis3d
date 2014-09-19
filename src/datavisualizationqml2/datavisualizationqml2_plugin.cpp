@@ -116,6 +116,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<DeclarativeSurface, 1>(uri, 1, 2, "Surface3D");
     qmlRegisterType<Q3DCamera, 1>(uri, 1, 2, "Camera3D");
     qmlRegisterType<QCustom3DItem, 1>(uri, 1, 2, "Custom3DItem");
+    qmlRegisterType<DeclarativeBars, 1>(uri, 1, 2, "Bars3D");
 
     // New types
     qmlRegisterType<Q3DInputHandler>(uri, 1, 2, "InputHandler3D");

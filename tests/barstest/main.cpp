@@ -262,6 +262,11 @@ int main(int argc, char **argv)
     reflectivitySlider->setValue(50);
     reflectivitySlider->setMaximum(100);
 
+    QSlider *floorLevelSlider = new QSlider(Qt::Horizontal, widget);
+    floorLevelSlider->setMinimum(-50);
+    floorLevelSlider->setValue(0);
+    floorLevelSlider->setMaximum(50);
+
     QPushButton *toggleCustomItemButton = new QPushButton(widget);
     toggleCustomItemButton->setText(QStringLiteral("Toggle Custom Item"));
 
@@ -435,7 +440,9 @@ int main(int argc, char **argv)
     vLayout3->addWidget(cameraTargetSliderZ, 0, Qt::AlignTop);
     vLayout3->addWidget(reflectionCheckBox, 0, Qt::AlignTop);
     vLayout3->addWidget(reflectivitySlider, 0, Qt::AlignTop);
-    vLayout3->addWidget(toggleCustomItemButton, 1, Qt::AlignTop);
+    vLayout3->addWidget(toggleCustomItemButton, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust floor level")), 0, Qt::AlignTop);
+    vLayout3->addWidget(floorLevelSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -568,6 +575,8 @@ int main(int argc, char **argv)
                      &GraphModifier::setReflection);
     QObject::connect(reflectivitySlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::setReflectivity);
+    QObject::connect(floorLevelSlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setFloorLevel);
     QObject::connect(toggleCustomItemButton, &QPushButton::clicked, modifier,
                      &GraphModifier::toggleCustomItem);
 

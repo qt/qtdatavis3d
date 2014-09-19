@@ -99,6 +99,8 @@ private:
     float m_zeroPosition;
     float m_xScaleFactor;
     float m_zScaleFactor;
+    float m_floorLevel;
+    float m_actualFloorLevel;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
@@ -115,6 +117,7 @@ public:
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
     void updateAspectRatio(float ratio);
+    void updateFloorLevel(float level);
 
 protected:
     virtual void initializeOpenGL();

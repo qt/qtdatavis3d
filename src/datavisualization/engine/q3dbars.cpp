@@ -331,6 +331,26 @@ QBar3DSeries *Q3DBars::selectedSeries() const
 }
 
 /*!
+ * \property Q3DBars::floorLevel
+ *
+ * The desired floor level for the bar graph in Y-axis data coordinates.
+ * The actual floor level cannot go below Y-axis minimum or above Y-axis maximum.
+ * Defaults to zero.
+ */
+void Q3DBars::setFloorLevel(float level)
+{
+    if (level != floorLevel()) {
+        dptr()->m_shared->setFloorLevel(level);
+        emit floorLevelChanged(level);
+    }
+}
+
+float Q3DBars::floorLevel() const
+{
+    return dptrc()->m_shared->floorLevel();
+}
+
+/*!
  * Adds \a axis to the graph. The axes added via addAxis are not yet taken to use,
  * addAxis is simply used to give the ownership of the \a axis to the graph.
  * The \a axis must not be null or added to another graph.

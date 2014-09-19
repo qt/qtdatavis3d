@@ -1519,6 +1519,12 @@ void GraphModifier::setCameraTargetZ(int value)
     qDebug() << "m_cameraTarget:" << m_cameraTarget;
 }
 
+void GraphModifier::setFloorLevel(int value)
+{
+    m_graph->setFloorLevel(float(value));
+    qDebug() << "Floor level:" << value;
+}
+
 void GraphModifier::populateFlatSeries(QBar3DSeries *series, int rows, int columns, float value)
 {
     QBarDataArray *dataArray = new QBarDataArray;

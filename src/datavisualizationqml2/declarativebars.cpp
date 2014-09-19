@@ -129,6 +129,19 @@ QBar3DSeries *DeclarativeBars::selectedSeries() const
     return m_barsController->selectedSeries();
 }
 
+void DeclarativeBars::setFloorLevel(float level)
+{
+    if (level != floorLevel()) {
+        m_barsController->setFloorLevel(level);
+        emit floorLevelChanged(level);
+    }
+}
+
+float DeclarativeBars::floorLevel() const
+{
+    return m_barsController->floorLevel();
+}
+
 QQmlListProperty<QBar3DSeries> DeclarativeBars::seriesList()
 {
     return QQmlListProperty<QBar3DSeries>(this, this,

@@ -74,6 +74,8 @@ Rectangle {
 
             customItemList: [shuttleItem, labelItem]
             orthoProjection: true
+
+            floorLevel: 10
         }
 
         Custom3DItem {

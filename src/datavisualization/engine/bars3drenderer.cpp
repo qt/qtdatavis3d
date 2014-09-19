@@ -77,7 +77,9 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_haveGradientSeries(false),
       m_zeroPosition(0.0f),
       m_xScaleFactor(1.0f),
-      m_zScaleFactor(1.0f)
+      m_zScaleFactor(1.0f),
+      m_floorLevel(0.0f),
+      m_actualFloorLevel(0.0f)
 {
     m_axisCacheY.setScale(2.0f);
     m_axisCacheY.setTranslate(-1.0f);
@@ -209,7 +211,7 @@ void Bars3DRenderer::updateData()
 
     calculateSceneScalingFactors();
 
-    m_zeroPosition = m_axisCacheY.formatter()->positionAt(0.0f);
+    m_zeroPosition = m_axisCacheY.formatter()->positionAt(m_actualFloorLevel);
 
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
         BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
@@ -2457,14 +2459,8 @@ void Bars3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientatio
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
 
-    if (orientation == QAbstract3DAxis::AxisOrientationY) {
-        // Check if we have negative values
-        if (min < 0)
-            m_hasNegativeValues = true;
-        else if (min >= 0)
-            m_hasNegativeValues = false;
+    if (orientation == QAbstract3DAxis::AxisOrientationY)
         calculateHeightAdjustment();
-    }
 }
 
 void Bars3DRenderer::updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation, bool enable)
@@ -2602,24 +2598,33 @@ void Bars3DRenderer::calculateSceneScalingFactors()
 
 void Bars3DRenderer::calculateHeightAdjustment()
 {
+    float min = m_axisCacheY.min();
+    float max = m_axisCacheY.max();
     GLfloat newAdjustment = 1.0f;
-    GLfloat maxAbs = qFabs(m_axisCacheY.max());
+    m_actualFloorLevel = qBound(min, m_floorLevel, max);
+    GLfloat maxAbs = qFabs(max - m_actualFloorLevel);
 
-    if (m_axisCacheY.max() < 0.0f) {
-        m_heightNormalizer = GLfloat(qFabs(m_axisCacheY.min()) - qFabs(m_axisCacheY.max()));
-        maxAbs = qFabs(m_axisCacheY.max()) - qFabs(m_axisCacheY.min());
+    // Check if we have negative values
+    if (min < m_actualFloorLevel)
+        m_hasNegativeValues = true;
+    else if (min >= m_actualFloorLevel)
+        m_hasNegativeValues = false;
+
+    if (max < m_actualFloorLevel) {
+        m_heightNormalizer = GLfloat(qFabs(min) - qFabs(max));
+        maxAbs = qFabs(max) - qFabs(min);
     } else {
-        m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min());
+        m_heightNormalizer = GLfloat(max - min);
     }
 
     // Height fractions are used in gradient calculations and are therefore doubled
     // Note that if max or min is exactly zero, we still consider it outside the range
-    if (m_axisCacheY.max() <= 0.0f || m_axisCacheY.min() >= 0.0f) {
+    if (max <= m_actualFloorLevel || min >= m_actualFloorLevel) {
         m_noZeroInRange = true;
         m_gradientFraction = 2.0f;
     } else {
         m_noZeroInRange = false;
-        GLfloat minAbs = qFabs(m_axisCacheY.min());
+        GLfloat minAbs = qFabs(min - m_actualFloorLevel);
         m_gradientFraction = qMax(minAbs, maxAbs) / m_heightNormalizer * 2.0f;
     }
 
@@ -2833,6 +2838,14 @@ QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position
 void Bars3DRenderer::updateAspectRatio(float ratio)
 {
     Q_UNUSED(ratio)
+}
+
+void Bars3DRenderer::updateFloorLevel(float level)
+{
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
+    m_floorLevel = level;
+    calculateHeightAdjustment();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

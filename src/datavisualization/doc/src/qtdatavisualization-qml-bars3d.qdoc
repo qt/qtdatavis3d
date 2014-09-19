@@ -115,6 +115,14 @@
  */
 
 /*!
+ * \qmlproperty real Bars3D::floorLevel
+ *
+ * The desired floor level for the bar graph in Y-axis data coordinates.
+ * The actual floor level cannot go below Y-axis minimum or above Y-axis maximum.
+ * Defaults to zero.
+ */
+
+/*!
  * \qmlmethod void Bars3D::addSeries(Bar3DSeries series)
  * Adds the \a series to the graph. A graph can contain multiple series, but only one set of axes,
  * so the rows and columns of all series must match for the visualized data to be meaningful.

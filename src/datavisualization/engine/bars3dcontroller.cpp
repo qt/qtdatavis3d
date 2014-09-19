@@ -36,6 +36,7 @@ Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
       m_isBarSpecRelative(true),
       m_barThicknessRatio(1.0f),
       m_barSpacing(QSizeF(1.0, 1.0)),
+      m_floorLevel(0.0f),
       m_renderer(0)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
@@ -81,6 +82,12 @@ void Bars3DController::synchDataToRenderer()
     if (Abstract3DController::m_changeTracker.axisYRangeChanged
             || Abstract3DController::m_changeTracker.axisYReversedChanged) {
         needSceneUpdate = true;
+    }
+
+    // Floor level update requires data update, so do before abstract sync
+    if (m_changeTracker.floorLevelChanged) {
+        m_renderer->updateFloorLevel(m_floorLevel);
+        m_changeTracker.floorLevelChanged = false;
     }
 
     Abstract3DController::synchDataToRenderer();
@@ -483,6 +490,19 @@ QSizeF Bars3DController::barSpacing()
 bool Bars3DController::isBarSpecRelative()
 {
     return m_isBarSpecRelative;
+}
+
+void Bars3DController::setFloorLevel(float level)
+{
+    m_floorLevel = level;
+    m_isDataDirty = true;
+    m_changeTracker.floorLevelChanged = true;
+    emitNeedRender();
+}
+
+float Bars3DController::floorLevel() const
+{
+    return m_floorLevel;
 }
 
 void Bars3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)

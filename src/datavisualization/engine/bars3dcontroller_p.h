@@ -43,13 +43,15 @@ struct Bars3DChangeBitField {
     bool selectedBarChanged         : 1;
     bool rowsChanged                : 1;
     bool itemChanged                : 1;
+    bool floorLevelChanged          : 1;
 
     Bars3DChangeBitField() :
         multiSeriesScalingChanged(true),
         barSpecsChanged(true),
         selectedBarChanged(true),
         rowsChanged(false),
-        itemChanged(false)
+        itemChanged(false),
+        floorLevelChanged(false)
     {
     }
 };
@@ -84,6 +86,7 @@ private:
     bool m_isBarSpecRelative;
     GLfloat m_barThicknessRatio;
     QSizeF m_barSpacing;
+    float m_floorLevel;
 
     // Rendering
     Bars3DRenderer *m_renderer;
@@ -107,6 +110,8 @@ public:
     GLfloat barThickness();
     QSizeF barSpacing();
     bool isBarSpecRelative();
+    void setFloorLevel(float level);
+    float floorLevel() const;
 
     inline QBar3DSeries *selectedSeries() const { return m_selectedBarSeries; }
 
