@@ -131,9 +131,6 @@ void Surface3DRenderer::initializeOpenGL()
     loadGridLineMesh();
 #endif
 
-    // Load label mesh
-    loadLabelMesh();
-
     // Resize in case we've missed resize events
     // Resize calls initSelectionBuffer and initDepthBuffer, so they don't need to be called here
     handleResize();
@@ -1296,6 +1293,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         glCullFace(GL_BACK);
     }
 #endif
+
+    // Do position mapping when necessary
+    if (m_graphPositionQueryPending) {
+        QVector3D graphDimensions(m_scaleX, m_scaleY, m_scaleZ);
+        queriedGraphPosition(projectionViewMatrix, graphDimensions, defaultFboHandle);
+        emit needRender();
+    }
 
     // Draw selection buffer
     if (!m_cachedIsSlicingActivated && (!m_renderCacheList.isEmpty()
@@ -2830,8 +2834,11 @@ void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 
     m_cachedIsSlicingActivated = isSlicing;
 
-    if (!m_cachedIsSlicingActivated)
-        initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
+    if (!m_cachedIsSlicingActivated) {
+        // We need to re-init selection buffer in case there has been a resize
+        initSelectionBuffer();
+        initCursorPositionBuffer();
+    }
 
 #if !defined(QT_OPENGL_ES_2)
     updateDepthBuffer(); // Re-init depth buffer as well

@@ -97,6 +97,7 @@ public:
     void setInputHandlerRotationEnabled(int enabled);
     void setInputHandlerZoomEnabled(int enabled);
     void setInputHandlerSelectionEnabled(int enabled);
+    void setInputHandlerZoomAtTargetEnabled(int enabled);
     void setReflection(bool enabled);
     void setReflectivity(int value);
     void toggleCustomItem();

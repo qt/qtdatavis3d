@@ -33,6 +33,7 @@ const int tapAndHoldTime = 250;
 const float rotationSpeed = 200.0f;
 const int minZoomLevel = 10;
 const int maxZoomLevel = 500;
+const float touchZoomDrift = 0.02f;
 
 /*!
  * \class QTouch3DInputHandler
@@ -113,7 +114,8 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
     if (!scene()->isSlicingActive() && points.count() == 2) {
         d_ptr->m_holdTimer->stop();
         QPointF distance = points.at(0).pos() - points.at(1).pos();
-        d_ptr->handlePinchZoom(distance.manhattanLength());
+        QPoint midPoint = ((points.at(0).pos() + points.at(1).pos()) / 2.0).toPoint();
+        d_ptr->handlePinchZoom(distance.manhattanLength(), midPoint);
     } else if (points.count() == 1) {
         QPointF pointerPos = points.at(0).pos();
         if (event->type() == QEvent::TouchBegin) {
@@ -165,7 +167,8 @@ void QTouch3DInputHandler::touchEvent(QTouchEvent *event)
 }
 
 QTouch3DInputHandlerPrivate::QTouch3DInputHandlerPrivate(QTouch3DInputHandler *q)
-    : q_ptr(q),
+    : Q3DInputHandlerPrivate(q),
+      q_ptr(q),
       m_holdTimer(0),
       m_inputState(QAbstract3DInputHandlerPrivate::InputStateNone)
 {
@@ -181,7 +184,7 @@ QTouch3DInputHandlerPrivate::~QTouch3DInputHandlerPrivate()
     delete m_holdTimer;
 }
 
-void QTouch3DInputHandlerPrivate::handlePinchZoom(float distance)
+void QTouch3DInputHandlerPrivate::handlePinchZoom(float distance, const QPoint &pos)
 {
     if (q_ptr->isZoomEnabled()) {
         int newDistance = distance;
@@ -200,7 +203,18 @@ void QTouch3DInputHandlerPrivate::handlePinchZoom(float distance)
             zoomLevel = maxZoomLevel;
         else if (zoomLevel < minZoomLevel)
             zoomLevel = minZoomLevel;
-        camera->setZoomLevel(zoomLevel);
+
+        if (q_ptr->isZoomAtTargetEnabled()) {
+            q_ptr->scene()->setGraphPositionQuery(pos);
+            m_zoomAtTargetPending = true;
+            // If zoom at target is enabled, we don't want to zoom yet, as that causes
+            // jitter. Instead, we zoom next frame, when we apply the camera position.
+            m_requestedZoomLevel = zoomLevel;
+            m_driftMultiplier = touchZoomDrift;
+        } else {
+            camera->setZoomLevel(zoomLevel);
+        }
+
         q_ptr->setPrevDistance(newDistance);
     }
 }

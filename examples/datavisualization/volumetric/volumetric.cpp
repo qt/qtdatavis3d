@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/qcustom3dlabel.h>
 #include <QtDataVisualization/q3dscatter.h>
+#include <QtDataVisualization/q3dinputhandler.h>
 #include <QtCore/qmath.h>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QRadioButton>
@@ -85,6 +86,9 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->setOrthoProjection(true);
     //! [6]
     m_graph->activeTheme()->setBackgroundEnabled(false);
+
+    // Only allow zooming at the center to avoid clipping issues
+    static_cast<Q3DInputHandler *>(m_graph->activeInputHandler())->setZoomAtTargetEnabled(false);
 
     toggleAreaAll(true);
 

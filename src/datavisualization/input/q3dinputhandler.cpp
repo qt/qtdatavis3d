@@ -18,13 +18,16 @@
 
 #include "datavisualizationglobal_p.h"
 #include "q3dinputhandler_p.h"
+#include "abstract3dcontroller_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-const int minZoomLevel         = 10;
-const int halfSizeZoomLevel    = 50;
-const int oneToOneZoomLevel    = 100;
-const int maxZoomLevel         = 500;
+const int minZoomLevel           = 10;
+const int halfSizeZoomLevel      = 50;
+const int oneToOneZoomLevel      = 100;
+const int maxZoomLevel           = 500;
+const int driftTowardCenterLevel = 175;
+const float wheelZoomDrift       = 0.1f;
 
 const int nearZoomRangeDivider = 12;
 const int midZoomRangeDivider  = 60;
@@ -84,6 +87,7 @@ const float rotationSpeed      = 100.0f;
  * \since QtDataVisualization 1.2
  *
  * This property specifies if this input handler allows graph rotation.
+ * Defaults to \c{true}.
  */
 
 /*!
@@ -91,6 +95,7 @@ const float rotationSpeed      = 100.0f;
  * \since QtDataVisualization 1.2
  *
  * This property specifies if this input handler allows graph zooming.
+ * Defaults to \c{true}.
  */
 
 /*!
@@ -98,6 +103,16 @@ const float rotationSpeed      = 100.0f;
  * \since QtDataVisualization 1.2
  *
  * This property specifies if this input handler allows selection from the graph.
+ * Defaults to \c{true}.
+ */
+
+/*!
+ * \qmlproperty bool InputHandler3D::zoomAtTargetEnabled
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies if zooming changes the camera target to the position of the input
+ * at the time of the zoom.
+ * Defaults to \c{true}.
  */
 
 /*!
@@ -236,7 +251,16 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
         else if (zoomLevel < minZoomLevel)
             zoomLevel = minZoomLevel;
 
-        scene()->activeCamera()->setZoomLevel(zoomLevel);
+        if (isZoomAtTargetEnabled()) {
+            scene()->setGraphPositionQuery(event->pos());
+            d_ptr->m_zoomAtTargetPending = true;
+            // If zoom at target is enabled, we don't want to zoom yet, as that causes
+            // jitter. Instead, we zoom next frame, when we apply the camera position.
+            d_ptr->m_requestedZoomLevel = zoomLevel;
+            d_ptr->m_driftMultiplier = wheelZoomDrift;
+        } else {
+            scene()->activeCamera()->setZoomLevel(zoomLevel);
+        }
     }
 }
 
@@ -245,6 +269,7 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
  * \since QtDataVisualization 1.2
  *
  * This property specifies if this input handler allows graph rotation.
+ * Defaults to \c{true}.
  */
 void Q3DInputHandler::setRotationEnabled(bool enable)
 {
@@ -264,6 +289,7 @@ bool Q3DInputHandler::isRotationEnabled() const
  * \since QtDataVisualization 1.2
  *
  * This property specifies if this input handler allows graph zooming.
+ * Defaults to \c{true}.
  */
 void Q3DInputHandler::setZoomEnabled(bool enable)
 {
@@ -283,6 +309,7 @@ bool Q3DInputHandler::isZoomEnabled() const
  * \since QtDataVisualization 1.2
  *
  * This property specifies if this input handler allows selection from the graph.
+ * Defaults to \c{true}.
  */
 void Q3DInputHandler::setSelectionEnabled(bool enable)
 {
@@ -297,17 +324,100 @@ bool Q3DInputHandler::isSelectionEnabled() const
     return d_ptr->m_selectionEnabled;
 }
 
+/*!
+ * \property Q3DInputHandler::zoomAtTargetEnabled
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies if zooming should change the camera target so that the zoomed point
+ * of the graph stays at the same location after the zoom.
+ * Defaults to \c{true}.
+ */
+void Q3DInputHandler::setZoomAtTargetEnabled(bool enable)
+{
+    if (d_ptr->m_zoomAtTargetEnabled != enable) {
+        d_ptr->m_zoomAtTargetEnabled = enable;
+        emit zoomAtTargetEnabledChanged(enable);
+    }
+}
+
+bool Q3DInputHandler::isZoomAtTargetEnabled() const
+{
+    return d_ptr->m_zoomAtTargetEnabled;
+}
+
 Q3DInputHandlerPrivate::Q3DInputHandlerPrivate(Q3DInputHandler *q)
     : q_ptr(q),
       m_inputState(QAbstract3DInputHandlerPrivate::InputStateNone),
       m_rotationEnabled(true),
       m_zoomEnabled(true),
-      m_selectionEnabled(true)
+      m_selectionEnabled(true),
+      m_zoomAtTargetEnabled(true),
+      m_zoomAtTargetPending(false),
+      m_controller(0),
+      m_requestedZoomLevel(0.0f),
+      m_driftMultiplier(0.0f)
 {
+    QObject::connect(q, &QAbstract3DInputHandler::sceneChanged,
+                     this, &Q3DInputHandlerPrivate::handleSceneChange);
 }
 
 Q3DInputHandlerPrivate::~Q3DInputHandlerPrivate()
 {
+}
+
+void Q3DInputHandlerPrivate::handleSceneChange(Q3DScene *scene)
+{
+    if (scene) {
+        if (m_controller) {
+            QObject::disconnect(m_controller, &Abstract3DController::queriedGraphPositionChanged,
+                                this, &Q3DInputHandlerPrivate::handleQueriedGraphPositionChange);
+        }
+
+        m_controller = qobject_cast<Abstract3DController *>(scene->parent());
+
+        if (m_controller) {
+            QObject::connect(m_controller, &Abstract3DController::queriedGraphPositionChanged,
+                             this, &Q3DInputHandlerPrivate::handleQueriedGraphPositionChange);
+        }
+    }
+}
+
+void Q3DInputHandlerPrivate::handleQueriedGraphPositionChange()
+{
+    if (m_zoomAtTargetPending) {
+        // Check if the zoom point is on graph
+        QVector3D newTarget = m_controller->queriedGraphPosition();
+        float currentZoom = m_requestedZoomLevel;
+        float previousZoom = q_ptr->scene()->activeCamera()->zoomLevel();
+        q_ptr->scene()->activeCamera()->setZoomLevel(currentZoom);
+        float diffAdj = 0.0f;
+
+        // If zooming in/out outside the graph, or zooming out after certain point,
+        // move towards the center.
+        if ((qAbs(newTarget.x()) > 1.0f
+             || qAbs(newTarget.y()) > 1.0f
+             || qAbs(newTarget.z()) > 1.0f)
+                || (previousZoom > currentZoom && currentZoom <= driftTowardCenterLevel)) {
+            newTarget = zeroVector;
+            // Add some extra correction so that we actually reach the center eventually
+            diffAdj = m_driftMultiplier;
+            if (previousZoom > currentZoom)
+                diffAdj *= 2.0f; // Correct towards center little more when zooming out
+        }
+
+        float zoomFraction = 1.0f - (previousZoom / currentZoom);
+
+        // Adjust camera towards the zoom point, attempting to keep the cursor at same graph point
+        QVector3D oldTarget = q_ptr->scene()->activeCamera()->target();
+        QVector3D origDiff = newTarget - oldTarget;
+        QVector3D diff = origDiff * zoomFraction + (origDiff.normalized() * diffAdj);
+        if (diff.length() > origDiff.length())
+            diff = origDiff;
+        q_ptr->scene()->activeCamera()->setTarget(oldTarget + diff);
+
+        if (q_ptr->scene()->selectionQueryPosition() == Q3DScene::invalidSelectionPoint())
+            m_zoomAtTargetPending = false;
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

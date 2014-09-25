@@ -173,6 +173,7 @@ private:
     bool m_reflectionEnabled;
     qreal m_reflectivity;
     QLocale m_locale;
+    QVector3D m_queriedGraphPosition;
 
 protected:
     Q3DScene *m_scene;
@@ -302,6 +303,8 @@ public:
     void setLocale(const QLocale &locale);
     QLocale locale() const;
 
+    QVector3D queriedGraphPosition() const;
+
     void emitNeedRender();
 
     virtual void clearSelection() = 0;
@@ -327,7 +330,8 @@ public:
     virtual void handleAxisTitleVisibilityChangedBySender(QObject *sender);
     virtual void handleAxisTitleFixedChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
-    virtual void handlePendingClick() = 0;
+    virtual void handlePendingClick();
+    virtual void handlePendingGraphPositionQuery();
     virtual void adjustAxisRanges() = 0;
 
     void markSeriesItemLabelsDirty();
@@ -384,6 +388,7 @@ signals:
     void reflectionChanged(bool enabled);
     void reflectivityChanged(qreal reflectivity);
     void localeChanged(const QLocale &locale);
+    void queriedGraphPositionChanged(const QVector3D &data);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

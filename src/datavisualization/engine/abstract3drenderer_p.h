@@ -80,7 +80,6 @@ public:
     virtual void updateTextures();
     virtual void initSelectionBuffer() = 0;
     virtual void updateSelectionState(SelectionState state);
-    virtual void updateInputPosition(const QPoint &position);
 
 #if !defined(QT_OPENGL_ES_2)
     virtual void updateDepthBuffer() = 0;
@@ -99,6 +98,9 @@ public:
                                           const QString &sliceFrameVertexShader,
                                           const QString &sliceFrameShader);
     virtual void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void initCursorPositionShaders(const QString &vertexShader,
+                                           const QString &fragmentShader);
+    virtual void initCursorPositionBuffer();
 
     virtual void updateAxisType(QAbstract3DAxis::AxisOrientation orientation,
                                 QAbstract3DAxis::AxisType type);
@@ -120,7 +122,7 @@ public:
     virtual void updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientation orientation,
                                              float angle);
     virtual void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
-                                      bool visible);
+                                           bool visible);
     virtual void updateAxisTitleFixed(QAbstract3DAxis::AxisOrientation orientation,
                                       bool fixed);
     virtual void modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList);
@@ -145,6 +147,9 @@ public:
     inline void clearClickPending() { m_clickPending = false; }
     inline QAbstract3DSeries *clickedSeries() const { return m_clickedSeries; }
     inline QAbstract3DGraph::ElementType clickedType() { return m_clickedType; }
+    inline bool isGraphPositionQueryPending() { return m_graphPositionQueryPending; }
+    inline void clearGraphPositionQueryPending() { m_graphPositionQueryPending = false; }
+    inline QVector3D queriedGraphPosition() const { return m_queriedGraphPosition; }
 
     LabelItem &selectionLabelItem();
     void setSelectionLabel(const QString &label);
@@ -199,6 +204,7 @@ protected:
 
     void loadGridLineMesh();
     void loadLabelMesh();
+    void loadPositionMapperMesh();
 
     void drawRadialGrid(ShaderHelper *shader, float yFloorLinePos,
                         const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &depthMatrix);
@@ -213,6 +219,8 @@ protected:
     virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds) = 0;
     void drawVolumeSliceFrame(const CustomRenderItem *item, Qt::Axis axis,
                               const QMatrix4x4 &projectionViewMatrix);
+    void queriedGraphPosition(const QMatrix4x4 &projectionViewMatrix, const QVector3D &scaling,
+                              GLuint defaultFboHandle);
 
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
@@ -241,10 +249,13 @@ protected:
     float m_devicePixelRatio;
     bool m_selectionLabelDirty;
     bool m_clickPending;
+    bool m_graphPositionQueryPending;
     QAbstract3DSeries *m_clickedSeries;
     QAbstract3DGraph::ElementType m_clickedType;
     int m_selectedLabelIndex;
     int m_selectedCustomItemIndex;
+    QVector3D m_queriedGraphPosition;
+    QPoint m_graphPositionQuery;
 
     QString m_selectionLabel;
     LabelItem *m_selectionLabelItem;
@@ -256,6 +267,9 @@ protected:
     ShaderHelper *m_volumeTextureSliceShader;
     ShaderHelper *m_volumeSliceFrameShader;
     ShaderHelper *m_labelShader;
+    ShaderHelper *m_cursorPositionShader;
+    GLuint m_cursorPositionFrameBuffer;
+    GLuint m_cursorPositionTexture;
 
     bool m_useOrthoProjection;
     bool m_xFlipped;
@@ -266,6 +280,7 @@ protected:
     ObjectHelper *m_backgroundObj; // Shared reference
     ObjectHelper *m_gridLineObj; // Shared reference
     ObjectHelper *m_labelObj; // Shared reference
+    ObjectHelper *m_positionMapperObj; // Shared reference
 
     float m_graphAspectRatio;
     float m_graphHorizontalAspectRatio;

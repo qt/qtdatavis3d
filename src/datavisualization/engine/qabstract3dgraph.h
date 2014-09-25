@@ -57,6 +57,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged)
     Q_PROPERTY(qreal reflectivity READ reflectivity WRITE setReflectivity NOTIFY reflectivityChanged)
     Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
+    Q_PROPERTY(QVector3D queriedGraphPosition READ queriedGraphPosition NOTIFY queriedGraphPositionChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -175,6 +176,8 @@ public:
     void setLocale(const QLocale &locale);
     QLocale locale() const;
 
+    QVector3D queriedGraphPosition() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -204,6 +207,7 @@ signals:
     void reflectionChanged(bool enabled);
     void reflectivityChanged(qreal reflectivity);
     void localeChanged(const QLocale &locale);
+    void queriedGraphPositionChanged(const QVector3D &data);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)

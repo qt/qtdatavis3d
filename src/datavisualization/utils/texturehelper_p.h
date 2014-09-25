@@ -55,6 +55,7 @@ class TextureHelper : protected QOpenGLFunctions
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
     // Returns selection texture and inserts generated framebuffers to framebuffer parameters
     GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
+    GLuint createCursorPositionTexture(const QSize &size, GLuint &frameBuffer);
     GLuint createUniformTexture(const QColor &color);
     GLuint createGradientTexture(const QLinearGradient &gradient);
 #if !defined(QT_OPENGL_ES_2)
@@ -75,6 +76,7 @@ class TextureHelper : protected QOpenGLFunctions
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;
     friend class Scatter3DRenderer;
+    friend class Abstract3DRenderer;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

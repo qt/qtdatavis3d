@@ -62,6 +62,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
 {
     if (!m_scene)
         m_scene = new Q3DScene;
+    m_scene->setParent(this);
 
     // Set initial theme
     Q3DTheme *defaultTheme = new Q3DTheme(Q3DTheme::ThemeQt);
@@ -165,7 +166,12 @@ void Abstract3DController::synchDataToRenderer()
 {
     // Subclass implementations check for renderer validity already, so no need to check here.
 
-    // If there is a pending click from renderer, handle that first.
+    // If there are pending queries, handle those first
+    if (m_renderer->isGraphPositionQueryPending()) {
+        handlePendingGraphPositionQuery();
+        m_renderer->clearGraphPositionQueryPending();
+    }
+
     if (m_renderer->isClickPending()) {
         handlePendingClick();
         m_renderer->clearClickPending();
@@ -804,14 +810,15 @@ void Abstract3DController::setActiveInputHandler(QAbstract3DInputHandler *inputH
         addInputHandler(inputHandler);
 
     m_activeInputHandler = inputHandler;
-    if (m_activeInputHandler)
+    if (m_activeInputHandler) {
         m_activeInputHandler->setScene(m_scene);
 
-    // Connect the input handler
-    QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::inputViewChanged, this,
-                     &Abstract3DController::handleInputViewChanged);
-    QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::positionChanged, this,
-                     &Abstract3DController::handleInputPositionChanged);
+        // Connect the input handler
+        QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::inputViewChanged, this,
+                         &Abstract3DController::handleInputViewChanged);
+        QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::positionChanged, this,
+                         &Abstract3DController::handleInputPositionChanged);
+    }
 
     // Notify change of input handler
     emit activeInputHandlerChanged(m_activeInputHandler);
@@ -1468,6 +1475,12 @@ void Abstract3DController::handlePendingClick()
     emit elementSelected(type);
 }
 
+void Abstract3DController::handlePendingGraphPositionQuery()
+{
+    m_queriedGraphPosition = m_renderer->queriedGraphPosition();
+    emit queriedGraphPositionChanged(m_queriedGraphPosition);
+}
+
 int Abstract3DController::selectedLabelIndex() const
 {
     int index = m_renderer->m_selectedLabelIndex;
@@ -1658,5 +1671,11 @@ QLocale Abstract3DController::locale() const
 {
     return m_locale;
 }
+
+QVector3D Abstract3DController::queriedGraphPosition() const
+{
+    return m_queriedGraphPosition;
+}
+
 
 QT_END_NAMESPACE_DATAVISUALIZATION

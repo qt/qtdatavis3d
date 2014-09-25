@@ -96,6 +96,26 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty point Scene3D::graphPositionQuery
+ *
+ * This property contains the coordinates for the user input that should be processed
+ * by the scene as a graph position query. If this is set to value other than
+ * invalidSelectionPoint, the graph tries to match a graph position to the given \a point
+ * within the primary viewport.
+ * After the rendering pass this property is returned to its default state of
+ * invalidSelectionPoint. The queried graph position can be read from
+ * AbstractGraph3D::queriedGraphPosition property after the next render pass.
+ *
+ * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * consistent, the queries are always done against the inner sides of an invisible box surrounding
+ * the graph.
+ *
+ * \note Bar graphs allow graph position queries only at the graph floor level.
+ *
+ * \sa AbstractGraph3D::queriedGraphPosition
+ */
+
+/*!
  * \qmlproperty bool Scene3D::slicingActive
  *
  * This property contains whether 2D slicing view is currently active or not. If setting it, you
@@ -258,7 +278,7 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
  * \property Q3DScene::selectionQueryPosition
  *
  * This property contains the coordinates for the user input that should be processed
- * by the scene as selection. If this is set to value other than invalidSelectionPoint() the
+ * by the scene as a selection. If this is set to value other than invalidSelectionPoint(), the
  * graph tries to select a data item, axis label, or a custom item at the given \a point within
  * the primary viewport.
  * After the rendering pass the property is returned to its default state of
@@ -290,6 +310,42 @@ QPoint Q3DScene::invalidSelectionPoint()
 {
     static const QPoint invalidSelectionPos(-1, -1);
     return invalidSelectionPos;
+}
+
+/*!
+ * \property Q3DScene::graphPositionQuery
+ *
+ * This property contains the coordinates for the user input that should be processed
+ * by the scene as a graph position query. If this is set to value other than
+ * invalidSelectionPoint(), the graph tries to match a graph position to the given \a point
+ * within the primary viewport.
+ * After the rendering pass this property is returned to its default state of
+ * invalidSelectionPoint(). The queried graph position can be read from
+ * QAbstract3DGraph::queriedGraphPosition property after the next render pass.
+ *
+ * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * consistent, the queries are always done against the inner sides of an invisible box surrounding
+ * the graph.
+ *
+ * \note Bar graphs allow graph position queries only at the graph floor level.
+ *
+ * \sa QAbstract3DGraph::queriedGraphPosition
+ */
+void Q3DScene::setGraphPositionQuery(const QPoint &point)
+{
+    if (point != d_ptr->m_graphPositionQueryPosition) {
+        d_ptr->m_graphPositionQueryPosition = point;
+        d_ptr->m_changeTracker.graphPositionQueryPositionChanged = true;
+        d_ptr->m_sceneDirty = true;
+
+        emit graphPositionQueryChanged(point);
+        emit d_ptr->needRender();
+    }
+}
+
+QPoint Q3DScene::graphPositionQuery() const
+{
+    return d_ptr->m_graphPositionQueryPosition;
 }
 
 /*!
@@ -453,7 +509,9 @@ Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     m_light(),
     m_isUnderSideCameraEnabled(false),
     m_isSlicingActive(false),
-    m_selectionQueryPosition(Q3DScene::invalidSelectionPoint())
+    m_selectionQueryPosition(Q3DScene::invalidSelectionPoint()),
+    m_graphPositionQueryPosition(Q3DScene::invalidSelectionPoint()),
+    m_sceneDirty(true)
 {
 }
 

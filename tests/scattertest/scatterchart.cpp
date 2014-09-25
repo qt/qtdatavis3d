@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/Q3DInputHandler>
 #include <qmath.h>
 using namespace QtDataVisualization;
 
@@ -46,6 +47,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->setAxisX(new QValue3DAxis);
     m_chart->setAxisY(new QValue3DAxis);
     m_chart->setAxisZ(new QValue3DAxis);
+    static_cast<Q3DInputHandler *>(m_chart->activeInputHandler())->setZoomAtTargetEnabled(true);
 
     createAndAddSeries();
     createAndAddSeries();
@@ -435,6 +437,10 @@ void ScatterDataModifier::testAxisReverse()
         m_chart->axisX()->setRange(0.0f, 10.0f);
         m_chart->axisY()->setRange(-20.0f, 50.0f);
         m_chart->axisZ()->setRange(5.0f, 15.0f);
+        m_chart->axisX()->setTitle("Axis X");
+        m_chart->axisZ()->setTitle("Axis Z");
+        m_chart->axisX()->setTitleVisible(true);
+        m_chart->axisZ()->setTitleVisible(true);
         m_chart->addSeries(series0);
         m_chart->addSeries(series1);
     }

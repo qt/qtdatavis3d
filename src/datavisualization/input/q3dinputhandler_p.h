@@ -34,19 +34,34 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-class Q3DInputHandlerPrivate
+class Abstract3DController;
+
+class Q3DInputHandlerPrivate : public QObject
 {
+    Q_OBJECT
 public:
     Q3DInputHandlerPrivate(Q3DInputHandler *q);
     ~Q3DInputHandlerPrivate();
 
-protected:
+public slots:
+    void handleSceneChange(Q3DScene *scene);
+    void handleQueriedGraphPositionChange();
+
+private:
     Q3DInputHandler *q_ptr;
+protected:
     QAbstract3DInputHandlerPrivate::InputState m_inputState;
 
     bool m_rotationEnabled;
     bool m_zoomEnabled;
     bool m_selectionEnabled;
+    bool m_zoomAtTargetEnabled;
+    bool m_zoomAtTargetPending;
+
+    Abstract3DController *m_controller; // Not owned
+
+    float m_requestedZoomLevel;
+    float m_driftMultiplier;
 
     friend class Q3DInputHandler;
 };

@@ -21,18 +21,21 @@
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QtDataVisualization/QSurface3DSeries>
 #include <QtDataVisualization/Q3DTheme>
+#include <QtDataVisualization/Q3DInputHandler>
 
 #include <qmath.h>
 #include <QLinearGradient>
 #include <QDebug>
 #include <QComboBox>
-
+#ifndef QT_NO_CURSOR
+#include <QtGui/QCursor>
+#endif
 using namespace QtDataVisualization;
 
 //#define JITTER_PLANE
 //#define WONKY_PLANE
 
-GraphModifier::GraphModifier(Q3DSurface *graph)
+GraphModifier::GraphModifier(Q3DSurface *graph, QWidget *parentWidget)
     : m_graph(graph),
       m_series1(new QSurface3DSeries),
       m_series2(new QSurface3DSeries),
@@ -63,7 +66,8 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_drawMode2(QSurface3DSeries::DrawSurfaceAndWireframe),
       m_drawMode3(QSurface3DSeries::DrawSurfaceAndWireframe),
       m_drawMode4(QSurface3DSeries::DrawSurfaceAndWireframe),
-      m_offset(4.0f)
+      m_offset(4.0f),
+      m_parentWidget(parentWidget)
 {
     m_graph->setAxisX(new QValue3DAxis);
     m_graph->axisX()->setTitle("X-Axis");
@@ -97,6 +101,8 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
     m_graph->axisY()->setRange(m_minY, m_minY + m_rangeY);
     m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
 
+    static_cast<Q3DInputHandler *>(m_graph->activeInputHandler())->setZoomAtTargetEnabled(true);
+
     for (int i = 0; i < 4; i++) {
         m_multiseries[i] = new QSurface3DSeries;
         m_multiseries[i]->setName(QStringLiteral("Series %1").arg(i+1));
@@ -109,6 +115,7 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
     m_theSeries->setItemLabelFormat(QStringLiteral("@seriesName: (@xLabel, @zLabel): @yLabel"));
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
+    connect(&m_graphPositionQueryTimer, &QTimer::timeout, this, &GraphModifier::graphQueryTimeout);
     connect(m_theSeries, &QSurface3DSeries::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
 
     QObject::connect(m_graph, &Q3DSurface::axisXChanged, this,
@@ -119,6 +126,8 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
                      &GraphModifier::handleAxisZChanged);
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &GraphModifier::handleFpsChange);
+
+    //m_graphPositionQueryTimer.start(100);
 }
 
 GraphModifier::~GraphModifier()
@@ -689,6 +698,16 @@ void GraphModifier::timeout()
 
     // Reset same array to make it redraw
     m_theSeries->dataProxy()->resetArray(m_planeArray);
+}
+
+void GraphModifier::graphQueryTimeout()
+{
+#ifndef QT_NO_CURSOR
+    m_graph->scene()->setGraphPositionQuery(m_parentWidget->mapFromGlobal(QCursor::pos()));
+    qDebug() << "pos: " << (m_parentWidget->mapFromGlobal(QCursor::pos()));
+#else
+    m_graph->scene()->setGraphPositionQuery(QPoint(100, 100));
+#endif
 }
 
 void GraphModifier::handleAxisXChanged(QValue3DAxis *axis)

@@ -341,6 +341,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::reflectivityChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::localeChanged, this,
                      &AbstractDeclarative::localeChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::queriedGraphPositionChanged, this,
+                     &AbstractDeclarative::queriedGraphPositionChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -794,6 +796,11 @@ void AbstractDeclarative::setLocale(const QLocale &locale)
 QLocale AbstractDeclarative::locale() const
 {
     return m_controller->locale();
+}
+
+QVector3D AbstractDeclarative::queriedGraphPosition() const
+{
+    return m_controller->queriedGraphPosition();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

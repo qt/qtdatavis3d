@@ -234,6 +234,10 @@ int main(int argc, char **argv)
     inputHandlerSelectionCheckBox->setText("IH: Allow selection");
     inputHandlerSelectionCheckBox->setChecked(true);
 
+    QCheckBox *inputHandlerZoomAtTargetCheckBox = new QCheckBox(widget);
+    inputHandlerZoomAtTargetCheckBox->setText("IH: setZoomAtTarget");
+    inputHandlerZoomAtTargetCheckBox->setChecked(false);
+
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
     rotationSliderX->setTickInterval(1);
     rotationSliderX->setMinimum(-180);
@@ -422,6 +426,7 @@ int main(int argc, char **argv)
     vLayout3->addWidget(inputHandlerRotationCheckBox, 0, Qt::AlignTop);
     vLayout3->addWidget(inputHandlerZoomCheckBox, 0, Qt::AlignTop);
     vLayout3->addWidget(inputHandlerSelectionCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(inputHandlerZoomAtTargetCheckBox, 0, Qt::AlignTop);
     vLayout3->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
     vLayout3->addWidget(shadowQuality, 0, Qt::AlignTop);
     vLayout3->addWidget(new QLabel(QStringLiteral("Change font")), 0, Qt::AlignTop);
@@ -559,6 +564,8 @@ int main(int argc, char **argv)
                      &GraphModifier::setInputHandlerZoomEnabled);
     QObject::connect(inputHandlerSelectionCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setInputHandlerSelectionEnabled);
+    QObject::connect(inputHandlerZoomAtTargetCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setInputHandlerZoomAtTargetEnabled);
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setUseNullInputHandler);
 

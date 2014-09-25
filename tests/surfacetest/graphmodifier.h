@@ -41,7 +41,7 @@ public:
         Map
     };
 
-    explicit GraphModifier(Q3DSurface *graph);
+    explicit GraphModifier(Q3DSurface *graph, QWidget *parentWidget);
     ~GraphModifier();
 
     void toggleSeries1(bool enabled);
@@ -122,6 +122,7 @@ public slots:
     void flipViews();
     void changeSelectionMode(int mode);
     void timeout();
+    void graphQueryTimeout();
 
     void handleAxisXChanged(QValue3DAxis *axis);
     void handleAxisYChanged(QValue3DAxis *axis);
@@ -190,6 +191,8 @@ private:
     float m_multiSampleOffsetZ[4];
     QSurfaceDataArray m_massiveTestCacheArray;
     QVector3D m_cameraTarget;
+    QWidget *m_parentWidget;
+    QTimer m_graphPositionQueryTimer;
 };
 
 #endif

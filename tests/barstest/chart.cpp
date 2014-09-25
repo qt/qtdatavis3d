@@ -203,6 +203,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
 
     m_graph->activeTheme()->setFont(QFont("Times Roman", 20));
 
+
     // Release and store the default input handler.
     m_defaultInputHandler = static_cast<Q3DInputHandler *>(m_graph->activeInputHandler());
     m_graph->releaseInputHandler(m_defaultInputHandler);
@@ -1419,6 +1420,11 @@ void GraphModifier::setInputHandlerZoomEnabled(int enabled)
 void GraphModifier::setInputHandlerSelectionEnabled(int enabled)
 {
     m_defaultInputHandler->setSelectionEnabled(enabled);
+}
+
+void GraphModifier::setInputHandlerZoomAtTargetEnabled(int enabled)
+{
+    m_defaultInputHandler->setZoomAtTargetEnabled(enabled);
 }
 
 void GraphModifier::changeValueAxisSegments(int value)

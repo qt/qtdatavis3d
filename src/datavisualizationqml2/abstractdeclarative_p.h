@@ -78,6 +78,7 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged REVISION 2)
     Q_PROPERTY(qreal reflectivity READ reflectivity WRITE setReflectivity NOTIFY reflectivityChanged REVISION 2)
     Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged REVISION 2)
+    Q_PROPERTY(QVector3D queriedGraphPosition READ queriedGraphPosition NOTIFY queriedGraphPositionChanged REVISION 2)
 
 public:
     enum SelectionFlag {
@@ -217,6 +218,8 @@ public:
     void setLocale(const QLocale &locale);
     QLocale locale() const;
 
+    QVector3D queriedGraphPosition() const;
+
 public slots:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -260,6 +263,7 @@ signals:
     Q_REVISION(2) void reflectionChanged(bool enabled);
     Q_REVISION(2) void reflectivityChanged(qreal reflectivity);
     Q_REVISION(2) void localeChanged(const QLocale &locale);
+    Q_REVISION(2) void queriedGraphPositionChanged(const QVector3D &data);
 
 private:
     QPointer<Abstract3DController> m_controller;

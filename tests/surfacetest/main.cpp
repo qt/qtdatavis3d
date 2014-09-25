@@ -524,7 +524,7 @@ int main(int argc, char *argv[])
 
     widget->show();
 
-    GraphModifier *modifier = new GraphModifier(surfaceGraph);
+    GraphModifier *modifier = new GraphModifier(surfaceGraph, container);
 
     // Connect controls to slots on modifier
     QObject::connect(smoothCB, &QCheckBox::stateChanged,

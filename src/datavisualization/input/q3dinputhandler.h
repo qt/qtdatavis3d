@@ -31,6 +31,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DInputHandler : public QAbstract3DInputHandl
     Q_PROPERTY(bool rotationEnabled READ isRotationEnabled WRITE setRotationEnabled NOTIFY rotationEnabledChanged)
     Q_PROPERTY(bool zoomEnabled READ isZoomEnabled WRITE setZoomEnabled NOTIFY zoomEnabledChanged)
     Q_PROPERTY(bool selectionEnabled READ isSelectionEnabled WRITE setSelectionEnabled NOTIFY selectionEnabledChanged)
+    Q_PROPERTY(bool zoomAtTargetEnabled READ isZoomAtTargetEnabled WRITE setZoomAtTargetEnabled NOTIFY zoomAtTargetEnabledChanged)
 
 public:
     explicit Q3DInputHandler(QObject *parent = 0);
@@ -42,6 +43,8 @@ public:
     bool isZoomEnabled() const;
     void setSelectionEnabled(bool enable);
     bool isSelectionEnabled() const;
+    void setZoomAtTargetEnabled(bool enable);
+    bool isZoomAtTargetEnabled() const;
 
     // Input event listeners
     virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
@@ -53,6 +56,7 @@ signals:
     void rotationEnabledChanged(bool enable);
     void zoomEnabledChanged(bool enable);
     void selectionEnabledChanged(bool enable);
+    void zoomAtTargetEnabledChanged(bool enable);
 
 private:
     Q_DISABLE_COPY(Q3DInputHandler)

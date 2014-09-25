@@ -218,6 +218,31 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     return textureid;
 }
 
+GLuint TextureHelper::createCursorPositionTexture(const QSize &size, GLuint &frameBuffer)
+{
+    GLuint textureid;
+    glGenTextures(1, &textureid);
+    glBindTexture(GL_TEXTURE_2D, textureid);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                           textureid, 0);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        qCritical() << "Cursor position mapper frame buffer creation failed:" << status;
+        glDeleteTextures(1, &textureid);
+        textureid = 0;
+    }
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return textureid;
+}
+
 GLuint TextureHelper::createUniformTexture(const QColor &color)
 {
     QImage image(QSize(int(uniformTextureWidth), int(uniformTextureHeight)),

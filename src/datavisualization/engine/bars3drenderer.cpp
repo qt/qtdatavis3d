@@ -122,9 +122,6 @@ void Bars3DRenderer::initializeOpenGL()
     // Load grid line mesh
     loadGridLineMesh();
 
-    // Load label mesh
-    loadLabelMesh();
-
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
 }
@@ -1160,6 +1157,16 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                    m_primarySubViewport.height());
     }
 #endif
+
+    // Do position mapping when necessary
+    if (m_graphPositionQueryPending) {
+        QVector3D graphDimensions(m_xScaleFactor, 0.0f, m_zScaleFactor);
+        queriedGraphPosition(projectionViewMatrix, graphDimensions, defaultFboHandle);
+
+        // Y is always at floor level
+        m_queriedGraphPosition.setY(0.0f);
+        emit needRender();
+    }
 
     // Skip selection mode drawing if we're slicing or have no selection mode
     if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
@@ -2732,8 +2739,11 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
 
     m_cachedIsSlicingActivated = isSlicing;
 
-    if (!m_cachedIsSlicingActivated)
-        initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
+    if (!m_cachedIsSlicingActivated) {
+        // We need to re-init selection buffer in case there has been a resize
+        initSelectionBuffer();
+        initCursorPositionBuffer();
+    }
 
 #if !defined(QT_OPENGL_ES_2)
     updateDepthBuffer(); // Re-init depth buffer as well

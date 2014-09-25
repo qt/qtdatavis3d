@@ -117,9 +117,6 @@ void Scatter3DRenderer::initializeOpenGL()
     loadGridLineMesh();
 #endif
 
-    // Load label mesh
-    loadLabelMesh();
-
     // Set view port
     glViewport(m_primarySubViewport.x(),
                m_primarySubViewport.y(),
@@ -650,6 +647,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     ShaderHelper *pointSelectionShader = m_pointShader;
 #endif
     ShaderHelper *selectionShader = m_selectionShader;
+
+    // Do position mapping when necessary
+    if (m_graphPositionQueryPending) {
+        QVector3D graphDimensions(m_scaleX, m_scaleY, m_scaleZ);
+        queriedGraphPosition(projectionViewMatrix, graphDimensions, defaultFboHandle);
+        emit needRender();
+    }
 
     // Skip selection mode drawing if we have no selection mode
     if (m_cachedSelectionMode > QAbstract3DGraph::SelectionNone

@@ -786,6 +786,31 @@ QLocale QAbstract3DGraph::locale() const
 }
 
 /*!
+ * \property QAbstract3DGraph::queriedGraphPosition
+ * \since QtDataVisualization 1.2
+ *
+ * This read-only property contains the latest graph position values along each axis queried using
+ * Q3DScene::graphPositionQuery. The values are normalized to range \c{[-1, 1]}.
+ * If the queried position was outside the graph bounds, the values
+ * will not reflect the real position, but will instead be some undefined position outside
+ * the range \c{[-1, 1]}. The value will be undefined before any queries are made.
+ *
+ * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * consistent, the queries are always done against the inner sides of an invisible box surrounding
+ * the graph.
+ *
+ * \note Bar graphs only allow querying graph position at the graph floor level,
+ * so the Y-value is always zero for bar graphs and the valid queries can be only made at
+ * screen positions that contain the floor of the graph.
+ *
+ * \sa Q3DScene::graphPositionQuery
+ */
+QVector3D QAbstract3DGraph::queriedGraphPosition() const
+{
+    return d_ptr->m_visualController->queriedGraphPosition();
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)
@@ -948,6 +973,8 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::reflectivityChanged);
     QObject::connect(m_visualController, &Abstract3DController::localeChanged, q_ptr,
                      &QAbstract3DGraph::localeChanged);
+    QObject::connect(m_visualController, &Abstract3DController::queriedGraphPositionChanged, q_ptr,
+                     &QAbstract3DGraph::queriedGraphPositionChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

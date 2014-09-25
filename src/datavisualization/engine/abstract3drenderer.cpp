@@ -54,8 +54,11 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_devicePixelRatio(1.0f),
       m_selectionLabelDirty(true),
       m_clickPending(false),
+      m_graphPositionQueryPending(false),
       m_clickedSeries(0),
       m_clickedType(QAbstract3DGraph::ElementNone),
+      m_selectedLabelIndex(-1),
+      m_selectedCustomItemIndex(-1),
       m_selectionLabelItem(0),
       m_visibleSeriesCount(0),
       m_customItemShader(0),
@@ -64,6 +67,9 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_volumeTextureSliceShader(0),
       m_volumeSliceFrameShader(0),
       m_labelShader(0),
+      m_cursorPositionShader(0),
+      m_cursorPositionFrameBuffer(0),
+      m_cursorPositionTexture(0),
       m_useOrthoProjection(false),
       m_xFlipped(false),
       m_yFlipped(false),
@@ -72,6 +78,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_backgroundObj(0),
       m_gridLineObj(0),
       m_labelObj(0),
+      m_positionMapperObj(0),
       m_graphAspectRatio(2.0f),
       m_graphHorizontalAspectRatio(0.0f),
       m_polarGraph(false),
@@ -110,6 +117,7 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_volumeSliceFrameShader;
     delete m_volumeTextureSliceShader;
     delete m_labelShader;
+    delete m_cursorPositionShader;
 
     foreach (SeriesRenderCache *cache, m_renderCacheList) {
         cache->cleanup(m_textureHelper);
@@ -127,9 +135,15 @@ Abstract3DRenderer::~Abstract3DRenderer()
     ObjectHelper::releaseObjectHelper(this, m_backgroundObj);
     ObjectHelper::releaseObjectHelper(this, m_gridLineObj);
     ObjectHelper::releaseObjectHelper(this, m_labelObj);
+    ObjectHelper::releaseObjectHelper(this, m_positionMapperObj);
 
     if (m_textureHelper) {
         m_textureHelper->deleteTexture(&m_depthTexture);
+        m_textureHelper->deleteTexture(&m_cursorPositionTexture);
+
+        if (QOpenGLContext::currentContext())
+            m_textureHelper->glDeleteFramebuffers(1, &m_cursorPositionFrameBuffer);
+
         delete m_textureHelper;
     }
 }
@@ -157,6 +171,12 @@ void Abstract3DRenderer::initializeOpenGL()
 
     initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
                      QStringLiteral(":/shaders/fragmentLabel"));
+
+    initCursorPositionShaders(QStringLiteral(":/shaders/vertexPosition"),
+                              QStringLiteral(":/shaders/fragmentPositionMap"));
+
+    loadLabelMesh();
+    loadPositionMapperMesh();
 }
 
 void Abstract3DRenderer::render(const GLuint defaultFboHandle)
@@ -189,11 +209,6 @@ void Abstract3DRenderer::render(const GLuint defaultFboHandle)
 void Abstract3DRenderer::updateSelectionState(SelectionState state)
 {
     m_selectionState = state;
-}
-
-void Abstract3DRenderer::updateInputPosition(const QPoint &position)
-{
-    m_inputPosition = position;
 }
 
 void Abstract3DRenderer::initGradientShaders(const QString &vertexShader,
@@ -244,6 +259,27 @@ void Abstract3DRenderer::initLabelShaders(const QString &vertexShader, const QSt
     m_labelShader->initialize();
 }
 
+void Abstract3DRenderer::initCursorPositionShaders(const QString &vertexShader,
+                                                   const QString &fragmentShader)
+{
+    // Init the shader
+    delete m_cursorPositionShader;
+    m_cursorPositionShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_cursorPositionShader->initialize();
+}
+
+void Abstract3DRenderer::initCursorPositionBuffer()
+{
+    m_textureHelper->deleteTexture(&m_cursorPositionTexture);
+
+    if (m_primarySubViewport.size().isEmpty())
+        return;
+
+    m_cursorPositionTexture =
+            m_textureHelper->createCursorPositionTexture(m_primarySubViewport.size(),
+                                                         m_cursorPositionFrameBuffer);
+}
+
 void Abstract3DRenderer::updateTheme(Q3DTheme *theme)
 {
     // Synchronize the controller theme with renderer
@@ -270,8 +306,12 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     }
 
     QPoint logicalPixelPosition = scene->selectionQueryPosition();
-    updateInputPosition(QPoint(logicalPixelPosition.x() * m_devicePixelRatio,
-                               logicalPixelPosition.y() * m_devicePixelRatio));
+    m_inputPosition = QPoint(logicalPixelPosition.x() * m_devicePixelRatio,
+                             logicalPixelPosition.y() * m_devicePixelRatio);
+
+    QPoint logicalGraphPosition = scene->graphPositionQuery();
+    m_graphPositionQuery = QPoint(logicalGraphPosition.x() * m_devicePixelRatio,
+                                  logicalGraphPosition.y() * m_devicePixelRatio);
 
     // Synchronize the renderer scene to controller scene
     scene->d_ptr->sync(*m_cachedScene->d_ptr);
@@ -295,6 +335,11 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
         } else {
             updateSelectionState(SelectOnScene);
         }
+    }
+
+    if (Q3DScene::invalidSelectionPoint() != logicalGraphPosition) {
+        m_graphPositionQueryPending = true;
+        scene->setGraphPositionQuery(Q3DScene::invalidSelectionPoint());
     }
 }
 
@@ -347,7 +392,7 @@ void Abstract3DRenderer::reInitShaders()
                              QStringLiteral(":/shaders/fragmentTexture3D"),
                              QStringLiteral(":/shaders/fragmentTexture3DLowDef"),
                              QStringLiteral(":/shaders/fragmentTexture3DSlice"),
-                             QStringLiteral(":/shaders/colorAndPosition"),
+                             QStringLiteral(":/shaders/vertexPosition"),
                              QStringLiteral(":/shaders/fragment3DSliceFrames"));
 #else
     if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
@@ -434,6 +479,8 @@ void Abstract3DRenderer::handleResize()
     // Re-init depth buffer
     updateDepthBuffer();
 #endif
+
+    initCursorPositionBuffer();
 }
 
 void Abstract3DRenderer::calculateZoomLevel()
@@ -929,6 +976,12 @@ void Abstract3DRenderer::loadLabelMesh()
                                     QStringLiteral(":/defaultMeshes/plane"));
 }
 
+void Abstract3DRenderer::loadPositionMapperMesh()
+{
+    ObjectHelper::resetObjectHelper(this, m_positionMapperObj,
+                                    QStringLiteral(":/defaultMeshes/barFull"));
+}
+
 void Abstract3DRenderer::generateBaseColorTexture(const QColor &color, GLuint *texture)
 {
     m_textureHelper->deleteTexture(texture);
@@ -1305,7 +1358,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
             // Check that the render item is visible, and skip drawing if not
             // Also check if reflected item is on the "wrong" side, and skip drawing if it is
             if (!item->isVisible() || ((m_reflectionEnabled && reflection < 0.0f)
-                    && (m_yFlipped == item->translation().y() >= 0.0))) {
+                    && (m_yFlipped == (item->translation().y() >= 0.0)))) {
                 continue;
             }
             if (loopCount == 0) {
@@ -1625,6 +1678,59 @@ void Abstract3DRenderer::drawVolumeSliceFrame(const CustomRenderItem *item, Qt::
 
     m_drawer->drawObject(m_volumeSliceFrameShader, item->mesh());
 
+}
+
+void Abstract3DRenderer::queriedGraphPosition(const QMatrix4x4 &projectionViewMatrix,
+                                              const QVector3D &scaling,
+                                              GLuint defaultFboHandle)
+{
+    m_cursorPositionShader->bind();
+
+    // Set up mapper framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, m_cursorPositionFrameBuffer);
+    glViewport(0, 0,
+               m_primarySubViewport.width(),
+               m_primarySubViewport.height());
+    glClearColor(1.0f, 1.0f, 1.0f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT);
+    glDisable(GL_DITHER); // Dither may affect colors if enabled
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_FRONT);
+
+    // Draw a cube scaled to the graph dimensions
+    QMatrix4x4 modelMatrix;
+    QMatrix4x4 MVPMatrix;
+
+    modelMatrix.scale(scaling);
+
+    MVPMatrix = projectionViewMatrix * modelMatrix;
+    m_cursorPositionShader->setUniformValue(m_cursorPositionShader->MVP(), MVPMatrix);
+    m_drawer->drawObject(m_cursorPositionShader, m_positionMapperObj);
+
+    QVector4D dataColor = Utils::getSelection(m_graphPositionQuery,
+                                              m_primarySubViewport.height());
+    if (dataColor.w() > 0.0f) {
+        // If position is outside the graph, set the position well outside the graph boundaries
+        dataColor = QVector4D(-10000.0f, -10000.0f, -10000.0f, 0.0f);
+    } else {
+        // Normalize to range [0.0, 1.0]
+        dataColor /= 255.0f;
+    }
+
+    // Restore state
+    glEnable(GL_DITHER);
+    glCullFace(GL_BACK);
+    glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
+    glViewport(m_primarySubViewport.x(),
+               m_primarySubViewport.y(),
+               m_primarySubViewport.width(),
+               m_primarySubViewport.height());
+
+    QVector3D normalizedValues = dataColor.toVector3D() * 2.0f;
+    normalizedValues -= oneVector;
+    m_queriedGraphPosition = QVector3D(normalizedValues.x(),
+                                       normalizedValues.y(),
+                                       normalizedValues.z());
 }
 
 void Abstract3DRenderer::calculatePolarXZ(const QVector3D &dataPos, float &x, float &z) const
