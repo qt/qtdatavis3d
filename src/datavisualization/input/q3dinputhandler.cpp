@@ -22,18 +22,16 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-const int minZoomLevel           = 10;
-const int halfSizeZoomLevel      = 50;
-const int oneToOneZoomLevel      = 100;
-const int maxZoomLevel           = 500;
-const int driftTowardCenterLevel = 175;
-const float wheelZoomDrift       = 0.1f;
+static const int halfSizeZoomLevel      = 50;
+static const int oneToOneZoomLevel      = 100;
+static const int driftTowardCenterLevel = 175;
+static const float wheelZoomDrift       = 0.1f;
 
-const int nearZoomRangeDivider = 12;
-const int midZoomRangeDivider  = 60;
-const int farZoomRangeDivider  = 120;
+static const int nearZoomRangeDivider = 12;
+static const int midZoomRangeDivider  = 60;
+static const int farZoomRangeDivider  = 120;
 
-const float rotationSpeed      = 100.0f;
+static const float rotationSpeed      = 100.0f;
 
 /*!
  * \class Q3DInputHandler
@@ -58,7 +56,7 @@ const float rotationSpeed      = 100.0f;
  *              \l {QAbstract3DGraph::selectionMode}{selection mode}.
  *      \row
  *          \li Mouse wheel
- *          \li Zoom in/out within default range (10...500%).
+ *          \li Zoom in/out within the allowable zoom range set for Q3DCamera.
  *      \row
  *          \li Left click on the primary view when the secondary view is visible
  *          \li Closes the secondary view.
@@ -239,17 +237,17 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
             return;
 
         // Adjust zoom level based on what zoom range we're in.
-        int zoomLevel = scene()->activeCamera()->zoomLevel();
+        Q3DCamera *camera = scene()->activeCamera();
+        int zoomLevel = int(camera->zoomLevel());
+        const int minZoomLevel = int(camera->minZoomLevel());
+        const int maxZoomLevel = int(camera->maxZoomLevel());
         if (zoomLevel > oneToOneZoomLevel)
             zoomLevel += event->angleDelta().y() / nearZoomRangeDivider;
         else if (zoomLevel > halfSizeZoomLevel)
             zoomLevel += event->angleDelta().y() / midZoomRangeDivider;
         else
             zoomLevel += event->angleDelta().y() / farZoomRangeDivider;
-        if (zoomLevel > maxZoomLevel)
-            zoomLevel = maxZoomLevel;
-        else if (zoomLevel < minZoomLevel)
-            zoomLevel = minZoomLevel;
+        zoomLevel = qBound(minZoomLevel, zoomLevel, maxZoomLevel);
 
         if (isZoomAtTargetEnabled()) {
             scene()->setGraphPositionQuery(event->pos());
@@ -259,7 +257,7 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
             d_ptr->m_requestedZoomLevel = zoomLevel;
             d_ptr->m_driftMultiplier = wheelZoomDrift;
         } else {
-            scene()->activeCamera()->setZoomLevel(zoomLevel);
+            camera->setZoomLevel(zoomLevel);
         }
     }
 }

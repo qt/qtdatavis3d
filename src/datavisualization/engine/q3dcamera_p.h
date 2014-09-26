@@ -90,13 +90,15 @@ public:
     QMatrix4x4 m_viewMatrix;
     bool m_isViewMatrixUpdateActive;
 
-    GLfloat m_xRotation;
-    GLfloat m_yRotation;
-    GLfloat m_minXRotation;
-    GLfloat m_minYRotation;
-    GLfloat m_maxXRotation;
-    GLfloat m_maxYRotation;
-    GLfloat m_zoomLevel;
+    float m_xRotation;
+    float m_yRotation;
+    float m_minXRotation;
+    float m_minYRotation;
+    float m_maxXRotation;
+    float m_maxYRotation;
+    float m_zoomLevel;
+    float m_minZoomLevel;
+    float m_maxZoomLevel;
     bool m_wrapXRotation;
     bool m_wrapYRotation;
     Q3DCamera::CameraPreset m_activePreset;

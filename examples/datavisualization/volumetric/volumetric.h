@@ -50,7 +50,6 @@ public slots:
     void adjustSliceX(int value);
     void adjustSliceY(int value);
     void adjustSliceZ(int value);
-    void handleZoomLevelChange();
     void handleFpsChange(qreal fps);
     void handleTimeout();
     void toggleLowDetail(bool enabled);

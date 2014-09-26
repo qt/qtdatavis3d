@@ -110,8 +110,36 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty float Camera3D::zoomLevel
  *
- * This property contains the the camera zoom level in percentage. 100.0 means there is no zoom
- * in or out set in the camera.
+ * This property contains the the camera zoom level in percentage. The default value of \c{100.0}
+ * means there is no zoom in or out set in the camera.
+ * The value is limited within the bounds defined by minZoomLevel and maxZoomLevel properties.
+ *
+ * \sa minZoomLevel, maxZoomLevel
+ */
+
+/*!
+ * \qmlproperty float Camera3D::minZoomLevel
+ *
+ * This property contains the the minimum allowed camera zoom level.
+ * If the new minimum level is more than the existing maximum level, the maximum level is
+ * adjusted to the new minimum as well.
+ * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * The minZoomLevel cannot be set below \c{1.0}.
+ * Defaults to \c{10.0}.
+ *
+ * \sa zoomLevel, maxZoomLevel
+ */
+
+/*!
+ * \qmlproperty float Camera3D::maxZoomLevel
+ *
+ * This property contains the the maximum allowed camera zoom level.
+ * If the new maximum level is less than the existing minimum level, the minimum level is
+ * adjusted to the new maximum as well.
+ * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * Defaults to \c{500.0f}.
+ *
+ * \sa zoomLevel, minZoomLevel
  */
 
 /*!
@@ -191,6 +219,8 @@ void Q3DCamera::copyValuesFrom(const Q3DObject &source)
     d_ptr->m_wrapYRotation = sourceCamera.d_ptr->m_wrapYRotation;
 
     d_ptr->m_zoomLevel = sourceCamera.d_ptr->m_zoomLevel;
+    d_ptr->m_minZoomLevel = sourceCamera.d_ptr->m_minZoomLevel;
+    d_ptr->m_maxZoomLevel = sourceCamera.d_ptr->m_maxZoomLevel;
     d_ptr->m_activePreset = sourceCamera.d_ptr->m_activePreset;
 }
 
@@ -401,8 +431,11 @@ void Q3DCamera::setCameraPreset(CameraPreset preset)
 /*!
  * \property Q3DCamera::zoomLevel
  *
- * This property contains the the camera zoom level in percentage. \c 100.0f means there is no zoom
- * in or out set in the camera.
+ * This property contains the the camera zoom level in percentage. The default value of \c{100.0f}
+ * means there is no zoom in or out set in the camera.
+ * The value is limited within the bounds defined by minZoomLevel and maxZoomLevel properties.
+ *
+ * \sa minZoomLevel, maxZoomLevel
  */
 float Q3DCamera::zoomLevel() const
 {
@@ -411,10 +444,73 @@ float Q3DCamera::zoomLevel() const
 
 void Q3DCamera::setZoomLevel(float zoomLevel)
 {
-    if (d_ptr->m_zoomLevel != zoomLevel) {
-        d_ptr->m_zoomLevel = zoomLevel;
+    float newZoomLevel = qBound(d_ptr->m_minZoomLevel, zoomLevel, d_ptr->m_maxZoomLevel);
+
+    if (d_ptr->m_zoomLevel != newZoomLevel) {
+        d_ptr->m_zoomLevel = newZoomLevel;
         setDirty(true);
-        emit zoomLevelChanged(zoomLevel);
+        emit zoomLevelChanged(newZoomLevel);
+    }
+}
+
+/*!
+ * \property Q3DCamera::minZoomLevel
+ *
+ * This property contains the the minimum allowed camera zoom level.
+ * If the new minimum level is more than the existing maximum level, the maximum level is
+ * adjusted to the new minimum as well.
+ * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * The minZoomLevel cannot be set below \c{1.0f}.
+ * Defaults to \c{10.0f}.
+ *
+ * \sa zoomLevel, maxZoomLevel
+ */
+float Q3DCamera::minZoomLevel() const
+{
+    return d_ptr->m_minZoomLevel;
+}
+
+void Q3DCamera::setMinZoomLevel(float zoomLevel)
+{
+    // Don't allow minimum to be below one, as that can cause zoom to break.
+    float newMinLevel = qMax(zoomLevel, 1.0f);
+    if (d_ptr->m_minZoomLevel != newMinLevel) {
+        d_ptr->m_minZoomLevel = newMinLevel;
+        if (d_ptr->m_maxZoomLevel < newMinLevel)
+            setMaxZoomLevel(newMinLevel);
+        setZoomLevel(d_ptr->m_zoomLevel);
+        setDirty(true);
+        emit minZoomLevelChanged(newMinLevel);
+    }
+}
+
+/*!
+ * \property Q3DCamera::maxZoomLevel
+ *
+ * This property contains the the maximum allowed camera zoom level.
+ * If the new maximum level is less than the existing minimum level, the minimum level is
+ * adjusted to the new maximum as well.
+ * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * Defaults to \c{500.0f}.
+ *
+ * \sa zoomLevel, minZoomLevel
+ */
+float Q3DCamera::maxZoomLevel() const
+{
+    return d_ptr->m_maxZoomLevel;
+}
+
+void Q3DCamera::setMaxZoomLevel(float zoomLevel)
+{
+    // Don't allow maximum to be below one, as that can cause zoom to break.
+    float newMaxLevel = qMax(zoomLevel, 1.0f);
+    if (d_ptr->m_maxZoomLevel != newMaxLevel) {
+        d_ptr->m_maxZoomLevel = newMaxLevel;
+        if (d_ptr->m_minZoomLevel > newMaxLevel)
+            setMinZoomLevel(newMaxLevel);
+        setZoomLevel(d_ptr->m_zoomLevel);
+        setDirty(true);
+        emit maxZoomLevelChanged(newMaxLevel);
     }
 }
 
@@ -461,12 +557,12 @@ void Q3DCamera::setWrapYRotation(bool isEnabled)
 /*!
  * Utility function that sets the camera rotations and distance.\a horizontal and \a vertical
  * define the camera rotations to be used.
- * Optional \a zoom parameter can be given to set the zoom percentage of the camera in range of
- * \c{10.0f - 500.0f}.
+ * Optional \a zoom parameter can be given to set the zoom percentage of the camera within
+ * the bounds defined by minZoomLevel and maxZoomLevel properties.
  */
 void Q3DCamera::setCameraPosition(float horizontal, float vertical, float zoom)
 {
-    setZoomLevel(qBound(10.0f, zoom, 500.0f));
+    setZoomLevel(zoom);
     setXRotation(horizontal);
     setYRotation(vertical);
 }
@@ -524,6 +620,8 @@ Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     m_maxXRotation(180.0f),
     m_maxYRotation(90.0f),
     m_zoomLevel(100.0f),
+    m_minZoomLevel(10.0f),
+    m_maxZoomLevel(500.0f),
     m_wrapXRotation(true),
     m_wrapYRotation(false),
     m_activePreset(Q3DCamera::CameraPresetNone)

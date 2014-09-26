@@ -87,8 +87,9 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     //! [6]
     m_graph->activeTheme()->setBackgroundEnabled(false);
 
-    // Only allow zooming at the center to avoid clipping issues
+    // Only allow zooming at the center and limit the zoom to 200% to avoid clipping issues
     static_cast<Q3DInputHandler *>(m_graph->activeInputHandler())->setZoomAtTargetEnabled(false);
+    m_graph->scene()->activeCamera()->setMaxZoomLevel(200.0f);
 
     toggleAreaAll(true);
 
@@ -204,8 +205,6 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     m_graph->addCustomItem(warningLabel);
 #endif
 
-    QObject::connect(m_graph->scene()->activeCamera(), &Q3DCamera::zoomLevelChanged, this,
-                     &VolumetricModifier::handleZoomLevelChange);
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &VolumetricModifier::handleFpsChange);
     QObject::connect(&m_timer, &QTimer::timeout, this,
@@ -308,13 +307,6 @@ void VolumetricModifier::adjustSliceZ(int value)
         m_sliceLabelZ->setPixmap(
                     QPixmap::fromImage(m_volumeItem->renderSlice(Qt::ZAxis, m_sliceIndexZ)));
     }
-}
-
-void VolumetricModifier::handleZoomLevelChange()
-{
-    // Zooming inside volumetric object causes ugly clipping issues, so restrict zoom level a bit
-    if (m_graph->scene()->activeCamera()->zoomLevel() > 200)
-        m_graph->scene()->activeCamera()->setZoomLevel(200);
 }
 
 void VolumetricModifier::handleFpsChange(qreal fps)

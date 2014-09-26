@@ -22,18 +22,16 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-const float maxTapAndHoldJitter = 20.0f;
-const int maxPinchJitter = 10;
+static const float maxTapAndHoldJitter = 20.0f;
+static const int maxPinchJitter = 10;
 #if defined (Q_OS_ANDROID) || defined(Q_OS_IOS)
-const int maxSelectionJitter = 10;
+static const int maxSelectionJitter = 10;
 #else
-const int maxSelectionJitter = 5;
+static const int maxSelectionJitter = 5;
 #endif
-const int tapAndHoldTime = 250;
-const float rotationSpeed = 200.0f;
-const int minZoomLevel = 10;
-const int maxZoomLevel = 500;
-const float touchZoomDrift = 0.02f;
+static const int tapAndHoldTime = 250;
+static const float rotationSpeed = 200.0f;
+static const float touchZoomDrift = 0.02f;
 
 /*!
  * \class QTouch3DInputHandler
@@ -61,7 +59,7 @@ const float touchZoomDrift = 0.02f;
  *          \li Same as tap.
  *      \row
  *          \li Pinch
- *          \li Zoom in/out within default range (10...500%).
+ *          \li Zoom in/out within the allowable zoom range set for Q3DCamera.
  *      \row
  *          \li Tap on the primary view when the secondary view is visible
  *          \li Closes the secondary view.
@@ -193,16 +191,15 @@ void QTouch3DInputHandlerPrivate::handlePinchZoom(float distance, const QPoint &
             return;
         m_inputState = QAbstract3DInputHandlerPrivate::InputStatePinching;
         Q3DCamera *camera = q_ptr->scene()->activeCamera();
-        int zoomLevel = camera->zoomLevel();
+        int zoomLevel = int(camera->zoomLevel());
+        const int minZoomLevel = int(camera->minZoomLevel());
+        const int maxZoomLevel = int(camera->maxZoomLevel());
         float zoomRate = qSqrt(qSqrt(zoomLevel));
         if (newDistance > prevDist)
             zoomLevel += zoomRate;
         else
             zoomLevel -= zoomRate;
-        if (zoomLevel > maxZoomLevel)
-            zoomLevel = maxZoomLevel;
-        else if (zoomLevel < minZoomLevel)
-            zoomLevel = minZoomLevel;
+        zoomLevel = qBound(minZoomLevel, zoomLevel, maxZoomLevel);
 
         if (q_ptr->isZoomAtTargetEnabled()) {
             q_ptr->scene()->setGraphPositionQuery(pos);

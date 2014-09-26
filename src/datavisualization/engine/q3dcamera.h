@@ -36,6 +36,8 @@ class QT_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
     Q_PROPERTY(bool wrapXRotation READ wrapXRotation WRITE setWrapXRotation NOTIFY wrapXRotationChanged)
     Q_PROPERTY(bool wrapYRotation READ wrapYRotation WRITE setWrapYRotation NOTIFY wrapYRotationChanged)
     Q_PROPERTY(QVector3D target READ target WRITE setTarget NOTIFY targetChanged REVISION 1)
+    Q_PROPERTY(float minZoomLevel READ minZoomLevel WRITE setMinZoomLevel NOTIFY minZoomLevelChanged REVISION 1)
+    Q_PROPERTY(float maxZoomLevel READ maxZoomLevel WRITE setMaxZoomLevel NOTIFY maxZoomLevelChanged REVISION 1)
 
 public:
     enum CameraPreset {
@@ -87,6 +89,10 @@ public:
 
     float zoomLevel() const;
     void setZoomLevel(float zoomLevel);
+    float minZoomLevel() const;
+    void setMinZoomLevel(float zoomLevel);
+    float maxZoomLevel() const;
+    void setMaxZoomLevel(float zoomLevel);
 
     void setCameraPosition(float horizontal, float vertical, float zoom = 100.0f);
 
@@ -101,6 +107,8 @@ signals:
     void wrapXRotationChanged(bool isEnabled);
     void wrapYRotationChanged(bool isEnabled);
     Q_REVISION(1) void targetChanged(const QVector3D &target);
+    Q_REVISION(1) void minZoomLevelChanged(float zoomLevel);
+    Q_REVISION(1) void maxZoomLevelChanged(float zoomLevel);
 
 private:
     QScopedPointer<Q3DCameraPrivate> d_ptr;
