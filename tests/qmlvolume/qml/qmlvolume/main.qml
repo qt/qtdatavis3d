@@ -39,7 +39,7 @@ Item {
             width: dataView.width
             height: dataView.height
             orthoProjection: true
-            measureFps: true
+            //measureFps: true
 
             onCurrentFpsChanged: {
                 if (fps > 10)
@@ -125,10 +125,15 @@ Item {
                     text: "Slice"
 
                     onClicked: {
-                        if (volumeItem.sliceIndexZ == -1)
+                        if (volumeItem.sliceIndexZ == -1) {
                             volumeItem.sliceIndexZ = 128
-                        else
+                            volumeItem.drawSlices = true
+                            volumeItem.drawSliceFrames = true
+                        } else {
                             volumeItem.sliceIndexZ = -1
+                            volumeItem.drawSlices = false
+                            volumeItem.drawSliceFrames = false
+                        }
                     }
                 }
                 NewButton {

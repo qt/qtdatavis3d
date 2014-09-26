@@ -1171,8 +1171,9 @@ void Abstract3DRenderer::recalculateCustomItemScalingAndPos(CustomRenderItem *it
         item->setScaling(item->origScaling());
         item->setPosition(item->origPosition());
         if (item->isVolume()) {
-            item->setMinBounds(-1.0f * zeroVector);
-            item->setMaxBounds(oneVector);
+            // Y and Z need to be flipped as shader flips those axes
+            item->setMinBounds(QVector3D(-1.0f, 1.0f, 1.0f));
+            item->setMaxBounds(QVector3D(1.0f, -1.0f, -1.0f));
         }
     }
     QVector3D translation = convertPositionToTranslation(item->position(),
