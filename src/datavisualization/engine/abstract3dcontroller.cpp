@@ -1034,6 +1034,11 @@ void Abstract3DController::releaseCustomItem(QCustom3DItem *item)
     }
 }
 
+QList<QCustom3DItem *> Abstract3DController::customItems() const
+{
+    return m_customItems;
+}
+
 void Abstract3DController::updateCustomItem()
 {
     m_isCustomItemDirty = true;

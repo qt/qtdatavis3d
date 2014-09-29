@@ -400,7 +400,7 @@ void QAbstract3DGraph::clearSelection()
  * \return index to the added item if add was successful, -1 if trying to add a null item, and
  * index of the item if trying to add an already added item.
  *
- * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt()
+ * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt(), customItems()
  *
  * \since QtDataVisualization 1.1
  */
@@ -452,6 +452,16 @@ void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
 void QAbstract3DGraph::releaseCustomItem(QCustom3DItem *item)
 {
     return d_ptr->m_visualController->releaseCustomItem(item);
+}
+
+/*!
+ * \return list of all added custom items.
+ * \since QtDataVisualization 1.2
+ * \sa addCustomItem()
+ */
+QList<QCustom3DItem *> QAbstract3DGraph::customItems() const
+{
+    return d_ptr->m_visualController->customItems();
 }
 
 /*!
