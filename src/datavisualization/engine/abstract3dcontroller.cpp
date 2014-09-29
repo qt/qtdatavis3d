@@ -58,7 +58,10 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_radialLabelOffset(1.0f),
     m_measureFps(false),
     m_numFrames(0),
-    m_currentFps(0.0)
+    m_currentFps(0.0),
+    m_clickedType(QAbstract3DGraph::ElementNone),
+    m_selectedLabelIndex(-1),
+    m_selectedCustomItemIndex(-1)
 {
     if (!m_scene)
         m_scene = new Q3DScene;
@@ -1471,8 +1474,11 @@ void Abstract3DController::emitNeedRender()
 
 void Abstract3DController::handlePendingClick()
 {
-    QAbstract3DGraph::ElementType type = m_renderer->clickedType();
-    emit elementSelected(type);
+    m_clickedType = m_renderer->clickedType();
+    m_selectedLabelIndex = m_renderer->m_selectedLabelIndex;
+    m_selectedCustomItemIndex = m_renderer->m_selectedCustomItemIndex;
+
+    emit elementSelected(m_clickedType);
 }
 
 void Abstract3DController::handlePendingGraphPositionQuery()
@@ -1483,7 +1489,7 @@ void Abstract3DController::handlePendingGraphPositionQuery()
 
 int Abstract3DController::selectedLabelIndex() const
 {
-    int index = m_renderer->m_selectedLabelIndex;
+    int index = m_selectedLabelIndex;
     QAbstract3DAxis *axis = selectedAxis();
     if (axis && axis->labels().count() <= index)
         index = -1;
@@ -1493,7 +1499,7 @@ int Abstract3DController::selectedLabelIndex() const
 QAbstract3DAxis *Abstract3DController::selectedAxis() const
 {
     QAbstract3DAxis *axis = 0;
-    QAbstract3DGraph::ElementType type = m_renderer->clickedType();
+    QAbstract3DGraph::ElementType type = m_clickedType;
     switch (type) {
     case QAbstract3DGraph::ElementAxisXLabel:
         axis = axisX();
@@ -1514,7 +1520,7 @@ QAbstract3DAxis *Abstract3DController::selectedAxis() const
 
 int Abstract3DController::selectedCustomItemIndex() const
 {
-    int index = m_renderer->m_selectedCustomItemIndex;
+    int index = m_selectedCustomItemIndex;
     if (m_customItems.count() <= index)
         index = -1;
     return index;
@@ -1531,10 +1537,7 @@ QCustom3DItem *Abstract3DController::selectedCustomItem() const
 
 QAbstract3DGraph::ElementType Abstract3DController::selectedElement() const
 {
-    if (m_renderer)
-        return m_renderer->clickedType();
-    else
-        return QAbstract3DGraph::ElementNone;
+    return m_clickedType;
 }
 
 void Abstract3DController::setOrthoProjection(bool enable)

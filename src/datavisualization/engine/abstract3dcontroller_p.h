@@ -205,6 +205,10 @@ protected:
 
     QList<QCustom3DItem *> m_customItems;
 
+    QAbstract3DGraph::ElementType m_clickedType;
+    int m_selectedLabelIndex;
+    int m_selectedCustomItemIndex;
+
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
 public:
