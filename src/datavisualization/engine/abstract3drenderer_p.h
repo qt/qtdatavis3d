@@ -136,6 +136,7 @@ public:
     virtual void updateHorizontalAspectRatio(float ratio);
     virtual void updatePolar(bool enable);
     virtual void updateRadialLabelOffset(float offset);
+    virtual void updateMargin(float margin);
 
     virtual QVector3D convertPositionToTranslation(const QVector3D &position,
                                                    bool isAbsolute) = 0;
@@ -297,8 +298,12 @@ protected:
     QQuaternion m_xFlipRotation;
     QQuaternion m_zFlipRotation;
 
+    float m_requestedMargin;
     float m_vBackgroundMargin;
     float m_hBackgroundMargin;
+    float m_scaleXWithBackground;
+    float m_scaleYWithBackground;
+    float m_scaleZWithBackground;
 
     QVector3D m_oldCameraTarget;
 

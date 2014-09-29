@@ -92,8 +92,12 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_zRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -90.0f)),
       m_xFlipRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -180.0f)),
       m_zFlipRotation(QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, -180.0f)),
+      m_requestedMargin(-1.0f),
       m_vBackgroundMargin(0.1f),
       m_hBackgroundMargin(0.1f),
+      m_scaleXWithBackground(0.0f),
+      m_scaleYWithBackground(0.0f),
+      m_scaleZWithBackground(0.0f),
       m_oldCameraTarget(QVector3D(2000.0f, 2000.0f, 2000.0f)), // Just random invalid target
       m_reflectionEnabled(false),
       m_reflectivity(0.5)
@@ -457,6 +461,11 @@ void Abstract3DRenderer::updatePolar(bool enable)
 void Abstract3DRenderer::updateRadialLabelOffset(float offset)
 {
     m_radialLabelOffset = offset;
+}
+
+void Abstract3DRenderer::updateMargin(float margin)
+{
+    m_requestedMargin = margin;
 }
 
 void Abstract3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint)

@@ -821,6 +821,35 @@ QVector3D QAbstract3DGraph::queriedGraphPosition() const
 }
 
 /*!
+ * \property QAbstract3DGraph::margin
+ * \since QtDataVisualization 1.2
+ *
+ * This property contains the absolute value used for graph margin. The graph margin is the space
+ * left between the edge of the plottable graph area and the edge of the graph background.
+ * If the margin value is negative, the margins are determined automatically and can vary according
+ * to size of the items in the series and the type of the graph.
+ * The value is interpreted as a fraction of Y-axis range, provided the graph aspect ratios have
+ * not beed changed from the defaults.
+ * Defaults to \c{-1.0}.
+ *
+ * \note Having smaller than the automatically determined margin on scatter graph can cause
+ * the scatter items at the edges of the graph to overlap with the graph background.
+ *
+ * \note On scatter and surface graphs, if the margin is comparatively small to the axis label
+ * size, the positions of the edge labels of the axes are adjusted to avoid overlap with
+ * the edge labels of the neighboring axes.
+ */
+void QAbstract3DGraph::setMargin(qreal margin)
+{
+    d_ptr->m_visualController->setMargin(margin);
+}
+
+qreal QAbstract3DGraph::margin() const
+{
+    return d_ptr->m_visualController->margin();
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)
@@ -985,6 +1014,8 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
                      &QAbstract3DGraph::localeChanged);
     QObject::connect(m_visualController, &Abstract3DController::queriedGraphPositionChanged, q_ptr,
                      &QAbstract3DGraph::queriedGraphPositionChanged);
+    QObject::connect(m_visualController, &Abstract3DController::marginChanged, q_ptr,
+                     &QAbstract3DGraph::marginChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()

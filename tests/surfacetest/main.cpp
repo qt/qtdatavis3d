@@ -425,6 +425,11 @@ int main(int argc, char *argv[])
     cameraTargetSliderZ->setValue(0);
     cameraTargetSliderZ->setMaximum(100);
 
+    QSlider *marginSlider = new QSlider(Qt::Horizontal, widget);
+    marginSlider->setMinimum(-1);
+    marginSlider->setValue(-1);
+    marginSlider->setMaximum(100);
+
     // Add controls to the layout
 #ifdef MULTI_SERIES
     vLayout->addWidget(series1CB);
@@ -491,7 +496,9 @@ int main(int argc, char *argv[])
     vLayout2->addWidget(new QLabel(QStringLiteral("Camera target")));
     vLayout2->addWidget(cameraTargetSliderX);
     vLayout2->addWidget(cameraTargetSliderY);
-    vLayout2->addWidget(cameraTargetSliderZ, 1, Qt::AlignTop);
+    vLayout2->addWidget(cameraTargetSliderZ);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust margin")), 0, Qt::AlignTop);
+    vLayout2->addWidget(marginSlider, 1, Qt::AlignTop);
 
     vLayout3->addWidget(labelButton);
     vLayout3->addWidget(meshButton);
@@ -707,6 +714,8 @@ int main(int argc, char *argv[])
                      &GraphModifier::setCameraTargetY);
     QObject::connect(cameraTargetSliderZ, &QSlider::valueChanged, modifier,
                      &GraphModifier::setCameraTargetZ);
+    QObject::connect(marginSlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setGraphMargin);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

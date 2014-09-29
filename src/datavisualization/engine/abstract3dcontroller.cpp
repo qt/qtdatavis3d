@@ -61,7 +61,8 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_currentFps(0.0),
     m_clickedType(QAbstract3DGraph::ElementNone),
     m_selectedLabelIndex(-1),
-    m_selectedCustomItemIndex(-1)
+    m_selectedCustomItemIndex(-1),
+    m_margin(-1.0)
 {
     if (!m_scene)
         m_scene = new Q3DScene;
@@ -480,6 +481,11 @@ void Abstract3DController::synchDataToRenderer()
         m_renderer->updateAxisTitleFixed(QAbstract3DAxis::AxisOrientationZ,
                                          m_axisZ->isTitleFixed());
         m_changeTracker.axisZTitleFixedChanged = false;
+    }
+
+    if (m_changeTracker.marginChanged) {
+        m_renderer->updateMargin(float(m_margin));
+        m_changeTracker.marginChanged = false;
     }
 
     if (m_changedSeriesList.size()) {
@@ -1683,6 +1689,21 @@ QLocale Abstract3DController::locale() const
 QVector3D Abstract3DController::queriedGraphPosition() const
 {
     return m_queriedGraphPosition;
+}
+
+void Abstract3DController::setMargin(qreal margin)
+{
+    if (m_margin != margin) {
+        m_margin = margin;
+        m_changeTracker.marginChanged = true;
+        emit marginChanged(margin);
+        emitNeedRender();
+    }
+}
+
+qreal Abstract3DController::margin() const
+{
+    return m_margin;
 }
 
 

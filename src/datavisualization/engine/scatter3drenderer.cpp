@@ -60,9 +60,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_scaleX(0.0f),
       m_scaleY(0.0f),
       m_scaleZ(0.0f),
-      m_scaleXWithBackground(0.0f),
-      m_scaleYWithBackground(0.0f),
-      m_scaleZWithBackground(0.0f),
       m_selectedItemIndex(Scatter3DController::invalidSelectionIndex()),
       m_selectedSeriesCache(0),
       m_oldSelectedSeriesCache(0),
@@ -397,6 +394,12 @@ void Scatter3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHin
                                QStringLiteral(":/shaders/fragmentLabel"));
     }
 #endif
+}
+
+void Scatter3DRenderer::updateMargin(float margin)
+{
+    Abstract3DRenderer::updateMargin(margin);
+    calculateSceneScalingFactors();
 }
 
 void Scatter3DRenderer::resetClickedStatus()
@@ -1689,6 +1692,23 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             } else {
                 labelTrans.setZ(m_axisCacheZ.labelPosition(label));
             }
+            if (label == 0 || label == (labelCount - 1)) {
+                // If the margin is small, adjust the position of the edge labels to avoid overlapping
+                // with labels of the other axes.
+                float scaleFactor = m_drawer->scaledFontSize() / axisLabelItem.size().height();
+                float labelOverlap = qAbs(labelTrans.z())
+                        + (scaleFactor * axisLabelItem.size().height() / 2.0f)
+                        - m_scaleZWithBackground + labelMargin;
+                // No need to adjust quite as much on the front edges
+                if (label != startIndex)
+                    labelOverlap /= 2.0f;
+                if (labelOverlap > 0.0f) {
+                    if (label == 0)
+                        labelTrans.setZ(labelTrans.z() - labelOverlap);
+                    else
+                        labelTrans.setZ(labelTrans.z() + labelOverlap);
+                }
+            }
             m_dummyRenderItem.setTranslation(labelTrans);
 
             if (drawSelection) {
@@ -1860,8 +1880,25 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
             } else {
                 labelTrans.setX(m_axisCacheX.labelPosition(label));
             }
-            m_dummyRenderItem.setTranslation(labelTrans);
             const LabelItem &axisLabelItem = *m_axisCacheX.labelItems().at(label);
+            if (label == 0 || label == (labelCount - 1)) {
+                // If the margin is small, adjust the position of the edge labels to avoid overlapping
+                // with labels of the other axes.
+                float scaleFactor = m_drawer->scaledFontSize() / axisLabelItem.size().height();
+                float labelOverlap = qAbs(labelTrans.x())
+                        + (scaleFactor * axisLabelItem.size().height() / 2.0f)
+                        - m_scaleXWithBackground + labelMargin;
+                // No need to adjust quite as much on the front edges
+                if (label != startIndex)
+                    labelOverlap /= 2.0f;
+                if (labelOverlap > 0.0f) {
+                    if (label == 0)
+                        labelTrans.setX(labelTrans.x() + labelOverlap);
+                    else
+                        labelTrans.setX(labelTrans.x() - labelOverlap);
+                }
+            }
+            m_dummyRenderItem.setTranslation(labelTrans);
 
             if (drawSelection) {
                 QVector4D labelColor = QVector4D(0.0f, label / 255.0f, 0.0f,
@@ -1965,7 +2002,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         float offsetValue = 0.0f;
         for (int label = startIndex; label != endIndex; label = label + indexStep) {
             const LabelItem &axisLabelItem = *m_axisCacheY.labelItems().at(label);
-            const float labelYTrans = m_axisCacheY.labelPosition(label);
+            float labelYTrans = m_axisCacheY.labelPosition(label);
 
             glPolygonOffset(offsetValue++ / -10.0f, 1.0f);
 
@@ -1973,6 +2010,21 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
                 QVector4D labelColor = QVector4D(0.0f, 0.0f, label / 255.0f,
                                                  alphaForValueSelection);
                 shader->setUniformValue(shader->color(), labelColor);
+            }
+
+            if (label == startIndex) {
+                // If the margin is small, adjust the position of the edge label to avoid
+                // overlapping with labels of the other axes.
+                float scaleFactor = m_drawer->scaledFontSize() / axisLabelItem.size().height();
+                float labelOverlap = qAbs(labelYTrans)
+                        + (scaleFactor * axisLabelItem.size().height() / 2.0f)
+                        - m_scaleYWithBackground + labelMargin;
+                if (labelOverlap > 0.0f) {
+                    if (label == 0)
+                        labelYTrans += labelOverlap;
+                    else
+                        labelYTrans -= labelOverlap;
+                }
             }
 
             // Back wall
@@ -2121,11 +2173,16 @@ void Scatter3DRenderer::calculateTranslation(ScatterRenderItem &item)
 
 void Scatter3DRenderer::calculateSceneScalingFactors()
 {
-    if (m_maxItemSize > defaultMaxSize)
-        m_hBackgroundMargin = m_maxItemSize / itemScaler;
-    else
-        m_hBackgroundMargin = defaultMaxSize;
-    m_vBackgroundMargin = m_hBackgroundMargin;
+    if (m_requestedMargin < 0.0f) {
+        if (m_maxItemSize > defaultMaxSize)
+            m_hBackgroundMargin = m_maxItemSize / itemScaler;
+        else
+            m_hBackgroundMargin = defaultMaxSize;
+        m_vBackgroundMargin = m_hBackgroundMargin;
+    } else {
+        m_hBackgroundMargin = m_requestedMargin;
+        m_vBackgroundMargin = m_requestedMargin;
+    }
     if (m_polarGraph) {
         float polarMargin = calculatePolarBackgroundMargin();
         m_hBackgroundMargin = qMax(m_hBackgroundMargin, polarMargin);

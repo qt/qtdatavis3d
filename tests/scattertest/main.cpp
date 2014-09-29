@@ -294,6 +294,11 @@ int main(int argc, char **argv)
     cameraTargetSliderZ->setValue(0);
     cameraTargetSliderZ->setMaximum(100);
 
+    QSlider *marginSlider = new QSlider(Qt::Horizontal, widget);
+    marginSlider->setMinimum(-1);
+    marginSlider->setValue(-1);
+    marginSlider->setMaximum(100);
+
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(styleButton, 0, Qt::AlignTop);
@@ -357,7 +362,9 @@ int main(int argc, char **argv)
     vLayout3->addWidget(new QLabel(QStringLiteral("Camera target")), 0, Qt::AlignTop);
     vLayout3->addWidget(cameraTargetSliderX, 0, Qt::AlignTop);
     vLayout3->addWidget(cameraTargetSliderY, 0, Qt::AlignTop);
-    vLayout3->addWidget(cameraTargetSliderZ, 1, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderZ, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust margin")), 0, Qt::AlignTop);
+    vLayout3->addWidget(marginSlider, 1, Qt::AlignTop);
 
     ScatterDataModifier *modifier = new ScatterDataModifier(chart);
 
@@ -469,6 +476,8 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::setCameraTargetY);
     QObject::connect(cameraTargetSliderZ, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setCameraTargetZ);
+    QObject::connect(marginSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setGraphMargin);
 
     modifier->setFpsLabel(fpsLabel);
 

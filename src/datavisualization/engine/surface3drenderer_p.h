@@ -61,9 +61,6 @@ private:
     float m_scaleX;
     float m_scaleY;
     float m_scaleZ;
-    float m_scaleXWithBackground;
-    float m_scaleYWithBackground;
-    float m_scaleZWithBackground;
     GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
@@ -104,6 +101,7 @@ public:
                           const QStringList &labels);
     void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
                                    bool visible);
+    void updateMargin(float margin);
 
     void render(GLuint defaultFboHandle = 0);
 

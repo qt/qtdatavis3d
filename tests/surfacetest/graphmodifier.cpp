@@ -836,6 +836,12 @@ void GraphModifier::setCameraTargetZ(int value)
     qDebug() << "m_cameraTarget:" << m_cameraTarget;
 }
 
+void GraphModifier::setGraphMargin(int value)
+{
+    m_graph->setMargin(qreal(value) / 100.0);
+    qDebug() << "Setting margin:" << m_graph->margin() << value;
+}
+
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
 {
     m_axisMinSliderX->setValue(minX);

@@ -1702,7 +1702,8 @@ void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        QVector3D backgroundScaler(m_xScaleFactor, 1.0f, m_zScaleFactor);
+        QVector3D backgroundScaler(m_scaleXWithBackground, m_scaleYWithBackground,
+                                   m_scaleZWithBackground);
         QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
         if (m_reflectionEnabled)
             backgroundColor.setW(backgroundColor.w() * m_reflectivity);
@@ -1845,7 +1846,7 @@ void Bars3DRenderer::drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
         if (m_yFlipped)
             yFloorLinePosition = -yFloorLinePosition;
 
-        QVector3D gridLineScaler(m_xScaleFactor, gridLineWidth, gridLineWidth);
+        QVector3D gridLineScaler(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
 
         if (m_yFlipped)
             lineRotation = m_xRightAngleRotation;
@@ -1894,7 +1895,7 @@ void Bars3DRenderer::drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
 #if defined(QT_OPENGL_ES_2)
         lineRotation = m_yRightAngleRotation;
 #endif
-        gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, m_zScaleFactor);
+        gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
         for (GLfloat bar = 0.0f; bar <= m_cachedColumnCount; bar++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -1936,11 +1937,11 @@ void Bars3DRenderer::drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
             // Wall lines: back wall
             int gridLineCount = m_axisCacheY.gridLineCount();
 
-            GLfloat zWallLinePosition = -m_zScaleFactor + gridLineOffset;
+            GLfloat zWallLinePosition = -m_scaleZWithBackground + gridLineOffset;
             if (m_zFlipped)
                 zWallLinePosition = -zWallLinePosition;
 
-            gridLineScaler = QVector3D(m_xScaleFactor, gridLineWidth, gridLineWidth);
+            gridLineScaler = QVector3D(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
             for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
@@ -1981,7 +1982,7 @@ void Bars3DRenderer::drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
             }
 
             // Wall lines: side wall
-            GLfloat xWallLinePosition = -m_xScaleFactor + gridLineOffset;
+            GLfloat xWallLinePosition = -m_scaleXWithBackground + gridLineOffset;
             if (m_xFlipped)
                 xWallLinePosition = -xWallLinePosition;
 
@@ -1990,7 +1991,7 @@ void Bars3DRenderer::drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
             else
                 lineRotation = m_yRightAngleRotation;
 
-            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, m_zScaleFactor);
+            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
             for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
@@ -2064,8 +2065,8 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     int labelCount = m_axisCacheY.labelCount();
     GLfloat labelMarginXTrans = labelMargin;
     GLfloat labelMarginZTrans = labelMargin;
-    GLfloat labelXTrans = m_xScaleFactor;
-    GLfloat labelZTrans = m_zScaleFactor;
+    GLfloat labelXTrans = m_scaleXWithBackground;
+    GLfloat labelZTrans = m_scaleZWithBackground;
     QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
     QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
     Qt::AlignmentFlag backAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
@@ -2169,10 +2170,8 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     fractionCamY = activeCamera->yRotation() * labelAngleFraction;
     fractionCamX = activeCamera->xRotation() * labelAngleFraction;
     GLfloat labelYAdjustment = 0.005f;
-    GLfloat scaledRowWidth = m_xScaleFactor;
-    GLfloat scaledColumnDepth = m_zScaleFactor;
-    GLfloat colPosValue = scaledRowWidth + labelMargin;
-    GLfloat rowPosValue = scaledColumnDepth + labelMargin;
+    GLfloat colPosValue = m_scaleXWithBackground + labelMargin;
+    GLfloat rowPosValue = m_scaleZWithBackground + labelMargin;
     GLfloat rowPos = 0.0f;
     GLfloat colPos = 0.0f;
     Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
@@ -2599,6 +2598,18 @@ void Bars3DRenderer::calculateSceneScalingFactors()
     m_xScaleFactor = m_rowWidth / m_scaleFactor;
     m_zScaleFactor = m_columnDepth / m_scaleFactor;
 
+    if (m_requestedMargin < 0.0f) {
+        m_hBackgroundMargin = 0.0f;
+        m_vBackgroundMargin = 0.0f;
+    } else {
+        m_hBackgroundMargin = m_requestedMargin;
+        m_vBackgroundMargin = m_requestedMargin;
+    }
+
+    m_scaleXWithBackground = m_xScaleFactor + m_hBackgroundMargin;
+    m_scaleYWithBackground = 1.0f + m_vBackgroundMargin;
+    m_scaleZWithBackground = m_zScaleFactor + m_hBackgroundMargin;
+
     updateCameraViewport();
     updateCustomItemPositions();
 }
@@ -2856,6 +2867,12 @@ void Bars3DRenderer::updateFloorLevel(float level)
         cache->setDataDirty(true);
     m_floorLevel = level;
     calculateHeightAdjustment();
+}
+
+void Bars3DRenderer::updateMargin(float margin)
+{
+    Abstract3DRenderer::updateMargin(margin);
+    calculateSceneScalingFactors();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

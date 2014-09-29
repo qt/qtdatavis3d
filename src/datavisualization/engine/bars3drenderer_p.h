@@ -118,6 +118,7 @@ public:
 
     void updateAspectRatio(float ratio);
     void updateFloorLevel(float level);
+    void updateMargin(float margin);
 
 protected:
     virtual void initializeOpenGL();

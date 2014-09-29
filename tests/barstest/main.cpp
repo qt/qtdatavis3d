@@ -368,6 +368,11 @@ int main(int argc, char **argv)
     cameraTargetSliderZ->setValue(0);
     cameraTargetSliderZ->setMaximum(100);
 
+    QSlider *marginSlider = new QSlider(Qt::Horizontal, widget);
+    marginSlider->setMinimum(-1);
+    marginSlider->setValue(-1);
+    marginSlider->setMaximum(100);
+
     vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(addDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addMultiDataButton, 0, Qt::AlignTop);
@@ -447,7 +452,9 @@ int main(int argc, char **argv)
     vLayout3->addWidget(reflectivitySlider, 0, Qt::AlignTop);
     vLayout3->addWidget(toggleCustomItemButton, 0, Qt::AlignTop);
     vLayout3->addWidget(new QLabel(QStringLiteral("Adjust floor level")), 0, Qt::AlignTop);
-    vLayout3->addWidget(floorLevelSlider, 1, Qt::AlignTop);
+    vLayout3->addWidget(floorLevelSlider, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust margin")), 0, Qt::AlignTop);
+    vLayout3->addWidget(marginSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -584,6 +591,8 @@ int main(int argc, char **argv)
                      &GraphModifier::setReflectivity);
     QObject::connect(floorLevelSlider, &QSlider::valueChanged, modifier,
                      &GraphModifier::setFloorLevel);
+    QObject::connect(marginSlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setGraphMargin);
     QObject::connect(toggleCustomItemButton, &QPushButton::clicked, modifier,
                      &GraphModifier::toggleCustomItem);
 

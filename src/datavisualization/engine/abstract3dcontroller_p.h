@@ -96,6 +96,7 @@ struct Abstract3DChangeBitField {
     bool radialLabelOffsetChanged      : 1;
     bool reflectionChanged             : 1;
     bool reflectivityChanged           : 1;
+    bool marginChanged                 : 1;
 
     Abstract3DChangeBitField() :
         themeChanged(true),
@@ -144,7 +145,8 @@ struct Abstract3DChangeBitField {
         polarChanged(true),
         radialLabelOffsetChanged(true),
         reflectionChanged(true),
-        reflectivityChanged(true)
+        reflectivityChanged(true),
+        marginChanged(true)
     {
     }
 };
@@ -208,6 +210,7 @@ protected:
     QAbstract3DGraph::ElementType m_clickedType;
     int m_selectedLabelIndex;
     int m_selectedCustomItemIndex;
+    qreal m_margin;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
@@ -310,6 +313,9 @@ public:
 
     QVector3D queriedGraphPosition() const;
 
+    void setMargin(qreal margin);
+    qreal margin() const;
+
     void emitNeedRender();
 
     virtual void clearSelection() = 0;
@@ -394,6 +400,7 @@ signals:
     void reflectivityChanged(qreal reflectivity);
     void localeChanged(const QLocale &locale);
     void queriedGraphPositionChanged(const QVector3D &data);
+    void marginChanged(qreal margin);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

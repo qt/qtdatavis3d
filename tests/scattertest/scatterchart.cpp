@@ -1023,6 +1023,12 @@ void ScatterDataModifier::setCameraTargetZ(int value)
     qDebug() << "m_cameraTarget:" << m_cameraTarget;
 }
 
+void ScatterDataModifier::setGraphMargin(int value)
+{
+    m_chart->setMargin(qreal(value) / 100.0);
+    qDebug() << "Setting margin:" << m_chart->margin() << value;
+}
+
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
     QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);

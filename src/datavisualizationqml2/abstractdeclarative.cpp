@@ -343,6 +343,8 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::localeChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::queriedGraphPositionChanged, this,
                      &AbstractDeclarative::queriedGraphPositionChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::marginChanged, this,
+                     &AbstractDeclarative::marginChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -801,6 +803,16 @@ QLocale AbstractDeclarative::locale() const
 QVector3D AbstractDeclarative::queriedGraphPosition() const
 {
     return m_controller->queriedGraphPosition();
+}
+
+void AbstractDeclarative::setMargin(qreal margin)
+{
+    m_controller->setMargin(margin);
+}
+
+qreal AbstractDeclarative::margin() const
+{
+    return m_controller->margin();
 }
 
 void AbstractDeclarative::windowDestroyed(QObject *obj)

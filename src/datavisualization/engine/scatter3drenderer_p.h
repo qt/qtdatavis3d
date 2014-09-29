@@ -70,9 +70,6 @@ private:
     float m_scaleX;
     float m_scaleY;
     float m_scaleZ;
-    float m_scaleXWithBackground;
-    float m_scaleYWithBackground;
-    float m_scaleZWithBackground;
     int m_selectedItemIndex;
     ScatterSeriesRenderCache *m_selectedSeriesCache;
     ScatterSeriesRenderCache *m_oldSelectedSeriesCache;
@@ -99,6 +96,7 @@ public:
     void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
                                    bool visible);
     void updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint);
+    void updateMargin(float margin);
 
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 

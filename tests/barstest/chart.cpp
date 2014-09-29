@@ -1531,6 +1531,12 @@ void GraphModifier::setFloorLevel(int value)
     qDebug() << "Floor level:" << value;
 }
 
+void GraphModifier::setGraphMargin(int value)
+{
+    m_graph->setMargin(qreal(value) / 100.0);
+    qDebug() << "Setting margin:" << m_graph->margin() << value;
+}
+
 void GraphModifier::populateFlatSeries(QBar3DSeries *series, int rows, int columns, float value)
 {
     QBarDataArray *dataArray = new QBarDataArray;

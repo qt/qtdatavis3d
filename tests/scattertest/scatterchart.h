@@ -101,6 +101,7 @@ public slots:
     void setCameraTargetX(int value);
     void setCameraTargetY(int value);
     void setCameraTargetZ(int value);
+    void setGraphMargin(int value);
 
 signals:
     void shadowQualityChanged(int quality);
