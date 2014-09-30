@@ -43,6 +43,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_updateLabels(false),
       m_dotShader(0),
       m_dotGradientShader(0),
+      m_staticSelectedItemGradientShader(0),
+      m_staticSelectedItemShader(0),
       #if defined(QT_OPENGL_ES_2)
       m_pointShader(0),
       #endif
@@ -85,6 +87,8 @@ Scatter3DRenderer::~Scatter3DRenderer()
         m_textureHelper->deleteTexture(&m_bgrTexture);
     }
     delete m_dotShader;
+    delete m_staticSelectedItemGradientShader;
+    delete m_staticSelectedItemShader;
     delete m_dotGradientShader;
     delete m_depthShader;
     delete m_selectionShader;
@@ -1007,6 +1011,17 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     && m_selectedItemIndex != Scatter3DController::invalidSelectionIndex()) {
                 ScatterRenderItem &item = renderArray[m_selectedItemIndex];
                 if (item.isVisible()) {
+                    ShaderHelper *selectionShader;
+                    if (drawingPoints) {
+                        selectionShader = pointSelectionShader;
+                    } else {
+                        if (colorStyleIsUniform)
+                            selectionShader = m_staticSelectedItemShader;
+                        else
+                            selectionShader = m_staticSelectedItemGradientShader;
+                    }
+                    selectionShader->bind();
+
                     ObjectHelper *dotObj = cache->object();
 
                     QMatrix4x4 modelMatrix;
@@ -1021,6 +1036,15 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                         }
                         modelMatrix.scale(modelScaler);
                         itModelMatrix.scale(modelScaler);
+
+                        selectionShader->setUniformValue(selectionShader->lightP(),
+                                                         lightPos);
+                        selectionShader->setUniformValue(selectionShader->view(),
+                                                         viewMatrix);
+                        selectionShader->setUniformValue(selectionShader->ambientS(),
+                                                         m_cachedTheme->ambientLightStrength());
+                        selectionShader->setUniformValue(selectionShader->lightColor(),
+                                                         lightColor);
                     }
 
                     QMatrix4x4 MVPMatrix;
@@ -1044,19 +1068,29 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                     if (!drawingPoints) {
                         // Set shader bindings
-                        dotShader->setUniformValue(dotShader->model(), modelMatrix);
-                        dotShader->setUniformValue(dotShader->nModel(),
-                                                   itModelMatrix.inverted().transposed());
+                        selectionShader->setUniformValue(selectionShader->model(), modelMatrix);
+                        selectionShader->setUniformValue(selectionShader->nModel(),
+                                                         itModelMatrix.inverted().transposed());
+                        if (!colorStyleIsUniform) {
+                            if (colorStyle == Q3DTheme::ColorStyleObjectGradient) {
+                                selectionShader->setUniformValue(selectionShader->gradientMin(),
+                                                                 0.0f);
+                                selectionShader->setUniformValue(selectionShader->gradientHeight(),
+                                                                 0.5f);
+                            } else {
+                                // Each dot is of uniform color according to its Y-coordinate
+                                selectionShader->setUniformValue(selectionShader->gradientHeight(),
+                                                                 0.0f);
+                                selectionShader->setUniformValue(selectionShader->gradientMin(),
+                                                                 (item.translation().y() + m_scaleY)
+                                                                 * rangeGradientYScaler);
+                            }
+                        }
                     }
 
-                    dotShader->setUniformValue(dotShader->MVP(), MVPMatrix);
-                    if (useColor) {
-                        dotShader->setUniformValue(dotShader->color(), dotColor);
-                    } else if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
-                        dotShader->setUniformValue(dotShader->gradientMin(),
-                                                   (item.translation().y() + m_scaleY)
-                                                   * rangeGradientYScaler);
-                    }
+                    selectionShader->setUniformValue(selectionShader->MVP(), MVPMatrix);
+                    if (useColor)
+                        selectionShader->setUniformValue(selectionShader->color(), dotColor);
 
                     if (!drawingPoints) {
                         glEnable(GL_POLYGON_OFFSET_FILL);
@@ -1068,26 +1102,32 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                         if (!drawingPoints) {
                             // Set shadow shader bindings
                             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                            dotShader->setUniformValue(dotShader->depth(), depthMVPMatrix);
-                            dotShader->setUniformValue(dotShader->lightS(), lightStrength / 10.0f);
+                            selectionShader->setUniformValue(selectionShader->shadowQ(),
+                                                             m_shadowQualityToShader);
+                            selectionShader->setUniformValue(selectionShader->depth(),
+                                                             depthMVPMatrix);
+                            selectionShader->setUniformValue(selectionShader->lightS(),
+                                                             lightStrength / 10.0f);
 
                             // Draw the object
-                            m_drawer->drawObject(dotShader, dotObj, gradientTexture, m_depthTexture);
+                            m_drawer->drawObject(selectionShader, dotObj, gradientTexture,
+                                                 m_depthTexture);
                         } else {
                             // Draw the object
-                            m_drawer->drawPoint(dotShader);
+                            m_drawer->drawPoint(selectionShader);
                         }
                     } else
 #endif
                     {
                         if (!drawingPoints) {
                             // Set shadowless shader bindings
-                            dotShader->setUniformValue(dotShader->lightS(), lightStrength);
+                            selectionShader->setUniformValue(selectionShader->lightS(),
+                                                             lightStrength);
                             // Draw the object
-                            m_drawer->drawObject(dotShader, dotObj, gradientTexture);
+                            m_drawer->drawObject(selectionShader, dotObj, gradientTexture);
                         } else {
                             // Draw the object
-                            m_drawer->drawPoint(dotShader);
+                            m_drawer->drawPoint(selectionShader);
                         }
                     }
 
@@ -2235,8 +2275,7 @@ void Scatter3DRenderer::calculateSceneScalingFactors()
 
 void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &fragmentShader)
 {
-    if (m_dotShader)
-        delete m_dotShader;
+    delete m_dotShader;
     m_dotShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_dotShader->initialize();
 }
@@ -2244,17 +2283,30 @@ void Scatter3DRenderer::initShaders(const QString &vertexShader, const QString &
 void Scatter3DRenderer::initGradientShaders(const QString &vertexShader,
                                             const QString &fragmentShader)
 {
-    if (m_dotGradientShader)
-        delete m_dotGradientShader;
-
+    delete m_dotGradientShader;
     m_dotGradientShader = new ShaderHelper(this, vertexShader, fragmentShader);
     m_dotGradientShader->initialize();
+
+}
+
+void Scatter3DRenderer::initStaticSelectedItemShaders(const QString &vertexShader,
+                                                      const QString &fragmentShader,
+                                                      const QString &gradientVertexShader,
+                                                      const QString &gradientFragmentShader)
+{
+    delete m_staticSelectedItemShader;
+    m_staticSelectedItemShader = new ShaderHelper(this, vertexShader, fragmentShader);
+    m_staticSelectedItemShader->initialize();
+
+    delete m_staticSelectedItemGradientShader;
+    m_staticSelectedItemGradientShader = new ShaderHelper(this, gradientVertexShader,
+                                                          gradientFragmentShader);
+    m_staticSelectedItemGradientShader->initialize();
 }
 
 void Scatter3DRenderer::initSelectionShader()
 {
-    if (m_selectionShader)
-        delete m_selectionShader;
+    delete m_selectionShader;
     m_selectionShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPlainColor"),
                                          QStringLiteral(":/shaders/fragmentPlainColor"));
     m_selectionShader->initialize();

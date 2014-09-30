@@ -87,6 +87,10 @@ public:
     virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void initStaticSelectedItemShaders(const QString &vertexShader,
+                                               const QString &fragmentShader,
+                                               const QString &gradientVertexShader,
+                                               const QString &gradientFragmentShader);
     virtual void initBackgroundShaders(const QString &vertexShader,
                                        const QString &fragmentShader) = 0;
     virtual void initCustomItemShaders(const QString &vertexShader,

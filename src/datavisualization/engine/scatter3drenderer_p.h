@@ -53,6 +53,8 @@ private:
     bool m_updateLabels;
     ShaderHelper *m_dotShader;
     ShaderHelper *m_dotGradientShader;
+    ShaderHelper *m_staticSelectedItemGradientShader;
+    ShaderHelper *m_staticSelectedItemShader;
 #if defined(QT_OPENGL_ES_2)
     ShaderHelper *m_pointShader;
 #endif
@@ -116,6 +118,10 @@ protected:
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void initStaticSelectedItemShaders(const QString &vertexShader,
+                                               const QString &fragmentShader,
+                                               const QString &gradientVertexShader,
+                                               const QString &gradientFragmentShader);
     virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual void updateTextures();
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
