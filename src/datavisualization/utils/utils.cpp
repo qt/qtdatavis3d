@@ -25,6 +25,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 #define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
 #define MIN_POWER 2
 
+static GLint maxTextureSize = 0; // Safe, as all instances have the same texture size
+
 GLuint Utils::getNearestPowerOfTwo(GLuint value, GLuint &padding)
 {
     GLuint powOfTwoValue = MIN_POWER;
@@ -54,6 +56,9 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                                const QColor &txtColor, bool labelBackground,
                                bool borders, int maxLabelWidth)
 {
+    if (maxTextureSize == 0)
+        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+
     GLuint paddingWidth = 20;
     GLuint paddingHeight = 20;
     // Calculate text dimensions
@@ -61,28 +66,57 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     valueFont.setPointSize(textureFontSize);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
+#if defined(QT_OPENGL_ES_2)
+    // ES2 needs to use maxLabelWidth always (when given) because of the power of 2 -issue.
+    if (maxLabelWidth)
+#else
     if (maxLabelWidth && labelBackground)
+#endif
         valueStrWidth = maxLabelWidth;
     int valueStrHeight = valueFM.height();
     valueStrWidth += paddingWidth / 2; // Fix clipping problem with skewed fonts (italic or italic-style)
     QSize labelSize;
+    qreal fontRatio = 1.0;
 
+    bool sizeOk = false;
+    int currentFontSize = textureFontSize;
+    do {
 #if defined(QT_OPENGL_ES_2)
-    // ES2 can't handle textures with dimensions not in power of 2. Resize labels accordingly.
-    // Add some padding before converting to power of two to avoid too tight fit
-    GLuint prePadding = 5;
-    // ES2 needs to use this always (when given) because of the power of 2 -issue.
-    if (maxLabelWidth)
-        valueStrWidth = maxLabelWidth + paddingWidth / 2;
-    labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
-    labelSize.setWidth(getNearestPowerOfTwo(labelSize.width(), paddingWidth));
-    labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
+        // ES2 can't handle textures with dimensions not in power of 2. Resize labels accordingly.
+        // Add some padding before converting to power of two to avoid too tight fit
+        GLuint prePadding = 5;
+        labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
+        labelSize.setWidth(getNearestPowerOfTwo(labelSize.width(), paddingWidth));
+        labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
 #else
-    if (!labelBackground)
-        labelSize = QSize(valueStrWidth, valueStrHeight);
-    else
-        labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
+        if (!labelBackground)
+            labelSize = QSize(valueStrWidth, valueStrHeight);
+        else
+            labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
 #endif
+        if (labelSize.width() <= maxTextureSize) {
+            // Make sure the label is not too wide
+            sizeOk = true;
+        } else if (--currentFontSize == 4) {
+            qCritical() << "Label" << text << "is too long to be generated.";
+            return QImage();
+        } else {
+            fontRatio = (qreal)currentFontSize / (qreal)textureFontSize;
+            // Reduce font size and try again
+            valueFont.setPointSize(currentFontSize);
+            QFontMetrics currentValueFM(valueFont);
+#if defined(QT_OPENGL_ES_2)
+            if (maxLabelWidth)
+#else
+            if (maxLabelWidth && labelBackground)
+#endif
+                valueStrWidth = maxLabelWidth * fontRatio;
+            else
+                valueStrWidth = currentValueFM.width(text);
+            valueStrHeight = currentValueFM.height();
+            valueStrWidth += paddingWidth / 2;
+        }
+    } while (!sizeOk);
 
     // Create image
     QImage image = QImage(labelSize, QImage::Format_ARGB32);
@@ -110,13 +144,16 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
 #endif
     } else {
         painter.setBrush(QBrush(bgrColor));
+        qreal radius = 10.0 * fontRatio;
         if (borders) {
-            painter.setPen(QPen(QBrush(txtColor), 5, Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
-            painter.drawRoundedRect(5, 5, labelSize.width() - 10, labelSize.height() - 10,
-                                    10.0, 10.0);
+            painter.setPen(QPen(QBrush(txtColor), 5.0 * fontRatio,
+                                Qt::SolidLine, Qt::SquareCap, Qt::RoundJoin));
+            painter.drawRoundedRect(5, 5,
+                                    labelSize.width() - 10, labelSize.height() - 10,
+                                    radius, radius);
         } else {
             painter.setPen(bgrColor);
-            painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), 10.0, 10.0);
+            painter.drawRoundedRect(0, 0, labelSize.width(), labelSize.height(), radius, radius);
         }
         painter.setPen(txtColor);
         painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
@@ -215,8 +252,8 @@ QString Utils::formatLabelSprintf(const QByteArray &format, Utils::ParamType par
 }
 
 QString Utils::formatLabelLocalized(Utils::ParamType paramType, qreal value,
-                           const QLocale &locale, const QString &preStr, const QString &postStr,
-                           int precision, char formatSpec, const QByteArray &format)
+                                    const QLocale &locale, const QString &preStr, const QString &postStr,
+                                    int precision, char formatSpec, const QByteArray &format)
 {
     switch (paramType) {
     case ParamTypeInt:
