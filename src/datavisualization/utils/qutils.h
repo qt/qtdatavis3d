@@ -36,7 +36,6 @@ inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
     // Antialias not supported for ES
     antialias = false;
     surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
-    surfaceFormat.setAlphaBufferSize(8);
     surfaceFormat.setRedBufferSize(8);
     surfaceFormat.setBlueBufferSize(8);
     surfaceFormat.setGreenBufferSize(8);
