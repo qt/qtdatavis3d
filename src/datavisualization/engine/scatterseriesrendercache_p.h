@@ -63,6 +63,10 @@ public:
     inline ScatterObjectBufferHelper *bufferObject() const { return m_scatterBufferObj; }
     inline void setBufferPoints(ScatterPointBufferHelper *object) { m_scatterBufferPoints = object; }
     inline ScatterPointBufferHelper *bufferPoints() const { return m_scatterBufferPoints; }
+    inline QVector<int> &updateIndices() { return m_updateIndices; }
+    inline QVector<int> &bufferIndices() { return m_bufferIndices; }
+    inline void setVisibilityChanged(bool changed) { m_visibilityChanged = changed; }
+    inline bool visibilityChanged() const { return m_visibilityChanged; }
 
 protected:
     ScatterRenderItemArray m_renderArray;
@@ -73,6 +77,9 @@ protected:
     QString m_oldMeshFileName; // Used to detect if full buffer change needed
     ScatterObjectBufferHelper *m_scatterBufferObj;
     ScatterPointBufferHelper *m_scatterBufferPoints;
+    QVector<int> m_updateIndices; // Used as temporary cache during item updates
+    QVector<int> m_bufferIndices; // Cache for mapping renderarray to mesh buffer
+    bool m_visibilityChanged; // Used to detect if full buffer change needed
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

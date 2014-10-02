@@ -46,6 +46,7 @@ public:
     void pushPoint(uint pointIndex);
     void popPoint();
     void load(ScatterSeriesRenderCache *cache);
+    void update(ScatterSeriesRenderCache *cache);
     void setScaleY(float scale) { m_scaleY = scale; }
     void updateUVs(ScatterSeriesRenderCache *cache);
 
@@ -58,8 +59,7 @@ private:
 
 private:
     QVector<QVector3D> m_bufferedPoints;
-    uint m_oldRemoveIndex;
-    bool m_oldRemove;
+    int m_oldRemoveIndex;
     float m_scaleY;
 };
 

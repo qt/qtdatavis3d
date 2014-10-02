@@ -31,7 +31,8 @@ ScatterSeriesRenderCache::ScatterSeriesRenderCache(QAbstract3DSeries *series,
       m_oldRenderArraySize(0),
       m_oldMeshFileName(QString()),
       m_scatterBufferObj(0),
-      m_scatterBufferPoints(0)
+      m_scatterBufferPoints(0),
+      m_visibilityChanged(false)
 {
 }
 

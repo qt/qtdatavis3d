@@ -260,11 +260,13 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
             QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(seriesList[i]);
             if (scatterSeries->isVisible()) {
                 QAbstract3DSeriesChangeBitField &changeTracker = scatterSeries->d_ptr->m_changeTracker;
-                if (changeTracker.baseGradientChanged || changeTracker.colorStyleChanged) {
-                    ScatterSeriesRenderCache *cache =
-                            static_cast<ScatterSeriesRenderCache *>(m_renderCacheList.value(scatterSeries));
-                    if (cache)
+                ScatterSeriesRenderCache *cache =
+                        static_cast<ScatterSeriesRenderCache *>(m_renderCacheList.value(scatterSeries));
+                if (cache) {
+                    if (changeTracker.baseGradientChanged || changeTracker.colorStyleChanged)
                         cache->setStaticObjectUVDirty(true);
+                    if (cache->itemSize() != scatterSeries->itemSize())
+                        cache->setStaticBufferDirty(true);
                 }
             }
         }
@@ -308,6 +310,13 @@ void Scatter3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
                     m_haveGradientMeshSeries = true;
             }
 
+            if (cache->staticBufferDirty()) {
+                if (cache->mesh() != QAbstract3DSeries::MeshPoint) {
+                    ScatterObjectBufferHelper *object = cache->bufferObject();
+                    object->update(cache, m_dotSizeScale);
+                }
+                cache->setStaticBufferDirty(false);
+            }
             if (cache->staticObjectUVDirty()) {
                 if (cache->mesh() == QAbstract3DSeries::MeshPoint) {
                     ScatterPointBufferHelper *object = cache->bufferPoints();
@@ -340,6 +349,8 @@ void Scatter3DRenderer::updateItems(const QVector<Scatter3DController::ChangeIte
     ScatterSeriesRenderCache *cache = 0;
     const QScatter3DSeries *prevSeries = 0;
     const QScatterDataArray *dataArray = 0;
+    const bool optimizationStatic = m_cachedOptimizationHint.testFlag(
+                QAbstract3DGraph::OptimizationStatic);
 
     foreach (Scatter3DController::ChangeItem item, items) {
         QScatter3DSeries *currentSeries = item.series;
@@ -354,7 +365,41 @@ void Scatter3DRenderer::updateItems(const QVector<Scatter3DController::ChangeIte
         }
         if (cache->isVisible()) {
             const int index = item.index;
-            updateRenderItem(dataArray->at(index), cache->renderArray()[index]);
+            bool oldVisibility;
+            ScatterRenderItem &item = cache->renderArray()[index];
+            if (optimizationStatic)
+                oldVisibility = item.isVisible();
+            updateRenderItem(dataArray->at(index), item);
+            if (optimizationStatic) {
+                if (!cache->visibilityChanged() && oldVisibility != item.isVisible())
+                    cache->setVisibilityChanged(true);
+                cache->updateIndices().append(index);
+            }
+        }
+    }
+    if (optimizationStatic) {
+        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+            ScatterSeriesRenderCache *cache = static_cast<ScatterSeriesRenderCache *>(baseCache);
+            if (cache->isVisible() && cache->updateIndices().size()) {
+                if (cache->mesh() == QAbstract3DSeries::MeshPoint) {
+                    cache->bufferPoints()->update(cache);
+                    if (cache->colorStyle() == Q3DTheme::ColorStyleRangeGradient)
+                        cache->bufferPoints()->updateUVs(cache);
+                } else {
+                    if (cache->visibilityChanged()) {
+                        // If any change changes item visibility, full load is needed to
+                        // resize the buffers.
+                        cache->updateIndices().clear();
+                        cache->bufferObject()->fullLoad(cache, m_dotSizeScale);
+                    } else {
+                        cache->bufferObject()->update(cache, m_dotSizeScale);
+                        if (cache->colorStyle() == Q3DTheme::ColorStyleRangeGradient)
+                            cache->bufferObject()->updateUVs(cache);
+                    }
+                }
+                cache->updateIndices().clear();
+            }
+            cache->setVisibilityChanged(false);
         }
     }
 }
@@ -801,8 +846,6 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         }
     } else {
         dotShader = pointSelectionShader;
-        previousDrawingPoints = true;
-        dotShader->bind();
     }
 
     float rangeGradientYScaler = 0.5f / m_scaleY;
@@ -847,7 +890,15 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                  == Q3DTheme::ColorStyleUniform)))) {
                 previousDrawingPoints = drawingPoints;
                 if (drawingPoints) {
-                    dotShader = pointSelectionShader;
+                    if (!optimizationDefault && rangeGradientPoints) {
+#if !defined(QT_OPENGL_ES_2)
+                        dotShader = m_labelShader;
+#else
+                        dotShader = m_staticGradientPointShader;
+#endif
+                    } else {
+                        dotShader = pointSelectionShader;
+                    }
                 } else {
                     if (colorStyleIsUniform)
                         dotShader = m_dotShader;
@@ -859,13 +910,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             if (!drawingPoints && !colorStyleIsUniform && previousMeshColorStyle != colorStyle) {
                 if (colorStyle == Q3DTheme::ColorStyleObjectGradient) {
-                    m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientMin(), 0.0f);
-                    m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(),
-                                                         0.5f);
+                    dotShader->setUniformValue(dotShader->gradientMin(), 0.0f);
+                    dotShader->setUniformValue(dotShader->gradientHeight(),
+                                               0.5f);
                 } else {
                     // Each dot is of uniform color according to its Y-coordinate
-                    m_dotGradientShader->setUniformValue(m_dotGradientShader->gradientHeight(),
-                                                         0.0f);
+                    dotShader->setUniformValue(dotShader->gradientHeight(),
+                                               0.0f);
                 }
             }
 
@@ -921,15 +972,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     gradientTexture = cache->baseGradientTexture();
                 }
 
-                if (!optimizationDefault && rangeGradientPoints) {
-#if !defined(QT_OPENGL_ES_2)
-                    dotShader = m_labelShader;
-#else
-                    dotShader = m_staticGradientPointShader;
-#endif
-                    dotShader->bind();
+                if (!optimizationDefault && rangeGradientPoints)
                     gradientTexture = cache->baseGradientTexture();
-                }
 
                 GLfloat lightStrength = m_cachedTheme->lightStrength();
                 if (optimizationDefault && selectedSeries && (m_selectedItemIndex == i)) {
@@ -1134,6 +1178,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     if (!drawingPoints)
                         glDisable(GL_POLYGON_OFFSET_FILL);
                 }
+                dotShader->bind();
             }
         }
     }

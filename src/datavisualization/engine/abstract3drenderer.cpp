@@ -495,6 +495,8 @@ void Abstract3DRenderer::updateMargin(float margin)
 void Abstract3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint)
 {
     m_cachedOptimizationHint = hint;
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
 }
 
 void Abstract3DRenderer::handleResize()
