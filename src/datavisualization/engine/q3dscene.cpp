@@ -159,7 +159,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * A constant property providing an invalid point for selection.
  */
 
-
 /*!
  * Constructs a basic scene with one light and one camera in it. An
  * optional \a parent parameter can be given and is then passed to QObject constructor.
@@ -219,33 +218,35 @@ void Q3DScene::setPrimarySubViewport(const QRect &primarySubViewport)
 /*!
  * Returns whether the given \a point resides inside the primary subview or not.
  * \return \c true if the point is inside the primary subview.
+ * \note If subviews are superimposed, and the given \a point resides inside both, result is
+ * \c true only when the primary subview is on top.
  */
 bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
 {
     int x = point.x();
     int y = point.y();
-    int areaMinX = d_ptr->m_primarySubViewport.x();
-    int areaMaxX = d_ptr->m_primarySubViewport.x() + d_ptr->m_primarySubViewport.width();
-    int areaMinY = d_ptr->m_primarySubViewport.y();
-    int areaMaxY = d_ptr->m_primarySubViewport.y() + d_ptr->m_primarySubViewport.height();
-
-    return ( x > areaMinX && x < areaMaxX && y > areaMinY && y < areaMaxY );
+    bool isInSecondary = d_ptr->isInArea(d_ptr->m_secondarySubViewport, x, y);
+    if (!isInSecondary || (isInSecondary && !d_ptr->m_isSecondarySubviewOnTop))
+        return d_ptr->isInArea(d_ptr->m_primarySubViewport, x, y);
+    else
+        return false;
 }
 
 /*!
  * Returns whether the given \a point resides inside the secondary subview or not.
  * \return \c true if the point is inside the secondary subview.
+ * \note If subviews are superimposed, and the given \a point resides inside both, result is
+ * \c true only when the secondary subview is on top.
  */
 bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
 {
     int x = point.x();
     int y = point.y();
-    int areaMinX = d_ptr->m_secondarySubViewport.x();
-    int areaMaxX = d_ptr->m_secondarySubViewport.x() + d_ptr->m_secondarySubViewport.width();
-    int areaMinY = d_ptr->m_secondarySubViewport.y();
-    int areaMaxY = d_ptr->m_secondarySubViewport.y() + d_ptr->m_secondarySubViewport.height();
-
-    return ( x > areaMinX && x < areaMaxX && y > areaMinY && y < areaMaxY );
+    bool isInPrimary = d_ptr->isInArea(d_ptr->m_primarySubViewport, x, y);
+    if (!isInPrimary || (isInPrimary && d_ptr->m_isSecondarySubviewOnTop))
+        return d_ptr->isInArea(d_ptr->m_secondarySubViewport, x, y);
+    else
+        return false;
 }
 
 /*!
@@ -367,6 +368,10 @@ void Q3DScene::setSlicingActive(bool isSlicing)
         d_ptr->m_isSlicingActive = isSlicing;
         d_ptr->m_changeTracker.slicingActivatedChanged = true;
         d_ptr->m_sceneDirty = true;
+
+        // Set secondary subview behind primary to achieve default functionality (= clicking on
+        // primary disables slice)
+        setSecondarySubviewOnTop(!isSlicing);
 
         d_ptr->calculateSubViewports();
         emit slicingActiveChanged(isSlicing);
@@ -717,6 +722,15 @@ void Q3DScenePrivate::markDirty()
 {
     m_sceneDirty = true;
     emit needRender();
+}
+
+bool Q3DScenePrivate::isInArea(const QRect &area, int x, int y) const
+{
+    int areaMinX = area.x();
+    int areaMaxX = area.x() + area.width();
+    int areaMinY = area.y();
+    int areaMaxY = area.y() + area.height();
+    return ( x >= areaMinX && x <= areaMaxX && y >= areaMinY && y <= areaMaxY );
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

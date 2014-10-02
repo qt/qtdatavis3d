@@ -203,7 +203,6 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
 
     m_graph->activeTheme()->setFont(QFont("Times Roman", 20));
 
-
     // Release and store the default input handler.
     m_defaultInputHandler = static_cast<Q3DInputHandler *>(m_graph->activeInputHandler());
     m_graph->releaseInputHandler(m_defaultInputHandler);
@@ -335,6 +334,9 @@ void GraphModifier::releaseSeries()
 void GraphModifier::flipViews()
 {
     m_graph->scene()->setSecondarySubviewOnTop(!m_graph->scene()->isSecondarySubviewOnTop());
+    qDebug() << "secondary subview on top:" << m_graph->scene()->isSecondarySubviewOnTop();
+    qDebug() << "point (50, 50) in primary subview:" << m_graph->scene()->isPointInPrimarySubView(QPoint(50, 50));
+    qDebug() << "point (50, 50) in secondary subview:" << m_graph->scene()->isPointInSecondarySubView(QPoint(50, 50));
 }
 
 void GraphModifier::createMassiveArray()

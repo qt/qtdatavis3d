@@ -93,6 +93,8 @@ public:
 
     void markDirty();
 
+    bool isInArea(const QRect &area, int x, int y) const;
+
 signals:
     void needRender();
 
