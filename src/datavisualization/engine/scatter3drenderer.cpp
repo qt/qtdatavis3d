@@ -887,7 +887,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             if (drawingPoints != previousDrawingPoints
                     || (!drawingPoints &&
                         (colorStyleIsUniform != (previousMeshColorStyle
-                                                 == Q3DTheme::ColorStyleUniform)))) {
+                                                 == Q3DTheme::ColorStyleUniform)))
+                    || (!optimizationDefault && drawingPoints)) {
                 previousDrawingPoints = drawingPoints;
                 if (drawingPoints) {
                     if (!optimizationDefault && rangeGradientPoints) {

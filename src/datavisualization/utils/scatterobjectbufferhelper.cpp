@@ -58,6 +58,10 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
         glDeleteBuffers(1, &m_uvbuffer);
         glDeleteBuffers(1, &m_normalbuffer);
         glDeleteBuffers(1, &m_elementbuffer);
+        m_vertexbuffer = 0;
+        m_uvbuffer = 0;
+        m_normalbuffer = 0;
+        m_elementbuffer = 0;
     }
 
     // Index vertices
@@ -314,13 +318,14 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
     QVector<QVector3D> buffered_vertices;
     buffered_vertices.resize(verticeCount * updateSize);
 
+    int itemCount = 0;
     for (int i = 0; i < updateSize; i++) {
         int index = updateAll ? i : cache->updateIndices().at(i);
         const ScatterRenderItem &item = renderArray.at(index);
         if (!item.isVisible())
             continue;
 
-        const int offset = i * verticeCount;
+        const int offset = itemCount * verticeCount;
         if (item.rotation().isIdentity()) {
             for (int j = 0; j < verticeCount; j++)
                 buffered_vertices[j + offset] = scaled_vertices[j] + item.translation();
@@ -334,18 +339,25 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
                 buffered_vertices[j + offset] = indexed_vertices[j] * modelMatrix
                         + item.translation();
         }
+        itemCount++;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
+    int sizeOfItem = verticeCount * sizeof(QVector3D);
     if (updateAll) {
-        glBufferData(GL_ARRAY_BUFFER, buffered_vertices.size() * sizeof(QVector3D),
-                     &buffered_vertices.at(0), GL_DYNAMIC_DRAW);
+        if (itemCount) {
+            glBufferData(GL_ARRAY_BUFFER, itemCount * sizeOfItem,
+                         &buffered_vertices.at(0), GL_STATIC_DRAW);
+        }
     } else {
-        int itemSize = verticeCount * sizeof(QVector3D);
+        itemCount = 0;
         for (int i = 0; i < updateSize; i++) {
             int index = updateAll ? i : cache->updateIndices().at(i);
-            glBufferSubData(GL_ARRAY_BUFFER, cache->bufferIndices().at(index) * itemSize,
-                            itemSize, &buffered_vertices.at(i * verticeCount));
+            if (renderArray.at(index).isVisible()) {
+                glBufferSubData(GL_ARRAY_BUFFER, cache->bufferIndices().at(index) * sizeOfItem,
+                                sizeOfItem, &buffered_vertices.at(itemCount * verticeCount));
+                itemCount++;
+            }
         }
     }
     glBindBuffer(GL_ARRAY_BUFFER, 0);

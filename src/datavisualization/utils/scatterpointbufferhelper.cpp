@@ -87,6 +87,8 @@ void ScatterPointBufferHelper::load(ScatterSeriesRenderCache *cache)
         glDeleteBuffers(1, &m_pointbuffer);
         glDeleteBuffers(1, &m_uvbuffer);
         m_bufferedPoints.clear();
+        m_pointbuffer = 0;
+        m_uvbuffer = 0;
     }
 
     bool itemsVisible = false;
