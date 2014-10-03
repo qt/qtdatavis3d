@@ -49,6 +49,13 @@ public:
         Undefined
     };
 
+    enum DataDimensions {
+        BothAscending = 0,
+        XDescending = 1,
+        ZDescending = 2,
+        BothDescending = XDescending | ZDescending
+    };
+
 public:
     SurfaceObject(Surface3DRenderer *renderer);
     virtual ~SurfaceObject();
@@ -64,7 +71,7 @@ public:
     void updateSmoothItem(const QSurfaceDataArray &dataArray, int row, int column, bool polar);
     void updateCoarseItem(const QSurfaceDataArray &dataArray, int row, int column, bool polar);
     void createSmoothIndices(int x, int y, int endX, int endY);
-    void createCoarseIndices(int x, int y, int columns, int rows);
+    void createCoarseSubSection(int x, int y, int columns, int rows);
     void createSmoothGridlineIndices(int x, int y, int endX, int endY);
     void createCoarseGridlineIndices(int x, int y, int endX, int endY);
     void uploadBuffers();
@@ -78,11 +85,16 @@ public:
     inline void activateSurfaceTexture(bool value) { m_returnTextureBuffer = value; }
 
 private:
-    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c, bool flipNormal);
+    void createCoarseIndices(GLint *indices, int &p, int row, int upperRow, int j);
+    void createNormals(int &p, int row, int upperRow, int j);
+    void createSmoothNormalBodyLine(int &totalIndex, int column);
+    void createSmoothNormalUpperLine(int &totalIndex);
+    QVector3D createSmoothNormalBodyLineItem(int x, int y);
+    QVector3D createSmoothNormalUpperLineItem(int x, int y);
+    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
     void createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
-                       const QVector<QVector3D> &normals, const GLint *indices,
-                       bool changeGeometry);
-    bool checkFlipNormal(const QSurfaceDataArray &array);
+                       const QVector<QVector3D> &normals, const GLint *indices);
+    void checkDirections(const QSurfaceDataArray &array);
     inline void getNormalizedVertex(const QSurfaceDataItem &data, QVector3D &vertex, bool polar,
                                     bool flipXZ);
 
@@ -103,6 +115,8 @@ private:
     float m_maxY;
     GLuint m_uvTextureBuffer;
     bool m_returnTextureBuffer;
+    int m_dataDimension;
+    int m_oldDataDimension;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

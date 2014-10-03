@@ -67,7 +67,9 @@ GraphModifier::GraphModifier(Q3DSurface *graph, QWidget *parentWidget)
       m_drawMode3(QSurface3DSeries::DrawSurfaceAndWireframe),
       m_drawMode4(QSurface3DSeries::DrawSurfaceAndWireframe),
       m_offset(4.0f),
-      m_parentWidget(parentWidget)
+      m_parentWidget(parentWidget),
+      m_ascendingX(true),
+      m_ascendingZ(true)
 {
     m_graph->setAxisX(new QValue3DAxis);
     m_graph->axisX()->setTitle("X-Axis");
@@ -753,6 +755,8 @@ void GraphModifier::toggleAxisTitleFixed(bool enabled)
 
 void GraphModifier::toggleXAscending(bool enabled)
 {
+    m_ascendingX = enabled;
+
     // Flip data array contents if necessary
     foreach (QSurface3DSeries *series, m_graph->seriesList()) {
         QSurfaceDataArray *array = const_cast<QSurfaceDataArray *>(series->dataProxy()->array());
@@ -781,6 +785,8 @@ void GraphModifier::toggleXAscending(bool enabled)
 
 void GraphModifier::toggleZAscending(bool enabled)
 {
+    m_ascendingZ = enabled;
+
     // Flip data array contents if necessary
     foreach (QSurface3DSeries *series, m_graph->seriesList()) {
         QSurfaceDataArray *array = const_cast<QSurfaceDataArray *>(series->dataProxy()->array());
@@ -896,7 +902,10 @@ void GraphModifier::changeRow()
 
         int row = rand() % m_zCount;
         QSurfaceDataRow *newRow = createMultiRow(row, changeRowSeries, true);
-        m_multiseries[changeRowSeries]->dataProxy()->setRow(row, newRow);
+        if (m_ascendingZ)
+            m_multiseries[changeRowSeries]->dataProxy()->setRow(row, newRow);
+        else
+            m_multiseries[changeRowSeries]->dataProxy()->setRow((m_zCount - 1) - row, newRow);
 
         changeRowSeries++;
         if (changeRowSeries > 3)
@@ -913,11 +922,20 @@ QSurfaceDataRow *GraphModifier::createMultiRow(int row, int series, bool change)
     float i = float(row);
     QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
     float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[series];
-    for (int j = 0; j < m_xCount; j++) {
-        float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[series];
-        float angle = (z * x) / float(full) * 1.57f;
-        float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f * float(change) + 1.1f *series;
-        (*newRow)[j].setPosition(QVector3D(x, y, z));
+    if (m_ascendingX) {
+        for (int j = 0; j < m_xCount; j++) {
+            float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[series];
+            float angle = (z * x) / float(full) * 1.57f;
+            float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f * float(change) + 1.1f *series;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
+        }
+    } else {
+        for (int j = m_xCount - 1; j >= 0 ; j--) {
+            float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[series];
+            float angle = (z * x) / float(full) * 1.57f;
+            float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f * float(change) + 1.1f *series;
+            (*newRow)[(m_xCount - 1) - j].setPosition(QVector3D(x, y, z));
+        }
     }
 
     return newRow;
@@ -1026,7 +1044,16 @@ void GraphModifier::changeItem()
         float angle = (z * x) / float(full) * 1.57f;
         float y = qSin(angle * float(qPow(1.3f, changeItemSeries))) + 0.2f + 1.1f *changeItemSeries;
         QSurfaceDataItem newItem(QVector3D(x, y, z));
-        m_multiseries[changeItemSeries]->dataProxy()->setItem(int(i), int(j), newItem);
+
+        if (m_ascendingZ && m_ascendingX)
+            m_multiseries[changeItemSeries]->dataProxy()->setItem(int(i), int(j), newItem);
+        else if (!m_ascendingZ && m_ascendingX)
+            m_multiseries[changeItemSeries]->dataProxy()->setItem(m_zCount - 1 - int(i), int(j), newItem);
+        else if (m_ascendingZ && !m_ascendingX)
+            m_multiseries[changeItemSeries]->dataProxy()->setItem(int(i), m_xCount - 1 - int(j), newItem);
+        else
+            m_multiseries[changeItemSeries]->dataProxy()->setItem(m_zCount - 1 - int(i), m_xCount - 1 - int(j), newItem);
+        //m_multiseries[changeItemSeries]->setSelectedPoint(QPoint(i, j));
         changeItemSeries++;
         if (changeItemSeries > 3)
             changeItemSeries = 0;

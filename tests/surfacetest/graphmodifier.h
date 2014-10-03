@@ -194,6 +194,8 @@ private:
     QVector3D m_cameraTarget;
     QWidget *m_parentWidget;
     QTimer m_graphPositionQueryTimer;
+    bool m_ascendingX;
+    bool m_ascendingZ;
 };
 
 #endif
