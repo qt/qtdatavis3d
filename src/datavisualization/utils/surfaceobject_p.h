@@ -49,12 +49,13 @@ public:
         Undefined
     };
 
-    enum DataDimensions {
+    enum DataDimension {
         BothAscending = 0,
         XDescending = 1,
         ZDescending = 2,
         BothDescending = XDescending | ZDescending
     };
+    Q_DECLARE_FLAGS(DataDimensions, DataDimension)
 
 public:
     SurfaceObject(Surface3DRenderer *renderer);
@@ -115,8 +116,8 @@ private:
     float m_maxY;
     GLuint m_uvTextureBuffer;
     bool m_returnTextureBuffer;
-    int m_dataDimension;
-    int m_oldDataDimension;
+    SurfaceObject::DataDimensions m_dataDimension;
+    SurfaceObject::DataDimensions m_oldDataDimension;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

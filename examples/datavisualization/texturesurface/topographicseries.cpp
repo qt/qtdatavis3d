@@ -49,7 +49,8 @@ void TopographicSeries::setTopographyFile(const QString file, float width, float
     QSurfaceDataArray *dataArray = new QSurfaceDataArray;
     dataArray->reserve(imageHeight);
     for (int i = 0; i < imageHeight; i++) {
-        int p = (imageHeight - 1 - i) * widthBits;
+        int p = i * widthBits;
+        float z = height - float(i) * stepZ;
         QSurfaceDataRow *newRow = new QSurfaceDataRow(imageWidth);
         for (int j = 0; j < imageWidth; j++) {
             uchar aa = bits[p + 0];
@@ -57,7 +58,7 @@ void TopographicSeries::setTopographyFile(const QString file, float width, float
             uchar gg = bits[p + 2];
             uint color = uint((gg << 16) + (rr << 8) + aa);
             float y = float(color) / packingFactor;
-            (*newRow)[j].setPosition(QVector3D(float(j) * stepX, y, float(i) * stepZ));
+            (*newRow)[j].setPosition(QVector3D(float(j) * stepX, y, z));
             p = p + 4;
         }
         *dataArray << newRow;

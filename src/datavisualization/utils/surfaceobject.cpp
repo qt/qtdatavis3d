@@ -307,15 +307,21 @@ void SurfaceObject::smoothUVs(const QSurfaceDataArray &dataArray,
     float zRangeNormalizer = dataArray.at(rows - 1)->at(0).z() - dataArray.at(0)->at(0).z();
     float xMin = dataArray.at(0)->at(0).x();
     float zMin = dataArray.at(0)->at(0).z();
+    const bool zDescending = m_dataDimension.testFlag(SurfaceObject::ZDescending);
+    const bool xDescending = m_dataDimension.testFlag(SurfaceObject::XDescending);
 
     QVector<QVector2D> uvs;
     uvs.resize(m_rows * m_columns);
     int index = 0;
     for (int i = 0; i < m_rows; i++) {
         float y = (modelArray.at(i)->at(0).z() - zMin) / zRangeNormalizer;
+        if (zDescending)
+            y = 1.0f - y;
         const QSurfaceDataRow &p = *modelArray.at(i);
         for (int j = 0; j < m_columns; j++) {
             float x = (p.at(j).x() - xMin) / xRangeNormalizer;
+            if (xDescending)
+                x = 1.0f - x;
             uvs[index] = QVector2D(x, y);
             index++;
         }
@@ -601,6 +607,8 @@ void SurfaceObject::coarseUVs(const QSurfaceDataArray &dataArray,
     float zRangeNormalizer = dataArray.at(rows - 1)->at(0).z() - dataArray.at(0)->at(0).z();
     float xMin = dataArray.at(0)->at(0).x();
     float zMin = dataArray.at(0)->at(0).z();
+    const bool zDescending = m_dataDimension.testFlag(SurfaceObject::ZDescending);
+    const bool xDescending = m_dataDimension.testFlag(SurfaceObject::XDescending);
 
     QVector<QVector2D> uvs;
     uvs.resize(m_rows * m_columns * 2);
@@ -608,9 +616,13 @@ void SurfaceObject::coarseUVs(const QSurfaceDataArray &dataArray,
     int colLimit = m_columns - 1;
     for (int i = 0; i < m_rows; i++) {
         float y = (modelArray.at(i)->at(0).z() - zMin) / zRangeNormalizer;
+        if (zDescending)
+            y = 1.0f - y;
         const QSurfaceDataRow &p = *modelArray.at(i);
         for (int j = 0; j < m_columns; j++) {
             float x = (p.at(j).x() - xMin) / xRangeNormalizer;
+            if (xDescending)
+                x = 1.0f - x;
             uvs[index] = QVector2D(x, y);
             index++;
             if (j > 0 && j < colLimit) {
