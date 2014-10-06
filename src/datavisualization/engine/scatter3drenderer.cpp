@@ -365,6 +365,8 @@ void Scatter3DRenderer::updateItems(const QVector<Scatter3DController::ChangeIte
         }
         if (cache->isVisible()) {
             const int index = item.index;
+            if (index >= cache->renderArray().size())
+                continue; // Items removed from array for same render
             bool oldVisibility;
             ScatterRenderItem &item = cache->renderArray()[index];
             if (optimizationStatic)
