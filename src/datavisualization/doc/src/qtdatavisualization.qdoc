@@ -98,7 +98,7 @@
     \row
       \li Windows (MSVC)           \li nmake
     \row
-      \li OSX                      \li make
+      \li OS X                     \li make
     \endtable
 
     The above generates the default makefiles for your configuration, which is typically
@@ -127,7 +127,7 @@
     make release
     \endcode
 
-    For both builds (Windows/Mac only):
+    For both builds (Windows/OS X only):
     \code
     qmake CONFIG+="debug_and_release build_all"
     make

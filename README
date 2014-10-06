@@ -22,7 +22,7 @@ After running qmake, build the project with make:
     (Linux) make
     (Windows with MinGw) mingw32-make
     (Windows with Visual Studio) nmake
-    (OSX) make
+    (OS X) make
 
 The above generates the default makefiles for your configuration, which is typically
 the release build if you are using precompiled binary Qt distribution. To build both
@@ -42,7 +42,7 @@ For release builds:
     qmake CONFIG+=debug_and_release
     make release
 
-For both builds (Windows/Mac only):
+For both builds (Windows/OS X only):
     qmake CONFIG+="debug_and_release build_all"
     make
 

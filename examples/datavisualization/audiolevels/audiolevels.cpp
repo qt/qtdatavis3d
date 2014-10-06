@@ -74,7 +74,7 @@ AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
 
         m_audioInput = new QAudioInput(inputDevice, formatAudio, this);
 #ifdef Q_OS_MAC
-        // Mac seems to wait for entire buffer to fill before calling writeData, so use smaller buffer
+        // OS X seems to wait for entire buffer to fill before calling writeData, so use smaller buffer
         m_audioInput->setBufferSize(256);
 #else
         m_audioInput->setBufferSize(1024);
