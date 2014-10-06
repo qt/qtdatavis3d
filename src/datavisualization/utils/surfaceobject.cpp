@@ -179,7 +179,7 @@ void SurfaceObject::createSmoothNormalBodyLine(int &totalIndex, int column)
 
 void SurfaceObject::createSmoothNormalUpperLine(int &totalIndex)
 {
-    if ((m_dataDimension == BothAscending) ) {
+    if (m_dataDimension == BothAscending) {
         int lineEnd = m_rows * m_columns - 1;
         for (int j = (m_rows - 1) * m_columns; j < lineEnd; j++) {
             m_normals[totalIndex++] = normal(m_vertices.at(j),
@@ -263,7 +263,7 @@ QVector3D SurfaceObject::createSmoothNormalBodyLineItem(int x, int y)
 QVector3D SurfaceObject::createSmoothNormalUpperLineItem(int x, int y)
 {
     int p = y * m_columns + x;
-    if ((m_dataDimension == BothAscending) ) {
+    if (m_dataDimension == BothAscending) {
         if (x < m_columns - 1) {
             return normal(m_vertices.at(p), m_vertices.at(p - m_columns),
                           m_vertices.at(p + 1));
