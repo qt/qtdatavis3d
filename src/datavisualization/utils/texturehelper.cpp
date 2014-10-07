@@ -45,6 +45,9 @@ TextureHelper::TextureHelper()
 
 TextureHelper::~TextureHelper()
 {
+#if !defined(QT_OPENGL_ES_2)
+    delete m_openGlFunctions_2_1;
+#endif
 }
 
 GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering,

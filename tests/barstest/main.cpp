@@ -236,7 +236,7 @@ int main(int argc, char **argv)
 
     QCheckBox *inputHandlerZoomAtTargetCheckBox = new QCheckBox(widget);
     inputHandlerZoomAtTargetCheckBox->setText("IH: setZoomAtTarget");
-    inputHandlerZoomAtTargetCheckBox->setChecked(false);
+    inputHandlerZoomAtTargetCheckBox->setChecked(true);
 
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
     rotationSliderX->setTickInterval(1);

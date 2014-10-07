@@ -42,7 +42,7 @@ const int mineShaftDiameter(1);
 const int airColorIndex(254);
 const int mineShaftColorIndex(255);
 const int layerColorThickness(60);
-const int heightToColorDiv(128);
+const int heightToColorDiv(140);
 const int magmaColorsMin(0);
 const int magmaColorsMax(layerColorThickness);
 const int aboveWaterGroundColorsMin(magmaColorsMax + 1);
