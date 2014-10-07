@@ -1090,8 +1090,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                 shadowOffset = -0.015f;
                         }
 
-                        if (m_reflectionEnabled && ((m_yFlipped && item.height() > 0.0)
-                                                    || (!m_yFlipped && item.height() < 0.0))) {
+                        if (m_cachedTheme->isBackgroundEnabled() && m_reflectionEnabled
+                                && ((m_yFlipped && item.height() > 0.0)
+                                    || (!m_yFlipped && item.height() < 0.0))) {
                             continue;
                         }
 
