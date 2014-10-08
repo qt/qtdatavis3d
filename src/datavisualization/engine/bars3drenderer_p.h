@@ -159,7 +159,7 @@ private:
                   GLint startBar, GLint stopBar, GLint stepBar, GLfloat reflection = 1.0f);
     void drawBackground(GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
                         const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
-                        bool reflectingDraw = false);
+                        bool reflectingDraw = false, bool drawingSelectionBuffer = false);
     void drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
                        const QMatrix4x4 &projectionViewMatrix,
                        const QMatrix4x4 &viewMatrix);

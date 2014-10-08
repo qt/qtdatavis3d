@@ -1242,11 +1242,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                             projectionViewMatrix, depthProjectionViewMatrix,
                                             m_depthTexture, m_shadowQualityToShader);
         drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
+        drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix,
+                       viewMatrix, false, true);
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        QVector4D clickedColor = Utils::getSelection(m_inputPosition,
-                                                     m_viewport.height());
+        QVector4D clickedColor = Utils::getSelection(m_inputPosition, m_viewport.height());
         m_clickedPosition = selectionColorToArrayPosition(clickedColor);
         m_clickedSeries = selectionColorToSeries(clickedColor);
 
@@ -1688,17 +1689,23 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
 void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
                                     const QMatrix4x4 &depthProjectionViewMatrix,
                                     const QMatrix4x4 &projectionViewMatrix,
-                                    const QMatrix4x4 &viewMatrix, bool reflectingDraw)
+                                    const QMatrix4x4 &viewMatrix, bool reflectingDraw,
+                                    bool drawingSelectionBuffer)
 {
-    QVector3D lightPos =  m_cachedScene->activeLight()->position();
-    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
-    GLfloat adjustedLightStrength = m_cachedTheme->lightStrength() / 10.0f;
-
-    // Bind background shader
-    m_backgroundShader->bind();
-
     // Draw background
     if (m_cachedTheme->isBackgroundEnabled() && m_backgroundObj) {
+        QVector3D lightPos =  m_cachedScene->activeLight()->position();
+        QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+        GLfloat adjustedLightStrength = m_cachedTheme->lightStrength() / 10.0f;
+        ShaderHelper *shader = 0;
+
+        // Bind background shader
+        if (drawingSelectionBuffer)
+            shader = m_selectionShader; // Use single color shader when drawing to selection buffer
+        else
+            shader = m_backgroundShader;
+        shader->bind();
+
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
@@ -1710,12 +1717,17 @@ void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
             backgroundColor.setW(backgroundColor.w() * m_reflectivity);
 
         // Set shader bindings
-        m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
-        m_backgroundShader->setUniformValue(m_backgroundShader->view(), viewMatrix);
-        m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
-        m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
-                                            m_cachedTheme->ambientLightStrength() * 2.0f);
-        m_backgroundShader->setUniformValue(m_backgroundShader->lightColor(), lightColor);
+        shader->setUniformValue(shader->lightP(), lightPos);
+        shader->setUniformValue(shader->view(), viewMatrix);
+        if (drawingSelectionBuffer) {
+            // Use selectionSkipColor for background when drawing to selection buffer
+            shader->setUniformValue(shader->color(), selectionSkipColor);
+        } else {
+            shader->setUniformValue(shader->color(), backgroundColor);
+        }
+        shader->setUniformValue(shader->ambientS(),
+                                m_cachedTheme->ambientLightStrength() * 2.0f);
+        shader->setUniformValue(shader->lightColor(), lightColor);
 
         // Draw floor
         modelMatrix.scale(backgroundScaler);
@@ -1733,23 +1745,22 @@ void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
         // Set changed shader bindings
-        m_backgroundShader->setUniformValue(m_backgroundShader->model(), modelMatrix);
-        m_backgroundShader->setUniformValue(m_backgroundShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-        m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
+        shader->setUniformValue(shader->model(), modelMatrix);
+        shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+        shader->setUniformValue(shader->MVP(), MVPMatrix);
 
 #if !defined(QT_OPENGL_ES_2)
         if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
             // Set shadow shader bindings
             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-            m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
+            shader->setUniformValue(shader->depth(), depthMVPMatrix);
             // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_gridLineObj, 0, m_depthTexture);
+            m_drawer->drawObject(shader, m_gridLineObj, 0, m_depthTexture);
         } else
 #endif
         {
             // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_gridLineObj);
+            m_drawer->drawObject(shader, m_gridLineObj);
         }
 
         // Draw walls
@@ -1769,23 +1780,20 @@ void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
 #endif
 
         // Set changed shader bindings
-        m_backgroundShader->setUniformValue(m_backgroundShader->model(), modelMatrix);
-        m_backgroundShader->setUniformValue(m_backgroundShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-        m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
+        shader->setUniformValue(shader->model(), modelMatrix);
+        shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+        shader->setUniformValue(shader->MVP(), MVPMatrix);
         if (!m_reflectionEnabled || (m_reflectionEnabled && reflectingDraw)) {
 #if !defined(QT_OPENGL_ES_2)
             if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
                 // Set shadow shader bindings
                 QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
-                                                    m_shadowQualityToShader);
-                m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
-                m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                    adjustedLightStrength);
+                shader->setUniformValue(shader->shadowQ(), m_shadowQualityToShader);
+                shader->setUniformValue(shader->depth(), depthMVPMatrix);
+                shader->setUniformValue(shader->lightS(), adjustedLightStrength);
 
                 // Draw the object
-                m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
+                m_drawer->drawObject(shader, m_backgroundObj, 0, m_depthTexture);
             } else
 #else
             Q_UNUSED(adjustedLightStrength);
@@ -1793,11 +1801,10 @@ void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
 #endif
             {
                 // Set shadowless shader bindings
-                m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                    m_cachedTheme->lightStrength());
+                shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
 
                 // Draw the object
-                m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
+                m_drawer->drawObject(shader, m_backgroundObj);
             }
         }
     }
