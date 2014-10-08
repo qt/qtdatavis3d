@@ -802,6 +802,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         QVector4D clickedColor = Utils::getSelection(m_inputPosition,
                                                      m_viewport.height());
         selectionColorToSeriesAndIndex(clickedColor, m_clickedIndex, m_clickedSeries);
+        m_clickResolved = true;
 
         emit needRender();
 

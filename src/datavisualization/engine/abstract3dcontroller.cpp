@@ -170,16 +170,14 @@ void Abstract3DController::synchDataToRenderer()
 {
     // Subclass implementations check for renderer validity already, so no need to check here.
 
-    // If there are pending queries, handle those first
-    if (m_renderer->isGraphPositionQueryPending()) {
-        handlePendingGraphPositionQuery();
-        m_renderer->clearGraphPositionQueryPending();
-    }
+    m_renderPending = false;
 
-    if (m_renderer->isClickPending()) {
+    // If there are pending queries, handle those first
+    if (m_renderer->isGraphPositionQueryResolved())
+        handlePendingGraphPositionQuery();
+
+    if (m_renderer->isClickQueryResolved())
         handlePendingClick();
-        m_renderer->clearClickPending();
-    }
 
     startRecordingRemovesAndInserts();
 
@@ -518,8 +516,6 @@ void Abstract3DController::synchDataToRenderer()
 
 void Abstract3DController::render(const GLuint defaultFboHandle)
 {
-    m_renderPending = false;
-
     // If not initialized, do nothing.
     if (!m_renderer)
         return;
@@ -1489,12 +1485,27 @@ void Abstract3DController::handlePendingClick()
     m_selectedLabelIndex = m_renderer->m_selectedLabelIndex;
     m_selectedCustomItemIndex = m_renderer->m_selectedCustomItemIndex;
 
+    // Invalidate query position to indicate the query has been handled, unless another
+    // point has been queried.
+    if (m_renderer->cachedClickQuery() == m_scene->selectionQueryPosition())
+        m_scene->setSelectionQueryPosition(Q3DScene::invalidSelectionPoint());
+
+    m_renderer->clearClickQueryResolved();
+
     emit elementSelected(m_clickedType);
 }
 
 void Abstract3DController::handlePendingGraphPositionQuery()
 {
     m_queriedGraphPosition = m_renderer->queriedGraphPosition();
+
+    // Invalidate query position to indicate the query has been handled, unless another
+    // point has been queried.
+    if (m_renderer->cachedGraphPositionQuery() == m_scene->graphPositionQuery())
+        m_scene->setGraphPositionQuery(Q3DScene::invalidSelectionPoint());
+
+    m_renderer->clearGraphPositionQueryResolved();
+
     emit queriedGraphPositionChanged(m_queriedGraphPosition);
 }
 

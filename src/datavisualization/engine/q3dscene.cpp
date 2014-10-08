@@ -560,6 +560,11 @@ void Q3DScenePrivate::sync(Q3DScenePrivate &other)
         m_changeTracker.selectionQueryPositionChanged = false;
         other.m_changeTracker.selectionQueryPositionChanged = false;
     }
+    if (m_changeTracker.graphPositionQueryPositionChanged) {
+        other.q_ptr->setGraphPositionQuery(q_ptr->graphPositionQuery());
+        m_changeTracker.graphPositionQueryPositionChanged = false;
+        other.m_changeTracker.graphPositionQueryPositionChanged = false;
+    }
     if (m_changeTracker.cameraChanged) {
         m_camera->setDirty(true);
         m_changeTracker.cameraChanged = false;

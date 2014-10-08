@@ -1353,6 +1353,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 + uint(clickedColor.w()) * alphaMultiplier;
 
         m_clickedPosition = selectionIdToSurfacePoint(selectionId);
+        m_clickResolved = true;
 
         emit needRender();
 

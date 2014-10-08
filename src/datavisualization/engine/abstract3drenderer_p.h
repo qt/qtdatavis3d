@@ -148,13 +148,15 @@ public:
     void generateBaseColorTexture(const QColor &color, GLuint *texture);
     void fixGradientAndGenerateTexture(QLinearGradient *gradient, GLuint *gradientTexture);
 
-    inline bool isClickPending() { return m_clickPending; }
-    inline void clearClickPending() { m_clickPending = false; }
+    inline bool isClickQueryResolved() const { return m_clickResolved; }
+    inline void clearClickQueryResolved() { m_clickResolved = false; }
+    inline QPoint cachedClickQuery() const { return m_cachedScene->selectionQueryPosition(); }
     inline QAbstract3DSeries *clickedSeries() const { return m_clickedSeries; }
     inline QAbstract3DGraph::ElementType clickedType() { return m_clickedType; }
-    inline bool isGraphPositionQueryPending() { return m_graphPositionQueryPending; }
-    inline void clearGraphPositionQueryPending() { m_graphPositionQueryPending = false; }
+    inline bool isGraphPositionQueryResolved() const { return m_graphPositionQueryResolved; }
+    inline void clearGraphPositionQueryResolved() { m_graphPositionQueryResolved = false; }
     inline QVector3D queriedGraphPosition() const { return m_queriedGraphPosition; }
+    inline QPoint cachedGraphPositionQuery() const { return m_cachedScene->graphPositionQuery(); }
 
     LabelItem &selectionLabelItem();
     void setSelectionLabel(const QString &label);
@@ -253,8 +255,9 @@ protected:
     QRect m_secondarySubViewport;
     float m_devicePixelRatio;
     bool m_selectionLabelDirty;
-    bool m_clickPending;
+    bool m_clickResolved;
     bool m_graphPositionQueryPending;
+    bool m_graphPositionQueryResolved;
     QAbstract3DSeries *m_clickedSeries;
     QAbstract3DGraph::ElementType m_clickedType;
     int m_selectedLabelIndex;

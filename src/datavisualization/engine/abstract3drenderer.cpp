@@ -53,8 +53,9 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_selectionState(SelectNone),
       m_devicePixelRatio(1.0f),
       m_selectionLabelDirty(true),
-      m_clickPending(false),
+      m_clickResolved(false),
       m_graphPositionQueryPending(false),
+      m_graphPositionQueryResolved(false),
       m_clickedSeries(0),
       m_clickedType(QAbstract3DGraph::ElementNone),
       m_selectedLabelIndex(-1),
@@ -337,10 +338,6 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
     if (Q3DScene::invalidSelectionPoint() == logicalPixelPosition) {
         updateSelectionState(SelectNone);
     } else {
-        // Selections are one-shot, reset selection active to false before processing
-        scene->setSelectionQueryPosition(Q3DScene::invalidSelectionPoint());
-        m_clickPending = true;
-
         if (scene->isSlicingActive()) {
             if (scene->isPointInPrimarySubView(logicalPixelPosition))
                 updateSelectionState(SelectOnOverview);
@@ -353,10 +350,14 @@ void Abstract3DRenderer::updateScene(Q3DScene *scene)
         }
     }
 
-    if (Q3DScene::invalidSelectionPoint() != logicalGraphPosition) {
+    if (Q3DScene::invalidSelectionPoint() != logicalGraphPosition)
         m_graphPositionQueryPending = true;
-        scene->setGraphPositionQuery(Q3DScene::invalidSelectionPoint());
-    }
+
+    // Queue up another render when we have a query that needs resolving.
+    // This is needed because QtQuick scene graph can sometimes do a sync without following it up
+    // with a render.
+    if (m_graphPositionQueryPending || m_selectionState != SelectNone)
+        emit needRender();
 }
 
 void Abstract3DRenderer::updateTextures()
@@ -1767,6 +1768,8 @@ void Abstract3DRenderer::queriedGraphPosition(const QMatrix4x4 &projectionViewMa
     m_queriedGraphPosition = QVector3D(normalizedValues.x(),
                                        normalizedValues.y(),
                                        normalizedValues.z());
+    m_graphPositionQueryResolved = true;
+    m_graphPositionQueryPending = false;
 }
 
 void Abstract3DRenderer::calculatePolarXZ(const QVector3D &dataPos, float &x, float &z) const

@@ -1250,6 +1250,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         QVector4D clickedColor = Utils::getSelection(m_inputPosition, m_viewport.height());
         m_clickedPosition = selectionColorToArrayPosition(clickedColor);
         m_clickedSeries = selectionColorToSeries(clickedColor);
+        m_clickResolved = true;
 
         emit needRender();
 
