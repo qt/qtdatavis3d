@@ -1858,7 +1858,11 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
     const QVector<float> &subGridPositions = m_axisCacheX.formatter()->subGridPositions();
     int mainSize = gridPositions.size();
     QVector3D translateVector(0.0f, yFloorLinePos, -halfRatio);
+#if defined(QT_OPENGL_ES_2)
+    QQuaternion finalRotation = m_yRightAngleRotationNeg;
+#else
     QQuaternion finalRotation = m_xRightAngleRotationNeg;
+#endif
     if (m_yFlippedForGrid)
         finalRotation *= m_xFlipRotation;
     for (int i = 0; i < gridLineCount; i++) {
