@@ -929,7 +929,7 @@ void Surface3DRenderer::drawSlicedScene()
 #if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
 #else
-        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
+        ShaderHelper *lineShader = m_surfaceGridShader; // Plain color shader for GL_LINES
 #endif
 
         // Bind line shader
@@ -1571,7 +1571,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 #if !(defined QT_OPENGL_ES_2)
         ShaderHelper *lineShader = m_backgroundShader;
 #else
-        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
+        ShaderHelper *lineShader = m_surfaceGridShader; // Plain color shader for GL_LINES
 #endif
 
         // Bind line shader
