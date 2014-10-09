@@ -743,6 +743,9 @@ qreal QAbstract3DGraph::horizontalAspectRatio() const
  * for custom items that intersect the floor plane. In that case, reflections should be turned off
  * to avoid incorrect rendering.
  *
+ * \note If using custom surface format, stencil buffer needs to be defined
+ * (QSurfaceFormat::setStencilBufferSize()) for reflections to work.
+ *
  * \sa reflectivity
  */
 void QAbstract3DGraph::setReflection(bool enable)
