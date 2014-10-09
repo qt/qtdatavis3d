@@ -126,14 +126,18 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // 2nd attribute buffer : normals
-    glEnableVertexAttribArray(shader->normalAtt());
-    glBindBuffer(GL_ARRAY_BUFFER, object->normalBuf());
-    glVertexAttribPointer(shader->normalAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    if (shader->normalAtt() >= 0) {
+        glEnableVertexAttribArray(shader->normalAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, object->normalBuf());
+        glVertexAttribPointer(shader->normalAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    }
 
     // 3rd attribute buffer : UVs
-    glEnableVertexAttribArray(shader->uvAtt());
-    glBindBuffer(GL_ARRAY_BUFFER, object->uvBuf());
-    glVertexAttribPointer(shader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    if (shader->uvAtt() >= 0) {
+        glEnableVertexAttribArray(shader->uvAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, object->uvBuf());
+        glVertexAttribPointer(shader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    }
 
     // Index buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
@@ -145,8 +149,10 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glDisableVertexAttribArray(shader->uvAtt());
-    glDisableVertexAttribArray(shader->normalAtt());
+    if (shader->uvAtt() >= 0)
+        glDisableVertexAttribArray(shader->uvAtt());
+    if (shader->normalAtt() >= 0)
+        glDisableVertexAttribArray(shader->normalAtt());
     glDisableVertexAttribArray(shader->posAtt());
 
     // Release textures
