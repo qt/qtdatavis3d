@@ -94,7 +94,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         else
             labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
 #endif
-        if (labelSize.width() <= maxTextureSize) {
+        if (!maxTextureSize || labelSize.width() <= maxTextureSize) {
             // Make sure the label is not too wide
             sizeOk = true;
         } else if (--currentFontSize == 4) {
