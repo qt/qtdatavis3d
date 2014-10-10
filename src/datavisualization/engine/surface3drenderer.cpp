@@ -53,7 +53,6 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
       m_scaleX(0.0f),
       m_scaleY(0.0f),
       m_scaleZ(0.0f),
-      m_depthModelTexture(0),
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
       m_selectionDepthBuffer(0),
@@ -93,7 +92,6 @@ Surface3DRenderer::~Surface3DRenderer()
 
         m_textureHelper->deleteTexture(&m_noShadowTexture);
         m_textureHelper->deleteTexture(&m_depthTexture);
-        m_textureHelper->deleteTexture(&m_depthModelTexture);
         m_textureHelper->deleteTexture(&m_selectionResultTexture);
     }
     delete m_depthShader;
@@ -1202,6 +1200,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                                           / (GLfloat)m_primarySubViewport.height(), 3.0f, 100.0f);
         depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
+        // Surface is not closed, so don't cull anything
         glDisable(GL_CULL_FACE);
 
         foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
@@ -1231,45 +1230,14 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
 
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_FRONT);
-
-        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
-                                            projectionViewMatrix,
-                                            depthProjectionViewMatrix, m_depthTexture,
-                                            m_shadowQualityToShader);
-
-        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D,
-                               m_depthModelTexture, 0);
-        glClear(GL_DEPTH_BUFFER_BIT);
-
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
-            SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
-            SurfaceObject *object = cache->surfaceObject();
-            if (object->indexCount() && cache->surfaceVisible() && cache->isVisible()
-                    && cache->sampleSpace().width() >= 2 && cache->sampleSpace().height() >= 2) {
-                m_depthShader->setUniformValue(m_depthShader->MVP(), cache->MVPMatrix());
-
-                // 1st attribute buffer : vertices
-                glEnableVertexAttribArray(m_depthShader->posAtt());
-                glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
-                glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
-                                      (void *)0);
-
-                // Index buffer
-                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
-
-                // Draw the triangles
-                glDrawElements(GL_TRIANGLES, object->indexCount(),
-                               object->indicesType(), (void *)0);
-            }
-        }
-
         // Free buffers
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ARRAY_BUFFER, 0);
 
         glDisableVertexAttribArray(m_depthShader->posAtt());
+
+        glEnable(GL_CULL_FACE);
+        glCullFace(GL_FRONT);
 
         Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
                                             projectionViewMatrix,
@@ -1453,7 +1421,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
                         // Draw the objects
                         m_drawer->drawObject(shader, cache->surfaceObject(), texture,
-                                             m_depthModelTexture);
+                                             m_depthTexture);
                     } else
 #endif
                     {
@@ -3025,7 +2993,6 @@ void Surface3DRenderer::initDepthShader()
 void Surface3DRenderer::updateDepthBuffer()
 {
     m_textureHelper->deleteTexture(&m_depthTexture);
-    m_textureHelper->deleteTexture(&m_depthModelTexture);
 
     if (m_primarySubViewport.size().isEmpty())
         return;
@@ -3034,11 +3001,7 @@ void Surface3DRenderer::updateDepthBuffer()
         m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
                                                                         m_depthFrameBuffer,
                                                                         m_shadowQualityMultiplier);
-        if (m_depthTexture) {
-            m_depthModelTexture = m_textureHelper->createDepthTexture(m_primarySubViewport.size(),
-                                                                      m_shadowQualityMultiplier);
-        }
-        if (!m_depthTexture || !m_depthModelTexture)
+        if (!m_depthTexture)
             lowerShadowQuality();
     }
 }

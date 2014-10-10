@@ -61,7 +61,6 @@ private:
     float m_scaleX;
     float m_scaleY;
     float m_scaleZ;
-    GLuint m_depthModelTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
