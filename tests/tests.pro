@@ -19,7 +19,8 @@ SUBDIRS += barstest \
            qmlmultitest \
            volumetrictest \
            qmlvolume \
-           auto
+           auto \
+           qmlperf
 
 #SUBDIRS += kinectsurface
 
