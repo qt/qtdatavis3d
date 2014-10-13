@@ -229,6 +229,7 @@ public slots:
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisZChanged(QAbstract3DAxis *axis) = 0;
     void windowDestroyed(QObject *obj);
+    void destroyContext();
 
 protected:
     virtual void mouseDoubleClickEvent(QMouseEvent *event);

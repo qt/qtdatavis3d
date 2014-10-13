@@ -62,24 +62,7 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 
 AbstractDeclarative::~AbstractDeclarative()
 {
-#ifdef USE_SHARED_CONTEXT
-    // Context can be in another thread, don't delete it directly in that case
-    if (m_contextThread && m_contextThread != m_mainThread) {
-        if (m_context)
-            m_context->deleteLater();
-        m_context = 0;
-    } else {
-        delete m_context;
-    }
-#else
-    if (m_contextThread && m_contextThread != m_mainThread) {
-        if (m_stateStore)
-            m_stateStore->deleteLater();
-        m_stateStore = 0;
-    } else {
-        delete m_stateStore;
-    }
-#endif
+    destroyContext();
 
     disconnect(this, 0, this, 0);
     checkWindowList(0);
@@ -363,7 +346,6 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
         m_contextThread = QThread::currentThread();
         m_contextWindow = window;
         m_qtContext = currentContext;
-
         m_context = new QOpenGLContext();
         m_context->setFormat(m_qtContext->format());
         m_context->setShareContext(m_qtContext);
@@ -371,6 +353,10 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 
         m_context->makeCurrent(window);
         m_controller->initializeOpenGL();
+
+        // Make sure context gets deleted.
+        QObject::connect(m_contextThread, &QThread::finished, this,
+                         &AbstractDeclarative::destroyContext, Qt::DirectConnection);
     } else {
         m_context->makeCurrent(window);
     }
@@ -392,6 +378,10 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 
         m_stateStore->storeGLState();
         m_controller->initializeOpenGL();
+
+        // Make sure state store gets deleted.
+        QObject::connect(m_contextThread, &QThread::finished, this,
+                         &AbstractDeclarative::destroyContext, Qt::DirectConnection);
     } else {
         m_stateStore->storeGLState();
     }
@@ -825,6 +815,33 @@ void AbstractDeclarative::windowDestroyed(QObject *obj)
         graphWindowList.remove(this);
 
     windowClearList.remove(win);
+}
+
+void AbstractDeclarative::destroyContext()
+{
+#ifdef USE_SHARED_CONTEXT
+    // Context can be in another thread, don't delete it directly in that case
+    if (m_contextThread && m_contextThread != m_mainThread) {
+        if (m_context)
+            m_context->deleteLater();
+    } else {
+        delete m_context;
+    }
+    m_context = 0;
+#else
+    if (m_contextThread && m_contextThread != m_mainThread) {
+        if (m_stateStore)
+            m_stateStore->deleteLater();
+    } else {
+        delete m_stateStore;
+    }
+    m_stateStore = 0;
+#endif
+    if (m_contextThread) {
+        QObject::disconnect(m_contextThread, &QThread::finished, this,
+                            &AbstractDeclarative::destroyContext);
+        m_contextThread = 0;
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

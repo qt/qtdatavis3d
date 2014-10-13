@@ -100,7 +100,7 @@ Abstract3DController::~Abstract3DController()
 void Abstract3DController::destroyRenderer()
 {
     // Renderer can be in another thread, don't delete it directly in that case
-    if (m_renderer && m_renderer->thread() != QThread::currentThread())
+    if (m_renderer && m_renderer->thread() && m_renderer->thread() != this->thread())
         m_renderer->deleteLater();
     else
         delete m_renderer;
@@ -114,6 +114,13 @@ void Abstract3DController::destroyRenderer()
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
 {
     m_renderer = renderer;
+
+    // If renderer is created in different thread than controller, make sure renderer gets
+    // destroyed before the render thread finishes.
+    if (renderer->thread() != this->thread()) {
+        QObject::connect(renderer->thread(), &QThread::finished, this,
+                         &Abstract3DController::destroyRenderer, Qt::DirectConnection);
+    }
 }
 
 void Abstract3DController::addSeries(QAbstract3DSeries *series)

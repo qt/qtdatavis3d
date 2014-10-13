@@ -90,6 +90,8 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
 
 Bars3DRenderer::~Bars3DRenderer()
 {
+    fixContextBeforeDelete();
+
     if (QOpenGLContext::currentContext()) {
         m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);

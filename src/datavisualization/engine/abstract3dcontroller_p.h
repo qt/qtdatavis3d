@@ -218,7 +218,6 @@ public:
     virtual ~Abstract3DController();
 
     inline bool isInitialized() { return (m_renderer != 0); }
-    virtual void destroyRenderer();
     virtual void synchDataToRenderer();
     virtual void render(const GLuint defaultFboHandle = 0);
     virtual void initializeOpenGL() = 0;
@@ -348,6 +347,8 @@ public:
     void markSeriesItemLabelsDirty();
 
 public slots:
+    void destroyRenderer();
+
     void handleAxisTitleChanged(const QString &title);
     void handleAxisLabelsChanged();
     void handleAxisRangeChanged(float min, float max);

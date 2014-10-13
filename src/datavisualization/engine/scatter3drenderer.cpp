@@ -79,6 +79,8 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
 
 Scatter3DRenderer::~Scatter3DRenderer()
 {
+    fixContextBeforeDelete();
+
     if (QOpenGLContext::currentContext()) {
         m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);

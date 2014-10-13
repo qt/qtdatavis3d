@@ -37,6 +37,8 @@
 #include "seriesrendercache_p.h"
 #include "customrenderitem_p.h"
 
+class QSurface;
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class TextureHelper;
@@ -229,6 +231,9 @@ protected:
     void queriedGraphPosition(const QMatrix4x4 &projectionViewMatrix, const QVector3D &scaling,
                               GLuint defaultFboHandle);
 
+    void fixContextBeforeDelete();
+    void restoreContextAfterDelete();
+
     bool m_hasNegativeValues;
     Q3DTheme *m_cachedTheme;
     Drawer *m_drawer;
@@ -318,6 +323,10 @@ protected:
     qreal m_reflectivity;
 
     QLocale m_locale;
+    QPointer<QOpenGLContext> m_context; // Not owned
+    QOpenGLContext *m_currentContextAtDelete; // Not owned
+    QSurface *m_currentSurfaceAtDelete; // Not owned
+    QWindow *m_dummySurfaceAtDelete;
 
 private:
     friend class Abstract3DController;

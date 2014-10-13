@@ -28,6 +28,8 @@
 #include "scatter3drenderer_p.h"
 
 #include <QtCore/qmath.h>
+#include <QtGui/QWindow>
+#include <QtCore/QThread>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -101,7 +103,11 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_scaleZWithBackground(0.0f),
       m_oldCameraTarget(QVector3D(2000.0f, 2000.0f, 2000.0f)), // Just random invalid target
       m_reflectionEnabled(false),
-      m_reflectivity(0.5)
+      m_reflectivity(0.5),
+      m_context(0),
+      m_currentContextAtDelete(0),
+      m_currentSurfaceAtDelete(0),
+      m_dummySurfaceAtDelete(0)
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,
@@ -151,10 +157,14 @@ Abstract3DRenderer::~Abstract3DRenderer()
 
         delete m_textureHelper;
     }
+
+    restoreContextAfterDelete();
 }
 
 void Abstract3DRenderer::initializeOpenGL()
 {
+    m_context = QOpenGLContext::currentContext();
+
     // Set OpenGL features
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
@@ -1770,6 +1780,36 @@ void Abstract3DRenderer::queriedGraphPosition(const QMatrix4x4 &projectionViewMa
                                        normalizedValues.z());
     m_graphPositionQueryResolved = true;
     m_graphPositionQueryPending = false;
+}
+
+void Abstract3DRenderer::fixContextBeforeDelete()
+{
+    m_currentContextAtDelete = QOpenGLContext::currentContext();
+    if (m_currentContextAtDelete)
+        m_currentSurfaceAtDelete = m_currentContextAtDelete->surface();
+    if (!m_context.isNull() && m_context.data() != m_currentContextAtDelete
+            && QThread::currentThread() == this->thread()) {
+        m_dummySurfaceAtDelete = new QWindow();
+        m_dummySurfaceAtDelete->setSurfaceType(QWindow::OpenGLSurface);
+        m_dummySurfaceAtDelete->setFormat(m_context->format());
+        m_dummySurfaceAtDelete->create();
+
+        m_context->makeCurrent(m_dummySurfaceAtDelete);
+    }
+}
+
+void Abstract3DRenderer::restoreContextAfterDelete()
+{
+    if (m_currentContextAtDelete && m_currentSurfaceAtDelete
+            && m_context.data() != m_currentContextAtDelete) {
+        m_currentContextAtDelete->makeCurrent(m_currentSurfaceAtDelete);
+    } else if (m_dummySurfaceAtDelete) {
+        m_context->doneCurrent();
+    }
+    delete m_dummySurfaceAtDelete;
+    m_currentContextAtDelete = 0;
+    m_currentSurfaceAtDelete = 0;
+    m_dummySurfaceAtDelete = 0;
 }
 
 void Abstract3DRenderer::calculatePolarXZ(const QVector3D &dataPos, float &x, float &z) const

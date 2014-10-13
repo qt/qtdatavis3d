@@ -85,6 +85,8 @@ Surface3DRenderer::Surface3DRenderer(Surface3DController *controller)
 
 Surface3DRenderer::~Surface3DRenderer()
 {
+    fixContextBeforeDelete();
+
     if (QOpenGLContext::currentContext()) {
         m_textureHelper->glDeleteFramebuffers(1, &m_depthFrameBuffer);
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
@@ -2879,19 +2881,12 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
     Q_UNUSED(vertexShader);
     Q_UNUSED(fragmentShader);
 
-    // draw the shader for the surface according to smooth status, shadow and uniform color
-    if (m_surfaceFlatShader)
-        delete m_surfaceFlatShader;
-    if (m_surfaceSmoothShader)
-        delete m_surfaceSmoothShader;
-    if (m_surfaceTexturedSmoothShader)
-        delete m_surfaceTexturedSmoothShader;
-    if (m_surfaceTexturedFlatShader)
-        delete m_surfaceTexturedFlatShader;
-    if (m_surfaceSliceFlatShader)
-        delete m_surfaceSliceFlatShader;
-    if (m_surfaceSliceSmoothShader)
-        delete m_surfaceSliceSmoothShader;
+    delete m_surfaceFlatShader;
+    delete m_surfaceSmoothShader;
+    delete m_surfaceTexturedSmoothShader;
+    delete m_surfaceTexturedFlatShader;
+    delete m_surfaceSliceFlatShader;
+    delete m_surfaceSliceSmoothShader;
 
 #if !defined(QT_OPENGL_ES_2)
     if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
@@ -2924,6 +2919,7 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
     } else {
         m_surfaceFlatShader = 0;
         m_surfaceSliceFlatShader = 0;
+        m_surfaceTexturedFlatShader = 0;
     }
 #else
     m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
@@ -2983,8 +2979,7 @@ void Surface3DRenderer::initSurfaceShaders()
 #if !defined(QT_OPENGL_ES_2)
 void Surface3DRenderer::initDepthShader()
 {
-    if (m_depthShader)
-        delete m_depthShader;
+    delete m_depthShader;
     m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
                                      QStringLiteral(":/shaders/fragmentDepth"));
     m_depthShader->initialize();
