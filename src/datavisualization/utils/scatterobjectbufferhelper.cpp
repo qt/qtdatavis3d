@@ -20,6 +20,7 @@
 #include "objecthelper_p.h"
 #include <QtGui/QVector2D>
 #include <QtGui/QMatrix4x4>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -232,6 +233,8 @@ uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache 
     const ScatterRenderItemArray &renderArray = cache->renderArray();
     const bool updateAll = (cache->updateIndices().size() == 0);
     const int updateSize = updateAll ? renderArray.size() : cache->updateIndices().size();
+    const float yAdjustment = 0.1f / gradientTextureHeight;
+    const float flippedYAdjustment = 0.9f / gradientTextureHeight;
 
     QVector2D uv;
     uv.setX(0.0f);
@@ -243,7 +246,17 @@ uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache 
             continue;
 
         float y = ((item.translation().y() + m_scaleY) * 0.5f) / m_scaleY;
+
+        // Avoid values near gradient texel boundary, as this causes artifacts
+        // with some graphics cards.
+        const float floorY = float(qFloor(y * gradientTextureHeight));
+        const float diff = y - floorY;
+        if (diff < yAdjustment)
+            y += yAdjustment;
+        else if (diff > flippedYAdjustment)
+            y -= yAdjustment;
         uv.setY(y);
+
         int offset = pos * uvsCount;
         for (int j = 0; j < uvsCount; j++)
             buffered_uvs[j + offset] = uv;

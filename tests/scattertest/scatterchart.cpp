@@ -723,8 +723,21 @@ void ScatterDataModifier::changeBunch()
     if (m_targetSeries->dataProxy()->array()->size()) {
         int amount = qMin(m_targetSeries->dataProxy()->array()->size(), 100);
         QScatterDataArray items(amount);
-        for (int i = 0; i < items.size(); i++)
+        for (int i = 0; i < items.size(); i++) {
             items[i].setPosition(randVector());
+            // Change the Y-values of first few items to exact gradient boundaries
+            if (i == 0)
+                items[i].setY(0.65f);
+            else  if (i == 1)
+                items[i].setY(0.1f);
+            else  if (i == 2)
+                items[i].setY(-0.45f);
+            else  if (i == 3)
+                items[i].setY(-1.0f);
+            else  if (i == 4)
+                items[i].setY(1.2f);
+        }
+
         m_targetSeries->dataProxy()->setItems(0, items);
         qDebug() << m_loopCounter << "Changed bunch, array size:" << m_targetSeries->dataProxy()->array()->size();
     }
