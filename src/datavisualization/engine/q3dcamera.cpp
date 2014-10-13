@@ -421,6 +421,9 @@ void Q3DCamera::setCameraPreset(CameraPreset preset)
         break;
     }
 
+    // All presets target the center of the graph
+    setTarget(zeroVector);
+
     if (d_ptr->m_activePreset != preset) {
         d_ptr->m_activePreset = preset;
         setDirty(true);
@@ -604,6 +607,8 @@ void Q3DCamera::setTarget(const QVector3D &target)
         newTarget.setZ(1.0f);
 
     if (d_ptr->m_requestedTarget != newTarget) {
+        if (d_ptr->m_activePreset != CameraPresetNone)
+            d_ptr->m_activePreset = CameraPresetNone;
         d_ptr->m_requestedTarget = newTarget;
         setDirty(true);
         emit targetChanged(newTarget);
