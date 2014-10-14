@@ -1210,12 +1210,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             SurfaceObject *object = cache->surfaceObject();
             if (object->indexCount() && cache->surfaceVisible() && cache->isVisible()
                     && cache->sampleSpace().width() >= 2 && cache->sampleSpace().height() >= 2) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-
-                MVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                cache->setMVPMatrix(MVPMatrix);
-                m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
+                // No translation nor scaling for surfaces, therefore no modelMatrix
+                // Use directly projectionViewMatrix
+                m_depthShader->setUniformValue(m_depthShader->MVP(), depthProjectionViewMatrix);
 
                 // 1st attribute buffer : vertices
                 glEnableVertexAttribArray(m_depthShader->posAtt());
@@ -1291,11 +1288,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
             SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
             if (cache->surfaceObject()->indexCount() && cache->renderable()) {
-                QMatrix4x4 modelMatrix;
-                QMatrix4x4 MVPMatrix;
-
-                MVPMatrix = projectionViewMatrix * modelMatrix;
-                m_selectionShader->setUniformValue(m_selectionShader->MVP(), MVPMatrix);
+                m_selectionShader->setUniformValue(m_selectionShader->MVP(), projectionViewMatrix);
 
                 cache->surfaceObject()->activateSurfaceTexture(false);
 
@@ -1348,9 +1341,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             QMatrix4x4 itModelMatrix;
 
 #ifdef SHOW_DEPTH_TEXTURE_SCENE
-            MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+            MVPMatrix = depthProjectionViewMatrix;
 #else
-            MVPMatrix = projectionViewMatrix * modelMatrix;
+            MVPMatrix = projectionViewMatrix;
 #endif
             cache->setMVPMatrix(MVPMatrix);
 

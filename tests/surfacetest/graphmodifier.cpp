@@ -170,7 +170,6 @@ void GraphModifier::fillSeries()
                 (*newRow[s])[j].setPosition(QVector3D(x, y, z));
             }
         }
-        qDebug() << newRow[0]->at(0).z();
         *dataArray1 << newRow[0];
         *dataArray2 << newRow[1];
         *dataArray3 << newRow[2];

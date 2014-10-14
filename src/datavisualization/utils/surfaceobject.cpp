@@ -110,7 +110,7 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     totalIndex = 0;
 
     if ((m_dataDimension == BothAscending) || (m_dataDimension == XDescending)) {
-        for (int row = 0; row < rowLimit; row ++)
+        for (int row = 0; row < rowLimit; row++)
             createSmoothNormalBodyLine(totalIndex, row * m_columns);
         createSmoothNormalUpperLine(totalIndex);
     } else { // BothDescending || ZDescending
