@@ -233,8 +233,8 @@ uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache 
     const ScatterRenderItemArray &renderArray = cache->renderArray();
     const bool updateAll = (cache->updateIndices().size() == 0);
     const int updateSize = updateAll ? renderArray.size() : cache->updateIndices().size();
-    const float yAdjustment = 0.1f / gradientTextureHeight;
-    const float flippedYAdjustment = 0.9f / gradientTextureHeight;
+    const float yAdjustment = 0.1f;
+    const float flippedYAdjustment = 0.9f;
 
     QVector2D uv;
     uv.setX(0.0f);
@@ -250,11 +250,11 @@ uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache 
         // Avoid values near gradient texel boundary, as this causes artifacts
         // with some graphics cards.
         const float floorY = float(qFloor(y * gradientTextureHeight));
-        const float diff = y - floorY;
+        const float diff = (y * gradientTextureHeight) - floorY;
         if (diff < yAdjustment)
-            y += yAdjustment;
+            y += yAdjustment / gradientTextureHeight;
         else if (diff > flippedYAdjustment)
-            y -= yAdjustment;
+            y -= yAdjustment / gradientTextureHeight;
         uv.setY(y);
 
         int offset = pos * uvsCount;

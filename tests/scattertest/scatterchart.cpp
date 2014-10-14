@@ -47,6 +47,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->setAxisX(new QValue3DAxis);
     m_chart->setAxisY(new QValue3DAxis);
     m_chart->setAxisZ(new QValue3DAxis);
+    m_chart->axisY()->setLabelFormat(QStringLiteral("%.7f"));
     static_cast<Q3DInputHandler *>(m_chart->activeInputHandler())->setZoomAtTargetEnabled(true);
 
     createAndAddSeries();
@@ -736,6 +737,9 @@ void ScatterDataModifier::changeBunch()
                 items[i].setY(-1.0f);
             else  if (i == 4)
                 items[i].setY(1.2f);
+//            else
+//                items[i].setY(0.1001f - (0.00001f * float(i)));
+
         }
 
         m_targetSeries->dataProxy()->setItems(0, items);
