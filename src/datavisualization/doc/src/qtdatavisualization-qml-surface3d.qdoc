@@ -73,11 +73,6 @@
  */
 
 /*!
-  \qmlproperty ColorGradient Surface3D::gradient
-  The current surface gradient. Setting this property replaces the previous gradient.
- */
-
-/*!
  * \qmlproperty list<Surface3DSeries> Surface3D::seriesList
  * \default
  * This property holds the series of the graph.
