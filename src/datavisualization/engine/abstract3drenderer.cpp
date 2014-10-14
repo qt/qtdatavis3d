@@ -105,8 +105,6 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_reflectionEnabled(false),
       m_reflectivity(0.5),
       m_context(0),
-      m_currentContextAtDelete(0),
-      m_currentSurfaceAtDelete(0),
       m_dummySurfaceAtDelete(0)
 {
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
@@ -157,6 +155,10 @@ Abstract3DRenderer::~Abstract3DRenderer()
 
         delete m_textureHelper;
     }
+
+    m_axisCacheX.clearLabels();
+    m_axisCacheY.clearLabels();
+    m_axisCacheZ.clearLabels();
 
     restoreContextAfterDelete();
 }
@@ -1784,10 +1786,9 @@ void Abstract3DRenderer::queriedGraphPosition(const QMatrix4x4 &projectionViewMa
 
 void Abstract3DRenderer::fixContextBeforeDelete()
 {
-    m_currentContextAtDelete = QOpenGLContext::currentContext();
-    if (m_currentContextAtDelete)
-        m_currentSurfaceAtDelete = m_currentContextAtDelete->surface();
-    if (!m_context.isNull() && m_context.data() != m_currentContextAtDelete
+    // Only need to fix context if the current context is null.
+    // Otherwise we expect it to be our shared context, so we can use it for cleanup.
+    if (!QOpenGLContext::currentContext() && !m_context.isNull()
             && QThread::currentThread() == this->thread()) {
         m_dummySurfaceAtDelete = new QWindow();
         m_dummySurfaceAtDelete->setSurfaceType(QWindow::OpenGLSurface);
@@ -1800,15 +1801,10 @@ void Abstract3DRenderer::fixContextBeforeDelete()
 
 void Abstract3DRenderer::restoreContextAfterDelete()
 {
-    if (m_currentContextAtDelete && m_currentSurfaceAtDelete
-            && m_context.data() != m_currentContextAtDelete) {
-        m_currentContextAtDelete->makeCurrent(m_currentSurfaceAtDelete);
-    } else if (m_dummySurfaceAtDelete) {
+    if (m_dummySurfaceAtDelete)
         m_context->doneCurrent();
-    }
+
     delete m_dummySurfaceAtDelete;
-    m_currentContextAtDelete = 0;
-    m_currentSurfaceAtDelete = 0;
     m_dummySurfaceAtDelete = 0;
 }
 

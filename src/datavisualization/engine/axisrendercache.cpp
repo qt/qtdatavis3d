@@ -44,8 +44,7 @@ AxisRenderCache::AxisRenderCache()
 
 AxisRenderCache::~AxisRenderCache()
 {
-    foreach (LabelItem *label, m_labelItems)
-        delete label;
+    clearLabels();
 
     delete m_formatter;
 }
@@ -173,6 +172,13 @@ void AxisRenderCache::updateTextures()
         else
             m_drawer->generateLabelItem(*m_labelItems[i], m_labels.at(i), widest);
     }
+}
+
+void AxisRenderCache::clearLabels()
+{
+    m_titleItem.clear();
+    for (int i = 0; i < m_labels.size(); i++)
+        m_labelItems[i]->clear();
 }
 
 int AxisRenderCache::maxLabelWidth(const QStringList &labels) const

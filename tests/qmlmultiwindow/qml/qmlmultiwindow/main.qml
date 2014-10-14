@@ -91,6 +91,13 @@ Rectangle {
         }
     }
 
+    function destroyWindow() {
+        if (surfaceWindowObject != null)
+            surfaceWindowObject.destroy()
+    }
+
+    Component.onDestruction: destroyWindow()
+
     //! [0]
     GridLayout {
         id: gridLayout
@@ -114,8 +121,7 @@ Rectangle {
             running: false
             repeat: false
             onTriggered: {
-                if (surfaceWindowObject != null)
-                    surfaceWindowObject.destroy()
+                destroyWindow()
                 surfaceWindowObject = Qt.createQmlObject(surfaceWindowStr, mainView)
             }
         }

@@ -108,6 +108,7 @@ public:
     inline void setTitleFixed(bool fixed) { m_titleFixed = fixed; }
 
     void updateTextures();
+    void clearLabels();
 
 private:
     int maxLabelWidth(const QStringList &labels) const;

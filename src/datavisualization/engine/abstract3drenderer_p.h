@@ -324,8 +324,6 @@ protected:
 
     QLocale m_locale;
     QPointer<QOpenGLContext> m_context; // Not owned
-    QOpenGLContext *m_currentContextAtDelete; // Not owned
-    QSurface *m_currentSurfaceAtDelete; // Not owned
     QWindow *m_dummySurfaceAtDelete;
 
 private:
