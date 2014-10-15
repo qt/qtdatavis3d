@@ -44,7 +44,9 @@ AxisRenderCache::AxisRenderCache()
 
 AxisRenderCache::~AxisRenderCache()
 {
-    clearLabels();
+    foreach (LabelItem *label, m_labelItems)
+        delete label;
+    m_titleItem.clear();
 
     delete m_formatter;
 }
