@@ -76,6 +76,7 @@ static const float touchZoomDrift = 0.02f;
  * \since QtDataVisualization 1.2
  * \ingroup datavisualization_qml
  * \instantiates QTouch3DInputHandler
+ * \inherits InputHandler3D
  * \brief Basic touch display based input handler.
  *
  * TouchInputHandler3D is the basic input handler for touch screen devices.
