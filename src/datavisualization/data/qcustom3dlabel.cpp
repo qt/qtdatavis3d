@@ -44,6 +44,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since QtDataVisualization 1.1
  * \ingroup datavisualization_qml
  * \instantiates QCustom3DLabel
+ * \inherits Custom3DItem
  * \brief The Custom3DLabel type is for creating custom labels to be added to a graph.
  *
  * This type is for creating custom labels to be added to a graph. You can set text, font,

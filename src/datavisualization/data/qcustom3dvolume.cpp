@@ -52,6 +52,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since QtDataVisualization 1.2
  * \ingroup datavisualization_qml
  * \instantiates QCustom3DVolume
+ * \inherits Custom3DItem
  * \brief The Custom3DVolume type is for creating volume rendered objects to be added to a graph.
  *
  * This class is for creating volume rendered objects to be added to a graph. A volume rendered
