@@ -25,5 +25,41 @@ Item {
     height: 150
     width: 150
 
-    // TODO: Add tests for Light3D
+    // TODO: Has no adjustable properties yet.
+    // Keeping this as a placeholder for future implementations (QTRD-2406)
+    /*
+    Light3D {
+        id: initial
+    }
+
+    Light3D {
+        id: initialized
+    }
+
+
+    Light3D {
+        id: change
+    }
+
+    TestCase {
+        name: "Light3D Initial"
+
+        function test_initial() {
+        }
+    }
+
+    TestCase {
+        name: "Light3D Initialized"
+
+        function test_initialized() {
+        }
+    }
+
+    TestCase {
+        name: "Light3D Change"
+
+        function test_change() {
+        }
+    }
+    */
 }

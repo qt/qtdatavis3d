@@ -20,15 +20,15 @@ OTHER_FILES += bars3d\tst_basic.qml \
                theme3d\tst_themecolor.qml \
                custom3d\tst_customitem.qml \
                custom3d\tst_customlabel.qml \
-               custom3d\tst_customvolume.qml #\
-#               scene3d\tst_scene.qml \
-#               scene3d\tst_camera.qml \
-#               scene3d\tst_light.qml \
+               custom3d\tst_customvolume.qml \
+               scene3d\tst_scene.qml \
+               scene3d\tst_camera.qml \
+               scene3d\tst_light.qml #\
 #               axis3d\tst_category.qml \
 #               axis3d\tst_value.qml \
 #               axis3d\tst_logvalue.qml
 
-# TODO: Check new QML types (and properties) in 1.2 (only customvolume added for now)
+# TODO: Check new QML types in 1.2
 
 RESOURCES += \
     qmltest.qrc

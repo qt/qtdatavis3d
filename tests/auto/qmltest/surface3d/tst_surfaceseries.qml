@@ -67,6 +67,7 @@ Item {
         drawMode: Surface3DSeries.DrawSurface
         flatShadingEnabled: false
         selectedPoint: Qt.point(0, 0)
+        textureFile: ":\customtexture.jpg"
 
         baseColor: "blue"
         baseGradient: gradient1
@@ -143,6 +144,7 @@ Item {
             compare(initialized.drawMode, Surface3DSeries.DrawSurface)
             compare(initialized.flatShadingEnabled, false)
             compare(initialized.selectedPoint, Qt.point(0, 0))
+            compare(initialized.textureFile, ":\customtexture.jpg")
         }
 
         function test_2_initialized_common() {
@@ -173,6 +175,7 @@ Item {
             change.drawMode = Surface3DSeries.DrawSurface
             change.flatShadingEnabled = false
             change.selectedPoint = Qt.point(0, 0)
+            change.textureFile = ":\customtexture.jpg"
         }
 
         function test_2_test_change() {
@@ -181,6 +184,7 @@ Item {
             compare(change.drawMode, Surface3DSeries.DrawSurface)
             compare(change.flatShadingEnabled, false)
             compare(change.selectedPoint, Qt.point(0, 0))
+            compare(change.textureFile, ":\customtexture.jpg")
         }
 
         function test_3_change_common() {

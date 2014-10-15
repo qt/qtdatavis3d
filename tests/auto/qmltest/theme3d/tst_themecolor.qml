@@ -57,7 +57,7 @@ Item {
     TestCase {
         name: "ThemeColor Change"
 
-        function test_1_change() {
+        function test_change() {
             change.color = "blue"
 
             compare(change.color, "#0000ff")
