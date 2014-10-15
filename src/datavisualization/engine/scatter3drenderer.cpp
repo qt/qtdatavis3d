@@ -184,23 +184,25 @@ void Scatter3DRenderer::updateData()
 
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
         ScatterSeriesRenderCache *cache = static_cast<ScatterSeriesRenderCache *>(baseCache);
-        if (cache->isVisible() && cache->dataDirty()) {
+        if (cache->isVisible()) {
             const QScatter3DSeries *currentSeries = cache->series();
             ScatterRenderItemArray &renderArray = cache->renderArray();
             QScatterDataProxy *dataProxy = currentSeries->dataProxy();
             const QScatterDataArray &dataArray = *dataProxy->array();
             int dataSize = dataArray.size();
             totalDataSize += dataSize;
-            if (dataSize != renderArray.size())
-                renderArray.resize(dataSize);
+            if (cache->dataDirty()) {
+                if (dataSize != renderArray.size())
+                    renderArray.resize(dataSize);
 
-            for (int i = 0; i < dataSize; i++)
-                updateRenderItem(dataArray.at(i), renderArray[i]);
+                for (int i = 0; i < dataSize; i++)
+                    updateRenderItem(dataArray.at(i), renderArray[i]);
 
-            if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic))
-                cache->setStaticBufferDirty(true);
+                if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic))
+                    cache->setStaticBufferDirty(true);
 
-            cache->setDataDirty(false);
+                cache->setDataDirty(false);
+            }
         }
     }
 
