@@ -176,8 +176,10 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create render buffer
-    if (!depthBuffer)
-        glGenRenderbuffers(1, &depthBuffer);
+    if (depthBuffer)
+        glDeleteRenderbuffers(1, &depthBuffer);
+
+    glGenRenderbuffers(1, &depthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
     GLenum status = glGetError();
     // glGetError docs advise to call glGetError in loop to clear all error flags
