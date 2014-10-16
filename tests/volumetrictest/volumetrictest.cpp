@@ -381,6 +381,9 @@ void VolumetricModifier::createVolume()
 
     m_volumeItem->createTextureData(imageArray);
 
+    for (int i = 0; i < imageCount; i++)
+        delete imageArray[i];
+
     m_sliceIndexX = m_volumeItem->textureWidth() / 2;
     m_sliceIndexY = m_volumeItem->textureWidth() / 2;
     m_sliceIndexZ = m_volumeItem->textureWidth() / 2;
@@ -533,6 +536,9 @@ void VolumetricModifier::createAnotherVolume()
     }
 
     m_volumeItem2->createTextureData(imageArray);
+
+    for (int i = 0; i < imageCount; i++)
+        delete imageArray[i];
 
     m_sliceIndexX = m_volumeItem2->textureWidth() / 2;
     m_sliceIndexY = m_volumeItem2->textureWidth() / 2;
