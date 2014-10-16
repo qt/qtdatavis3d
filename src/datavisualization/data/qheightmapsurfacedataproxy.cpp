@@ -84,7 +84,7 @@ const float defaultMaxValue = 10.0f;
 /*!
  * \qmlproperty real HeightMapSurfaceDataProxy::minXValue
  *
- * The minimum X value for the generated surface points.
+ * The minimum X value for the generated surface points. Defaults to \c{0.0}.
  * When setting this property the corresponding maximum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -92,7 +92,7 @@ const float defaultMaxValue = 10.0f;
 /*!
  * \qmlproperty real HeightMapSurfaceDataProxy::maxXValue
  *
- * The maximum X value for the generated surface points.
+ * The maximum X value for the generated surface points. Defaults to \c{10.0}.
  * When setting this property the corresponding minimum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -100,7 +100,7 @@ const float defaultMaxValue = 10.0f;
 /*!
  * \qmlproperty real HeightMapSurfaceDataProxy::minZValue
  *
- * The minimum Z value for the generated surface points.
+ * The minimum Z value for the generated surface points. Defaults to \c{0.0}.
  * When setting this property the corresponding maximum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -108,7 +108,7 @@ const float defaultMaxValue = 10.0f;
 /*!
  * \qmlproperty real HeightMapSurfaceDataProxy::maxZValue
  *
- * The maximum Z value for the generated surface points.
+ * The maximum Z value for the generated surface points. Defaults to \c{10.0}.
  * When setting this property the corresponding minimum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -228,7 +228,7 @@ void QHeightMapSurfaceDataProxy::setValueRanges(float minX, float maxX, float mi
 /*!
  * \property QHeightMapSurfaceDataProxy::minXValue
  *
- * The minimum X value for the generated surface points.
+ * The minimum X value for the generated surface points. Defaults to \c{0.0}.
  * When setting this property the corresponding maximum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -245,7 +245,7 @@ float QHeightMapSurfaceDataProxy::minXValue() const
 /*!
  * \property QHeightMapSurfaceDataProxy::maxXValue
  *
- * The maximum X value for the generated surface points.
+ * The maximum X value for the generated surface points. Defaults to \c{10.0}.
  * When setting this property the corresponding minimum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -262,7 +262,7 @@ float QHeightMapSurfaceDataProxy::maxXValue() const
 /*!
  * \property QHeightMapSurfaceDataProxy::minZValue
  *
- * The minimum Z value for the generated surface points.
+ * The minimum Z value for the generated surface points. Defaults to \c{0.0}.
  * When setting this property the corresponding maximum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -279,7 +279,7 @@ float QHeightMapSurfaceDataProxy::minZValue() const
 /*!
  * \property QHeightMapSurfaceDataProxy::maxZValue
  *
- * The maximum Z value for the generated surface points.
+ * The maximum Z value for the generated surface points. Defaults to \c{10.0}.
  * When setting this property the corresponding minimum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
