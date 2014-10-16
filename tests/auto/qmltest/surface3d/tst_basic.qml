@@ -70,6 +70,12 @@ Item {
             compare(empty.seriesList.length, 0, "seriesList")
             compare(empty.selectedSeries, null, "selectedSeries")
             compare(empty.flipHorizontalGrid, false, "flipHorizontalGrid")
+            compare(empty.axisX.orientation, AbstractAxis3D.AxisOrientationX)
+            compare(empty.axisZ.orientation, AbstractAxis3D.AxisOrientationZ)
+            compare(empty.axisY.orientation, AbstractAxis3D.AxisOrientationY)
+            compare(empty.axisX.type, AbstractAxis3D.AxisTypeValue)
+            compare(empty.axisZ.type, AbstractAxis3D.AxisTypeValue)
+            compare(empty.axisY.type, AbstractAxis3D.AxisTypeValue)
         }
     }
 

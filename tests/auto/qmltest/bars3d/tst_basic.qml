@@ -80,6 +80,12 @@ Item {
             compare(empty.selectedSeries, null, "selectedSeries")
             compare(empty.primarySeries, null, "primarySeries")
             compare(empty.floorLevel, 0.0, "floorLevel")
+            compare(empty.columnAxis.orientation, AbstractAxis3D.AxisOrientationX)
+            compare(empty.rowAxis.orientation, AbstractAxis3D.AxisOrientationZ)
+            compare(empty.valueAxis.orientation, AbstractAxis3D.AxisOrientationY)
+            compare(empty.columnAxis.type, AbstractAxis3D.AxisTypeCategory)
+            compare(empty.rowAxis.type, AbstractAxis3D.AxisTypeCategory)
+            compare(empty.valueAxis.type, AbstractAxis3D.AxisTypeValue)
         }
     }
 

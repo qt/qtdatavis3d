@@ -25,10 +25,10 @@ OTHER_FILES += bars3d\tst_basic.qml \
                scene3d\tst_camera.qml \
                scene3d\tst_light.qml \
                input3d\tst_input.qml \
-               input3d\tst_touch.qml #\
-#               axis3d\tst_category.qml \
-#               axis3d\tst_value.qml \
-#               axis3d\tst_logvalue.qml \
+               input3d\tst_touch.qml \
+               axis3d\tst_category.qml \
+               axis3d\tst_value.qml \
+               axis3d\tst_logvalue.qml \
 
 RESOURCES += \
     qmltest.qrc
