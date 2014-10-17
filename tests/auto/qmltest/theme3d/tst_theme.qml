@@ -93,6 +93,10 @@ Item {
         id: change
     }
 
+    Theme3D {
+        id: invalid
+    }
+
     TestCase {
         name: "Theme3D Initial"
 
@@ -237,6 +241,26 @@ Item {
         function test_3_change_gradient() {
             gradient4.stops[0].color = "black"
             compare(change.baseGradients[0].stops[0].color, "#000000")
+        }
+    }
+
+
+    TestCase {
+        name: "Theme3D Invalid"
+
+        function test_invalid() {
+            invalid.ambientLightStrength = -1.0
+            compare(invalid.ambientLightStrength, 0.25)
+            invalid.ambientLightStrength = 1.1
+            compare(invalid.ambientLightStrength, 0.25)
+            invalid.highlightLightStrength = -1.0
+            compare(invalid.highlightLightStrength, 7.5)
+            invalid.highlightLightStrength = 10.1
+            compare(invalid.highlightLightStrength, 7.5)
+            invalid.lightStrength = -1.0
+            compare(invalid.lightStrength, 5.0)
+            invalid.lightStrength = 10.1
+            compare(invalid.lightStrength, 5.0)
         }
     }
 }

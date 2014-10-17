@@ -45,6 +45,10 @@ Item {
         id: change
     }
 
+    Camera3D {
+        id: invalid
+    }
+
     TestCase {
         name: "Camera3D Initial"
 
@@ -114,6 +118,18 @@ Item {
             compare(change.yRotation, 22.5)
             compare(change.zoomLevel, 500.0)
         }
+    }
 
+    TestCase {
+        name: "Camera3D Invalid"
+
+        function test_invalid() {
+            invalid.target = Qt.vector3d(-1.5, -1.5, -1.5)
+            compare(invalid.target, Qt.vector3d(-1.0, -1.0, -1.0))
+            invalid.target = Qt.vector3d(1.5, 1.5, 1.5)
+            compare(invalid.target, Qt.vector3d(1.0, 1.0, 1.0))
+            invalid.minZoomLevel = 0.1
+            compare(invalid.minZoomLevel, 1.0)
+        }
     }
 }

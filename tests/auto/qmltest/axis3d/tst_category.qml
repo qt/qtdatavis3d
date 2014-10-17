@@ -46,6 +46,10 @@ Item {
         id: change
     }
 
+    CategoryAxis3D {
+        id: invalid
+    }
+
     TestCase {
         name: "CategoryAxis3D Initial"
 
@@ -111,6 +115,21 @@ Item {
             compare(change.title, "initialized")
             compare(change.titleFixed, false)
             compare(change.titleVisible, true)
+        }
+    }
+
+    TestCase {
+        name: "CategoryAxis3D Invalid"
+
+        function test_invalid() {
+            invalid.labelAutoRotation = -10
+            compare(invalid.labelAutoRotation, 0.0)
+            invalid.labelAutoRotation = 100
+            compare(invalid.labelAutoRotation, 90.0)
+            invalid.max = -10
+            compare(invalid.min, 0)
+            invalid.min = 10
+            compare(invalid.max, 11)
         }
     }
 }

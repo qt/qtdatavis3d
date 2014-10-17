@@ -42,6 +42,10 @@ Item {
         id: change
     }
 
+    HeightMapSurfaceDataProxy {
+        id: invalid
+    }
+
     TestCase {
         name: "HeightMapSurfaceDataProxy Initial"
 
@@ -96,6 +100,17 @@ Item {
 
             compare(change.columnCount, 24)
             compare(change.rowCount, 24)
+        }
+    }
+
+    TestCase {
+        name: "HeightMapSurfaceDataProxy Invalid"
+
+        function test_invalid() {
+            invalid.maxXValue = -10
+            compare(invalid.minXValue, -11)
+            invalid.minZValue = 20
+            compare(invalid.maxZValue, 21)
         }
     }
 }

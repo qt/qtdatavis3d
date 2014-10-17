@@ -40,6 +40,10 @@ Item {
         id: change
     }
 
+    LogValueAxis3DFormatter {
+        id: invalid
+    }
+
     TestCase {
         name: "LogValueAxis3DFormatter Initial"
 
@@ -71,6 +75,17 @@ Item {
             compare(change.autoSubGrid, false)
             compare(change.base, 0.1)
             compare(change.showEdgeLabels, false)
+        }
+    }
+
+    TestCase {
+        name: "LogValueAxis3DFormatter Invalid"
+
+        function test_invalid() {
+            invalid.base = 1
+            compare(invalid.base, 10)
+            invalid.base = -1
+            compare(invalid.base, 10)
         }
     }
 }

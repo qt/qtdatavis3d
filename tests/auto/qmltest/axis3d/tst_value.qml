@@ -50,6 +50,10 @@ Item {
         id: change
     }
 
+    ValueAxis3D {
+        id: invalid
+    }
+
     TestCase {
         name: "ValueAxis3D Initial"
 
@@ -125,6 +129,26 @@ Item {
             compare(change.title, "initialized")
             compare(change.titleFixed, false)
             compare(change.titleVisible, true)
+        }
+    }
+
+    TestCase {
+        name: "ValueAxis3D Invalid"
+
+        function test_invalid() {
+            invalid.segmentCount = -1
+            compare(invalid.segmentCount, 1)
+            invalid.subSegmentCount = -1
+            compare(invalid.subSegmentCount, 1)
+
+            invalid.labelAutoRotation = -10
+            compare(invalid.labelAutoRotation, 0.0)
+            invalid.labelAutoRotation = 100
+            compare(invalid.labelAutoRotation, 90.0)
+            invalid.max = -10
+            compare(invalid.min, -11)
+            invalid.min = 10
+            compare(invalid.max, 11)
         }
     }
 }

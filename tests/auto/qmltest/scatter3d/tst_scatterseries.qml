@@ -100,6 +100,10 @@ Item {
         id: change
     }
 
+    Scatter3DSeries {
+        id: invalid
+    }
+
     TestCase {
         name: "Scatter3DSeries Initial"
 
@@ -214,6 +218,16 @@ Item {
         function test_4_change_gradient_stop() {
             gradient1.stops[0].color = "yellow"
             compare(change.baseGradient.stops[0].color, "#ffff00")
+        }
+    }
+    TestCase {
+        name: "Scatter3DSeries Invalid"
+
+        function test_invalid() {
+            invalid.itemSize = -1.0
+            compare(invalid.itemSize, 0.0)
+            invalid.itemSize = 1.1
+            compare(invalid.itemSize, 0.0)
         }
     }
 }

@@ -46,6 +46,10 @@ Item {
         id: change
     }
 
+    Bars3D {
+        id: invalid
+    }
+
     TestCase {
         name: "Scene3D Initial"
 
@@ -107,6 +111,15 @@ Item {
             compare(change.scene.selectionQueryPosition, Qt.point(0, 0))
             compare(change.scene.slicingActive, true)
             compare(change.scene.viewport, Qt.rect(0, 0, 100, 100))
+        }
+    }
+
+    TestCase {
+        name: "Scene3D Invalid"
+
+        function test_invalid() {
+            invalid.scene.primarySubViewport = Qt.rect(0, 0, -50, -50)
+            compare(invalid.scene.primarySubViewport, Qt.rect(0, 0, 0, 0))
         }
     }
 }

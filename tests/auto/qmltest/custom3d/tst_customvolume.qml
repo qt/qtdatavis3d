@@ -57,6 +57,10 @@ Item {
         id: change
     }
 
+    Custom3DVolume {
+        id: invalid
+    }
+
     TestCase {
         name: "Custom3DVolume Initial"
 
@@ -158,6 +162,21 @@ Item {
             compare(change.scalingAbsolute, false)
             compare(change.shadowCasting, false)
             compare(change.visible, false)
+        }
+    }
+
+    TestCase {
+        name: "Custom3DVolume Invalid"
+
+        function test_invalid() {
+            invalid.alphaMultiplier = -1.0
+            compare(invalid.alphaMultiplier, 1.0)
+            invalid.sliceFrameGaps = Qt.vector3d(-0.1, -0.1, -0.1)
+            compare(invalid.sliceFrameGaps, Qt.vector3d(0.01, 0.01, 0.01))
+            invalid.sliceFrameThicknesses = Qt.vector3d(-0.1, -0.1, -0.1)
+            compare(invalid.sliceFrameThicknesses, Qt.vector3d(0.01, 0.01, 0.01))
+            invalid.sliceFrameWidths = Qt.vector3d(-0.1, -0.1, -0.1)
+            compare(invalid.sliceFrameWidths, Qt.vector3d(0.01, 0.01, 0.01))
         }
     }
 }
