@@ -50,7 +50,7 @@ qhp.QtDataVisualization.subprojects.classes.selectors           = class
 qhp.QtDataVisualization.subprojects.classes.sortPages           = true
 qhp.QtDataVisualization.subprojects.types.title                 = QML Types
 qhp.QtDataVisualization.subprojects.types.indexTitle            = Qt Data Visualization QML Types
-qhp.QtDataVisualization.subprojects.types.selectors             = fake:qmlclass
+qhp.QtDataVisualization.subprojects.types.selectors             = qmlclass
 qhp.QtDataVisualization.subprojects.types.sortPages             = true
 
 navigation.landingpage = Qt Data Visualization
