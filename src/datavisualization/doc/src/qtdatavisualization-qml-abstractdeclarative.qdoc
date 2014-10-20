@@ -342,11 +342,20 @@
  * \qmlproperty AbstractGraph3D.OptimizationHints AbstractGraph3D::optimizationHints
  * \since QtDataVisualization 1.1
  *
- * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
- * reasonable performance. Static optimizes graph rendering and is ideal for large non-changing data sets.
- * It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it with
- * massive data sets is not advisable. Static works only on the Scatter graph.
+ * Defines if the rendering optimization is default or static. Default mode provides the full
+ * feature set at reasonable performance. Static mode optimizes graph rendering and is ideal for
+ * large non-changing data sets. It is slower with dynamic data changes and item rotations.
+ * Selection is not optimized, so using it with massive data sets is not advisable.
+ * Static works only on the Scatter graph.
  * Defaults to \c{OptimizationDefault}.
+ *
+ * \note On some environments, large graphs using static optimization may not render, because
+ * all of the items are rendered using a single draw call, and different graphics drivers have
+ * different maximum vertice counts per call that they support.
+ * This is mostly an issue on 32bit and/or OpenGL ES2 platforms.
+ * To work around this issue, choose an item mesh with low vertex count or use the point mesh.
+ *
+ * \sa Abstract3DSeries::mesh
  */
 
 /*!

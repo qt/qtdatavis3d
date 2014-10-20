@@ -53,6 +53,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \note Surfaces with less than two rows or columns are not considered valid surfaces and will
  * not be rendered.
  *
+ * \note On some environments, surfaces with a lot of visible vertices may not render, because
+ * they exceed the per-draw vertex count supported by the graphics driver.
+ * This is mostly an issue on 32bit and/or OpenGL ES2 platforms.
+ *
  * \sa {Qt Data Visualization Data Handling}
  */
 
