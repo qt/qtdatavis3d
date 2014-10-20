@@ -1,4 +1,4 @@
-QT += testlib datavisualization
+QT += testlib datavisualization widgets
 
 TARGET = tst_cpptest
 CONFIG += console testcase

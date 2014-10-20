@@ -36,7 +36,6 @@ private slots:
 
     void initialProperties();
     void initializeProperties();
-    void invalidProperties();
 
 private:
     QScatterDataProxy *m_proxy;
@@ -70,15 +69,22 @@ void tst_proxy::construct()
 void tst_proxy::initialProperties()
 {
     QVERIFY(m_proxy);
+
+    QCOMPARE(m_proxy->itemCount(), 0);
+    QVERIFY(!m_proxy->series());
+
+    QCOMPARE(m_proxy->type(), QAbstractDataProxy::DataTypeScatter);
 }
 
 void tst_proxy::initializeProperties()
 {
     QVERIFY(m_proxy);
-}
 
-void tst_proxy::invalidProperties()
-{
+    QScatterDataArray data;
+    data << QVector3D(0.5f, 0.5f, 0.5f) << QVector3D(-0.3f, -0.5f, -0.4f);
+    m_proxy->addItems(data);
+
+    QCOMPARE(m_proxy->itemCount(), 2);
 }
 
 QTEST_MAIN(tst_proxy)

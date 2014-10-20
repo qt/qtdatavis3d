@@ -36,7 +36,6 @@ private slots:
 
     void initialProperties();
     void initializeProperties();
-    void invalidProperties();
 
 private:
     QBarDataProxy *m_proxy;
@@ -70,15 +69,28 @@ void tst_proxy::construct()
 void tst_proxy::initialProperties()
 {
     QVERIFY(m_proxy);
+
+    QCOMPARE(m_proxy->columnLabels().count(), 0);
+    QCOMPARE(m_proxy->rowCount(), 0);
+    QCOMPARE(m_proxy->rowLabels().count(), 0);
+    QVERIFY(!m_proxy->series());
+
+    QCOMPARE(m_proxy->type(), QAbstractDataProxy::DataTypeBar);
 }
 
 void tst_proxy::initializeProperties()
 {
     QVERIFY(m_proxy);
-}
 
-void tst_proxy::invalidProperties()
-{
+    m_proxy->setColumnLabels(QStringList() << "1" << "2" << "3");
+    QBarDataRow *data = new QBarDataRow;
+    *data << 1.0f << 3.0f << 7.5f;
+    m_proxy->addRow(data);
+    m_proxy->setRowLabels(QStringList() << "1");
+
+    QCOMPARE(m_proxy->columnLabels().count(), 3);
+    QCOMPARE(m_proxy->rowCount(), 1);
+    QCOMPARE(m_proxy->rowLabels().count(), 1);
 }
 
 QTEST_MAIN(tst_proxy)

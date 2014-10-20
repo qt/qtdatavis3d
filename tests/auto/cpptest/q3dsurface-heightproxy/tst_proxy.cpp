@@ -70,15 +70,72 @@ void tst_proxy::construct()
 void tst_proxy::initialProperties()
 {
     QVERIFY(m_proxy);
+
+    QCOMPARE(m_proxy->heightMap(), QImage());
+    QCOMPARE(m_proxy->heightMapFile(), QString(""));
+    QCOMPARE(m_proxy->maxXValue(), 10.0f);
+    QCOMPARE(m_proxy->maxZValue(), 10.0f);
+    QCOMPARE(m_proxy->minXValue(), 0.0f);
+    QCOMPARE(m_proxy->minZValue(), 0.0f);
+
+    QCOMPARE(m_proxy->columnCount(), 0);
+    QCOMPARE(m_proxy->rowCount(), 0);
+    QVERIFY(!m_proxy->series());
+
+    QCOMPARE(m_proxy->type(), QAbstractDataProxy::DataTypeSurface);
 }
 
 void tst_proxy::initializeProperties()
 {
     QVERIFY(m_proxy);
+
+    m_proxy->setHeightMapFile(":/customtexture.jpg");
+    m_proxy->setMaxXValue(11.0f);
+    m_proxy->setMaxZValue(11.0f);
+    m_proxy->setMinXValue(-10.0f);
+    m_proxy->setMinZValue(-10.0f);
+
+    QCoreApplication::processEvents();
+
+    QCOMPARE(m_proxy->heightMapFile(), QString(":/customtexture.jpg"));
+    QCOMPARE(m_proxy->maxXValue(), 11.0f);
+    QCOMPARE(m_proxy->maxZValue(), 11.0f);
+    QCOMPARE(m_proxy->minXValue(), -10.0f);
+    QCOMPARE(m_proxy->minZValue(), -10.0f);
+
+    QCOMPARE(m_proxy->columnCount(), 24);
+    QCOMPARE(m_proxy->rowCount(), 24);
+
+    m_proxy->setHeightMapFile("");
+
+    QCoreApplication::processEvents();
+
+    QCOMPARE(m_proxy->columnCount(), 0);
+    QCOMPARE(m_proxy->rowCount(), 0);
+
+    m_proxy->setHeightMap(QImage(":/customtexture.jpg"));
+
+    QCoreApplication::processEvents();
+
+    QCOMPARE(m_proxy->columnCount(), 24);
+    QCOMPARE(m_proxy->rowCount(), 24);
 }
 
 void tst_proxy::invalidProperties()
 {
+    m_proxy->setMaxXValue(-10.0f);
+    m_proxy->setMaxZValue(-10.0f);
+    QCOMPARE(m_proxy->maxXValue(), -10.0f);
+    QCOMPARE(m_proxy->maxZValue(), -10.0f);
+    QCOMPARE(m_proxy->minXValue(), -11.0f);
+    QCOMPARE(m_proxy->minZValue(), -11.0f);
+
+    m_proxy->setMinXValue(10.0f);
+    m_proxy->setMinZValue(10.0f);
+    QCOMPARE(m_proxy->maxXValue(), 11.0f);
+    QCOMPARE(m_proxy->maxZValue(), 11.0f);
+    QCOMPARE(m_proxy->minXValue(), 10.0f);
+    QCOMPARE(m_proxy->minZValue(), 10.0f);
 }
 
 QTEST_MAIN(tst_proxy)

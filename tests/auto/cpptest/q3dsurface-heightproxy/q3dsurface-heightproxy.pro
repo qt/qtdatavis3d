@@ -6,3 +6,6 @@ CONFIG += console testcase
 TEMPLATE = app
 
 SOURCES += tst_proxy.cpp
+
+RESOURCES += \
+    q3dsurface-heightproxy.qrc
