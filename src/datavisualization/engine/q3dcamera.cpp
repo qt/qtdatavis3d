@@ -885,20 +885,33 @@ QVector3D Q3DCameraPrivate::calculatePositionRelativeToCamera(const QVector3D &r
                                                               float distanceModifier) const
 {
     // Move the position with camera
-    GLfloat radiusFactor = cameraDistance * (1.5f + distanceModifier);
-    GLfloat xAngle;
-    GLfloat yAngle;
+    const float radiusFactor = cameraDistance * (1.5f + distanceModifier);
+    float xAngle;
+    float yAngle;
+
     if (!fixedRotation) {
         xAngle = qDegreesToRadians(m_xRotation);
-        yAngle = qDegreesToRadians(m_yRotation);
+        float yRotation = m_yRotation;
+        // Light must not be paraller to eye vector, so fudge the y rotation a bit.
+        // Note: This needs redoing if we ever allow arbitrary light positioning.
+        const float yMargin = 0.1f; // Smaller margins cause weird shadow artifacts on tops of bars
+        const float absYRotation = qAbs(yRotation);
+        if (absYRotation < 90.0f + yMargin && absYRotation > 90.0f - yMargin) {
+            if (yRotation < 0.0f)
+                yRotation = -90.0f + yMargin;
+            else
+                yRotation = 90.0f - yMargin;
+        }
+        yAngle = qDegreesToRadians(yRotation);
     } else {
         xAngle = qDegreesToRadians(fixedRotation);
         yAngle = 0;
     }
-    GLfloat radius = (radiusFactor + relativePosition.y()); // set radius to match the highest height of the position
-    GLfloat zPos = radius * qCos(xAngle) * qCos(yAngle);
-    GLfloat xPos = radius * qSin(xAngle) * qCos(yAngle);
-    GLfloat yPos = (radiusFactor + relativePosition.y()) * qSin(yAngle);
+    // Set radius to match the highest height of the position
+    const float radius = (radiusFactor + relativePosition.y());
+    const float zPos = radius * qCos(xAngle) * qCos(yAngle);
+    const float xPos = radius * qSin(xAngle) * qCos(yAngle);
+    const float yPos = radius * qSin(yAngle);
 
     // Keep in the set position in relation to camera
     return QVector3D(-xPos + relativePosition.x(),
