@@ -95,6 +95,10 @@ void tst_bars::construct()
     Q3DBars *graph = new Q3DBars();
     QVERIFY(graph);
     delete graph;
+
+    graph = new Q3DBars(new QSurfaceFormat());
+    QVERIFY(graph);
+    delete graph;
 }
 
 void tst_bars::initialProperties()

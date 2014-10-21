@@ -68,6 +68,64 @@ void tst_proxy::construct()
     QItemModelBarDataProxy *proxy = new QItemModelBarDataProxy();
     QVERIFY(proxy);
     delete proxy;
+
+    QTableWidget *table = new QTableWidget();
+
+    proxy = new QItemModelBarDataProxy(table->model());
+    QVERIFY(proxy);
+    delete proxy;
+
+    proxy = new QItemModelBarDataProxy(table->model(), "val");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString(""));
+    QCOMPARE(proxy->columnRole(), QString(""));
+    QCOMPARE(proxy->valueRole(), QString("val"));
+    QCOMPARE(proxy->rotationRole(), QString(""));
+    QCOMPARE(proxy->rowCategories().length(), 0);
+    QCOMPARE(proxy->columnCategories().length(), 0);
+    delete proxy;
+
+    proxy = new QItemModelBarDataProxy(table->model(), "row", "col", "val");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString("row"));
+    QCOMPARE(proxy->columnRole(), QString("col"));
+    QCOMPARE(proxy->valueRole(), QString("val"));
+    QCOMPARE(proxy->rotationRole(), QString(""));
+    QCOMPARE(proxy->rowCategories().length(), 0);
+    QCOMPARE(proxy->columnCategories().length(), 0);
+    delete proxy;
+
+    proxy = new QItemModelBarDataProxy(table->model(), "row", "col", "val", "rot");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString("row"));
+    QCOMPARE(proxy->columnRole(), QString("col"));
+    QCOMPARE(proxy->valueRole(), QString("val"));
+    QCOMPARE(proxy->rotationRole(), QString("rot"));
+    QCOMPARE(proxy->rowCategories().length(), 0);
+    QCOMPARE(proxy->columnCategories().length(), 0);
+    delete proxy;
+
+    proxy = new QItemModelBarDataProxy(table->model(), "row", "col", "val",
+                                       QStringList() << "rowCat", QStringList() << "colCat");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString("row"));
+    QCOMPARE(proxy->columnRole(), QString("col"));
+    QCOMPARE(proxy->valueRole(), QString("val"));
+    QCOMPARE(proxy->rotationRole(), QString(""));
+    QCOMPARE(proxy->rowCategories().length(), 1);
+    QCOMPARE(proxy->columnCategories().length(), 1);
+    delete proxy;
+
+    proxy = new QItemModelBarDataProxy(table->model(), "row", "col", "val", "rot",
+                                       QStringList() << "rowCat", QStringList() << "colCat");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString("row"));
+    QCOMPARE(proxy->columnRole(), QString("col"));
+    QCOMPARE(proxy->valueRole(), QString("val"));
+    QCOMPARE(proxy->rotationRole(), QString("rot"));
+    QCOMPARE(proxy->rowCategories().length(), 1);
+    QCOMPARE(proxy->columnCategories().length(), 1);
+    delete proxy;
 }
 
 void tst_proxy::initialProperties()

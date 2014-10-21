@@ -63,10 +63,74 @@ void tst_proxy::cleanup()
     delete m_proxy;
 }
 
+
 void tst_proxy::construct()
 {
     QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy();
     QVERIFY(proxy);
+    delete proxy;
+
+    QTableWidget *table = new QTableWidget();
+
+    proxy = new QItemModelSurfaceDataProxy(table->model());
+    QVERIFY(proxy);
+    delete proxy;
+
+    proxy = new QItemModelSurfaceDataProxy(table->model(), "y");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString(""));
+    QCOMPARE(proxy->columnRole(), QString(""));
+    QCOMPARE(proxy->xPosRole(), QString(""));
+    QCOMPARE(proxy->yPosRole(), QString("y"));
+    QCOMPARE(proxy->zPosRole(), QString(""));
+    QCOMPARE(proxy->rowCategories().length(), 0);
+    QCOMPARE(proxy->columnCategories().length(), 0);
+    delete proxy;
+
+    proxy = new QItemModelSurfaceDataProxy(table->model(), "row", "column", "y");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString("row"));
+    QCOMPARE(proxy->columnRole(), QString("column"));
+    QCOMPARE(proxy->xPosRole(), QString("column"));
+    QCOMPARE(proxy->yPosRole(), QString("y"));
+    QCOMPARE(proxy->zPosRole(), QString("row"));
+    QCOMPARE(proxy->rowCategories().length(), 0);
+    QCOMPARE(proxy->columnCategories().length(), 0);
+    delete proxy;
+
+    proxy = new QItemModelSurfaceDataProxy(table->model(), "row", "column", "x", "y", "z");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString("row"));
+    QCOMPARE(proxy->columnRole(), QString("column"));
+    QCOMPARE(proxy->xPosRole(), QString("x"));
+    QCOMPARE(proxy->yPosRole(), QString("y"));
+    QCOMPARE(proxy->zPosRole(), QString("z"));
+    QCOMPARE(proxy->rowCategories().length(), 0);
+    QCOMPARE(proxy->columnCategories().length(), 0);
+    delete proxy;
+
+    proxy = new QItemModelSurfaceDataProxy(table->model(), "row", "column", "y",
+                                           QStringList() << "rowCat", QStringList() << "colCat");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString("row"));
+    QCOMPARE(proxy->columnRole(), QString("column"));
+    QCOMPARE(proxy->xPosRole(), QString("column"));
+    QCOMPARE(proxy->yPosRole(), QString("y"));
+    QCOMPARE(proxy->zPosRole(), QString("row"));
+    QCOMPARE(proxy->rowCategories().length(), 1);
+    QCOMPARE(proxy->columnCategories().length(), 1);
+    delete proxy;
+
+    proxy = new QItemModelSurfaceDataProxy(table->model(), "row", "column", "x", "y", "z",
+                                           QStringList() << "rowCat", QStringList() << "colCat");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->rowRole(), QString("row"));
+    QCOMPARE(proxy->columnRole(), QString("column"));
+    QCOMPARE(proxy->xPosRole(), QString("x"));
+    QCOMPARE(proxy->yPosRole(), QString("y"));
+    QCOMPARE(proxy->zPosRole(), QString("z"));
+    QCOMPARE(proxy->rowCategories().length(), 1);
+    QCOMPARE(proxy->columnCategories().length(), 1);
     delete proxy;
 }
 

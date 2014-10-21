@@ -80,6 +80,10 @@ void tst_scatter::construct()
     Q3DScatter *graph = new Q3DScatter();
     QVERIFY(graph);
     delete graph;
+
+    graph = new Q3DScatter(new QSurfaceFormat());
+    QVERIFY(graph);
+    delete graph;
 }
 
 void tst_scatter::initialProperties()

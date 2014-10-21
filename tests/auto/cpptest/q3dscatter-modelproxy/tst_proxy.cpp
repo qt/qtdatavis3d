@@ -68,6 +68,28 @@ void tst_proxy::construct()
     QItemModelScatterDataProxy *proxy = new QItemModelScatterDataProxy();
     QVERIFY(proxy);
     delete proxy;
+
+    QTableWidget *table = new QTableWidget();
+
+    proxy = new QItemModelScatterDataProxy(table->model());
+    QVERIFY(proxy);
+    delete proxy;
+
+    proxy = new QItemModelScatterDataProxy(table->model(), "x", "y", "z");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->xPosRole(), QString("x"));
+    QCOMPARE(proxy->yPosRole(), QString("y"));
+    QCOMPARE(proxy->zPosRole(), QString("z"));
+    QCOMPARE(proxy->rotationRole(), QString(""));
+    delete proxy;
+
+    proxy = new QItemModelScatterDataProxy(table->model(), "x", "y", "z", "rot");
+    QVERIFY(proxy);
+    QCOMPARE(proxy->xPosRole(), QString("x"));
+    QCOMPARE(proxy->yPosRole(), QString("y"));
+    QCOMPARE(proxy->zPosRole(), QString("z"));
+    QCOMPARE(proxy->rotationRole(), QString("rot"));
+    delete proxy;
 }
 
 void tst_proxy::initialProperties()

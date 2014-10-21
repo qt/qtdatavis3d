@@ -85,6 +85,10 @@ void tst_surface::construct()
     Q3DSurface *graph = new Q3DSurface();
     QVERIFY(graph);
     delete graph;
+
+    graph = new Q3DSurface(new QSurfaceFormat());
+    QVERIFY(graph);
+    delete graph;
 }
 
 void tst_surface::initialProperties()
