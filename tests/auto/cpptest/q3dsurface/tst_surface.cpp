@@ -97,6 +97,9 @@ void tst_surface::initialProperties()
     QCOMPARE(m_graph->seriesList().length(), 0);
     QVERIFY(!m_graph->selectedSeries());
     QCOMPARE(m_graph->flipHorizontalGrid(), false);
+    QCOMPARE(m_graph->axisX()->orientation(), QAbstract3DAxis::AxisOrientationX);
+    QCOMPARE(m_graph->axisY()->orientation(), QAbstract3DAxis::AxisOrientationY);
+    QCOMPARE(m_graph->axisZ()->orientation(), QAbstract3DAxis::AxisOrientationZ);
 
     // Common properties
     QCOMPARE(m_graph->activeTheme()->type(), Q3DTheme::ThemeQt);

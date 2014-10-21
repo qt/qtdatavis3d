@@ -11,4 +11,7 @@ SUBDIRS = q3dbars \
           q3dsurface-proxy \
           q3dsurface-modelproxy \
           q3dsurface-heightproxy \
-          q3dsurface-series
+          q3dsurface-series \
+          q3daxis-category \
+          q3daxis-logvalue \
+          q3daxis-value

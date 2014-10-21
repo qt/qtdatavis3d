@@ -112,6 +112,9 @@ void tst_bars::initialProperties()
     QVERIFY(!m_graph->selectedSeries());
     QVERIFY(!m_graph->primarySeries());
     QCOMPARE(m_graph->floorLevel(), 0.0);
+    QCOMPARE(m_graph->columnAxis()->orientation(), QAbstract3DAxis::AxisOrientationX);
+    QCOMPARE(m_graph->valueAxis()->orientation(), QAbstract3DAxis::AxisOrientationY);
+    QCOMPARE(m_graph->rowAxis()->orientation(), QAbstract3DAxis::AxisOrientationZ);
 
     // Common properties
     QCOMPARE(m_graph->activeTheme()->type(), Q3DTheme::ThemeQt);
