@@ -69,5 +69,6 @@
         <file alias="fragment3DSliceFrames">shaders/3dsliceframes.frag</file>
         <file alias="vertexPosition">shaders/position.vert</file>
         <file alias="fragmentPositionMap">shaders/positionmap.frag</file>
+        <file alias="fragmentTexturedSurfaceShadow">shaders/surfaceTexturedShadow.frag</file>
     </qresource>
 </RCC>

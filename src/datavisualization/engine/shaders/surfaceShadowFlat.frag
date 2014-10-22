@@ -2,7 +2,7 @@
 
 #extension GL_EXT_gpu_shader4 : require
 
-varying highp vec3 coords_mdl;
+varying highp vec2 coords_mdl;
 varying highp vec3 position_wrld;
 flat varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
@@ -51,7 +51,7 @@ void main() {
     highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
 
     highp float bias = 0.005 * tan(acos(cosTheta));
-    bias = clamp(bias, 0.0, 0.01);
+    bias = clamp(bias, 0.001, 0.01);
 
     vec4 shadCoords = shadowCoord;
     shadCoords.z -= bias;

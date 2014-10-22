@@ -49,7 +49,7 @@ void main() {
     highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
 
     highp float bias = 0.005 * tan(acos(cosTheta));
-    bias = clamp(bias, 0.0, 0.01);
+    bias = clamp(bias, 0.001, 0.01);
 
     vec4 shadCoords = shadowCoord;
     shadCoords.z -= bias;

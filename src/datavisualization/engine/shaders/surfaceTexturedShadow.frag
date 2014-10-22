@@ -1,22 +1,18 @@
 #version 120
 
-#extension GL_EXT_gpu_shader4 : require
-
-varying highp vec3 coords_mdl;
-varying highp vec3 position_wrld;
-flat varying highp vec3 normal_cmr;
-varying highp vec3 eyeDirection_cmr;
-varying highp vec3 lightDirection_cmr;
-varying highp vec2 UV;
-
-uniform highp sampler2DShadow shadowMap;
-uniform sampler2D textureSampler;
-varying highp vec4 shadowCoord;
-uniform highp vec3 lightPosition_wrld;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
 uniform highp float shadowQuality;
+uniform highp sampler2D textureSampler;
+uniform highp sampler2DShadow shadowMap;
 uniform highp vec4 lightColor;
+
+varying highp vec4 shadowCoord;
+varying highp vec2 UV;
+varying highp vec3 position_wrld;
+varying highp vec3 normal_cmr;
+varying highp vec3 eyeDirection_cmr;
+varying highp vec3 lightDirection_cmr;
 
 highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
                                       vec2(0.94558609, -0.76890725),
@@ -36,9 +32,9 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
                                       vec2(0.14383161, -0.14100790));
 
 void main() {
-    highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).xyz;
+    highp vec3 materialDiffuseColor = texture2D(textureSampler, UV).rgb;
     highp vec3 materialAmbientColor = lightColor.rgb * ambientStrength * materialDiffuseColor;
-    highp vec3 materialSpecularColor = lightColor.rgb;
+    highp vec3 materialSpecularColor = lightColor.rgb * 0.2;
 
     highp vec3 n = normalize(normal_cmr);
     highp vec3 l = normalize(lightDirection_cmr);
@@ -66,7 +62,6 @@ void main() {
         (materialAmbientColor +
         materialDiffuseColor * lightStrength * cosTheta +
         materialSpecularColor * lightStrength * pow(cosAlpha, 10));
-    gl_FragColor.a = 1.0;
+    gl_FragColor.a = texture2D(textureSampler, UV).a;
     gl_FragColor.rgb = visibility * clamp(gl_FragColor.rgb, 0.0, 1.0);
 }
-

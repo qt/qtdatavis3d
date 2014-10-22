@@ -2886,7 +2886,7 @@ void Surface3DRenderer::initShaders(const QString &vertexShader, const QString &
         m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexShadow"),
                                                  QStringLiteral(":/shaders/fragmentSurfaceShadowNoTex"));
         m_surfaceTexturedSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexShadow"),
-                                                         QStringLiteral(":/shaders/fragmentShadow"));
+                                                         QStringLiteral(":/shaders/fragmentTexturedSurfaceShadow"));
     } else {
         m_surfaceSmoothShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
                                                  QStringLiteral(":/shaders/fragmentSurface"));
