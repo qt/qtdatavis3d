@@ -14,4 +14,7 @@ SUBDIRS = q3dbars \
           q3dsurface-series \
           q3daxis-category \
           q3daxis-logvalue \
-          q3daxis-value
+          q3daxis-value \
+          q3dscene \
+          q3dscene-camera \
+          q3dscene-light
