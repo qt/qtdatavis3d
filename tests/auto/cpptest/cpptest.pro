@@ -17,4 +17,5 @@ SUBDIRS = q3dbars \
           q3daxis-value \
           q3dscene \
           q3dscene-camera \
-          q3dscene-light
+          q3dscene-light \
+          q3dtheme
