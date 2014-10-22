@@ -18,4 +18,6 @@ SUBDIRS = q3dbars \
           q3dscene \
           q3dscene-camera \
           q3dscene-light \
-          q3dtheme
+          q3dtheme \
+          q3dinput \
+          q3dinput-touch
