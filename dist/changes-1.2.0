@@ -62,6 +62,8 @@ General:
 - Fixed the OpenGL context cleanup upon renderer destruction.
 - Fixed scatter item autosizing when adding a new series.
 - Fixed a crash related to selection render buffer reuse.
+- Fixed the flipped Z-coordinate for absolutely positioned custom items.
+- Fixed shadows when viewing the graph directly from above or below.
 
 New examples
 ------------

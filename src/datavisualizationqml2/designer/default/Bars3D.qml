@@ -17,7 +17,7 @@
 ****************************************************************************/
 
 import QtQuick 2.0
-import QtDataVisualization 1.1
+import QtDataVisualization 1.2
 
 Bars3D {
     width: 300

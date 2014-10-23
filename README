@@ -1,5 +1,5 @@
 ---------------------------
-Qt Data Visualization 1.1.0
+Qt Data Visualization 1.2.0
 ---------------------------
 
 Qt Data Visualization module provides multiple graph types to visualize data in 3D space
@@ -78,12 +78,14 @@ Known Issues
   so only the Qt Quick 2 versions of graphs are available in practice for those platforms.
 - Shadows are not supported with OpenGL ES2 (including Angle builds in Windows).
 - Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
+- QCustom3DVolume items are not supported with OpenGL ES2 (including Angle builds in Windows).
 - Surfaces with non-straight rows and columns do not always render properly.
 - Q3DLight class (and Light3D QML item) are currently not usable for anything.
-- Changing any of Q3DScene properties affecting subviewports currently has no effect.
+- Changing most of Q3DScene properties affecting subviewports currently has no effect.
 - Widget based examples layout incorrectly in iOS.
 - Reparenting a graph to an item in another QQuickWindow is not supported.
-- There is a low-impact binary break between 1.0 and 1.1. The break is due to a QML type
-  registration conflict with QAbstractItemModel between QtDataVisualization and
-  QtCommercial.Charts. Introducing the binary break makes it possible to use both
-  Charts and Data Visualization in the same QML application.
+- Android builds of QML applications importing QtDataVisualization also require
+  "QT += datavisualization" in the pro file. This is because Qt Data Visualization QML plugin has
+  a dependency to Qt Data Visualization C++ library, which Qt Creator doesn't automatically add
+  to the deployment package.
+
