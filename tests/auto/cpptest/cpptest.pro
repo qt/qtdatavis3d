@@ -20,4 +20,7 @@ SUBDIRS = q3dbars \
           q3dscene-light \
           q3dtheme \
           q3dinput \
-          q3dinput-touch
+          q3dinput-touch \
+          q3dcustom \
+          q3dcustom-label \
+          q3dcustom-volume
