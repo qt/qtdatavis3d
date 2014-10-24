@@ -1,4 +1,5 @@
 TEMPLATE = subdirs
 CONFIG += ordered
-SUBDIRS += datavisualization \
-           datavisualizationqml2
+SUBDIRS += datavisualization
+
+qtHaveModule(quick): SUBDIRS += datavisualizationqml2

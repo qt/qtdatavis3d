@@ -1,15 +1,17 @@
 TEMPLATE = subdirs
-SUBDIRS += qmlbars \
-           qmlscatter \
-           qmlsurface \
-           qmlcustominput \
-           qmllegend \
-           qmlmultigraph \
-           qmloscilloscope \
-           qmlsurfacelayers \
-           qmlaxisformatter \
-           qmlaxisdrag \
-           qmlspectrogram
+qtHaveModule(quick) {
+    SUBDIRS += qmlbars \
+               qmlscatter \
+               qmlsurface \
+               qmlcustominput \
+               qmllegend \
+               qmlmultigraph \
+               qmloscilloscope \
+               qmlsurfacelayers \
+               qmlaxisformatter \
+               qmlaxisdrag \
+               qmlspectrogram
+}
 
 !android:!ios {
     SUBDIRS += bars \
@@ -23,6 +25,7 @@ SUBDIRS += qmlbars \
                customitems \
                texturesurface \
                volumetric
+
+    qtHaveModule(multimedia): SUBDIRS += audiolevels
 }
 
-qtHaveModule(multimedia):!android:!ios: SUBDIRS += audiolevels

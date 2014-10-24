@@ -1,5 +1,7 @@
 TEMPLATE = subdirs
-SUBDIRS = qmltest \
-          cpptest
+
+SUBDIRS += cpptest
+
+qtHaveModule(quick): SUBDIRS += qmltest
 
 installed_cmake.depends = cmake
