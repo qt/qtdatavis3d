@@ -29,6 +29,9 @@
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QOffscreenSurface>
+#if defined(Q_OS_OSX)
+#include <qpa/qplatformnativeinterface.h>
+#endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -208,6 +211,15 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
 #endif
 
     d_ptr->renderLater();
+
+#if defined(Q_OS_OSX)
+    // Enable touch events for Mac touchpads
+    typedef void * (*EnableTouch)(QWindow*, bool);
+    EnableTouch enableTouch =
+            (EnableTouch)QGuiApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("registertouchwindow");
+    if (enableTouch)
+        enableTouch(this, true);
+#endif
 }
 
 /*!

@@ -24,6 +24,9 @@
 #if defined(Q_OS_IOS)
 #include <QtCore/QTimer>
 #endif
+#if defined(Q_OS_OSX)
+#include <qpa/qplatformnativeinterface.h>
+#endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -442,6 +445,18 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
 
     if (!window)
         return;
+
+#if defined(Q_OS_OSX)
+    bool previousVisibility = window->isVisible();
+    // Enable touch events for Mac touchpads
+    window->setVisible(true);
+    typedef void * (*EnableTouch)(QWindow*, bool);
+    EnableTouch enableTouch =
+            (EnableTouch)QGuiApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("registertouchwindow");
+    if (enableTouch)
+        enableTouch(window, true);
+    window->setVisible(previousVisibility);
+#endif
 
     connect(window, &QObject::destroyed, this, &AbstractDeclarative::windowDestroyed);
 
