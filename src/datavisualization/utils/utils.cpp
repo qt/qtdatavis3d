@@ -27,11 +27,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 static GLint maxTextureSize = 0; // Safe, as all instances have the same texture size
 
-GLuint Utils::getNearestPowerOfTwo(GLuint value, GLuint &padding)
+GLuint Utils::getNearestPowerOfTwo(GLuint value)
 {
     GLuint powOfTwoValue = MIN_POWER;
     NUM_IN_POWER(powOfTwoValue, value);
-    padding = powOfTwoValue - value;
     return powOfTwoValue;
 }
 
@@ -60,7 +59,9 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 
     GLuint paddingWidth = 20;
+#if !defined(QT_OPENGL_ES_2) // TODO fix ifdef for dynamic OpenGL
     GLuint paddingHeight = 20;
+#endif
     // Calculate text dimensions
     QFont valueFont = font;
     valueFont.setPointSize(textureFontSize);
@@ -78,23 +79,41 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     QSize labelSize;
     qreal fontRatio = 1.0;
 
+#if defined(QT_OPENGL_ES_2) // TODO fix ifdef for dynamic OpenGL
+    // Test if text with slighly smaller font would fit into one step smaller texture
+    // ie. if the text is just exceeded the smaller texture boundary, it would
+    // make a label with large empty space
+    GLuint prePadding = 20;
+    GLint targetWidth = maxTextureSize;
+    uint testWidth = getNearestPowerOfTwo(valueStrWidth + prePadding) >> 1;
+    int diffToFit = (valueStrWidth + prePadding) - testWidth;
+    int maxSqueeze = int((valueStrWidth + prePadding) * 0.1f);
+    if (diffToFit < maxSqueeze && maxTextureSize > GLint(testWidth))
+        targetWidth = testWidth;
+#endif
+
     bool sizeOk = false;
     int currentFontSize = textureFontSize;
     do {
-#if defined(QT_OPENGL_ES_2)
+#if defined(QT_OPENGL_ES_2) // TODO fix ifdef for dynamic OpenGL
         // ES2 can't handle textures with dimensions not in power of 2. Resize labels accordingly.
         // Add some padding before converting to power of two to avoid too tight fit
-        GLuint prePadding = 5;
         labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
-        labelSize.setWidth(getNearestPowerOfTwo(labelSize.width(), paddingWidth));
-        labelSize.setHeight(getNearestPowerOfTwo(labelSize.height(), paddingHeight));
+        labelSize.setWidth(getNearestPowerOfTwo(labelSize.width()));
+        labelSize.setHeight(getNearestPowerOfTwo(labelSize.height()));
 #else
         if (!labelBackground)
             labelSize = QSize(valueStrWidth, valueStrHeight);
         else
             labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
 #endif
+
+#if defined(QT_OPENGL_ES_2)
+        if (!maxTextureSize || (labelSize.width() <= maxTextureSize
+                                && labelSize.width() <= targetWidth)) {
+#else
         if (!maxTextureSize || labelSize.width() <= maxTextureSize) {
+#endif
             // Make sure the label is not too wide
             sizeOk = true;
         } else if (--currentFontSize == 4) {

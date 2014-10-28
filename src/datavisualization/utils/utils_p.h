@@ -45,7 +45,7 @@ public:
         ParamTypeReal
     };
 
-    static GLuint getNearestPowerOfTwo(GLuint value, GLuint &padding);
+    static GLuint getNearestPowerOfTwo(GLuint value);
     static QVector4D vectorFromColor(const QColor &color);
     static QColor colorFromVector(const QVector3D &colorVector);
     static QColor colorFromVector(const QVector4D &colorVector);
