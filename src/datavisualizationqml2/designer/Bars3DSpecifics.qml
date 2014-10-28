@@ -288,6 +288,92 @@ Column {
                     Layout.fillWidth: true
                 }
             }
+            Label {
+                text: qsTr("aspectRatio")
+                toolTip: qsTr("Aspect Ratio")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    backendValue: backendValues.aspectRatio
+                    minimumValue: 0.01
+                    maximumValue: 100.0
+                    stepSize: 0.01
+                    decimals: 2
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("floorLevel")
+                toolTip: qsTr("Floor Level")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                LineEdit {
+                    backendValue: backendValues.floorLevel
+                    inputMethodHints: Qt.ImhFormattedNumbersOnly
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("horizontalAspectRatio")
+                toolTip: qsTr("Horizontal Aspect Ratio")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    backendValue: backendValues.horizontalAspectRatio
+                    minimumValue: 0.0
+                    maximumValue: 100.0
+                    stepSize: 0.01
+                    decimals: 2
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("reflection")
+                toolTip: qsTr("Reflection")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                CheckBox {
+                    id: reflectionCheckbox
+                    backendValue: backendValues.reflection
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("reflectivity")
+                toolTip: qsTr("Reflectivity")
+                Layout.fillWidth: true
+                visible: reflectionCheckbox.checked
+            }
+            SecondColumnLayout {
+                visible: reflectionCheckbox.checked
+                SpinBox {
+                    backendValue: backendValues.reflectivity
+                    minimumValue: 0.0
+                    maximumValue: 1.0
+                    stepSize: 0.01
+                    decimals: 1
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("margin")
+                toolTip: qsTr("Graph Margin")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    backendValue: backendValues.margin
+                    minimumValue: -1.0
+                    maximumValue: 100.0
+                    stepSize: 0.1
+                    decimals: 1
+                    Layout.fillWidth: true
+                }
+            }
 
             // Kept for debugging
             Label { }
