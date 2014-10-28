@@ -76,8 +76,6 @@ void ScatterPointBufferHelper::popPoint()
 
 void ScatterPointBufferHelper::load(ScatterSeriesRenderCache *cache)
 {
-    initializeOpenGLFunctions();
-
     ScatterRenderItemArray &renderArray = cache->renderArray();
     const int renderArraySize = renderArray.size();
     m_indexCount = 0;

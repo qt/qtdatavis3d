@@ -19,7 +19,6 @@
 #include "abstractdeclarative_p.h"
 #include "declarativetheme_p.h"
 #include "declarativerendernode_p.h"
-
 #include <QtGui/QGuiApplication>
 #if defined(Q_OS_IOS)
 #include <QtCore/QTimer>
@@ -39,11 +38,7 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_controller(0),
     m_contextWindow(0),
     m_renderMode(RenderIndirect),
-    #if defined(QT_OPENGL_ES_2)
     m_samples(0),
-    #else
-    m_samples(4),
-    #endif
     m_windowSamples(0),
     m_initialisedSize(0, 0),
     #ifdef USE_SHARED_CONTEXT
@@ -56,7 +51,6 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_contextThread(0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
-    setAntialiasing(m_samples > 0);
 
     // Set contents to false in case we are in qml designer to make component look nice
     m_runningInDesigner = QGuiApplication::applicationDisplayName() == "Qml2Puppet";
@@ -279,6 +273,10 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
     Q_ASSERT(controller);
     m_controller = controller;
 
+    if (!m_controller->isOpenGLES())
+        m_samples = 4;
+    setAntialiasing(m_samples > 0);
+
     // Reset default theme, as the default C++ theme is Q3DTheme, not DeclarativeTheme3D.
     DeclarativeTheme3D *defaultTheme = new DeclarativeTheme3D;
     defaultTheme->d_ptr->setDefaultTheme(true);
@@ -425,17 +423,15 @@ void AbstractDeclarative::setMsaaSamples(int samples)
     if (m_renderMode != RenderIndirect) {
         qWarning("Multisampling cannot be adjusted in this render mode");
     } else {
-#if defined(QT_OPENGL_ES_2)
-        if (samples > 0)
-            qWarning("Multisampling is not supported in OpenGL ES2");
-#else
-        if (m_samples != samples) {
+        if (m_controller->isOpenGLES()) {
+            if (samples > 0)
+                qWarning("Multisampling is not supported in OpenGL ES2");
+        } else if (m_samples != samples) {
             m_samples = samples;
             setAntialiasing(m_samples > 0);
             emit msaaSamplesChanged(samples);
             update();
         }
-#endif
     }
 }
 
@@ -577,24 +573,25 @@ void AbstractDeclarative::render()
     // Clear the background once per window as that is not done by default
     QQuickWindow *win = window();
     activateOpenGLContext(win);
+    QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
     if (m_renderMode == RenderDirectToBackground && !clearList.contains(win)) {
         clearList.append(win);
         QColor clearColor = win->color();
-        glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        funcs->glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
+        funcs->glClear(GL_COLOR_BUFFER_BIT);
     }
 
     if (isVisible()) {
-        glDepthMask(GL_TRUE);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glDisable(GL_BLEND);
+        funcs->glDepthMask(GL_TRUE);
+        funcs->glEnable(GL_DEPTH_TEST);
+        funcs->glDepthFunc(GL_LESS);
+        funcs->glEnable(GL_CULL_FACE);
+        funcs->glCullFace(GL_BACK);
+        funcs->glDisable(GL_BLEND);
 
         m_controller->render();
 
-        glEnable(GL_BLEND);
+        funcs->glEnable(GL_BLEND);
     }
     doneOpenGLContext(win);
 }

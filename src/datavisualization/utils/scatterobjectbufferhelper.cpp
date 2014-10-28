@@ -38,8 +38,6 @@ ScatterObjectBufferHelper::~ScatterObjectBufferHelper()
 
 void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal dotScale)
 {
-    initializeOpenGLFunctions();
-
     m_meshDataLoaded = false;
     m_indexCount = 0;
 

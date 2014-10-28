@@ -69,10 +69,9 @@ Drawer::~Drawer()
 
 void Drawer::initializeOpenGL()
 {
-    if (!m_textureHelper) {
-        initializeOpenGLFunctions();
+    initializeOpenGLFunctions();
+    if (!m_textureHelper)
         m_textureHelper = new TextureHelper();
-    }
 }
 
 void Drawer::setTheme(Q3DTheme *theme)

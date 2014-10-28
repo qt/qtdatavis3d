@@ -22,6 +22,7 @@
 #include "qabstract3dinputhandler_p.h"
 #include "q3dscene_p.h"
 #include "qutils.h"
+#include "utils_p.h"
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOpenGLContext>
@@ -172,11 +173,7 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
     if (format) {
         surfaceFormat = *format;
         // Make sure renderable type is correct
-#if !defined(QT_OPENGL_ES_2)
-        surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
-#else
-        surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
-#endif
+        surfaceFormat.setRenderableType(QSurfaceFormat::DefaultRenderableType);
     } else {
         surfaceFormat = qDefaultSurfaceFormat();
     }
@@ -200,15 +197,13 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
     qDebug() << "GLSL version:" << (const char *)shaderVersion;
 #endif
 
-#if !defined(QT_OPENGL_ES_2)
-    // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
-    QStringList splitversionstr =
-            QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
-    if (splitversionstr[0].toFloat() < 1.2)
-        qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
-#else
-    Q_UNUSED(shaderVersion)
-#endif
+    if (!Utils::isOpenGLES()) {
+        // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
+        QStringList splitversionstr =
+                QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
+        if (splitversionstr[0].toFloat() < 1.2)
+            qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
+    }
 
     d_ptr->renderLater();
 
@@ -1094,12 +1089,10 @@ QImage QAbstract3DGraphPrivate::renderToImage(int msaaSamples, const QSize &imag
     // Render the wanted frame offscreen
     m_context->makeCurrent(m_offscreenSurface);
     fboFormat.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-#ifdef QT_OPENGL_ES_2
-    Q_UNUSED(msaaSamples);
-#else
-    fboFormat.setInternalTextureFormat(GL_RGB);
-    fboFormat.setSamples(msaaSamples);
-#endif
+    if (!Utils::isOpenGLES()) {
+        fboFormat.setInternalTextureFormat(GL_RGB);
+        fboFormat.setSamples(msaaSamples);
+    }
     fbo = new QOpenGLFramebufferObject(imageSize, fboFormat);
     if (fbo->isValid()) {
         QRect originalViewport = m_visualController->m_scene->viewport();

@@ -168,10 +168,8 @@ private:
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
-#if !defined(QT_OPENGL_ES_2)
     void initDepthShader();
     void updateDepthBuffer();
-#endif
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
     Abstract3DController::SelectionType isSelected(int row, int bar,

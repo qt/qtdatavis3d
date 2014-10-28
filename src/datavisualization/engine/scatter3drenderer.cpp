@@ -45,9 +45,7 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_dotGradientShader(0),
       m_staticSelectedItemGradientShader(0),
       m_staticSelectedItemShader(0),
-      #if defined(QT_OPENGL_ES_2)
       m_pointShader(0),
-      #endif
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
@@ -73,7 +71,6 @@ Scatter3DRenderer::Scatter3DRenderer(Scatter3DController *controller)
       m_haveUniformColorMeshSeries(false),
       m_haveGradientMeshSeries(false)
 {
-    initializeOpenGLFunctions();
     initializeOpenGL();
 }
 
@@ -104,21 +101,15 @@ void Scatter3DRenderer::initializeOpenGL()
 
     // Initialize shaders
 
-#if !defined(QT_OPENGL_ES_2)
-    // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
-    initDepthShader();
-#else
-    // Init point shader
-    initPointShader();
-#endif
+    if (!m_isOpenGLES) {
+        initDepthShader(); // For shadows
+        loadGridLineMesh();
+    } else {
+        initPointShader();
+    }
 
     // Init selection shader
     initSelectionShader();
-
-#if !defined(QT_OPENGL_ES_2)
-    // Load grid line mesh
-    loadGridLineMesh();
-#endif
 
     // Set view port
     glViewport(m_primarySubViewport.x(),
@@ -443,12 +434,11 @@ void Scatter3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHin
 
     Abstract3DRenderer::reInitShaders();
 
-#if defined(QT_OPENGL_ES_2)
-    if (hint.testFlag(QAbstract3DGraph::OptimizationStatic) && !m_staticGradientPointShader) {
+    if (m_isOpenGLES && hint.testFlag(QAbstract3DGraph::OptimizationStatic)
+            && !m_staticGradientPointShader) {
         initStaticPointShaders(QStringLiteral(":/shaders/vertexPointES2_UV"),
                                QStringLiteral(":/shaders/fragmentLabel"));
     }
-#endif
 }
 
 void Scatter3DRenderer::updateMargin(float margin)
@@ -546,164 +536,168 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     QVector3D lightPos = m_cachedScene->activeLight()->position();
 
     // Introduce regardless of shadow quality to simplify logic
-    QMatrix4x4 depthViewMatrix;
-    QMatrix4x4 depthProjectionMatrix;
     QMatrix4x4 depthProjectionViewMatrix;
 
+    ShaderHelper *pointSelectionShader;
+    if (!m_isOpenGLES) {
 #if !defined(QT_OPENGL_ES_2)
-    if (m_havePointSeries) {
-        glEnable(GL_POINT_SMOOTH);
-        glEnable(GL_PROGRAM_POINT_SIZE);
-    }
+        if (m_havePointSeries) {
+            glEnable(GL_POINT_SMOOTH);
+            glEnable(GL_PROGRAM_POINT_SIZE);
+        }
 
-    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-        // Render scene into a depth texture for using with shadow mapping
-        // Bind depth shader
-        m_depthShader->bind();
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            // Render scene into a depth texture for using with shadow mapping
+            // Bind depth shader
+            m_depthShader->bind();
 
-        // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
-        glViewport(0, 0,
-                   m_primarySubViewport.width() * m_shadowQualityMultiplier,
-                   m_primarySubViewport.height() * m_shadowQualityMultiplier);
+            // Set viewport for depth map rendering. Must match texture size. Larger values give smoother shadows.
+            glViewport(0, 0,
+                       m_primarySubViewport.width() * m_shadowQualityMultiplier,
+                       m_primarySubViewport.height() * m_shadowQualityMultiplier);
 
-        // Enable drawing to framebuffer
-        glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
-        glClear(GL_DEPTH_BUFFER_BIT);
+            // Enable drawing to framebuffer
+            glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
+            glClear(GL_DEPTH_BUFFER_BIT);
 
-        // Set front face culling to reduce self-shadowing issues
-        glCullFace(GL_FRONT);
+            // Set front face culling to reduce self-shadowing issues
+            glCullFace(GL_FRONT);
 
-        // Get the depth view matrix
-        // It may be possible to hack lightPos here if we want to make some tweaks to shadow
-        QVector3D depthLightPos = activeCamera->d_ptr->calculatePositionRelativeToCamera(
-                    zeroVector, 0.0f, 2.5f / m_autoScaleAdjustment);
-        depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
-        // Set the depth projection matrix
-        depthProjectionMatrix.perspective(15.0f, viewPortRatio, 3.0f, 100.0f);
-        depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
+            QMatrix4x4 depthViewMatrix;
+            QMatrix4x4 depthProjectionMatrix;
 
-        // Draw dots to depth buffer
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
-            if (baseCache->isVisible()) {
-                ScatterSeriesRenderCache *cache =
-                        static_cast<ScatterSeriesRenderCache *>(baseCache);
-                ObjectHelper *dotObj = cache->object();
-                QQuaternion seriesRotation(cache->meshRotation());
-                const ScatterRenderItemArray &renderArray = cache->renderArray();
-                const int renderArraySize = renderArray.size();
-                bool drawingPoints = (cache->mesh() == QAbstract3DSeries::MeshPoint);
-                float itemSize = cache->itemSize() / itemScaler;
-                if (itemSize == 0.0f)
-                    itemSize = m_dotSizeScale;
-                if (drawingPoints) {
-                    // Scale points based on shadow quality for shadows, not by zoom level
-                    glPointSize(itemSize * 100.0f * m_shadowQualityMultiplier);
-                }
-                QVector3D modelScaler(itemSize, itemSize, itemSize);
+            // Get the depth view matrix
+            // It may be possible to hack lightPos here if we want to make some tweaks to shadow
+            QVector3D depthLightPos = activeCamera->d_ptr->calculatePositionRelativeToCamera(
+                        zeroVector, 0.0f, 2.5f / m_autoScaleAdjustment);
+            depthViewMatrix.lookAt(depthLightPos, zeroVector, upVector);
+            // Set the depth projection matrix
+            depthProjectionMatrix.perspective(15.0f, viewPortRatio, 3.0f, 100.0f);
+            depthProjectionViewMatrix = depthProjectionMatrix * depthViewMatrix;
 
-                if (!optimizationDefault
-                        && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
-                            || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
-                    continue;
-                }
+            // Draw dots to depth buffer
+            foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+                if (baseCache->isVisible()) {
+                    ScatterSeriesRenderCache *cache =
+                            static_cast<ScatterSeriesRenderCache *>(baseCache);
+                    ObjectHelper *dotObj = cache->object();
+                    QQuaternion seriesRotation(cache->meshRotation());
+                    const ScatterRenderItemArray &renderArray = cache->renderArray();
+                    const int renderArraySize = renderArray.size();
+                    bool drawingPoints = (cache->mesh() == QAbstract3DSeries::MeshPoint);
+                    float itemSize = cache->itemSize() / itemScaler;
+                    if (itemSize == 0.0f)
+                        itemSize = m_dotSizeScale;
+                    if (drawingPoints) {
+                        // Scale points based on shadow quality for shadows, not by zoom level
+                        m_funcs_2_1->glPointSize(itemSize * 100.0f * m_shadowQualityMultiplier);
+                    }
+                    QVector3D modelScaler(itemSize, itemSize, itemSize);
 
-                int loopCount = 1;
-                if (optimizationDefault)
-                    loopCount = renderArraySize;
-                for (int dot = 0; dot < loopCount; dot++) {
-                    const ScatterRenderItem &item = renderArray.at(dot);
-                    if (!item.isVisible() && optimizationDefault)
+                    if (!optimizationDefault
+                            && ((drawingPoints && cache->bufferPoints()->indexCount() == 0)
+                                || (!drawingPoints && cache->bufferObject()->indexCount() == 0))) {
                         continue;
-
-                    QMatrix4x4 modelMatrix;
-                    QMatrix4x4 MVPMatrix;
-
-                    if (optimizationDefault) {
-                        modelMatrix.translate(item.translation());
-                        if (!drawingPoints) {
-                            if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
-                                modelMatrix.rotate(seriesRotation * item.rotation());
-                            modelMatrix.scale(modelScaler);
-                        }
                     }
 
-                    MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                    int loopCount = 1;
+                    if (optimizationDefault)
+                        loopCount = renderArraySize;
+                    for (int dot = 0; dot < loopCount; dot++) {
+                        const ScatterRenderItem &item = renderArray.at(dot);
+                        if (!item.isVisible() && optimizationDefault)
+                            continue;
 
-                    m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
+                        QMatrix4x4 modelMatrix;
+                        QMatrix4x4 MVPMatrix;
 
-                    if (drawingPoints) {
-                        if (optimizationDefault)
-                            m_drawer->drawPoint(m_depthShader);
-                        else
-                            m_drawer->drawPoints(m_depthShader, cache->bufferPoints(), 0);
-                    } else {
                         if (optimizationDefault) {
-                            // 1st attribute buffer : vertices
-                            glEnableVertexAttribArray(m_depthShader->posAtt());
-                            glBindBuffer(GL_ARRAY_BUFFER, dotObj->vertexBuf());
-                            glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
-                                                  (void *)0);
+                            modelMatrix.translate(item.translation());
+                            if (!drawingPoints) {
+                                if (!seriesRotation.isIdentity() || !item.rotation().isIdentity())
+                                    modelMatrix.rotate(seriesRotation * item.rotation());
+                                modelMatrix.scale(modelScaler);
+                            }
+                        }
 
-                            // Index buffer
-                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dotObj->elementBuf());
+                        MVPMatrix = depthProjectionViewMatrix * modelMatrix;
 
-                            // Draw the triangles
-                            glDrawElements(GL_TRIANGLES, dotObj->indexCount(), GL_UNSIGNED_SHORT,
-                                           (void *)0);
+                        m_depthShader->setUniformValue(m_depthShader->MVP(), MVPMatrix);
 
-                            // Free buffers
-                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                            glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-                            glDisableVertexAttribArray(m_depthShader->posAtt());
+                        if (drawingPoints) {
+                            if (optimizationDefault)
+                                m_drawer->drawPoint(m_depthShader);
+                            else
+                                m_drawer->drawPoints(m_depthShader, cache->bufferPoints(), 0);
                         } else {
-                            ScatterObjectBufferHelper *object = cache->bufferObject();
-                            // 1st attribute buffer : vertices
-                            glEnableVertexAttribArray(m_depthShader->posAtt());
-                            glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
-                            glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
-                                                  (void *)0);
+                            if (optimizationDefault) {
+                                // 1st attribute buffer : vertices
+                                glEnableVertexAttribArray(m_depthShader->posAtt());
+                                glBindBuffer(GL_ARRAY_BUFFER, dotObj->vertexBuf());
+                                glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
+                                                      (void *)0);
 
-                            // Index buffer
-                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
+                                // Index buffer
+                                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dotObj->elementBuf());
 
-                            // Draw the triangles
-                            glDrawElements(GL_TRIANGLES, object->indexCount(),
-                                           object->indicesType(), (void *)0);
+                                // Draw the triangles
+                                glDrawElements(GL_TRIANGLES, dotObj->indexCount(), GL_UNSIGNED_SHORT,
+                                               (void *)0);
 
-                            // Free buffers
-                            glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-                            glBindBuffer(GL_ARRAY_BUFFER, 0);
+                                // Free buffers
+                                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                                glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-                            glDisableVertexAttribArray(m_depthShader->posAtt());
+                                glDisableVertexAttribArray(m_depthShader->posAtt());
+                            } else {
+                                ScatterObjectBufferHelper *object = cache->bufferObject();
+                                // 1st attribute buffer : vertices
+                                glEnableVertexAttribArray(m_depthShader->posAtt());
+                                glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());
+                                glVertexAttribPointer(m_depthShader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0,
+                                                      (void *)0);
+
+                                // Index buffer
+                                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
+
+                                // Draw the triangles
+                                glDrawElements(GL_TRIANGLES, object->indexCount(),
+                                               object->indicesType(), (void *)0);
+
+                                // Free buffers
+                                glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+                                glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+                                glDisableVertexAttribArray(m_depthShader->posAtt());
+                            }
                         }
                     }
                 }
             }
+
+            Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
+                                                projectionViewMatrix,
+                                                depthProjectionViewMatrix, m_depthTexture,
+                                                m_shadowQualityToShader);
+
+            // Disable drawing to framebuffer (= enable drawing to screen)
+            glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
+
+            // Reset culling to normal
+            glCullFace(GL_BACK);
+
+            // Revert to original viewport
+            glViewport(m_primarySubViewport.x(),
+                       m_primarySubViewport.y(),
+                       m_primarySubViewport.width(),
+                       m_primarySubViewport.height());
         }
-
-        Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
-                                            projectionViewMatrix,
-                                            depthProjectionViewMatrix, m_depthTexture,
-                                            m_shadowQualityToShader);
-
-        // Disable drawing to framebuffer (= enable drawing to screen)
-        glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
-
-        // Reset culling to normal
-        glCullFace(GL_BACK);
-
-        // Revert to original viewport
-        glViewport(m_primarySubViewport.x(),
-                   m_primarySubViewport.y(),
-                   m_primarySubViewport.width(),
-                   m_primarySubViewport.height());
+#endif
+        pointSelectionShader = m_selectionShader;
+    } else {
+        pointSelectionShader = m_pointShader;
     }
 
-    ShaderHelper *pointSelectionShader = m_selectionShader;
-#else
-    ShaderHelper *pointSelectionShader = m_pointShader;
-#endif
     ShaderHelper *selectionShader = m_selectionShader;
 
     // Do position mapping when necessary
@@ -744,8 +738,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 if (itemSize == 0.0f)
                     itemSize = m_dotSizeScale;
 #if !defined(QT_OPENGL_ES_2)
-                if (drawingPoints)
-                    glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+                if (drawingPoints && !m_isOpenGLES)
+                    m_funcs_2_1->glPointSize(itemSize * activeCamera->zoomLevel());
 #endif
                 QVector3D modelScaler(itemSize, itemSize, itemSize);
 
@@ -877,8 +871,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             if (itemSize == 0.0f)
                 itemSize = m_dotSizeScale;
 #if !defined(QT_OPENGL_ES_2)
-            if (drawingPoints)
-                glPointSize(itemSize * activeCamera->zoomLevel()); // Scale points based on zoom
+            if (drawingPoints && !m_isOpenGLES)
+                m_funcs_2_1->glPointSize(itemSize * activeCamera->zoomLevel());
 #endif
             QVector3D modelScaler(itemSize, itemSize, itemSize);
             int gradientImageHeight = cache->gradientImage().height();
@@ -899,11 +893,10 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 previousDrawingPoints = drawingPoints;
                 if (drawingPoints) {
                     if (!optimizationDefault && rangeGradientPoints) {
-#if !defined(QT_OPENGL_ES_2)
-                        dotShader = m_labelShader;
-#else
-                        dotShader = m_staticGradientPointShader;
-#endif
+                        if (m_isOpenGLES)
+                            dotShader = m_staticGradientPointShader;
+                        else
+                            dotShader = m_labelShader;
                     } else {
                         dotShader = pointSelectionShader;
                     }
@@ -938,6 +931,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             int loopCount = 1;
             if (optimizationDefault)
                 loopCount = renderArraySize;
+
             for (int i = 0; i < loopCount; i++) {
                 ScatterRenderItem &item = renderArray[i];
                 if (!item.isVisible() && optimizationDefault)
@@ -1013,8 +1007,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                (item.translation().y() + m_scaleY)
                                                * rangeGradientYScaler);
                 }
-#if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !m_isOpenGLES) {
                     if (!drawingPoints) {
                         // Set shadow shader bindings
                         QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -1037,9 +1030,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                         else
                             m_drawer->drawPoints(dotShader, cache->bufferPoints(), gradientTexture);
                     }
-                } else
-#endif
-                {
+                } else {
                     if (!drawingPoints) {
                         // Set shadowless shader bindings
                         dotShader->setUniformValue(dotShader->lightS(), lightStrength);
@@ -1057,6 +1048,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     }
                 }
             }
+
 
             // Draw the selected item on static optimization
             if (!optimizationDefault && selectedSeries
@@ -1149,8 +1141,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                         glPolygonOffset(-1.0f, 1.0f);
                     }
 
-#if !defined(QT_OPENGL_ES_2)
-                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone
+                            && !m_isOpenGLES) {
                         if (!drawingPoints) {
                             // Set shadow shader bindings
                             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
@@ -1168,9 +1160,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                             // Draw the object
                             m_drawer->drawPoint(selectionShader);
                         }
-                    } else
-#endif
-                    {
+                    } else {
                         if (!drawingPoints) {
                             // Set shadowless shader bindings
                             selectionShader->setUniformValue(selectionShader->lightS(),
@@ -1240,8 +1230,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                             m_cachedTheme->ambientLightStrength() * 2.0f);
         m_backgroundShader->setUniformValue(m_backgroundShader->lightColor(), lightColor);
 
-#if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !m_isOpenGLES) {
             // Set shadow shader bindings
             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
             m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
@@ -1252,9 +1241,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
-        } else
-#endif
-        {
+        } else {
             // Set shadowless shader bindings
             m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
                                                 m_cachedTheme->lightStrength());
@@ -1270,11 +1257,11 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
     QVector3D gridLineScaleY(gridLineWidth, m_scaleYWithBackground, gridLineWidth);
 
     if (m_cachedTheme->isGridEnabled()) {
-#if !(defined QT_OPENGL_ES_2)
-        ShaderHelper *lineShader = m_backgroundShader;
-#else
-        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
-#endif
+        ShaderHelper *lineShader;
+        if (m_isOpenGLES)
+            lineShader = m_selectionShader; // Plain color shader for GL_LINES
+        else
+            lineShader = m_backgroundShader;
 
         // Bind line shader
         lineShader->bind();
@@ -1286,15 +1273,12 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
         lineShader->setUniformValue(lineShader->lightColor(), lightColor);
-#if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !m_isOpenGLES) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
                                         m_cachedTheme->lightStrength() / 20.0f);
-        } else
-#endif
-        {
+        } else {
             // Set shadowless shader bindings
             lineShader->setUniformValue(lineShader->lightS(),
                                         m_cachedTheme->lightStrength() / 2.5f);
@@ -1347,20 +1331,20 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                 itModelMatrix.inverted().transposed());
                     lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                        // Set shadow shader bindings
-                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                        // Draw the object
-                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    if (m_isOpenGLES) {
+                        m_drawer->drawLine(lineShader);
                     } else {
-                        // Draw the object
-                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                            // Set shadow shader bindings
+                            lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                            // Draw the object
+                            m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                        } else {
+                            // Draw the object
+                            m_drawer->drawObject(lineShader, m_gridLineObj);
+                        }
                     }
-#else
-                    m_drawer->drawLine(lineShader);
-#endif
                 }
 
                 // Side wall lines
@@ -1379,13 +1363,13 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     modelMatrix.scale(gridLineScaleY);
                     itModelMatrix.scale(gridLineScaleY);
 
-#if !defined(QT_OPENGL_ES_2)
-                    modelMatrix.rotate(lineYRotation);
-                    itModelMatrix.rotate(lineYRotation);
-#else
-                    modelMatrix.rotate(m_zRightAngleRotation);
-                    itModelMatrix.rotate(m_zRightAngleRotation);
-#endif
+                    if (m_isOpenGLES) {
+                        modelMatrix.rotate(m_zRightAngleRotation);
+                        itModelMatrix.rotate(m_zRightAngleRotation);
+                    } else {
+                        modelMatrix.rotate(lineYRotation);
+                        itModelMatrix.rotate(lineYRotation);
+                    }
 
                     MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1395,29 +1379,28 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                 itModelMatrix.inverted().transposed());
                     lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                        // Set shadow shader bindings
-                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                        // Draw the object
-                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    if (!m_isOpenGLES) {
+                        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                            // Set shadow shader bindings
+                            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                            lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                            // Draw the object
+                            m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                        } else {
+                            // Draw the object
+                            m_drawer->drawObject(lineShader, m_gridLineObj);
+                        }
                     } else {
-                        // Draw the object
-                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                        m_drawer->drawLine(lineShader);
                     }
-#else
-                    m_drawer->drawLine(lineShader);
-#endif
                 }
             }
         }
 
         // Columns (= X)
         if (m_axisCacheX.segmentCount() > 0) {
-#if defined(QT_OPENGL_ES_2)
-            lineXRotation = m_yRightAngleRotation;
-#endif
+            if (m_isOpenGLES)
+                lineXRotation = m_yRightAngleRotation;
             // Floor lines
             int gridLineCount = m_axisCacheX.gridLineCount();
 
@@ -1447,20 +1430,20 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                 itModelMatrix.inverted().transposed());
                     lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                        // Set shadow shader bindings
-                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                        // Draw the object
-                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    if (!m_isOpenGLES) {
+                        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                            // Set shadow shader bindings
+                            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                            lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                            // Draw the object
+                            m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                        } else {
+                            // Draw the object
+                            m_drawer->drawObject(lineShader, m_gridLineObj);
+                        }
                     } else {
-                        // Draw the object
-                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                        m_drawer->drawLine(lineShader);
                     }
-#else
-                    m_drawer->drawLine(lineShader);
-#endif
                 }
 
                 // Back wall lines
@@ -1479,15 +1462,15 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                     modelMatrix.scale(gridLineScaleY);
                     itModelMatrix.scale(gridLineScaleY);
 
-#if !defined(QT_OPENGL_ES_2)
-                    if (m_zFlipped) {
-                        modelMatrix.rotate(m_xFlipRotation);
-                        itModelMatrix.rotate(m_xFlipRotation);
+                    if (m_isOpenGLES) {
+                        modelMatrix.rotate(m_zRightAngleRotation);
+                        itModelMatrix.rotate(m_zRightAngleRotation);
+                    } else {
+                        if (m_zFlipped) {
+                            modelMatrix.rotate(m_xFlipRotation);
+                            itModelMatrix.rotate(m_xFlipRotation);
+                        }
                     }
-#else
-                    modelMatrix.rotate(m_zRightAngleRotation);
-                    itModelMatrix.rotate(m_zRightAngleRotation);
-#endif
 
                     MVPMatrix = projectionViewMatrix * modelMatrix;
 
@@ -1497,20 +1480,20 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                                 itModelMatrix.inverted().transposed());
                     lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                        // Set shadow shader bindings
-                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                        // Draw the object
-                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    if (!m_isOpenGLES) {
+                        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                            // Set shadow shader bindings
+                            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                            lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                            // Draw the object
+                            m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                        } else {
+                            // Draw the object
+                            m_drawer->drawObject(lineShader, m_gridLineObj);
+                        }
                     } else {
-                        // Draw the object
-                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                        m_drawer->drawLine(lineShader);
                     }
-#else
-                    m_drawer->drawLine(lineShader);
-#endif
                 }
             }
         }
@@ -1548,20 +1531,20 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                             itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                if (!m_isOpenGLES) {
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
                 } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    m_drawer->drawLine(lineShader);
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
             }
 
             // Side wall
@@ -1591,20 +1574,20 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                             itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                if (!m_isOpenGLES) {
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
                 } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    m_drawer->drawLine(lineShader);
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
             }
         }
     }
@@ -2214,10 +2197,8 @@ void Scatter3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality qual
 
     handleShadowQualityChange();
 
-#if !defined(QT_OPENGL_ES_2)
     // Re-init depth buffer
     updateDepthBuffer();
-#endif
 }
 
 void Scatter3DRenderer::loadBackgroundMesh()
@@ -2377,41 +2358,45 @@ void Scatter3DRenderer::initSelectionBuffer()
                                                                  m_selectionDepthBuffer);
 }
 
-#if !defined(QT_OPENGL_ES_2)
 void Scatter3DRenderer::initDepthShader()
 {
-    if (m_depthShader)
-        delete m_depthShader;
-    m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
-                                     QStringLiteral(":/shaders/fragmentDepth"));
-    m_depthShader->initialize();
+    if (!m_isOpenGLES) {
+        if (m_depthShader)
+            delete m_depthShader;
+        m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
+                                         QStringLiteral(":/shaders/fragmentDepth"));
+        m_depthShader->initialize();
+    }
 }
 
 void Scatter3DRenderer::updateDepthBuffer()
 {
-    m_textureHelper->deleteTexture(&m_depthTexture);
+    if (!m_isOpenGLES) {
+        m_textureHelper->deleteTexture(&m_depthTexture);
 
-    if (m_primarySubViewport.size().isEmpty())
-        return;
+        if (m_primarySubViewport.size().isEmpty())
+            return;
 
-    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
-                                                                        m_depthFrameBuffer,
-                                                                        m_shadowQualityMultiplier);
-        if (!m_depthTexture)
-            lowerShadowQuality();
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
+                                                                            m_depthFrameBuffer,
+                                                                            m_shadowQualityMultiplier);
+            if (!m_depthTexture)
+                lowerShadowQuality();
+        }
     }
 }
-#else
+
 void Scatter3DRenderer::initPointShader()
 {
-    if (m_pointShader)
-        delete m_pointShader;
-    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPointES2"),
-                                     QStringLiteral(":/shaders/fragmentPlainColor"));
-    m_pointShader->initialize();
+    if (m_isOpenGLES) {
+        if (m_pointShader)
+            delete m_pointShader;
+        m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexPointES2"),
+                                         QStringLiteral(":/shaders/fragmentPlainColor"));
+        m_pointShader->initialize();
+    }
 }
-#endif
 
 void Scatter3DRenderer::initBackgroundShaders(const QString &vertexShader,
                                               const QString &fragmentShader)

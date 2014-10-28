@@ -48,21 +48,17 @@ class TextureHelper : protected QOpenGLFunctions
     // Ownership of created texture is transferred to caller
     GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false,
                            bool convert = true, bool smoothScale = true, bool clampY = false);
-#if !defined(QT_OPENGL_ES_2)
     GLuint create3DTexture(const QVector<uchar> *data, int width, int height, int depth,
                            QImage::Format dataFormat);
-#endif
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
     // Returns selection texture and inserts generated framebuffers to framebuffer parameters
     GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
     GLuint createCursorPositionTexture(const QSize &size, GLuint &frameBuffer);
     GLuint createUniformTexture(const QColor &color);
     GLuint createGradientTexture(const QLinearGradient &gradient);
-#if !defined(QT_OPENGL_ES_2)
     GLuint createDepthTexture(const QSize &size, GLuint textureSize);
     // Returns depth texture and inserts generated framebuffer to parameter
     GLuint createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize);
-#endif
     void deleteTexture(GLuint *texture);
 
     private:
@@ -71,7 +67,7 @@ class TextureHelper : protected QOpenGLFunctions
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
 
 #if !defined(QT_OPENGL_ES_2)
-    QOpenGLFunctions_2_1 *m_openGlFunctions_2_1;
+    QOpenGLFunctions_2_1 *m_openGlFunctions_2_1; // Not owned
 #endif
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;

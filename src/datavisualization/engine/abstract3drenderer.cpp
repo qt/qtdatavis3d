@@ -33,6 +33,9 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+// Defined in shaderhelper.cpp
+extern void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg);
+
 const qreal doublePi(M_PI * 2.0);
 const int polarGridRoundness(64);
 const qreal polarGridAngle(doublePi / qreal(polarGridRoundness));
@@ -104,9 +107,28 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_oldCameraTarget(QVector3D(2000.0f, 2000.0f, 2000.0f)), // Just random invalid target
       m_reflectionEnabled(false),
       m_reflectivity(0.5),
+#if !defined(QT_OPENGL_ES_2)
+      m_funcs_2_1(0),
+#endif
       m_context(0),
-      m_dummySurfaceAtDelete(0)
+      m_dummySurfaceAtDelete(0),
+      m_isOpenGLES(true)
+
 {
+    initializeOpenGLFunctions();
+    m_isOpenGLES = Utils::isOpenGLES();
+#if !defined(QT_OPENGL_ES_2)
+    if (!m_isOpenGLES) {
+        // Discard warnings about deprecated functions
+        QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
+
+        m_funcs_2_1 = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_2_1>();
+        m_funcs_2_1->initializeOpenGLFunctions();
+
+        // Restore original message handler
+        qInstallMessageHandler(handler);
+    }
+#endif
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);
     QObject::connect(this, &Abstract3DRenderer::needRender, controller,
                      &Abstract3DController::needRender, Qt::QueuedConnection);
@@ -174,9 +196,11 @@ void Abstract3DRenderer::initializeOpenGL()
     glCullFace(GL_BACK);
 
 #if !defined(QT_OPENGL_ES_2)
-    glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
-    glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
-    glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    if (!m_isOpenGLES) {
+        glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
+        glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);
+        glHint(GL_POLYGON_SMOOTH_HINT, GL_NICEST);
+    }
 #endif
 
     m_textureHelper = new TextureHelper();
@@ -381,91 +405,89 @@ void Abstract3DRenderer::updateTextures()
 
 void Abstract3DRenderer::reInitShaders()
 {
-#if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-        if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
-                && qobject_cast<Scatter3DRenderer *>(this)) {
-            initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                QStringLiteral(":/shaders/fragmentShadow"));
-            initStaticSelectedItemShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                          QStringLiteral(":/shaders/fragmentShadowNoTex"),
-                                          QStringLiteral(":/shaders/vertexShadow"),
-                                          QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-            initShaders(QStringLiteral(":/shaders/vertexShadowNoMatrices"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
+    if (!m_isOpenGLES) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
+                    && qobject_cast<Scatter3DRenderer *>(this)) {
+                initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                    QStringLiteral(":/shaders/fragmentShadow"));
+                initStaticSelectedItemShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                              QStringLiteral(":/shaders/fragmentShadowNoTex"),
+                                              QStringLiteral(":/shaders/vertexShadow"),
+                                              QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+                initShaders(QStringLiteral(":/shaders/vertexShadowNoMatrices"),
+                            QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            } else {
+                initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                    QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
+                initShaders(QStringLiteral(":/shaders/vertexShadow"),
+                            QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            }
+            initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                  QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            initCustomItemShaders(QStringLiteral(":/shaders/vertexShadow"),
+                                  QStringLiteral(":/shaders/fragmentShadow"));
         } else {
-            initGradientShaders(QStringLiteral(":/shaders/vertexShadow"),
-                                QStringLiteral(":/shaders/fragmentShadowNoTexColorOnY"));
-            initShaders(QStringLiteral(":/shaders/vertexShadow"),
-                        QStringLiteral(":/shaders/fragmentShadowNoTex"));
+            if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
+                    && qobject_cast<Scatter3DRenderer *>(this)) {
+                initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
+                                    QStringLiteral(":/shaders/fragmentTexture"));
+                initStaticSelectedItemShaders(QStringLiteral(":/shaders/vertex"),
+                                              QStringLiteral(":/shaders/fragment"),
+                                              QStringLiteral(":/shaders/vertex"),
+                                              QStringLiteral(":/shaders/fragmentColorOnY"));
+                initShaders(QStringLiteral(":/shaders/vertexNoMatrices"),
+                            QStringLiteral(":/shaders/fragment"));
+            } else {
+                initGradientShaders(QStringLiteral(":/shaders/vertex"),
+                                    QStringLiteral(":/shaders/fragmentColorOnY"));
+                initShaders(QStringLiteral(":/shaders/vertex"),
+                            QStringLiteral(":/shaders/fragment"));
+            }
+            initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
+                                  QStringLiteral(":/shaders/fragment"));
+            initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
+                                  QStringLiteral(":/shaders/fragmentTexture"));
         }
-        initBackgroundShaders(QStringLiteral(":/shaders/vertexShadow"),
-                              QStringLiteral(":/shaders/fragmentShadowNoTex"));
-        initCustomItemShaders(QStringLiteral(":/shaders/vertexShadow"),
-                              QStringLiteral(":/shaders/fragmentShadow"));
-    } else {
+        initVolumeTextureShaders(QStringLiteral(":/shaders/vertexTexture3D"),
+                                 QStringLiteral(":/shaders/fragmentTexture3D"),
+                                 QStringLiteral(":/shaders/fragmentTexture3DLowDef"),
+                                 QStringLiteral(":/shaders/fragmentTexture3DSlice"),
+                                 QStringLiteral(":/shaders/vertexPosition"),
+                                 QStringLiteral(":/shaders/fragment3DSliceFrames"));
+    } else  {
         if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
                 && qobject_cast<Scatter3DRenderer *>(this)) {
             initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
-                                QStringLiteral(":/shaders/fragmentTexture"));
+                                QStringLiteral(":/shaders/fragmentTextureES2"));
             initStaticSelectedItemShaders(QStringLiteral(":/shaders/vertex"),
-                                          QStringLiteral(":/shaders/fragment"),
+                                          QStringLiteral(":/shaders/fragmentES2"),
                                           QStringLiteral(":/shaders/vertex"),
-                                          QStringLiteral(":/shaders/fragmentColorOnY"));
-            initShaders(QStringLiteral(":/shaders/vertexNoMatrices"),
-                        QStringLiteral(":/shaders/fragment"));
+                                          QStringLiteral(":/shaders/fragmentColorOnYES2"));
+            initBackgroundShaders(QStringLiteral(":/shaders/vertexNoMatrices"),
+                                  QStringLiteral(":/shaders/fragmentES2"));
         } else {
             initGradientShaders(QStringLiteral(":/shaders/vertex"),
-                                QStringLiteral(":/shaders/fragmentColorOnY"));
+                                QStringLiteral(":/shaders/fragmentColorOnYES2"));
             initShaders(QStringLiteral(":/shaders/vertex"),
-                        QStringLiteral(":/shaders/fragment"));
+                        QStringLiteral(":/shaders/fragmentES2"));
         }
         initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                              QStringLiteral(":/shaders/fragment"));
-        initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
-                              QStringLiteral(":/shaders/fragmentTexture"));
-    }
-    initVolumeTextureShaders(QStringLiteral(":/shaders/vertexTexture3D"),
-                             QStringLiteral(":/shaders/fragmentTexture3D"),
-                             QStringLiteral(":/shaders/fragmentTexture3DLowDef"),
-                             QStringLiteral(":/shaders/fragmentTexture3DSlice"),
-                             QStringLiteral(":/shaders/vertexPosition"),
-                             QStringLiteral(":/shaders/fragment3DSliceFrames"));
-#else
-    if (m_cachedOptimizationHint.testFlag(QAbstract3DGraph::OptimizationStatic)
-            && qobject_cast<Scatter3DRenderer *>(this)) {
-        initGradientShaders(QStringLiteral(":/shaders/vertexTexture"),
-                            QStringLiteral(":/shaders/fragmentTextureES2"));
-        initStaticSelectedItemShaders(QStringLiteral(":/shaders/vertex"),
-                                      QStringLiteral(":/shaders/fragmentES2"),
-                                      QStringLiteral(":/shaders/vertex"),
-                                      QStringLiteral(":/shaders/fragmentColorOnYES2"));
-        initBackgroundShaders(QStringLiteral(":/shaders/vertexNoMatrices"),
                               QStringLiteral(":/shaders/fragmentES2"));
-    } else {
-        initGradientShaders(QStringLiteral(":/shaders/vertex"),
-                            QStringLiteral(":/shaders/fragmentColorOnYES2"));
-        initShaders(QStringLiteral(":/shaders/vertex"),
-                    QStringLiteral(":/shaders/fragmentES2"));
+        initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
+                              QStringLiteral(":/shaders/fragmentTextureES2"));
     }
-    initBackgroundShaders(QStringLiteral(":/shaders/vertex"),
-                          QStringLiteral(":/shaders/fragmentES2"));
-    initCustomItemShaders(QStringLiteral(":/shaders/vertexTexture"),
-                          QStringLiteral(":/shaders/fragmentTextureES2"));
-#endif
 }
 
 void Abstract3DRenderer::handleShadowQualityChange()
 {
     reInitShaders();
 
-#if defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality != QAbstract3DGraph::ShadowQualityNone) {
+    if (m_isOpenGLES && m_cachedShadowQuality != QAbstract3DGraph::ShadowQualityNone) {
         emit requestShadowQuality(QAbstract3DGraph::ShadowQualityNone);
         qWarning("Shadows are not yet supported for OpenGL ES2");
         m_cachedShadowQuality = QAbstract3DGraph::ShadowQualityNone;
     }
-#endif
 }
 
 void Abstract3DRenderer::updateSelectionMode(QAbstract3DGraph::SelectionFlags mode)
@@ -523,10 +545,8 @@ void Abstract3DRenderer::handleResize()
     // Re-init selection buffer
     initSelectionBuffer();
 
-#if !defined(QT_OPENGL_ES_2)
     // Re-init depth buffer
     updateDepthBuffer();
-#endif
 
     initCursorPositionBuffer();
 }
@@ -1111,8 +1131,7 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         newItem->setOrigScaling(scaling);
         // Check if facing camera
         facingCamera = labelItem->isFacingCamera();
-#if !defined(QT_OPENGL_ES_2)
-    } else if (item->d_ptr->m_isVolumeItem) {
+    } else if (item->d_ptr->m_isVolumeItem && !m_isOpenGLES) {
         QCustom3DVolume *volumeItem = static_cast<QCustom3DVolume *>(item);
         newItem->setTextureWidth(volumeItem->textureWidth());
         newItem->setTextureHeight(volumeItem->textureHeight());
@@ -1140,14 +1159,12 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
         newItem->setSliceFrameWidths(volumeItem->sliceFrameWidths());
         newItem->setSliceFrameGaps(volumeItem->sliceFrameGaps());
         newItem->setSliceFrameThicknesses(volumeItem->sliceFrameThicknesses());
-#endif
     }
     recalculateCustomItemScalingAndPos(newItem);
     newItem->setRotation(item->rotation());
-#if !defined(QT_OPENGL_ES_2)
+
     // In OpenGL ES we simply draw volumes as regular custom item placeholders.
-    if (!item->d_ptr->m_isVolumeItem)
-#endif
+    if (!item->d_ptr->m_isVolumeItem || m_isOpenGLES)
     {
         newItem->setBlendNeeded(textureImage.hasAlphaChannel());
         texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
@@ -1291,17 +1308,13 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
                                                       m_cachedTheme->isLabelBorderEnabled());
                 textureImage = item->d_ptr->textureImage();
             }
-        } else
-#if !defined(QT_OPENGL_ES_2)
-            if (!item->d_ptr->m_isVolumeItem)
-#endif
-            {
-                renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
-                GLuint oldTexture = renderItem->texture();
-                m_textureHelper->deleteTexture(&oldTexture);
-                GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
-                renderItem->setTexture(texture);
-            }
+        } else if (!item->d_ptr->m_isVolumeItem || m_isOpenGLES) {
+            renderItem->setBlendNeeded(textureImage.hasAlphaChannel());
+            GLuint oldTexture = renderItem->texture();
+            m_textureHelper->deleteTexture(&oldTexture);
+            GLuint texture = m_textureHelper->create2DTexture(textureImage, true, true, true);
+            renderItem->setTexture(texture);
+        }
         item->d_ptr->clearTextureImage();
         item->d_ptr->m_dirtyBits.textureDirty = false;
     }
@@ -1319,8 +1332,7 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             renderItem->setFacingCamera(labelItem->isFacingCamera());
             labelItem->dptr()->m_facingCameraDirty = false;
         }
-#if !defined(QT_OPENGL_ES_2)
-    } else if (item->d_ptr->m_isVolumeItem) {
+    } else if (item->d_ptr->m_isVolumeItem && !m_isOpenGLES) {
         QCustom3DVolume *volumeItem = static_cast<QCustom3DVolume *>(item);
         if (volumeItem->dptr()->m_dirtyBitsVolume.colorTableDirty) {
             renderItem->setColorTable(volumeItem->colorTable());
@@ -1366,7 +1378,6 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
             renderItem->setUseHighDefShader(volumeItem->useHighDefShader());
             volumeItem->dptr()->m_dirtyBitsVolume.shaderDirty = false;
         }
-#endif
     }
 }
 
@@ -1481,8 +1492,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
             if (RenderingNormal == state) {
                 // Normal render
                 ShaderHelper *prevShader = shader;
-#if !defined(QT_OPENGL_ES_2)
-                if (item->isVolume()) {
+                if (item->isVolume() && !m_isOpenGLES) {
                     if (item->drawSlices() &&
                             (item->sliceIndexX() >= 0
                              || item->sliceIndexY() >= 0
@@ -1493,12 +1503,11 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                     } else {
                         shader = m_volumeTextureLowDefShader;
                     }
-                } else
-#endif
-                if (item->isLabel())
+                } else if (item->isLabel()) {
                     shader = m_labelShader;
-                else
+                } else {
                     shader = regularShader;
+                }
                 if (shader != prevShader)
                     shader->bind();
                 shader->setUniformValue(shader->model(), modelMatrix);
@@ -1508,31 +1517,23 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                 if (item->isBlendNeeded()) {
                     glEnable(GL_BLEND);
                     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
-#if !defined(QT_OPENGL_ES_2)
-                    if (!item->isVolume())
-#endif
+                    if (!item->isVolume() && !m_isOpenGLES)
                         glDisable(GL_CULL_FACE);
                 } else {
                     glDisable(GL_BLEND);
                     glEnable(GL_CULL_FACE);
                 }
 
-#if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !item->isVolume()) {
+                if (!m_isOpenGLES && m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone
+                        && !item->isVolume()) {
                     // Set shadow shader bindings
                     shader->setUniformValue(shader->shadowQ(), shadowQuality);
                     shader->setUniformValue(shader->depth(), depthProjectionViewMatrix * modelMatrix);
                     shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength() / 10.0f);
                     m_drawer->drawObject(shader, item->mesh(), item->texture(), depthTexture);
-                } else
-#else
-                Q_UNUSED(depthTexture)
-                Q_UNUSED(shadowQuality)
-#endif
-                {
+                } else {
                     // Set shadowless shader bindings
-#if !defined(QT_OPENGL_ES_2)
-                    if (item->isVolume()) {
+                    if (item->isVolume() && !m_isOpenGLES) {
                         QVector3D cameraPos = m_cachedScene->activeCamera()->position();
                         cameraPos = MVPMatrix.inverted().map(cameraPos);
                         // Adjust camera position according to min/max bounds
@@ -1598,9 +1599,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                             shader->bind();
                         }
                         m_drawer->drawObject(shader, item->mesh(), 0, 0, item->texture());
-                    } else
-#endif
-                    {
+                    } else {
                         shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
                         m_drawer->drawObject(shader, item->mesh(), item->texture());
                     }
@@ -1823,9 +1822,6 @@ void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePo
                                         const QMatrix4x4 &projectionViewMatrix,
                                         const QMatrix4x4 &depthMatrix)
 {
-#if defined(QT_OPENGL_ES_2)
-    Q_UNUSED(depthMatrix)
-#endif
     static QVector<QQuaternion> lineRotations;
     if (!lineRotations.size()) {
         lineRotations.resize(polarGridRoundness);
@@ -1865,20 +1861,20 @@ void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePo
             shader->setUniformValue(shader->model(), modelMatrix);
             shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
             shader->setUniformValue(shader->MVP(), MVPMatrix);
-#if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                // Set shadow shader bindings
-                QMatrix4x4 depthMVPMatrix = depthMatrix * modelMatrix;
-                shader->setUniformValue(shader->depth(), depthMVPMatrix);
-                // Draw the object
-                m_drawer->drawObject(shader, m_gridLineObj, 0, m_depthTexture);
+            if (!m_isOpenGLES) {
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                    // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthMatrix * modelMatrix;
+                    shader->setUniformValue(shader->depth(), depthMVPMatrix);
+                    // Draw the object
+                    m_drawer->drawObject(shader, m_gridLineObj, 0, m_depthTexture);
+                } else {
+                    // Draw the object
+                    m_drawer->drawObject(shader, m_gridLineObj);
+                }
             } else {
-                // Draw the object
-                m_drawer->drawObject(shader, m_gridLineObj);
+                m_drawer->drawLine(shader);
             }
-#else
-            m_drawer->drawLine(shader);
-#endif
         }
     }
 }
@@ -1887,9 +1883,6 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
                                          const QMatrix4x4 &projectionViewMatrix,
                                          const QMatrix4x4 &depthMatrix)
 {
-#if defined(QT_OPENGL_ES_2)
-    Q_UNUSED(depthMatrix)
-#endif
     float halfRatio((m_polarRadius + (labelMargin / 2.0f)) / 2.0f);
     QVector3D gridLineScaler(gridLineWidth, gridLineWidth, halfRatio);
     int gridLineCount = m_axisCacheX.gridLineCount();
@@ -1897,11 +1890,11 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
     const QVector<float> &subGridPositions = m_axisCacheX.formatter()->subGridPositions();
     int mainSize = gridPositions.size();
     QVector3D translateVector(0.0f, yFloorLinePos, -halfRatio);
-#if defined(QT_OPENGL_ES_2)
-    QQuaternion finalRotation = m_yRightAngleRotationNeg;
-#else
-    QQuaternion finalRotation = m_xRightAngleRotationNeg;
-#endif
+    QQuaternion finalRotation;
+    if (m_isOpenGLES)
+        finalRotation = m_yRightAngleRotationNeg;
+    else
+        finalRotation = m_xRightAngleRotationNeg;
     if (m_yFlippedForGrid)
         finalRotation *= m_xFlipRotation;
     for (int i = 0; i < gridLineCount; i++) {
@@ -1922,20 +1915,20 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
         shader->setUniformValue(shader->model(), modelMatrix);
         shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
         shader->setUniformValue(shader->MVP(), MVPMatrix);
-#if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-            // Set shadow shader bindings
-            QMatrix4x4 depthMVPMatrix = depthMatrix * modelMatrix;
-            shader->setUniformValue(shader->depth(), depthMVPMatrix);
-            // Draw the object
-            m_drawer->drawObject(shader, m_gridLineObj, 0, m_depthTexture);
+        if (m_isOpenGLES) {
+            m_drawer->drawLine(shader);
         } else {
-            // Draw the object
-            m_drawer->drawObject(shader, m_gridLineObj);
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                // Set shadow shader bindings
+                QMatrix4x4 depthMVPMatrix = depthMatrix * modelMatrix;
+                shader->setUniformValue(shader->depth(), depthMVPMatrix);
+                // Draw the object
+                m_drawer->drawObject(shader, m_gridLineObj, 0, m_depthTexture);
+            } else {
+                // Draw the object
+                m_drawer->drawObject(shader, m_gridLineObj);
+            }
         }
-#else
-        m_drawer->drawLine(shader);
-#endif
     }
 }
 

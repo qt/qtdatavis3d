@@ -17,6 +17,7 @@
 ****************************************************************************/
 
 #include "utils_p.h"
+#include "qutils.h"
 
 #include <QtGui/QPainter>
 
@@ -55,65 +56,58 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                                const QColor &txtColor, bool labelBackground,
                                bool borders, int maxLabelWidth)
 {
-    if (maxTextureSize == 0)
-        glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-
+    if (maxTextureSize == 0) {
+        QOpenGLContext::currentContext()->functions()->glGetIntegerv(
+                    GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+    }
     GLuint paddingWidth = 20;
-#if !defined(QT_OPENGL_ES_2) // TODO fix ifdef for dynamic OpenGL
     GLuint paddingHeight = 20;
-#endif
+    GLuint prePadding = 20;
+    GLint targetWidth = maxTextureSize;
+
     // Calculate text dimensions
     QFont valueFont = font;
     valueFont.setPointSize(textureFontSize);
     QFontMetrics valueFM(valueFont);
     int valueStrWidth = valueFM.width(text);
-#if defined(QT_OPENGL_ES_2)
+
     // ES2 needs to use maxLabelWidth always (when given) because of the power of 2 -issue.
-    if (maxLabelWidth)
-#else
-    if (maxLabelWidth && labelBackground)
-#endif
+    if (maxLabelWidth && (labelBackground || Utils::isOpenGLES()))
         valueStrWidth = maxLabelWidth;
     int valueStrHeight = valueFM.height();
     valueStrWidth += paddingWidth / 2; // Fix clipping problem with skewed fonts (italic or italic-style)
     QSize labelSize;
     qreal fontRatio = 1.0;
 
-#if defined(QT_OPENGL_ES_2) // TODO fix ifdef for dynamic OpenGL
-    // Test if text with slighly smaller font would fit into one step smaller texture
-    // ie. if the text is just exceeded the smaller texture boundary, it would
-    // make a label with large empty space
-    GLuint prePadding = 20;
-    GLint targetWidth = maxTextureSize;
-    uint testWidth = getNearestPowerOfTwo(valueStrWidth + prePadding) >> 1;
-    int diffToFit = (valueStrWidth + prePadding) - testWidth;
-    int maxSqueeze = int((valueStrWidth + prePadding) * 0.1f);
-    if (diffToFit < maxSqueeze && maxTextureSize > GLint(testWidth))
-        targetWidth = testWidth;
-#endif
+    if (Utils::isOpenGLES()) {
+        // Test if text with slighly smaller font would fit into one step smaller texture
+        // ie. if the text is just exceeded the smaller texture boundary, it would
+        // make a label with large empty space
+        uint testWidth = getNearestPowerOfTwo(valueStrWidth + prePadding) >> 1;
+        int diffToFit = (valueStrWidth + prePadding) - testWidth;
+        int maxSqueeze = int((valueStrWidth + prePadding) * 0.1f);
+        if (diffToFit < maxSqueeze && maxTextureSize > GLint(testWidth))
+            targetWidth = testWidth;
+    }
 
     bool sizeOk = false;
     int currentFontSize = textureFontSize;
     do {
-#if defined(QT_OPENGL_ES_2) // TODO fix ifdef for dynamic OpenGL
-        // ES2 can't handle textures with dimensions not in power of 2. Resize labels accordingly.
-        // Add some padding before converting to power of two to avoid too tight fit
-        labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
-        labelSize.setWidth(getNearestPowerOfTwo(labelSize.width()));
-        labelSize.setHeight(getNearestPowerOfTwo(labelSize.height()));
-#else
-        if (!labelBackground)
-            labelSize = QSize(valueStrWidth, valueStrHeight);
-        else
-            labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
-#endif
+        if (Utils::isOpenGLES()) {
+            // ES2 can't handle textures with dimensions not in power of 2. Resize labels accordingly.
+            // Add some padding before converting to power of two to avoid too tight fit
+            labelSize = QSize(valueStrWidth + prePadding, valueStrHeight + prePadding);
+            labelSize.setWidth(getNearestPowerOfTwo(labelSize.width()));
+            labelSize.setHeight(getNearestPowerOfTwo(labelSize.height()));
+        } else {
+            if (!labelBackground)
+                labelSize = QSize(valueStrWidth, valueStrHeight);
+            else
+                labelSize = QSize(valueStrWidth + paddingWidth * 2, valueStrHeight + paddingHeight * 2);
+        }
 
-#if defined(QT_OPENGL_ES_2)
         if (!maxTextureSize || (labelSize.width() <= maxTextureSize
-                                && labelSize.width() <= targetWidth)) {
-#else
-        if (!maxTextureSize || labelSize.width() <= maxTextureSize) {
-#endif
+                                && (labelSize.width() <= targetWidth || !Utils::isOpenGLES()))) {
             // Make sure the label is not too wide
             sizeOk = true;
         } else if (--currentFontSize == 4) {
@@ -124,11 +118,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
             // Reduce font size and try again
             valueFont.setPointSize(currentFontSize);
             QFontMetrics currentValueFM(valueFont);
-#if defined(QT_OPENGL_ES_2)
-            if (maxLabelWidth)
-#else
-            if (maxLabelWidth && labelBackground)
-#endif
+            if (maxLabelWidth && (labelBackground || Utils::isOpenGLES()))
                 valueStrWidth = maxLabelWidth * fontRatio;
             else
                 valueStrWidth = currentValueFM.width(text);
@@ -149,18 +139,18 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
     painter.setFont(valueFont);
     if (!labelBackground) {
         painter.setPen(txtColor);
-#if defined(QT_OPENGL_ES_2)
-        painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
-                         (labelSize.height() - valueStrHeight) / 2.0f,
-                         valueStrWidth, valueStrHeight,
-                         Qt::AlignCenter | Qt::AlignVCenter,
-                         text);
-#else
-        painter.drawText(0, 0,
-                         valueStrWidth, valueStrHeight,
-                         Qt::AlignCenter | Qt::AlignVCenter,
-                         text);
-#endif
+        if (Utils::isOpenGLES()) {
+            painter.drawText((labelSize.width() - valueStrWidth) / 2.0f,
+                             (labelSize.height() - valueStrHeight) / 2.0f,
+                             valueStrWidth, valueStrHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter,
+                             text);
+        } else {
+            painter.drawText(0, 0,
+                             valueStrWidth, valueStrHeight,
+                             Qt::AlignCenter | Qt::AlignVCenter,
+                             text);
+        }
     } else {
         painter.setBrush(QBrush(bgrColor));
         qreal radius = 10.0 * fontRatio;
@@ -189,8 +179,9 @@ QVector4D Utils::getSelection(QPoint mousepos, int height)
     // This is the only one that works with OpenGL ES 2.0, so we're forced to use it
     // Item count will be limited to 256*256*256
     GLubyte pixel[4] = {255, 255, 255, 255};
-    glReadPixels(mousepos.x(), height - mousepos.y(), 1, 1, GL_RGBA, GL_UNSIGNED_BYTE,
-                 (void *)pixel);
+    QOpenGLContext::currentContext()->functions()->glReadPixels(mousepos.x(), height - mousepos.y(),
+                                                                1, 1, GL_RGBA, GL_UNSIGNED_BYTE,
+                                                                (void *)pixel);
     QVector4D selectedColor(pixel[0], pixel[1], pixel[2], pixel[3]);
     return selectedColor;
 }
@@ -320,6 +311,43 @@ QQuaternion Utils::calculateRotation(const QVector3D &xyzRotations)
     QQuaternion rotQuatZ = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, xyzRotations.z());
     QQuaternion totalRotation = rotQuatY * rotQuatZ * rotQuatX;
     return totalRotation;
+}
+
+bool Utils::isOpenGLES()
+{
+#if defined(QT_OPENGL_ES_2)
+    return true;
+#elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+    return false;
+#else
+    static bool resolved = false;
+    static bool isES = false;
+    if (!resolved) {
+        QOpenGLContext *ctx = QOpenGLContext::currentContext();
+        QWindow *dummySurface = 0;
+        if (!ctx) {
+            QSurfaceFormat surfaceFormat = qDefaultSurfaceFormat();
+            dummySurface = new QWindow();
+            dummySurface->setSurfaceType(QWindow::OpenGLSurface);
+            dummySurface->setFormat(surfaceFormat);
+            dummySurface->create();
+            ctx = new QOpenGLContext;
+            ctx->setFormat(surfaceFormat);
+            ctx->create();
+            ctx->makeCurrent(dummySurface);
+        }
+
+        isES = ctx->isOpenGLES();
+        resolved = true;
+
+        if (dummySurface) {
+            ctx->doneCurrent();
+            delete ctx;
+            delete dummySurface;
+        }
+    }
+    return isES;
+#endif
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -29,6 +29,7 @@
 #include <QtWidgets/QRadioButton>
 #include <QtWidgets/QSlider>
 #include <QtCore/QDebug>
+#include <QtGui/QOpenGLContext>
 
 using namespace QtDataVisualization;
 
@@ -52,6 +53,17 @@ const int underWaterGroundColorsMax(underWaterGroundColorsMin + layerColorThickn
 const int waterColorsMin(underWaterGroundColorsMax + 1);
 const int waterColorsMax(waterColorsMin + layerColorThickness);
 const int terrainTransparency(12);
+
+static bool isOpenGLES()
+{
+#if defined(QT_OPENGL_ES_2)
+    return true;
+#elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+    return false;
+#else
+    return QOpenGLContext::currentContext()->isOpenGLES();
+#endif
+}
 
 VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     : m_graph(scatter),
@@ -93,117 +105,117 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
 
     toggleAreaAll(true);
 
-#if !defined(QT_OPENGL_ES_2)
-    m_lowDetailData = new QVector<uchar>(lowDetailSize * lowDetailSize * lowDetailSize / 2);
-    m_mediumDetailData = new QVector<uchar>(mediumDetailSize * mediumDetailSize * mediumDetailSize / 2);
-    m_highDetailData = new QVector<uchar>(highDetailSize * highDetailSize * highDetailSize / 2);
+    if (!isOpenGLES()) {
+        m_lowDetailData = new QVector<uchar>(lowDetailSize * lowDetailSize * lowDetailSize / 2);
+        m_mediumDetailData = new QVector<uchar>(mediumDetailSize * mediumDetailSize * mediumDetailSize / 2);
+        m_highDetailData = new QVector<uchar>(highDetailSize * highDetailSize * highDetailSize / 2);
 
-    initHeightMap(QStringLiteral(":/heightmaps/layer_ground.png"), m_groundLayer);
-    initHeightMap(QStringLiteral(":/heightmaps/layer_water.png"), m_waterLayer);
-    initHeightMap(QStringLiteral(":/heightmaps/layer_magma.png"), m_magmaLayer);
+        initHeightMap(QStringLiteral(":/heightmaps/layer_ground.png"), m_groundLayer);
+        initHeightMap(QStringLiteral(":/heightmaps/layer_water.png"), m_waterLayer);
+        initHeightMap(QStringLiteral(":/heightmaps/layer_magma.png"), m_magmaLayer);
 
-    initMineShaftArray();
+        initMineShaftArray();
 
-    createVolume(lowDetailSize, 0, lowDetailSize, m_lowDetailData);
-    excavateMineShaft(lowDetailSize, 0, m_mineShaftArray.size(), m_lowDetailData);
+        createVolume(lowDetailSize, 0, lowDetailSize, m_lowDetailData);
+        excavateMineShaft(lowDetailSize, 0, m_mineShaftArray.size(), m_lowDetailData);
 
-    //! [0]
-    m_volumeItem = new QCustom3DVolume;
-    // Adjust water level to zero with a minor tweak to y-coordinate position and scaling
-    m_volumeItem->setScaling(
-                QVector3D(m_graph->axisX()->max() - m_graph->axisX()->min(),
-                          (m_graph->axisY()->max() - m_graph->axisY()->min()) * 0.91f,
-                          m_graph->axisZ()->max() - m_graph->axisZ()->min()));
-    m_volumeItem->setPosition(
-                QVector3D((m_graph->axisX()->max() + m_graph->axisX()->min()) / 2.0f,
-                          -0.045f * (m_graph->axisY()->max() - m_graph->axisY()->min()) +
-                          (m_graph->axisY()->max() + m_graph->axisY()->min()) / 2.0f,
-                          (m_graph->axisZ()->max() + m_graph->axisZ()->min()) / 2.0f));
-    m_volumeItem->setScalingAbsolute(false);
-    //! [0]
-    //! [1]
-    m_volumeItem->setTextureWidth(lowDetailSize);
-    m_volumeItem->setTextureHeight(lowDetailSize / 2);
-    m_volumeItem->setTextureDepth(lowDetailSize);
-    m_volumeItem->setTextureFormat(QImage::Format_Indexed8);
-    m_volumeItem->setTextureData(new QVector<uchar>(*m_lowDetailData));
-    //! [1]
+        //! [0]
+        m_volumeItem = new QCustom3DVolume;
+        // Adjust water level to zero with a minor tweak to y-coordinate position and scaling
+        m_volumeItem->setScaling(
+                    QVector3D(m_graph->axisX()->max() - m_graph->axisX()->min(),
+                              (m_graph->axisY()->max() - m_graph->axisY()->min()) * 0.91f,
+                              m_graph->axisZ()->max() - m_graph->axisZ()->min()));
+        m_volumeItem->setPosition(
+                    QVector3D((m_graph->axisX()->max() + m_graph->axisX()->min()) / 2.0f,
+                              -0.045f * (m_graph->axisY()->max() - m_graph->axisY()->min()) +
+                              (m_graph->axisY()->max() + m_graph->axisY()->min()) / 2.0f,
+                              (m_graph->axisZ()->max() + m_graph->axisZ()->min()) / 2.0f));
+        m_volumeItem->setScalingAbsolute(false);
+        //! [0]
+        //! [1]
+        m_volumeItem->setTextureWidth(lowDetailSize);
+        m_volumeItem->setTextureHeight(lowDetailSize / 2);
+        m_volumeItem->setTextureDepth(lowDetailSize);
+        m_volumeItem->setTextureFormat(QImage::Format_Indexed8);
+        m_volumeItem->setTextureData(new QVector<uchar>(*m_lowDetailData));
+        //! [1]
 
-    // Generate color tables.
-    m_colorTable1.resize(colorTableSize);
-    m_colorTable2.resize(colorTableSize);
+        // Generate color tables.
+        m_colorTable1.resize(colorTableSize);
+        m_colorTable2.resize(colorTableSize);
 
-    for (int i = 0; i < colorTableSize - 2; i++) {
-        if (i < magmaColorsMax) {
-            m_colorTable1[i] = qRgba(130 - (i * 2), 0, 0, 255);
-        } else if (i < aboveWaterGroundColorsMax) {
-            m_colorTable1[i] = qRgba((i - magmaColorsMax) * 4,
-                                     ((i - magmaColorsMax) * 2) + 120,
-                                     (i - magmaColorsMax) * 5, terrainTransparency);
-        } else if (i < underWaterGroundColorsMax) {
-            m_colorTable1[i] = qRgba(((layerColorThickness - i - aboveWaterGroundColorsMax)) + 70,
-                                     ((layerColorThickness - i - aboveWaterGroundColorsMax) * 2) + 20,
-                                     ((layerColorThickness - i - aboveWaterGroundColorsMax)) + 50,
-                                     terrainTransparency);
-        } else if (i < waterColorsMax) {
-            m_colorTable1[i] = qRgba(0, 0, ((i - underWaterGroundColorsMax) * 2) + 120,
-                                     terrainTransparency);
-        } else {
-            m_colorTable1[i] = qRgba(0, 0, 0, 0); // Not used
+        for (int i = 0; i < colorTableSize - 2; i++) {
+            if (i < magmaColorsMax) {
+                m_colorTable1[i] = qRgba(130 - (i * 2), 0, 0, 255);
+            } else if (i < aboveWaterGroundColorsMax) {
+                m_colorTable1[i] = qRgba((i - magmaColorsMax) * 4,
+                                         ((i - magmaColorsMax) * 2) + 120,
+                                         (i - magmaColorsMax) * 5, terrainTransparency);
+            } else if (i < underWaterGroundColorsMax) {
+                m_colorTable1[i] = qRgba(((layerColorThickness - i - aboveWaterGroundColorsMax)) + 70,
+                                         ((layerColorThickness - i - aboveWaterGroundColorsMax) * 2) + 20,
+                                         ((layerColorThickness - i - aboveWaterGroundColorsMax)) + 50,
+                                         terrainTransparency);
+            } else if (i < waterColorsMax) {
+                m_colorTable1[i] = qRgba(0, 0, ((i - underWaterGroundColorsMax) * 2) + 120,
+                                         terrainTransparency);
+            } else {
+                m_colorTable1[i] = qRgba(0, 0, 0, 0); // Not used
+            }
         }
-    }
-    m_colorTable1[airColorIndex] = qRgba(0, 0, 0, 0);
-    m_colorTable1[mineShaftColorIndex] = qRgba(50, 50, 50, 255);
+        m_colorTable1[airColorIndex] = qRgba(0, 0, 0, 0);
+        m_colorTable1[mineShaftColorIndex] = qRgba(50, 50, 50, 255);
 
-    // The alternate color table just has gray gradients for all terrain except water
-    for (int i = 0; i < colorTableSize - 2; i++) {
-        if (i < magmaColorsMax) {
-            m_colorTable2[i] = qRgba(((i - aboveWaterGroundColorsMax) * 2),
-                                     ((i - aboveWaterGroundColorsMax) * 2),
-                                     ((i - aboveWaterGroundColorsMax) * 2), 255);
-        } else if (i < underWaterGroundColorsMax) {
-            m_colorTable2[i] = qRgba(((i - aboveWaterGroundColorsMax) * 2),
-                                     ((i - aboveWaterGroundColorsMax) * 2),
-                                     ((i - aboveWaterGroundColorsMax) * 2), terrainTransparency);
-        } else if (i < waterColorsMax) {
-            m_colorTable2[i] = qRgba(0, 0, ((i - underWaterGroundColorsMax) * 2) + 120,
-                                     terrainTransparency);
-        } else {
-            m_colorTable2[i] = qRgba(0, 0, 0, 0); // Not used
+        // The alternate color table just has gray gradients for all terrain except water
+        for (int i = 0; i < colorTableSize - 2; i++) {
+            if (i < magmaColorsMax) {
+                m_colorTable2[i] = qRgba(((i - aboveWaterGroundColorsMax) * 2),
+                                         ((i - aboveWaterGroundColorsMax) * 2),
+                                         ((i - aboveWaterGroundColorsMax) * 2), 255);
+            } else if (i < underWaterGroundColorsMax) {
+                m_colorTable2[i] = qRgba(((i - aboveWaterGroundColorsMax) * 2),
+                                         ((i - aboveWaterGroundColorsMax) * 2),
+                                         ((i - aboveWaterGroundColorsMax) * 2), terrainTransparency);
+            } else if (i < waterColorsMax) {
+                m_colorTable2[i] = qRgba(0, 0, ((i - underWaterGroundColorsMax) * 2) + 120,
+                                         terrainTransparency);
+            } else {
+                m_colorTable2[i] = qRgba(0, 0, 0, 0); // Not used
+            }
         }
+        m_colorTable2[airColorIndex] = qRgba(0, 0, 0, 0);
+        m_colorTable2[mineShaftColorIndex] = qRgba(255, 255, 0, 255);
+
+        //! [2]
+        m_volumeItem->setColorTable(m_colorTable1);
+        //! [2]
+
+        //! [5]
+        m_volumeItem->setSliceFrameGaps(QVector3D(0.01f, 0.02f, 0.01f));
+        m_volumeItem->setSliceFrameThicknesses(QVector3D(0.0025f, 0.005f, 0.0025f));
+        m_volumeItem->setSliceFrameWidths(QVector3D(0.0025f, 0.005f, 0.0025f));
+        m_volumeItem->setDrawSliceFrames(false);
+        //! [5]
+        handleSlicingChanges();
+
+        //! [3]
+        m_graph->addCustomItem(m_volumeItem);
+        //! [3]
+
+        m_timer.start(0);
+    } else {
+        // OpenGL ES2 doesn't support 3D textures, so show a warning label instead
+        QCustom3DLabel *warningLabel = new QCustom3DLabel(
+                    "QCustom3DVolume is not supported with OpenGL ES2",
+                    QFont(),
+                    QVector3D(0.0f, 0.5f, 0.0f),
+                    QVector3D(1.5f, 1.5f, 0.0f),
+                    QQuaternion());
+        warningLabel->setPositionAbsolute(true);
+        warningLabel->setFacingCamera(true);
+        m_graph->addCustomItem(warningLabel);
     }
-    m_colorTable2[airColorIndex] = qRgba(0, 0, 0, 0);
-    m_colorTable2[mineShaftColorIndex] = qRgba(255, 255, 0, 255);
-
-    //! [2]
-    m_volumeItem->setColorTable(m_colorTable1);
-    //! [2]
-
-    //! [5]
-    m_volumeItem->setSliceFrameGaps(QVector3D(0.01f, 0.02f, 0.01f));
-    m_volumeItem->setSliceFrameThicknesses(QVector3D(0.0025f, 0.005f, 0.0025f));
-    m_volumeItem->setSliceFrameWidths(QVector3D(0.0025f, 0.005f, 0.0025f));
-    m_volumeItem->setDrawSliceFrames(false);
-    //! [5]
-    handleSlicingChanges();
-
-    //! [3]
-    m_graph->addCustomItem(m_volumeItem);
-    //! [3]
-
-    m_timer.start(0);
-#else
-    // OpenGL ES2 doesn't support 3D textures, so show a warning label instead
-    QCustom3DLabel *warningLabel = new QCustom3DLabel(
-                "QCustom3DVolume is not supported with OpenGL ES2",
-                QFont(),
-                QVector3D(0.0f, 0.5f, 0.0f),
-                QVector3D(1.5f, 1.5f, 0.0f),
-                QQuaternion());
-    warningLabel->setPositionAbsolute(true);
-    warningLabel->setFacingCamera(true);
-    m_graph->addCustomItem(warningLabel);
-#endif
 
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &VolumetricModifier::handleFpsChange);

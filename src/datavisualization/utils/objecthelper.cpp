@@ -111,7 +111,6 @@ ObjectHelper *ObjectHelper::getObjectHelper(const Abstract3DRenderer *cacheId,
 
 void ObjectHelper::load()
 {
-    initializeOpenGLFunctions();
     if (m_meshDataLoaded) {
         // Delete old data
         glDeleteBuffers(1, &m_vertexbuffer);

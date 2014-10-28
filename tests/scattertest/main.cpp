@@ -36,6 +36,7 @@
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
+    //QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
 
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
@@ -484,7 +485,7 @@ int main(int argc, char **argv)
     chart->setGeometry(QRect(0, 0, 800, 800));
 
     modifier->start();
-    modifier->renderToImage(); // Initial hidden render
+    //modifier->renderToImage(); // Initial hidden render
 
     widget->show();
 

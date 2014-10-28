@@ -252,15 +252,16 @@ void SelectionPointer::initShaders()
     // The shader for the small point ball
     if (m_pointShader)
         delete m_pointShader;
-#if !defined(QT_OPENGL_ES_2)
-    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
-                                     QStringLiteral(":/shaders/fragment"));
-#else
-    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
-                                     QStringLiteral(":/shaders/fragmentES2"));
-#endif
-    m_pointShader->initialize();
 
+    if (Utils::isOpenGLES()) {
+        m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                         QStringLiteral(":/shaders/fragmentES2"));
+    } else {
+        m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                         QStringLiteral(":/shaders/fragment"));
+    }
+
+    m_pointShader->initialize();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

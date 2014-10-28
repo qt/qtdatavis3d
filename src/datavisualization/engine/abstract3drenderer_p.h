@@ -30,7 +30,9 @@
 #define ABSTRACT3DRENDERER_P_H
 
 #include <QtGui/QOpenGLFunctions>
-
+#if !defined(QT_OPENGL_ES_2)
+#  include <QtGui/QOpenGLFunctions_2_1>
+#endif
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
 #include "axisrendercache_p.h"
@@ -83,9 +85,7 @@ public:
     virtual void initSelectionBuffer() = 0;
     virtual void updateSelectionState(SelectionState state);
 
-#if !defined(QT_OPENGL_ES_2)
     virtual void updateDepthBuffer() = 0;
-#endif
     virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) = 0;
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader) = 0;
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
@@ -323,8 +323,12 @@ protected:
     qreal m_reflectivity;
 
     QLocale m_locale;
+#if !defined(QT_OPENGL_ES_2)
+    QOpenGLFunctions_2_1 *m_funcs_2_1;  // Not owned
+#endif
     QPointer<QOpenGLContext> m_context; // Not owned
     QWindow *m_dummySurfaceAtDelete;
+    bool m_isOpenGLES;
 
 private:
     friend class Abstract3DController;

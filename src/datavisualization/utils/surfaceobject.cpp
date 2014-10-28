@@ -37,7 +37,6 @@ SurfaceObject::SurfaceObject(Surface3DRenderer *renderer)
       m_oldDataDimension(-1)
 {
     m_indicesType = GL_UNSIGNED_INT;
-    initializeOpenGLFunctions();
     glGenBuffers(1, &m_vertexbuffer);
     glGenBuffers(1, &m_normalbuffer);
     glGenBuffers(1, &m_uvbuffer);

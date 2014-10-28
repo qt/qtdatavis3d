@@ -144,9 +144,7 @@ private:
     void surfacePointSelected(const QPoint &point);
     void updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point, bool label);
     QPoint selectionIdToSurfacePoint(uint id);
-#if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();
-#endif
     void emitSelectedPointChanged(QPoint position);
 
     Q_DISABLE_COPY(Surface3DRenderer)

@@ -25,6 +25,7 @@
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
 #include "qcustom3ditem_p.h"
+#include "utils_p.h"
 #include <QtCore/QThread>
 #include <QtGui/QOpenGLFramebufferObject>
 
@@ -940,11 +941,7 @@ QAbstract3DGraph::OptimizationHints Abstract3DController::optimizationHints() co
 
 bool Abstract3DController::shadowsSupported() const
 {
-#if defined(QT_OPENGL_ES_2)
-    return false;
-#else
-    return true;
-#endif
+    return !isOpenGLES();
 }
 
 bool Abstract3DController::isSlicingActive() const
@@ -1360,6 +1357,11 @@ void Abstract3DController::markSeriesItemLabelsDirty()
 {
     for (int i = 0; i < m_seriesList.size(); i++)
         m_seriesList.at(i)->d_ptr->markItemLabelDirty();
+}
+
+bool Abstract3DController::isOpenGLES() const
+{
+    return Utils::isOpenGLES();
 }
 
 void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orientation,

@@ -34,6 +34,18 @@
 #include <QColorDialog>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QtGui/QOpenGLContext>
+
+static bool isOpenGLES()
+{
+#if defined(QT_OPENGL_ES_2)
+    return true;
+#elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+    return false;
+#else
+    return QOpenGLContext::currentContext()->isOpenGLES();
+#endif
+}
 
 int main(int argc, char **argv)
 {
@@ -48,9 +60,8 @@ int main(int argc, char **argv)
     // For testing custom surface format
     QSurfaceFormat surfaceFormat;
     surfaceFormat.setDepthBufferSize(24);
-#if !defined(QT_OPENGL_ES_2)
-    surfaceFormat.setSamples(8);
-#endif
+    if (!isOpenGLES())
+        surfaceFormat.setSamples(8);
 
     Q3DBars *widgetchart = new Q3DBars(&surfaceFormat);
     QSize screenSize = widgetchart->screen()->size();

@@ -28,7 +28,7 @@ LabelItem::LabelItem()
 
 LabelItem::~LabelItem()
 {
-    glDeleteTextures(1, &m_textureId);
+    QOpenGLContext::currentContext()->functions()->glDeleteTextures(1, &m_textureId);
 }
 
 void LabelItem::setSize(const QSize &size)
@@ -43,7 +43,7 @@ QSize LabelItem::size() const
 
 void LabelItem::setTextureId(GLuint textureId)
 {
-    glDeleteTextures(1, &m_textureId);
+    QOpenGLContext::currentContext()->functions()->glDeleteTextures(1, &m_textureId);
     m_textureId = textureId;
 }
 
@@ -55,7 +55,7 @@ GLuint LabelItem::textureId() const
 void LabelItem::clear()
 {
     if (m_textureId) {
-        glDeleteTextures(1, &m_textureId);
+        QOpenGLContext::currentContext()->functions()->glDeleteTextures(1, &m_textureId);
         m_textureId = 0;
     }
     m_size = QSize(0, 0);

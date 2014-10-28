@@ -345,6 +345,7 @@ public:
     virtual void adjustAxisRanges() = 0;
 
     void markSeriesItemLabelsDirty();
+    bool isOpenGLES() const;
 
 public slots:
     void destroyRenderer();
