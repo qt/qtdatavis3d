@@ -70,6 +70,7 @@ public:
     static float wrapValue(float value, float min, float max);
     static QQuaternion calculateRotation(const QVector3D &xyzRotations);
     static bool isOpenGLES();
+    static void resolveStatics();
 
 private:
     static ParamType mapFormatCharToParamType(char formatSpec);

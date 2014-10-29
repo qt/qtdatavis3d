@@ -35,21 +35,18 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QtGui/QOpenGLContext>
-
-static bool isOpenGLES()
-{
-#if defined(QT_OPENGL_ES_2)
-    return true;
-#elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
-    return false;
-#else
-    return QOpenGLContext::currentContext()->isOpenGLES();
-#endif
-}
+#include <QtDataVisualization/QCustom3DItem>
+#include <QtDataVisualization/QCustom3DLabel>
+#include <QtDataVisualization/QCustom3DVolume>
 
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
+
+    // Test creating custom items before graph is created
+    QCustom3DItem customItem;
+    QCustom3DLabel customLabel;
+    QCustom3DVolume customVolume;
 
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
@@ -60,8 +57,7 @@ int main(int argc, char **argv)
     // For testing custom surface format
     QSurfaceFormat surfaceFormat;
     surfaceFormat.setDepthBufferSize(24);
-    if (!isOpenGLES())
-        surfaceFormat.setSamples(8);
+    surfaceFormat.setSamples(8);
 
     Q3DBars *widgetchart = new Q3DBars(&surfaceFormat);
     QSize screenSize = widgetchart->screen()->size();

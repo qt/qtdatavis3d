@@ -28,7 +28,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 #define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
 #define MIN_POWER 2
 
-static GLint maxTextureSize = 0; // Safe, as all instances have the same texture size
+// Some values that only need to be resolved once
+static bool staticsResolved = false;
+static GLint maxTextureSize = 0;
+static bool isES = false;
 
 GLuint Utils::getNearestPowerOfTwo(GLuint value)
 {
@@ -58,10 +61,9 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                                const QColor &txtColor, bool labelBackground,
                                bool borders, int maxLabelWidth)
 {
-    if (maxTextureSize == 0) {
-        QOpenGLContext::currentContext()->functions()->glGetIntegerv(
-                    GL_MAX_TEXTURE_SIZE, &maxTextureSize);
-    }
+    if (!staticsResolved)
+        resolveStatics();
+
     GLuint paddingWidth = 20;
     GLuint paddingHeight = 20;
     GLuint prePadding = 20;
@@ -317,39 +319,44 @@ QQuaternion Utils::calculateRotation(const QVector3D &xyzRotations)
 
 bool Utils::isOpenGLES()
 {
-#if defined(QT_OPENGL_ES_2)
-    return true;
-#elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
-    return false;
-#else
-    static bool resolved = false;
-    static bool isES = false;
-    if (!resolved) {
-        QOpenGLContext *ctx = QOpenGLContext::currentContext();
-        QWindow *dummySurface = 0;
-        if (!ctx) {
-            QSurfaceFormat surfaceFormat = qDefaultSurfaceFormat();
-            dummySurface = new QWindow();
-            dummySurface->setSurfaceType(QWindow::OpenGLSurface);
-            dummySurface->setFormat(surfaceFormat);
-            dummySurface->create();
-            ctx = new QOpenGLContext;
-            ctx->setFormat(surfaceFormat);
-            ctx->create();
-            ctx->makeCurrent(dummySurface);
-        }
-
-        isES = ctx->isOpenGLES();
-        resolved = true;
-
-        if (dummySurface) {
-            ctx->doneCurrent();
-            delete ctx;
-            delete dummySurface;
-        }
-    }
+    if (!staticsResolved)
+        resolveStatics();
     return isES;
+}
+
+void Utils::resolveStatics()
+{
+    QOpenGLContext *ctx = QOpenGLContext::currentContext();
+    QWindow *dummySurface = 0;
+    if (!ctx) {
+        QSurfaceFormat surfaceFormat = qDefaultSurfaceFormat();
+        dummySurface = new QWindow();
+        dummySurface->setSurfaceType(QWindow::OpenGLSurface);
+        dummySurface->setFormat(surfaceFormat);
+        dummySurface->create();
+        ctx = new QOpenGLContext;
+        ctx->setFormat(surfaceFormat);
+        ctx->create();
+        ctx->makeCurrent(dummySurface);
+    }
+
+#if defined(QT_OPENGL_ES_2)
+    isES = true;
+#elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+    isES = false;
+#else
+    isES = ctx->isOpenGLES();
 #endif
+
+    ctx->functions()->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
+
+    if (dummySurface) {
+        ctx->doneCurrent();
+        delete ctx;
+        delete dummySurface;
+    }
+
+    staticsResolved = true;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
