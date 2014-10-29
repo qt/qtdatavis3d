@@ -20,6 +20,8 @@
 #include "qutils.h"
 
 #include <QtGui/QPainter>
+#include <QtGui/QOpenGLContext>
+#include <QtGui/QWindow>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
