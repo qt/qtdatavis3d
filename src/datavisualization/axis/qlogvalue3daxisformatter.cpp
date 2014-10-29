@@ -42,6 +42,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since QtDataVisualization 1.1
  * \ingroup datavisualization_qml
  * \instantiates QLogValue3DAxisFormatter
+ * \inherits ValueAxis3DFormatter
  * \brief LogValueAxis3DFormatter implements logarithmic value axis formatter.
  *
  * This type provides formatting rules for a logarithmic ValueAxis3D.

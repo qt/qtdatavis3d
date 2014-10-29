@@ -38,6 +38,7 @@
 #include "qcustom3ditem.h"
 #include <QtGui/QLinearGradient>
 #include <QtCore/QTime>
+#include <QtCore/QLocale>
 
 class QOpenGLFramebufferObject;
 
@@ -84,12 +85,18 @@ struct Abstract3DChangeBitField {
     bool axisYLabelAutoRotationChanged : 1;
     bool axisZLabelAutoRotationChanged : 1;
     bool aspectRatioChanged            : 1;
+    bool horizontalAspectRatioChanged  : 1;
     bool axisXTitleVisibilityChanged   : 1;
     bool axisYTitleVisibilityChanged   : 1;
     bool axisZTitleVisibilityChanged   : 1;
     bool axisXTitleFixedChanged        : 1;
     bool axisYTitleFixedChanged        : 1;
     bool axisZTitleFixedChanged        : 1;
+    bool polarChanged                  : 1;
+    bool radialLabelOffsetChanged      : 1;
+    bool reflectionChanged             : 1;
+    bool reflectivityChanged           : 1;
+    bool marginChanged                 : 1;
 
     Abstract3DChangeBitField() :
         themeChanged(true),
@@ -128,12 +135,18 @@ struct Abstract3DChangeBitField {
         axisYLabelAutoRotationChanged(true),
         axisZLabelAutoRotationChanged(true),
         aspectRatioChanged(true),
+        horizontalAspectRatioChanged(true),
         axisXTitleVisibilityChanged(true),
         axisYTitleVisibilityChanged(true),
         axisZTitleVisibilityChanged(true),
         axisXTitleFixedChanged(true),
         axisYTitleFixedChanged(true),
-        axisZTitleFixedChanged(true)
+        axisZTitleFixedChanged(true),
+        polarChanged(true),
+        radialLabelOffsetChanged(true),
+        reflectionChanged(true),
+        reflectivityChanged(true),
+        marginChanged(true)
     {
     }
 };
@@ -156,8 +169,13 @@ private:
     QAbstract3DGraph::SelectionFlags m_selectionMode;
     QAbstract3DGraph::ShadowQuality m_shadowQuality;
     bool m_useOrthoProjection;
-    float m_aspectRatio;
+    qreal m_aspectRatio;
+    qreal m_horizontalAspectRatio;
     QAbstract3DGraph::OptimizationHints m_optimizationHints;
+    bool m_reflectionEnabled;
+    qreal m_reflectivity;
+    QLocale m_locale;
+    QVector3D m_queriedGraphPosition;
 
 protected:
     Q3DScene *m_scene;
@@ -175,6 +193,8 @@ protected:
     bool m_isCustomItemDirty;
     bool m_isSeriesVisualsDirty;
     bool m_renderPending;
+    bool m_isPolar;
+    float m_radialLabelOffset;
 
     QList<QAbstract3DSeries *> m_seriesList;
 
@@ -187,13 +207,17 @@ protected:
 
     QList<QCustom3DItem *> m_customItems;
 
+    QAbstract3DGraph::ElementType m_clickedType;
+    int m_selectedLabelIndex;
+    int m_selectedCustomItemIndex;
+    qreal m_margin;
+
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
 public:
     virtual ~Abstract3DController();
 
     inline bool isInitialized() { return (m_renderer != 0); }
-    virtual void destroyRenderer();
     virtual void synchDataToRenderer();
     virtual void render(const GLuint defaultFboHandle = 0);
     virtual void initializeOpenGL() = 0;
@@ -252,6 +276,7 @@ public:
     void deleteCustomItem(QCustom3DItem *item);
     void deleteCustomItem(const QVector3D &position);
     void releaseCustomItem(QCustom3DItem *item);
+    QList<QCustom3DItem *> customItems() const;
 
     int selectedLabelIndex() const;
     QAbstract3DAxis *selectedAxis() const;
@@ -260,6 +285,35 @@ public:
 
     void setOrthoProjection(bool enable);
     bool isOrthoProjection() const;
+
+    void setMeasureFps(bool enable);
+    inline bool measureFps() const { return m_measureFps; }
+    inline qreal currentFps() const { return m_currentFps; }
+
+    QAbstract3DGraph::ElementType selectedElement() const;
+
+    void setAspectRatio(qreal ratio);
+    qreal aspectRatio();
+    void setHorizontalAspectRatio(qreal ratio);
+    qreal horizontalAspectRatio() const;
+
+    void setReflection(bool enable);
+    bool reflection() const;
+    void setReflectivity(qreal reflectivity);
+    qreal reflectivity() const;
+
+    void setPolar(bool enable);
+    bool isPolar() const;
+    void setRadialLabelOffset(float offset);
+    float radialLabelOffset() const;
+
+    void setLocale(const QLocale &locale);
+    QLocale locale() const;
+
+    QVector3D queriedGraphPosition() const;
+
+    void setMargin(qreal margin);
+    qreal margin() const;
 
     void emitNeedRender();
 
@@ -286,12 +340,16 @@ public:
     virtual void handleAxisTitleVisibilityChangedBySender(QObject *sender);
     virtual void handleAxisTitleFixedChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
-    virtual void handlePendingClick() = 0;
+    virtual void handlePendingClick();
+    virtual void handlePendingGraphPositionQuery();
     virtual void adjustAxisRanges() = 0;
 
     void markSeriesItemLabelsDirty();
+    bool isOpenGLES() const;
 
 public slots:
+    void destroyRenderer();
+
     void handleAxisTitleChanged(const QString &title);
     void handleAxisLabelsChanged();
     void handleAxisRangeChanged(float min, float max);
@@ -320,16 +378,7 @@ public slots:
     // Renderer callback handlers
     void handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality);
 
-    void setMeasureFps(bool enable);
-    inline bool measureFps() const { return m_measureFps; }
-    inline qreal currentFps() const { return m_currentFps; }
-
-    QAbstract3DGraph::ElementType selectedElement() const;
-
     void updateCustomItem();
-
-    void setAspectRatio(float ratio);
-    float aspectRatio();
 
 signals:
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
@@ -344,8 +393,16 @@ signals:
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);
-    void aspectRatioChanged(float ratio);
+    void aspectRatioChanged(qreal ratio);
+    void horizontalAspectRatioChanged(qreal ratio);
     void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    void polarChanged(bool enabled);
+    void radialLabelOffsetChanged(float offset);
+    void reflectionChanged(bool enabled);
+    void reflectivityChanged(qreal reflectivity);
+    void localeChanged(const QLocale &locale);
+    void queriedGraphPositionChanged(const QVector3D &data);
+    void marginChanged(qreal margin);
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

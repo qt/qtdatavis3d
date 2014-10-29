@@ -32,6 +32,10 @@
 #include "datavisualizationglobal_p.h"
 #include <QtGui/QRgb>
 #include <QtGui/QLinearGradient>
+#if !defined(QT_OPENGL_ES_2)
+// 3D Textures are not supported by ES set
+#  include <QtGui/QOpenGLFunctions_2_1>
+#endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -44,17 +48,17 @@ class TextureHelper : protected QOpenGLFunctions
     // Ownership of created texture is transferred to caller
     GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false,
                            bool convert = true, bool smoothScale = true, bool clampY = false);
+    GLuint create3DTexture(const QVector<uchar> *data, int width, int height, int depth,
+                           QImage::Format dataFormat);
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
     // Returns selection texture and inserts generated framebuffers to framebuffer parameters
     GLuint createSelectionTexture(const QSize &size, GLuint &frameBuffer, GLuint &depthBuffer);
+    GLuint createCursorPositionTexture(const QSize &size, GLuint &frameBuffer);
     GLuint createUniformTexture(const QColor &color);
     GLuint createGradientTexture(const QLinearGradient &gradient);
-#if !defined(QT_OPENGL_ES_2)
     GLuint createDepthTexture(const QSize &size, GLuint textureSize);
     // Returns depth texture and inserts generated framebuffer to parameter
     GLuint createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer, GLuint textureSize);
-    void fillDepthTexture(GLuint texture, const QSize &size, GLuint textureSize, GLfloat value);
-#endif
     void deleteTexture(GLuint *texture);
 
     private:
@@ -62,9 +66,13 @@ class TextureHelper : protected QOpenGLFunctions
     void convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage, GLenum texture_format);
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
 
+#if !defined(QT_OPENGL_ES_2)
+    QOpenGLFunctions_2_1 *m_openGlFunctions_2_1; // Not owned
+#endif
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;
     friend class Scatter3DRenderer;
+    friend class Abstract3DRenderer;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

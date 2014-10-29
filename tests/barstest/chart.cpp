@@ -26,6 +26,7 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/q3dinputhandler.h>
+#include <QtDataVisualization/qcustom3ditem.h>
 #include <QtCore/QTime>
 #include <QtCore/qmath.h>
 
@@ -203,7 +204,7 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
     m_graph->activeTheme()->setFont(QFont("Times Roman", 20));
 
     // Release and store the default input handler.
-    m_defaultInputHandler = m_graph->activeInputHandler();
+    m_defaultInputHandler = static_cast<Q3DInputHandler *>(m_graph->activeInputHandler());
     m_graph->releaseInputHandler(m_defaultInputHandler);
     m_graph->setActiveInputHandler(m_defaultInputHandler);
 
@@ -240,7 +241,6 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
 
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &GraphModifier::handleFpsChange);
-
 
     resetTemperatureData();
 }
@@ -334,6 +334,9 @@ void GraphModifier::releaseSeries()
 void GraphModifier::flipViews()
 {
     m_graph->scene()->setSecondarySubviewOnTop(!m_graph->scene()->isSecondarySubviewOnTop());
+    qDebug() << "secondary subview on top:" << m_graph->scene()->isSecondarySubviewOnTop();
+    qDebug() << "point (50, 50) in primary subview:" << m_graph->scene()->isPointInPrimarySubView(QPoint(50, 50));
+    qDebug() << "point (50, 50) in secondary subview:" << m_graph->scene()->isPointInSecondarySubView(QPoint(50, 50));
 }
 
 void GraphModifier::createMassiveArray()
@@ -626,33 +629,33 @@ void GraphModifier::changeTheme()
         m_graph->setActiveTheme(m_builtinTheme);
 
     switch (theme) {
-        case Q3DTheme::ThemeQt:
-            qDebug() << __FUNCTION__ << "ThemeQt";
-            break;
-        case Q3DTheme::ThemePrimaryColors:
-            qDebug() << __FUNCTION__ << "ThemePrimaryColors";
-            break;
-        case Q3DTheme::ThemeDigia:
-            qDebug() << __FUNCTION__ << "ThemeDigia";
-            break;
-        case Q3DTheme::ThemeStoneMoss:
-            qDebug() << __FUNCTION__ << "ThemeStoneMoss";
-            break;
-        case Q3DTheme::ThemeArmyBlue:
-            qDebug() << __FUNCTION__ << "ThemeArmyBlue";
-            break;
-        case Q3DTheme::ThemeRetro:
-            qDebug() << __FUNCTION__ << "ThemeRetro";
-            break;
-        case Q3DTheme::ThemeEbony:
-            qDebug() << __FUNCTION__ << "ThemeEbony";
-            break;
-        case Q3DTheme::ThemeIsabelle:
-            qDebug() << __FUNCTION__ << "ThemeIsabelle";
-            break;
-        default:
-            qDebug() << __FUNCTION__ << "Unknown theme";
-            break;
+    case Q3DTheme::ThemeQt:
+        qDebug() << __FUNCTION__ << "ThemeQt";
+        break;
+    case Q3DTheme::ThemePrimaryColors:
+        qDebug() << __FUNCTION__ << "ThemePrimaryColors";
+        break;
+    case Q3DTheme::ThemeDigia:
+        qDebug() << __FUNCTION__ << "ThemeDigia";
+        break;
+    case Q3DTheme::ThemeStoneMoss:
+        qDebug() << __FUNCTION__ << "ThemeStoneMoss";
+        break;
+    case Q3DTheme::ThemeArmyBlue:
+        qDebug() << __FUNCTION__ << "ThemeArmyBlue";
+        break;
+    case Q3DTheme::ThemeRetro:
+        qDebug() << __FUNCTION__ << "ThemeRetro";
+        break;
+    case Q3DTheme::ThemeEbony:
+        qDebug() << __FUNCTION__ << "ThemeEbony";
+        break;
+    case Q3DTheme::ThemeIsabelle:
+        qDebug() << __FUNCTION__ << "ThemeIsabelle";
+        break;
+    default:
+        qDebug() << __FUNCTION__ << "Unknown theme";
+        break;
     }
 
     if (++theme > Q3DTheme::ThemeIsabelle)
@@ -1128,7 +1131,7 @@ void GraphModifier::changeValueAxisFormat(const QString & text)
 void GraphModifier::changeLogBase(const QString &text)
 {
     QLogValue3DAxisFormatter *formatter =
-        qobject_cast<QLogValue3DAxisFormatter *>(m_graph->valueAxis()->formatter());
+            qobject_cast<QLogValue3DAxisFormatter *>(m_graph->valueAxis()->formatter());
     if (formatter)
         formatter->setBase(qreal(text.toDouble()));
 }
@@ -1406,6 +1409,26 @@ void GraphModifier::reverseValueAxis(int enabled)
     m_graph->valueAxis()->setReversed(enabled);
 }
 
+void GraphModifier::setInputHandlerRotationEnabled(int enabled)
+{
+    m_defaultInputHandler->setRotationEnabled(enabled);
+}
+
+void GraphModifier::setInputHandlerZoomEnabled(int enabled)
+{
+    m_defaultInputHandler->setZoomEnabled(enabled);
+}
+
+void GraphModifier::setInputHandlerSelectionEnabled(int enabled)
+{
+    m_defaultInputHandler->setSelectionEnabled(enabled);
+}
+
+void GraphModifier::setInputHandlerZoomAtTargetEnabled(int enabled)
+{
+    m_defaultInputHandler->setZoomAtTargetEnabled(enabled);
+}
+
 void GraphModifier::changeValueAxisSegments(int value)
 {
     qDebug() << __FUNCTION__ << value;
@@ -1478,6 +1501,42 @@ void GraphModifier::handleFpsChange(qreal fps)
 {
     static const QString fpsPrefix(QStringLiteral("FPS: "));
     m_fpsLabel->setText(fpsPrefix + QString::number(qRound(fps)));
+}
+
+void GraphModifier::setCameraTargetX(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setX(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void GraphModifier::setCameraTargetY(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setY(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void GraphModifier::setCameraTargetZ(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setZ(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void GraphModifier::setFloorLevel(int value)
+{
+    m_graph->setFloorLevel(float(value));
+    qDebug() << "Floor level:" << value;
+}
+
+void GraphModifier::setGraphMargin(int value)
+{
+    m_graph->setMargin(qreal(value) / 100.0);
+    qDebug() << "Setting margin:" << m_graph->margin() << value;
 }
 
 void GraphModifier::populateFlatSeries(QBar3DSeries *series, int rows, int columns, float value)
@@ -1672,4 +1731,45 @@ void GraphModifier::setGradient()
 void GraphModifier::toggleMultiseriesScaling()
 {
     m_graph->setMultiSeriesUniform(!m_graph->isMultiSeriesUniform());
+}
+
+void GraphModifier::setReflection(bool enabled)
+{
+    m_graph->setReflection(enabled);
+}
+
+void GraphModifier::setReflectivity(int value)
+{
+    qreal reflectivity = (qreal)value / 100.0;
+    m_graph->setReflectivity(reflectivity);
+}
+
+void GraphModifier::toggleCustomItem()
+{
+    static int counter = 0;
+    int state = ++counter % 3;
+
+    QVector3D positionOne = QVector3D(6.0f, -15.0f, 3.0f);
+    QVector3D positionTwo = QVector3D(2.0f, 18.0f, 3.0f);
+
+    if (state == 0) {
+        m_graph->removeCustomItemAt(positionTwo);
+    } else if (state == 1) {
+        QCustom3DItem *item = new QCustom3DItem();
+        item->setMeshFile(":/shuttle.obj");
+        item->setPosition(positionOne);
+        item->setScaling(QVector3D(0.1f, 0.1f, 0.1f));
+        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rand()));
+        item->setTextureImage(QImage(":/shuttle.png"));
+        m_graph->addCustomItem(item);
+    } else {
+        m_graph->removeCustomItemAt(positionOne);
+        QCustom3DItem *item = new QCustom3DItem();
+        item->setMeshFile(":/shuttle.obj");
+        item->setPosition(positionTwo);
+        item->setScaling(QVector3D(0.1f, 0.1f, 0.1f));
+        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rand()));
+        item->setTextureImage(QImage(":/shuttle.png"));
+        m_graph->addCustomItem(item);
+    }
 }

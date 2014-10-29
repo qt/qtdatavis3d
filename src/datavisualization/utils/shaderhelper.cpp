@@ -40,7 +40,37 @@ ShaderHelper::ShaderHelper(QObject *parent,
       m_vertexShaderFile(vertexShader),
       m_fragmentShaderFile(fragmentShader),
       m_textureFile(texture),
-      m_depthTextureFile(depthTexture)
+      m_depthTextureFile(depthTexture),
+      m_positionAttr(0),
+      m_uvAttr(0),
+      m_normalAttr(0),
+      m_colorUniform(0),
+      m_viewMatrixUniform(0),
+      m_modelMatrixUniform(0),
+      m_invTransModelMatrixUniform(0),
+      m_depthMatrixUniform(0),
+      m_mvpMatrixUniform(0),
+      m_lightPositionUniform(0),
+      m_lightStrengthUniform(0),
+      m_ambientStrengthUniform(0),
+      m_shadowQualityUniform(0),
+      m_textureUniform(0),
+      m_shadowUniform(0),
+      m_gradientMinUniform(0),
+      m_gradientHeightUniform(0),
+      m_lightColorUniform(0),
+      m_volumeSliceIndicesUniform(0),
+      m_colorIndexUniform(0),
+      m_cameraPositionRelativeToModelUniform(0),
+      m_color8BitUniform(0),
+      m_textureDimensionsUniform(0),
+      m_sampleCountUniform(0),
+      m_alphaMultiplierUniform(0),
+      m_preserveOpacityUniform(0),
+      m_minBoundsUniform(0),
+      m_maxBoundsUniform(0),
+      m_sliceFrameWidthUniform(0),
+      m_initialized(false)
 {
 }
 
@@ -93,6 +123,17 @@ void ShaderHelper::initialize()
     m_gradientMinUniform = m_program->uniformLocation("gradMin");
     m_gradientHeightUniform = m_program->uniformLocation("gradHeight");
     m_lightColorUniform = m_program->uniformLocation("lightColor");
+    m_volumeSliceIndicesUniform = m_program->uniformLocation("volumeSliceIndices");
+    m_colorIndexUniform = m_program->uniformLocation("colorIndex");
+    m_cameraPositionRelativeToModelUniform = m_program->uniformLocation("cameraPositionRelativeToModel");
+    m_color8BitUniform = m_program->uniformLocation("color8Bit");
+    m_textureDimensionsUniform = m_program->uniformLocation("textureDimensions");
+    m_sampleCountUniform = m_program->uniformLocation("sampleCount");
+    m_alphaMultiplierUniform = m_program->uniformLocation("alphaMultiplier");
+    m_preserveOpacityUniform = m_program->uniformLocation("preserveOpacity");
+    m_minBoundsUniform = m_program->uniformLocation("minBounds");
+    m_maxBoundsUniform = m_program->uniformLocation("maxBounds");
+    m_sliceFrameWidthUniform = m_program->uniformLocation("sliceFrameWidth");
     m_initialized = true;
 }
 
@@ -125,151 +166,239 @@ void ShaderHelper::release()
     m_program->release();
 }
 
-void ShaderHelper::setUniformValue(GLuint uniform, const QVector3D &value)
+void ShaderHelper::setUniformValue(GLint uniform, const QVector2D &value)
 {
     m_program->setUniformValue(uniform, value);
 }
 
-void ShaderHelper::setUniformValue(GLuint uniform, const QVector4D &value)
+void ShaderHelper::setUniformValue(GLint uniform, const QVector3D &value)
 {
     m_program->setUniformValue(uniform, value);
 }
 
-void ShaderHelper::setUniformValue(GLuint uniform, const QMatrix4x4 &value)
+void ShaderHelper::setUniformValue(GLint uniform, const QVector4D &value)
 {
     m_program->setUniformValue(uniform, value);
 }
 
-void ShaderHelper::setUniformValue(GLuint uniform, GLfloat value)
+void ShaderHelper::setUniformValue(GLint uniform, const QMatrix4x4 &value)
 {
     m_program->setUniformValue(uniform, value);
 }
 
-void ShaderHelper::setUniformValue(GLuint uniform, GLint value)
+void ShaderHelper::setUniformValue(GLint uniform, GLfloat value)
 {
     m_program->setUniformValue(uniform, value);
 }
 
-GLuint ShaderHelper::MVP()
+void ShaderHelper::setUniformValue(GLint uniform, GLint value)
+{
+    m_program->setUniformValue(uniform, value);
+}
+
+void ShaderHelper::setUniformValueArray(GLint uniform, const QVector4D *values, int count)
+{
+    m_program->setUniformValueArray(uniform, values, count);
+}
+
+GLint ShaderHelper::MVP()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_mvpMatrixUniform;
 }
 
-GLuint ShaderHelper::view()
+GLint ShaderHelper::view()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_viewMatrixUniform;
 }
 
-GLuint ShaderHelper::model()
+GLint ShaderHelper::model()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_modelMatrixUniform;
 }
 
-GLuint ShaderHelper::nModel()
+GLint ShaderHelper::nModel()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_invTransModelMatrixUniform;
 }
 
-GLuint ShaderHelper::depth()
+GLint ShaderHelper::depth()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_depthMatrixUniform;
 }
 
-GLuint ShaderHelper::lightP()
+GLint ShaderHelper::lightP()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_lightPositionUniform;
 }
 
-GLuint ShaderHelper::lightS()
+GLint ShaderHelper::lightS()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_lightStrengthUniform;
 }
 
-GLuint ShaderHelper::ambientS()
+GLint ShaderHelper::ambientS()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_ambientStrengthUniform;
 }
 
-GLuint ShaderHelper::shadowQ()
+GLint ShaderHelper::shadowQ()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_shadowQualityUniform;
 }
 
-GLuint ShaderHelper::color()
+GLint ShaderHelper::color()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_colorUniform;
 }
 
-GLuint ShaderHelper::texture()
+GLint ShaderHelper::texture()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_textureUniform;
 }
 
-GLuint ShaderHelper::shadow()
+GLint ShaderHelper::shadow()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_shadowUniform;
 }
 
-GLuint ShaderHelper::gradientMin()
+GLint ShaderHelper::gradientMin()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_gradientMinUniform;
 }
 
-GLuint ShaderHelper::gradientHeight()
+GLint ShaderHelper::gradientHeight()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_gradientHeightUniform;
 }
 
-GLuint ShaderHelper::lightColor()
+GLint ShaderHelper::lightColor()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_lightColorUniform;
 }
 
-GLuint ShaderHelper::posAtt()
+GLint ShaderHelper::volumeSliceIndices()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_volumeSliceIndicesUniform;
+}
+
+GLint ShaderHelper::colorIndex()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_colorIndexUniform;
+}
+
+GLint ShaderHelper::cameraPositionRelativeToModel()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_cameraPositionRelativeToModelUniform;
+}
+
+GLint ShaderHelper::color8Bit()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_color8BitUniform;
+}
+
+GLint ShaderHelper::textureDimensions()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_textureDimensionsUniform;
+}
+
+GLint ShaderHelper::sampleCount()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_sampleCountUniform;
+}
+
+GLint ShaderHelper::alphaMultiplier()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_alphaMultiplierUniform;
+}
+
+GLint ShaderHelper::preserveOpacity()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_preserveOpacityUniform;
+}
+
+GLint ShaderHelper::maxBounds()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_maxBoundsUniform;
+}
+
+GLint ShaderHelper::minBounds()
+{
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_minBoundsUniform;
+}
+
+GLint ShaderHelper::sliceFrameWidth()
+{
+
+    if (!m_initialized)
+        qFatal("Shader not initialized");
+    return m_sliceFrameWidthUniform;
+}
+
+GLint ShaderHelper::posAtt()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_positionAttr;
 }
 
-GLuint ShaderHelper::uvAtt()
+GLint ShaderHelper::uvAtt()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");
     return m_uvAttr;
 }
 
-GLuint ShaderHelper::normalAtt()
+GLint ShaderHelper::normalAtt()
 {
     if (!m_initialized)
         qFatal("Shader not initialized");

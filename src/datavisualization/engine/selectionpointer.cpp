@@ -122,9 +122,6 @@ void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
 
     MVPMatrix = projectionMatrix * viewMatrix * modelMatrix;
 
-    // Enable texturing
-    glEnable(GL_TEXTURE_2D);
-
     QVector3D lightPos =  m_cachedScene->activeLight()->position();
 
     //
@@ -186,9 +183,6 @@ void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
     // Release shader
     glUseProgram(0);
 
-    // Disable textures
-    glDisable(GL_TEXTURE_2D);
-
     // Disable transparency
     glDisable(GL_BLEND);
 
@@ -217,10 +211,12 @@ void SelectionPointer::setRotation(const QQuaternion &rotation)
     m_rotation = rotation;
 }
 
-void SelectionPointer::setLabel(const QString &label)
+void SelectionPointer::setLabel(const QString &label, bool themeChange)
 {
-    m_label = label;
-    m_drawer->generateLabelItem(m_labelItem, m_label);
+    if (themeChange || m_label != label) {
+        m_label = label;
+        m_drawer->generateLabelItem(m_labelItem, m_label);
+    }
 }
 
 void SelectionPointer::setPointerObject(ObjectHelper *object)
@@ -236,7 +232,7 @@ void SelectionPointer::setLabelObject(ObjectHelper *object)
 void SelectionPointer::handleDrawerChange()
 {
     m_cachedTheme = m_drawer->theme();
-    setLabel(m_label);
+    setLabel(m_label, true);
 }
 
 void SelectionPointer::updateBoundingRect(const QRect &rect)
@@ -256,15 +252,16 @@ void SelectionPointer::initShaders()
     // The shader for the small point ball
     if (m_pointShader)
         delete m_pointShader;
-#if !defined(QT_OPENGL_ES_2)
-    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
-                                     QStringLiteral(":/shaders/fragment"));
-#else
-    m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
-                                     QStringLiteral(":/shaders/fragmentES2"));
-#endif
-    m_pointShader->initialize();
 
+    if (Utils::isOpenGLES()) {
+        m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                         QStringLiteral(":/shaders/fragmentES2"));
+    } else {
+        m_pointShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertex"),
+                                         QStringLiteral(":/shaders/fragment"));
+    }
+
+    m_pointShader->initialize();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

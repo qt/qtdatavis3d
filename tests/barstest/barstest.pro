@@ -5,4 +5,6 @@
 SOURCES += main.cpp chart.cpp custominputhandler.cpp
 HEADERS += chart.h custominputhandler.h
 
+RESOURCES += barstest.qrc
+
 QT += widgets

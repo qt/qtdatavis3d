@@ -1,5 +1,6 @@
 TARGET = datavisualizationqml2
 QT += qml quick datavisualization
+osx: QT += gui-private
 TARGETPATH = QtDataVisualization
 IMPORT_VERSION = $$MODULE_VERSION
 

@@ -39,6 +39,7 @@ public:
     void changeLabelStyle();
     void changeFont(const QFont &font);
     void changeFontSize(int fontsize);
+    void enableOptimization(int enabled);
     void setBackgroundEnabled(int enabled);
     void setGridEnabled(int enabled);
     void toggleRotation();

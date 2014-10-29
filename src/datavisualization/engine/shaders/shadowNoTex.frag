@@ -61,6 +61,6 @@ void main() {
         (materialAmbientColor +
         materialDiffuseColor * lightStrength * cosTheta +
         materialSpecularColor * lightStrength * pow(cosAlpha, 10));
-    gl_FragColor.a = 1.0;
+    gl_FragColor.a = color_mdl.a;
     gl_FragColor.rgb = visibility * clamp(gl_FragColor.rgb, 0.0, 1.0);
 }

@@ -51,19 +51,16 @@ private:
     ShaderHelper *m_backgroundShader;
     ShaderHelper *m_surfaceFlatShader;
     ShaderHelper *m_surfaceSmoothShader;
+    ShaderHelper *m_surfaceTexturedSmoothShader;
+    ShaderHelper *m_surfaceTexturedFlatShader;
     ShaderHelper *m_surfaceGridShader;
     ShaderHelper *m_surfaceSliceFlatShader;
     ShaderHelper *m_surfaceSliceSmoothShader;
     ShaderHelper *m_selectionShader;
-    ShaderHelper *m_labelShader;
-    GLfloat m_heightNormalizer;
-    GLfloat m_scaleFactor;
-    GLfloat m_scaleX;
-    GLfloat m_scaleZ;
-    GLfloat m_scaleXWithBackground;
-    GLfloat m_scaleZWithBackground;
-    GLuint m_depthTexture;
-    GLuint m_depthModelTexture;
+    float m_heightNormalizer;
+    float m_scaleX;
+    float m_scaleY;
+    float m_scaleZ;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
@@ -73,13 +70,12 @@ private:
     bool m_selectionActive;
     AbstractRenderItem m_dummyRenderItem;
     GLint m_shadowQualityMultiplier;
-    QSizeF m_areaSize;
-    bool m_hasHeightAdjustmentChanged;
     QPoint m_selectedPoint;
     QSurface3DSeries *m_selectedSeries;
     QPoint m_clickedPosition;
     bool m_selectionTexturesDirty;
     GLuint m_noShadowTexture;
+    bool m_flipHorizontalGrid;
 
 public:
     explicit Surface3DRenderer(Surface3DController *controller);
@@ -87,6 +83,7 @@ public:
 
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    void updateSurfaceTextures(QVector<QSurface3DSeries *> seriesList);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void cleanCache(SeriesRenderCache *cache);
     void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode);
@@ -95,14 +92,22 @@ public:
     void updateScene(Q3DScene *scene);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, QSurface3DSeries *series);
+    void updateFlipHorizontalGrid(bool flip);
     inline QPoint clickedPosition() const { return m_clickedPosition; }
     void resetClickedStatus();
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
+    void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                          const QStringList &labels);
+    void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
+                                   bool visible);
+    void updateMargin(float margin);
 
     void render(GLuint defaultFboHandle = 0);
 
 protected:
     void initializeOpenGL();
+    virtual void fixCameraTarget(QVector3D &target);
+    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
 
 signals:
     void flatShadingSupportedChanged(bool supported);
@@ -128,7 +133,6 @@ private:
 
     void calculateSceneScalingFactors();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionShaders();
     void initSurfaceShaders();
     void initSelectionBuffer();
@@ -136,13 +140,11 @@ private:
     void updateSelectionTextures();
     void createSelectionTexture(SurfaceSeriesRenderCache *cache, uint &lastSelectionId);
     void idToRGBA(uint id, uchar *r, uchar *g, uchar *b, uchar *a);
-    void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a, int stride);
+    void fillIdCorner(uchar *p, uchar r, uchar g, uchar b, uchar a);
     void surfacePointSelected(const QPoint &point);
     void updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point, bool label);
     QPoint selectionIdToSurfacePoint(uint id);
-#if !defined(QT_OPENGL_ES_2)
     void updateDepthBuffer();
-#endif
     void emitSelectedPointChanged(QPoint position);
 
     Q_DISABLE_COPY(Surface3DRenderer)

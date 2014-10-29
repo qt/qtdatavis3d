@@ -71,6 +71,8 @@ public:
     inline bool isVisible() const { return m_visible; }
     inline void setDataDirty(bool state) { m_objectDirty = state; }
     inline bool dataDirty() const { return m_objectDirty; }
+    inline void setStaticObjectUVDirty(bool state) { m_staticObjectUVDirty = state; }
+    inline bool staticObjectUVDirty() { return m_staticObjectUVDirty; }
 
 protected:
     QAbstract3DSeries *m_series;
@@ -94,6 +96,7 @@ protected:
     bool m_visible;
     Abstract3DRenderer *m_renderer;
     bool m_objectDirty;
+    bool m_staticObjectUVDirty;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

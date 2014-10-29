@@ -53,31 +53,28 @@ private:
     bool m_updateLabels;
     ShaderHelper *m_dotShader;
     ShaderHelper *m_dotGradientShader;
-#if defined(QT_OPENGL_ES_2)
+    ShaderHelper *m_staticSelectedItemGradientShader;
+    ShaderHelper *m_staticSelectedItemShader;
     ShaderHelper *m_pointShader;
-#endif
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
-    ShaderHelper *m_labelShader;
+    ShaderHelper *m_staticGradientPointShader;
     GLuint m_bgrTexture;
-    GLuint m_depthTexture;
     GLuint m_selectionTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
     GLuint m_selectionDepthBuffer;
     GLfloat m_shadowQualityToShader;
     GLint m_shadowQualityMultiplier;
-    GLfloat m_heightNormalizer;
-    GLfloat m_scaleFactor;
+    float m_scaleX;
+    float m_scaleY;
+    float m_scaleZ;
     int m_selectedItemIndex;
     ScatterSeriesRenderCache *m_selectedSeriesCache;
     ScatterSeriesRenderCache *m_oldSelectedSeriesCache;
-    QSizeF m_areaSize;
     GLfloat m_dotSizeScale;
-    bool m_hasHeightAdjustmentChanged;
     ScatterRenderItem m_dummyRenderItem;
-    GLfloat m_backgroundMargin;
     GLfloat m_maxItemSize;
     int m_clickedIndex;
     bool m_havePointSeries;
@@ -94,6 +91,12 @@ public:
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
     void updateItems(const QVector<Scatter3DController::ChangeItem> &items);
     void updateScene(Q3DScene *scene);
+    void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
+                          const QStringList &labels);
+    void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
+                                   bool visible);
+    void updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint);
+    void updateMargin(float margin);
 
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
@@ -107,10 +110,16 @@ public slots:
 
 protected:
     virtual void initializeOpenGL();
+    virtual void fixCameraTarget(QVector3D &target);
+    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
 
 private:
     virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
     virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
+    virtual void initStaticSelectedItemShaders(const QString &vertexShader,
+                                               const QString &fragmentShader,
+                                               const QString &gradientVertexShader,
+                                               const QString &gradientFragmentShader);
     virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
     virtual void updateTextures();
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
@@ -122,14 +131,11 @@ private:
     void loadBackgroundMesh();
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initStaticPointShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
-#if !defined(QT_OPENGL_ES_2)
     void initDepthShader();
     void updateDepthBuffer();
-#else
     void initPointShader();
-#endif
     void calculateTranslation(ScatterRenderItem &item);
     void calculateSceneScalingFactors();
 

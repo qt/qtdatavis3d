@@ -57,5 +57,18 @@
         <file alias="fragmentTexture">shaders/texture.frag</file>
         <file alias="fragmentTextureES2">shaders/texture_ES2.frag</file>
         <file alias="vertexTexture">shaders/texture.vert</file>
+        <file alias="fragmentTexturedSurfaceShadowFlat">shaders/surfaceTexturedShadowFlat.frag</file>
+        <file alias="fragmentSurfaceTexturedFlat">shaders/surfaceTexturedFlat.frag</file>
+        <file alias="fragmentTexture3D">shaders/texture3d.frag</file>
+        <file alias="vertexTexture3D">shaders/texture3d.vert</file>
+        <file alias="fragmentTexture3DSlice">shaders/texture3dslice.frag</file>
+        <file alias="vertexShadowNoMatrices">shaders/shadowNoMatrices.vert</file>
+        <file alias="vertexNoMatrices">shaders/defaultNoMatrices.vert</file>
+        <file alias="fragmentTexture3DLowDef">shaders/texture3dlowdef.frag</file>
+        <file alias="vertexPointES2_UV">shaders/point_ES2_UV.vert</file>
+        <file alias="fragment3DSliceFrames">shaders/3dsliceframes.frag</file>
+        <file alias="vertexPosition">shaders/position.vert</file>
+        <file alias="fragmentPositionMap">shaders/positionmap.frag</file>
+        <file alias="fragmentTexturedSurfaceShadow">shaders/surfaceTexturedShadow.frag</file>
     </qresource>
 </RCC>

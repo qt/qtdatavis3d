@@ -7,22 +7,33 @@ contains(QT_CONFIG, opengles1) {
 
 TEMPLATE = subdirs
 
-SUBDIRS += barstest \
-           scattertest \
-           surfacetest \
-           qmlcamera \
-           qmldynamicdata \
-           multigraphs \
-           directional \
-           qmlmultiwindow \
-           itemmodeltest \
-           qmlmultitest
+SUBDIRS += auto
 
-#SUBDIRS += kinectsurface
+qtHaveModule(quick) {
+    SUBDIRS += qmlcamera \
+               qmldynamicdata \
+               qmlmultiwindow \
+               qmlmultitest \
+               qmlvolume \
+               qmlperf
+}
+
+!android:!ios {
+    SUBDIRS += barstest \
+               scattertest \
+               surfacetest \
+               multigraphs \
+               directional \
+               itemmodeltest \
+               volumetrictest
+
+    # For testing code snippets of minimal applications
+    SUBDIRS += minimalbars \
+               minimalscatter \
+               minimalsurface
+
+    # Requires Kinect drivers
+    #SUBDIRS += kinectsurface
+}
 
 qtHaveModule(multimedia):!android:!static: SUBDIRS += spectrum
-
-# For testing code snippets of minimal applications
-SUBDIRS += minimalbars \
-           minimalscatter \
-           minimalsurface

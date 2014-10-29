@@ -119,7 +119,14 @@ void ScatterDataModifier::addData()
     m_graph->seriesList().at(0)->dataProxy()->resetArray(dataArray);
 }
 
-//! [8]
+void ScatterDataModifier::enableOptimization(int enabled)
+{
+    if (enabled)
+        m_graph->setOptimizationHints(QAbstract3DGraph::OptimizationStatic);
+    else
+        m_graph->setOptimizationHints(QAbstract3DGraph::OptimizationDefault);
+}
+
 void ScatterDataModifier::changeStyle(int style)
 {
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());

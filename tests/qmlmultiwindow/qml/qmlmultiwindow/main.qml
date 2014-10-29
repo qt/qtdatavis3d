@@ -31,19 +31,51 @@ Rectangle {
         id: data
     }
 
-    Window {
-        id: firstWindow
-        x: 100
-        y: 100
-        width: 500
-        height: 500
-        visible: true
-        Rectangle {
-            id: firstRect
-            color: "red"
-            anchors.fill: parent
-        }
-    }
+    property QtObject surfaceWindowObject;
+    property string surfaceWindowStr:
+    "\n
+        import QtQuick 2.1\n
+        import QtQuick.Window 2.1\n
+        import QtQuick.Layouts 1.0\n
+        import QtDataVisualization 1.0\n
+        import \".\"\n
+        Window {\n
+               Data {\n
+                   id: data\n
+               }\n
+        id: firstWindow\n
+        x: 100\n
+        y: 100\n
+        width: 500\n
+        height: 500\n
+        visible: true\n
+        Rectangle {\n
+            id: firstRect\n
+            color: \"red\"\n
+            anchors.fill: parent\n
+            Surface3D {\n
+                id: surfaceGraph\n
+                anchors.fill: parent\n
+                anchors.margins: parent.border.width\n
+                theme: Theme3D {\n
+                    type: Theme3D.ThemePrimaryColors\n
+                    font.pointSize: 60\n
+                }\n
+                scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh\n
+                Surface3DSeries {\n
+                    itemLabelFormat: \"Pop density at (@xLabel N, @zLabel E): @yLabel\"\n
+                    ItemModelSurfaceDataProxy {\n
+                        itemModel: data.myData\n
+                        rowRole: \"row\"\n
+                        columnRole: \"col\"\n
+                        xPosRole: \"latitude\"\n
+                        zPosRole: \"longitude\"\n
+                        yPosRole: \"pop_density\"\n
+                    }\n
+                }\n
+            }\n
+        }\n
+    }"
 
     Window {
         id: secondWindow
@@ -59,18 +91,12 @@ Rectangle {
         }
     }
 
-    states: [
-        State {
-            name: "firstWindow"
-            ParentChange { target: surfaceGraph; parent: firstRect; x: 0; y: 0 }
-        },
-        State {
-            name: "secondWindow"
-            ParentChange { target: surfaceGraph; parent: secondRect; x: 0; y: 0 }
-        }
-    ]
+    function destroyWindow() {
+        if (surfaceWindowObject != null)
+            surfaceWindowObject.destroy()
+    }
 
-    state: "firstWindow"
+    Component.onDestruction: destroyWindow()
 
     //! [0]
     GridLayout {
@@ -86,32 +112,17 @@ Rectangle {
         Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
-            border.color: surfaceGraph.theme.gridLineColor
             border.width: 2
+        }
 
-            Surface3D {
-                id: surfaceGraph
-                anchors.fill: parent
-                anchors.margins: parent.border.width
-                theme: Theme3D {
-                    type: Theme3D.ThemePrimaryColors
-                    font.pointSize: 60
-                }
-                scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
-
-                Surface3DSeries {
-                    itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
-                    ItemModelSurfaceDataProxy {
-                        itemModel: data.myData
-                        // The surface data points are not neatly lined up in rows and columns,
-                        // so we define explicit row and column roles.
-                        rowRole: "row"
-                        columnRole: "col"
-                        xPosRole: "latitude"
-                        zPosRole: "longitude"
-                        yPosRole: "pop_density"
-                    }
-                }
+        Timer {
+            id: windowToggleTimer
+            interval: 1000
+            running: false
+            repeat: false
+            onTriggered: {
+                destroyWindow()
+                surfaceWindowObject = Qt.createQmlObject(surfaceWindowStr, mainView)
             }
         }
 
@@ -131,13 +142,10 @@ Rectangle {
                     Layout.minimumWidth: parent.width / 2
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: "Move graph between windows"
+                    text: "(re)construct surface window in a loop"
                     onClicked: {
-                        if (mainView.state === "firstWindow") {
-                            mainView.state = "secondWindow"
-                        } else {
-                            mainView.state = "firstWindow"
-                        }
+                        windowToggleTimer.running = true
+                        windowToggleTimer.repeat = true
                     }
                 }
 
@@ -231,14 +239,11 @@ Rectangle {
     function clearSelections() {
         barGraph.clearSelection()
         scatterGraph.clearSelection()
-        surfaceGraph.clearSelection()
     }
 
     function resetCameras() {
-        surfaceGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
         scatterGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
         barGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetIsometricLeftHigh
-        surfaceGraph.scene.activeCamera.zoomLevel = 100.0
         scatterGraph.scene.activeCamera.zoomLevel = 100.0
         barGraph.scene.activeCamera.zoomLevel = 100.0
     }
@@ -246,12 +251,9 @@ Rectangle {
     function toggleMeshStyle() {
         if (barGraph.seriesList[0].meshSmooth === true) {
             barGraph.seriesList[0].meshSmooth = false
-            if (surfaceGraph.seriesList[0].flatShadingSupported)
-                surfaceGraph.seriesList[0].flatShadingEnabled = true
             scatterGraph.seriesList[0].meshSmooth = false
         } else {
             barGraph.seriesList[0].meshSmooth = true
-            surfaceGraph.seriesList[0].flatShadingEnabled = false
             scatterGraph.seriesList[0].meshSmooth = true
         }
     }

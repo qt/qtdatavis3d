@@ -27,6 +27,7 @@
 #include <QtCore/QDebug>
 #include <QtCore/QStringList>
 #include <QtCore/QPointer>
+#include <QtCore/QPropertyAnimation>
 
 using namespace QtDataVisualization;
 
@@ -49,6 +50,7 @@ public:
     void setSmoothBars(int smooth);
     void setSeriesVisibility(int enabled);
     void setReverseValueAxis(int enabled);
+    void setReflection(bool enabled);
 
 public slots:
     void changeRange(int range);
@@ -60,6 +62,7 @@ public slots:
     void changeLabelRotation(int rotation);
     void setAxisTitleVisibility(bool enabled);
     void setAxisTitleFixed(bool enabled);
+    void zoomToSelectedBar();
 
 signals:
     void shadowQualityChanged(int quality);
@@ -86,6 +89,14 @@ private:
     QBar3DSeries *m_secondarySeries;
     QAbstract3DSeries::Mesh m_barMesh;
     bool m_smooth;
+    QPropertyAnimation m_animationCameraX;
+    QPropertyAnimation m_animationCameraY;
+    QPropertyAnimation m_animationCameraZoom;
+    QPropertyAnimation m_animationCameraTarget;
+    float m_defaultAngleX;
+    float m_defaultAngleY;
+    float m_defaultZoom;
+    QVector3D m_defaultTarget;
 };
 
 #endif

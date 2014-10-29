@@ -141,6 +141,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty string Surface3DSeries::textureFile
+ *
+ * Holds the texture file name for the surface texture. To clear the texture, set empty
+ * file name.
+ */
+
+
+/*!
  * \enum QSurface3DSeries::DrawFlag
  *
  * Drawing mode of the surface. Values of this enumeration can be combined with OR operator.
@@ -300,6 +308,57 @@ QSurface3DSeries::DrawFlags QSurface3DSeries::drawMode() const
 }
 
 /*!
+ * \property QSurface3DSeries::texture
+ *
+ * Set the \a texture as a QImage for the surface. To clear the texture, set empty
+ * QImage as texture.
+ */
+void QSurface3DSeries::setTexture(const QImage &texture)
+{
+    if (dptr()->m_texture != texture) {
+        dptr()->setTexture(texture);
+
+        emit textureChanged(texture);
+        dptr()->m_textureFile.clear();
+    }
+}
+
+QImage QSurface3DSeries::texture() const
+{
+    return dptrc()->m_texture;
+}
+
+/*!
+ * \property QSurface3DSeries::textureFile
+ *
+ * Holds the texture file name for the surface texture. To clear the texture, set empty
+ * file name.
+ */
+void QSurface3DSeries::setTextureFile(const QString &filename)
+{
+    if (dptr()->m_textureFile != filename) {
+        if (filename.isEmpty()) {
+            setTexture(QImage());
+        } else {
+            QImage image(filename);
+            if (image.isNull()) {
+                qWarning() << "Warning: Tried to set invalid image file as surface texture.";
+                return;
+            }
+            setTexture(image);
+        }
+
+        dptr()->m_textureFile = filename;
+        emit textureFileChanged(filename);
+    }
+}
+
+QString QSurface3DSeries::textureFile() const
+{
+    return dptrc()->m_textureFile;
+}
+
+/*!
  * \internal
  */
 QSurface3DSeriesPrivate *QSurface3DSeries::dptr()
@@ -443,6 +502,13 @@ void QSurface3DSeriesPrivate::setDrawMode(QSurface3DSeries::DrawFlags mode)
     } else {
         qWarning("You may not clear all draw flags. Mode not changed.");
     }
+}
+
+void QSurface3DSeriesPrivate::setTexture(const QImage &texture)
+{
+    m_texture = texture;
+    if (static_cast<Surface3DController *>(m_controller))
+        static_cast<Surface3DController *>(m_controller)->updateSurfaceTexture(qptr());
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

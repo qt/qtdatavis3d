@@ -10,3 +10,5 @@ SOURCES += \
     $$PWD/qabstract3dinputhandler.cpp \
     $$PWD/q3dinputhandler.cpp \
     $$PWD/qtouch3dinputhandler.cpp
+
+INCLUDEPATH += $$PWD

@@ -28,17 +28,21 @@ inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
     QSurfaceFormat surfaceFormat;
 
     surfaceFormat.setDepthBufferSize(24);
+    surfaceFormat.setStencilBufferSize(8);
     surfaceFormat.setSwapBehavior(QSurfaceFormat::DoubleBuffer);
-#if !defined(QT_OPENGL_ES_2)
-    surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
-#else
+    surfaceFormat.setRenderableType(QSurfaceFormat::DefaultRenderableType);
+#if defined(QT_OPENGL_ES_2)
     // Antialias not supported for ES
     antialias = false;
-    surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
+    surfaceFormat.setRedBufferSize(8);
+    surfaceFormat.setBlueBufferSize(8);
+    surfaceFormat.setGreenBufferSize(8);
 #endif
 
     if (antialias)
         surfaceFormat.setSamples(8);
+    else
+        surfaceFormat.setSamples(0);
 
     return surfaceFormat;
 }

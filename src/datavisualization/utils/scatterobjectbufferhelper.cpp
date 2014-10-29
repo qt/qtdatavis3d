@@ -20,12 +20,14 @@
 #include "objecthelper_p.h"
 #include <QtGui/QVector2D>
 #include <QtGui/QMatrix4x4>
+#include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 const GLfloat itemScaler = 3.0f;
 
 ScatterObjectBufferHelper::ScatterObjectBufferHelper()
+    : m_scaleY(0.0f)
 {
     m_indicesType = GL_UNSIGNED_INT;
 }
@@ -36,34 +38,40 @@ ScatterObjectBufferHelper::~ScatterObjectBufferHelper()
 
 void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal dotScale)
 {
-    initializeOpenGLFunctions();
-
     m_meshDataLoaded = false;
     m_indexCount = 0;
 
     ObjectHelper *dotObj = cache->object();
-    ScatterRenderItemArray &renderArray = cache->renderArray();
+    const ScatterRenderItemArray &renderArray = cache->renderArray();
     const uint renderArraySize = renderArray.size();
+
     if (renderArraySize == 0)
         return;  // No use to go forward
-    uint itemCount = renderArraySize;
+
+    uint itemCount = 0;
     QQuaternion seriesRotation(cache->meshRotation());
+
     if (m_meshDataLoaded) {
         // Delete old data
         glDeleteBuffers(1, &m_vertexbuffer);
         glDeleteBuffers(1, &m_uvbuffer);
         glDeleteBuffers(1, &m_normalbuffer);
         glDeleteBuffers(1, &m_elementbuffer);
+        m_vertexbuffer = 0;
+        m_uvbuffer = 0;
+        m_normalbuffer = 0;
+        m_elementbuffer = 0;
     }
+
     // Index vertices
     const QVector<unsigned short> indices = dotObj->indices();
     const QVector<QVector3D> indexed_vertices = dotObj->indexedvertices();
     const QVector<QVector2D> indexed_uvs = dotObj->indexedUVs();
     const QVector<QVector3D> indexed_normals = dotObj->indexedNormals();
-    int indicesCount = indices.count();
-    int verticeCount = indexed_vertices.count();
-    int uvsCount = indexed_uvs.count();
-    int normalsCount = indexed_normals.count();
+    const int indicesCount = indices.count();
+    const int verticeCount = indexed_vertices.count();
+    const int uvsCount = indexed_uvs.count();
+    const int normalsCount = indexed_normals.count();
 
     float itemSize = cache->itemSize() / itemScaler;
     if (itemSize == 0.0f)
@@ -89,47 +97,58 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
 
     buffered_indices.resize(indicesCount * renderArraySize);
     buffered_vertices.resize(verticeCount * renderArraySize);
-    buffered_uvs.resize(uvsCount * renderArraySize);
     buffered_normals.resize(normalsCount * renderArraySize);
-    uint pos = 0;
+    buffered_uvs.resize(uvsCount * renderArraySize);
+
+    if (cache->colorStyle() == Q3DTheme::ColorStyleRangeGradient)
+        createRangeGradientUVs(cache, buffered_uvs);
+    else if (cache->colorStyle() == Q3DTheme::ColorStyleObjectGradient)
+        createObjectGradientUVs(cache, buffered_uvs, indexed_vertices);
+
+    QVector2D dummyUV(0.0f, 0.0f);
+
+    cache->bufferIndices().resize(renderArraySize);
 
     for (uint i = 0; i < renderArraySize; i++) {
-        ScatterRenderItem &item = renderArray[i];
-        if (!item.isVisible()) {
-            itemCount--;
+        const ScatterRenderItem &item = renderArray.at(i);
+        if (!item.isVisible())
             continue;
-        }
+        else
+            cache->bufferIndices()[i] = itemCount;
 
-        int offset = pos * verticeCount;
+        int offset = itemCount * verticeCount;
         if (item.rotation().isIdentity()) {
-            for (int j = 0; j < verticeCount; j++)
+            for (int j = 0; j < verticeCount; j++) {
                 buffered_vertices[j + offset] = scaled_vertices[j] + item.translation();
+                buffered_normals[j + offset] = indexed_normals[j];
+            }
         } else {
             QMatrix4x4 matrix;
-            matrix.rotate(seriesRotation * item.rotation());
-            modelMatrix = matrix.transposed();
-            modelMatrix.scale(modelScaler);
+            QQuaternion totalRotation = seriesRotation * item.rotation();
+            matrix.rotate(totalRotation);
+            matrix.scale(modelScaler);
+            QMatrix4x4 itModelMatrix = matrix.inverted();
+            modelMatrix = matrix.transposed(); // Because of row-column major difference
 
-            for (int j = 0; j < verticeCount; j++)
+            for (int j = 0; j < verticeCount; j++) {
                 buffered_vertices[j + offset] = indexed_vertices[j] * modelMatrix
                         + item.translation();
+                buffered_normals[j + offset] = indexed_normals[j] * itModelMatrix;
+            }
         }
 
-        offset = pos * normalsCount;
-        for (int j = 0; j < normalsCount; j++)
-            buffered_normals[j + offset] = indexed_normals[j];
+        if (cache->colorStyle() == Q3DTheme::ColorStyleUniform) {
+            offset = itemCount * uvsCount;
+            for (int j = 0; j < uvsCount; j++)
+                buffered_uvs[j + offset] = dummyUV;
+        }
 
-        offset = pos * uvsCount;
-        for (int j = 0; j < uvsCount; j++)
-            buffered_uvs[j + offset] = indexed_uvs[j];
-
-        int offsetVertice = i * verticeCount;
-        offset = pos * indicesCount;
-        for (int j = 0; j < indicesCount; j++) {
+        int offsetVertice = itemCount * verticeCount;
+        offset = itemCount * indicesCount;
+        for (int j = 0; j < indicesCount; j++)
             buffered_indices[j + offset] = GLuint(indices[j] + offsetVertice);
-        }
 
-        pos++;
+        itemCount++;
     }
 
     m_indexCount = indicesCount * itemCount;
@@ -164,14 +183,127 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
     }
 }
 
+void ScatterObjectBufferHelper::updateUVs(ScatterSeriesRenderCache *cache)
+{
+    ObjectHelper *dotObj = cache->object();
+    const int uvsCount = dotObj->indexedUVs().count();
+    const ScatterRenderItemArray &renderArray = cache->renderArray();
+    const bool updateAll = (cache->updateIndices().size() == 0);
+    const int updateSize = updateAll ? renderArray.size() : cache->updateIndices().size();
+
+    if (!updateSize)
+        return;
+
+    QVector<QVector2D> buffered_uvs;
+    buffered_uvs.resize(uvsCount * updateSize);
+
+    uint itemCount = 0;
+    if (cache->colorStyle() == Q3DTheme::ColorStyleRangeGradient) {
+        itemCount = createRangeGradientUVs(cache, buffered_uvs);
+    } else if (cache->colorStyle() == Q3DTheme::ColorStyleObjectGradient) {
+        const QVector<QVector3D> indexed_vertices = dotObj->indexedvertices();
+        itemCount = createObjectGradientUVs(cache, buffered_uvs, indexed_vertices);
+    }
+
+    glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+    int itemSize = uvsCount * sizeof(QVector2D);
+    if (cache->updateIndices().size()) {
+        int pos = 0;
+        for (int i = 0; i < updateSize; i++) {
+            int index = cache->updateIndices().at(i);
+            if (renderArray.at(index).isVisible()) {
+                int dataPos = cache->bufferIndices().at(index);
+                glBufferSubData(GL_ARRAY_BUFFER, itemSize * dataPos, itemSize,
+                                &buffered_uvs.at(uvsCount * pos++));
+            }
+        }
+    } else {
+        glBufferData(GL_ARRAY_BUFFER, itemSize * itemCount, &buffered_uvs.at(0), GL_STATIC_DRAW);
+    }
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache *cache,
+                                                       QVector<QVector2D> &buffered_uvs)
+{
+    ObjectHelper *dotObj = cache->object();
+    const int uvsCount = dotObj->indexedUVs().count();
+    const ScatterRenderItemArray &renderArray = cache->renderArray();
+    const bool updateAll = (cache->updateIndices().size() == 0);
+    const int updateSize = updateAll ? renderArray.size() : cache->updateIndices().size();
+    const float yAdjustment = 0.1f;
+    const float flippedYAdjustment = 0.9f;
+
+    QVector2D uv;
+    uv.setX(0.0f);
+    uint pos = 0;
+    for (int i = 0; i < updateSize; i++) {
+        int index = updateAll ? i : cache->updateIndices().at(i);
+        const ScatterRenderItem &item = renderArray.at(index);
+        if (!item.isVisible())
+            continue;
+
+        float y = ((item.translation().y() + m_scaleY) * 0.5f) / m_scaleY;
+
+        // Avoid values near gradient texel boundary, as this causes artifacts
+        // with some graphics cards.
+        const float floorY = float(qFloor(y * gradientTextureHeight));
+        const float diff = (y * gradientTextureHeight) - floorY;
+        if (diff < yAdjustment)
+            y += yAdjustment / gradientTextureHeight;
+        else if (diff > flippedYAdjustment)
+            y -= yAdjustment / gradientTextureHeight;
+        uv.setY(y);
+
+        int offset = pos * uvsCount;
+        for (int j = 0; j < uvsCount; j++)
+            buffered_uvs[j + offset] = uv;
+
+        pos++;
+    }
+
+    return pos;
+}
+
+uint ScatterObjectBufferHelper::createObjectGradientUVs(ScatterSeriesRenderCache *cache,
+                                                        QVector<QVector2D> &buffered_uvs,
+                                                        const QVector<QVector3D> &indexed_vertices)
+{
+    ObjectHelper *dotObj = cache->object();
+    const int uvsCount = dotObj->indexedUVs().count();
+    const ScatterRenderItemArray &renderArray = cache->renderArray();
+    const uint renderArraySize = renderArray.size();
+
+    QVector2D uv;
+    uv.setX(0.0f);
+    uint pos = 0;
+    for (uint i = 0; i < renderArraySize; i++) {
+        const ScatterRenderItem &item = renderArray.at(i);
+        if (!item.isVisible())
+            continue;
+
+        int offset = pos * uvsCount;
+        for (int j = 0; j < uvsCount; j++) {
+            uv.setY((indexed_vertices.at(j).y() + 1.0f) / 2.0f);
+            buffered_uvs[j + offset] = uv;
+        }
+
+        pos++;
+    }
+
+    return pos;
+}
+
 void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal dotScale)
 {
-    initializeOpenGLFunctions();
-
     ObjectHelper *dotObj = cache->object();
-    ScatterRenderItemArray &renderArray = cache->renderArray();
-    const int renderArraySize = renderArray.size();
+    const ScatterRenderItemArray &renderArray = cache->renderArray();
+    const bool updateAll = (cache->updateIndices().size() == 0);
+    const int updateSize = updateAll ? renderArray.size() : cache->updateIndices().size();
     QQuaternion seriesRotation(cache->meshRotation());
+
+    if (!updateSize)
+        return;
 
     // Index vertices
     const QVector<QVector3D> indexed_vertices = dotObj->indexedvertices();
@@ -195,14 +327,16 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
         scaled_vertices[i] = indexed_vertices[i] * modelMatrix;
 
     QVector<QVector3D> buffered_vertices;
+    buffered_vertices.resize(verticeCount * updateSize);
 
-    buffered_vertices.resize(verticeCount * renderArraySize);
-    for (int i = 0; i < renderArraySize; i++) {
-        ScatterRenderItem &item = renderArray[i];
+    int itemCount = 0;
+    for (int i = 0; i < updateSize; i++) {
+        int index = updateAll ? i : cache->updateIndices().at(i);
+        const ScatterRenderItem &item = renderArray.at(index);
         if (!item.isVisible())
             continue;
 
-        const int offset = i * verticeCount;
+        const int offset = itemCount * verticeCount;
         if (item.rotation().isIdentity()) {
             for (int j = 0; j < verticeCount; j++)
                 buffered_vertices[j + offset] = scaled_vertices[j] + item.translation();
@@ -216,15 +350,28 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
                 buffered_vertices[j + offset] = indexed_vertices[j] * modelMatrix
                         + item.translation();
         }
+        itemCount++;
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, buffered_vertices.size() * sizeof(QVector3D),
-                 &buffered_vertices.at(0),
-                 GL_DYNAMIC_DRAW);
-
+    int sizeOfItem = verticeCount * sizeof(QVector3D);
+    if (updateAll) {
+        if (itemCount) {
+            glBufferData(GL_ARRAY_BUFFER, itemCount * sizeOfItem,
+                         &buffered_vertices.at(0), GL_STATIC_DRAW);
+        }
+    } else {
+        itemCount = 0;
+        for (int i = 0; i < updateSize; i++) {
+            int index = updateAll ? i : cache->updateIndices().at(i);
+            if (renderArray.at(index).isVisible()) {
+                glBufferSubData(GL_ARRAY_BUFFER, cache->bufferIndices().at(index) * sizeOfItem,
+                                sizeOfItem, &buffered_vertices.at(itemCount * verticeCount));
+                itemCount++;
+            }
+        }
+    }
     glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
     m_meshDataLoaded = true;
 }

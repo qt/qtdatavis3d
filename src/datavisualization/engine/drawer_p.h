@@ -75,11 +75,11 @@ public:
     inline GLfloat scaledFontSize() const { return m_scaledFontSize; }
 
     void drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId = 0,
-                    GLuint depthTextureId = 0);
+                    GLuint depthTextureId = 0, GLuint textureId3D = 0);
     void drawSelectionObject(ShaderHelper *shader, AbstractObjectHelper *object);
     void drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object);
     void drawPoint(ShaderHelper *shader);
-    void drawPoints(ShaderHelper *shader, ScatterPointBufferHelper *object);
+    void drawPoints(ShaderHelper *shader, ScatterPointBufferHelper *object, GLuint textureId);
     void drawLine(ShaderHelper *shader);
     void drawLabel(const AbstractRenderItem &item, const LabelItem &labelItem,
                    const QMatrix4x4 &viewmatrix, const QMatrix4x4 &projectionmatrix,

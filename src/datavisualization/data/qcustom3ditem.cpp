@@ -62,13 +62,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * Holds the item \a position as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
  *
- * Item position is either in data coordinates or in absolute coordinates, depending on
+ * Item position is either in data coordinates or in absolute coordinates, depending on the
  * positionAbsolute property. When using absolute coordinates, values between \c{-1.0...1.0} are
  * within axis ranges.
  *
- * \note Items positioned outside any axis range are not rendered if positionAbsolute is \c{false}.
+ * \note Items positioned outside any axis range are not rendered if positionAbsolute is \c{false},
+ * unless the item is a Custom3DVolume that would be partially visible and scalingAbsolute is also
+ * \c{false}. In that case, the visible portion of the volume will be rendered.
  *
- * \sa positionAbsolute
+ * \sa positionAbsolute, scalingAbsolute
  */
 
 /*! \qmlproperty bool Custom3DItem::positionAbsolute
@@ -83,8 +85,33 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*! \qmlproperty vector3d Custom3DItem::scaling
  *
  * Holds the item \a scaling as a vector3d. Defaults to \c {vector3d(0.1, 0.1, 0.1)}.
- * The default value sets the item to 10% of the height of the graph, provided the item size is
- * normalized.
+ *
+ * Item scaling is either in data values or in absolute values, depending on the
+ * scalingAbsolute property. The default vector interpreted as absolute values sets the item to
+ * 10% of the height of the graph, provided the item mesh is normalized and the graph aspect ratios
+ * haven't been changed from the defaults.
+ *
+ * \sa scalingAbsolute
+ */
+
+/*! \qmlproperty bool Custom3DItem::scalingAbsolute
+ * \since QtDataVisualization 1.2
+ *
+ * This property dictates if item scaling is to be handled in data values or in absolute
+ * values. Defaults to \c{true}. Items with absolute scaling will be rendered at the same
+ * size, regardless of axis ranges. Items with data scaling will change their apparent size
+ * according to the axis ranges. If positionAbsolute value is \c{true}, this property is ignored
+ * and scaling is interpreted as an absolute value. If the item has rotation, the data scaling
+ * is calculated on the unrotated item. Similarly, for Custom3DVolume items, the range clipping
+ * is calculated on the unrotated item.
+ *
+ * \note: Only absolute scaling is supported for Custom3DLabel items or for custom items used in
+ * \l{AbstractGraph3D::polar}{polar} graphs.
+ *
+ * \note: The custom item's mesh must be normalized to range \c{[-1 ,1]}, or the data
+ * scaling will not be accurate.
+ *
+ * \sa scaling, positionAbsolute
  */
 
 /*! \qmlproperty quaternion Custom3DItem::rotation
@@ -180,7 +207,9 @@ QString QCustom3DItem::meshFile() const
  * positionAbsolute property. When using absolute coordinates, values between \c{-1.0...1.0} are
  * within axis ranges.
  *
- * \note Items positioned outside any axis range are not rendered if positionAbsolute is \c{false}.
+ * \note Items positioned outside any axis range are not rendered if positionAbsolute is \c{false},
+ * unless the item is a QCustom3DVolume that would be partially visible and scalingAbsolute is also
+ * \c{false}. In that case, the visible portion of the volume will be rendered.
  *
  * \sa positionAbsolute
  */
@@ -211,7 +240,7 @@ void QCustom3DItem::setPositionAbsolute(bool positionAbsolute)
 {
     if (d_ptr->m_positionAbsolute != positionAbsolute) {
         d_ptr->m_positionAbsolute = positionAbsolute;
-        d_ptr->m_dirtyBits.positionAbsoluteDirty = true;
+        d_ptr->m_dirtyBits.positionDirty = true;
         emit positionAbsoluteChanged(positionAbsolute);
         emit d_ptr->needUpdate();
     }
@@ -225,8 +254,13 @@ bool QCustom3DItem::isPositionAbsolute() const
 /*! \property QCustom3DItem::scaling
  *
  * Holds the item \a scaling as a QVector3D. Defaults to \c {QVector3D(0.1, 0.1, 0.1)}.
- * The default value sets the item to 10% of the height of the graph, provided the item size is
- * normalized.
+ *
+ * Item scaling is either in data values or in absolute values, depending on the
+ * scalingAbsolute property. The default vector interpreted as absolute values sets the item to
+ * 10% of the height of the graph, provided the item mesh is normalized and the graph aspect ratios
+ * haven't been changed from the defaults.
+ *
+ * \sa scalingAbsolute
  */
 void QCustom3DItem::setScaling(const QVector3D &scaling)
 {
@@ -241,6 +275,42 @@ void QCustom3DItem::setScaling(const QVector3D &scaling)
 QVector3D QCustom3DItem::scaling() const
 {
     return d_ptr->m_scaling;
+}
+
+/*! \property QCustom3DItem::scalingAbsolute
+ * \since QtDataVisualization 1.2
+ *
+ * This property dictates if item scaling is to be handled in data values or in absolute
+ * values. Defaults to \c{true}. Items with absolute scaling will be rendered at the same
+ * size, regardless of axis ranges. Items with data scaling will change their apparent size
+ * according to the axis ranges. If positionAbsolute value is \c{true}, this property is ignored
+ * and scaling is interpreted as an absolute value. If the item has rotation, the data scaling
+ * is calculated on the unrotated item. Similarly, for QCustom3DVolume items, the range clipping
+ * is calculated on the unrotated item.
+ *
+ * \note: Only absolute scaling is supported for QCustom3DLabel items or for custom items used in
+ * \l{QAbstract3DGraph::polar}{polar} graphs.
+ *
+ * \note: The custom item's mesh must be normalized to range \c{[-1 ,1]}, or the data
+ * scaling will not be accurate.
+ *
+ * \sa scaling, positionAbsolute
+ */
+void QCustom3DItem::setScalingAbsolute(bool scalingAbsolute)
+{
+    if (d_ptr->m_isLabelItem && !scalingAbsolute) {
+        qWarning() << __FUNCTION__ << "Data bounds are not supported for label items.";
+    } else if (d_ptr->m_scalingAbsolute != scalingAbsolute) {
+        d_ptr->m_scalingAbsolute = scalingAbsolute;
+        d_ptr->m_dirtyBits.scalingDirty = true;
+        emit scalingAbsoluteChanged(scalingAbsolute);
+        emit d_ptr->needUpdate();
+    }
+}
+
+bool QCustom3DItem::isScalingAbsolute() const
+{
+    return d_ptr->m_scalingAbsolute;
 }
 
 /*! \property QCustom3DItem::rotation
@@ -367,13 +437,16 @@ QString QCustom3DItem::textureFile() const
 
 QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q) :
     q_ptr(q),
+    m_textureImage(QImage(1, 1, QImage::Format_ARGB32)),
     m_position(QVector3D(0.0f, 0.0f, 0.0f)),
     m_positionAbsolute(false),
     m_scaling(QVector3D(0.1f, 0.1f, 0.1f)),
-    m_rotation(QQuaternion(0.0f, 0.0f, 0.0f, 0.0f)),
+    m_scalingAbsolute(true),
+    m_rotation(identityQuaternion),
     m_visible(true),
     m_shadowCasting(true),
-    m_isLabelItem(false)
+    m_isLabelItem(false),
+    m_isVolumeItem(false)
 {
 }
 
@@ -381,14 +454,17 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q, const QString &mesh
                                            const QVector3D &position, const QVector3D &scaling,
                                            const QQuaternion &rotation) :
     q_ptr(q),
+    m_textureImage(QImage(1, 1, QImage::Format_ARGB32)),
     m_meshFile(meshFile),
     m_position(position),
     m_positionAbsolute(false),
     m_scaling(scaling),
+    m_scalingAbsolute(true),
     m_rotation(rotation),
     m_visible(true),
     m_shadowCasting(true),
-    m_isLabelItem(false)
+    m_isLabelItem(false),
+    m_isVolumeItem(false)
 {
 }
 
@@ -412,7 +488,6 @@ void QCustom3DItemPrivate::resetDirtyBits()
     m_dirtyBits.textureDirty = false;
     m_dirtyBits.meshDirty = false;
     m_dirtyBits.positionDirty = false;
-    m_dirtyBits.positionAbsoluteDirty = false;
     m_dirtyBits.scalingDirty = false;
     m_dirtyBits.rotationDirty = false;
     m_dirtyBits.visibleDirty = false;

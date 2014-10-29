@@ -36,11 +36,13 @@
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
+    //QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
 
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
     QVBoxLayout *vLayout2 = new QVBoxLayout();
+    QVBoxLayout *vLayout3 = new QVBoxLayout();
 
     Q3DScatter *chart = new Q3DScatter();
     QSize screenSize = chart->screen()->size();
@@ -56,6 +58,7 @@ int main(int argc, char **argv)
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
+    hLayout->addLayout(vLayout3);
 
     QPushButton *themeButton = new QPushButton(widget);
     themeButton->setText(QStringLiteral("Change theme"));
@@ -235,6 +238,25 @@ int main(int argc, char **argv)
     aspectRatioSlider->setValue(20);
     aspectRatioSlider->setMaximum(100);
 
+    QSlider *horizontalAspectRatioSlider = new QSlider(Qt::Horizontal, widget);
+    horizontalAspectRatioSlider->setTickInterval(30);
+    horizontalAspectRatioSlider->setTickPosition(QSlider::TicksBelow);
+    horizontalAspectRatioSlider->setMinimum(0);
+    horizontalAspectRatioSlider->setValue(0);
+    horizontalAspectRatioSlider->setMaximum(300);
+
+    QCheckBox *optimizationStaticCB = new QCheckBox(widget);
+    optimizationStaticCB->setText(QStringLiteral("Static optimization"));
+    optimizationStaticCB->setChecked(false);
+
+    QCheckBox *orthoCB = new QCheckBox(widget);
+    orthoCB->setText(QStringLiteral("Orthographic projection"));
+    orthoCB->setChecked(false);
+
+    QCheckBox *polarCB = new QCheckBox(widget);
+    polarCB->setText(QStringLiteral("Polar graph"));
+    polarCB->setChecked(false);
+
     QCheckBox *axisTitlesVisibleCB = new QCheckBox(widget);
     axisTitlesVisibleCB->setText(QStringLiteral("Axis titles visible"));
     axisTitlesVisibleCB->setChecked(false);
@@ -249,6 +271,34 @@ int main(int argc, char **argv)
     axisLabelRotationSlider->setMinimum(0);
     axisLabelRotationSlider->setValue(0);
     axisLabelRotationSlider->setMaximum(90);
+
+    QSlider *radialLabelSlider = new QSlider(Qt::Horizontal, widget);
+    radialLabelSlider->setTickInterval(10);
+    radialLabelSlider->setTickPosition(QSlider::TicksBelow);
+    radialLabelSlider->setMinimum(0);
+    radialLabelSlider->setValue(100);
+    radialLabelSlider->setMaximum(150);
+
+    QSlider *cameraTargetSliderX = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderX->setTickInterval(1);
+    cameraTargetSliderX->setMinimum(-100);
+    cameraTargetSliderX->setValue(0);
+    cameraTargetSliderX->setMaximum(100);
+    QSlider *cameraTargetSliderY = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderY->setTickInterval(1);
+    cameraTargetSliderY->setMinimum(-100);
+    cameraTargetSliderY->setValue(0);
+    cameraTargetSliderY->setMaximum(100);
+    QSlider *cameraTargetSliderZ = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderZ->setTickInterval(1);
+    cameraTargetSliderZ->setMinimum(-100);
+    cameraTargetSliderZ->setValue(0);
+    cameraTargetSliderZ->setMaximum(100);
+
+    QSlider *marginSlider = new QSlider(Qt::Horizontal, widget);
+    marginSlider->setMinimum(-1);
+    marginSlider->setValue(-1);
+    marginSlider->setMaximum(100);
 
     vLayout->addWidget(themeButton, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
@@ -296,12 +346,26 @@ int main(int argc, char **argv)
     vLayout2->addWidget(fontList);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")));
     vLayout2->addWidget(fontSizeSlider);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
-    vLayout2->addWidget(aspectRatioSlider, 1, Qt::AlignTop);
-    vLayout2->addWidget(axisTitlesVisibleCB);
-    vLayout2->addWidget(axisTitlesFixedCB);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
-    vLayout2->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust vertical aspect ratio")));
+    vLayout2->addWidget(aspectRatioSlider);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust horizontal aspect ratio")));
+    vLayout2->addWidget(horizontalAspectRatioSlider, 1, Qt::AlignTop);
+
+    vLayout3->addWidget(optimizationStaticCB);
+    vLayout3->addWidget(orthoCB);
+    vLayout3->addWidget(polarCB);
+    vLayout3->addWidget(axisTitlesVisibleCB);
+    vLayout3->addWidget(axisTitlesFixedCB);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
+    vLayout3->addWidget(axisLabelRotationSlider);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Radial label offset")));
+    vLayout3->addWidget(radialLabelSlider, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Camera target")), 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderX, 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderY, 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderZ, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust margin")), 0, Qt::AlignTop);
+    vLayout3->addWidget(marginSlider, 1, Qt::AlignTop);
 
     ScatterDataModifier *modifier = new ScatterDataModifier(chart);
 
@@ -389,6 +453,12 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::setMaxY);
     QObject::connect(maxSliderZ, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setMaxZ);
+    QObject::connect(optimizationStaticCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::toggleStatic);
+    QObject::connect(orthoCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::toggleOrtho);
+    QObject::connect(polarCB, &QCheckBox::stateChanged, modifier,
+                     &ScatterDataModifier::togglePolar);
     QObject::connect(axisTitlesVisibleCB, &QCheckBox::stateChanged, modifier,
                      &ScatterDataModifier::toggleAxisTitleVisibility);
     QObject::connect(axisTitlesFixedCB, &QCheckBox::stateChanged, modifier,
@@ -397,13 +467,25 @@ int main(int argc, char **argv)
                      &ScatterDataModifier::changeLabelRotation);
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged, modifier,
                      &ScatterDataModifier::setAspectRatio);
+    QObject::connect(horizontalAspectRatioSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setHorizontalAspectRatio);
+    QObject::connect(radialLabelSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::changeRadialLabelOffset);
+    QObject::connect(cameraTargetSliderX, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setCameraTargetX);
+    QObject::connect(cameraTargetSliderY, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setCameraTargetY);
+    QObject::connect(cameraTargetSliderZ, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setCameraTargetZ);
+    QObject::connect(marginSlider, &QSlider::valueChanged, modifier,
+                     &ScatterDataModifier::setGraphMargin);
 
     modifier->setFpsLabel(fpsLabel);
 
     chart->setGeometry(QRect(0, 0, 800, 800));
 
     modifier->start();
-    modifier->renderToImage(); // Initial hidden render
+    //modifier->renderToImage(); // Initial hidden render
 
     widget->show();
 

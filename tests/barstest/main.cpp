@@ -34,6 +34,18 @@
 #include <QColorDialog>
 #include <QLineEdit>
 #include <QSpinBox>
+#include <QtGui/QOpenGLContext>
+
+static bool isOpenGLES()
+{
+#if defined(QT_OPENGL_ES_2)
+    return true;
+#elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
+    return false;
+#else
+    return QOpenGLContext::currentContext()->isOpenGLES();
+#endif
+}
 
 int main(int argc, char **argv)
 {
@@ -43,13 +55,13 @@ int main(int argc, char **argv)
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
     QVBoxLayout *vLayout2 = new QVBoxLayout();
+    QVBoxLayout *vLayout3 = new QVBoxLayout();
 
     // For testing custom surface format
     QSurfaceFormat surfaceFormat;
     surfaceFormat.setDepthBufferSize(24);
-#if !defined(QT_OPENGL_ES_2)
-    surfaceFormat.setSamples(8);
-#endif
+    if (!isOpenGLES())
+        surfaceFormat.setSamples(8);
 
     Q3DBars *widgetchart = new Q3DBars(&surfaceFormat);
     QSize screenSize = widgetchart->screen()->size();
@@ -65,6 +77,7 @@ int main(int argc, char **argv)
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
+    hLayout->addLayout(vLayout3);
 
     QPushButton *addSeriesButton = new QPushButton(widget);
     addSeriesButton->setText(QStringLiteral("Add / Remove a series"));
@@ -220,6 +233,22 @@ int main(int argc, char **argv)
     staticCheckBox->setText("Use dynamic data");
     staticCheckBox->setChecked(false);
 
+    QCheckBox *inputHandlerRotationCheckBox = new QCheckBox(widget);
+    inputHandlerRotationCheckBox->setText("IH: Allow rotation");
+    inputHandlerRotationCheckBox->setChecked(true);
+
+    QCheckBox *inputHandlerZoomCheckBox = new QCheckBox(widget);
+    inputHandlerZoomCheckBox->setText("IH: Allow zoom");
+    inputHandlerZoomCheckBox->setChecked(true);
+
+    QCheckBox *inputHandlerSelectionCheckBox = new QCheckBox(widget);
+    inputHandlerSelectionCheckBox->setText("IH: Allow selection");
+    inputHandlerSelectionCheckBox->setChecked(true);
+
+    QCheckBox *inputHandlerZoomAtTargetCheckBox = new QCheckBox(widget);
+    inputHandlerZoomAtTargetCheckBox->setText("IH: setZoomAtTarget");
+    inputHandlerZoomAtTargetCheckBox->setChecked(true);
+
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
     rotationSliderX->setTickInterval(1);
     rotationSliderX->setMinimum(-180);
@@ -238,6 +267,23 @@ int main(int argc, char **argv)
     ratioSlider->setMinimum(10);
     ratioSlider->setValue(30);
     ratioSlider->setMaximum(100);
+
+    QCheckBox *reflectionCheckBox = new QCheckBox(widget);
+    reflectionCheckBox->setText(QStringLiteral("Show reflections"));
+    reflectionCheckBox->setChecked(false);
+
+    QSlider *reflectivitySlider = new QSlider(Qt::Horizontal, widget);
+    reflectivitySlider->setMinimum(0);
+    reflectivitySlider->setValue(50);
+    reflectivitySlider->setMaximum(100);
+
+    QSlider *floorLevelSlider = new QSlider(Qt::Horizontal, widget);
+    floorLevelSlider->setMinimum(-50);
+    floorLevelSlider->setValue(0);
+    floorLevelSlider->setMaximum(50);
+
+    QPushButton *toggleCustomItemButton = new QPushButton(widget);
+    toggleCustomItemButton->setText(QStringLiteral("Toggle Custom Item"));
 
     QSlider *spacingSliderX = new QSlider(Qt::Horizontal, widget);
     spacingSliderX->setTickInterval(1);
@@ -317,6 +363,27 @@ int main(int argc, char **argv)
     valueAxisSegmentsSpin->setMaximum(100);
     valueAxisSegmentsSpin->setValue(10);
 
+    QSlider *cameraTargetSliderX = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderX->setTickInterval(1);
+    cameraTargetSliderX->setMinimum(-100);
+    cameraTargetSliderX->setValue(0);
+    cameraTargetSliderX->setMaximum(100);
+    QSlider *cameraTargetSliderY = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderY->setTickInterval(1);
+    cameraTargetSliderY->setMinimum(-100);
+    cameraTargetSliderY->setValue(0);
+    cameraTargetSliderY->setMaximum(100);
+    QSlider *cameraTargetSliderZ = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderZ->setTickInterval(1);
+    cameraTargetSliderZ->setMinimum(-100);
+    cameraTargetSliderZ->setValue(0);
+    cameraTargetSliderZ->setMaximum(100);
+
+    QSlider *marginSlider = new QSlider(Qt::Horizontal, widget);
+    marginSlider->setMinimum(-1);
+    marginSlider->setValue(-1);
+    marginSlider->setMaximum(100);
+
     vLayout->addWidget(addSeriesButton, 0, Qt::AlignTop);
     vLayout->addWidget(addDataButton, 0, Qt::AlignTop);
     vLayout->addWidget(addMultiDataButton, 0, Qt::AlignTop);
@@ -340,15 +407,15 @@ int main(int argc, char **argv)
     vLayout->addWidget(insertRemoveTestButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseAxesButton, 0, Qt::AlignTop);
     vLayout->addWidget(releaseProxiesButton, 1, Qt::AlignTop);
-    vLayout->addWidget(flipViewsButton, 0, Qt::AlignTop);
-    vLayout->addWidget(changeColorStyleButton, 0, Qt::AlignTop);
-    vLayout->addWidget(ownThemeButton, 0, Qt::AlignTop);
-    vLayout->addWidget(primarySeriesTestsButton, 0, Qt::AlignTop);
-    vLayout->addWidget(toggleRotationButton, 0, Qt::AlignTop);
-    vLayout->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
-    vLayout->addWidget(logAxisButton, 0, Qt::AlignTop);
-    vLayout->addWidget(testItemAndRowChangesButton, 1, Qt::AlignTop);
 
+    vLayout2->addWidget(flipViewsButton, 0, Qt::AlignTop);
+    vLayout2->addWidget(changeColorStyleButton, 0, Qt::AlignTop);
+    vLayout2->addWidget(ownThemeButton, 0, Qt::AlignTop);
+    vLayout2->addWidget(primarySeriesTestsButton, 0, Qt::AlignTop);
+    vLayout2->addWidget(toggleRotationButton, 0, Qt::AlignTop);
+    vLayout2->addWidget(gradientBtoYPB, 0, Qt::AlignTop);
+    vLayout2->addWidget(logAxisButton, 0, Qt::AlignTop);
+    vLayout2->addWidget(testItemAndRowChangesButton, 0, Qt::AlignTop);
     vLayout2->addWidget(staticCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(rotationCheckBox, 0, Qt::AlignTop);
     vLayout2->addWidget(rotationSliderX, 0, Qt::AlignTop);
@@ -365,25 +432,40 @@ int main(int argc, char **argv)
     vLayout2->addWidget(minSliderX, 0, Qt::AlignTop);
     vLayout2->addWidget(minSliderZ, 0, Qt::AlignTop);
     vLayout2->addWidget(minSliderY, 0, Qt::AlignTop);
-    vLayout2->addWidget(maxSliderY, 0, Qt::AlignTop);
-    vLayout2->addWidget(fpsLabel, 0, Qt::AlignTop);
-    vLayout2->addWidget(fpsCheckBox, 0, Qt::AlignTop);
-    vLayout2->addWidget(reverseValueAxisCheckBox, 0, Qt::AlignTop);
-    vLayout2->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
-    vLayout2->addWidget(gridCheckBox, 0, Qt::AlignTop);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
-    vLayout2->addWidget(shadowQuality, 0, Qt::AlignTop);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Change font")), 0, Qt::AlignTop);
-    vLayout2->addWidget(fontList, 0, Qt::AlignTop);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust font size")), 0, Qt::AlignTop);
-    vLayout2->addWidget(fontSizeSlider, 0, Qt::AlignTop);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Value axis format")), 0, Qt::AlignTop);
-    vLayout2->addWidget(valueAxisFormatEdit, 0, Qt::AlignTop);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Log axis base")), 0, Qt::AlignTop);
-    vLayout2->addWidget(logBaseEdit, 0, Qt::AlignTop);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Value axis segments")), 0, Qt::AlignTop);
-    vLayout2->addWidget(valueAxisSegmentsSpin, 0, Qt::AlignTop);
-    // TODO: Add example for setMeshFileName
+    vLayout2->addWidget(maxSliderY, 1, Qt::AlignTop);
+
+    vLayout3->addWidget(fpsLabel, 0, Qt::AlignTop);
+    vLayout3->addWidget(fpsCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(reverseValueAxisCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(backgroundCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(gridCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(inputHandlerRotationCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(inputHandlerZoomCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(inputHandlerSelectionCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(inputHandlerZoomAtTargetCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")), 0, Qt::AlignTop);
+    vLayout3->addWidget(shadowQuality, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Change font")), 0, Qt::AlignTop);
+    vLayout3->addWidget(fontList, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust font size")), 0, Qt::AlignTop);
+    vLayout3->addWidget(fontSizeSlider, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Value axis format")), 0, Qt::AlignTop);
+    vLayout3->addWidget(valueAxisFormatEdit, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Log axis base")), 0, Qt::AlignTop);
+    vLayout3->addWidget(logBaseEdit, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Value axis segments")), 0, Qt::AlignTop);
+    vLayout3->addWidget(valueAxisSegmentsSpin, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Camera target")), 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderX, 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderY, 0, Qt::AlignTop);
+    vLayout3->addWidget(cameraTargetSliderZ, 0, Qt::AlignTop);
+    vLayout3->addWidget(reflectionCheckBox, 0, Qt::AlignTop);
+    vLayout3->addWidget(reflectivitySlider, 0, Qt::AlignTop);
+    vLayout3->addWidget(toggleCustomItemButton, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust floor level")), 0, Qt::AlignTop);
+    vLayout3->addWidget(floorLevelSlider, 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust margin")), 0, Qt::AlignTop);
+    vLayout3->addWidget(marginSlider, 1, Qt::AlignTop);
 
     widget->show();
 
@@ -411,6 +493,12 @@ int main(int argc, char **argv)
                      &GraphModifier::setMinY);
     QObject::connect(maxSliderY, &QSlider::valueChanged, modifier,
                      &GraphModifier::setMaxY);
+    QObject::connect(cameraTargetSliderX, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetX);
+    QObject::connect(cameraTargetSliderY, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetY);
+    QObject::connect(cameraTargetSliderZ, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetZ);
 
     QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
                      SLOT(changeShadowQuality(int)));
@@ -488,7 +576,14 @@ int main(int argc, char **argv)
                      &GraphModifier::setBackgroundEnabled);
     QObject::connect(gridCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setGridEnabled);
-
+    QObject::connect(inputHandlerRotationCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setInputHandlerRotationEnabled);
+    QObject::connect(inputHandlerZoomCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setInputHandlerZoomEnabled);
+    QObject::connect(inputHandlerSelectionCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setInputHandlerSelectionEnabled);
+    QObject::connect(inputHandlerZoomAtTargetCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setInputHandlerZoomAtTargetEnabled);
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setUseNullInputHandler);
 
@@ -500,6 +595,17 @@ int main(int argc, char **argv)
                      &QSlider::setEnabled);
     QObject::connect(rotationCheckBox, &QCheckBox::stateChanged, rotationSliderY,
                      &QSlider::setValue);
+
+    QObject::connect(reflectionCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setReflection);
+    QObject::connect(reflectivitySlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setReflectivity);
+    QObject::connect(floorLevelSlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setFloorLevel);
+    QObject::connect(marginSlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setGraphMargin);
+    QObject::connect(toggleCustomItemButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::toggleCustomItem);
 
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged, addDataButton,
                      &QPushButton::setEnabled);

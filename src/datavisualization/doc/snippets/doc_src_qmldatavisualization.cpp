@@ -17,12 +17,12 @@
 ****************************************************************************/
 
 //! [0]
-import QtDataVisualization 1.1
+import QtDataVisualization 1.2
 //! [0]
 
 //! [1]
 import QtQuick 2.0
-import QtDataVisualization 1.1
+import QtDataVisualization 1.2
 
 Item {
     width: 640
@@ -61,7 +61,7 @@ Item {
 
 //! [2]
 import QtQuick 2.0
-import QtDataVisualization 1.1
+import QtDataVisualization 1.2
 
 Item {
     width: 640
@@ -94,7 +94,7 @@ Item {
 
 //! [3]
 import QtQuick 2.0
-import QtDataVisualization 1.1
+import QtDataVisualization 1.2
 
 Item {
     width: 640

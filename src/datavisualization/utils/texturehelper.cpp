@@ -21,12 +21,29 @@
 
 #include <QtGui/QImage>
 #include <QtGui/QPainter>
+#include <QtCore/QTime>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+
+// Defined in shaderhelper.cpp
+extern void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg);
 
 TextureHelper::TextureHelper()
 {
     initializeOpenGLFunctions();
+#if !defined(QT_OPENGL_ES_2)
+    if (!Utils::isOpenGLES()) {
+        // Discard warnings about deprecated functions
+        QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
+
+        m_openGlFunctions_2_1 =
+                QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_2_1>();
+        m_openGlFunctions_2_1->initializeOpenGLFunctions();
+
+        // Restore original message handler
+        qInstallMessageHandler(handler);
+    }
+#endif
 }
 
 TextureHelper::~TextureHelper()
@@ -41,17 +58,16 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
 
     QImage texImage = image;
 
-#if defined(QT_OPENGL_ES_2)
-    GLuint temp;
-    GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width(), temp);
-    GLuint imageHeight = Utils::getNearestPowerOfTwo(image.height(), temp);
-    if (smoothScale) {
-        texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio,
-                                Qt::SmoothTransformation);
-    } else {
-        texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio);
+    if (!Utils::isOpenGLES()) {
+        GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width());
+        GLuint imageHeight = Utils::getNearestPowerOfTwo(image.height());
+        if (smoothScale) {
+            texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio,
+                                    Qt::SmoothTransformation);
+        } else {
+            texImage = image.scaled(imageWidth, imageHeight, Qt::IgnoreAspectRatio);
+        }
     }
-#endif
 
     GLuint textureId;
     glGenTextures(1, &textureId);
@@ -73,6 +89,53 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     if (clampY)
         glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
     glBindTexture(GL_TEXTURE_2D, 0);
+
+    return textureId;
+}
+
+GLuint TextureHelper::create3DTexture(const QVector<uchar> *data, int width, int height, int depth,
+                                      QImage::Format dataFormat)
+{
+    if (Utils::isOpenGLES() || !width || !height || !depth)
+        return 0;
+
+    GLuint textureId = 0;
+#if defined(QT_OPENGL_ES_2)
+    Q_UNUSED(dataFormat)
+    Q_UNUSED(data)
+#else
+    glEnable(GL_TEXTURE_3D);
+
+    glGenTextures(1, &textureId);
+    glBindTexture(GL_TEXTURE_3D, textureId);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_3D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+
+    GLenum status = glGetError();
+    // glGetError docs advise to call glGetError in loop to clear all error flags
+    while (status)
+        status = glGetError();
+
+    GLint internalFormat = 4;
+    GLint format = GL_BGRA;
+    if (dataFormat == QImage::Format_Indexed8) {
+        internalFormat = 1;
+        format = GL_RED;
+        // Align width to 32bits
+        width = width + width % 4;
+    }
+    m_openGlFunctions_2_1->glTexImage3D(GL_TEXTURE_3D, 0, internalFormat, width, height, depth, 0,
+                                        format, GL_UNSIGNED_BYTE, data->constData());
+    status = glGetError();
+    if (status)
+        qWarning() << __FUNCTION__ << "3D texture creation failed:" << status;
+
+    glBindTexture(GL_TEXTURE_3D, 0);
+    glDisable(GL_TEXTURE_3D);
+#endif
     return textureId;
 }
 
@@ -113,14 +176,27 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glBindTexture(GL_TEXTURE_2D, 0);
 
     // Create render buffer
-    if (!depthBuffer)
-        glGenRenderbuffers(1, &depthBuffer);
+    if (depthBuffer)
+        glDeleteRenderbuffers(1, &depthBuffer);
+
+    glGenRenderbuffers(1, &depthBuffer);
     glBindRenderbuffer(GL_RENDERBUFFER, depthBuffer);
-#if !defined(QT_OPENGL_ES_2)
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size.width(), size.height());
-#else
-    glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.width(), size.height());
-#endif
+    GLenum status = glGetError();
+    // glGetError docs advise to call glGetError in loop to clear all error flags
+    while (status)
+        status = glGetError();
+    if (Utils::isOpenGLES())
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, size.width(), size.height());
+    else
+        glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, size.width(), size.height());
+
+    status = glGetError();
+    if (status) {
+        qCritical() << "Selection texture render buffer creation failed:" << status;
+        glDeleteTextures(1, &textureid);
+        glBindRenderbuffer(GL_RENDERBUFFER, 0);
+        return 0;
+    }
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 
     // Create frame buffer
@@ -134,13 +210,39 @@ GLuint TextureHelper::createSelectionTexture(const QSize &size, GLuint &frameBuf
     glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, depthBuffer);
 
     // Verify that the frame buffer is complete
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
     if (status != GL_FRAMEBUFFER_COMPLETE) {
-        qCritical() << "Frame buffer creation failed" << status;
-        return 0;
+        qCritical() << "Selection texture frame buffer creation failed:" << status;
+        glDeleteTextures(1, &textureid);
+        textureid = 0;
     }
 
     // Restore the default framebuffer
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+    return textureid;
+}
+
+GLuint TextureHelper::createCursorPositionTexture(const QSize &size, GLuint &frameBuffer)
+{
+    GLuint textureid;
+    glGenTextures(1, &textureid);
+    glBindTexture(GL_TEXTURE_2D, textureid);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, size.width(), size.height(), 0, GL_RGBA,
+                 GL_UNSIGNED_BYTE, NULL);
+    glBindTexture(GL_TEXTURE_2D, 0);
+
+    glGenFramebuffers(1, &frameBuffer);
+    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                           textureid, 0);
+
+    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+    if (status != GL_FRAMEBUFFER_COMPLETE) {
+        qCritical() << "Cursor position mapper frame buffer creation failed:" << status;
+        glDeleteTextures(1, &textureid);
+        textureid = 0;
+    }
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
     return textureid;
@@ -170,76 +272,64 @@ GLuint TextureHelper::createGradientTexture(const QLinearGradient &gradient)
     return create2DTexture(image, false, true, false, true);
 }
 
-#if !defined(QT_OPENGL_ES_2)
 GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint textureSize)
 {
-    GLuint depthtextureid;
-
-    // Create depth texture for the shadow mapping
-    glGenTextures(1, &depthtextureid);
-    glBindTexture(GL_TEXTURE_2D, depthtextureid);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
-                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
+    GLuint depthtextureid = 0;
+#if defined(QT_OPENGL_ES_2)
+    Q_UNUSED(size)
+    Q_UNUSED(textureSize)
+#else
+    if (!Utils::isOpenGLES()) {
+        // Create depth texture for the shadow mapping
+        glGenTextures(1, &depthtextureid);
+        glBindTexture(GL_TEXTURE_2D, depthtextureid);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_FUNC, GL_LEQUAL);
+        glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_COMPARE_MODE_ARB, GL_COMPARE_R_TO_TEXTURE_ARB);
+        glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
+                     size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
+#endif
     return depthtextureid;
 }
-#endif
 
-#if !defined(QT_OPENGL_ES_2)
 GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &frameBuffer,
                                                     GLuint textureSize)
 {
     GLuint depthtextureid = createDepthTexture(size, textureSize);
+#if defined(QT_OPENGL_ES_2)
+    Q_UNUSED(frameBuffer)
+#else
+    if (!Utils::isOpenGLES()) {
+        // Create frame buffer
+        if (!frameBuffer)
+            glGenFramebuffers(1, &frameBuffer);
+        glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
 
-    // Create frame buffer
-    if (!frameBuffer)
-        glGenFramebuffers(1, &frameBuffer);
-    glBindFramebuffer(GL_FRAMEBUFFER, frameBuffer);
+        // Attach texture to depth attachment
+        glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthtextureid, 0);
 
-    // Attach texture to depth attachment
-    glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthtextureid, 0);
+        m_openGlFunctions_2_1->glDrawBuffer(GL_NONE);
+        m_openGlFunctions_2_1->glReadBuffer(GL_NONE);
 
-    glDrawBuffer(GL_NONE);
-    glReadBuffer(GL_NONE);
+        // Verify that the frame buffer is complete
+        GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
+        if (status != GL_FRAMEBUFFER_COMPLETE) {
+            qCritical() << "Depth texture frame buffer creation failed" << status;
+            glDeleteTextures(1, &depthtextureid);
+            depthtextureid = 0;
+        }
 
-    // Verify that the frame buffer is complete
-    GLenum status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-    if (status != GL_FRAMEBUFFER_COMPLETE) {
-        qCritical() << "Frame buffer creation failed" << status;
-        return 0;
+        // Restore the default framebuffer
+        glBindFramebuffer(GL_FRAMEBUFFER, 0);
     }
-
-    // Restore the default framebuffer
-    glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+#endif
     return depthtextureid;
 }
-#endif
-
-#if !defined(QT_OPENGL_ES_2)
-void TextureHelper::fillDepthTexture(GLuint texture,const QSize &size, GLuint textureSize,
-                                     GLfloat value)
-{
-    int nItems = size.width() * textureSize * size.height() * textureSize;
-    GLfloat *bits = new GLfloat[nItems];
-    for (int i = 0; i < nItems; i++)
-        bits[i] = value;
-
-    glBindTexture(GL_TEXTURE_2D, texture);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT, size.width() * textureSize,
-                 size.height() * textureSize, 0, GL_DEPTH_COMPONENT, GL_FLOAT, bits);
-    glBindTexture(GL_TEXTURE_2D, 0);
-
-    delete[] bits;
-}
-#endif
 
 void TextureHelper::deleteTexture(GLuint *texture)
 {

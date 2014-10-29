@@ -72,6 +72,7 @@ int main(int argc, char **argv)
     smoothCheckBox->setText(QStringLiteral("Smooth bars"));
     smoothCheckBox->setChecked(false);
 
+
     QComboBox *barStyleList = new QComboBox(widget);
     barStyleList->addItem(QStringLiteral("Bar"), int(QAbstract3DSeries::MeshBar));
     barStyleList->addItem(QStringLiteral("Pyramid"), int(QAbstract3DSeries::MeshPyramid));
@@ -83,6 +84,9 @@ int main(int argc, char **argv)
 
     QPushButton *cameraButton = new QPushButton(widget);
     cameraButton->setText(QStringLiteral("Change camera preset"));
+
+    QPushButton *zoomToSelectedButton = new QPushButton(widget);
+    zoomToSelectedButton->setText(QStringLiteral("Zoom to selected bar"));
 
     QComboBox *selectionModeList = new QComboBox(widget);
     selectionModeList->addItem(QStringLiteral("None"),
@@ -135,6 +139,10 @@ int main(int argc, char **argv)
     QCheckBox *reverseValueAxisCheckBox = new QCheckBox(widget);
     reverseValueAxisCheckBox->setText(QStringLiteral("Reverse value axis"));
     reverseValueAxisCheckBox->setChecked(false);
+
+    QCheckBox *reflectionCheckBox = new QCheckBox(widget);
+    reflectionCheckBox->setText(QStringLiteral("Show reflections"));
+    reflectionCheckBox->setChecked(false);
 
     //! [4]
     QSlider *rotationSliderX = new QSlider(Qt::Horizontal, widget);
@@ -206,9 +214,11 @@ int main(int argc, char **argv)
     //! [5]
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
+    vLayout->addWidget(zoomToSelectedButton, 0, Qt::AlignTop);
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(smoothCheckBox);
+    vLayout->addWidget(reflectionCheckBox);
     vLayout->addWidget(seriesCheckBox);
     vLayout->addWidget(reverseValueAxisCheckBox);
     vLayout->addWidget(axisTitlesVisibleCB);
@@ -243,6 +253,8 @@ int main(int argc, char **argv)
                      &GraphModifier::changeLabelBackground);
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &GraphModifier::changePresetCamera);
+    QObject::connect(zoomToSelectedButton, &QPushButton::clicked, modifier,
+                     &GraphModifier::zoomToSelectedBar);
 
     QObject::connect(backgroundCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setBackgroundEnabled);
@@ -254,6 +266,8 @@ int main(int argc, char **argv)
                      &GraphModifier::setSeriesVisibility);
     QObject::connect(reverseValueAxisCheckBox, &QCheckBox::stateChanged, modifier,
                      &GraphModifier::setReverseValueAxis);
+    QObject::connect(reflectionCheckBox, &QCheckBox::stateChanged, modifier,
+                     &GraphModifier::setReflection);
 
     QObject::connect(modifier, &GraphModifier::backgroundEnabledChanged,
                      backgroundCheckBox, &QCheckBox::setChecked);

@@ -38,14 +38,18 @@ class Surface3DRenderer;
 class QSurface3DSeries;
 
 struct Surface3DChangeBitField {
-    bool selectedPointChanged     : 1;
-    bool rowsChanged              : 1;
-    bool itemChanged              : 1;
+    bool selectedPointChanged      : 1;
+    bool rowsChanged               : 1;
+    bool itemChanged               : 1;
+    bool flipHorizontalGridChanged : 1;
+    bool surfaceTextureChanged     : 1;
 
     Surface3DChangeBitField() :
         selectedPointChanged(true),
         rowsChanged(false),
-        itemChanged(false)
+        itemChanged(false),
+        flipHorizontalGridChanged(true),
+        surfaceTextureChanged(true)
     {
     }
 };
@@ -73,6 +77,8 @@ private:
     bool m_flatShadingSupported;
     QVector<ChangeItem> m_changedItems;
     QVector<ChangeRow> m_changedRows;
+    bool m_flipHorizontalGrid;
+    QVector<QSurface3DSeries *> m_changedTextures;
 
 public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
@@ -101,6 +107,11 @@ public:
     virtual void removeSeries(QAbstract3DSeries *series);
     virtual QList<QSurface3DSeries *> surfaceSeriesList();
 
+    void setFlipHorizontalGrid(bool flip);
+    bool flipHorizontalGrid() const;
+
+    void updateSurfaceTexture(QSurface3DSeries *series);
+
 public slots:
     void handleArrayReset();
     void handleRowsAdded(int startIndex, int count);
@@ -113,6 +124,7 @@ public slots:
 
 signals:
     void selectedSeriesChanged(QSurface3DSeries *series);
+    void flipHorizontalGridChanged(bool flip);
 
 private:
     Q_DISABLE_COPY(Surface3DController)

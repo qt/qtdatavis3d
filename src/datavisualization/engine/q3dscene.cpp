@@ -96,9 +96,33 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
+ * \qmlproperty point Scene3D::graphPositionQuery
+ *
+ * This property contains the coordinates for the user input that should be processed
+ * by the scene as a graph position query. If this is set to value other than
+ * invalidSelectionPoint, the graph tries to match a graph position to the given \a point
+ * within the primary viewport.
+ * After the rendering pass this property is returned to its default state of
+ * invalidSelectionPoint. The queried graph position can be read from
+ * AbstractGraph3D::queriedGraphPosition property after the next render pass.
+ *
+ * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * consistent, the queries are always done against the inner sides of an invisible box surrounding
+ * the graph.
+ *
+ * \note Bar graphs allow graph position queries only at the graph floor level.
+ *
+ * \sa AbstractGraph3D::queriedGraphPosition
+ */
+
+/*!
  * \qmlproperty bool Scene3D::slicingActive
  *
- * This property contains whether 2D slicing view is currently active or not.
+ * This property contains whether 2D slicing view is currently active or not. If setting it, you
+ * must make sure AbstractGraph3D::selectionMode has either
+ * \l{QAbstract3DGraph::SelectionRow}{AbstractGraph3D.SelectionRow} or
+ * \l{QAbstract3DGraph::SelectionColumn}{AbstractGraph3D.SelectionColumn} flag set, and there is a
+ * valid selection.
  * \note Not all visualizations support the 2D slicing view.
  */
 
@@ -134,7 +158,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty point Scene3D::invalidSelectionPoint
  * A constant property providing an invalid point for selection.
  */
-
 
 /*!
  * Constructs a basic scene with one light and one camera in it. An
@@ -195,33 +218,35 @@ void Q3DScene::setPrimarySubViewport(const QRect &primarySubViewport)
 /*!
  * Returns whether the given \a point resides inside the primary subview or not.
  * \return \c true if the point is inside the primary subview.
+ * \note If subviews are superimposed, and the given \a point resides inside both, result is
+ * \c true only when the primary subview is on top.
  */
 bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
 {
     int x = point.x();
     int y = point.y();
-    int areaMinX = d_ptr->m_primarySubViewport.x();
-    int areaMaxX = d_ptr->m_primarySubViewport.x() + d_ptr->m_primarySubViewport.width();
-    int areaMinY = d_ptr->m_primarySubViewport.y();
-    int areaMaxY = d_ptr->m_primarySubViewport.y() + d_ptr->m_primarySubViewport.height();
-
-    return ( x > areaMinX && x < areaMaxX && y > areaMinY && y < areaMaxY );
+    bool isInSecondary = d_ptr->isInArea(d_ptr->m_secondarySubViewport, x, y);
+    if (!isInSecondary || (isInSecondary && !d_ptr->m_isSecondarySubviewOnTop))
+        return d_ptr->isInArea(d_ptr->m_primarySubViewport, x, y);
+    else
+        return false;
 }
 
 /*!
  * Returns whether the given \a point resides inside the secondary subview or not.
  * \return \c true if the point is inside the secondary subview.
+ * \note If subviews are superimposed, and the given \a point resides inside both, result is
+ * \c true only when the secondary subview is on top.
  */
 bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
 {
     int x = point.x();
     int y = point.y();
-    int areaMinX = d_ptr->m_secondarySubViewport.x();
-    int areaMaxX = d_ptr->m_secondarySubViewport.x() + d_ptr->m_secondarySubViewport.width();
-    int areaMinY = d_ptr->m_secondarySubViewport.y();
-    int areaMaxY = d_ptr->m_secondarySubViewport.y() + d_ptr->m_secondarySubViewport.height();
-
-    return ( x > areaMinX && x < areaMaxX && y > areaMinY && y < areaMaxY );
+    bool isInPrimary = d_ptr->isInArea(d_ptr->m_primarySubViewport, x, y);
+    if (!isInPrimary || (isInPrimary && d_ptr->m_isSecondarySubviewOnTop))
+        return d_ptr->isInArea(d_ptr->m_secondarySubViewport, x, y);
+    else
+        return false;
 }
 
 /*!
@@ -254,7 +279,7 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
  * \property Q3DScene::selectionQueryPosition
  *
  * This property contains the coordinates for the user input that should be processed
- * by the scene as selection. If this is set to value other than invalidSelectionPoint() the
+ * by the scene as a selection. If this is set to value other than invalidSelectionPoint(), the
  * graph tries to select a data item, axis label, or a custom item at the given \a point within
  * the primary viewport.
  * After the rendering pass the property is returned to its default state of
@@ -289,9 +314,47 @@ QPoint Q3DScene::invalidSelectionPoint()
 }
 
 /*!
+ * \property Q3DScene::graphPositionQuery
+ *
+ * This property contains the coordinates for the user input that should be processed
+ * by the scene as a graph position query. If this is set to value other than
+ * invalidSelectionPoint(), the graph tries to match a graph position to the given \a point
+ * within the primary viewport.
+ * After the rendering pass this property is returned to its default state of
+ * invalidSelectionPoint(). The queried graph position can be read from
+ * QAbstract3DGraph::queriedGraphPosition property after the next render pass.
+ *
+ * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * consistent, the queries are always done against the inner sides of an invisible box surrounding
+ * the graph.
+ *
+ * \note Bar graphs allow graph position queries only at the graph floor level.
+ *
+ * \sa QAbstract3DGraph::queriedGraphPosition
+ */
+void Q3DScene::setGraphPositionQuery(const QPoint &point)
+{
+    if (point != d_ptr->m_graphPositionQueryPosition) {
+        d_ptr->m_graphPositionQueryPosition = point;
+        d_ptr->m_changeTracker.graphPositionQueryPositionChanged = true;
+        d_ptr->m_sceneDirty = true;
+
+        emit graphPositionQueryChanged(point);
+        emit d_ptr->needRender();
+    }
+}
+
+QPoint Q3DScene::graphPositionQuery() const
+{
+    return d_ptr->m_graphPositionQueryPosition;
+}
+
+/*!
  * \property Q3DScene::slicingActive
  *
- * This property contains whether 2D slicing view is currently active or not.
+ * This property contains whether 2D slicing view is currently active or not. If setting it, you
+ * must make sure QAbstract3DGraph::selectionMode has either QAbstract3DGraph::SelectionRow or
+ * QAbstract3DGraph::SelectionColumn flag set, and there is a valid selection.
  * \note Not all visualizations support the 2D slicing view.
  */
 bool Q3DScene::isSlicingActive() const
@@ -305,6 +368,10 @@ void Q3DScene::setSlicingActive(bool isSlicing)
         d_ptr->m_isSlicingActive = isSlicing;
         d_ptr->m_changeTracker.slicingActivatedChanged = true;
         d_ptr->m_sceneDirty = true;
+
+        // Set secondary subview behind primary to achieve default functionality (= clicking on
+        // primary disables slice)
+        setSecondarySubviewOnTop(!isSlicing);
 
         d_ptr->calculateSubViewports();
         emit slicingActiveChanged(isSlicing);
@@ -447,7 +514,9 @@ Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     m_light(),
     m_isUnderSideCameraEnabled(false),
     m_isSlicingActive(false),
-    m_selectionQueryPosition(Q3DScene::invalidSelectionPoint())
+    m_selectionQueryPosition(Q3DScene::invalidSelectionPoint()),
+    m_graphPositionQueryPosition(Q3DScene::invalidSelectionPoint()),
+    m_sceneDirty(true)
 {
 }
 
@@ -490,6 +559,11 @@ void Q3DScenePrivate::sync(Q3DScenePrivate &other)
         other.q_ptr->setSelectionQueryPosition(q_ptr->selectionQueryPosition());
         m_changeTracker.selectionQueryPositionChanged = false;
         other.m_changeTracker.selectionQueryPositionChanged = false;
+    }
+    if (m_changeTracker.graphPositionQueryPositionChanged) {
+        other.q_ptr->setGraphPositionQuery(q_ptr->graphPositionQuery());
+        m_changeTracker.graphPositionQueryPositionChanged = false;
+        other.m_changeTracker.graphPositionQueryPositionChanged = false;
     }
     if (m_changeTracker.cameraChanged) {
         m_camera->setDirty(true);
@@ -647,6 +721,21 @@ void Q3DScenePrivate::setLightPositionRelativeToCamera(const QVector3D &relative
     m_light->setPosition(m_camera->d_ptr->calculatePositionRelativeToCamera(relativePosition,
                                                                             fixedRotation,
                                                                             distanceModifier));
+}
+
+void Q3DScenePrivate::markDirty()
+{
+    m_sceneDirty = true;
+    emit needRender();
+}
+
+bool Q3DScenePrivate::isInArea(const QRect &area, int x, int y) const
+{
+    int areaMinX = area.x();
+    int areaMaxX = area.x() + area.width();
+    int areaMinY = area.y();
+    int areaMaxY = area.y() + area.height();
+    return ( x >= areaMinX && x <= areaMaxX && y >= areaMinY && y <= areaMaxY );
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

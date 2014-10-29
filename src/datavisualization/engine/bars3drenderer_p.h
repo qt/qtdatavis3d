@@ -66,9 +66,7 @@ private:
     ShaderHelper *m_depthShader;
     ShaderHelper *m_selectionShader;
     ShaderHelper *m_backgroundShader;
-    ShaderHelper *m_labelShader;
     GLuint m_bgrTexture;
-    GLuint m_depthTexture;
     GLuint m_selectionTexture;
     GLuint m_depthFrameBuffer;
     GLuint m_selectionFrameBuffer;
@@ -86,7 +84,6 @@ private:
     GLfloat m_scaleFactor;
     GLfloat m_maxSceneSize;
     QPoint m_visualSelectedBarPos;
-    bool m_resetCameraBaseOrientation;
     QPoint m_selectedBarPos;
     BarSeriesRenderCache *m_selectedSeriesCache;
     BarRenderItem m_dummyBarRenderItem;
@@ -100,6 +97,10 @@ private:
     bool m_haveUniformColorSeries;
     bool m_haveGradientSeries;
     float m_zeroPosition;
+    float m_xScaleFactor;
+    float m_zScaleFactor;
+    float m_floorLevel;
+    float m_actualFloorLevel;
 
 public:
     explicit Bars3DRenderer(Bars3DController *controller);
@@ -116,9 +117,13 @@ public:
     QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
 
     void updateAspectRatio(float ratio);
+    void updateFloorLevel(float level);
+    void updateMargin(float margin);
 
 protected:
     virtual void initializeOpenGL();
+    virtual void fixCameraTarget(QVector3D &target);
+    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
 
 public slots:
     void updateMultiSeriesScaling(bool uniform);
@@ -146,18 +151,25 @@ private:
     void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
     void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
-                    const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
-                    GLfloat rowScaleFactor, GLfloat columnScaleFactor);
+                    const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
+
+    bool drawBars(BarRenderItem **selectedBar, const QMatrix4x4 &depthProjectionViewMatrix,
+                  const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
+                  GLint startRow, GLint stopRow, GLint stepRow,
+                  GLint startBar, GLint stopBar, GLint stepBar, GLfloat reflection = 1.0f);
+    void drawBackground(GLfloat backgroundRotation, const QMatrix4x4 &depthProjectionViewMatrix,
+                        const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
+                        bool reflectingDraw = false, bool drawingSelectionBuffer = false);
+    void drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
+                       const QMatrix4x4 &projectionViewMatrix,
+                       const QMatrix4x4 &viewMatrix);
 
     void loadBackgroundMesh();
     void initSelectionShader();
     void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initLabelShaders(const QString &vertexShader, const QString &fragmentShader);
     void initSelectionBuffer();
-#if !defined(QT_OPENGL_ES_2)
     void initDepthShader();
     void updateDepthBuffer();
-#endif
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
     Abstract3DController::SelectionType isSelected(int row, int bar,

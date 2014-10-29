@@ -40,6 +40,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
     Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
     Q_PROPERTY(QBar3DSeries *primarySeries READ primarySeries WRITE setPrimarySeries NOTIFY primarySeriesChanged)
     Q_PROPERTY(QBar3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
+    Q_PROPERTY(float floorLevel READ floorLevel WRITE setFloorLevel NOTIFY floorLevelChanged)
 
 public:
     explicit Q3DBars(const QSurfaceFormat *format = 0, QWindow *parent = 0);
@@ -75,6 +76,8 @@ public:
     QList<QAbstract3DAxis *> axes() const;
 
     QBar3DSeries *selectedSeries() const;
+    void setFloorLevel(float level);
+    float floorLevel() const;
 
 signals:
     void multiSeriesUniformChanged(bool uniform);
@@ -86,6 +89,7 @@ signals:
     void valueAxisChanged(QValue3DAxis *axis);
     void primarySeriesChanged(QBar3DSeries *series);
     void selectedSeriesChanged(QBar3DSeries *series);
+    void floorLevelChanged(float level);
 
 private:
     Q3DBarsPrivate *dptr();

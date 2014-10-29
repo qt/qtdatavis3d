@@ -25,6 +25,7 @@
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
 #include "qcustom3ditem_p.h"
+#include "utils_p.h"
 #include <QtCore/QThread>
 #include <QtGui/QOpenGLFramebufferObject>
 
@@ -37,8 +38,12 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_selectionMode(QAbstract3DGraph::SelectionItem),
     m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
     m_useOrthoProjection(false),
-    m_aspectRatio(2.0f),
+    m_aspectRatio(2.0),
+    m_horizontalAspectRatio(0.0),
     m_optimizationHints(QAbstract3DGraph::OptimizationDefault),
+    m_reflectionEnabled(false),
+    m_reflectivity(0.5),
+    m_locale(QLocale::c()),
     m_scene(scene),
     m_activeInputHandler(0),
     m_axisX(0),
@@ -50,12 +55,19 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_isCustomItemDirty(true),
     m_isSeriesVisualsDirty(true),
     m_renderPending(false),
+    m_isPolar(false),
+    m_radialLabelOffset(1.0f),
     m_measureFps(false),
     m_numFrames(0),
-    m_currentFps(0.0)
+    m_currentFps(0.0),
+    m_clickedType(QAbstract3DGraph::ElementNone),
+    m_selectedLabelIndex(-1),
+    m_selectedCustomItemIndex(-1),
+    m_margin(-1.0)
 {
     if (!m_scene)
         m_scene = new Q3DScene;
+    m_scene->setParent(this);
 
     // Set initial theme
     Q3DTheme *defaultTheme = new Q3DTheme(Q3DTheme::ThemeQt);
@@ -72,10 +84,6 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     inputHandler = new QTouch3DInputHandler();
     inputHandler->d_ptr->m_isDefaultHandler = true;
     setActiveInputHandler(inputHandler);
-    connect(inputHandler, &QAbstract3DInputHandler::inputViewChanged, this,
-            &Abstract3DController::handleInputViewChanged);
-    connect(inputHandler, &QAbstract3DInputHandler::positionChanged, this,
-            &Abstract3DController::handleInputPositionChanged);
     connect(m_scene->d_ptr.data(), &Q3DScenePrivate::needRender, this,
             &Abstract3DController::emitNeedRender);
 }
@@ -93,7 +101,7 @@ Abstract3DController::~Abstract3DController()
 void Abstract3DController::destroyRenderer()
 {
     // Renderer can be in another thread, don't delete it directly in that case
-    if (m_renderer && m_renderer->thread() != QThread::currentThread())
+    if (m_renderer && m_renderer->thread() && m_renderer->thread() != this->thread())
         m_renderer->deleteLater();
     else
         delete m_renderer;
@@ -107,6 +115,13 @@ void Abstract3DController::destroyRenderer()
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
 {
     m_renderer = renderer;
+
+    // If renderer is created in different thread than controller, make sure renderer gets
+    // destroyed before the render thread finishes.
+    if (renderer->thread() != this->thread()) {
+        QObject::connect(renderer->thread(), &QThread::finished, this,
+                         &Abstract3DController::destroyRenderer, Qt::DirectConnection);
+    }
 }
 
 void Abstract3DController::addSeries(QAbstract3DSeries *series)
@@ -163,11 +178,14 @@ void Abstract3DController::synchDataToRenderer()
 {
     // Subclass implementations check for renderer validity already, so no need to check here.
 
-    // If there is a pending click from renderer, handle that first.
-    if (m_renderer->isClickPending()) {
+    m_renderPending = false;
+
+    // If there are pending queries, handle those first
+    if (m_renderer->isGraphPositionQueryResolved())
+        handlePendingGraphPositionQuery();
+
+    if (m_renderer->isClickQueryResolved())
         handlePendingClick();
-        m_renderer->clearClickPending();
-    }
 
     startRecordingRemovesAndInserts();
 
@@ -175,6 +193,16 @@ void Abstract3DController::synchDataToRenderer()
         m_renderer->updateScene(m_scene);
 
     m_renderer->updateTheme(m_themeManager->activeTheme());
+
+    if (m_changeTracker.polarChanged) {
+        m_renderer->updatePolar(m_isPolar);
+        m_changeTracker.polarChanged = false;
+    }
+
+    if (m_changeTracker.radialLabelOffsetChanged) {
+        m_renderer->updateRadialLabelOffset(m_radialLabelOffset);
+        m_changeTracker.radialLabelOffsetChanged = false;
+    }
 
     if (m_changeTracker.shadowQualityChanged) {
         m_renderer->updateShadowQuality(m_shadowQuality);
@@ -192,13 +220,29 @@ void Abstract3DController::synchDataToRenderer()
     }
 
     if (m_changeTracker.aspectRatioChanged) {
-        m_renderer->updateAspectRatio(m_aspectRatio);
+        m_renderer->updateAspectRatio(float(m_aspectRatio));
         m_changeTracker.aspectRatioChanged = false;
+    }
+
+    if (m_changeTracker.horizontalAspectRatioChanged) {
+        m_renderer->updateHorizontalAspectRatio(float(m_horizontalAspectRatio));
+        m_changeTracker.horizontalAspectRatioChanged = false;
     }
 
     if (m_changeTracker.optimizationHintChanged) {
         m_renderer->updateOptimizationHint(m_optimizationHints);
         m_changeTracker.optimizationHintChanged = false;
+    }
+
+    if (m_changeTracker.reflectionChanged) {
+        m_renderer->m_reflectionEnabled = m_reflectionEnabled;
+        m_changeTracker.reflectionChanged = false;
+    }
+
+    if (m_changeTracker.reflectivityChanged) {
+        // Invert value to match functionality to the property description
+        m_renderer->m_reflectivity = -(m_reflectivity - 1.0);
+        m_changeTracker.reflectivityChanged = false;
     }
 
     if (m_changeTracker.axisXFormatterChanged) {
@@ -445,6 +489,11 @@ void Abstract3DController::synchDataToRenderer()
         m_changeTracker.axisZTitleFixedChanged = false;
     }
 
+    if (m_changeTracker.marginChanged) {
+        m_renderer->updateMargin(float(m_margin));
+        m_changeTracker.marginChanged = false;
+    }
+
     if (m_changedSeriesList.size()) {
         m_renderer->modifiedSeriesList(m_changedSeriesList);
         m_changedSeriesList.clear();
@@ -475,8 +524,6 @@ void Abstract3DController::synchDataToRenderer()
 
 void Abstract3DController::render(const GLuint defaultFboHandle)
 {
-    m_renderPending = false;
-
     // If not initialized, do nothing.
     if (!m_renderer)
         return;
@@ -765,8 +812,9 @@ void Abstract3DController::setActiveInputHandler(QAbstract3DInputHandler *inputH
             m_inputHandlers.removeAll(m_activeInputHandler);
             delete m_activeInputHandler;
         } else {
-            // Disconnect the old input handler from the scene
+            // Disconnect the old input handler
             m_activeInputHandler->setScene(0);
+            QObject::disconnect(m_activeInputHandler, 0, this, 0);
         }
     }
 
@@ -775,8 +823,15 @@ void Abstract3DController::setActiveInputHandler(QAbstract3DInputHandler *inputH
         addInputHandler(inputHandler);
 
     m_activeInputHandler = inputHandler;
-    if (m_activeInputHandler)
+    if (m_activeInputHandler) {
         m_activeInputHandler->setScene(m_scene);
+
+        // Connect the input handler
+        QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::inputViewChanged, this,
+                         &Abstract3DController::handleInputViewChanged);
+        QObject::connect(m_activeInputHandler, &QAbstract3DInputHandler::positionChanged, this,
+                         &Abstract3DController::handleInputPositionChanged);
+    }
 
     // Notify change of input handler
     emit activeInputHandlerChanged(m_activeInputHandler);
@@ -886,11 +941,7 @@ QAbstract3DGraph::OptimizationHints Abstract3DController::optimizationHints() co
 
 bool Abstract3DController::shadowsSupported() const
 {
-#if defined(QT_OPENGL_ES_2)
-    return false;
-#else
-    return true;
-#endif
+    return !isOpenGLES();
 }
 
 bool Abstract3DController::isSlicingActive() const
@@ -987,6 +1038,11 @@ void Abstract3DController::releaseCustomItem(QCustom3DItem *item)
         m_isCustomDataDirty = true;
         emitNeedRender();
     }
+}
+
+QList<QCustom3DItem *> Abstract3DController::customItems() const
+{
+    return m_customItems;
 }
 
 void Abstract3DController::updateCustomItem()
@@ -1303,6 +1359,11 @@ void Abstract3DController::markSeriesItemLabelsDirty()
         m_seriesList.at(i)->d_ptr->markItemLabelDirty();
 }
 
+bool Abstract3DController::isOpenGLES() const
+{
+    return Utils::isOpenGLES();
+}
+
 void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orientation,
                                          QAbstract3DAxis *axis, QAbstract3DAxis **axisPtr)
 {
@@ -1381,6 +1442,8 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
         handleAxisLabelFormatChangedBySender(valueAxis);
         handleAxisReversedChangedBySender(valueAxis);
         handleAxisFormatterDirtyBySender(valueAxis->dptr());
+
+        valueAxis->formatter()->setLocale(m_locale);
     }
 }
 
@@ -1427,13 +1490,37 @@ void Abstract3DController::emitNeedRender()
 
 void Abstract3DController::handlePendingClick()
 {
-    QAbstract3DGraph::ElementType type = m_renderer->clickedType();
-    emit elementSelected(type);
+    m_clickedType = m_renderer->clickedType();
+    m_selectedLabelIndex = m_renderer->m_selectedLabelIndex;
+    m_selectedCustomItemIndex = m_renderer->m_selectedCustomItemIndex;
+
+    // Invalidate query position to indicate the query has been handled, unless another
+    // point has been queried.
+    if (m_renderer->cachedClickQuery() == m_scene->selectionQueryPosition())
+        m_scene->setSelectionQueryPosition(Q3DScene::invalidSelectionPoint());
+
+    m_renderer->clearClickQueryResolved();
+
+    emit elementSelected(m_clickedType);
+}
+
+void Abstract3DController::handlePendingGraphPositionQuery()
+{
+    m_queriedGraphPosition = m_renderer->queriedGraphPosition();
+
+    // Invalidate query position to indicate the query has been handled, unless another
+    // point has been queried.
+    if (m_renderer->cachedGraphPositionQuery() == m_scene->graphPositionQuery())
+        m_scene->setGraphPositionQuery(Q3DScene::invalidSelectionPoint());
+
+    m_renderer->clearGraphPositionQueryResolved();
+
+    emit queriedGraphPositionChanged(m_queriedGraphPosition);
 }
 
 int Abstract3DController::selectedLabelIndex() const
 {
-    int index = m_renderer->m_selectedLabelIndex;
+    int index = m_selectedLabelIndex;
     QAbstract3DAxis *axis = selectedAxis();
     if (axis && axis->labels().count() <= index)
         index = -1;
@@ -1443,7 +1530,7 @@ int Abstract3DController::selectedLabelIndex() const
 QAbstract3DAxis *Abstract3DController::selectedAxis() const
 {
     QAbstract3DAxis *axis = 0;
-    QAbstract3DGraph::ElementType type = m_renderer->clickedType();
+    QAbstract3DGraph::ElementType type = m_clickedType;
     switch (type) {
     case QAbstract3DGraph::ElementAxisXLabel:
         axis = axisX();
@@ -1464,7 +1551,7 @@ QAbstract3DAxis *Abstract3DController::selectedAxis() const
 
 int Abstract3DController::selectedCustomItemIndex() const
 {
-    int index = m_renderer->m_selectedCustomItemIndex;
+    int index = m_selectedCustomItemIndex;
     if (m_customItems.count() <= index)
         index = -1;
     return index;
@@ -1481,10 +1568,7 @@ QCustom3DItem *Abstract3DController::selectedCustomItem() const
 
 QAbstract3DGraph::ElementType Abstract3DController::selectedElement() const
 {
-    if (m_renderer)
-        return m_renderer->clickedType();
-    else
-        return QAbstract3DGraph::ElementNone;
+    return m_clickedType;
 }
 
 void Abstract3DController::setOrthoProjection(bool enable)
@@ -1505,7 +1589,7 @@ bool Abstract3DController::isOrthoProjection() const
     return m_useOrthoProjection;
 }
 
-void Abstract3DController::setAspectRatio(float ratio)
+void Abstract3DController::setAspectRatio(qreal ratio)
 {
     if (m_aspectRatio != ratio) {
         m_aspectRatio = ratio;
@@ -1516,9 +1600,131 @@ void Abstract3DController::setAspectRatio(float ratio)
     }
 }
 
-float Abstract3DController::aspectRatio()
+qreal Abstract3DController::aspectRatio()
 {
     return m_aspectRatio;
 }
+
+void Abstract3DController::setHorizontalAspectRatio(qreal ratio)
+{
+    if (m_horizontalAspectRatio != ratio) {
+        m_horizontalAspectRatio = ratio;
+        m_changeTracker.horizontalAspectRatioChanged = true;
+        emit horizontalAspectRatioChanged(m_horizontalAspectRatio);
+        m_isDataDirty = true;
+        emitNeedRender();
+    }
+}
+
+qreal Abstract3DController::horizontalAspectRatio() const
+{
+    return m_horizontalAspectRatio;
+}
+
+void Abstract3DController::setReflection(bool enable)
+{
+    if (m_reflectionEnabled != enable) {
+        m_reflectionEnabled = enable;
+        m_changeTracker.reflectionChanged = true;
+        emit reflectionChanged(m_reflectionEnabled);
+        emitNeedRender();
+    }
+}
+
+bool Abstract3DController::reflection() const
+{
+    return m_reflectionEnabled;
+}
+
+void Abstract3DController::setReflectivity(qreal reflectivity)
+{
+    if (m_reflectivity != reflectivity) {
+        m_reflectivity = reflectivity;
+        m_changeTracker.reflectivityChanged = true;
+        emit reflectivityChanged(m_reflectivity);
+        emitNeedRender();
+    }
+}
+
+qreal Abstract3DController::reflectivity() const
+{
+    return m_reflectivity;
+}
+
+void Abstract3DController::setPolar(bool enable)
+{
+    if (enable != m_isPolar) {
+        m_isPolar = enable;
+        m_changeTracker.polarChanged = true;
+        m_isDataDirty = true;
+        emit polarChanged(m_isPolar);
+        emitNeedRender();
+    }
+}
+
+bool Abstract3DController::isPolar() const
+{
+    return m_isPolar;
+}
+
+void Abstract3DController::setRadialLabelOffset(float offset)
+{
+    if (m_radialLabelOffset != offset) {
+        m_radialLabelOffset = offset;
+        m_changeTracker.radialLabelOffsetChanged = true;
+        emit radialLabelOffsetChanged(m_radialLabelOffset);
+        emitNeedRender();
+    }
+}
+
+float Abstract3DController::radialLabelOffset() const
+{
+    return m_radialLabelOffset;
+}
+
+void Abstract3DController::setLocale(const QLocale &locale)
+{
+    if (m_locale != locale) {
+        m_locale = locale;
+
+        // Value axis formatters need to be updated
+        QValue3DAxis *axis = qobject_cast<QValue3DAxis *>(m_axisX);
+        if (axis)
+            axis->formatter()->setLocale(m_locale);
+        axis = qobject_cast<QValue3DAxis *>(m_axisY);
+        if (axis)
+            axis->formatter()->setLocale(m_locale);
+        axis = qobject_cast<QValue3DAxis *>(m_axisZ);
+        if (axis)
+            axis->formatter()->setLocale(m_locale);
+        emit localeChanged(m_locale);
+    }
+}
+
+QLocale Abstract3DController::locale() const
+{
+    return m_locale;
+}
+
+QVector3D Abstract3DController::queriedGraphPosition() const
+{
+    return m_queriedGraphPosition;
+}
+
+void Abstract3DController::setMargin(qreal margin)
+{
+    if (m_margin != margin) {
+        m_margin = margin;
+        m_changeTracker.marginChanged = true;
+        emit marginChanged(margin);
+        emitNeedRender();
+    }
+}
+
+qreal Abstract3DController::margin() const
+{
+    return m_margin;
+}
+
 
 QT_END_NAMESPACE_DATAVISUALIZATION

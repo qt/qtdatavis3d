@@ -48,6 +48,7 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
     Q_PROPERTY(QBar3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QBar3DSeries *primarySeries READ primarySeries WRITE setPrimarySeries NOTIFY primarySeriesChanged)
+    Q_PROPERTY(float floorLevel READ floorLevel WRITE setFloorLevel NOTIFY floorLevelChanged REVISION 1)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
 public:
@@ -85,6 +86,9 @@ public:
     QBar3DSeries *primarySeries() const;
     QBar3DSeries *selectedSeries() const;
 
+    void setFloorLevel(float level);
+    float floorLevel() const;
+
 public slots:
     void handleAxisXChanged(QAbstract3DAxis *axis);
     void handleAxisYChanged(QAbstract3DAxis *axis);
@@ -101,6 +105,7 @@ signals:
     void meshFileNameChanged(QString filename);
     void primarySeriesChanged(QBar3DSeries *series);
     void selectedSeriesChanged(QBar3DSeries *series);
+    Q_REVISION(1) void floorLevelChanged(float level);
 
 private:
     Bars3DController *m_barsController;

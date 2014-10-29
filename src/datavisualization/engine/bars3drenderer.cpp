@@ -31,7 +31,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-const GLfloat gridLineWidth = 0.005f;
 const bool sliceGridLabels = true;
 
 Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
@@ -48,9 +47,7 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_depthShader(0),
       m_selectionShader(0),
       m_backgroundShader(0),
-      m_labelShader(0),
       m_bgrTexture(0),
-      m_depthTexture(0),
       m_selectionTexture(0),
       m_depthFrameBuffer(0),
       m_selectionFrameBuffer(0),
@@ -67,7 +64,6 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_scaleFactor(0),
       m_maxSceneSize(40.0f),
       m_visualSelectedBarPos(Bars3DController::invalidSelectionPosition()),
-      m_resetCameraBaseOrientation(true),
       m_selectedBarPos(Bars3DController::invalidSelectionPosition()),
       m_selectedSeriesCache(0),
       m_noZeroInRange(false),
@@ -79,17 +75,22 @@ Bars3DRenderer::Bars3DRenderer(Bars3DController *controller)
       m_keepSeriesUniform(false),
       m_haveUniformColorSeries(false),
       m_haveGradientSeries(false),
-      m_zeroPosition(0.0f)
+      m_zeroPosition(0.0f),
+      m_xScaleFactor(1.0f),
+      m_zScaleFactor(1.0f),
+      m_floorLevel(0.0f),
+      m_actualFloorLevel(0.0f)
 {
     m_axisCacheY.setScale(2.0f);
     m_axisCacheY.setTranslate(-1.0f);
 
-    initializeOpenGLFunctions();
     initializeOpenGL();
 }
 
 Bars3DRenderer::~Bars3DRenderer()
 {
+    fixContextBeforeDelete();
+
     if (QOpenGLContext::currentContext()) {
         m_textureHelper->glDeleteFramebuffers(1, &m_selectionFrameBuffer);
         m_textureHelper->glDeleteRenderbuffers(1, &m_selectionDepthBuffer);
@@ -103,7 +104,6 @@ Bars3DRenderer::~Bars3DRenderer()
     delete m_depthShader;
     delete m_selectionShader;
     delete m_backgroundShader;
-    delete m_labelShader;
 }
 
 void Bars3DRenderer::initializeOpenGL()
@@ -111,13 +111,9 @@ void Bars3DRenderer::initializeOpenGL()
     Abstract3DRenderer::initializeOpenGL();
 
     // Initialize shaders
-    initLabelShaders(QStringLiteral(":/shaders/vertexLabel"),
-                     QStringLiteral(":/shaders/fragmentLabel"));
 
-#if !defined(QT_OPENGL_ES_2)
     // Init depth shader (for shadows). Init in any case, easier to handle shadow activation if done via api.
     initDepthShader();
-#endif
 
     // Init selection shader
     initSelectionShader();
@@ -125,11 +121,55 @@ void Bars3DRenderer::initializeOpenGL()
     // Load grid line mesh
     loadGridLineMesh();
 
-    // Load label mesh
-    loadLabelMesh();
-
     // Load background mesh (we need to be initialized first)
     loadBackgroundMesh();
+}
+
+void Bars3DRenderer::fixCameraTarget(QVector3D &target)
+{
+    target.setX(target.x() * m_xScaleFactor);
+    target.setY(0.0f);
+    target.setZ(target.z() * -m_zScaleFactor);
+}
+
+void Bars3DRenderer::getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds)
+{
+    // The inputs are the item bounds in OpenGL coordinates.
+    // The outputs limit these bounds to visible ranges, normalized to range [-1, 1]
+    // Volume shader flips the Y and Z axes, so we need to set negatives of actual values to those
+    float itemRangeX = (maxBounds.x() - minBounds.x());
+    float itemRangeY = (maxBounds.y() - minBounds.y());
+    float itemRangeZ = (maxBounds.z() - minBounds.z());
+
+    if (minBounds.x() < -m_xScaleFactor)
+        minBounds.setX(-1.0f + (2.0f * qAbs(minBounds.x() + m_xScaleFactor) / itemRangeX));
+    else
+        minBounds.setX(-1.0f);
+
+    if (minBounds.y() < -1.0f + m_backgroundAdjustment)
+        minBounds.setY(-(-1.0f + (2.0f * qAbs(minBounds.y() + 1.0f - m_backgroundAdjustment) / itemRangeY)));
+    else
+        minBounds.setY(1.0f);
+
+    if (minBounds.z() < -m_zScaleFactor)
+        minBounds.setZ(-(-1.0f + (2.0f * qAbs(minBounds.z() + m_zScaleFactor) / itemRangeZ)));
+    else
+        minBounds.setZ(1.0f);
+
+    if (maxBounds.x() > m_xScaleFactor)
+        maxBounds.setX(1.0f - (2.0f * qAbs(maxBounds.x() - m_xScaleFactor) / itemRangeX));
+    else
+        maxBounds.setX(1.0f);
+
+    if (maxBounds.y() > 1.0f + m_backgroundAdjustment)
+        maxBounds.setY(-(1.0f - (2.0f * qAbs(maxBounds.y() - 1.0f - m_backgroundAdjustment) / itemRangeY)));
+    else
+        maxBounds.setY(-1.0f);
+
+    if (maxBounds.z() > m_zScaleFactor)
+        maxBounds.setZ(-(1.0f - (2.0f * qAbs(maxBounds.z() - m_zScaleFactor) / itemRangeZ)));
+    else
+        maxBounds.setZ(-1.0f);
 }
 
 void Bars3DRenderer::updateData()
@@ -163,11 +203,11 @@ void Bars3DRenderer::updateData()
         GLfloat sceneRatio = qMin(GLfloat(newColumns) / GLfloat(newRows),
                                   GLfloat(newRows) / GLfloat(newColumns));
         m_maxSceneSize = 2.0f * qSqrt(sceneRatio * newColumns * newRows);
-        // Calculate here and at setting bar specs
-        calculateSceneScalingFactors();
     }
 
-    m_zeroPosition = m_axisCacheY.formatter()->positionAt(0.0f);
+    calculateSceneScalingFactors();
+
+    m_zeroPosition = m_axisCacheY.formatter()->positionAt(m_actualFloorLevel);
 
     foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
         BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
@@ -390,14 +430,6 @@ void Bars3DRenderer::updateScene(Q3DScene *scene)
         }
     }
 
-    if (m_resetCameraBaseOrientation) {
-        // Set initial camera position. Also update if height adjustment has changed.
-        scene->activeCamera()->d_ptr->setBaseOrientation(cameraDistanceVector,
-                                                         zeroVector,
-                                                         upVector);
-        m_resetCameraBaseOrientation = false;
-    }
-
     Abstract3DRenderer::updateScene(scene);
 
     updateSlicingActive(scene->isSlicingActive());
@@ -418,10 +450,17 @@ void Bars3DRenderer::render(GLuint defaultFboHandle)
 
 void Bars3DRenderer::drawSlicedScene()
 {
+    if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow)
+            == m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
+        qWarning("Invalid selection mode. Either QAbstract3DGraph::SelectionRow or"
+                 " QAbstract3DGraph::SelectionColumn must be set before calling"
+                 " setSlicingActive(true).");
+        return;
+    }
+
     GLfloat barPosX = 0;
     QVector3D lightPos;
     QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
-    static QQuaternion ninetyDegreeRotation = QQuaternion::fromAxisAndAngle(upVector, 90.0f);
 
     // Specify viewport
     glViewport(m_secondarySubViewport.x(),
@@ -482,11 +521,12 @@ void Bars3DRenderer::drawSlicedScene()
     // Draw grid lines
     if (m_cachedTheme->isGridEnabled()) {
         glDisable(GL_DEPTH_TEST);
-#if !(defined QT_OPENGL_ES_2)
-        ShaderHelper *lineShader = m_backgroundShader;
-#else
-        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
-#endif
+        ShaderHelper *lineShader;
+        if (m_isOpenGLES)
+            lineShader = m_selectionShader; // Plain color shader for GL_LINES
+        else
+            lineShader = m_backgroundShader;
+
         // Bind line shader
         lineShader->bind();
 
@@ -496,7 +536,8 @@ void Bars3DRenderer::drawSlicedScene()
         lineShader->setUniformValue(lineShader->view(), viewMatrix);
         lineShader->setUniformValue(lineShader->color(), lineColor);
         lineShader->setUniformValue(lineShader->ambientS(),
-                                    m_cachedTheme->ambientLightStrength() * 2.3f);
+                                    m_cachedTheme->ambientLightStrength()
+                                    + m_cachedTheme->lightStrength() / 7.0f);
         lineShader->setUniformValue(lineShader->lightS(), 0.0f);
         lineShader->setUniformValue(lineShader->lightColor(), lightColor);
 
@@ -524,11 +565,10 @@ void Bars3DRenderer::drawSlicedScene()
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
                 // Draw the object
-#if !(defined QT_OPENGL_ES_2)
-                m_drawer->drawObject(lineShader, m_gridLineObj);
-#else
-                m_drawer->drawLine(lineShader);
-#endif
+                if (m_isOpenGLES)
+                    m_drawer->drawLine(lineShader);
+                else
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
 
                 // Check if we have a line at zero position already
                 if (gridPos == (barPosYAdjustment + zeroPosAdjustment))
@@ -553,18 +593,16 @@ void Bars3DRenderer::drawSlicedScene()
                                                 m_cachedTheme->labelTextColor()));
 
                 // Draw the object
-#if !(defined QT_OPENGL_ES_2)
-                m_drawer->drawObject(lineShader, m_gridLineObj);
-#else
-                m_drawer->drawLine(lineShader);
-#endif
+                if (m_isOpenGLES)
+                    m_drawer->drawLine(lineShader);
+                else
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
             }
         }
 
         if (sliceGridLabels) {
             // Bind label shader
             m_labelShader->bind();
-            glEnable(GL_TEXTURE_2D);
             glCullFace(GL_BACK);
             glEnable(GL_BLEND);
             glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -587,7 +625,6 @@ void Bars3DRenderer::drawSlicedScene()
                 }
                 labelNbr++;
             }
-            glDisable(GL_TEXTURE_2D);
             glDisable(GL_BLEND);
             glEnable(GL_DEPTH_TEST);
         }
@@ -606,14 +643,16 @@ void Bars3DRenderer::drawSlicedScene()
     m_barShader->setUniformValue(m_barShader->view(), viewMatrix);
     m_barShader->setUniformValue(m_barShader->lightS(), 0.15f);
     m_barShader->setUniformValue(m_barShader->ambientS(),
-                                 m_cachedTheme->ambientLightStrength() * 2.3f);
+                                 m_cachedTheme->ambientLightStrength()
+                                 + m_cachedTheme->lightStrength() / 7.0f);
     m_barShader->setUniformValue(m_barShader->lightColor(), lightColor);
     m_barGradientShader->bind();
     m_barGradientShader->setUniformValue(m_barGradientShader->lightP(), lightPos);
     m_barGradientShader->setUniformValue(m_barGradientShader->view(), viewMatrix);
     m_barGradientShader->setUniformValue(m_barGradientShader->lightS(), 0.15f);
     m_barGradientShader->setUniformValue(m_barGradientShader->ambientS(),
-                                         m_cachedTheme->ambientLightStrength() * 2.3f);
+                                         m_cachedTheme->ambientLightStrength()
+                                         + m_cachedTheme->lightStrength() / 7.0f);
     m_barGradientShader->setUniformValue(m_barGradientShader->gradientMin(), 0.0f);
     m_barGradientShader->setUniformValue(m_barGradientShader->lightColor(), lightColor);
 
@@ -700,7 +739,7 @@ void Bars3DRenderer::drawSlicedScene()
                     barPosX = item.translation().x();
                 } else {
                     barPosX = -(item.translation().z()); // flip z; frontmost bar to the left
-                    barRotation *= ninetyDegreeRotation;
+                    barRotation *= m_yRightAngleRotation;
                 }
 
                 modelMatrix.translate(barPosX, barPosY, 0.0f);
@@ -760,7 +799,6 @@ void Bars3DRenderer::drawSlicedScene()
     // Draw labels
     m_labelShader->bind();
     glDisable(GL_DEPTH_TEST);
-    glEnable(GL_TEXTURE_2D);
     glCullFace(GL_BACK);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -778,6 +816,12 @@ void Bars3DRenderer::drawSlicedScene()
     int labelCount = m_sliceCache->labelItems().size();
 
     for (int labelNo = 0; labelNo < labelCount; labelNo++) {
+        // Check for invalid usage (no selection when setting slicing active)
+        if (!firstVisualSliceArray) {
+            qWarning("No slice data found. Make sure there is a valid selection.");
+            continue;
+        }
+
         // Get labels from first series only
         const BarRenderSliceItem &item = firstVisualSliceArray->at(labelNo);
         m_dummyBarRenderItem.setTranslation(QVector3D(item.translation().x(),
@@ -889,7 +933,6 @@ void Bars3DRenderer::drawSlicedScene()
                         m_cachedSelectionMode, m_labelShader, m_labelObj, activeCamera,
                         false, false, Drawer::LabelMid, Qt::AlignBottom);
 
-    glDisable(GL_TEXTURE_2D);
     glDisable(GL_BLEND);
     glEnable(GL_DEPTH_TEST);
 
@@ -911,8 +954,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     GLfloat colPos = 0;
     GLfloat rowPos = 0;
-
-    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
     const Q3DCamera *activeCamera = m_cachedScene->activeCamera();
 
@@ -990,15 +1031,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 
     QMatrix4x4 projectionViewMatrix = projectionMatrix * viewMatrix;
 
-    bool rowMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow);
-
-    GLfloat rowScaleFactor = m_rowWidth / m_scaleFactor;
-    GLfloat columnScaleFactor = m_columnDepth / m_scaleFactor;
-
     BarRenderItem *selectedBar(0);
 
-#if !defined(QT_OPENGL_ES_2)
-    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !m_isOpenGLES) {
         // Render scene into a depth texture for using with shadow mapping
         // Enable drawing to depth framebuffer
         glBindFramebuffer(GL_FRAMEBUFFER, m_depthFrameBuffer);
@@ -1052,6 +1087,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                 shadowOffset = -0.015f;
                         }
 
+                        if (m_cachedTheme->isBackgroundEnabled() && m_reflectionEnabled
+                                && ((m_yFlipped && item.height() > 0.0)
+                                    || (!m_yFlipped && item.height() < 0.0))) {
+                            continue;
+                        }
+
                         QMatrix4x4 modelMatrix;
                         QMatrix4x4 MVPMatrix;
 
@@ -1097,8 +1138,9 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         }
 
         Abstract3DRenderer::drawCustomItems(RenderingDepth, m_depthShader, viewMatrix,
-                                            projectionViewMatrix, depthProjectionViewMatrix,
-                                            m_depthTexture, m_shadowQualityToShader);
+                                            projectionViewMatrix,
+                                            depthProjectionViewMatrix, m_depthTexture,
+                                            m_shadowQualityToShader);
 
         // Disable drawing to depth framebuffer (= enable drawing to screen)
         glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
@@ -1112,12 +1154,22 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                    m_primarySubViewport.width(),
                    m_primarySubViewport.height());
     }
-#endif
+
+    // Do position mapping when necessary
+    if (m_graphPositionQueryPending) {
+        QVector3D graphDimensions(m_xScaleFactor, 0.0f, m_zScaleFactor);
+        queriedGraphPosition(projectionViewMatrix, graphDimensions, defaultFboHandle);
+
+        // Y is always at floor level
+        m_queriedGraphPosition.setY(0.0f);
+        emit needRender();
+    }
 
     // Skip selection mode drawing if we're slicing or have no selection mode
     if (!m_cachedIsSlicingActivated && m_cachedSelectionMode > QAbstract3DGraph::SelectionNone
             && m_selectionState == SelectOnScene
-            && (m_visibleSeriesCount > 0 || !m_customRenderCache.isEmpty())) {
+            && (m_visibleSeriesCount > 0 || !m_customRenderCache.isEmpty())
+            && m_selectionTexture) {
         // Bind selection shader
         m_selectionShader->bind();
 
@@ -1181,18 +1233,20 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
         glCullFace(GL_BACK);
-        Abstract3DRenderer::drawCustomItems(RenderingSelection, m_selectionShader, viewMatrix,
+        Abstract3DRenderer::drawCustomItems(RenderingSelection, m_selectionShader,
+                                            viewMatrix,
                                             projectionViewMatrix, depthProjectionViewMatrix,
                                             m_depthTexture, m_shadowQualityToShader);
-        drawLabels(true, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
-                   columnScaleFactor);
+        drawLabels(true, activeCamera, viewMatrix, projectionMatrix);
+        drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix,
+                       viewMatrix, false, true);
         glEnable(GL_DITHER);
 
         // Read color under cursor
-        QVector4D clickedColor = Utils::getSelection(m_inputPosition,
-                                                     m_viewport.height());
+        QVector4D clickedColor = Utils::getSelection(m_inputPosition, m_viewport.height());
         m_clickedPosition = selectionColorToArrayPosition(clickedColor);
         m_clickedSeries = selectionColorToSeries(clickedColor);
+        m_clickResolved = true;
 
         emit needRender();
 
@@ -1204,8 +1258,133 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                    m_primarySubViewport.height());
     }
 
-    // Enable texturing
-    glEnable(GL_TEXTURE_2D);
+    if (m_reflectionEnabled) {
+        //
+        // Draw reflections
+        //
+        glDisable(GL_DEPTH_TEST);
+        glColorMask(GL_FALSE, GL_FALSE, GL_FALSE, GL_FALSE);
+        glEnable(GL_STENCIL_TEST);
+        glStencilOp(GL_REPLACE, GL_REPLACE, GL_REPLACE);
+        glStencilFunc(GL_ALWAYS, 1, 0xffffffff);
+
+        // Draw background stencil
+        drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix,
+                       viewMatrix);
+
+        glColorMask(GL_TRUE, GL_TRUE, GL_TRUE, GL_TRUE);
+        glEnable(GL_DEPTH_TEST);
+
+        glStencilFunc(GL_EQUAL, 1, 0xffffffff);
+        glStencilOp(GL_KEEP, GL_KEEP, GL_KEEP);
+
+        // Set light
+        QVector3D reflectionLightPos = lightPos;
+        reflectionLightPos.setY(-(lightPos.y()));
+        m_cachedScene->activeLight()->setPosition(reflectionLightPos);
+
+        // Draw bar reflections
+        (void)drawBars(&selectedBar, depthProjectionViewMatrix,
+                       projectionViewMatrix, viewMatrix,
+                       startRow, stopRow, stepRow,
+                       startBar, stopBar, stepBar, -1.0f);
+
+        Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader,
+                                            viewMatrix, projectionViewMatrix,
+                                            depthProjectionViewMatrix, m_depthTexture,
+                                            m_shadowQualityToShader, -1.0f);
+
+        // Reset light
+        m_cachedScene->activeLight()->setPosition(lightPos);
+
+        glDisable(GL_STENCIL_TEST);
+
+        glCullFace(GL_BACK);
+    }
+
+    //
+    // Draw the real scene
+    //
+    // Draw background
+    if (m_reflectionEnabled) {
+        glEnable(GL_BLEND);
+        glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix,
+                       viewMatrix, true);
+        glDisable(GL_BLEND);
+    } else {
+        drawBackground(backgroundRotation, depthProjectionViewMatrix, projectionViewMatrix,
+                       viewMatrix);
+    }
+
+    // Draw bars
+    bool barSelectionFound = drawBars(&selectedBar, depthProjectionViewMatrix,
+                                      projectionViewMatrix, viewMatrix,
+                                      startRow, stopRow, stepRow,
+                                      startBar, stopBar, stepBar);
+
+    // Draw grid lines
+    drawGridLines(depthProjectionViewMatrix, projectionViewMatrix, viewMatrix);
+
+    // Draw custom items
+    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
+                                        projectionViewMatrix, depthProjectionViewMatrix,
+                                        m_depthTexture, m_shadowQualityToShader);
+
+    // Draw labels
+    drawLabels(false, activeCamera, viewMatrix, projectionMatrix);
+
+    // Handle selected bar label generation
+    if (barSelectionFound) {
+        // Print value of selected bar
+        glDisable(GL_DEPTH_TEST);
+        // Draw the selection label
+        LabelItem &labelItem = selectionLabelItem();
+        if (m_selectedBar != selectedBar || m_updateLabels || !labelItem.textureId()
+                || m_selectionLabelDirty) {
+            QString labelText = selectionLabel();
+            if (labelText.isNull() || m_selectionLabelDirty) {
+                labelText = m_selectedSeriesCache->itemLabel();
+                setSelectionLabel(labelText);
+                m_selectionLabelDirty = false;
+            }
+            m_drawer->generateLabelItem(labelItem, labelText);
+            m_selectedBar = selectedBar;
+        }
+
+        Drawer::LabelPosition position =
+                m_selectedBar->height() >= 0 ? Drawer::LabelOver : Drawer::LabelBelow;
+
+        m_drawer->drawLabel(*selectedBar, labelItem, viewMatrix, projectionMatrix,
+                            zeroVector, identityQuaternion, selectedBar->height(),
+                            m_cachedSelectionMode, m_labelShader,
+                            m_labelObj, activeCamera, true, false, position);
+
+        // Reset label update flag; they should have been updated when we get here
+        m_updateLabels = false;
+
+        glEnable(GL_DEPTH_TEST);
+    } else {
+        m_selectedBar = 0;
+    }
+
+    glDisable(GL_BLEND);
+
+    // Release shader
+    glUseProgram(0);
+    m_selectionDirty = false;
+}
+
+bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
+                              const QMatrix4x4 &depthProjectionViewMatrix,
+                              const QMatrix4x4 &projectionViewMatrix, const QMatrix4x4 &viewMatrix,
+                              GLint startRow, GLint stopRow, GLint stepRow,
+                              GLint startBar, GLint stopBar, GLint stepBar, GLfloat reflection)
+{
+    QVector3D lightPos =  m_cachedScene->activeLight()->position();
+    QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+
+    bool rowMode = m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionRow);
 
     ShaderHelper *barShader = 0;
     GLuint gradientTexture = 0;
@@ -1251,7 +1430,6 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         m_sliceTitleItem = 0;
     }
 
-    // Draw bars
     glEnable(GL_POLYGON_OFFSET_FILL);
     glPolygonOffset(0.5f, 1.0f);
 
@@ -1302,12 +1480,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
 
             previousColorStyle = colorStyle;
-
             for (int row = startRow; row != stopRow; row += stepRow) {
                 BarRenderItemRow &renderRow = renderArray[row];
                 for (int bar = startBar; bar != stopBar; bar += stepBar) {
                     BarRenderItem &item = renderRow[bar];
-                    if (item.height() < 0)
+                    float adjustedHeight = reflection * item.height();
+                    if (adjustedHeight < 0)
                         glCullFace(GL_FRONT);
                     else
                         glCullFace(GL_BACK);
@@ -1316,13 +1494,13 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                     QMatrix4x4 itModelMatrix;
                     QMatrix4x4 MVPMatrix;
 
-                    colPos = (bar + seriesPos) * (m_cachedBarSpacing.width());
-                    rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
+                    GLfloat colPos = (bar + seriesPos) * (m_cachedBarSpacing.width());
+                    GLfloat rowPos = (row + 0.5f) * (m_cachedBarSpacing.height());
 
                     modelMatrix.translate((colPos - m_rowWidth) / m_scaleFactor,
-                                          item.height(),
+                                          adjustedHeight,
                                           (m_columnDepth - rowPos) / m_scaleFactor);
-                    modelScaler.setY(item.height());
+                    modelScaler.setY(adjustedHeight);
                     if (!seriesRotation.isIdentity() || !item.rotation().isIdentity()) {
                         QQuaternion totalRotation = seriesRotation * item.rotation();
                         modelMatrix.rotate(totalRotation);
@@ -1357,8 +1535,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             // We have no ownership, don't delete the previous one
                             if (!m_cachedIsSlicingActivated
                                     && m_selectedSeriesCache == cache) {
-                                selectedBar = &item;
-                                selectedBar->setPosition(QPoint(row, bar));
+                                *selectedBar = &item;
+                                (*selectedBar)->setPosition(QPoint(row, bar));
                                 item.setTranslation(modelMatrix.column(3).toVector3D());
                                 barSelectionFound = true;
                             }
@@ -1438,8 +1616,15 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         }
                     }
 
-                    // Skip drawing of 0-height bars
-                    if (item.height() != 0) {
+                    if (item.height() == 0) {
+                        continue;
+                    } else if ((m_reflectionEnabled
+                                && (reflection == 1.0f
+                                    || (reflection != 1.0f
+                                        && ((m_yFlipped && item.height() < 0.0)
+                                            || (!m_yFlipped && item.height() > 0.0)))))
+                               || !m_reflectionEnabled) {
+                        // Skip drawing of 0-height bars and reflections of bars on the "wrong side"
                         // Set shader bindings
                         barShader->setUniformValue(barShader->model(), modelMatrix);
                         barShader->setUniformValue(barShader->nModel(),
@@ -1452,8 +1637,10 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                                        qAbs(item.height()) / m_gradientFraction);
                         }
 
-#if !defined(QT_OPENGL_ES_2)
-                        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        if (((m_reflectionEnabled && reflection == 1.0f
+                             && m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone)
+                                || m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone)
+                             && !m_isOpenGLES) {
                             // Set shadow shader bindings
                             QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
                             barShader->setUniformValue(barShader->shadowQ(),
@@ -1465,13 +1652,15 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                             // Draw the object
                             m_drawer->drawObject(barShader, barObj, gradientTexture,
                                                  m_depthTexture);
-                        } else
-#else
-                        Q_UNUSED(shadowLightStrength);
-#endif
-                        {
+                        } else {
                             // Set shadowless shader bindings
-                            barShader->setUniformValue(barShader->lightS(), lightStrength);
+                            if (m_reflectionEnabled && reflection != 1.0f
+                                    && m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                                barShader->setUniformValue(barShader->lightS(),
+                                                           adjustedLightStrength);
+                            } else {
+                                barShader->setUniformValue(barShader->lightS(), lightStrength);
+                            }
 
                             // Draw the object
                             m_drawer->drawObject(barShader, barObj, gradientTexture);
@@ -1481,22 +1670,91 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             }
         }
     }
-
     glDisable(GL_POLYGON_OFFSET_FILL);
 
     // Reset culling
     glCullFace(GL_BACK);
 
-    // Bind background shader
-    m_backgroundShader->bind();
+    return barSelectionFound;
+}
 
+void Bars3DRenderer::drawBackground(GLfloat backgroundRotation,
+                                    const QMatrix4x4 &depthProjectionViewMatrix,
+                                    const QMatrix4x4 &projectionViewMatrix,
+                                    const QMatrix4x4 &viewMatrix, bool reflectingDraw,
+                                    bool drawingSelectionBuffer)
+{
     // Draw background
     if (m_cachedTheme->isBackgroundEnabled() && m_backgroundObj) {
+        QVector3D lightPos =  m_cachedScene->activeLight()->position();
+        QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
+        GLfloat adjustedLightStrength = m_cachedTheme->lightStrength() / 10.0f;
+        ShaderHelper *shader = 0;
+
+        // Bind background shader
+        if (drawingSelectionBuffer)
+            shader = m_selectionShader; // Use single color shader when drawing to selection buffer
+        else
+            shader = m_backgroundShader;
+        shader->bind();
+
         QMatrix4x4 modelMatrix;
         QMatrix4x4 MVPMatrix;
         QMatrix4x4 itModelMatrix;
 
-        QVector3D backgroundScaler(rowScaleFactor, 1.0f, columnScaleFactor);
+        QVector3D backgroundScaler(m_scaleXWithBackground, m_scaleYWithBackground,
+                                   m_scaleZWithBackground);
+        QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
+        if (m_reflectionEnabled)
+            backgroundColor.setW(backgroundColor.w() * m_reflectivity);
+
+        // Set shader bindings
+        shader->setUniformValue(shader->lightP(), lightPos);
+        shader->setUniformValue(shader->view(), viewMatrix);
+        if (drawingSelectionBuffer) {
+            // Use selectionSkipColor for background when drawing to selection buffer
+            shader->setUniformValue(shader->color(), selectionSkipColor);
+        } else {
+            shader->setUniformValue(shader->color(), backgroundColor);
+        }
+        shader->setUniformValue(shader->ambientS(),
+                                m_cachedTheme->ambientLightStrength() * 2.0f);
+        shader->setUniformValue(shader->lightColor(), lightColor);
+
+        // Draw floor
+        modelMatrix.scale(backgroundScaler);
+
+        if (m_yFlipped)
+            modelMatrix.rotate(m_xRightAngleRotation);
+        else
+            modelMatrix.rotate(m_xRightAngleRotationNeg);
+
+        itModelMatrix = modelMatrix;
+
+#ifdef SHOW_DEPTH_TEXTURE_SCENE
+        MVPMatrix = depthProjectionViewMatrix * modelMatrix;
+#else
+        MVPMatrix = projectionViewMatrix * modelMatrix;
+#endif
+        // Set changed shader bindings
+        shader->setUniformValue(shader->model(), modelMatrix);
+        shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+        shader->setUniformValue(shader->MVP(), MVPMatrix);
+
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !m_isOpenGLES) {
+            // Set shadow shader bindings
+            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+            shader->setUniformValue(shader->depth(), depthMVPMatrix);
+            // Draw the object
+            m_drawer->drawObject(shader, m_gridLineObj, 0, m_depthTexture);
+        } else {
+            // Draw the object
+            m_drawer->drawObject(shader, m_gridLineObj);
+        }
+
+        // Draw walls
+        modelMatrix = QMatrix4x4();
+        itModelMatrix = QMatrix4x4();
         modelMatrix.translate(0.0f, m_backgroundAdjustment, 0.0f);
 
         modelMatrix.scale(backgroundScaler);
@@ -1509,93 +1767,47 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
 #else
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
-        QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
 
-        // Set shader bindings
-        m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
-        m_backgroundShader->setUniformValue(m_backgroundShader->view(), viewMatrix);
-        m_backgroundShader->setUniformValue(m_backgroundShader->model(), modelMatrix);
-        m_backgroundShader->setUniformValue(m_backgroundShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-        m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
-        m_backgroundShader->setUniformValue(m_backgroundShader->color(), backgroundColor);
-        m_backgroundShader->setUniformValue(m_backgroundShader->ambientS(),
-                                            m_cachedTheme->ambientLightStrength() * 2.0f);
-        m_backgroundShader->setUniformValue(m_backgroundShader->lightColor(), lightColor);
-
-#if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-            // Set shadow shader bindings
-            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-            m_backgroundShader->setUniformValue(m_backgroundShader->shadowQ(),
-                                                m_shadowQualityToShader);
-            m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
-            m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                adjustedLightStrength);
-
-            // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_backgroundObj, 0, m_depthTexture);
-        } else
-#endif
-        {
-            // Set shadowless shader bindings
-            m_backgroundShader->setUniformValue(m_backgroundShader->lightS(),
-                                                m_cachedTheme->lightStrength());
-
-            // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
-        }
-
-        // Draw floor
-        modelMatrix = QMatrix4x4();
-        itModelMatrix = QMatrix4x4();
-
-        modelMatrix.scale(backgroundScaler);
-
-        if (m_yFlipped)
-            modelMatrix.rotate(90.0f, 1.0f, 0.0f, 0.0f);
-        else
-            modelMatrix.rotate(-90.0f, 1.0f, 0.0f, 0.0f);
-
-        itModelMatrix = modelMatrix;
-
-#ifdef SHOW_DEPTH_TEXTURE_SCENE
-        MVPMatrix = depthProjectionViewMatrix * modelMatrix;
-#else
-        MVPMatrix = projectionViewMatrix * modelMatrix;
-#endif
         // Set changed shader bindings
-        m_backgroundShader->setUniformValue(m_backgroundShader->model(), modelMatrix);
-        m_backgroundShader->setUniformValue(m_backgroundShader->nModel(),
-                                            itModelMatrix.inverted().transposed());
-        m_backgroundShader->setUniformValue(m_backgroundShader->MVP(), MVPMatrix);
+        shader->setUniformValue(shader->model(), modelMatrix);
+        shader->setUniformValue(shader->nModel(), itModelMatrix.inverted().transposed());
+        shader->setUniformValue(shader->MVP(), MVPMatrix);
+        if (!m_reflectionEnabled || (m_reflectionEnabled && reflectingDraw)) {
+            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !m_isOpenGLES) {
+                // Set shadow shader bindings
+                QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                shader->setUniformValue(shader->shadowQ(), m_shadowQualityToShader);
+                shader->setUniformValue(shader->depth(), depthMVPMatrix);
+                shader->setUniformValue(shader->lightS(), adjustedLightStrength);
 
-#if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-            // Set shadow shader bindings
-            QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-            m_backgroundShader->setUniformValue(m_backgroundShader->depth(), depthMVPMatrix);
-            // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_gridLineObj, 0, m_depthTexture);
-        } else
-#endif
-        {
-            // Draw the object
-            m_drawer->drawObject(m_backgroundShader, m_gridLineObj);
+                // Draw the object
+                m_drawer->drawObject(shader, m_backgroundObj, 0, m_depthTexture);
+            } else {
+                // Set shadowless shader bindings
+                shader->setUniformValue(shader->lightS(), m_cachedTheme->lightStrength());
+
+                // Draw the object
+                m_drawer->drawObject(shader, m_backgroundObj);
+            }
         }
     }
+}
 
-    // Disable textures
-    glDisable(GL_TEXTURE_2D);
-
-    // Draw grid lines
+void Bars3DRenderer::drawGridLines(const QMatrix4x4 &depthProjectionViewMatrix,
+                                   const QMatrix4x4 &projectionViewMatrix,
+                                   const QMatrix4x4 &viewMatrix)
+{
     if (m_cachedTheme->isGridEnabled()) {
-#if !(defined QT_OPENGL_ES_2)
-        ShaderHelper *lineShader = m_backgroundShader;
-#else
-        ShaderHelper *lineShader = m_selectionShader; // Plain color shader for GL_LINES
-#endif
+        ShaderHelper *lineShader;
+        if (m_isOpenGLES)
+            lineShader = m_selectionShader; // Plain color shader for GL_LINES
+        else
+            lineShader = m_backgroundShader;
+
         QQuaternion lineRotation;
+
+        QVector3D lightPos =  m_cachedScene->activeLight()->position();
+        QVector4D lightColor = Utils::vectorFromColor(m_cachedTheme->lightColor());
 
         // Bind bar shader
         lineShader->bind();
@@ -1607,15 +1819,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         lineShader->setUniformValue(lineShader->color(), barColor);
         lineShader->setUniformValue(lineShader->ambientS(), m_cachedTheme->ambientLightStrength());
         lineShader->setUniformValue(lineShader->lightColor(), lightColor);
-#if !defined(QT_OPENGL_ES_2)
-        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone && !m_isOpenGLES) {
             // Set shadowed shader bindings
             lineShader->setUniformValue(lineShader->shadowQ(), m_shadowQualityToShader);
             lineShader->setUniformValue(lineShader->lightS(),
                                         m_cachedTheme->lightStrength() / 20.0f);
-        } else
-#endif
-        {
+        } else {
             // Set shadowless shader bindings
             lineShader->setUniformValue(lineShader->lightS(),
                                         m_cachedTheme->lightStrength() / 2.5f);
@@ -1625,12 +1834,12 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         if (m_yFlipped)
             yFloorLinePosition = -yFloorLinePosition;
 
-        QVector3D gridLineScaler(rowScaleFactor, gridLineWidth, gridLineWidth);
+        QVector3D gridLineScaler(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
 
         if (m_yFlipped)
-            lineRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f);
+            lineRotation = m_xRightAngleRotation;
         else
-            lineRotation = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f);
+            lineRotation = m_xRightAngleRotationNeg;
 
         // Floor lines: rows
         for (GLfloat row = 0.0f; row <= m_cachedRowCount; row++) {
@@ -1638,7 +1847,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            rowPos = row * m_cachedBarSpacing.height();
+            GLfloat rowPos = row * m_cachedBarSpacing.height();
             modelMatrix.translate(0.0f, yFloorLinePosition,
                                   (m_columnDepth - rowPos) / m_scaleFactor);
             modelMatrix.scale(gridLineScaler);
@@ -1654,33 +1863,32 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                         itModelMatrix.inverted().transposed());
             lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                // Set shadow shader bindings
-                QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                // Draw the object
-                m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+            if (m_isOpenGLES) {
+                m_drawer->drawLine(lineShader);
             } else {
-                // Draw the object
-                m_drawer->drawObject(lineShader, m_gridLineObj);
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                    // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    // Draw the object
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                } else {
+                    // Draw the object
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                }
             }
-#else
-            m_drawer->drawLine(lineShader);
-#endif
         }
 
         // Floor lines: columns
-#if defined(QT_OPENGL_ES_2)
-        lineRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
-#endif
-        gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, columnScaleFactor);
+        if (m_isOpenGLES)
+            lineRotation = m_yRightAngleRotation;
+        gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
         for (GLfloat bar = 0.0f; bar <= m_cachedColumnCount; bar++) {
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
             QMatrix4x4 itModelMatrix;
 
-            colPos = bar * m_cachedBarSpacing.width();
+            GLfloat colPos = bar * m_cachedBarSpacing.width();
             modelMatrix.translate((m_rowWidth - colPos) / m_scaleFactor,
                                   yFloorLinePosition, 0.0f);
             modelMatrix.scale(gridLineScaler);
@@ -1696,31 +1904,31 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                         itModelMatrix.inverted().transposed());
             lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-            if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                // Set shadow shader bindings
-                QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                // Draw the object
-                m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+            if (m_isOpenGLES) {
+                m_drawer->drawLine(lineShader);
             } else {
-                // Draw the object
-                m_drawer->drawObject(lineShader, m_gridLineObj);
+                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                    // Set shadow shader bindings
+                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                    // Draw the object
+                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                } else {
+                    // Draw the object
+                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                }
             }
-#else
-            m_drawer->drawLine(lineShader);
-#endif
         }
 
         if (m_axisCacheY.segmentCount() > 0) {
             // Wall lines: back wall
             int gridLineCount = m_axisCacheY.gridLineCount();
 
-            GLfloat zWallLinePosition = -columnScaleFactor + gridLineOffset;
+            GLfloat zWallLinePosition = -m_scaleZWithBackground + gridLineOffset;
             if (m_zFlipped)
                 zWallLinePosition = -zWallLinePosition;
 
-            gridLineScaler = QVector3D(rowScaleFactor, gridLineWidth, gridLineWidth);
+            gridLineScaler = QVector3D(m_scaleXWithBackground, gridLineWidth, gridLineWidth);
             for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
@@ -1732,8 +1940,8 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                 modelMatrix.scale(gridLineScaler);
                 itModelMatrix.scale(gridLineScaler);
                 if (m_zFlipped) {
-                    modelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
-                    itModelMatrix.rotate(180.0f, 1.0f, 0.0f, 0.0f);
+                    modelMatrix.rotate(m_xFlipRotation);
+                    itModelMatrix.rotate(m_xFlipRotation);
                 }
 
                 MVPMatrix = projectionViewMatrix * modelMatrix;
@@ -1744,33 +1952,33 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                             itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                if (m_isOpenGLES) {
+                    m_drawer->drawLine(lineShader);
                 } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
             }
 
             // Wall lines: side wall
-            GLfloat xWallLinePosition = -rowScaleFactor + gridLineOffset;
+            GLfloat xWallLinePosition = -m_scaleXWithBackground + gridLineOffset;
             if (m_xFlipped)
                 xWallLinePosition = -xWallLinePosition;
 
             if (m_xFlipped)
-                lineRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, -90.0f);
+                lineRotation = m_yRightAngleRotationNeg;
             else
-                lineRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, 90.0f);
+                lineRotation = m_yRightAngleRotation;
 
-            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, columnScaleFactor);
+            gridLineScaler = QVector3D(gridLineWidth, gridLineWidth, m_scaleZWithBackground);
             for (int line = 0; line < gridLineCount; line++) {
                 QMatrix4x4 modelMatrix;
                 QMatrix4x4 MVPMatrix;
@@ -1792,76 +2000,27 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                                             itModelMatrix.inverted().transposed());
                 lineShader->setUniformValue(lineShader->MVP(), MVPMatrix);
 
-#if !defined(QT_OPENGL_ES_2)
-                if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-                    // Set shadow shader bindings
-                    QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
-                    lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                if (m_isOpenGLES) {
+                    m_drawer->drawLine(lineShader);
                 } else {
-                    // Draw the object
-                    m_drawer->drawObject(lineShader, m_gridLineObj);
+                    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+                        // Set shadow shader bindings
+                        QMatrix4x4 depthMVPMatrix = depthProjectionViewMatrix * modelMatrix;
+                        lineShader->setUniformValue(lineShader->depth(), depthMVPMatrix);
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj, 0, m_depthTexture);
+                    } else {
+                        // Draw the object
+                        m_drawer->drawObject(lineShader, m_gridLineObj);
+                    }
                 }
-#else
-                m_drawer->drawLine(lineShader);
-#endif
             }
         }
     }
-
-    Abstract3DRenderer::drawCustomItems(RenderingNormal, m_customItemShader, viewMatrix,
-                                        projectionViewMatrix, depthProjectionViewMatrix,
-                                        m_depthTexture, m_shadowQualityToShader);
-
-    drawLabels(false, activeCamera, viewMatrix, projectionMatrix, rowScaleFactor,
-               columnScaleFactor);
-
-    // Handle selected bar label generation
-    if (barSelectionFound) {
-        // Print value of selected bar
-        glDisable(GL_DEPTH_TEST);
-        // Draw the selection label
-        LabelItem &labelItem = selectionLabelItem();
-        if (m_selectedBar != selectedBar || m_updateLabels || !labelItem.textureId()
-                || m_selectionLabelDirty) {
-            QString labelText = selectionLabel();
-            if (labelText.isNull() || m_selectionLabelDirty) {
-                labelText = m_selectedSeriesCache->itemLabel();
-                setSelectionLabel(labelText);
-                m_selectionLabelDirty = false;
-            }
-            m_drawer->generateLabelItem(labelItem, labelText);
-            m_selectedBar = selectedBar;
-        }
-
-        Drawer::LabelPosition position =
-                m_selectedBar->height() >= 0 ? Drawer::LabelOver : Drawer::LabelBelow;
-
-        m_drawer->drawLabel(*selectedBar, labelItem, viewMatrix, projectionMatrix,
-                            zeroVector, identityQuaternion, selectedBar->height(),
-                            m_cachedSelectionMode, m_labelShader,
-                            m_labelObj, activeCamera, true, false, position);
-
-        // Reset label update flag; they should have been updated when we get here
-        m_updateLabels = false;
-
-        glEnable(GL_DEPTH_TEST);
-    } else {
-        m_selectedBar = 0;
-    }
-
-    glDisable(GL_TEXTURE_2D);
-    glDisable(GL_BLEND);
-
-    // Release shader
-    glUseProgram(0);
-    m_selectionDirty = false;
 }
 
 void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
-                                const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix,
-                                GLfloat rowScaleFactor, GLfloat columnScaleFactor) {
+                                const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix) {
     ShaderHelper *shader = 0;
     GLfloat alphaForValueSelection = labelValueAlpha / 255.0f;
     GLfloat alphaForRowSelection = labelRowAlpha / 255.0f;
@@ -1873,7 +2032,6 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
         shader = m_labelShader;
         shader->bind();
 
-        glEnable(GL_TEXTURE_2D);
         glEnable(GL_BLEND);
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     }
@@ -1894,8 +2052,8 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     int labelCount = m_axisCacheY.labelCount();
     GLfloat labelMarginXTrans = labelMargin;
     GLfloat labelMarginZTrans = labelMargin;
-    GLfloat labelXTrans = rowScaleFactor;
-    GLfloat labelZTrans = columnScaleFactor;
+    GLfloat labelXTrans = m_scaleXWithBackground;
+    GLfloat labelZTrans = m_scaleZWithBackground;
     QVector3D backLabelRotation(0.0f, -90.0f, 0.0f);
     QVector3D sideLabelRotation(0.0f, 0.0f, 0.0f);
     Qt::AlignmentFlag backAlignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
@@ -1999,10 +2157,8 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     fractionCamY = activeCamera->yRotation() * labelAngleFraction;
     fractionCamX = activeCamera->xRotation() * labelAngleFraction;
     GLfloat labelYAdjustment = 0.005f;
-    GLfloat scaledRowWidth = rowScaleFactor;
-    GLfloat scaledColumnDepth = columnScaleFactor;
-    GLfloat colPosValue = scaledRowWidth + labelMargin;
-    GLfloat rowPosValue = scaledColumnDepth + labelMargin;
+    GLfloat colPosValue = m_scaleXWithBackground + labelMargin;
+    GLfloat rowPosValue = m_scaleZWithBackground + labelMargin;
     GLfloat rowPos = 0.0f;
     GLfloat colPos = 0.0f;
     Qt::AlignmentFlag alignment = (m_xFlipped == m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
@@ -2296,14 +2452,8 @@ void Bars3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orientatio
 {
     Abstract3DRenderer::updateAxisRange(orientation, min, max);
 
-    if (orientation == QAbstract3DAxis::AxisOrientationY) {
-        // Check if we have negative values
-        if (min < 0)
-            m_hasNegativeValues = true;
-        else if (min >= 0)
-            m_hasNegativeValues = false;
+    if (orientation == QAbstract3DAxis::AxisOrientationY)
         calculateHeightAdjustment();
-    }
 }
 
 void Bars3DRenderer::updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation, bool enable)
@@ -2384,10 +2534,12 @@ void Bars3DRenderer::updateShadowQuality(QAbstract3DGraph::ShadowQuality quality
 
     handleShadowQualityChange();
 
-#if !defined(QT_OPENGL_ES_2)
     // Re-init depth buffer
     updateDepthBuffer();
-#endif
+
+    // Redraw to handle both reflections and shadows on background
+    if (m_reflectionEnabled)
+        needRender();
 }
 
 void Bars3DRenderer::loadBackgroundMesh()
@@ -2398,6 +2550,8 @@ void Bars3DRenderer::loadBackgroundMesh()
 
 void Bars3DRenderer::updateTextures()
 {
+    Abstract3DRenderer::updateTextures();
+
     // Drawer has changed; this flag needs to be checked when checking if we need to update labels
     m_updateLabels = true;
 }
@@ -2420,30 +2574,60 @@ void Bars3DRenderer::calculateSceneScalingFactors()
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);
     m_scaleFactor = qMin((m_cachedColumnCount * (m_maxDimension / m_maxSceneSize)),
                          (m_cachedRowCount * (m_maxDimension / m_maxSceneSize)));
+
+    // Single bar scaling
     m_scaleX = m_cachedBarThickness.width() / m_scaleFactor;
     m_scaleZ = m_cachedBarThickness.height() / m_scaleFactor;
+
+    // Whole graph scale factors
+    m_xScaleFactor = m_rowWidth / m_scaleFactor;
+    m_zScaleFactor = m_columnDepth / m_scaleFactor;
+
+    if (m_requestedMargin < 0.0f) {
+        m_hBackgroundMargin = 0.0f;
+        m_vBackgroundMargin = 0.0f;
+    } else {
+        m_hBackgroundMargin = m_requestedMargin;
+        m_vBackgroundMargin = m_requestedMargin;
+    }
+
+    m_scaleXWithBackground = m_xScaleFactor + m_hBackgroundMargin;
+    m_scaleYWithBackground = 1.0f + m_vBackgroundMargin;
+    m_scaleZWithBackground = m_zScaleFactor + m_hBackgroundMargin;
+
+    updateCameraViewport();
+    updateCustomItemPositions();
 }
 
 void Bars3DRenderer::calculateHeightAdjustment()
 {
+    float min = m_axisCacheY.min();
+    float max = m_axisCacheY.max();
     GLfloat newAdjustment = 1.0f;
-    GLfloat maxAbs = qFabs(m_axisCacheY.max());
+    m_actualFloorLevel = qBound(min, m_floorLevel, max);
+    GLfloat maxAbs = qFabs(max - m_actualFloorLevel);
 
-    if (m_axisCacheY.max() < 0.0f) {
-        m_heightNormalizer = GLfloat(qFabs(m_axisCacheY.min()) - qFabs(m_axisCacheY.max()));
-        maxAbs = qFabs(m_axisCacheY.max()) - qFabs(m_axisCacheY.min());
+    // Check if we have negative values
+    if (min < m_actualFloorLevel)
+        m_hasNegativeValues = true;
+    else if (min >= m_actualFloorLevel)
+        m_hasNegativeValues = false;
+
+    if (max < m_actualFloorLevel) {
+        m_heightNormalizer = GLfloat(qFabs(min) - qFabs(max));
+        maxAbs = qFabs(max) - qFabs(min);
     } else {
-        m_heightNormalizer = GLfloat(m_axisCacheY.max() - m_axisCacheY.min());
+        m_heightNormalizer = GLfloat(max - min);
     }
 
     // Height fractions are used in gradient calculations and are therefore doubled
     // Note that if max or min is exactly zero, we still consider it outside the range
-    if (m_axisCacheY.max() <= 0.0f || m_axisCacheY.min() >= 0.0f) {
+    if (max <= m_actualFloorLevel || min >= m_actualFloorLevel) {
         m_noZeroInRange = true;
         m_gradientFraction = 2.0f;
     } else {
         m_noZeroInRange = false;
-        GLfloat minAbs = qFabs(m_axisCacheY.min());
+        GLfloat minAbs = qFabs(min - m_actualFloorLevel);
         m_gradientFraction = qMax(minAbs, maxAbs) / m_heightNormalizer * 2.0f;
     }
 
@@ -2551,13 +2735,13 @@ void Bars3DRenderer::updateSlicingActive(bool isSlicing)
 
     m_cachedIsSlicingActivated = isSlicing;
 
-    if (!m_cachedIsSlicingActivated)
-        initSelectionBuffer(); // We need to re-init selection buffer in case there has been a resize
+    if (!m_cachedIsSlicingActivated) {
+        // We need to re-init selection buffer in case there has been a resize
+        initSelectionBuffer();
+        initCursorPositionBuffer();
+    }
 
-#if !defined(QT_OPENGL_ES_2)
     updateDepthBuffer(); // Re-init depth buffer as well
-#endif
-
     m_selectionDirty = true;
 }
 
@@ -2598,32 +2782,35 @@ void Bars3DRenderer::initSelectionBuffer()
                                                                  m_selectionDepthBuffer);
 }
 
-#if !defined(QT_OPENGL_ES_2)
 void Bars3DRenderer::initDepthShader()
 {
-    if (m_depthShader)
-        delete m_depthShader;
-    m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
-                                     QStringLiteral(":/shaders/fragmentDepth"));
-    m_depthShader->initialize();
+    if (!m_isOpenGLES) {
+        if (m_depthShader)
+            delete m_depthShader;
+        m_depthShader = new ShaderHelper(this, QStringLiteral(":/shaders/vertexDepth"),
+                                         QStringLiteral(":/shaders/fragmentDepth"));
+        m_depthShader->initialize();
+    }
 }
 
 void Bars3DRenderer::updateDepthBuffer()
 {
-    m_textureHelper->deleteTexture(&m_depthTexture);
+    if (!m_isOpenGLES) {
+        m_textureHelper->deleteTexture(&m_depthTexture);
 
-    if (m_primarySubViewport.size().isEmpty())
-        return;
+        if (m_primarySubViewport.size().isEmpty())
+            return;
 
-    if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
-        m_depthTexture = m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
-                                                                        m_depthFrameBuffer,
-                                                                        m_shadowQualityMultiplier);
-        if (!m_depthTexture)
-            lowerShadowQuality();
+        if (m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+            m_depthTexture =
+                    m_textureHelper->createDepthTextureFrameBuffer(m_primarySubViewport.size(),
+                                                                   m_depthFrameBuffer,
+                                                                   m_shadowQualityMultiplier);
+            if (!m_depthTexture)
+                lowerShadowQuality();
+        }
     }
 }
-#endif
 
 void Bars3DRenderer::initBackgroundShaders(const QString &vertexShader,
                                            const QString &fragmentShader)
@@ -2634,14 +2821,6 @@ void Bars3DRenderer::initBackgroundShaders(const QString &vertexShader,
     m_backgroundShader->initialize();
 }
 
-void Bars3DRenderer::initLabelShaders(const QString &vertexShader, const QString &fragmentShader)
-{
-    if (m_labelShader)
-        delete m_labelShader;
-    m_labelShader = new ShaderHelper(this, vertexShader, fragmentShader);
-    m_labelShader->initialize();
-}
-
 QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position, bool isAbsolute)
 {
     float xTrans = 0.0f;
@@ -2649,15 +2828,15 @@ QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position
     float zTrans = 0.0f;
     if (!isAbsolute) {
         // Convert row and column to translation on graph
-        xTrans = (((position.x() + 0.5f) * m_cachedBarSpacing.width()) - m_rowWidth)
-                / m_scaleFactor;
-        zTrans = (m_columnDepth - ((position.z() + 0.5f) * m_cachedBarSpacing.height()))
-                / m_scaleFactor;
+        xTrans = (((position.x() - m_axisCacheX.min() + 0.5f) * m_cachedBarSpacing.width())
+                  - m_rowWidth) / m_scaleFactor;
+        zTrans = (m_columnDepth - ((position.z() - m_axisCacheZ.min() + 0.5f)
+                                   * m_cachedBarSpacing.height())) / m_scaleFactor;
         yTrans = m_axisCacheY.positionAt(position.y());
     } else {
-        xTrans = position.x() * m_scaleX;
+        xTrans = position.x() * m_xScaleFactor;
         yTrans = position.y() + m_backgroundAdjustment;
-        zTrans = position.z() * m_scaleZ;
+        zTrans = position.z() * -m_zScaleFactor;
     }
     return QVector3D(xTrans, yTrans, zTrans);
 }
@@ -2665,6 +2844,20 @@ QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position
 void Bars3DRenderer::updateAspectRatio(float ratio)
 {
     Q_UNUSED(ratio)
+}
+
+void Bars3DRenderer::updateFloorLevel(float level)
+{
+    foreach (SeriesRenderCache *cache, m_renderCacheList)
+        cache->setDataDirty(true);
+    m_floorLevel = level;
+    calculateHeightAdjustment();
+}
+
+void Bars3DRenderer::updateMargin(float margin)
+{
+    Abstract3DRenderer::updateMargin(margin);
+    calculateSceneScalingFactors();
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

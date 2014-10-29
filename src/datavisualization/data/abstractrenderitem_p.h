@@ -48,10 +48,12 @@ public:
     inline void setTranslation(const QVector3D &translation) { m_translation = translation; }
     inline const QVector3D &translation() const {return m_translation; }
 
-    inline QQuaternion rotation() const { return m_rotation; }
+    inline const QQuaternion &rotation() const { return m_rotation; }
     inline void setRotation(const QQuaternion &rotation)
     {
-        if (m_rotation != rotation)
+        if (rotation.isNull())
+            m_rotation = identityQuaternion;
+        else
             m_rotation = rotation;
     }
 

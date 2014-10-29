@@ -23,6 +23,7 @@
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/q3dtheme.h>
+#include <QtDataVisualization/Q3DInputHandler>
 #include <qmath.h>
 using namespace QtDataVisualization;
 
@@ -46,6 +47,8 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     m_chart->setAxisX(new QValue3DAxis);
     m_chart->setAxisY(new QValue3DAxis);
     m_chart->setAxisZ(new QValue3DAxis);
+    m_chart->axisY()->setLabelFormat(QStringLiteral("%.7f"));
+    static_cast<Q3DInputHandler *>(m_chart->activeInputHandler())->setZoomAtTargetEnabled(true);
 
     createAndAddSeries();
     createAndAddSeries();
@@ -435,6 +438,10 @@ void ScatterDataModifier::testAxisReverse()
         m_chart->axisX()->setRange(0.0f, 10.0f);
         m_chart->axisY()->setRange(-20.0f, 50.0f);
         m_chart->axisZ()->setRange(5.0f, 15.0f);
+        m_chart->axisX()->setTitle("Axis X");
+        m_chart->axisZ()->setTitle("Axis Z");
+        m_chart->axisX()->setTitleVisible(true);
+        m_chart->axisZ()->setTitleVisible(true);
         m_chart->addSeries(series0);
         m_chart->addSeries(series1);
     }
@@ -484,9 +491,9 @@ void ScatterDataModifier::addData()
     m_chart->axisX()->setRange(-50.0f, 50.0f);
     m_chart->axisY()->setRange(-1.0f, 1.2f);
     m_chart->axisZ()->setRange(-50.0f, 50.0f);
-    m_chart->axisX()->setSegmentCount(6);
+    m_chart->axisX()->setSegmentCount(5);
     m_chart->axisY()->setSegmentCount(4);
-    m_chart->axisZ()->setSegmentCount(9);
+    m_chart->axisZ()->setSegmentCount(10);
     m_chart->axisX()->setSubSegmentCount(2);
     m_chart->axisY()->setSubSegmentCount(3);
     m_chart->axisZ()->setSubSegmentCount(1);
@@ -717,8 +724,24 @@ void ScatterDataModifier::changeBunch()
     if (m_targetSeries->dataProxy()->array()->size()) {
         int amount = qMin(m_targetSeries->dataProxy()->array()->size(), 100);
         QScatterDataArray items(amount);
-        for (int i = 0; i < items.size(); i++)
+        for (int i = 0; i < items.size(); i++) {
             items[i].setPosition(randVector());
+            // Change the Y-values of first few items to exact gradient boundaries
+            if (i == 0)
+                items[i].setY(0.65f);
+            else  if (i == 1)
+                items[i].setY(0.1f);
+            else  if (i == 2)
+                items[i].setY(-0.45f);
+            else  if (i == 3)
+                items[i].setY(-1.0f);
+            else  if (i == 4)
+                items[i].setY(1.2f);
+//            else
+//                items[i].setY(0.1001f - (0.00001f * float(i)));
+
+        }
+
         m_targetSeries->dataProxy()->setItems(0, items);
         qDebug() << m_loopCounter << "Changed bunch, array size:" << m_targetSeries->dataProxy()->array()->size();
     }
@@ -934,6 +957,11 @@ void ScatterDataModifier::changeLabelRotation(int rotation)
     m_chart->axisZ()->setLabelAutoRotation(float(rotation));
 }
 
+void ScatterDataModifier::changeRadialLabelOffset(int offset)
+{
+    m_chart->setRadialLabelOffset(float(offset) / 100.0f);
+}
+
 void ScatterDataModifier::toggleAxisTitleVisibility(bool enabled)
 {
     m_chart->axisX()->setTitleVisible(enabled);
@@ -968,6 +996,54 @@ void ScatterDataModifier::renderToImage()
         renderedImageNoAASmall.save(QStringLiteral("./renderedImageNoAASmall_hidden.png"));
         qDebug() << "Hidden images rendered!";
     }
+}
+
+void ScatterDataModifier::togglePolar(bool enable)
+{
+    m_chart->setPolar(enable);
+}
+
+void ScatterDataModifier::toggleStatic(bool enable)
+{
+    if (enable)
+        m_chart->setOptimizationHints(QAbstract3DGraph::OptimizationStatic);
+    else
+        m_chart->setOptimizationHints(QAbstract3DGraph::OptimizationDefault);
+}
+
+void ScatterDataModifier::toggleOrtho(bool enable)
+{
+    m_chart->setOrthoProjection(enable);
+}
+
+void ScatterDataModifier::setCameraTargetX(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setX(float(value) / 100.0f);
+    m_chart->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void ScatterDataModifier::setCameraTargetY(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setY(float(value) / 100.0f);
+    m_chart->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void ScatterDataModifier::setCameraTargetZ(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setZ(float(value) / 100.0f);
+    m_chart->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void ScatterDataModifier::setGraphMargin(int value)
+{
+    m_chart->setMargin(qreal(value) / 100.0);
+    qDebug() << "Setting margin:" << m_chart->margin() << value;
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)
@@ -1019,8 +1095,14 @@ void ScatterDataModifier::setMaxZ(int max)
 
 void ScatterDataModifier::setAspectRatio(int ratio)
 {
-    float aspectRatio = float(ratio) / 10.0f;
+    qreal aspectRatio = qreal(ratio) / 10.0;
     m_chart->setAspectRatio(aspectRatio);
+}
+
+void ScatterDataModifier::setHorizontalAspectRatio(int ratio)
+{
+    qreal aspectRatio = qreal(ratio) / 100.0;
+    m_chart->setHorizontalAspectRatio(aspectRatio);
 }
 
 QVector3D ScatterDataModifier::randVector()

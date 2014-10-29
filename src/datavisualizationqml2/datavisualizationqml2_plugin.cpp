@@ -93,6 +93,7 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
                                                      QLatin1String("Trying to create uncreatable: Abstract3DSeries."));
     qmlRegisterUncreatableType<AbstractDeclarative, 1>(uri, 1, 1, "AbstractGraph3D",
                                                        QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
+
     qmlRegisterType<QValue3DAxis, 1>(uri, 1, 1, "ValueAxis3D");
     qmlRegisterType<QItemModelBarDataProxy, 1>(uri, 1, 1, "ItemModelBarDataProxy");
     qmlRegisterType<QItemModelSurfaceDataProxy, 1>(uri, 1, 1, "ItemModelSurfaceDataProxy");
@@ -106,6 +107,23 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
 
     // New metatypes
     qRegisterMetaType<QAbstract3DGraph::ElementType>("QAbstract3DGraph::ElementType");
+
+    // QtDataVisualization 1.2
+
+    // New revisions
+    qmlRegisterUncreatableType<AbstractDeclarative, 2>(uri, 1, 2, "AbstractGraph3D",
+                                                       QLatin1String("Trying to create uncreatable: AbstractGraph3D."));
+    qmlRegisterUncreatableType<Declarative3DScene, 1>(uri, 1, 2, "Scene3D",
+                                                      QLatin1String("Trying to create uncreatable: Scene3D."));
+    qmlRegisterType<DeclarativeSurface, 1>(uri, 1, 2, "Surface3D");
+    qmlRegisterType<Q3DCamera, 1>(uri, 1, 2, "Camera3D");
+    qmlRegisterType<QCustom3DItem, 1>(uri, 1, 2, "Custom3DItem");
+    qmlRegisterType<DeclarativeBars, 1>(uri, 1, 2, "Bars3D");
+
+    // New types
+    qmlRegisterType<Q3DInputHandler>(uri, 1, 2, "InputHandler3D");
+    qmlRegisterType<QTouch3DInputHandler>(uri, 1, 2, "TouchInputHandler3D");
+    qmlRegisterType<QCustom3DVolume>(uri, 1, 2, "Custom3DVolume");
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

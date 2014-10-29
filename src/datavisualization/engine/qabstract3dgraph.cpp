@@ -22,6 +22,7 @@
 #include "qabstract3dinputhandler_p.h"
 #include "q3dscene_p.h"
 #include "qutils.h"
+#include "utils_p.h"
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOpenGLContext>
@@ -29,6 +30,9 @@
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLFramebufferObject>
 #include <QtGui/QOffscreenSurface>
+#if defined(Q_OS_OSX)
+#include <qpa/qplatformnativeinterface.h>
+#endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -148,7 +152,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
     \value OptimizationDefault
            Provides the full feature set at a reasonable performance.
     \value OptimizationStatic
-           Beta level feature. Optimizes the rendering of static data sets at the expense of some features.
+           Optimizes the rendering of static data sets at the expense of some features.
 */
 
 /*!
@@ -169,11 +173,7 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
     if (format) {
         surfaceFormat = *format;
         // Make sure renderable type is correct
-#if !defined(QT_OPENGL_ES_2)
-        surfaceFormat.setRenderableType(QSurfaceFormat::OpenGL);
-#else
-        surfaceFormat.setRenderableType(QSurfaceFormat::OpenGLES);
-#endif
+        surfaceFormat.setRenderableType(QSurfaceFormat::DefaultRenderableType);
     } else {
         surfaceFormat = qDefaultSurfaceFormat();
     }
@@ -197,17 +197,24 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
     qDebug() << "GLSL version:" << (const char *)shaderVersion;
 #endif
 
-#if !defined(QT_OPENGL_ES_2)
-    // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
-    QStringList splitversionstr =
-            QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
-    if (splitversionstr[0].toFloat() < 1.2)
-        qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
-#else
-    Q_UNUSED(shaderVersion)
-#endif
+    if (!Utils::isOpenGLES()) {
+        // If we have real OpenGL, GLSL version must be 1.2 or over. Quit if not.
+        QStringList splitversionstr =
+                QString::fromLatin1((const char *)shaderVersion).split(QChar::fromLatin1(' '));
+        if (splitversionstr[0].toFloat() < 1.2)
+            qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
+    }
 
     d_ptr->renderLater();
+
+#if defined(Q_OS_OSX)
+    // Enable touch events for Mac touchpads
+    typedef void * (*EnableTouch)(QWindow*, bool);
+    EnableTouch enableTouch =
+            (EnableTouch)QGuiApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("registertouchwindow");
+    if (enableTouch)
+        enableTouch(this, true);
+#endif
 }
 
 /*!
@@ -400,7 +407,7 @@ void QAbstract3DGraph::clearSelection()
  * \return index to the added item if add was successful, -1 if trying to add a null item, and
  * index of the item if trying to add an already added item.
  *
- * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt()
+ * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt(), customItems()
  *
  * \since QtDataVisualization 1.1
  */
@@ -452,6 +459,16 @@ void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
 void QAbstract3DGraph::releaseCustomItem(QCustom3DItem *item)
 {
     return d_ptr->m_visualController->releaseCustomItem(item);
+}
+
+/*!
+ * \return list of all added custom items.
+ * \since QtDataVisualization 1.2
+ * \sa addCustomItem()
+ */
+QList<QCustom3DItem *> QAbstract3DGraph::customItems() const
+{
+    return d_ptr->m_visualController->customItems();
 }
 
 /*!
@@ -545,6 +562,8 @@ QAbstract3DGraph::ElementType QAbstract3DGraph::selectedElement() const
  * \since QtDataVisualization 1.1
  *
  * \return rendered image.
+ *
+ * \note OpenGL ES2 does not support anitialiasing, so \a msaaSamples is always forced to \c{0}.
  */
 QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
 {
@@ -591,8 +610,15 @@ qreal QAbstract3DGraph::currentFps() const
  * \property QAbstract3DGraph::orthoProjection
  * \since QtDataVisualization 1.1
  *
- * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
+ * If \c {true}, orthographic projection will be used for displaying the graph.
+ * \note Orthographic projection can be used to create 2D graphs by replacing the default input
+ * handler with one that doesn't allow rotating the graph and setting the camera to view the graph
+ * directly from the side or from the top. Also, axis labels typically need to be rotated when
+ * viewing the graph from the sides.
+ * Defaults to \c{false}.
  * \note Shadows will be disabled when set to \c{true}.
+ *
+ * \sa QAbstract3DAxis::labelAutoRotation, Q3DCamera::cameraPreset
  */
 void QAbstract3DGraph::setOrthoProjection(bool enable)
 {
@@ -608,14 +634,16 @@ bool QAbstract3DGraph::isOrthoProjection() const
  * \property QAbstract3DGraph::aspectRatio
  * \since QtDataVisualization 1.1
  *
- * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
- * vertical axes. Defaults to \c{2.0}.
+ * The aspect ratio is the ratio of the graph scaling between the longest axis on the horizontal
+ * plane and the Y-axis. Defaults to \c{2.0}.
  *
  * \note Has no effect on Q3DBars.
+ *
+ * \sa horizontalAspectRatio
  */
 void QAbstract3DGraph::setAspectRatio(qreal ratio)
 {
-    d_ptr->m_visualController->setAspectRatio(float(ratio));
+    d_ptr->m_visualController->setAspectRatio(ratio);
 }
 
 qreal QAbstract3DGraph::aspectRatio() const
@@ -626,14 +654,20 @@ qreal QAbstract3DGraph::aspectRatio() const
 /*!
  * \property QAbstract3DGraph::optimizationHints
  *
- * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
- * reasonable performance. Static is a beta level feature and currently supports only a subset of the
- * features on the Scatter graph. Missing features are object gradient for mesh objects, both gradients
- * for points, and diffuse and specular color on rotations. At this point static is intended just for
- * introducing a new feature. It optimizes graph rendering and is ideal for large non-changing data
- * sets. It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it
- * with massive data sets is not advisable.
+ * Defines if the rendering optimization is default or static. Default mode provides the full
+ * feature set at reasonable performance. Static mode optimizes graph rendering and is ideal for
+ * large non-changing data sets. It is slower with dynamic data changes and item rotations.
+ * Selection is not optimized, so using it with massive data sets is not advisable.
+ * Static works only on the Scatter graph.
  * Defaults to \c{OptimizationDefault}.
+ *
+ * \note On some environments, large graphs using static optimization may not render, because
+ * all of the items are rendered using a single draw call, and different graphics drivers have
+ * different maximum vertice counts per call that they support.
+ * This is mostly an issue on 32bit and/or OpenGL ES2 platforms.
+ * To work around this issue, choose an item mesh with low vertex count or use the point mesh.
+ *
+ * \sa QAbstract3DSeries::mesh
  */
 void QAbstract3DGraph::setOptimizationHints(OptimizationHints hints)
 {
@@ -643,6 +677,195 @@ void QAbstract3DGraph::setOptimizationHints(OptimizationHints hints)
 QAbstract3DGraph::OptimizationHints QAbstract3DGraph::optimizationHints() const
 {
     return d_ptr->m_visualController->optimizationHints();
+}
+
+/*!
+ * \property QAbstract3DGraph::polar
+ * \since QtDataVisualization 1.2
+ *
+ * If \c {true}, the horizontal axes are changed into polar axes. The X axis becomes the
+ * angular axis and the Z axis becomes the radial axis.
+ * Polar mode is not available for bar graphs.
+ *
+ * Defaults to \c{false}.
+ *
+ * \sa orthoProjection, radialLabelOffset
+ */
+void QAbstract3DGraph::setPolar(bool enable)
+{
+    d_ptr->m_visualController->setPolar(enable);
+}
+
+bool QAbstract3DGraph::isPolar() const
+{
+    return d_ptr->m_visualController->isPolar();
+}
+
+/*!
+ * \property QAbstract3DGraph::radialLabelOffset
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies the normalized horizontal offset for the axis labels of the radial
+ * polar axis. The value 0.0 indicates the labels should be drawn next to the 0-angle angular
+ * axis grid line. The value 1.0 indicates the labels are drawn on their normal place at the edge
+ * of the graph background.
+ * This property is ignored if polar property value is \c{false}. Defaults to 1.0.
+ *
+ * \sa polar
+ */
+void QAbstract3DGraph::setRadialLabelOffset(float offset)
+{
+    d_ptr->m_visualController->setRadialLabelOffset(offset);
+}
+
+float QAbstract3DGraph::radialLabelOffset() const
+{
+    return d_ptr->m_visualController->radialLabelOffset();
+}
+
+/*!
+ * \property QAbstract3DGraph::horizontalAspectRatio
+ * \since QtDataVisualization 1.2
+ *
+ * The horizontal aspect ratio is the ratio of the graph scaling between the X and Z axes.
+ * Value of 0.0 indicates automatic scaling according to axis ranges.
+ * Defaults to \c{0.0}.
+ *
+ * \note Has no effect on Q3DBars, which handles scaling on the horizontal plane via
+ * \l{Q3DBars::barThickness}{barThickness} and \l{Q3DBars::barSpacing}{barSpacing} properties.
+ * Polar graphs also ignore this property.
+ *
+ * \sa aspectRatio, polar, Q3DBars::barThickness, Q3DBars::barSpacing
+ */
+void QAbstract3DGraph::setHorizontalAspectRatio(qreal ratio)
+{
+    d_ptr->m_visualController->setHorizontalAspectRatio(ratio);
+}
+
+qreal QAbstract3DGraph::horizontalAspectRatio() const
+{
+    return d_ptr->m_visualController->horizontalAspectRatio();
+}
+
+/*!
+ * \property QAbstract3DGraph::reflection
+ * \since QtDataVisualization 1.2
+ *
+ * Sets floor reflections on or off. Defaults to \c{false}.
+ *
+ * \note Affects only Q3DBars.
+ *
+ * \note In Q3DBars graphs holding both positive and negative values, reflections are not supported
+ * for custom items that intersect the floor plane. In that case, reflections should be turned off
+ * to avoid incorrect rendering.
+ *
+ * \note If using custom surface format, stencil buffer needs to be defined
+ * (QSurfaceFormat::setStencilBufferSize()) for reflections to work.
+ *
+ * \sa reflectivity
+ */
+void QAbstract3DGraph::setReflection(bool enable)
+{
+    d_ptr->m_visualController->setReflection(enable);
+}
+
+bool QAbstract3DGraph::isReflection() const
+{
+    return d_ptr->m_visualController->reflection();
+}
+
+/*!
+ * \property QAbstract3DGraph::reflectivity
+ * \since QtDataVisualization 1.2
+ *
+ * Adjusts floor reflectivity, larger number being more reflective. Valid range is \c{[0...1]}.
+ * Defaults to \c{0.5}.
+ *
+ * \note Affects only Q3DBars.
+ *
+ * \sa reflection
+ */
+void QAbstract3DGraph::setReflectivity(qreal reflectivity)
+{
+    d_ptr->m_visualController->setReflectivity(reflectivity);
+}
+
+qreal QAbstract3DGraph::reflectivity() const
+{
+    return d_ptr->m_visualController->reflectivity();
+}
+
+/*!
+ * \property QAbstract3DGraph::locale
+ * \since QtDataVisualization 1.2
+ *
+ * Sets the locale used for formatting various numeric labels.
+ * Defaults to \c{"C"} locale.
+ *
+ * \sa QValue3DAxis::labelFormat
+ */
+void QAbstract3DGraph::setLocale(const QLocale &locale)
+{
+    d_ptr->m_visualController->setLocale(locale);
+}
+
+QLocale QAbstract3DGraph::locale() const
+{
+    return d_ptr->m_visualController->locale();
+}
+
+/*!
+ * \property QAbstract3DGraph::queriedGraphPosition
+ * \since QtDataVisualization 1.2
+ *
+ * This read-only property contains the latest graph position values along each axis queried using
+ * Q3DScene::graphPositionQuery. The values are normalized to range \c{[-1, 1]}.
+ * If the queried position was outside the graph bounds, the values
+ * will not reflect the real position, but will instead be some undefined position outside
+ * the range \c{[-1, 1]}. The value will be undefined before any queries are made.
+ *
+ * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * consistent, the queries are always done against the inner sides of an invisible box surrounding
+ * the graph.
+ *
+ * \note Bar graphs only allow querying graph position at the graph floor level,
+ * so the Y-value is always zero for bar graphs and the valid queries can be only made at
+ * screen positions that contain the floor of the graph.
+ *
+ * \sa Q3DScene::graphPositionQuery
+ */
+QVector3D QAbstract3DGraph::queriedGraphPosition() const
+{
+    return d_ptr->m_visualController->queriedGraphPosition();
+}
+
+/*!
+ * \property QAbstract3DGraph::margin
+ * \since QtDataVisualization 1.2
+ *
+ * This property contains the absolute value used for graph margin. The graph margin is the space
+ * left between the edge of the plottable graph area and the edge of the graph background.
+ * If the margin value is negative, the margins are determined automatically and can vary according
+ * to size of the items in the series and the type of the graph.
+ * The value is interpreted as a fraction of Y-axis range, provided the graph aspect ratios have
+ * not beed changed from the defaults.
+ * Defaults to \c{-1.0}.
+ *
+ * \note Having smaller than the automatically determined margin on scatter graph can cause
+ * the scatter items at the edges of the graph to overlap with the graph background.
+ *
+ * \note On scatter and surface graphs, if the margin is comparatively small to the axis label
+ * size, the positions of the edge labels of the axes are adjusted to avoid overlap with
+ * the edge labels of the neighboring axes.
+ */
+void QAbstract3DGraph::setMargin(qreal margin)
+{
+    d_ptr->m_visualController->setMargin(margin);
+}
+
+qreal QAbstract3DGraph::margin() const
+{
+    return d_ptr->m_visualController->margin();
 }
 
 /*!
@@ -795,6 +1018,23 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
 
     QObject::connect(m_visualController, &Abstract3DController::aspectRatioChanged, q_ptr,
                      &QAbstract3DGraph::aspectRatioChanged);
+    QObject::connect(m_visualController, &Abstract3DController::polarChanged, q_ptr,
+                     &QAbstract3DGraph::polarChanged);
+    QObject::connect(m_visualController, &Abstract3DController::radialLabelOffsetChanged, q_ptr,
+                     &QAbstract3DGraph::radialLabelOffsetChanged);
+    QObject::connect(m_visualController, &Abstract3DController::horizontalAspectRatioChanged, q_ptr,
+                     &QAbstract3DGraph::horizontalAspectRatioChanged);
+
+    QObject::connect(m_visualController, &Abstract3DController::reflectionChanged, q_ptr,
+                     &QAbstract3DGraph::reflectionChanged);
+    QObject::connect(m_visualController, &Abstract3DController::reflectivityChanged, q_ptr,
+                     &QAbstract3DGraph::reflectivityChanged);
+    QObject::connect(m_visualController, &Abstract3DController::localeChanged, q_ptr,
+                     &QAbstract3DGraph::localeChanged);
+    QObject::connect(m_visualController, &Abstract3DController::queriedGraphPositionChanged, q_ptr,
+                     &QAbstract3DGraph::queriedGraphPositionChanged);
+    QObject::connect(m_visualController, &Abstract3DController::marginChanged, q_ptr,
+                     &QAbstract3DGraph::marginChanged);
 }
 
 void QAbstract3DGraphPrivate::handleDevicePixelRatioChange()
@@ -849,8 +1089,10 @@ QImage QAbstract3DGraphPrivate::renderToImage(int msaaSamples, const QSize &imag
     // Render the wanted frame offscreen
     m_context->makeCurrent(m_offscreenSurface);
     fboFormat.setAttachment(QOpenGLFramebufferObject::CombinedDepthStencil);
-    fboFormat.setInternalTextureFormat(GL_RGB);
-    fboFormat.setSamples(msaaSamples);
+    if (!Utils::isOpenGLES()) {
+        fboFormat.setInternalTextureFormat(GL_RGB);
+        fboFormat.setSamples(msaaSamples);
+    }
     fbo = new QOpenGLFramebufferObject(imageSize, fboFormat);
     if (fbo->isValid()) {
         QRect originalViewport = m_visualController->m_scene->viewport();

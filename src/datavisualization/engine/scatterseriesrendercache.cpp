@@ -27,10 +27,12 @@ ScatterSeriesRenderCache::ScatterSeriesRenderCache(QAbstract3DSeries *series,
     : SeriesRenderCache(series, renderer),
       m_itemSize(0.0f),
       m_selectionIndexOffset(0),
+      m_staticBufferDirty(false),
       m_oldRenderArraySize(0),
       m_oldMeshFileName(QString()),
       m_scatterBufferObj(0),
-      m_scatterBufferPoints(0)
+      m_scatterBufferPoints(0),
+      m_visibilityChanged(false)
 {
 }
 

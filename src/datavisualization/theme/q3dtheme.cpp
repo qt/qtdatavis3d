@@ -323,7 +323,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty real Theme3D::lightStrength
  *
- * Specular light strength for the whole graph. Value must be between 0.0 and 1.0.
+ * Specular light strength for the whole graph. Value must be between 0.0 and 10.0.
  */
 
 /*!
@@ -335,7 +335,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty real Theme3D::highlightLightStrength
  *
- * Specular light strength for highlighted objects. Value must be between 0.0 and 1.0.
+ * Specular light strength for highlighted objects. Value must be between 0.0 and 10.0.
  */
 
 /*!
@@ -679,7 +679,7 @@ QLinearGradient Q3DTheme::multiHighlightGradient() const
 /*!
  * \property Q3DTheme::lightStrength
  *
- * Specular light strength for the whole graph. Value must be 0.0f and 10.0f.
+ * Specular light strength for the whole graph. Value must be between 0.0f and 10.0f.
  */
 void Q3DTheme::setLightStrength(float strength)
 {

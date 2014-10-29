@@ -270,6 +270,28 @@ QStringList &QValue3DAxisFormatter::labelStrings() const
     return d_ptr->m_labelStrings;
 }
 
+/*!
+ * Sets the \a locale that this formatter uses.
+ * The graph automatically sets the formatter's locale to a graph's locale whenever the parent axis
+ * is set as an active axis of the graph, the axis formatter is set to an axis attached to
+ * the graph, or the graph's locale changes.
+ *
+ * \sa locale(), QAbstract3DGraph::locale
+ */
+void QValue3DAxisFormatter::setLocale(const QLocale &locale)
+{
+    d_ptr->m_cLocaleInUse = (locale == QLocale::c());
+    d_ptr->m_locale = locale;
+    markDirty(true);
+}
+/*!
+ * \return the current locale this formatter is using.
+ */
+QLocale QValue3DAxisFormatter::locale() const
+{
+    return d_ptr->m_locale;
+}
+
 // QValue3DAxisFormatterPrivate
 QValue3DAxisFormatterPrivate::QValue3DAxisFormatterPrivate(QValue3DAxisFormatter *q)
     : QObject(0),
@@ -281,7 +303,10 @@ QValue3DAxisFormatterPrivate::QValue3DAxisFormatterPrivate(QValue3DAxisFormatter
       m_axis(0),
       m_preparsedParamType(Utils::ParamTypeUnknown),
       m_allowNegatives(true),
-      m_allowZero(true)
+      m_allowZero(true),
+      m_formatPrecision(6), // 6 and 'g' are defaults in Qt API for format precision and spec
+      m_formatSpec('g'),
+      m_cLocaleInUse(true)
 {
 }
 
@@ -363,12 +388,19 @@ QString QValue3DAxisFormatterPrivate::stringForValue(qreal value, const QString 
 {
     if (m_previousLabelFormat.compare(format)) {
         // Format string different than the previous one used, reparse it
-        m_previousLabelFormat = format;
-        m_preparsedParamType = Utils::findFormatParamType(format);
         m_labelFormatArray = format.toUtf8();
+        m_previousLabelFormat = format;
+        m_preparsedParamType = Utils::preParseFormat(format, m_formatPreStr, m_formatPostStr,
+                                                     m_formatPrecision, m_formatSpec);
     }
 
-    return Utils::formatLabel(m_labelFormatArray, m_preparsedParamType, value);
+    if (m_cLocaleInUse) {
+        return Utils::formatLabelSprintf(m_labelFormatArray, m_preparsedParamType, value);
+    } else {
+        return Utils::formatLabelLocalized(m_preparsedParamType, value, m_locale, m_formatPreStr,
+                                           m_formatPostStr, m_formatPrecision, m_formatSpec,
+                                           m_labelFormatArray);
+    }
 }
 
 float QValue3DAxisFormatterPrivate::positionAt(float value) const

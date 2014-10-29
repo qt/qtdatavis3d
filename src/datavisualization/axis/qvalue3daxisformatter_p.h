@@ -32,6 +32,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qvalue3daxisformatter.h"
 #include "utils_p.h"
+#include <QtCore/QLocale>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -82,6 +83,13 @@ protected:
 
     bool m_allowNegatives;
     bool m_allowZero;
+
+    QLocale m_locale;
+    QString m_formatPreStr;
+    QString m_formatPostStr;
+    int m_formatPrecision;
+    char m_formatSpec;
+    bool m_cLocaleInUse;
 
     friend class QValue3DAxisFormatter;
 };

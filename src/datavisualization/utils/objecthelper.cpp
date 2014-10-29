@@ -111,7 +111,6 @@ ObjectHelper *ObjectHelper::getObjectHelper(const Abstract3DRenderer *cacheId,
 
 void ObjectHelper::load()
 {
-    initializeOpenGLFunctions();
     if (m_meshDataLoaded) {
         // Delete old data
         glDeleteBuffers(1, &m_vertexbuffer);
@@ -122,6 +121,10 @@ void ObjectHelper::load()
         m_indexedVertices.clear();
         m_indexedUVs.clear();
         m_indexedNormals.clear();
+        m_vertexbuffer = 0;
+        m_uvbuffer = 0;
+        m_normalbuffer = 0;
+        m_elementbuffer = 0;
     }
     QVector<QVector3D> vertices;
     QVector<QVector2D> uvs;

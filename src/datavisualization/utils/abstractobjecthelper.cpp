@@ -28,6 +28,7 @@ AbstractObjectHelper::AbstractObjectHelper()
       m_indexCount(0),
       m_meshDataLoaded(false)
 {
+    initializeOpenGLFunctions();
 }
 
 AbstractObjectHelper::~AbstractObjectHelper()

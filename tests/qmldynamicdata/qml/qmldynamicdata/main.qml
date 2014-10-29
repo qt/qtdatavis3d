@@ -71,18 +71,16 @@ Rectangle {
                     isIncreasing = false;
                 }
             } else {
-                // TODO: Once QTRD-2645 is fixed, change this to remove from
-                // random index to add coverage.
-                graphModel.remove(2);
-                graphModel.remove(2);
-                graphModel.remove(2);
-                graphModel.remove(2);
-                graphModel.remove(2);
-                graphModel.remove(2);
-                graphModel.remove(2);
-                graphModel.remove(2);
-                graphModel.remove(2);
-                graphModel.remove(2);
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
+                graphModel.remove(Math.random() * (graphModel.count - 1));
                 if (graphModel.count == 2) {
                     scatterGraph.theme.type = Theme3D.ThemeDigia;
                     isIncreasing = true;
@@ -118,6 +116,12 @@ Rectangle {
             shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
             scene.activeCamera.yRotation: 30.0
             inputHandler: null
+            axisX.min: 0
+            axisY.min: 0
+            axisZ.min: 0
+            axisX.max: 1
+            axisY.max: 1
+            axisZ.max: 1
 
             Scatter3DSeries {
                 id: scatterSeries

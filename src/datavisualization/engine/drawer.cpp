@@ -69,10 +69,9 @@ Drawer::~Drawer()
 
 void Drawer::initializeOpenGL()
 {
-    if (!m_textureHelper) {
-        initializeOpenGLFunctions();
+    initializeOpenGLFunctions();
+    if (!m_textureHelper)
         m_textureHelper = new TextureHelper();
-    }
 }
 
 void Drawer::setTheme(Q3DTheme *theme)
@@ -93,8 +92,11 @@ QFont Drawer::font() const
 }
 
 void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLuint textureId,
-                        GLuint depthTextureId)
+                        GLuint depthTextureId, GLuint textureId3D)
 {
+#if defined(QT_OPENGL_ES_2)
+    Q_UNUSED(textureId3D)
+#endif
     if (textureId) {
         // Activate texture
         glActiveTexture(GL_TEXTURE0);
@@ -108,6 +110,14 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
         glBindTexture(GL_TEXTURE_2D, depthTextureId);
         shader->setUniformValue(shader->shadow(), 1);
     }
+#if !defined(QT_OPENGL_ES_2)
+    if (textureId3D) {
+        // Activate texture
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, textureId3D);
+        shader->setUniformValue(shader->texture(), 2);
+    }
+#endif
 
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(shader->posAtt());
@@ -115,14 +125,18 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
 
     // 2nd attribute buffer : normals
-    glEnableVertexAttribArray(shader->normalAtt());
-    glBindBuffer(GL_ARRAY_BUFFER, object->normalBuf());
-    glVertexAttribPointer(shader->normalAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    if (shader->normalAtt() >= 0) {
+        glEnableVertexAttribArray(shader->normalAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, object->normalBuf());
+        glVertexAttribPointer(shader->normalAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    }
 
     // 3rd attribute buffer : UVs
-    glEnableVertexAttribArray(shader->uvAtt());
-    glBindBuffer(GL_ARRAY_BUFFER, object->uvBuf());
-    glVertexAttribPointer(shader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    if (shader->uvAtt() >= 0) {
+        glEnableVertexAttribArray(shader->uvAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, object->uvBuf());
+        glVertexAttribPointer(shader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    }
 
     // Index buffer
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
@@ -134,11 +148,19 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    glDisableVertexAttribArray(shader->uvAtt());
-    glDisableVertexAttribArray(shader->normalAtt());
+    if (shader->uvAtt() >= 0)
+        glDisableVertexAttribArray(shader->uvAtt());
+    if (shader->normalAtt() >= 0)
+        glDisableVertexAttribArray(shader->normalAtt());
     glDisableVertexAttribArray(shader->posAtt());
 
     // Release textures
+#if !defined(QT_OPENGL_ES_2)
+    if (textureId3D) {
+        glActiveTexture(GL_TEXTURE2);
+        glBindTexture(GL_TEXTURE_3D, 0);
+    }
+#endif
     if (depthTextureId) {
         glActiveTexture(GL_TEXTURE1);
         glBindTexture(GL_TEXTURE_2D, 0);
@@ -206,12 +228,26 @@ void Drawer::drawPoint(ShaderHelper *shader)
     glDisableVertexAttribArray(shader->posAtt());
 }
 
-void Drawer::drawPoints(ShaderHelper *shader, ScatterPointBufferHelper *object)
+void Drawer::drawPoints(ShaderHelper *shader, ScatterPointBufferHelper *object, GLuint textureId)
 {
+    if (textureId) {
+        // Activate texture
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, textureId);
+        shader->setUniformValue(shader->texture(), 0);
+    }
+
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(shader->posAtt());
     glBindBuffer(GL_ARRAY_BUFFER, object->pointBuf());
     glVertexAttribPointer(shader->posAtt(), 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+
+    // 2nd attribute buffer : UVs
+    if (textureId) {
+        glEnableVertexAttribArray(shader->uvAtt());
+        glBindBuffer(GL_ARRAY_BUFFER, object->uvBuf());
+        glVertexAttribPointer(shader->uvAtt(), 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    }
 
     // Draw the points
     glDrawArrays(GL_POINTS, 0, object->indexCount());
@@ -220,6 +256,12 @@ void Drawer::drawPoints(ShaderHelper *shader, ScatterPointBufferHelper *object)
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
     glDisableVertexAttribArray(shader->posAtt());
+
+    if (textureId) {
+        glDisableVertexAttribArray(shader->uvAtt());
+        glActiveTexture(GL_TEXTURE0);
+        glBindTexture(GL_TEXTURE_2D, 0);
+    }
 }
 
 void Drawer::drawLine(ShaderHelper *shader)

@@ -46,8 +46,10 @@ int main(int argc, char *argv[])
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
     QVBoxLayout *vLayout2 = new QVBoxLayout();
+    QVBoxLayout *vLayout3 = new QVBoxLayout();
     vLayout->setAlignment(Qt::AlignTop);
     vLayout2->setAlignment(Qt::AlignTop);
+    vLayout3->setAlignment(Qt::AlignTop);
 
     Q3DSurface *surfaceGraph = new Q3DSurface();
     QSize screenSize = surfaceGraph->screen()->size();
@@ -56,7 +58,7 @@ int main(int argc, char *argv[])
     surfaceGraph->activeTheme()->setType(Q3DTheme::Theme(initialTheme));
 
     QWidget *container = QWidget::createWindowContainer(surfaceGraph);
-    container->setMinimumSize(QSize(screenSize.width() / 4, screenSize.height() / 4));
+    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 4));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
@@ -66,6 +68,7 @@ int main(int argc, char *argv[])
     hLayout->addWidget(container, 1);
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
+    hLayout->addLayout(vLayout3);
 
     QCheckBox *smoothCB = new QCheckBox(widget);
     smoothCB->setText(QStringLiteral("Flat Surface"));
@@ -183,7 +186,7 @@ int main(int argc, char *argv[])
     QSlider *axisRangeSliderX = new QSlider(Qt::Horizontal, widget);
     axisRangeSliderX->setTickInterval(1);
     axisRangeSliderX->setMinimum(1);
-    axisRangeSliderX->setValue(16);
+    axisRangeSliderX->setValue(34);
     axisRangeSliderX->setMaximum(100);
     axisRangeSliderX->setEnabled(true);
     QSlider *axisRangeSliderY = new QSlider(Qt::Horizontal, widget);
@@ -195,14 +198,14 @@ int main(int argc, char *argv[])
     QSlider *axisRangeSliderZ = new QSlider(Qt::Horizontal, widget);
     axisRangeSliderZ->setTickInterval(1);
     axisRangeSliderZ->setMinimum(1);
-    axisRangeSliderZ->setValue(16);
+    axisRangeSliderZ->setValue(34);
     axisRangeSliderZ->setMaximum(100);
     axisRangeSliderZ->setEnabled(true);
 
     QSlider *axisMinSliderX = new QSlider(Qt::Horizontal, widget);
     axisMinSliderX->setTickInterval(1);
     axisMinSliderX->setMinimum(-100);
-    axisMinSliderX->setValue(-8);
+    axisMinSliderX->setValue(-17);
     axisMinSliderX->setMaximum(100);
     axisMinSliderX->setEnabled(true);
     QSlider *axisMinSliderY = new QSlider(Qt::Horizontal, widget);
@@ -214,7 +217,7 @@ int main(int argc, char *argv[])
     QSlider *axisMinSliderZ = new QSlider(Qt::Horizontal, widget);
     axisMinSliderZ->setTickInterval(1);
     axisMinSliderZ->setMinimum(-100);
-    axisMinSliderZ->setValue(-8);
+    axisMinSliderZ->setValue(-17);
     axisMinSliderZ->setMaximum(100);
     axisMinSliderZ->setEnabled(true);
 
@@ -222,6 +225,11 @@ int main(int argc, char *argv[])
     aspectRatioSlider->setMinimum(1);
     aspectRatioSlider->setValue(20);
     aspectRatioSlider->setMaximum(100);
+
+    QSlider *horizontalAspectRatioSlider = new QSlider(Qt::Horizontal, widget);
+    horizontalAspectRatioSlider->setMinimum(0);
+    horizontalAspectRatioSlider->setValue(0);
+    horizontalAspectRatioSlider->setMaximum(300);
 
     QLinearGradient gr(0, 0, 100, 1);
     gr.setColorAt(0.0, Qt::black);
@@ -393,6 +401,35 @@ int main(int argc, char *argv[])
     zAscendingCB->setText(QStringLiteral("Z Ascending"));
     zAscendingCB->setChecked(true);
 
+    QCheckBox *polarCB = new QCheckBox(widget);
+    polarCB->setText(QStringLiteral("Polar"));
+    polarCB->setChecked(false);
+
+    QCheckBox *surfaceTextureCB = new QCheckBox(widget);
+    surfaceTextureCB->setText(QStringLiteral("Map texture"));
+    surfaceTextureCB->setChecked(false);
+
+    QSlider *cameraTargetSliderX = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderX->setTickInterval(1);
+    cameraTargetSliderX->setMinimum(-100);
+    cameraTargetSliderX->setValue(0);
+    cameraTargetSliderX->setMaximum(100);
+    QSlider *cameraTargetSliderY = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderY->setTickInterval(1);
+    cameraTargetSliderY->setMinimum(-100);
+    cameraTargetSliderY->setValue(0);
+    cameraTargetSliderY->setMaximum(100);
+    QSlider *cameraTargetSliderZ = new QSlider(Qt::Horizontal, widget);
+    cameraTargetSliderZ->setTickInterval(1);
+    cameraTargetSliderZ->setMinimum(-100);
+    cameraTargetSliderZ->setValue(0);
+    cameraTargetSliderZ->setMaximum(100);
+
+    QSlider *marginSlider = new QSlider(Qt::Horizontal, widget);
+    marginSlider->setMinimum(-1);
+    marginSlider->setValue(-1);
+    marginSlider->setMaximum(100);
+
     // Add controls to the layout
 #ifdef MULTI_SERIES
     vLayout->addWidget(series1CB);
@@ -420,6 +457,7 @@ int main(int argc, char *argv[])
     vLayout->addWidget(surfaceGridS4CB);
     vLayout->addWidget(surfaceS4CB);
     vLayout->addWidget(series4VisibleCB);
+    vLayout->addWidget(surfaceTextureCB, 1, Qt::AlignTop);
 #endif
 #ifndef MULTI_SERIES
     vLayout->addWidget(new QLabel(QStringLiteral("Select surface sample")));
@@ -429,60 +467,71 @@ int main(int argc, char *argv[])
     vLayout->addWidget(new QLabel(QStringLiteral("Adjust sample count")));
     vLayout->addWidget(gridSlidersLockCB);
     vLayout->addWidget(gridSliderX);
-    vLayout->addWidget(gridSliderZ);
+    vLayout->addWidget(gridSliderZ, 1, Qt::AlignTop);
 #endif
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust aspect ratio")));
-    vLayout->addWidget(aspectRatioSlider);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis range")));
-    vLayout->addWidget(axisRangeSliderX);
-    vLayout->addWidget(axisRangeSliderY);
-    vLayout->addWidget(axisRangeSliderZ);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust axis minimum")));
-    vLayout->addWidget(axisMinSliderX);
-    vLayout->addWidget(axisMinSliderY);
-    vLayout->addWidget(axisMinSliderZ);
-    vLayout->addWidget(xAscendingCB);
-    vLayout->addWidget(zAscendingCB);
+
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust vertical aspect ratio")));
+    vLayout2->addWidget(aspectRatioSlider);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust horizontal aspect ratio")));
+    vLayout2->addWidget(horizontalAspectRatioSlider);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust axis range")));
+    vLayout2->addWidget(axisRangeSliderX);
+    vLayout2->addWidget(axisRangeSliderY);
+    vLayout2->addWidget(axisRangeSliderZ);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust axis minimum")));
+    vLayout2->addWidget(axisMinSliderX);
+    vLayout2->addWidget(axisMinSliderY);
+    vLayout2->addWidget(axisMinSliderZ);
+    vLayout2->addWidget(xAscendingCB);
+    vLayout2->addWidget(zAscendingCB);
+    vLayout2->addWidget(polarCB);
     vLayout2->addWidget(new QLabel(QStringLiteral("Change font")));
     vLayout2->addWidget(fontList);
-    vLayout2->addWidget(labelButton);
-    vLayout2->addWidget(meshButton);
     vLayout2->addWidget(new QLabel(QStringLiteral("Change theme")));
     vLayout2->addWidget(themeList);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
     vLayout2->addWidget(shadowQuality);
     vLayout2->addWidget(new QLabel(QStringLiteral("Selection Mode")));
     vLayout2->addWidget(selectionMode);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Camera target")));
+    vLayout2->addWidget(cameraTargetSliderX);
+    vLayout2->addWidget(cameraTargetSliderY);
+    vLayout2->addWidget(cameraTargetSliderZ);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust margin")), 0, Qt::AlignTop);
+    vLayout2->addWidget(marginSlider, 1, Qt::AlignTop);
+
+    vLayout3->addWidget(labelButton);
+    vLayout3->addWidget(meshButton);
 #ifndef MULTI_SERIES
-    vLayout2->addWidget(selectButton);
-    vLayout2->addWidget(selectionInfoLabel);
-    vLayout2->addWidget(flipViewsButton);
+    vLayout3->addWidget(selectButton);
+    vLayout3->addWidget(selectionInfoLabel);
+    vLayout3->addWidget(flipViewsButton);
 #endif
 
-    vLayout2->addWidget(colorPB);
-    vLayout2->addWidget(changeRowButton);
-    vLayout2->addWidget(changeRowsButton);
-    vLayout2->addWidget(changeMultipleRowsButton);
-    vLayout2->addWidget(changeItemButton);
-    vLayout2->addWidget(changeMultipleItemButton);
-    vLayout2->addWidget(addRowButton);
-    vLayout2->addWidget(addRowsButton);
-    vLayout2->addWidget(insertRowButton);
-    vLayout2->addWidget(insertRowsButton);
-    vLayout2->addWidget(removeRowButton);
-    vLayout2->addWidget(resetArrayButton);
-    vLayout2->addWidget(resetArrayEmptyButton);
-    vLayout2->addWidget(massiveDataTestButton);
-    vLayout2->addWidget(testReverseButton);
-    vLayout2->addWidget(testDataOrderingButton);
-    vLayout2->addWidget(axisTitlesVisibleCB);
-    vLayout2->addWidget(axisTitlesFixedCB);
-    vLayout2->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
-    vLayout2->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
+    vLayout3->addWidget(colorPB);
+    vLayout3->addWidget(changeRowButton);
+    vLayout3->addWidget(changeRowsButton);
+    vLayout3->addWidget(changeMultipleRowsButton);
+    vLayout3->addWidget(changeItemButton);
+    vLayout3->addWidget(changeMultipleItemButton);
+    vLayout3->addWidget(addRowButton);
+    vLayout3->addWidget(addRowsButton);
+    vLayout3->addWidget(insertRowButton);
+    vLayout3->addWidget(insertRowsButton);
+    vLayout3->addWidget(removeRowButton);
+    vLayout3->addWidget(resetArrayButton);
+    vLayout3->addWidget(resetArrayEmptyButton);
+    vLayout3->addWidget(massiveDataTestButton);
+    vLayout3->addWidget(testReverseButton);
+    vLayout3->addWidget(testDataOrderingButton);
+    vLayout3->addWidget(axisTitlesVisibleCB);
+    vLayout3->addWidget(axisTitlesFixedCB);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
+    vLayout3->addWidget(axisLabelRotationSlider, 1, Qt::AlignTop);
 
     widget->show();
 
-    GraphModifier *modifier = new GraphModifier(surfaceGraph);
+    GraphModifier *modifier = new GraphModifier(surfaceGraph, container);
 
     // Connect controls to slots on modifier
     QObject::connect(smoothCB, &QCheckBox::stateChanged,
@@ -650,9 +699,23 @@ int main(int argc, char *argv[])
                      modifier, &GraphModifier::toggleXAscending);
     QObject::connect(zAscendingCB, &QCheckBox::stateChanged,
                      modifier, &GraphModifier::toggleZAscending);
+    QObject::connect(polarCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::togglePolar);
 
     QObject::connect(aspectRatioSlider, &QSlider::valueChanged,
                      modifier, &GraphModifier::setAspectRatio);
+    QObject::connect(horizontalAspectRatioSlider, &QSlider::valueChanged,
+                     modifier, &GraphModifier::setHorizontalAspectRatio);
+    QObject::connect(surfaceTextureCB, &QCheckBox::stateChanged,
+                     modifier, &GraphModifier::setSurfaceTexture);
+    QObject::connect(cameraTargetSliderX, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetX);
+    QObject::connect(cameraTargetSliderY, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetY);
+    QObject::connect(cameraTargetSliderZ, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setCameraTargetZ);
+    QObject::connect(marginSlider, &QSlider::valueChanged, modifier,
+                     &GraphModifier::setGraphMargin);
 
 #ifdef MULTI_SERIES
     modifier->setSeries1CB(series1CB);

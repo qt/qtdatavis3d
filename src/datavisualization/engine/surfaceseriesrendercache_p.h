@@ -85,6 +85,8 @@ public:
     inline bool slicePointerActive() const { return m_slicePointerActive; }
     inline void setMainPointerActivity(bool activity) { m_mainPointerActive = activity; }
     inline bool mainPointerActive() const { return m_mainPointerActive; }
+    inline void setSurfaceTexture(GLuint texture) { m_surfaceTexture = texture; }
+    inline GLuint surfaceTexture() const { return m_surfaceTexture; }
 
 protected:
     bool m_surfaceVisible;
@@ -105,6 +107,7 @@ protected:
     SelectionPointer *m_mainSelectionPointer;
     bool m_slicePointerActive;
     bool m_mainPointerActive;
+    GLuint m_surfaceTexture;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -84,22 +84,25 @@ signals:
 public:
     Q3DCamera *q_ptr;
 
-    QVector3D m_target;
+    QVector3D m_actualTarget;
     QVector3D m_up;
 
     QMatrix4x4 m_viewMatrix;
     bool m_isViewMatrixUpdateActive;
 
-    GLfloat m_xRotation;
-    GLfloat m_yRotation;
-    GLfloat m_minXRotation;
-    GLfloat m_minYRotation;
-    GLfloat m_maxXRotation;
-    GLfloat m_maxYRotation;
-    GLfloat m_zoomLevel;
+    float m_xRotation;
+    float m_yRotation;
+    float m_minXRotation;
+    float m_minYRotation;
+    float m_maxXRotation;
+    float m_maxYRotation;
+    float m_zoomLevel;
+    float m_minZoomLevel;
+    float m_maxZoomLevel;
     bool m_wrapXRotation;
     bool m_wrapYRotation;
     Q3DCamera::CameraPreset m_activePreset;
+    QVector3D m_requestedTarget;
 
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;

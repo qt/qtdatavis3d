@@ -46,6 +46,7 @@ AxisRenderCache::~AxisRenderCache()
 {
     foreach (LabelItem *label, m_labelItems)
         delete label;
+    m_titleItem.clear();
 
     delete m_formatter;
 }
@@ -54,10 +55,8 @@ void AxisRenderCache::setDrawer(Drawer *drawer)
 {
     m_drawer = drawer;
     m_font = m_drawer->font();
-    if (m_drawer) {
-        QObject::connect(m_drawer, &Drawer::drawerChanged, this, &AxisRenderCache::updateTextures);
+    if (m_drawer)
         updateTextures();
-    }
 }
 
 void AxisRenderCache::setType(QAbstract3DAxis::AxisType type)
@@ -106,10 +105,12 @@ void AxisRenderCache::setLabels(const QStringList &labels)
             if (i >= oldSize)
                 m_labelItems.append(new LabelItem);
             if (m_drawer) {
-                if (labels.at(i).isEmpty())
+                if (labels.at(i).isEmpty()) {
                     m_labelItems[i]->clear();
-                else if (i >= oldSize || labels.at(i) != m_labels.at(i))
+                } else if (i >= oldSize || labels.at(i) != m_labels.at(i)
+                           || m_labelItems[i]->size().width() != widest) {
                     m_drawer->generateLabelItem(*m_labelItems[i], labels.at(i), widest);
+                }
             }
         }
         m_labels = labels;
@@ -173,6 +174,13 @@ void AxisRenderCache::updateTextures()
         else
             m_drawer->generateLabelItem(*m_labelItems[i], m_labels.at(i), widest);
     }
+}
+
+void AxisRenderCache::clearLabels()
+{
+    m_titleItem.clear();
+    for (int i = 0; i < m_labels.size(); i++)
+        m_labelItems[i]->clear();
 }
 
 int AxisRenderCache::maxLabelWidth(const QStringList &labels) const

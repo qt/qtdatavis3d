@@ -21,18 +21,21 @@
 #include <QtDataVisualization/QSurfaceDataProxy>
 #include <QtDataVisualization/QSurface3DSeries>
 #include <QtDataVisualization/Q3DTheme>
+#include <QtDataVisualization/Q3DInputHandler>
 
 #include <qmath.h>
 #include <QLinearGradient>
 #include <QDebug>
 #include <QComboBox>
-
+#ifndef QT_NO_CURSOR
+#include <QtGui/QCursor>
+#endif
 using namespace QtDataVisualization;
 
 //#define JITTER_PLANE
 //#define WONKY_PLANE
 
-GraphModifier::GraphModifier(Q3DSurface *graph)
+GraphModifier::GraphModifier(Q3DSurface *graph, QWidget *parentWidget)
     : m_graph(graph),
       m_series1(new QSurface3DSeries),
       m_series2(new QSurface3DSeries),
@@ -48,12 +51,12 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_zCount(24),
       m_activeSample(0),
       m_fontSize(40),
-      m_rangeX(16.0),
+      m_rangeX(34.0),
       m_rangeY(16.0),
-      m_rangeZ(16.0),
-      m_minX(-8.0),
+      m_rangeZ(34.0),
+      m_minX(-17.0),
       m_minY(-8.0),
-      m_minZ(-8.0),
+      m_minZ(-17.0),
       m_addRowCounter(m_zCount),
       m_insertTestZPos(0),
       m_insertTestIndexPos(1),
@@ -63,7 +66,10 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
       m_drawMode2(QSurface3DSeries::DrawSurfaceAndWireframe),
       m_drawMode3(QSurface3DSeries::DrawSurfaceAndWireframe),
       m_drawMode4(QSurface3DSeries::DrawSurfaceAndWireframe),
-      m_offset(4.0f)
+      m_offset(4.0f),
+      m_parentWidget(parentWidget),
+      m_ascendingX(true),
+      m_ascendingZ(true)
 {
     m_graph->setAxisX(new QValue3DAxis);
     m_graph->axisX()->setTitle("X-Axis");
@@ -97,6 +103,8 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
     m_graph->axisY()->setRange(m_minY, m_minY + m_rangeY);
     m_graph->axisZ()->setRange(m_minZ, m_minZ + m_rangeZ);
 
+    static_cast<Q3DInputHandler *>(m_graph->activeInputHandler())->setZoomAtTargetEnabled(true);
+
     for (int i = 0; i < 4; i++) {
         m_multiseries[i] = new QSurface3DSeries;
         m_multiseries[i]->setName(QStringLiteral("Series %1").arg(i+1));
@@ -109,6 +117,7 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
     m_theSeries->setItemLabelFormat(QStringLiteral("@seriesName: (@xLabel, @zLabel): @yLabel"));
 
     connect(&m_timer, &QTimer::timeout, this, &GraphModifier::timeout);
+    connect(&m_graphPositionQueryTimer, &QTimer::timeout, this, &GraphModifier::graphQueryTimeout);
     connect(m_theSeries, &QSurface3DSeries::selectedPointChanged, this, &GraphModifier::selectedPointChanged);
 
     QObject::connect(m_graph, &Q3DSurface::axisXChanged, this,
@@ -119,6 +128,8 @@ GraphModifier::GraphModifier(Q3DSurface *graph)
                      &GraphModifier::handleAxisZChanged);
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
                      &GraphModifier::handleFpsChange);
+
+    //m_graphPositionQueryTimer.start(100);
 }
 
 GraphModifier::~GraphModifier()
@@ -159,7 +170,6 @@ void GraphModifier::fillSeries()
                 (*newRow[s])[j].setPosition(QVector3D(x, y, z));
             }
         }
-        qDebug() << newRow[0]->at(0).z();
         *dataArray1 << newRow[0];
         *dataArray2 << newRow[1];
         *dataArray3 << newRow[2];
@@ -606,19 +616,30 @@ void GraphModifier::adjustZMin(int min)
 
 void GraphModifier::gradientPressed()
 {
+    static Q3DTheme::ColorStyle colorStyle = Q3DTheme::ColorStyleUniform;
+
+    if (colorStyle == Q3DTheme::ColorStyleRangeGradient) {
+        colorStyle = Q3DTheme::ColorStyleObjectGradient;
+        qDebug() << "Color style: ColorStyleObjectGradient";
+    } else if (colorStyle == Q3DTheme::ColorStyleObjectGradient) {
+        colorStyle = Q3DTheme::ColorStyleUniform;
+        qDebug() << "Color style: ColorStyleUniform";
+    } else {
+        colorStyle = Q3DTheme::ColorStyleRangeGradient;
+        qDebug() << "Color style: ColorStyleRangeGradient";
+    }
+
     QLinearGradient gradient;
     gradient.setColorAt(0.0, Qt::black);
     gradient.setColorAt(0.33, Qt::blue);
     gradient.setColorAt(0.67, Qt::red);
     gradient.setColorAt(1.0, Qt::yellow);
-//    m_graph->seriesList().at(0)->setBaseGradient(gradient);
-//    m_graph->seriesList().at(0)->setSingleHighlightColor(Qt::red);
-//    m_graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
 
     QList<QLinearGradient> gradients;
     gradients << gradient;
     m_graph->activeTheme()->setBaseGradients(gradients);
-    m_graph->activeTheme()->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
+    m_graph->activeTheme()->setColorStyle(colorStyle);
+
 }
 
 void GraphModifier::changeFont(const QFont &font)
@@ -680,6 +701,16 @@ void GraphModifier::timeout()
     m_theSeries->dataProxy()->resetArray(m_planeArray);
 }
 
+void GraphModifier::graphQueryTimeout()
+{
+#ifndef QT_NO_CURSOR
+    m_graph->scene()->setGraphPositionQuery(m_parentWidget->mapFromGlobal(QCursor::pos()));
+    qDebug() << "pos: " << (m_parentWidget->mapFromGlobal(QCursor::pos()));
+#else
+    m_graph->scene()->setGraphPositionQuery(QPoint(100, 100));
+#endif
+}
+
 void GraphModifier::handleAxisXChanged(QValue3DAxis *axis)
 {
     qDebug() << __FUNCTION__ << axis << axis->orientation() << (axis == m_graph->axisX());
@@ -723,6 +754,8 @@ void GraphModifier::toggleAxisTitleFixed(bool enabled)
 
 void GraphModifier::toggleXAscending(bool enabled)
 {
+    m_ascendingX = enabled;
+
     // Flip data array contents if necessary
     foreach (QSurface3DSeries *series, m_graph->seriesList()) {
         QSurfaceDataArray *array = const_cast<QSurfaceDataArray *>(series->dataProxy()->array());
@@ -751,6 +784,8 @@ void GraphModifier::toggleXAscending(bool enabled)
 
 void GraphModifier::toggleZAscending(bool enabled)
 {
+    m_ascendingZ = enabled;
+
     // Flip data array contents if necessary
     foreach (QSurface3DSeries *series, m_graph->seriesList()) {
         QSurfaceDataArray *array = const_cast<QSurfaceDataArray *>(series->dataProxy()->array());
@@ -775,6 +810,41 @@ void GraphModifier::toggleZAscending(bool enabled)
             series->dataProxy()->resetArray(newArray);
         }
     }
+}
+
+void GraphModifier::togglePolar(bool enabled)
+{
+    m_graph->setPolar(enabled);
+}
+
+void GraphModifier::setCameraTargetX(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setX(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void GraphModifier::setCameraTargetY(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setY(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void GraphModifier::setCameraTargetZ(int value)
+{
+    // Value is (-100, 100), normalize
+    m_cameraTarget.setZ(float(value) / 100.0f);
+    m_graph->scene()->activeCamera()->setTarget(m_cameraTarget);
+    qDebug() << "m_cameraTarget:" << m_cameraTarget;
+}
+
+void GraphModifier::setGraphMargin(int value)
+{
+    m_graph->setMargin(qreal(value) / 100.0);
+    qDebug() << "Setting margin:" << m_graph->margin() << value;
 }
 
 void GraphModifier::resetArrayAndSliders(QSurfaceDataArray *array, float minZ, float maxZ, float minX, float maxX)
@@ -831,7 +901,10 @@ void GraphModifier::changeRow()
 
         int row = rand() % m_zCount;
         QSurfaceDataRow *newRow = createMultiRow(row, changeRowSeries, true);
-        m_multiseries[changeRowSeries]->dataProxy()->setRow(row, newRow);
+        if (m_ascendingZ)
+            m_multiseries[changeRowSeries]->dataProxy()->setRow(row, newRow);
+        else
+            m_multiseries[changeRowSeries]->dataProxy()->setRow((m_zCount - 1) - row, newRow);
 
         changeRowSeries++;
         if (changeRowSeries > 3)
@@ -848,11 +921,20 @@ QSurfaceDataRow *GraphModifier::createMultiRow(int row, int series, bool change)
     float i = float(row);
     QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
     float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[series];
-    for (int j = 0; j < m_xCount; j++) {
-        float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[series];
-        float angle = (z * x) / float(full) * 1.57f;
-        float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f * float(change) + 1.1f *series;
-        (*newRow)[j].setPosition(QVector3D(x, y, z));
+    if (m_ascendingX) {
+        for (int j = 0; j < m_xCount; j++) {
+            float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[series];
+            float angle = (z * x) / float(full) * 1.57f;
+            float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f * float(change) + 1.1f *series;
+            (*newRow)[j].setPosition(QVector3D(x, y, z));
+        }
+    } else {
+        for (int j = m_xCount - 1; j >= 0 ; j--) {
+            float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[series];
+            float angle = (z * x) / float(full) * 1.57f;
+            float y = qSin(angle * float(qPow(1.3f, series))) + 0.2f * float(change) + 1.1f *series;
+            (*newRow)[(m_xCount - 1) - j].setPosition(QVector3D(x, y, z));
+        }
     }
 
     return newRow;
@@ -961,7 +1043,16 @@ void GraphModifier::changeItem()
         float angle = (z * x) / float(full) * 1.57f;
         float y = qSin(angle * float(qPow(1.3f, changeItemSeries))) + 0.2f + 1.1f *changeItemSeries;
         QSurfaceDataItem newItem(QVector3D(x, y, z));
-        m_multiseries[changeItemSeries]->dataProxy()->setItem(int(i), int(j), newItem);
+
+        if (m_ascendingZ && m_ascendingX)
+            m_multiseries[changeItemSeries]->dataProxy()->setItem(int(i), int(j), newItem);
+        else if (!m_ascendingZ && m_ascendingX)
+            m_multiseries[changeItemSeries]->dataProxy()->setItem(m_zCount - 1 - int(i), int(j), newItem);
+        else if (m_ascendingZ && !m_ascendingX)
+            m_multiseries[changeItemSeries]->dataProxy()->setItem(int(i), m_xCount - 1 - int(j), newItem);
+        else
+            m_multiseries[changeItemSeries]->dataProxy()->setItem(m_zCount - 1 - int(i), m_xCount - 1 - int(j), newItem);
+        //m_multiseries[changeItemSeries]->setSelectedPoint(QPoint(i, j));
         changeItemSeries++;
         if (changeItemSeries > 3)
             changeItemSeries = 0;
@@ -1228,12 +1319,12 @@ void GraphModifier::resetArray()
 
 void GraphModifier::resetArrayEmpty()
 {
-    QSurfaceDataArray *emptryArray = new QSurfaceDataArray;
+    QSurfaceDataArray *emptyArray = new QSurfaceDataArray;
 #ifdef MULTI_SERIES
     int series = rand() % 4;
-    m_multiseries[series]->dataProxy()->resetArray(emptryArray);
+    m_multiseries[series]->dataProxy()->resetArray(emptyArray);
 #else
-    m_theSeries->dataProxy()->resetArray(emptryArray);
+    m_theSeries->dataProxy()->resetArray(emptyArray);
 #endif
 }
 
@@ -1569,6 +1660,20 @@ void GraphModifier::updateSamples()
 
 void GraphModifier::setAspectRatio(int ratio)
 {
-    float aspectRatio = float(ratio) / 10.0f;
+    qreal aspectRatio = qreal(ratio) / 10.0;
     m_graph->setAspectRatio(aspectRatio);
+}
+
+void GraphModifier::setHorizontalAspectRatio(int ratio)
+{
+    qreal aspectRatio = qreal(ratio) / 100.0;
+    m_graph->setHorizontalAspectRatio(aspectRatio);
+}
+
+void GraphModifier::setSurfaceTexture(bool enabled)
+{
+    if (enabled)
+        m_multiseries[3]->setTexture(QImage(":/maps/mapimage"));
+    else
+        m_multiseries[3]->setTexture(QImage());
 }

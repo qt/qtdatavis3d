@@ -98,6 +98,8 @@ Q3DSurface::Q3DSurface(const QSurfaceFormat *format, QWindow *parent)
     dptr()->m_shared->initializeOpenGL();
     QObject::connect(dptr()->m_shared, &Surface3DController::selectedSeriesChanged,
                      this, &Q3DSurface::selectedSeriesChanged);
+    QObject::connect(dptr()->m_shared, &Surface3DController::flipHorizontalGridChanged,
+                     this, &Q3DSurface::flipHorizontalGridChanged);
 }
 
 /*!
@@ -227,6 +229,31 @@ QValue3DAxis *Q3DSurface::axisZ() const
 QSurface3DSeries *Q3DSurface::selectedSeries() const
 {
     return dptrc()->m_shared->selectedSeries();
+}
+
+/*!
+ * \property Q3DSurface::flipHorizontalGrid
+ * \since QtDataVisualization 1.2
+ *
+ * In some use cases the horizontal axis grid is mostly covered by the surface, so it can be more
+ * useful to display the horizontal axis grid on top of the graph rather than on the bottom.
+ * A typical use case for this is showing 2D spectrograms using orthoGraphic projection with
+ * a top-down viewpoint.
+ *
+ * If \c{false}, the horizontal axis grid and labels are drawn on the horizontal background
+ * of the graph.
+ * If \c{true}, the horizontal axis grid and labels are drawn on the opposite side of the graph
+ * from the horizontal background.
+ * Defaults to \c{false}.
+ */
+void Q3DSurface::setFlipHorizontalGrid(bool flip)
+{
+    dptr()->m_shared->setFlipHorizontalGrid(flip);
+}
+
+bool Q3DSurface::flipHorizontalGrid() const
+{
+    return dptrc()->m_shared->flipHorizontalGrid();
 }
 
 /*!

@@ -43,26 +43,27 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *   \row
  *     \li @valueTitle    \li Title from value axis
  *   \row
- *     \li @rowIdx        \li Visible row index
+ *     \li @rowIdx        \li Visible row index. Localized using graph locale.
  *   \row
- *     \li @colIdx        \li Visible Column index
+ *     \li @colIdx        \li Visible Column index. Localized using graph locale.
  *   \row
  *     \li @rowLabel      \li Label from row axis
  *   \row
  *     \li @colLabel      \li Label from column axis
  *   \row
- *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to
+ *                            the graph uses. See \l{QValue3DAxis::labelFormat} for more information.
  *   \row
  *     \li @seriesName    \li Name of the series
  *   \row
- *     \li %<format spec> \li Item value in specified format.
+ *     \li %<format spec> \li Item value in specified format. Formatted using the same rules as
+ *                            \l{QValue3DAxis::labelFormat}.
  * \endtable
  *
  * For example:
  * \snippet doc_src_qtdatavisualization.cpp 1
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Data Visualization Data Handling}, QAbstract3DGraph::locale
  */
 
 /*!
@@ -334,6 +335,10 @@ void QBar3DSeriesPrivate::createItemLabel()
         return;
     }
 
+    QLocale locale(QLocale::c());
+    if (m_controller)
+        locale = m_controller->locale();
+
     QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_controller->axisZ());
     QCategory3DAxis *categoryAxisX = static_cast<QCategory3DAxis *>(m_controller->axisX());
     QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(m_controller->axisY());
@@ -344,13 +349,13 @@ void QBar3DSeriesPrivate::createItemLabel()
 
     int selBarPosRow = m_selectedBar.x();
     int selBarPosCol = m_selectedBar.y();
-    m_itemLabel.replace(rowIndexTag, QString::number(selBarPosRow));
+    m_itemLabel.replace(rowIndexTag, locale.toString(selBarPosRow));
     if (categoryAxisZ->labels().size() > selBarPosRow)
         m_itemLabel.replace(rowLabelTag, categoryAxisZ->labels().at(selBarPosRow));
     else
         m_itemLabel.replace(rowLabelTag, QString());
     m_itemLabel.replace(rowTitleTag, categoryAxisZ->title());
-    m_itemLabel.replace(colIndexTag, QString::number(selBarPosCol));
+    m_itemLabel.replace(colIndexTag, locale.toString(selBarPosCol));
     if (categoryAxisX->labels().size() > selBarPosCol)
         m_itemLabel.replace(colLabelTag, categoryAxisX->labels().at(selBarPosCol));
     else

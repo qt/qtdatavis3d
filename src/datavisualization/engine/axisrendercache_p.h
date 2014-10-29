@@ -107,8 +107,8 @@ public:
     inline bool isTitleFixed() const { return m_titleFixed; }
     inline void setTitleFixed(bool fixed) { m_titleFixed = fixed; }
 
-public slots:
     void updateTextures();
+    void clearLabels();
 
 private:
     int maxLabelWidth(const QStringList &labels) const;

@@ -110,8 +110,36 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty float Camera3D::zoomLevel
  *
- * This property contains the the camera zoom level in percentage. 100.0 means there is no zoom
- * in or out set in the camera.
+ * This property contains the the camera zoom level in percentage. The default value of \c{100.0}
+ * means there is no zoom in or out set in the camera.
+ * The value is limited within the bounds defined by minZoomLevel and maxZoomLevel properties.
+ *
+ * \sa minZoomLevel, maxZoomLevel
+ */
+
+/*!
+ * \qmlproperty float Camera3D::minZoomLevel
+ *
+ * This property contains the the minimum allowed camera zoom level.
+ * If the new minimum level is more than the existing maximum level, the maximum level is
+ * adjusted to the new minimum as well.
+ * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * The minZoomLevel cannot be set below \c{1.0}.
+ * Defaults to \c{10.0}.
+ *
+ * \sa zoomLevel, maxZoomLevel
+ */
+
+/*!
+ * \qmlproperty float Camera3D::maxZoomLevel
+ *
+ * This property contains the the maximum allowed camera zoom level.
+ * If the new maximum level is less than the existing minimum level, the minimum level is
+ * adjusted to the new maximum as well.
+ * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * Defaults to \c{500.0f}.
+ *
+ * \sa zoomLevel, minZoomLevel
  */
 
 /*!
@@ -134,6 +162,19 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If \c true the Y-rotation of the camera is wrapped from minimum to maximum and from maximum
  * to minimum. If \c false the Y-rotation of the camera is limited to the sector determined by minimum
  * and maximum values.
+ */
+
+/*!
+ * \qmlproperty vector3d Camera3D::target
+ * \since QtDataVisualization 1.2
+ *
+ * Holds the camera \a target as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
+ *
+ * Valid coordinate values are between \c{-1.0...1.0}, where the edge values indicate
+ * the edges of the corresponding axis range. Any values outside this range are clamped to the edge.
+ *
+ * \note For bar graphs, the Y-coordinate is ignored and camera always targets a point on
+ * the horizontal background.
  */
 
 /*!
@@ -160,22 +201,11 @@ Q3DCamera::~Q3DCamera()
  */
 void Q3DCamera::copyValuesFrom(const Q3DObject &source)
 {
-    Q3DObject::copyValuesFrom(source);
+    // Note: Do not copy values from parent, as we are handling the position internally
 
     const Q3DCamera &sourceCamera = static_cast<const Q3DCamera &>(source);
 
-    d_ptr->m_target.setX(sourceCamera.d_ptr->m_target.x());
-    d_ptr->m_target.setY(sourceCamera.d_ptr->m_target.y());
-    d_ptr->m_target.setZ(sourceCamera.d_ptr->m_target.z());
-
-    d_ptr->m_up.setX(sourceCamera.d_ptr->m_up.x());
-    d_ptr->m_up.setY(sourceCamera.d_ptr->m_up.y());
-    d_ptr->m_up.setZ(sourceCamera.d_ptr->m_up.z());
-
-    float *values = new float[16];
-    sourceCamera.d_ptr->m_viewMatrix.copyDataTo(values);
-    d_ptr->m_viewMatrix = QMatrix4x4(values);
-    delete[] values;
+    d_ptr->m_requestedTarget = sourceCamera.d_ptr->m_requestedTarget;
 
     d_ptr->m_xRotation = sourceCamera.d_ptr->m_xRotation;
     d_ptr->m_yRotation = sourceCamera.d_ptr->m_yRotation;
@@ -189,6 +219,8 @@ void Q3DCamera::copyValuesFrom(const Q3DObject &source)
     d_ptr->m_wrapYRotation = sourceCamera.d_ptr->m_wrapYRotation;
 
     d_ptr->m_zoomLevel = sourceCamera.d_ptr->m_zoomLevel;
+    d_ptr->m_minZoomLevel = sourceCamera.d_ptr->m_minZoomLevel;
+    d_ptr->m_maxZoomLevel = sourceCamera.d_ptr->m_maxZoomLevel;
     d_ptr->m_activePreset = sourceCamera.d_ptr->m_activePreset;
 }
 
@@ -389,6 +421,9 @@ void Q3DCamera::setCameraPreset(CameraPreset preset)
         break;
     }
 
+    // All presets target the center of the graph
+    setTarget(zeroVector);
+
     if (d_ptr->m_activePreset != preset) {
         d_ptr->m_activePreset = preset;
         setDirty(true);
@@ -399,8 +434,11 @@ void Q3DCamera::setCameraPreset(CameraPreset preset)
 /*!
  * \property Q3DCamera::zoomLevel
  *
- * This property contains the the camera zoom level in percentage. \c 100.0f means there is no zoom
- * in or out set in the camera.
+ * This property contains the the camera zoom level in percentage. The default value of \c{100.0f}
+ * means there is no zoom in or out set in the camera.
+ * The value is limited within the bounds defined by minZoomLevel and maxZoomLevel properties.
+ *
+ * \sa minZoomLevel, maxZoomLevel
  */
 float Q3DCamera::zoomLevel() const
 {
@@ -409,10 +447,73 @@ float Q3DCamera::zoomLevel() const
 
 void Q3DCamera::setZoomLevel(float zoomLevel)
 {
-    if (d_ptr->m_zoomLevel != zoomLevel) {
-        d_ptr->m_zoomLevel = zoomLevel;
+    float newZoomLevel = qBound(d_ptr->m_minZoomLevel, zoomLevel, d_ptr->m_maxZoomLevel);
+
+    if (d_ptr->m_zoomLevel != newZoomLevel) {
+        d_ptr->m_zoomLevel = newZoomLevel;
         setDirty(true);
-        emit zoomLevelChanged(zoomLevel);
+        emit zoomLevelChanged(newZoomLevel);
+    }
+}
+
+/*!
+ * \property Q3DCamera::minZoomLevel
+ *
+ * This property contains the the minimum allowed camera zoom level.
+ * If the new minimum level is more than the existing maximum level, the maximum level is
+ * adjusted to the new minimum as well.
+ * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * The minZoomLevel cannot be set below \c{1.0f}.
+ * Defaults to \c{10.0f}.
+ *
+ * \sa zoomLevel, maxZoomLevel
+ */
+float Q3DCamera::minZoomLevel() const
+{
+    return d_ptr->m_minZoomLevel;
+}
+
+void Q3DCamera::setMinZoomLevel(float zoomLevel)
+{
+    // Don't allow minimum to be below one, as that can cause zoom to break.
+    float newMinLevel = qMax(zoomLevel, 1.0f);
+    if (d_ptr->m_minZoomLevel != newMinLevel) {
+        d_ptr->m_minZoomLevel = newMinLevel;
+        if (d_ptr->m_maxZoomLevel < newMinLevel)
+            setMaxZoomLevel(newMinLevel);
+        setZoomLevel(d_ptr->m_zoomLevel);
+        setDirty(true);
+        emit minZoomLevelChanged(newMinLevel);
+    }
+}
+
+/*!
+ * \property Q3DCamera::maxZoomLevel
+ *
+ * This property contains the the maximum allowed camera zoom level.
+ * If the new maximum level is less than the existing minimum level, the minimum level is
+ * adjusted to the new maximum as well.
+ * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * Defaults to \c{500.0f}.
+ *
+ * \sa zoomLevel, minZoomLevel
+ */
+float Q3DCamera::maxZoomLevel() const
+{
+    return d_ptr->m_maxZoomLevel;
+}
+
+void Q3DCamera::setMaxZoomLevel(float zoomLevel)
+{
+    // Don't allow maximum to be below one, as that can cause zoom to break.
+    float newMaxLevel = qMax(zoomLevel, 1.0f);
+    if (d_ptr->m_maxZoomLevel != newMaxLevel) {
+        d_ptr->m_maxZoomLevel = newMaxLevel;
+        if (d_ptr->m_minZoomLevel > newMaxLevel)
+            setMinZoomLevel(newMaxLevel);
+        setZoomLevel(d_ptr->m_zoomLevel);
+        setDirty(true);
+        emit maxZoomLevelChanged(newMaxLevel);
     }
 }
 
@@ -459,14 +560,59 @@ void Q3DCamera::setWrapYRotation(bool isEnabled)
 /*!
  * Utility function that sets the camera rotations and distance.\a horizontal and \a vertical
  * define the camera rotations to be used.
- * Optional \a zoom parameter can be given to set the zoom percentage of the camera in range of
- * \c{10.0f - 500.0f}.
+ * Optional \a zoom parameter can be given to set the zoom percentage of the camera within
+ * the bounds defined by minZoomLevel and maxZoomLevel properties.
  */
 void Q3DCamera::setCameraPosition(float horizontal, float vertical, float zoom)
 {
-    setZoomLevel(qBound(10.0f, zoom, 500.0f));
+    setZoomLevel(zoom);
     setXRotation(horizontal);
     setYRotation(vertical);
+}
+
+/*!
+ * \property Q3DCamera::target
+ * \since QtDataVisualization 1.2
+ *
+ * Holds the camera \a target as a QVector3D. Defaults to \c {QVector3D(0.0, 0.0, 0.0)}.
+ *
+ * Valid coordinate values are between \c{-1.0...1.0}, where the edge values indicate
+ * the edges of the corresponding axis range. Any values outside this range are clamped to the edge.
+ *
+ * \note For bar graphs, the Y-coordinate is ignored and camera always targets a point on
+ * the horizontal background.
+ */
+QVector3D Q3DCamera::target() const
+{
+    return d_ptr->m_requestedTarget;
+}
+
+void Q3DCamera::setTarget(const QVector3D &target)
+{
+    QVector3D newTarget = target;
+
+    if (newTarget.x() < -1.0f)
+        newTarget.setX(-1.0f);
+    else if (newTarget.x() > 1.0f)
+        newTarget.setX(1.0f);
+
+    if (newTarget.y() < -1.0f)
+        newTarget.setY(-1.0f);
+    else if (newTarget.y() > 1.0f)
+        newTarget.setY(1.0f);
+
+    if (newTarget.z() < -1.0f)
+        newTarget.setZ(-1.0f);
+    else if (newTarget.z() > 1.0f)
+        newTarget.setZ(1.0f);
+
+    if (d_ptr->m_requestedTarget != newTarget) {
+        if (d_ptr->m_activePreset != CameraPresetNone)
+            d_ptr->m_activePreset = CameraPresetNone;
+        d_ptr->m_requestedTarget = newTarget;
+        setDirty(true);
+        emit targetChanged(newTarget);
+    }
 }
 
 Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
@@ -479,6 +625,8 @@ Q3DCameraPrivate::Q3DCameraPrivate(Q3DCamera *q) :
     m_maxXRotation(180.0f),
     m_maxYRotation(90.0f),
     m_zoomLevel(100.0f),
+    m_minZoomLevel(10.0f),
+    m_maxZoomLevel(500.0f),
     m_wrapXRotation(true),
     m_wrapYRotation(false),
     m_activePreset(Q3DCamera::CameraPresetNone)
@@ -645,9 +793,9 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     QMatrix4x4 viewMatrix;
 
     // Apply to view matrix
-    viewMatrix.lookAt(q_ptr->position(), m_target, m_up);
+    viewMatrix.lookAt(q_ptr->position(), m_actualTarget, m_up);
     // Compensate for translation (if d_ptr->m_target is off origin)
-    viewMatrix.translate(m_target.x(), m_target.y(), m_target.z());
+    viewMatrix.translate(m_actualTarget.x(), m_actualTarget.y(), m_actualTarget.z());
     // Apply rotations
     // Handle x and z rotation when y -angle is other than 0
     viewMatrix.rotate(m_xRotation, 0, qCos(qDegreesToRadians(m_yRotation)),
@@ -657,7 +805,7 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
     // handle zoom by scaling
     viewMatrix.scale(zoom / 100.0f);
     // Compensate for translation (if d_ptr->m_target is off origin)
-    viewMatrix.translate(-m_target.x(), -m_target.y(), -m_target.z());
+    viewMatrix.translate(-m_actualTarget.x(), -m_actualTarget.y(), -m_actualTarget.z());
 
     setViewMatrix(viewMatrix);
 }
@@ -713,9 +861,9 @@ void Q3DCameraPrivate::setBaseOrientation(const QVector3D &basePosition,
                                           const QVector3D &target,
                                           const QVector3D &baseUp)
 {
-    if (q_ptr->position() != basePosition || m_target != target || m_up != baseUp) {
+    if (q_ptr->position() != basePosition || m_actualTarget != target || m_up != baseUp) {
         q_ptr->setPosition(basePosition);
-        m_target = target;
+        m_actualTarget = target;
         m_up = baseUp;
         q_ptr->setDirty(true);
     }
@@ -737,20 +885,33 @@ QVector3D Q3DCameraPrivate::calculatePositionRelativeToCamera(const QVector3D &r
                                                               float distanceModifier) const
 {
     // Move the position with camera
-    GLfloat radiusFactor = cameraDistance * (1.5f + distanceModifier);
-    GLfloat xAngle;
-    GLfloat yAngle;
+    const float radiusFactor = cameraDistance * (1.5f + distanceModifier);
+    float xAngle;
+    float yAngle;
+
     if (!fixedRotation) {
         xAngle = qDegreesToRadians(m_xRotation);
-        yAngle = qDegreesToRadians(m_yRotation);
+        float yRotation = m_yRotation;
+        // Light must not be paraller to eye vector, so fudge the y rotation a bit.
+        // Note: This needs redoing if we ever allow arbitrary light positioning.
+        const float yMargin = 0.1f; // Smaller margins cause weird shadow artifacts on tops of bars
+        const float absYRotation = qAbs(yRotation);
+        if (absYRotation < 90.0f + yMargin && absYRotation > 90.0f - yMargin) {
+            if (yRotation < 0.0f)
+                yRotation = -90.0f + yMargin;
+            else
+                yRotation = 90.0f - yMargin;
+        }
+        yAngle = qDegreesToRadians(yRotation);
     } else {
         xAngle = qDegreesToRadians(fixedRotation);
         yAngle = 0;
     }
-    GLfloat radius = (radiusFactor + relativePosition.y()); // set radius to match the highest height of the position
-    GLfloat zPos = radius * qCos(xAngle) * qCos(yAngle);
-    GLfloat xPos = radius * qSin(xAngle) * qCos(yAngle);
-    GLfloat yPos = (radiusFactor + relativePosition.y()) * qSin(yAngle);
+    // Set radius to match the highest height of the position
+    const float radius = (radiusFactor + relativePosition.y());
+    const float zPos = radius * qCos(xAngle) * qCos(yAngle);
+    const float xPos = radius * qSin(xAngle) * qCos(yAngle);
+    const float yPos = radius * qSin(yAngle);
 
     // Keep in the set position in relation to camera
     return QVector3D(-xPos + relativePosition.x(),

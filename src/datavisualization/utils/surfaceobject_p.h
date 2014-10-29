@@ -49,34 +49,55 @@ public:
         Undefined
     };
 
+    enum DataDimension {
+        BothAscending = 0,
+        XDescending = 1,
+        ZDescending = 2,
+        BothDescending = XDescending | ZDescending
+    };
+    Q_DECLARE_FLAGS(DataDimensions, DataDimension)
+
 public:
     SurfaceObject(Surface3DRenderer *renderer);
-    ~SurfaceObject();
+    virtual ~SurfaceObject();
 
     void setUpData(const QSurfaceDataArray &dataArray, const QRect &space,
-                   bool changeGeometry, bool flipXZ = false);
+                   bool changeGeometry, bool polar, bool flipXZ = false);
     void setUpSmoothData(const QSurfaceDataArray &dataArray, const QRect &space,
-                         bool changeGeometry, bool flipXZ = false);
-    void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex);
-    void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow);
-    void updateSmoothItem(const QSurfaceDataArray &dataArray, int row, int column);
-    void updateCoarseItem(const QSurfaceDataArray &dataArray, int row, int column);
+                         bool changeGeometry, bool polar, bool flipXZ = false);
+    void smoothUVs(const QSurfaceDataArray &dataArray, const QSurfaceDataArray &modelArray);
+    void coarseUVs(const QSurfaceDataArray &dataArray, const QSurfaceDataArray &modelArray);
+    void updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex, bool polar);
+    void updateSmoothRow(const QSurfaceDataArray &dataArray, int startRow, bool polar);
+    void updateSmoothItem(const QSurfaceDataArray &dataArray, int row, int column, bool polar);
+    void updateCoarseItem(const QSurfaceDataArray &dataArray, int row, int column, bool polar);
     void createSmoothIndices(int x, int y, int endX, int endY);
-    void createCoarseIndices(int x, int y, int columns, int rows);
+    void createCoarseSubSection(int x, int y, int columns, int rows);
     void createSmoothGridlineIndices(int x, int y, int endX, int endY);
     void createCoarseGridlineIndices(int x, int y, int endX, int endY);
     void uploadBuffers();
     GLuint gridElementBuf();
+    GLuint uvBuf();
     GLuint gridIndexCount();
     QVector3D vertexAt(int column, int row);
     void clear();
+    float minYValue() const { return m_minY; }
+    float maxYValue() const { return m_maxY; }
+    inline void activateSurfaceTexture(bool value) { m_returnTextureBuffer = value; }
 
 private:
-    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c, bool flipNormal);
+    void createCoarseIndices(GLint *indices, int &p, int row, int upperRow, int j);
+    void createNormals(int &p, int row, int upperRow, int j);
+    void createSmoothNormalBodyLine(int &totalIndex, int column);
+    void createSmoothNormalUpperLine(int &totalIndex);
+    QVector3D createSmoothNormalBodyLineItem(int x, int y);
+    QVector3D createSmoothNormalUpperLineItem(int x, int y);
+    QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
     void createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
-                       const QVector<QVector3D> &normals, const GLint *indices,
-                       bool changeGeometry);
-    bool checkFlipNormal(const QSurfaceDataArray &array);
+                       const QVector<QVector3D> &normals, const GLint *indices);
+    void checkDirections(const QSurfaceDataArray &array);
+    inline void getNormalizedVertex(const QSurfaceDataItem &data, QVector3D &vertex, bool polar,
+                                    bool flipXZ);
 
 private:
     SurfaceType m_surfaceType;
@@ -90,6 +111,13 @@ private:
     AxisRenderCache &m_axisCacheX;
     AxisRenderCache &m_axisCacheY;
     AxisRenderCache &m_axisCacheZ;
+    Surface3DRenderer *m_renderer;
+    float m_minY;
+    float m_maxY;
+    GLuint m_uvTextureBuffer;
+    bool m_returnTextureBuffer;
+    SurfaceObject::DataDimensions m_dataDimension;
+    SurfaceObject::DataDimensions m_oldDataDimension;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

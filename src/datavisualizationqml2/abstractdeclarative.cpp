@@ -19,10 +19,12 @@
 #include "abstractdeclarative_p.h"
 #include "declarativetheme_p.h"
 #include "declarativerendernode_p.h"
-
 #include <QtGui/QGuiApplication>
 #if defined(Q_OS_IOS)
 #include <QtCore/QTimer>
+#endif
+#if defined(Q_OS_OSX)
+#include <qpa/qplatformnativeinterface.h>
 #endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -36,11 +38,7 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_controller(0),
     m_contextWindow(0),
     m_renderMode(RenderIndirect),
-    #if defined(QT_OPENGL_ES_2)
     m_samples(0),
-    #else
-    m_samples(4),
-    #endif
     m_windowSamples(0),
     m_initialisedSize(0, 0),
     #ifdef USE_SHARED_CONTEXT
@@ -53,7 +51,6 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_contextThread(0)
 {
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
-    setAntialiasing(m_samples > 0);
 
     // Set contents to false in case we are in qml designer to make component look nice
     m_runningInDesigner = QGuiApplication::applicationDisplayName() == "Qml2Puppet";
@@ -62,24 +59,7 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
 
 AbstractDeclarative::~AbstractDeclarative()
 {
-#ifdef USE_SHARED_CONTEXT
-    // Context can be in another thread, don't delete it directly in that case
-    if (m_contextThread && m_contextThread != m_mainThread) {
-        if (m_context)
-            m_context->deleteLater();
-        m_context = 0;
-    } else {
-        delete m_context;
-    }
-#else
-    if (m_contextThread && m_contextThread != m_mainThread) {
-        if (m_stateStore)
-            m_stateStore->deleteLater();
-        m_stateStore = 0;
-    } else {
-        delete m_stateStore;
-    }
-#endif
+    destroyContext();
 
     disconnect(this, 0, this, 0);
     checkWindowList(0);
@@ -293,6 +273,10 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
     Q_ASSERT(controller);
     m_controller = controller;
 
+    if (!m_controller->isOpenGLES())
+        m_samples = 4;
+    setAntialiasing(m_samples > 0);
+
     // Reset default theme, as the default C++ theme is Q3DTheme, not DeclarativeTheme3D.
     DeclarativeTheme3D *defaultTheme = new DeclarativeTheme3D;
     defaultTheme->d_ptr->setDefaultTheme(true);
@@ -329,6 +313,22 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
                      &AbstractDeclarative::aspectRatioChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::optimizationHintsChanged, this,
                      &AbstractDeclarative::handleOptimizationHintChange);
+    QObject::connect(m_controller.data(), &Abstract3DController::polarChanged, this,
+                     &AbstractDeclarative::polarChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::radialLabelOffsetChanged, this,
+                     &AbstractDeclarative::radialLabelOffsetChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::horizontalAspectRatioChanged, this,
+                     &AbstractDeclarative::horizontalAspectRatioChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::reflectionChanged, this,
+                     &AbstractDeclarative::reflectionChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::reflectivityChanged, this,
+                     &AbstractDeclarative::reflectivityChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::localeChanged, this,
+                     &AbstractDeclarative::localeChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::queriedGraphPositionChanged, this,
+                     &AbstractDeclarative::queriedGraphPositionChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::marginChanged, this,
+                     &AbstractDeclarative::marginChanged);
 }
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
@@ -347,7 +347,6 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
         m_contextThread = QThread::currentThread();
         m_contextWindow = window;
         m_qtContext = currentContext;
-
         m_context = new QOpenGLContext();
         m_context->setFormat(m_qtContext->format());
         m_context->setShareContext(m_qtContext);
@@ -355,6 +354,10 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 
         m_context->makeCurrent(window);
         m_controller->initializeOpenGL();
+
+        // Make sure context gets deleted.
+        QObject::connect(m_contextThread, &QThread::finished, this,
+                         &AbstractDeclarative::destroyContext, Qt::DirectConnection);
     } else {
         m_context->makeCurrent(window);
     }
@@ -376,6 +379,10 @@ void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 
         m_stateStore->storeGLState();
         m_controller->initializeOpenGL();
+
+        // Make sure state store gets deleted.
+        QObject::connect(m_contextThread, &QThread::finished, this,
+                         &AbstractDeclarative::destroyContext, Qt::DirectConnection);
     } else {
         m_stateStore->storeGLState();
     }
@@ -416,17 +423,15 @@ void AbstractDeclarative::setMsaaSamples(int samples)
     if (m_renderMode != RenderIndirect) {
         qWarning("Multisampling cannot be adjusted in this render mode");
     } else {
-#if defined(QT_OPENGL_ES_2)
-        if (samples > 0)
-            qWarning("Multisampling is not supported in OpenGL ES2");
-#else
-        if (m_samples != samples) {
+        if (m_controller->isOpenGLES()) {
+            if (samples > 0)
+                qWarning("Multisampling is not supported in OpenGL ES2");
+        } else if (m_samples != samples) {
             m_samples = samples;
             setAntialiasing(m_samples > 0);
             emit msaaSamplesChanged(samples);
             update();
         }
-#endif
     }
 }
 
@@ -436,6 +441,18 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
 
     if (!window)
         return;
+
+#if defined(Q_OS_OSX)
+    bool previousVisibility = window->isVisible();
+    // Enable touch events for Mac touchpads
+    window->setVisible(true);
+    typedef void * (*EnableTouch)(QWindow*, bool);
+    EnableTouch enableTouch =
+            (EnableTouch)QGuiApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("registertouchwindow");
+    if (enableTouch)
+        enableTouch(window, true);
+    window->setVisible(previousVisibility);
+#endif
 
     connect(window, &QObject::destroyed, this, &AbstractDeclarative::windowDestroyed);
 
@@ -556,24 +573,25 @@ void AbstractDeclarative::render()
     // Clear the background once per window as that is not done by default
     QQuickWindow *win = window();
     activateOpenGLContext(win);
+    QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
     if (m_renderMode == RenderDirectToBackground && !clearList.contains(win)) {
         clearList.append(win);
         QColor clearColor = win->color();
-        glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
-        glClear(GL_COLOR_BUFFER_BIT);
+        funcs->glClearColor(clearColor.redF(), clearColor.greenF(), clearColor.blueF(), 1.0f);
+        funcs->glClear(GL_COLOR_BUFFER_BIT);
     }
 
     if (isVisible()) {
-        glDepthMask(GL_TRUE);
-        glEnable(GL_DEPTH_TEST);
-        glDepthFunc(GL_LESS);
-        glEnable(GL_CULL_FACE);
-        glCullFace(GL_BACK);
-        glDisable(GL_BLEND);
+        funcs->glDepthMask(GL_TRUE);
+        funcs->glEnable(GL_DEPTH_TEST);
+        funcs->glDepthFunc(GL_LESS);
+        funcs->glEnable(GL_CULL_FACE);
+        funcs->glCullFace(GL_BACK);
+        funcs->glDisable(GL_BLEND);
 
         m_controller->render();
 
-        glEnable(GL_BLEND);
+        funcs->glEnable(GL_BLEND);
     }
     doneOpenGLContext(win);
 }
@@ -704,7 +722,7 @@ AbstractDeclarative::ElementType AbstractDeclarative::selectedElement() const
 
 void AbstractDeclarative::setAspectRatio(qreal ratio)
 {
-    m_controller->setAspectRatio(float(ratio));
+    m_controller->setAspectRatio(ratio);
 }
 
 qreal AbstractDeclarative::aspectRatio() const
@@ -724,6 +742,81 @@ AbstractDeclarative::OptimizationHints AbstractDeclarative::optimizationHints() 
     return OptimizationHints(intmode);
 }
 
+void AbstractDeclarative::setPolar(bool enable)
+{
+    m_controller->setPolar(enable);
+}
+
+bool AbstractDeclarative::isPolar() const
+{
+    return m_controller->isPolar();
+}
+
+void AbstractDeclarative::setRadialLabelOffset(float offset)
+{
+    m_controller->setRadialLabelOffset(offset);
+}
+
+float AbstractDeclarative::radialLabelOffset() const
+{
+    return m_controller->radialLabelOffset();
+}
+
+void AbstractDeclarative::setHorizontalAspectRatio(qreal ratio)
+{
+    m_controller->setHorizontalAspectRatio(ratio);
+}
+
+qreal AbstractDeclarative::horizontalAspectRatio() const
+{
+    return m_controller->horizontalAspectRatio();
+}
+
+void AbstractDeclarative::setReflection(bool enable)
+{
+    m_controller->setReflection(enable);
+}
+
+bool AbstractDeclarative::isReflection() const
+{
+    return m_controller->reflection();
+}
+
+void AbstractDeclarative::setReflectivity(qreal reflectivity)
+{
+    m_controller->setReflectivity(reflectivity);
+}
+
+qreal AbstractDeclarative::reflectivity() const
+{
+    return m_controller->reflectivity();
+}
+
+void AbstractDeclarative::setLocale(const QLocale &locale)
+{
+    m_controller->setLocale(locale);
+}
+
+QLocale AbstractDeclarative::locale() const
+{
+    return m_controller->locale();
+}
+
+QVector3D AbstractDeclarative::queriedGraphPosition() const
+{
+    return m_controller->queriedGraphPosition();
+}
+
+void AbstractDeclarative::setMargin(qreal margin)
+{
+    m_controller->setMargin(margin);
+}
+
+qreal AbstractDeclarative::margin() const
+{
+    return m_controller->margin();
+}
+
 void AbstractDeclarative::windowDestroyed(QObject *obj)
 {
     // Remove destroyed window from window lists
@@ -734,6 +827,33 @@ void AbstractDeclarative::windowDestroyed(QObject *obj)
         graphWindowList.remove(this);
 
     windowClearList.remove(win);
+}
+
+void AbstractDeclarative::destroyContext()
+{
+#ifdef USE_SHARED_CONTEXT
+    // Context can be in another thread, don't delete it directly in that case
+    if (m_contextThread && m_contextThread != m_mainThread) {
+        if (m_context)
+            m_context->deleteLater();
+    } else {
+        delete m_context;
+    }
+    m_context = 0;
+#else
+    if (m_contextThread && m_contextThread != m_mainThread) {
+        if (m_stateStore)
+            m_stateStore->deleteLater();
+    } else {
+        delete m_stateStore;
+    }
+    m_stateStore = 0;
+#endif
+    if (m_contextThread) {
+        QObject::disconnect(m_contextThread, &QThread::finished, this,
+                            &AbstractDeclarative::destroyContext);
+        m_contextThread = 0;
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

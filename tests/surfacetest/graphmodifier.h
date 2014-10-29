@@ -41,7 +41,7 @@ public:
         Map
     };
 
-    explicit GraphModifier(Q3DSurface *graph);
+    explicit GraphModifier(Q3DSurface *graph, QWidget *parentWidget);
     ~GraphModifier();
 
     void toggleSeries1(bool enabled);
@@ -112,8 +112,9 @@ public:
     void massiveTestAppendAndScroll();
     void testAxisReverse();
     void testDataOrdering();
-
     void setAspectRatio(int ratio);
+    void setHorizontalAspectRatio(int ratio);
+    void setSurfaceTexture(bool enabled);
 
 public slots:
     void changeShadowQuality(int quality);
@@ -121,6 +122,7 @@ public slots:
     void flipViews();
     void changeSelectionMode(int mode);
     void timeout();
+    void graphQueryTimeout();
 
     void handleAxisXChanged(QValue3DAxis *axis);
     void handleAxisYChanged(QValue3DAxis *axis);
@@ -131,6 +133,11 @@ public slots:
     void toggleAxisTitleFixed(bool enabled);
     void toggleXAscending(bool enabled);
     void toggleZAscending(bool enabled);
+    void togglePolar(bool enabled);
+    void setCameraTargetX(int value);
+    void setCameraTargetY(int value);
+    void setCameraTargetZ(int value);
+    void setGraphMargin(int value);
 
 private:
     void fillSeries();
@@ -184,6 +191,11 @@ private:
     float m_multiSampleOffsetX[4];
     float m_multiSampleOffsetZ[4];
     QSurfaceDataArray m_massiveTestCacheArray;
+    QVector3D m_cameraTarget;
+    QWidget *m_parentWidget;
+    QTimer m_graphPositionQueryTimer;
+    bool m_ascendingX;
+    bool m_ascendingZ;
 };
 
 #endif

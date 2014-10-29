@@ -10,9 +10,11 @@ uniform sampler2D textureSampler;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
 uniform highp vec4 lightColor;
+uniform highp float gradMin;
+uniform highp float gradHeight;
 
 void main() {
-    highp vec2 gradientUV = vec2(0.0, (coords_mdl.y + 1.0) / 2.0);
+    highp vec2 gradientUV = vec2(0.0, gradMin + coords_mdl.y * gradHeight);
     highp vec3 materialDiffuseColor = texture2D(textureSampler, gradientUV).xyz;
     highp vec3 materialAmbientColor = lightColor.rgb * ambientStrength * materialDiffuseColor;
     highp vec3 materialSpecularColor = lightColor.rgb;

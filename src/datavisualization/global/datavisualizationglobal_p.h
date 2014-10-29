@@ -52,6 +52,7 @@ static const float gridLineOffset = 0.0035f; // Offset for lifting grid lines of
 // y position is added to the minimum height (or can be thought to be that much above or below the camera)
 static const QVector3D defaultLightPos = QVector3D(0.0f, 0.5f, 0.0f);
 static const QVector3D zeroVector = QVector3D(0.0f, 0.0f, 0.0f);
+static const QVector3D oneVector = QVector3D(1.0f, 1.0f, 1.0f);
 static const QVector3D upVector = QVector3D(0.0f, 1.0f, 0.0f);
 static const QVector3D cameraDistanceVector = QVector3D(0.0f, 0.0f, cameraDistance);
 static const QQuaternion identityQuaternion;
@@ -69,6 +70,7 @@ static const GLfloat gradientTextureWidth = 2.0f;
 static const GLfloat uniformTextureHeight = 64.0f;
 static const GLfloat uniformTextureWidth = 2.0f;
 static const GLfloat labelMargin = 0.05f;
+static const GLfloat gridLineWidth = 0.005f;
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

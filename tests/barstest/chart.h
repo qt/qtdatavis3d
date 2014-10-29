@@ -20,7 +20,7 @@
 #define CHARTMODIFIER_H
 
 #include <QtDataVisualization/q3dbars.h>
-#include <QtDataVisualization/qabstract3dinputhandler.h>
+#include <QtDataVisualization/q3dinputhandler.h>
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QFont>
@@ -94,6 +94,13 @@ public:
     void addRemoveSeries();
     void testItemAndRowChanges();
     void reverseValueAxis(int enabled);
+    void setInputHandlerRotationEnabled(int enabled);
+    void setInputHandlerZoomEnabled(int enabled);
+    void setInputHandlerSelectionEnabled(int enabled);
+    void setInputHandlerZoomAtTargetEnabled(int enabled);
+    void setReflection(bool enabled);
+    void setReflectivity(int value);
+    void toggleCustomItem();
 
 public slots:
     void flipViews();
@@ -115,6 +122,11 @@ public slots:
     void triggerRotation();
     void handleValueAxisLabelsChanged();
     void handleFpsChange(qreal fps);
+    void setCameraTargetX(int value);
+    void setCameraTargetY(int value);
+    void setCameraTargetZ(int value);
+    void setFloorLevel(int value);
+    void setGraphMargin(int value);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -159,7 +171,7 @@ private:
     QValue3DAxis *m_currentAxis;
     bool m_negativeValuesOn;
     bool m_useNullInputHandler;
-    QAbstract3DInputHandler *m_defaultInputHandler;
+    Q3DInputHandler *m_defaultInputHandler;
     Q3DTheme *m_ownTheme;
     Q3DTheme *m_builtinTheme;
     QTimer m_insertRemoveTimer;
@@ -169,6 +181,7 @@ private:
     QTimer m_rotationTimer;
     QLabel *m_fpsLabel;
     QBar3DSeries *m_extraSeries;
+    QVector3D m_cameraTarget;
 };
 
 #endif

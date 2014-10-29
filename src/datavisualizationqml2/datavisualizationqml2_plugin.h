@@ -42,11 +42,13 @@
 #include "declarativeseries_p.h"
 #include "q3dtheme.h"
 #include "declarativetheme_p.h"
-#include "qabstract3dinputhandler.h"
+#include "q3dinputhandler.h"
+#include "qtouch3dinputhandler.h"
 #include "declarativecolor_p.h"
 #include "declarativescene_p.h"
 #include "qcustom3ditem.h"
 #include "qcustom3dlabel.h"
+#include "qcustom3dvolume.h"
 
 #include <QtQml/QQmlExtensionPlugin>
 
@@ -97,9 +99,12 @@ QML_DECLARE_TYPE(Q3DTheme)
 QML_DECLARE_TYPE(DeclarativeTheme3D)
 
 QML_DECLARE_TYPE(QAbstract3DInputHandler)
+QML_DECLARE_TYPE(Q3DInputHandler)
+QML_DECLARE_TYPE(QTouch3DInputHandler)
 
 QML_DECLARE_TYPE(QCustom3DItem)
 QML_DECLARE_TYPE(QCustom3DLabel)
+QML_DECLARE_TYPE(QCustom3DVolume)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

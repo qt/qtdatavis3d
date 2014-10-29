@@ -16,3 +16,5 @@ SOURCES += \
     $$PWD/qcategory3daxis.cpp \
     $$PWD/qvalue3daxisformatter.cpp \
     $$PWD/qlogvalue3daxisformatter.cpp
+
+INCLUDEPATH += $$PWD

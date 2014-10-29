@@ -25,6 +25,7 @@
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
+#include <QtCore/QLocale>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -50,6 +51,14 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
     Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged)
     Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged)
     Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged)
+    Q_PROPERTY(bool polar READ isPolar WRITE setPolar NOTIFY polarChanged)
+    Q_PROPERTY(float radialLabelOffset READ radialLabelOffset WRITE setRadialLabelOffset NOTIFY radialLabelOffsetChanged)
+    Q_PROPERTY(qreal horizontalAspectRatio READ horizontalAspectRatio WRITE setHorizontalAspectRatio NOTIFY horizontalAspectRatioChanged)
+    Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged)
+    Q_PROPERTY(qreal reflectivity READ reflectivity WRITE setReflectivity NOTIFY reflectivityChanged)
+    Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged)
+    Q_PROPERTY(QVector3D queriedGraphPosition READ queriedGraphPosition NOTIFY queriedGraphPositionChanged)
+    Q_PROPERTY(qreal margin READ margin WRITE setMargin NOTIFY marginChanged)
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
@@ -126,6 +135,7 @@ public:
     void removeCustomItem(QCustom3DItem *item);
     void removeCustomItemAt(const QVector3D &position);
     void releaseCustomItem(QCustom3DItem *item);
+    QList<QCustom3DItem *> customItems() const;
 
     int selectedLabelIndex() const;
     QAbstract3DAxis *selectedAxis() const;
@@ -150,6 +160,29 @@ public:
     void setOptimizationHints(OptimizationHints hints);
     OptimizationHints optimizationHints() const;
 
+    void setPolar(bool enable);
+    bool isPolar() const;
+
+    void setRadialLabelOffset(float offset);
+    float radialLabelOffset() const;
+
+    void setHorizontalAspectRatio(qreal ratio);
+    qreal horizontalAspectRatio() const;
+
+    void setReflection(bool enable);
+    bool isReflection() const;
+
+    void setReflectivity(qreal reflectivity);
+    qreal reflectivity() const;
+
+    void setLocale(const QLocale &locale);
+    QLocale locale() const;
+
+    QVector3D queriedGraphPosition() const;
+
+    void setMargin(qreal margin);
+    qreal margin() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
@@ -173,6 +206,14 @@ signals:
     void orthoProjectionChanged(bool enabled);
     void aspectRatioChanged(qreal ratio);
     void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    void polarChanged(bool enabled);
+    void radialLabelOffsetChanged(float offset);
+    void horizontalAspectRatioChanged(qreal ratio);
+    void reflectionChanged(bool enabled);
+    void reflectivityChanged(qreal reflectivity);
+    void localeChanged(const QLocale &locale);
+    void queriedGraphPositionChanged(const QVector3D &data);
+    void marginChanged(qreal margin);
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)

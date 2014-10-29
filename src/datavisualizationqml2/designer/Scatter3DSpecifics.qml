@@ -121,6 +121,78 @@ Column {
                     Layout.fillWidth: true
                 }
             }
+            Label {
+                text: qsTr("optimizationHints")
+                toolTip: qsTr("Optimization Hints")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                ComboBox {
+                    backendValue: backendValues.optimizationHints
+                    model: ["OptimizationDefault", "OptimizationStatic"]
+                    Layout.fillWidth: true
+                    scope: "AbstractGraph3D"
+                }
+            }
+            Label {
+                text: qsTr("polar")
+                toolTip: qsTr("Use Polar Coordinates")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                CheckBox {
+                    id: polarCheckbox
+                    backendValue: backendValues.polar
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("radialLabelOffset")
+                toolTip: qsTr("Radial Label Offset")
+                Layout.fillWidth: true
+                visible: polarCheckbox.checked
+            }
+            SecondColumnLayout {
+                visible: polarCheckbox.checked
+                SpinBox {
+                    backendValue: backendValues.radialLabelOffset
+                    minimumValue: 0.0
+                    maximumValue: 1.0
+                    stepSize: 0.01
+                    decimals: 1
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("horizontalAspectRatio")
+                toolTip: qsTr("Horizontal Aspect Ratio")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    backendValue: backendValues.horizontalAspectRatio
+                    minimumValue: 0.0
+                    maximumValue: 100.0
+                    stepSize: 0.01
+                    decimals: 2
+                    Layout.fillWidth: true
+                }
+            }
+            Label {
+                text: qsTr("margin")
+                toolTip: qsTr("Graph Margin")
+                Layout.fillWidth: true
+            }
+            SecondColumnLayout {
+                SpinBox {
+                    backendValue: backendValues.margin
+                    minimumValue: -1.0
+                    maximumValue: 100.0
+                    stepSize: 0.1
+                    decimals: 1
+                    Layout.fillWidth: true
+                }
+            }
         }
     }
 }

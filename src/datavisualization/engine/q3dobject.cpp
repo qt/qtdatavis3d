@@ -53,9 +53,7 @@ Q3DObject::~Q3DObject()
  */
 void Q3DObject::copyValuesFrom(const Q3DObject &source)
 {
-    d_ptr->m_position.setX(source.d_ptr->m_position.x());
-    d_ptr->m_position.setY(source.d_ptr->m_position.y());
-    d_ptr->m_position.setZ(source.d_ptr->m_position.z());
+    d_ptr->m_position = source.d_ptr->m_position;
     setDirty(true);
 }
 
@@ -74,6 +72,9 @@ Q3DScene *Q3DObject::parentScene()
  * \property Q3DObject::position
  *
  * This property contains the 3D position of the object.
+ *
+ * \note Currently setting this property has no effect, as the positions of Q3DObjects in the
+ * scene are handled internally.
  */
 QVector3D Q3DObject::position() const
 {
@@ -97,7 +98,7 @@ void Q3DObject::setDirty(bool dirty)
 {
     d_ptr->m_isDirty = dirty;
     if (parentScene())
-        parentScene()->d_ptr->m_sceneDirty = true;
+        parentScene()->d_ptr->markDirty();
 }
 
 /*!

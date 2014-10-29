@@ -53,6 +53,7 @@ public:
     void setMaxY(int max);
     void setMaxZ(int max);
     void setAspectRatio(int ratio);
+    void setHorizontalAspectRatio(int ratio);
     void start();
     void massiveDataTest();
     void massiveTestScroll();
@@ -90,9 +91,17 @@ public slots:
     void handleAxisZChanged(QValue3DAxis *axis);
     void handleFpsChange(qreal fps);
     void changeLabelRotation(int rotation);
+    void changeRadialLabelOffset(int offset);
     void toggleAxisTitleVisibility(bool enabled);
     void toggleAxisTitleFixed(bool enabled);
     void renderToImage();
+    void togglePolar(bool enable);
+    void toggleStatic(bool enable);
+    void toggleOrtho(bool enable);
+    void setCameraTargetX(int value);
+    void setCameraTargetY(int value);
+    void setCameraTargetZ(int value);
+    void setGraphMargin(int value);
 
 signals:
     void shadowQualityChanged(int quality);
@@ -113,6 +122,8 @@ private:
     QScatter3DSeries *m_targetSeries;
     QScatterDataArray m_massiveTestCacheArray;
     QLabel *m_fpsLabel;
+    QVector3D m_cameraTarget;
+
 };
 
 #endif

@@ -5,15 +5,17 @@ varying highp vec3 position_wrld;
 varying highp vec3 normal_cmr;
 varying highp vec3 eyeDirection_cmr;
 varying highp vec3 lightDirection_cmr;
+varying highp vec4 shadowCoord;
 
 uniform highp sampler2DShadow shadowMap;
 uniform sampler2D textureSampler;
-varying highp vec4 shadowCoord;
 uniform highp vec3 lightPosition_wrld;
 uniform highp float lightStrength;
 uniform highp float ambientStrength;
 uniform highp float shadowQuality;
 uniform highp vec4 lightColor;
+uniform highp float gradMin;
+uniform highp float gradHeight;
 
 highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
                                       vec2(0.94558609, -0.76890725),
@@ -33,7 +35,7 @@ highp vec2 poissonDisk[16] = vec2[16](vec2(-0.94201624, -0.39906216),
                                       vec2(0.14383161, -0.14100790));
 
 void main() {
-    highp vec2 gradientUV = vec2(0.0, (coords_mdl.y + 1.0) / 2.0);
+    highp vec2 gradientUV = vec2(0.0, gradMin + coords_mdl.y * gradHeight);
     highp vec3 materialDiffuseColor = texture2D(textureSampler, gradientUV).xyz;
     highp vec3 materialAmbientColor = lightColor.rgb * ambientStrength * materialDiffuseColor;
     highp vec3 materialSpecularColor = lightColor.rgb;
@@ -47,7 +49,7 @@ void main() {
     highp float cosAlpha = clamp(dot(E, R), 0.0, 1.0);
 
     highp float bias = 0.005 * tan(acos(cosTheta));
-    bias = clamp(bias, 0.0, 0.01);
+    bias = clamp(bias, 0.001, 0.01);
 
     vec4 shadCoords = shadowCoord;
     shadCoords.z -= bias;

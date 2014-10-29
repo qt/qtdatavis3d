@@ -1,5 +1,5 @@
 # Target can't start with 'Qt' as it gets major version number inserted into it in that case,
-# which we don't want. Exception is mac bundles, where the target name must match the module name
+# which we don't want. Exception is OS X bundles, where the target name must match the module name
 mac:CONFIG(shared, static|shared):contains(QT_CONFIG, qt_framework) {
     TARGET = QtDataVisualization
 } else {
@@ -7,7 +7,8 @@ mac:CONFIG(shared, static|shared):contains(QT_CONFIG, qt_framework) {
 }
 message($$QT_CONFIG)
 
-QT = core gui
+QT += core gui
+osx: QT +=  gui-private
 DEFINES += QT_DATAVISUALIZATION_LIBRARY
 
 # Fix exports in static builds for applications linking datavisualization module
@@ -19,9 +20,8 @@ QMAKE_DOCS = $$PWD/doc/qtdatavisualization.qdocconf
 
 load(qt_module)
 
-include($$PWD/common.pri)
-include($$PWD/engine/engine.pri)
 include($$PWD/global/global.pri)
+include($$PWD/engine/engine.pri)
 include($$PWD/utils/utils.pri)
 include($$PWD/theme/theme.pri)
 include($$PWD/axis/axis.pri)

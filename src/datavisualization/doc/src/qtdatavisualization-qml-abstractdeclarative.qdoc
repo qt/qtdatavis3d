@@ -153,6 +153,32 @@
  */
 
 /*!
+ * \qmlproperty bool AbstractGraph3D::polar
+ * \since QtDataVisualization 1.2
+ *
+ * If \c {true}, the horizontal axes are changed into polar axes. The X axis becomes the
+ * angular axis and the Z axis becomes the radial axis.
+ * Polar mode is not available for bar graphs.
+ *
+ * Defaults to \c{false}.
+ *
+ * \sa orthoProjection, radialLabelOffset
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::radialLabelOffset
+ * \since QtDataVisualization 1.2
+ *
+ * This property specifies the normalized horizontal offset for the axis labels of the radial
+ * polar axis. The value 0.0 indicates the labels should be drawn next to the 0-angle angular
+ * axis grid line. The value 1.0 indicates the labels are drawn on their normal place at the edge
+ * of the graph background.
+ * This property is ignored if polar property value is \c{false}. Defaults to 1.0.
+ *
+ * \sa polar
+ */
+
+/*!
  * \qmlmethod void AbstractGraph3D::clearSelection()
  * Clears selection from all attached series.
  */
@@ -289,22 +315,123 @@
  * \qmlproperty real AbstractGraph3D::aspectRatio
  * \since QtDataVisualization 1.1
  *
- * Aspect ratio of the graph data. This is the ratio of data scaling between horizontal and
- * vertical axes. Defaults to \c{2.0}.
+ * The aspect ratio is the ratio of the graph scaling between the longest axis on the horizontal
+ * plane and the Y-axis. Defaults to \c{2.0}.
  *
  * \note Has no effect on Bars3D.
+ *
+ * \sa horizontalAspectRatio
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::horizontalAspectRatio
+ * \since QtDataVisualization 1.2
+ *
+ * The horizontal aspect ratio is the ratio of the graph scaling between the X and Z axes.
+ * Value of 0.0 indicates automatic scaling according to axis ranges.
+ * Defaults to \c{0.0}.
+ *
+ * \note Has no effect on Bars3D, which handles scaling on the horizontal plane via
+ * \l{Bars3D::barThickness}{barThickness} and \l{Bars3D::barSpacing}{barSpacing} properties.
+ * Polar graphs also ignore this property.
+ *
+ * \sa aspectRatio, polar, Bars3D::barThickness, Bars3D::barSpacing
  */
 
 /*!
  * \qmlproperty AbstractGraph3D.OptimizationHints AbstractGraph3D::optimizationHints
- * \since Qt Data Visualization 1.1
+ * \since QtDataVisualization 1.1
  *
- * Defines if the rendering optimization is default or static. Default mode provides the full feature set at
- * reasonable performance. Static is a beta level feature and currently supports only a subset of the
- * features on the Scatter graph. Missing features are object gradient for mesh objects, both gradients
- * for points, and diffuse and specular color on rotations. At this point static is intended just for
- * introducing a new feature. It optimizes graph rendering and is ideal for large non-changing data
- * sets. It is slower with dynamic data changes and item rotations. Selection is not optimized, so using it
- * with massive data sets is not advisable.
- * Defaults to \c{OptimizationDefault}
+ * Defines if the rendering optimization is default or static. Default mode provides the full
+ * feature set at reasonable performance. Static mode optimizes graph rendering and is ideal for
+ * large non-changing data sets. It is slower with dynamic data changes and item rotations.
+ * Selection is not optimized, so using it with massive data sets is not advisable.
+ * Static works only on the Scatter graph.
+ * Defaults to \c{OptimizationDefault}.
+ *
+ * \note On some environments, large graphs using static optimization may not render, because
+ * all of the items are rendered using a single draw call, and different graphics drivers have
+ * different maximum vertice counts per call that they support.
+ * This is mostly an issue on 32bit and/or OpenGL ES2 platforms.
+ * To work around this issue, choose an item mesh with low vertex count or use the point mesh.
+ *
+ * \sa Abstract3DSeries::mesh
+ */
+
+/*!
+ * \qmlproperty bool AbstractGraph3D::reflection
+ * \since QtDataVisualization 1.2
+ *
+ * Sets floor reflections on or off. Defaults to \c{false}.
+ *
+ * \note Affects only Bars3D.
+ *
+ * \note In Bars3D graphs holding both positive and negative values, reflections are not supported
+ * for custom items that intersect the floor plane. In that case, reflections should be turned off
+ * to avoid incorrect rendering.
+ *
+ * \sa reflectivity
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::reflectivity
+ * \since QtDataVisualization 1.2
+ *
+ * Adjusts floor reflectivity, larger number being more reflective. Valid range is \c{[0...1]}.
+ * Defaults to \c{0.5}.
+ *
+ * \note Affects only Bars3D.
+ *
+ * \sa reflection
+ */
+
+/*!
+ * \qmlproperty locale AbstractGraph3D::locale
+ * \since QtDataVisualization 1.2
+ *
+ * Sets the locale used for formatting various numeric labels.
+ * Defaults to \c{"C"} locale.
+ *
+ * \sa ValueAxis3D::labelFormat
+ */
+
+/*!
+ * \qmlproperty vector3d AbstractGraph3D::queriedGraphPosition
+ * \since QtDataVisualization 1.2
+ *
+ * This read-only property contains the latest graph position values along each axis queried using
+ * Scene3D::graphPositionQuery. The values are normalized to range \c{[-1, 1]}.
+ * If the queried position was outside the graph bounds, the values
+ * will not reflect the real position, but will instead be some undefined position outside
+ * the range \c{[-1, 1]}. The value will be undefined before any queries are made.
+ *
+ * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * consistent, the queries are always done against the inner sides of an invisible box surrounding
+ * the graph.
+ *
+ * \note Bar graphs only allow querying graph position at the graph floor level,
+ * so the Y-value is always zero for bar graphs and the valid queries can be only made at
+ * screen positions that contain the floor of the graph.
+ *
+ * \sa Scene3D::graphPositionQuery
+ */
+
+/*!
+ * \qmlproperty real AbstractGraph3D::margin
+ * \since QtDataVisualization 1.2
+ *
+ * This property contains the absolute value used for graph margin. The graph margin is the space
+ * left between the edge of the plottable graph area and the edge of the graph background.
+ * If the margin value is negative, the margins are determined automatically and can vary according
+ * to size of the items in the series and the type of the graph.
+ * The value is interpreted as a fraction of Y-axis range, provided the graph aspect ratios have
+ * not beed changed from the defaults.
+ * Defaults to \c{-1.0}.
+ *
+ * \note Having smaller than the automatically determined margin on scatter graph can cause
+ * the scatter items at the edges of the graph to overlap with the graph background.
+ *
+ * \note On scatter and surface graphs, if the margin is comparatively small to the axis label
+ * size, the positions of the edge labels of the axes are adjusted to avoid overlap with
+ * the edge labels of the neighboring axes.
  */

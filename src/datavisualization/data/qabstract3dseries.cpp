@@ -657,6 +657,9 @@ QAbstract3DSeriesPrivate::QAbstract3DSeriesPrivate(QAbstract3DSeries *q,
       m_mesh(QAbstract3DSeries::MeshCube),
       m_meshSmooth(false),
       m_colorStyle(Q3DTheme::ColorStyleUniform),
+      m_baseColor(Qt::black),
+      m_singleHighlightColor(Qt::black),
+      m_multiHighlightColor(Qt::black),
       m_itemLabelDirty(true),
       m_itemLabelVisible(true)
 {

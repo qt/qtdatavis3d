@@ -37,7 +37,8 @@ SeriesRenderCache::SeriesRenderCache(QAbstract3DSeries *series, Abstract3DRender
       m_valid(false),
       m_visible(false),
       m_renderer(renderer),
-      m_objectDirty(true)
+      m_objectDirty(true),
+      m_staticObjectUVDirty(false)
 {
 }
 
@@ -91,9 +92,8 @@ void SeriesRenderCache::populate(bool newSeries)
                 meshFileName = QStringLiteral(":/defaultMeshes/arrow");
                 break;
             case QAbstract3DSeries::MeshPoint:
-#if defined(QT_OPENGL_ES_2)
-                qWarning("QAbstract3DSeries::MeshPoint is not fully supported on OpenGL ES2");
-#endif
+                if (Utils::isOpenGLES())
+                    qWarning("QAbstract3DSeries::MeshPoint is not fully supported on OpenGL ES2");
                 break;
             default:
                 // Default to cube

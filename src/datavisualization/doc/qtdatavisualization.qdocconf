@@ -6,7 +6,7 @@ include($QT_INSTALL_DOCS/global/qt-html-templates-offline.qdocconf)
 
 project             = QtDataVisualization
 description         = Qt Data Visualization Reference Documentation
-version             = 1.1.0
+version             = 1.2.0
 
 exampledirs += ../../../examples/datavisualization \
                snippets
@@ -27,14 +27,14 @@ indexes +=  $QT_INSTALL_DOCS/qtcore/qtcore.index \
 qhp.projects                            = QtDataVisualization
 
 qhp.QtDataVisualization.file            = qtdatavisualization.qhp
-qhp.QtDataVisualization.namespace       = com.digia.qtdatavisualization.110
+qhp.QtDataVisualization.namespace       = com.digia.qtdatavisualization.120
 qhp.QtDataVisualization.virtualFolder   = qtdatavisualization
 qhp.QtDataVisualization.indexTitle      = Qt Data Visualization
 qhp.QtDataVisualization.indexRoot       =
 
-qhp.QtDataVisualization.filterAttributes                        = qtdatavisualization 1.1.0 qtrefdoc
-qhp.QtDataVisualization.customFilters.Qt.name                   = QtDataVisualization 1.1.0
-qhp.QtDataVisualization.customFilters.Qt.filterAttributes       = qtdatavisualization 1.1.0
+qhp.QtDataVisualization.filterAttributes                        = qtdatavisualization 1.2.0 qtrefdoc
+qhp.QtDataVisualization.customFilters.Qt.name                   = QtDataVisualization 1.2.0
+qhp.QtDataVisualization.customFilters.Qt.filterAttributes       = qtdatavisualization 1.2.0
 qhp.QtDataVisualization.subprojects                             = gettingstarted examples classes types
 qhp.QtDataVisualization.subprojects.gettingstarted.title        = Getting Started
 qhp.QtDataVisualization.subprojects.gettingstarted.indexTitle   = Qt Data Visualization Getting Started
@@ -50,7 +50,7 @@ qhp.QtDataVisualization.subprojects.classes.selectors           = class
 qhp.QtDataVisualization.subprojects.classes.sortPages           = true
 qhp.QtDataVisualization.subprojects.types.title                 = QML Types
 qhp.QtDataVisualization.subprojects.types.indexTitle            = Qt Data Visualization QML Types
-qhp.QtDataVisualization.subprojects.types.selectors             = fake:qmlclass
+qhp.QtDataVisualization.subprojects.types.selectors             = qmlclass
 qhp.QtDataVisualization.subprojects.types.sortPages             = true
 
 navigation.landingpage = Qt Data Visualization
