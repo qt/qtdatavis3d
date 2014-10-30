@@ -45,7 +45,7 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
                               float xMin, float xMax, float yMin, float yMax,
                               float zMin, float zMax)
 {
-    if (!cacheCount)
+    if (!cacheCount || !rowCount || !columnCount)
         return;
 
     clearData();

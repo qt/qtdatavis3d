@@ -150,7 +150,7 @@ Item {
                             maximumValue: minimumValue * 10
                             stepSize: mainView.sampleCache
                             updateValueWhileDragging: false
-                            value: minimumValue * 2
+                            Component.onCompleted: value = minimumValue * 2
                         }
 
                         Rectangle {
