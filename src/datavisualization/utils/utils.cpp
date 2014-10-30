@@ -21,7 +21,7 @@
 
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLContext>
-#include <QtGui/QWindow>
+#include <QtGui/QOffscreenSurface>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -327,11 +327,10 @@ bool Utils::isOpenGLES()
 void Utils::resolveStatics()
 {
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
-    QWindow *dummySurface = 0;
+    QOffscreenSurface *dummySurface = 0;
     if (!ctx) {
         QSurfaceFormat surfaceFormat = qDefaultSurfaceFormat();
-        dummySurface = new QWindow();
-        dummySurface->setSurfaceType(QWindow::OpenGLSurface);
+        dummySurface = new QOffscreenSurface();
         dummySurface->setFormat(surfaceFormat);
         dummySurface->create();
         ctx = new QOpenGLContext;

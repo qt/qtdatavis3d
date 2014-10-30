@@ -39,7 +39,7 @@
 #include "seriesrendercache_p.h"
 #include "customrenderitem_p.h"
 
-class QSurface;
+class QOffscreenSurface;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -327,7 +327,7 @@ protected:
     QOpenGLFunctions_2_1 *m_funcs_2_1;  // Not owned
 #endif
     QPointer<QOpenGLContext> m_context; // Not owned
-    QWindow *m_dummySurfaceAtDelete;
+    QOffscreenSurface *m_dummySurfaceAtDelete;
     bool m_isOpenGLES;
 
 private:

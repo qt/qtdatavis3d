@@ -28,7 +28,7 @@
 #include "scatter3drenderer_p.h"
 
 #include <QtCore/qmath.h>
-#include <QtGui/QWindow>
+#include <QtGui/QOffscreenSurface>
 #include <QtCore/QThread>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -1789,8 +1789,7 @@ void Abstract3DRenderer::fixContextBeforeDelete()
     // Otherwise we expect it to be our shared context, so we can use it for cleanup.
     if (!QOpenGLContext::currentContext() && !m_context.isNull()
             && QThread::currentThread() == this->thread()) {
-        m_dummySurfaceAtDelete = new QWindow();
-        m_dummySurfaceAtDelete->setSurfaceType(QWindow::OpenGLSurface);
+        m_dummySurfaceAtDelete = new QOffscreenSurface();
         m_dummySurfaceAtDelete->setFormat(m_context->format());
         m_dummySurfaceAtDelete->create();
 
