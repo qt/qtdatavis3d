@@ -54,10 +54,9 @@ GLuint LabelItem::textureId() const
 
 void LabelItem::clear()
 {
-    if (m_textureId) {
+    if (m_textureId && QOpenGLContext::currentContext())
         QOpenGLContext::currentContext()->functions()->glDeleteTextures(1, &m_textureId);
-        m_textureId = 0;
-    }
+    m_textureId = 0;
     m_size = QSize(0, 0);
 }
 
