@@ -28,7 +28,7 @@ LabelItem::LabelItem()
 
 LabelItem::~LabelItem()
 {
-    QOpenGLContext::currentContext()->functions()->glDeleteTextures(1, &m_textureId);
+    clear();
 }
 
 void LabelItem::setSize(const QSize &size)
