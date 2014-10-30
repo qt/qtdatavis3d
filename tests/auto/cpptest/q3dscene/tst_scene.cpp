@@ -136,7 +136,7 @@ void tst_scene::subViews()
 
     QCoreApplication::processEvents();
 
-    QCOMPARE(scene->viewport(), QRect(0, 0, 200, 200));
+    QTRY_COMPARE(scene->viewport(), QRect(0, 0, 200, 200));
     QCOMPARE(scene->primarySubViewport(), QRect(0, 0, 200, 200));
     QCOMPARE(scene->secondarySubViewport(), QRect(0, 0, 0, 0));
 
