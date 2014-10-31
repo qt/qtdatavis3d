@@ -57,7 +57,7 @@ GLStateStore::GLStateStore(QOpenGLContext *context, QObject *parent) :
     m_vertexAttribArrayTypes.reset(new GLint[maxVertexAttribs]);
     m_vertexAttribArrayNormalized.reset(new GLint[maxVertexAttribs]);
     m_vertexAttribArrayStrides.reset(new GLint[maxVertexAttribs]);
-    m_vertexAttribArrayOffsets.reset(new GLint[maxVertexAttribs]);
+    m_vertexAttribArrayOffsets.reset(new void *[maxVertexAttribs]);
 
     initGLDefaultState();
 }
@@ -336,7 +336,7 @@ void GLStateStore::restoreGLState()
                               m_vertexAttribArrayTypes[i],
                               m_vertexAttribArrayNormalized[i],
                               m_vertexAttribArrayStrides[i],
-                              (void *) m_vertexAttribArrayOffsets[i]);
+                              m_vertexAttribArrayOffsets[i]);
     }
 
     glBindBuffer(GL_ARRAY_BUFFER, m_boundArrayBuffer);
