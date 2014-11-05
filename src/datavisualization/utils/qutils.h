@@ -64,11 +64,13 @@ inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
         delete dummySurface;
     }
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
     // We support only ES2 emulation with software renderer for now
     if (QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
         qWarning("Only OpenGL ES2 emulation is available for software rendering.");
         isES = true;
     }
+#endif
 
     if (isES) {
         // For ES2 only attributes
