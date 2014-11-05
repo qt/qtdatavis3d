@@ -329,7 +329,7 @@ void Utils::resolveStatics()
     QOpenGLContext *ctx = QOpenGLContext::currentContext();
     QOffscreenSurface *dummySurface = 0;
     if (!ctx) {
-        QSurfaceFormat surfaceFormat = qDefaultSurfaceFormat();
+        QSurfaceFormat surfaceFormat;
         dummySurface = new QOffscreenSurface();
         dummySurface->setFormat(surfaceFormat);
         dummySurface->create();
@@ -353,6 +353,12 @@ void Utils::resolveStatics()
         ctx->doneCurrent();
         delete ctx;
         delete dummySurface;
+    }
+
+    // We support only ES2 emulation with software renderer for now
+    if (QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
+        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
+        isES = true;
     }
 
     staticsResolved = true;
