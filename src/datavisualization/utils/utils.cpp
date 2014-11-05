@@ -89,7 +89,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         // make a label with large empty space
         uint testWidth = getNearestPowerOfTwo(valueStrWidth + prePadding) >> 1;
         int diffToFit = (valueStrWidth + prePadding) - testWidth;
-        int maxSqueeze = int((valueStrWidth + prePadding) * 0.1f);
+        int maxSqueeze = int((valueStrWidth + prePadding) * 0.25f);
         if (diffToFit < maxSqueeze && maxTextureSize > GLint(testWidth))
             targetWidth = testWidth;
     }
