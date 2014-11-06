@@ -71,7 +71,7 @@ public:
     QScopedArrayPointer<GLint> m_vertexAttribArrayTypes;
     QScopedArrayPointer<GLint> m_vertexAttribArrayNormalized;
     QScopedArrayPointer<GLint> m_vertexAttribArrayStrides;
-    QScopedArrayPointer<GLint> m_vertexAttribArrayOffsets;
+    QScopedArrayPointer<void *> m_vertexAttribArrayOffsets;
 
     GLint m_activeTexture;
     GLint m_texBinding2D;

@@ -16,18 +16,26 @@
 **
 ****************************************************************************/
 
-//function createData(base) {
-//    for (var z = 0; z < 30; z++) {
-//        for (var x = 0; x < 30; x++) {
-//            var angle = (((z - 16) * (x - 16)) / 144.0) * 1.57;
-//            var y = Math.sin(angle + base);
-//            dataModel.append({"z": z, "x": x, "y": y});
-//        }
-//    }
-//}
+#ifndef DATAGENERATOR_H
+#define DATAGENERATOR_H
 
-function createData(base) {
-    for (var i = 0; i < base; i++) {
-        dataModel.append({"z": Math.random(), "x": Math.random(), "y": Math.random()});
-    }
-}
+#include <QtDataVisualization/QScatter3DSeries>
+
+using namespace QtDataVisualization;
+
+class DataGenerator  : public QObject
+{
+    Q_OBJECT
+public:
+    DataGenerator(QObject *parent = 0);
+    virtual ~DataGenerator();
+
+public slots:
+    void generateData(QScatter3DSeries *series, uint count);
+    void add(QScatter3DSeries *series, uint count);
+
+private:
+    QScatter3DSeries m_series;
+};
+
+#endif // DATAGENERATOR_H

@@ -58,7 +58,7 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
 
     QImage texImage = image;
 
-    if (!Utils::isOpenGLES()) {
+    if (Utils::isOpenGLES()) {
         GLuint imageWidth = Utils::getNearestPowerOfTwo(image.width());
         GLuint imageHeight = Utils::getNearestPowerOfTwo(image.height());
         if (smoothScale) {

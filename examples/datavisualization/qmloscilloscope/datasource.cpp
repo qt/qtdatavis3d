@@ -45,7 +45,7 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
                               float xMin, float xMax, float yMin, float yMax,
                               float zMin, float zMax)
 {
-    if (!cacheCount)
+    if (!cacheCount || !rowCount || !columnCount)
         return;
 
     clearData();
@@ -84,7 +84,7 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
                 float colWave = float(qSin((2.0 * M_PI * colMod) - (1.0 / 2.0 * M_PI)) + 1.0);
                 float y = (colWave * ((float(qSin(rowColWaveAngleMul * colMod) + 1.0))))
                         * rowColWaveMul
-                        + (0.15f * float(rand()) / float(RAND_MAX)) * yRangeMod;
+                        + (0.15f * float(qrand()) / float(RAND_MAX)) * yRangeMod;
 
                 int index = k + cacheIndexAdjustment;
                 if (index >= columnCount) {

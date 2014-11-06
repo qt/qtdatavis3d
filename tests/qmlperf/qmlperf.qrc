@@ -1,6 +1,5 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/qmlperf/main.qml</file>
-        <file>qml/qmlperf/script.js</file>
     </qresource>
 </RCC>

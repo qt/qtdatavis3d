@@ -16,8 +16,11 @@
 **
 ****************************************************************************/
 
+#include "datagenerator.h"
+
 #include <QtGui/QGuiApplication>
 #include <QtCore/QDir>
+#include <QtQml/QQmlContext>
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlEngine>
 
@@ -37,6 +40,9 @@ int main(int argc, char *argv[])
     viewer.engine()->addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
                                       QString::fromLatin1("qml")));
     QObject::connect(viewer.engine(), &QQmlEngine::quit, &viewer, &QWindow::close);
+
+    DataGenerator dataGenerator;
+    viewer.rootContext()->setContextProperty("dataGenerator", &dataGenerator);
 
     viewer.setTitle(QStringLiteral("QML Performance"));
     viewer.setSource(QUrl("qrc:/qml/qmlperf/main.qml"));

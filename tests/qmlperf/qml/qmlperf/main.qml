@@ -20,7 +20,6 @@ import QtQuick 2.1
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.0
 import QtDataVisualization 1.1
-import "script.js" as Script
 import "."
 
 Rectangle {
@@ -29,7 +28,7 @@ Rectangle {
     height: 1024
 
     property var itemCount: 1000.0
-    property var addItems: 1000.0
+    property var addItems: 500.0
 
     Button {
         id: changeButton
@@ -90,7 +89,7 @@ Rectangle {
         text: "Add"
         onClicked: {
             itemCount = itemCount + addItems;
-            Script.createData(addItems);
+            dataGenerator.add(scatterSeries, addItems);
         }
     }
 
@@ -101,11 +100,6 @@ Rectangle {
         anchors.top: changeButton.bottom
         anchors.left: mainview.left
         state: "meshsphere"
-
-        ListModel {
-            id: dataModel
-            Component.onCompleted: Script.createData(itemCount)
-        }
 
         Scatter3D {
             id: scatterPlot
@@ -134,13 +128,9 @@ Rectangle {
             Scatter3DSeries {
                 id: scatterSeries
                 mesh: Abstract3DSeries.MeshSphere
-                ItemModelScatterDataProxy {
-                    itemModel: dataModel
-                    xPosRole: "x"
-                    yPosRole: "y"
-                    zPosRole: "z"
-                }
             }
+
+            Component.onCompleted: dataGenerator.generateData(scatterSeries, itemCount);
         }
 
         states: [

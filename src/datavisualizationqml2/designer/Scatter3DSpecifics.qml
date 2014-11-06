@@ -159,7 +159,7 @@ Column {
                     minimumValue: 0.0
                     maximumValue: 1.0
                     stepSize: 0.01
-                    decimals: 1
+                    decimals: 2
                     Layout.fillWidth: true
                 }
             }

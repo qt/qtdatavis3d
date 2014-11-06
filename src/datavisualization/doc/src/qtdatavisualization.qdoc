@@ -338,6 +338,8 @@
             "QT += datavisualization" in the pro file. This is because Qt Data Visualization
             QML plugin has a dependency to Qt Data Visualization C++ library, which Qt Creator
             doesn't automatically add to the deployment package.
+        \li Only OpenGL ES2 emulation is available for software renderer (that is, when using
+            QCoreApplication::setAttribute(Qt::AA_UseSoftwareOpenGL))
     \endlist
 */
 
