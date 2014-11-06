@@ -120,9 +120,9 @@ void tst_proxy::initializeProperties()
 {
     QVERIFY(m_proxy);
 
-    QTableWidget *table = new QTableWidget();
+    QTableWidget table;
 
-    m_proxy->setItemModel(table->model());
+    m_proxy->setItemModel(table.model());
     m_proxy->setRotationRole("rotation");
     m_proxy->setRotationRolePattern(QRegExp("/-/"));
     m_proxy->setRotationRoleReplace("\\\\1");
@@ -153,26 +153,26 @@ void tst_proxy::initializeProperties()
 
 void tst_proxy::addModel()
 {
-    QTableWidget *table = new QTableWidget();
+    QTableWidget table;
     QStringList rows;
     rows << "row 1";
     QStringList columns;
     columns << "col 1";
     const char *values[1][2] = {{"0/0/5.5/30", "0/0/10.5/30"}};
 
-    table->setRowCount(2);
-    table->setColumnCount(1);
+    table.setRowCount(2);
+    table.setColumnCount(1);
 
     for (int col = 0; col < columns.size(); col++) {
         for (int row = 0; row < rows.size(); row++) {
-            QModelIndex index = table->model()->index(col, row);
-            table->model()->setData(index, values[col][row]);
+            QModelIndex index = table.model()->index(col, row);
+            table.model()->setData(index, values[col][row]);
         }
     }
 
-    m_proxy->setItemModel(table->model());
-    m_proxy->setXPosRole(table->model()->roleNames().value(Qt::DisplayRole));
-    m_proxy->setZPosRole(table->model()->roleNames().value(Qt::DisplayRole));
+    m_proxy->setItemModel(table.model());
+    m_proxy->setXPosRole(table.model()->roleNames().value(Qt::DisplayRole));
+    m_proxy->setZPosRole(table.model()->roleNames().value(Qt::DisplayRole));
     m_proxy->setXPosRolePattern(QRegExp(QStringLiteral("^(\\d*)\\/(\\d*)\\/\\d*[\\.\\,]?\\d*\\/\\d*[\\.\\,]?\\d*$")));
     m_proxy->setXPosRoleReplace(QStringLiteral("\\2"));
     m_proxy->setYPosRolePattern(QRegExp(QStringLiteral("^\\d*(\\/)(\\d*)\\/(\\d*[\\.\\,]?\\d*)\\/\\d*[\\.\\,]?\\d*$")));
@@ -187,6 +187,9 @@ void tst_proxy::addModel()
 
     QCOMPARE(m_proxy->itemCount(), 2);
     QVERIFY(m_proxy->series());
+
+    delete series;
+    m_proxy = 0; // proxy gets deleted with series
 }
 
 QTEST_MAIN(tst_proxy)

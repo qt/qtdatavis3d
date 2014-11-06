@@ -66,7 +66,9 @@ void tst_proxy::construct()
     QVERIFY(proxy);
     delete proxy;
 
-    proxy = new QHeightMapSurfaceDataProxy(QImage(QSize(10, 10), QImage::Format_ARGB32));
+    QImage image(QSize(10, 10), QImage::Format_ARGB32);
+    image.fill(0);
+    proxy = new QHeightMapSurfaceDataProxy(image);
     QVERIFY(proxy);
     QCoreApplication::processEvents();
     QCOMPARE(proxy->columnCount(), 10);

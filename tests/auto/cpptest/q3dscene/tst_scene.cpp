@@ -127,12 +127,12 @@ void tst_scene::invalidProperties()
 
 void tst_scene::subViews()
 {
-    Q3DBars *graph = new Q3DBars();
-    graph->setPosition(QPoint(0, 0));
-    graph->setWidth(200);
-    graph->setHeight(200);
+    Q3DBars graph;
+    graph.setPosition(QPoint(0, 0));
+    graph.setWidth(200);
+    graph.setHeight(200);
 
-    Q3DScene *scene = graph->scene();
+    Q3DScene *scene = graph.scene();
 
     QCoreApplication::processEvents();
 

@@ -81,7 +81,8 @@ void tst_scatter::construct()
     QVERIFY(graph);
     delete graph;
 
-    graph = new Q3DScatter(new QSurfaceFormat());
+    QSurfaceFormat format;
+    graph = new Q3DScatter(&format);
     QVERIFY(graph);
     delete graph;
 }
@@ -207,6 +208,8 @@ void tst_scatter::removeSeries()
     m_graph->addSeries(series);
     m_graph->removeSeries(series);
     QCOMPARE(m_graph->seriesList().length(), 0);
+
+    delete series;
 }
 
 void tst_scatter::removeMultipleSeries()
@@ -231,6 +234,10 @@ void tst_scatter::removeMultipleSeries()
 
     m_graph->removeSeries(series3);
     QCOMPARE(m_graph->seriesList().length(), 0);
+
+    delete series;
+    delete series2;
+    delete series3;
 }
 
 QTEST_MAIN(tst_scatter)

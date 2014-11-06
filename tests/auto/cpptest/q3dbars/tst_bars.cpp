@@ -96,7 +96,8 @@ void tst_bars::construct()
     QVERIFY(graph);
     delete graph;
 
-    graph = new Q3DBars(new QSurfaceFormat());
+    QSurfaceFormat format;
+    graph = new Q3DBars(&format);
     QVERIFY(graph);
     delete graph;
 }
@@ -250,6 +251,7 @@ void tst_bars::removeSeries()
     m_graph->addSeries(series);
     m_graph->removeSeries(series);
     QCOMPARE(m_graph->seriesList().length(), 0);
+    delete series;
 }
 
 void tst_bars::removeMultipleSeries()
@@ -276,6 +278,10 @@ void tst_bars::removeMultipleSeries()
 
     m_graph->removeSeries(series3);
     QCOMPARE(m_graph->seriesList().length(), 0);
+
+    delete series;
+    delete series2;
+    delete series3;
 }
 
 // The following tests are not required for scatter or surface, as they are handled identically
