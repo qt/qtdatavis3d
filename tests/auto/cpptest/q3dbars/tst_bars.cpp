@@ -2,17 +2,17 @@
 **
 ** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
-** For any questions to Digia, please use contact form at http://qt.digia.com
+** For any questions to Digia, please use contact form at http://qt.io
 **
-** This file is part of the QtDataVisualization module.
+** This file is part of the Qt Data Visualization module.
 **
-** Licensees holding valid Qt Enterprise licenses may use this file in
-** accordance with the Qt Enterprise License Agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.
+** Licensees holding valid commercial license for Qt may use this file in
+** accordance with the Qt License Agreement provided with the Software
+** or, alternatively, in accordance with the terms contained in a written
+** agreement between you and Digia.
 **
 ** If you have questions regarding the use of this file, please use
-** contact form at http://qt.digia.com
+** contact form at http://qt.io
 **
 ****************************************************************************/
 
@@ -96,7 +96,8 @@ void tst_bars::construct()
     QVERIFY(graph);
     delete graph;
 
-    graph = new Q3DBars(new QSurfaceFormat());
+    QSurfaceFormat format;
+    graph = new Q3DBars(&format);
     QVERIFY(graph);
     delete graph;
 }
@@ -250,6 +251,7 @@ void tst_bars::removeSeries()
     m_graph->addSeries(series);
     m_graph->removeSeries(series);
     QCOMPARE(m_graph->seriesList().length(), 0);
+    delete series;
 }
 
 void tst_bars::removeMultipleSeries()
@@ -276,6 +278,10 @@ void tst_bars::removeMultipleSeries()
 
     m_graph->removeSeries(series3);
     QCOMPARE(m_graph->seriesList().length(), 0);
+
+    delete series;
+    delete series2;
+    delete series3;
 }
 
 // The following tests are not required for scatter or surface, as they are handled identically

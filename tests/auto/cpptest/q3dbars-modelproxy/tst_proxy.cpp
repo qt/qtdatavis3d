@@ -2,17 +2,17 @@
 **
 ** Copyright (C) 2014 Digia Plc
 ** All rights reserved.
-** For any questions to Digia, please use contact form at http://qt.digia.com
+** For any questions to Digia, please use contact form at http://qt.io
 **
-** This file is part of the QtDataVisualization module.
+** This file is part of the Qt Data Visualization module.
 **
-** Licensees holding valid Qt Enterprise licenses may use this file in
-** accordance with the Qt Enterprise License Agreement provided with the
-** Software or, alternatively, in accordance with the terms contained in
-** a written agreement between you and Digia.
+** Licensees holding valid commercial license for Qt may use this file in
+** accordance with the Qt License Agreement provided with the Software
+** or, alternatively, in accordance with the terms contained in a written
+** agreement between you and Digia.
 **
 ** If you have questions regarding the use of this file, please use
-** contact form at http://qt.digia.com
+** contact form at http://qt.io
 **
 ****************************************************************************/
 
@@ -164,7 +164,7 @@ void tst_proxy::initializeProperties()
 {
     QVERIFY(m_proxy);
 
-    QTableWidget *table = new QTableWidget();
+    QTableWidget table;
 
     m_proxy->setAutoColumnCategories(false);
     m_proxy->setAutoRowCategories(false);
@@ -172,7 +172,7 @@ void tst_proxy::initializeProperties()
     m_proxy->setColumnRole("column");
     m_proxy->setColumnRolePattern(QRegExp("/^.*-(\\d\\d)$/"));
     m_proxy->setColumnRoleReplace("\\\\1");
-    m_proxy->setItemModel(table->model());
+    m_proxy->setItemModel(table.model());
     m_proxy->setMultiMatchBehavior(QItemModelBarDataProxy::MMBAverage);
     m_proxy->setRotationRole("rotation");
     m_proxy->setRotationRolePattern(QRegExp("/-/"));
@@ -209,28 +209,28 @@ void tst_proxy::initializeProperties()
 
 void tst_proxy::multiMatch()
 {
-    Q3DBars *graph = new Q3DBars();
+    Q3DBars graph;
 
-    QTableWidget *table = new QTableWidget();
+    QTableWidget table;
     QStringList rows;
     rows << "row 1" << "row 2" << "row 3";
     QStringList columns;
     columns << "col 1";
     const char *values[1][3] = {{"0/0/3.5/30", "0/0/5.0/30", "0/0/6.5/30"}};
 
-    table->setRowCount(1);
-    table->setColumnCount(3);
+    table.setRowCount(1);
+    table.setColumnCount(3);
 
     for (int col = 0; col < columns.size(); col++) {
         for (int row = 0; row < rows.size(); row++) {
-            QModelIndex index = table->model()->index(col, row);
-            table->model()->setData(index, values[col][row]);
+            QModelIndex index = table.model()->index(col, row);
+            table.model()->setData(index, values[col][row]);
         }
     }
 
-    m_proxy->setItemModel(table->model());
-    m_proxy->setRowRole(table->model()->roleNames().value(Qt::DisplayRole));
-    m_proxy->setColumnRole(table->model()->roleNames().value(Qt::DisplayRole));
+    m_proxy->setItemModel(table.model());
+    m_proxy->setRowRole(table.model()->roleNames().value(Qt::DisplayRole));
+    m_proxy->setColumnRole(table.model()->roleNames().value(Qt::DisplayRole));
     m_proxy->setRowRolePattern(QRegExp(QStringLiteral("^(\\d*)\\/(\\d*)\\/\\d*[\\.\\,]?\\d*\\/\\d*[\\.\\,]?\\d*$")));
     m_proxy->setRowRoleReplace(QStringLiteral("\\2"));
     m_proxy->setValueRolePattern(QRegExp(QStringLiteral("^\\d*(\\/)(\\d*)\\/(\\d*[\\.\\,]?\\d*)\\/\\d*[\\.\\,]?\\d*$")));
@@ -240,27 +240,29 @@ void tst_proxy::multiMatch()
 
     QBar3DSeries *series = new QBar3DSeries(m_proxy);
 
-    graph->addSeries(series);
+    graph.addSeries(series);
 
     QCoreApplication::processEvents();
-    QCOMPARE(graph->valueAxis()->max(), 6.5f);
+    QCOMPARE(graph.valueAxis()->max(), 6.5f);
     m_proxy->setMultiMatchBehavior(QItemModelBarDataProxy::MMBFirst);
     QCoreApplication::processEvents();
-    QCOMPARE(graph->valueAxis()->max(), 3.5f);
+    QCOMPARE(graph.valueAxis()->max(), 3.5f);
     m_proxy->setMultiMatchBehavior(QItemModelBarDataProxy::MMBLast);
     QCoreApplication::processEvents();
-    QCOMPARE(graph->valueAxis()->max(), 6.5f);
+    QCOMPARE(graph.valueAxis()->max(), 6.5f);
     m_proxy->setMultiMatchBehavior(QItemModelBarDataProxy::MMBAverage);
     QCoreApplication::processEvents();
-    QCOMPARE(graph->valueAxis()->max(), 5.0f);
+    QCOMPARE(graph.valueAxis()->max(), 5.0f);
     m_proxy->setMultiMatchBehavior(QItemModelBarDataProxy::MMBCumulative);
     QCoreApplication::processEvents();
-    QCOMPARE(graph->valueAxis()->max(), 15.0f);
+    QCOMPARE(graph.valueAxis()->max(), 15.0f);
 
     QCOMPARE(m_proxy->columnLabels().count(), 1);
     QCOMPARE(m_proxy->rowCount(), 1);
     QCOMPARE(m_proxy->rowLabels().count(), 1);
     QVERIFY(m_proxy->series());
+
+    m_proxy = 0; // Proxy gets deleted as graph gets deleted
 }
 
 QTEST_MAIN(tst_proxy)
