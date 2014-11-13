@@ -49,7 +49,7 @@
 
     \snippet qmloscilloscope/datasource.cpp 0
 
-    The secod method, \c update(), copies one set of the cached data into another array, which we
+    The second method, \c update(), copies one set of the cached data into another array, which we
     set to the data proxy of the series by calling QSurfaceDataProxy::resetArray().
     We reuse the same array if the array dimensions have not changed to minimize overhead:
 
