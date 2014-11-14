@@ -33,7 +33,7 @@ Column {
         SectionLayout {
             Label {
                 text: qsTr("multiSeriesUniform")
-                toolTip: qsTr("Multiseries Uniform")
+                tooltip: qsTr("Multiseries Uniform")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -44,7 +44,7 @@ Column {
             }
             Label {
                 text: qsTr("barThickness")
-                toolTip: qsTr("Bar Thickness Ratio")
+                tooltip: qsTr("Bar Thickness Ratio")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -59,7 +59,7 @@ Column {
             }
             Label {
                 text: qsTr("barSpacing")
-                toolTip: qsTr("Bar Spacing")
+                tooltip: qsTr("Bar Spacing")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -84,7 +84,7 @@ Column {
             }
             Label {
                 text: qsTr("barSpacingRelative")
-                toolTip: qsTr("Bar Spacing Relative")
+                tooltip: qsTr("Bar Spacing Relative")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -95,7 +95,7 @@ Column {
             }
             Label {
                 text: qsTr("renderingMode")
-                toolTip: qsTr("Rendering Mode")
+                tooltip: qsTr("Rendering Mode")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -109,7 +109,7 @@ Column {
             }
             Label {
                 text: qsTr("msaaSamples")
-                toolTip: qsTr("MSAA Sample Count")
+                tooltip: qsTr("MSAA Sample Count")
                 Layout.fillWidth: true
             }
             SpinBox {
@@ -121,7 +121,7 @@ Column {
             }
             Label {
                 text: qsTr("shadowQuality")
-                toolTip: qsTr("Shadow Quality")
+                tooltip: qsTr("Shadow Quality")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -136,7 +136,7 @@ Column {
             }
             Label {
                 text: qsTr("selectionMode")
-                toolTip: qsTr("Selection Mode")
+                tooltip: qsTr("Selection Mode")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -268,7 +268,7 @@ Column {
             }
             Label {
                 text: qsTr("measureFps")
-                toolTip: qsTr("Measure Frames Per Second")
+                tooltip: qsTr("Measure Frames Per Second")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -279,7 +279,7 @@ Column {
             }
             Label {
                 text: qsTr("orthoProjection")
-                toolTip: qsTr("Use Orthographic Projection")
+                tooltip: qsTr("Use Orthographic Projection")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -290,7 +290,7 @@ Column {
             }
             Label {
                 text: qsTr("aspectRatio")
-                toolTip: qsTr("Aspect Ratio")
+                tooltip: qsTr("Aspect Ratio")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -305,7 +305,7 @@ Column {
             }
             Label {
                 text: qsTr("floorLevel")
-                toolTip: qsTr("Floor Level")
+                tooltip: qsTr("Floor Level")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -317,7 +317,7 @@ Column {
             }
             Label {
                 text: qsTr("horizontalAspectRatio")
-                toolTip: qsTr("Horizontal Aspect Ratio")
+                tooltip: qsTr("Horizontal Aspect Ratio")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -332,7 +332,7 @@ Column {
             }
             Label {
                 text: qsTr("reflection")
-                toolTip: qsTr("Reflection")
+                tooltip: qsTr("Reflection")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -344,7 +344,7 @@ Column {
             }
             Label {
                 text: qsTr("reflectivity")
-                toolTip: qsTr("Reflectivity")
+                tooltip: qsTr("Reflectivity")
                 Layout.fillWidth: true
                 visible: reflectionCheckbox.checked
             }
@@ -361,7 +361,7 @@ Column {
             }
             Label {
                 text: qsTr("margin")
-                toolTip: qsTr("Graph Margin")
+                tooltip: qsTr("Graph Margin")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
