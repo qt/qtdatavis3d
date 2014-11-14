@@ -32,7 +32,7 @@ Column {
         SectionLayout {
             Label {
                 text: qsTr("renderingMode")
-                toolTip: qsTr("Rendering Mode")
+                tooltip: qsTr("Rendering Mode")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -46,7 +46,7 @@ Column {
             }
             Label {
                 text: qsTr("msaaSamples")
-                toolTip: qsTr("MSAA Sample Count")
+                tooltip: qsTr("MSAA Sample Count")
                 Layout.fillWidth: true
             }
             SpinBox {
@@ -58,7 +58,7 @@ Column {
             }
             Label {
                 text: qsTr("shadowQuality")
-                toolTip: qsTr("Shadow Quality")
+                tooltip: qsTr("Shadow Quality")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -73,7 +73,7 @@ Column {
             }
             Label {
                 text: qsTr("selectionMode")
-                toolTip: qsTr("Selection Mode")
+                tooltip: qsTr("Selection Mode")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -86,7 +86,7 @@ Column {
             }
             Label {
                 text: qsTr("measureFps")
-                toolTip: qsTr("Measure Frames Per Second")
+                tooltip: qsTr("Measure Frames Per Second")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -97,7 +97,7 @@ Column {
             }
             Label {
                 text: qsTr("orthoProjection")
-                toolTip: qsTr("Use Orthographic Projection")
+                tooltip: qsTr("Use Orthographic Projection")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -108,7 +108,7 @@ Column {
             }
             Label {
                 text: qsTr("aspectRatio")
-                toolTip: qsTr("Horizontal to Vertical Aspect Ratio")
+                tooltip: qsTr("Horizontal to Vertical Aspect Ratio")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -123,7 +123,7 @@ Column {
             }
             Label {
                 text: qsTr("optimizationHints")
-                toolTip: qsTr("Optimization Hints")
+                tooltip: qsTr("Optimization Hints")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -136,7 +136,7 @@ Column {
             }
             Label {
                 text: qsTr("polar")
-                toolTip: qsTr("Use Polar Coordinates")
+                tooltip: qsTr("Use Polar Coordinates")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -148,7 +148,7 @@ Column {
             }
             Label {
                 text: qsTr("radialLabelOffset")
-                toolTip: qsTr("Radial Label Offset")
+                tooltip: qsTr("Radial Label Offset")
                 Layout.fillWidth: true
                 visible: polarCheckbox.checked
             }
@@ -165,7 +165,7 @@ Column {
             }
             Label {
                 text: qsTr("horizontalAspectRatio")
-                toolTip: qsTr("Horizontal Aspect Ratio")
+                tooltip: qsTr("Horizontal Aspect Ratio")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
@@ -180,7 +180,7 @@ Column {
             }
             Label {
                 text: qsTr("margin")
-                toolTip: qsTr("Graph Margin")
+                tooltip: qsTr("Graph Margin")
                 Layout.fillWidth: true
             }
             SecondColumnLayout {
