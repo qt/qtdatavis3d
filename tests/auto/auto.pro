@@ -1,6 +1,6 @@
 TEMPLATE = subdirs
 
-SUBDIRS += cpptest
+!android: SUBDIRS += cpptest
 
 qtHaveModule(quick): SUBDIRS += qmltest
 
