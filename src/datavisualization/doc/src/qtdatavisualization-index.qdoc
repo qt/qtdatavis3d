@@ -35,12 +35,14 @@
         \list
             \li Control viewable data window with axis ranges
             \li Customize value axis grid lines and labels with axis formatters
+            \li Polar horizontal axes support for surface and scatter graphs
         \endlist
         \li Customizable input handling
         \li Customizable themes
         \li Custom items and labels can be added to any graph
         \li Ready-made data proxies to visualize data from Qt item models and height maps
         \li Perspective and orthographic projections
+        \li Volumetric custom items
     \endlist
 
     \section1 Getting Started
