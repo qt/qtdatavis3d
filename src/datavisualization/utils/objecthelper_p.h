@@ -48,7 +48,7 @@ public:
     static void releaseObjectHelper(const Abstract3DRenderer *cacheId, ObjectHelper *&obj);
     inline const QString &objectFile() { return m_objectFile; }
 
-    inline const QVector<unsigned short> &indices() const { return m_indices; }
+    inline const QVector<GLuint> &indices() const { return m_indices; }
     inline const QVector<QVector3D> &indexedvertices() const { return m_indexedVertices; }
     inline const QVector<QVector2D> &indexedUVs() const { return m_indexedUVs; }
     inline const QVector<QVector3D> &indexedNormals() const { return m_indexedNormals; }
@@ -59,7 +59,7 @@ private:
     void load();
 
     QString m_objectFile;
-    QVector<unsigned short> m_indices;
+    QVector<GLuint> m_indices;
     QVector<QVector3D> m_indexedVertices;
     QVector<QVector2D> m_indexedUVs;
     QVector<QVector3D> m_indexedNormals;

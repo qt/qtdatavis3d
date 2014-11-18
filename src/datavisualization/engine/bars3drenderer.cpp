@@ -1124,7 +1124,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
                         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, barObj->elementBuf());
 
                         // Draw the triangles
-                        glDrawElements(GL_TRIANGLES, barObj->indexCount(), GL_UNSIGNED_SHORT,
+                        glDrawElements(GL_TRIANGLES, barObj->indexCount(), GL_UNSIGNED_INT,
                                        (void *)0);
 
                         // Free buffers

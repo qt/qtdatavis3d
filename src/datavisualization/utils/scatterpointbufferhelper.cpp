@@ -27,7 +27,6 @@ ScatterPointBufferHelper::ScatterPointBufferHelper()
     : m_pointbuffer(0),
       m_oldRemoveIndex(-1)
 {
-    m_indicesType = GL_UNSIGNED_INT;
 }
 
 ScatterPointBufferHelper::~ScatterPointBufferHelper()

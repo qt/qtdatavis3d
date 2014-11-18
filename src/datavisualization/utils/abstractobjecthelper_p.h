@@ -45,7 +45,6 @@ public:
     virtual GLuint uvBuf();
     GLuint elementBuf();
     GLuint indexCount();
-    GLuint indicesType();
 
 public:
     GLuint m_vertexbuffer;
@@ -55,8 +54,6 @@ public:
 
     GLuint m_indexCount;
     GLboolean m_meshDataLoaded;
-
-    GLuint m_indicesType;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

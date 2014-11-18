@@ -641,8 +641,8 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, dotObj->elementBuf());
 
                                 // Draw the triangles
-                                glDrawElements(GL_TRIANGLES, dotObj->indexCount(), GL_UNSIGNED_SHORT,
-                                               (void *)0);
+                                glDrawElements(GL_TRIANGLES, dotObj->indexCount(),
+                                               GL_UNSIGNED_INT, (void *)0);
 
                                 // Free buffers
                                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -662,7 +662,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
                                 // Draw the triangles
                                 glDrawElements(GL_TRIANGLES, object->indexCount(),
-                                               object->indicesType(), (void *)0);
+                                               GL_UNSIGNED_INT, (void *)0);
 
                                 // Free buffers
                                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
