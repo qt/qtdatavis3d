@@ -1216,8 +1216,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                 glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, object->elementBuf());
 
                 // Draw the triangles
-                glDrawElements(GL_TRIANGLES, object->indexCount(),
-                               object->indicesType(), (void *)0);
+                glDrawElements(GL_TRIANGLES, object->indexCount(), GL_UNSIGNED_INT, (void *)0);
             }
         }
 

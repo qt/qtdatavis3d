@@ -64,6 +64,7 @@ General:
 - Fixed a crash related to selection render buffer reuse.
 - Fixed the flipped Z-coordinate for absolutely positioned custom items.
 - Fixed shadows when viewing the graph directly from above or below.
+- Fixed problems using large custom meshes where vertex index count overflowed unsigned short.
 
 New examples
 ------------

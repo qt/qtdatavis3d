@@ -192,7 +192,7 @@
 
     \section1 Series
 
-    Series is combination of logically connected set of data items (handled by a data proxy)
+    A series is a combination of a logically connected set of data items (handled by a data proxy)
     and visual properties that describe how the data items should be rendered, such as item
     meshes and colors. Each visualization type has its own series type. For example, bar graphs
     use QBar3DSeries. All graphs can have multiple series added simultaneously.

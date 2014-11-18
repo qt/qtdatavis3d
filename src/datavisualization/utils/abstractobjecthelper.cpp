@@ -74,9 +74,4 @@ GLuint AbstractObjectHelper::indexCount()
     return m_indexCount;
 }
 
-GLuint AbstractObjectHelper::indicesType()
-{
-    return m_indicesType;
-}
-
 QT_END_NAMESPACE_DATAVISUALIZATION

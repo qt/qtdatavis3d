@@ -25,7 +25,6 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 ObjectHelper::ObjectHelper(const QString &objectFile)
     : m_objectFile(objectFile)
 {
-    m_indicesType = GL_UNSIGNED_SHORT;
     load();
 }
 
@@ -158,7 +157,7 @@ void ObjectHelper::load()
 
     glGenBuffers(1, &m_elementbuffer);
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(unsigned short),
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(GLuint),
                  &m_indices.at(0), GL_STATIC_DRAW);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);

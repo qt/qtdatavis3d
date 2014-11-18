@@ -29,7 +29,6 @@ const GLfloat itemScaler = 3.0f;
 ScatterObjectBufferHelper::ScatterObjectBufferHelper()
     : m_scaleY(0.0f)
 {
-    m_indicesType = GL_UNSIGNED_INT;
 }
 
 ScatterObjectBufferHelper::~ScatterObjectBufferHelper()
@@ -64,7 +63,7 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
     }
 
     // Index vertices
-    const QVector<unsigned short> indices = dotObj->indices();
+    const QVector<GLuint> indices = dotObj->indices();
     const QVector<QVector3D> indexed_vertices = dotObj->indexedvertices();
     const QVector<QVector2D> indexed_uvs = dotObj->indexedUVs();
     const QVector<QVector3D> indexed_normals = dotObj->indexedNormals();
