@@ -18,7 +18,7 @@ qtHaveModule(quick) {
                qmlperf
 }
 
-!android:!ios {
+!android:!ios:!winrt {
     SUBDIRS += barstest \
                scattertest \
                surfacetest \
@@ -36,4 +36,4 @@ qtHaveModule(quick) {
     #SUBDIRS += kinectsurface
 }
 
-qtHaveModule(multimedia):!android:!static: SUBDIRS += spectrum
+qtHaveModule(multimedia):!android:!static:!winrt: SUBDIRS += spectrum

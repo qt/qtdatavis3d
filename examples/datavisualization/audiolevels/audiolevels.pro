@@ -1,5 +1,5 @@
-android|ios {
-    error( "This example is not supported for android or ios." )
+android|ios|winrt {
+    error( "This example is not supported for android, ios, or winrt." )
 }
 
 requires(qtHaveModule(multimedia))

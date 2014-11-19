@@ -13,7 +13,7 @@ qtHaveModule(quick) {
                qmlspectrogram
 }
 
-!android:!ios {
+!android:!ios:!winrt {
     SUBDIRS += bars \
                custominput \
                customproxy \
