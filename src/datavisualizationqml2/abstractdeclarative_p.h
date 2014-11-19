@@ -37,7 +37,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QThread>
 
-#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID)
+#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
 #define USE_SHARED_CONTEXT
 #endif
 
