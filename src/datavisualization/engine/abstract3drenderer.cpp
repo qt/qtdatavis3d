@@ -464,8 +464,8 @@ void Abstract3DRenderer::reInitShaders()
                                           QStringLiteral(":/shaders/fragmentES2"),
                                           QStringLiteral(":/shaders/vertex"),
                                           QStringLiteral(":/shaders/fragmentColorOnYES2"));
-            initBackgroundShaders(QStringLiteral(":/shaders/vertexNoMatrices"),
-                                  QStringLiteral(":/shaders/fragmentES2"));
+            initShaders(QStringLiteral(":/shaders/vertexNoMatrices"),
+                        QStringLiteral(":/shaders/fragmentES2"));
         } else {
             initGradientShaders(QStringLiteral(":/shaders/vertex"),
                                 QStringLiteral(":/shaders/fragmentColorOnYES2"));
