@@ -80,8 +80,6 @@ void GLStateStore::storeGLState()
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_drawFramebuffer);
     glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_readFramebuffer);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &m_renderbuffer);
-#else
-    glGetIntegerv(GL_RENDERBUFFER, &m_renderbuffer);
 #endif
     glGetFloatv(GL_COLOR_CLEAR_VALUE, m_clearColor);
     m_isBlendingEnabled = glIsEnabled(GL_BLEND);
@@ -138,8 +136,8 @@ void GLStateStore::printCurrentState(bool in)
 #if !defined(QT_OPENGL_ES_2)
         GLint drawFramebuffer;
         GLint readFramebuffer;
-#endif
         GLint renderbuffer;
+#endif
         GLfloat clearColor[4];
         GLfloat clearDepth;
         GLboolean isBlendingEnabled = glIsEnabled(GL_BLEND);
@@ -178,8 +176,6 @@ void GLStateStore::printCurrentState(bool in)
         glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFramebuffer);
         glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFramebuffer);
         glGetIntegerv(GL_RENDERBUFFER_BINDING, &renderbuffer);
-#else
-        glGetIntegerv(GL_RENDERBUFFER, &renderbuffer);
 #endif
         glGetFloatv(GL_COLOR_CLEAR_VALUE, clearColor);
         glGetFloatv(GL_DEPTH_CLEAR_VALUE, &clearDepth);
@@ -223,8 +219,8 @@ void GLStateStore::printCurrentState(bool in)
         msg << "---" << endl;
         msg << "    GL_DRAW_FRAMEBUFFER_BINDING "<< drawFramebuffer << endl;
         msg << "    GL_READ_FRAMEBUFFER_BINDING "<< readFramebuffer << endl;
-#endif
         msg << "    GL_RENDERBUFFER_BINDING " << renderbuffer << endl;
+#endif
         msg << "    GL_SCISSOR_TEST " << bool(isScissorTestEnabled) << endl;
         msg << "    GL_SCISSOR_BOX " << m_scissorBox[0] << m_scissorBox[1] << m_scissorBox[2]
             << m_scissorBox[3] << endl;
@@ -275,8 +271,6 @@ void GLStateStore::restoreGLState()
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_readFramebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_drawFramebuffer);
     glBindRenderbuffer(GL_RENDERBUFFER_BINDING, m_renderbuffer);
-#else
-    glBindRenderbuffer(GL_RENDERBUFFER, m_renderbuffer);
 #endif
 
     if (m_isScissorTestEnabled)
@@ -351,8 +345,8 @@ void GLStateStore::initGLDefaultState()
 #if !defined(QT_OPENGL_ES_2)
     m_drawFramebuffer = 0;
     m_readFramebuffer = 0;
-#endif
     m_renderbuffer = 0;
+#endif
     m_clearColor[0] = m_clearColor[1] = m_clearColor[2] = m_clearColor[3] = 1.0f;
     m_clearDepth = 1.0f;
     m_isBlendingEnabled = GL_FALSE;
