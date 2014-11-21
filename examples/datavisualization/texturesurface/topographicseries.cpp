@@ -29,6 +29,7 @@ TopographicSeries::TopographicSeries()
 {
     setDrawMode(QSurface3DSeries::DrawSurface);
     setFlatShadingEnabled(true);
+    setBaseColor(Qt::white);
 }
 
 TopographicSeries::~TopographicSeries()
