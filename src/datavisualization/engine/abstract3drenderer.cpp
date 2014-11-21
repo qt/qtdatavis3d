@@ -1768,6 +1768,11 @@ void Abstract3DRenderer::queriedGraphPosition(const QMatrix4x4 &projectionViewMa
     // Restore state
     glEnable(GL_DITHER);
     glCullFace(GL_BACK);
+
+    // Note: Zeroing the frame buffer before resetting it is a workaround for flickering that occurs
+    // during zoom in some environments.
+    glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
     glBindFramebuffer(GL_FRAMEBUFFER, defaultFboHandle);
     glViewport(m_primarySubViewport.x(),
                m_primarySubViewport.y(),
