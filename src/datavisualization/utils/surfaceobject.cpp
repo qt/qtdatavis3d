@@ -325,12 +325,14 @@ void SurfaceObject::smoothUVs(const QSurfaceDataArray &dataArray,
         }
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_uvTextureBuffer);
-    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
-                 &uvs.at(0), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if (uvs.size() > 0) {
+        glBindBuffer(GL_ARRAY_BUFFER, m_uvTextureBuffer);
+        glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
+                     &uvs.at(0), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    m_returnTextureBuffer = true;
+        m_returnTextureBuffer = true;
+    }
 }
 
 void SurfaceObject::updateSmoothRow(const QSurfaceDataArray &dataArray, int rowIndex, bool polar)
