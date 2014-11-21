@@ -55,8 +55,8 @@ public:
 #if !defined(QT_OPENGL_ES_2)
     GLint m_drawFramebuffer;
     GLint m_readFramebuffer;
-#endif
     GLint m_renderbuffer;
+#endif
     GLfloat m_clearColor[4];
     GLfloat m_clearDepth;
     GLboolean m_isBlendingEnabled;

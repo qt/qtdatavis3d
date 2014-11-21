@@ -80,7 +80,7 @@ int main(int argc, char **argv)
     QLabel *label = new QLabel(widget);
     label->setPixmap(pm);
 
-    QGroupBox *heightMapGroupBox = new QGroupBox(QStringLiteral("Height color map"));
+    QGroupBox *heightMapGroupBox = new QGroupBox(QStringLiteral("Highlight color map"));
     QVBoxLayout *colorMapVBox = new QVBoxLayout;
     colorMapVBox->addWidget(label);
     heightMapGroupBox->setLayout(colorMapVBox);

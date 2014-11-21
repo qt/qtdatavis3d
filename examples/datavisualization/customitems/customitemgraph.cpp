@@ -109,6 +109,9 @@ CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)
     titleLabel->setFacingCamera(true);
     titleLabel->setBackgroundColor(QColor(0x66cdaa));
     m_graph->addCustomItem(titleLabel);
+
+    toggleItemOne(true);
+    toggleItemTwo(true);
 }
 
 CustomItemGraph::~CustomItemGraph()

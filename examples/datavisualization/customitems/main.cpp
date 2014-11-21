@@ -53,10 +53,12 @@ int main(int argc, char **argv)
 
     font.setBold(false);
     QCheckBox *checkboxOne = new QCheckBox("Oil Rig 1");
+    checkboxOne->setChecked(true);
     checkboxOne->setFont(font);
     vLayoutLeft->addWidget(checkboxOne);
 
     QCheckBox *checkboxTwo = new QCheckBox("Oil Rig 2");
+    checkboxTwo->setChecked(true);
     checkboxTwo->setFont(font);
     vLayoutLeft->addWidget(checkboxTwo);
 
