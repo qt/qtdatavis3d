@@ -299,6 +299,9 @@ QVector3D SurfaceObject::createSmoothNormalUpperLineItem(int x, int y)
 void SurfaceObject::smoothUVs(const QSurfaceDataArray &dataArray,
                               const QSurfaceDataArray &modelArray)
 {
+    if (dataArray.size() == 0 || modelArray.size() == 0)
+        return;
+
     int columns = dataArray.at(0)->size();
     int rows = dataArray.size();
     float xRangeNormalizer = dataArray.at(0)->at(columns - 1).x() - dataArray.at(0)->at(0).x();
@@ -601,6 +604,9 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
 void SurfaceObject::coarseUVs(const QSurfaceDataArray &dataArray,
                               const QSurfaceDataArray &modelArray)
 {
+    if (dataArray.size() == 0 || modelArray.size() == 0)
+        return;
+
     int columns = dataArray.at(0)->size();
     int rows = dataArray.size();
     float xRangeNormalizer = dataArray.at(0)->at(columns - 1).x() - dataArray.at(0)->at(0).x();
@@ -632,12 +638,14 @@ void SurfaceObject::coarseUVs(const QSurfaceDataArray &dataArray,
         }
     }
 
-    glBindBuffer(GL_ARRAY_BUFFER, m_uvTextureBuffer);
-    glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
-                 &uvs.at(0), GL_STATIC_DRAW);
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    if (uvs.size() > 0) {
+        glBindBuffer(GL_ARRAY_BUFFER, m_uvTextureBuffer);
+        glBufferData(GL_ARRAY_BUFFER, uvs.size() * sizeof(QVector2D),
+                     &uvs.at(0), GL_STATIC_DRAW);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    m_returnTextureBuffer = true;
+        m_returnTextureBuffer = true;
+    }
 }
 
 void SurfaceObject::updateCoarseRow(const QSurfaceDataArray &dataArray, int rowIndex, bool polar)
