@@ -90,6 +90,8 @@ int main(int argc, char **argv)
     filteredCheckBox->setText(QStringLiteral("Filtered"));
     filteredCheckBox->setChecked(false);
 
+    QLabel *fpsLabel = new QLabel(QStringLiteral(""));
+
     vLayout->addWidget(new QLabel(QStringLiteral("Galaxy radius")));
     vLayout->addWidget(radiusGalaxySlider);
     vLayout->addWidget(new QLabel(QStringLiteral("Core radius")));
@@ -102,6 +104,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(eccentricityOuterSlider);
     vLayout->addWidget(resetButton);
     vLayout->addWidget(filteredCheckBox);
+    vLayout->addWidget(fpsLabel);
 
     GalaxyData *modifier = new GalaxyData(graph);
 
@@ -122,6 +125,7 @@ int main(int argc, char **argv)
 
     modifier->setSliders(radiusGalaxySlider, radiusCoreSlider, angleOffsetSlider,
                          eccentricityInnerSlider, eccentricityOuterSlider);
+    modifier->setFpsLabel(fpsLabel);
 
     widget->show();
     return app.exec();

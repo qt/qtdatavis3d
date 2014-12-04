@@ -21,7 +21,6 @@
  * Thanks to Ingo Berg, great work.
  * Licensed under a  Creative Commons Attribution 3.0 License
  * http://creativecommons.org/licenses/by/3.0/
- *
  */
 
 #include "galaxydata.h"
@@ -57,8 +56,7 @@ GalaxyData::GalaxyData(Q3DScatter *scatter,
       m_elEx1(ex1),
       m_elEx2(ex2),
       m_radFarField(m_radGalaxy * 2),
-      m_filtered(false),
-      m_tableSize(0)
+      m_filtered(false)
 {
     m_graph->activeTheme()->setType(Q3DTheme::ThemeEbony);
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftLow);
@@ -66,6 +64,10 @@ GalaxyData::GalaxyData(Q3DScatter *scatter,
     m_graph->axisX()->setRange(-25000.0f, 25000.0f);
     //m_graph->axisY()->setRange(m_minY, m_minY + m_rangeY);
     m_graph->axisZ()->setRange(-25000.0f, 25000.0f);
+
+    QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged,
+                     this, &GalaxyData::handleFpsChange);
+    m_graph->setMeasureFps(true);
 
     createNormalSeries();
 
@@ -172,6 +174,7 @@ void GalaxyData::createNormalDataView()
     }
 
     m_graph->seriesList().at(0)->dataProxy()->resetArray(m_dataArray);
+    m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshPoint);
 }
 
 void GalaxyData::createFilteredView()
@@ -193,59 +196,35 @@ void GalaxyData::createFilteredView()
             max = table[y * steps + x];
     }
 
-    QLinearGradient gr(0, 0, 1, 100);
-    gr.setColorAt(0.0, Qt::white);
-    gr.setColorAt(0.05, Qt::green);
-//    gr.setColorAt(0.10, Qt::red);
-//    gr.setColorAt(0.15, Qt::darkGreen);
-    gr.setColorAt(1.0, Qt::red);
-    QImage image(QSize(1, 100), QImage::Format_RGB32);
-    QPainter pmp(&image);
-    pmp.setBrush(QBrush(gr));
-    pmp.setPen(Qt::NoPen);
-    pmp.drawRect(0, 0, 1, 100);
-
-    if (tableSize != m_tableSize) {
-        createFilteredSeries(tableSize);
-        m_tableSize = tableSize;
+    // Count how many cells have data
+    int nActiveCell = 0;
+    for (int i = 0; i < tableSize; i++) {
+        if (table[i])
+            nActiveCell++;
     }
+
+    m_dataArray->clear();
+    m_dataArray->resize(nActiveCell);
+    QScatterDataItem *ptrToDataArray = &m_dataArray->first();
 
     for (int y = 0; y < steps; y++) {
         for (int x = 0; x < steps; x++) {
             if (table[y * steps + x]) {
-                QScatterDataArray *dataArray = new QScatterDataArray;
-                dataArray->resize(1);
-                QScatterDataItem *ptrToDataArray = &dataArray->first();
                 ptrToDataArray->setPosition(QVector3D(float(x) * 1000.0f - add + 500.0f,
-                                                      (float(table[y * steps + x]) / float(max)) * 2.0f - 1.0f,
+                                                      float(table[y * steps + x]),
                                                       float(y) * 1000.0f - add + 500.0f));
-
-                QScatter3DSeries *series = m_graph->seriesList().at(y * steps + x);
-                series->dataProxy()->resetArray(dataArray);
-                int pos = (float(table[y * steps + x]) / float(max)) * 100;
-                pos = qMin(pos, 99);
-                QRgb color = image.pixel(0, pos);
-                series->setBaseColor(QColor(color));
-                series->setItemSize(0.1f);
+                ptrToDataArray++;
             }
         }
     }
 
+    m_graph->seriesList().at(0)->dataProxy()->resetArray(m_dataArray);
+    m_graph->seriesList().at(0)->setMesh(QAbstract3DSeries::MeshCube);
+    m_graph->seriesList().at(0)->setItemSize(0.1f);
+
+    m_graph->axisY()->setRange(0.0f, float(max + 1));
+
     qDebug() << "max = " << max;
-}
-
-void GalaxyData::createFilteredSeries(int tableSize)
-{
-    int size =  m_graph->seriesList().size();
-    for (int i = 0; i < size; i++)
-        m_graph->removeSeries(m_graph->seriesList().at(0));
-
-    for (int i = 0; i < tableSize; i++) {
-        QScatterDataProxy *proxy = new QScatterDataProxy;
-        QScatter3DSeries *series = new QScatter3DSeries(proxy);
-        series->setMesh(QAbstract3DSeries::MeshCube);
-        m_graph->addSeries(series);
-    }
 }
 
 void GalaxyData::checkMinMax(const Star &star)
@@ -316,16 +295,22 @@ void GalaxyData::setFilteredEnabled(bool enabled)
 {
     m_filtered = enabled;
     if (enabled) {
-        m_graph->removeSeries(m_graph->seriesList().at(0));
+        QLinearGradient gr(0, 0, 1, 100);
+        gr.setColorAt(0.0, Qt::white);
+        gr.setColorAt(0.05, Qt::green);
+        gr.setColorAt(1.0, Qt::red);
+
+        m_graph->seriesList().at(0)->setBaseGradient(gr);
+        m_graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleRangeGradient);
 
         createFilteredView();
     } else {
-        int size =  m_graph->seriesList().size();
-        for (int i = 0; i < size; i++)
-            m_graph->removeSeries(m_graph->seriesList().at(0));
-        m_tableSize = 0;
+        m_dataArray->clear();
+        m_dataArray->resize(numOfStars);
+        m_graph->seriesList().at(0)->setColorStyle(Q3DTheme::ColorStyleUniform);
+        m_graph->axisY()->setRange(-1.0f, 1.0f);
+        m_graph->seriesList().at(0)->setItemSize(0.0f);
 
-        createNormalSeries();
         createNormalDataView();
     }
 }
@@ -337,4 +322,10 @@ void GalaxyData::resetValues()
     m_angleOffsetSlider->setValue(40);
     m_eccentricityInnerSlider->setValue(90);
     m_eccentricityOuterSlider->setValue(90);
+}
+
+void GalaxyData::handleFpsChange(qreal fps)
+{
+    static const QString fpsPrefix(QStringLiteral("FPS: "));
+    m_fpsLabel->setText(fpsPrefix + QString::number(qRound(fps)));
 }

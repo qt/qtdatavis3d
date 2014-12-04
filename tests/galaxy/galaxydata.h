@@ -25,6 +25,7 @@
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtGui/QFont>
 #include <QtWidgets/QSlider>
+#include <QtWidgets/QLabel>
 
 using namespace QtDataVisualization;
 
@@ -61,6 +62,8 @@ public:
         m_eccentricityInnerSlider = ei;
         m_eccentricityOuterSlider = eo;
     }
+    void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
+    void handleFpsChange(qreal fps);
 
 private:
     void createGalaxy();
@@ -68,7 +71,6 @@ private:
     void createNormalDataView();
     void createFilteredView();
     void createNormalSeries();
-    void createFilteredSeries(int tableSize);
     qreal value;
 
 private:
@@ -90,6 +92,7 @@ private:
     QSlider *m_angleOffsetSlider;
     QSlider *m_eccentricityInnerSlider;
     QSlider *m_eccentricityOuterSlider;
+    QLabel *m_fpsLabel;
 
     qreal m_minx = 9999.9;
     qreal m_maxx = -9999.0;
@@ -97,7 +100,6 @@ private:
     qreal m_maxy = -9999.0;
     int m_range;
     bool m_filtered;
-    int m_tableSize;
 };
 
 #endif
