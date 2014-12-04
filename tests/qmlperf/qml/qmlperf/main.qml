@@ -32,7 +32,7 @@ Rectangle {
 
     Button {
         id: changeButton
-        width: 350
+        width: parent.width / 6
         height: 50
         anchors.left: parent.left
         enabled: true
@@ -54,7 +54,7 @@ Rectangle {
     Text {
         id: fpsText
         text: "Reading"
-        width: 300
+        width: parent.width / 2
         height: 50
         anchors.left: changeButton.right
         verticalAlignment: Text.AlignVCenter
@@ -63,7 +63,7 @@ Rectangle {
 
     Button {
         id: optimization
-        width: 300
+        width: parent.width / 6
         height: 50
         anchors.left: fpsText.right
         enabled: true
@@ -82,7 +82,7 @@ Rectangle {
 
     Button {
         id: itemAdd
-        width: 300
+        width: parent.width / 6
         height: 50
         anchors.left: optimization.right
         enabled: true
