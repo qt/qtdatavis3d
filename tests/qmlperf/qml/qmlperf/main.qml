@@ -32,7 +32,7 @@ Rectangle {
 
     Button {
         id: changeButton
-        width: parent.width / 6
+        width: parent.width / 7
         height: 50
         anchors.left: parent.left
         enabled: true
@@ -54,7 +54,7 @@ Rectangle {
     Text {
         id: fpsText
         text: "Reading"
-        width: parent.width / 2
+        width: (parent.width / 7) * 3
         height: 50
         anchors.left: changeButton.right
         verticalAlignment: Text.AlignVCenter
@@ -63,7 +63,7 @@ Rectangle {
 
     Button {
         id: optimization
-        width: parent.width / 6
+        width: parent.width / 7
         height: 50
         anchors.left: fpsText.right
         enabled: true
@@ -82,7 +82,7 @@ Rectangle {
 
     Button {
         id: itemAdd
-        width: parent.width / 6
+        width: parent.width / 7
         height: 50
         anchors.left: optimization.right
         enabled: true
@@ -90,6 +90,18 @@ Rectangle {
         onClicked: {
             itemCount = itemCount + addItems;
             dataGenerator.add(scatterSeries, addItems);
+        }
+    }
+
+    Button {
+        id: writeLine
+        width: parent.width / 7
+        height: 50
+        anchors.left: itemAdd.right
+        enabled: true
+        text: "Write"
+        onClicked: {
+            dataGenerator.writeLine(itemCount, scatterPlot.currentFps.toFixed(1));
         }
     }
 

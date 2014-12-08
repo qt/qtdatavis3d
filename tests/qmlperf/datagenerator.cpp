@@ -27,11 +27,18 @@ DataGenerator::DataGenerator(QObject *parent) :
     QObject(parent)
 {
     qRegisterMetaType<QScatter3DSeries *>();
+
+    m_file = new QFile("results.txt");
+    if (!m_file->open(QIODevice::WriteOnly | QIODevice::Text)) {
+        delete m_file;
+        m_file = 0;
+    }
 }
 
 DataGenerator::~DataGenerator()
 {
-    qDebug() << __FUNCTION__;
+    m_file->close();
+    delete m_file;
 }
 
 void DataGenerator::generateData(QScatter3DSeries *series, uint count)
@@ -64,4 +71,16 @@ void DataGenerator::add(QScatter3DSeries *series, uint count)
     }
 
     series->dataProxy()->addItems(appendArray);
+}
+
+void DataGenerator::writeLine(int itemCount, float fps)
+{
+    if (m_file) {
+        QTextStream out(m_file);
+
+        QString fpsFormatString(QStringLiteral("%1   %2\n"));
+        QString fpsString = fpsFormatString.arg(itemCount).arg(fps);
+
+        out << fpsString;
+    }
 }

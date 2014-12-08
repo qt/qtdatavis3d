@@ -20,6 +20,7 @@
 #define DATAGENERATOR_H
 
 #include <QtDataVisualization/QScatter3DSeries>
+#include <QtCore/QFile>
 
 using namespace QtDataVisualization;
 
@@ -33,9 +34,11 @@ public:
 public slots:
     void generateData(QScatter3DSeries *series, uint count);
     void add(QScatter3DSeries *series, uint count);
+    void writeLine(int itemCount, float fps);
 
 private:
     QScatter3DSeries m_series;
+    QFile *m_file;
 };
 
 #endif // DATAGENERATOR_H
