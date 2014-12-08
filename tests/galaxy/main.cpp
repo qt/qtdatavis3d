@@ -83,6 +83,10 @@ int main(int argc, char **argv)
     eccentricityOuterSlider->setValue(90);
     eccentricityOuterSlider->setEnabled(true);
 
+    QCheckBox *staticCheckBox = new QCheckBox(widget);
+    staticCheckBox->setText(QStringLiteral("Static"));
+    staticCheckBox->setChecked(false);
+
     QPushButton *resetButton = new QPushButton(widget);
     resetButton->setText(QStringLiteral("Reset values"));
 
@@ -102,6 +106,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(eccentricityInnerSlider);
     vLayout->addWidget(new QLabel(QStringLiteral("Eccentricity outer")));
     vLayout->addWidget(eccentricityOuterSlider);
+    vLayout->addWidget(staticCheckBox);
     vLayout->addWidget(resetButton);
     vLayout->addWidget(filteredCheckBox);
     vLayout->addWidget(fpsLabel);
@@ -122,6 +127,8 @@ int main(int argc, char **argv)
                      modifier, &GalaxyData::resetValues);
     QObject::connect(filteredCheckBox, &QCheckBox::stateChanged,
                      modifier, &GalaxyData::setFilteredEnabled);
+    QObject::connect(staticCheckBox, &QCheckBox::stateChanged,
+                     modifier, &GalaxyData::setStaticEnabled);
 
     modifier->setSliders(radiusGalaxySlider, radiusCoreSlider, angleOffsetSlider,
                          eccentricityInnerSlider, eccentricityOuterSlider);

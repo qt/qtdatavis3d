@@ -51,6 +51,7 @@ public:
     void eccentricityOuterChanged(int value);
     void resetValues();
     void setFilteredEnabled(bool enabled);
+    void setStaticEnabled(bool enabled);
     inline void setSliders(QSlider *rg,
                            QSlider *rc,
                            QSlider *ao,
@@ -70,12 +71,13 @@ private:
     void checkMinMax(const Star &star);
     void createNormalDataView();
     void createFilteredView();
-    void createNormalSeries();
+    void createSeries();
     qreal value;
 
 private:
     Q3DScatter *m_graph;
-    QScatterDataArray *m_dataArray;
+    QScatter3DSeries *m_normalSeries;
+    QScatter3DSeries *m_filteredSeries;
     Star *m_pStars;
 
     qreal m_elEx1;          // Excentricity of the innermost ellipse
