@@ -87,6 +87,18 @@ int main(int argc, char **argv)
     staticCheckBox->setText(QStringLiteral("Static"));
     staticCheckBox->setChecked(false);
 
+    QCheckBox *starsCheckBox = new QCheckBox(widget);
+    starsCheckBox->setText(QStringLiteral("Stars"));
+    starsCheckBox->setChecked(true);
+
+    QCheckBox *dustCheckBox = new QCheckBox(widget);
+    dustCheckBox->setText(QStringLiteral("Dust"));
+    dustCheckBox->setChecked(true);
+
+    QCheckBox *H2CheckBox = new QCheckBox(widget);
+    H2CheckBox->setText(QStringLiteral("H2"));
+    H2CheckBox->setChecked(true);
+
     QPushButton *resetButton = new QPushButton(widget);
     resetButton->setText(QStringLiteral("Reset values"));
 
@@ -107,6 +119,9 @@ int main(int argc, char **argv)
     vLayout->addWidget(new QLabel(QStringLiteral("Eccentricity outer")));
     vLayout->addWidget(eccentricityOuterSlider);
     vLayout->addWidget(staticCheckBox);
+    vLayout->addWidget(starsCheckBox);
+    vLayout->addWidget(dustCheckBox);
+    vLayout->addWidget(H2CheckBox);
     vLayout->addWidget(resetButton);
     vLayout->addWidget(filteredCheckBox);
     vLayout->addWidget(fpsLabel);
@@ -129,6 +144,12 @@ int main(int argc, char **argv)
                      modifier, &GalaxyData::setFilteredEnabled);
     QObject::connect(staticCheckBox, &QCheckBox::stateChanged,
                      modifier, &GalaxyData::setStaticEnabled);
+    QObject::connect(starsCheckBox, &QCheckBox::stateChanged,
+                     modifier, &GalaxyData::setStarsVisible);
+    QObject::connect(dustCheckBox, &QCheckBox::stateChanged,
+                     modifier, &GalaxyData::setDustVisible);
+    QObject::connect(H2CheckBox, &QCheckBox::stateChanged,
+                     modifier, &GalaxyData::setH2Visible);
 
     modifier->setSliders(radiusGalaxySlider, radiusCoreSlider, angleOffsetSlider,
                          eccentricityInnerSlider, eccentricityOuterSlider);

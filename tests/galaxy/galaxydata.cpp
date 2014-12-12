@@ -39,7 +39,9 @@
 
 using namespace QtDataVisualization;
 
-static const int numOfStars = 30000;
+static const int numOfStars = 70000;
+static const int numOfDust = numOfStars / 2;
+static const int numOfH2 = 200;
 static const qreal rand_max = qreal(RAND_MAX);
 
 GalaxyData::GalaxyData(Q3DScatter *scatter,
@@ -50,6 +52,8 @@ GalaxyData::GalaxyData(Q3DScatter *scatter,
                        qreal ex2)
     : m_graph(scatter),
       m_pStars(0),
+      m_pDust(0),
+      m_pH2(0),
       m_radGalaxy(rad),
       m_radCore(radCore),
       m_angleOffset(deltaAng),
@@ -64,6 +68,12 @@ GalaxyData::GalaxyData(Q3DScatter *scatter,
     m_graph->axisX()->setRange(-25000.0f, 25000.0f);
     //m_graph->axisY()->setRange(m_minY, m_minY + m_rangeY);
     m_graph->axisZ()->setRange(-25000.0f, 25000.0f);
+    m_graph->setOptimizationHints(QAbstract3DGraph::OptimizationStatic);
+    //m_graph->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
+    m_graph->activeTheme()->setBackgroundColor(QColor(31, 31, 31));
+    m_graph->activeTheme()->setWindowColor(QColor(31, 31, 31));
+    m_graph->activeTheme()->setLabelBackgroundColor(QColor(31, 31, 31));
+    m_graph->activeTheme()->setLabelTextColor(QColor(31, 31, 31));
 
     QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged,
                      this, &GalaxyData::handleFpsChange);
@@ -76,6 +86,12 @@ GalaxyData::GalaxyData(Q3DScatter *scatter,
 GalaxyData::~GalaxyData()
 {
     delete m_graph;
+    if (m_pStars)
+        delete [] m_pStars;
+    if (m_pDust)
+        delete [] m_pDust;
+    if (m_pH2)
+        delete [] m_pH2;
 }
 
 void GalaxyData::createGalaxy()
@@ -83,6 +99,15 @@ void GalaxyData::createGalaxy()
     if (m_pStars)
         delete [] m_pStars;
     m_pStars = new Star[numOfStars];
+
+    if (m_pDust)
+        delete [] m_pDust;
+    m_pDust = new Star[numOfDust];
+
+    if (m_pH2)
+        delete [] m_pH2;
+    m_pH2 = new Star[numOfH2 * 2];
+
 
     m_minx = 9999.9;
     m_maxx = -9999.0;
@@ -137,6 +162,48 @@ void GalaxyData::createGalaxy()
         checkMinMax(m_pStars[i]);
     }
 
+    // Initialize Dust
+    qreal x, y, rad;
+    for (int i = 0; i < numOfDust; ++i)
+    {
+        x = 2.0 * m_radGalaxy * ((double)rand() / RAND_MAX) - m_radGalaxy;
+        y = 2.0 * m_radGalaxy * ((double)rand() / RAND_MAX) - m_radGalaxy;
+        rad = sqrt(x*x + y*y);
+
+        m_pDust[i].m_a = rad;
+        m_pDust[i].m_b = rad * getExcentricity(rad);
+        m_pDust[i].m_angle = getAngularOffset(rad);
+        m_pDust[i].m_theta = 360.0 * ((double)rand() / RAND_MAX);
+        m_pDust[i].m_center = QVector2D(0.0f, 0.0f);
+        m_pDust[i].calcXY();
+
+        checkMinMax(m_pDust[i]);
+    }
+
+    // Initialize H2
+    for (int i = 0; i < numOfH2; ++i)
+    {
+        x = 2*(m_radGalaxy) * ((double)rand() / RAND_MAX) - (m_radGalaxy);
+        y = 2*(m_radGalaxy) * ((double)rand() / RAND_MAX) - (m_radGalaxy);
+        rad = sqrt(x*x + y*y);
+
+        int k1 = 2*i;
+        m_pH2[k1].m_a = rad;
+        m_pH2[k1].m_b = rad * getExcentricity(rad);
+        m_pH2[k1].m_angle = getAngularOffset(rad);
+        m_pH2[k1].m_theta = 360.0 * ((double)rand() / RAND_MAX);
+        m_pH2[k1].m_center = QVector2D(0.0f, 0.0f);
+        m_pH2[k1].calcXY();
+
+        int k2 = 2*i + 1;
+        m_pH2[k2].m_a = rad + 1000.0;
+        m_pH2[k2].m_b = rad * getExcentricity(rad);
+        m_pH2[k2].m_angle = m_pH2[k1].m_angle;
+        m_pH2[k2].m_theta = m_pH2[k1].m_theta;
+        m_pH2[k2].m_center = m_pH2[k1].m_center;
+        m_pH2[k2].calcXY();
+    }
+
     qreal max = qMax(m_maxx, m_maxy);
     qreal min = -qMin(m_minx, m_miny);
     max = qMax(min, max);
@@ -157,9 +224,19 @@ void GalaxyData::createSeries()
     m_normalSeries->setMesh(QAbstract3DSeries::MeshPoint);
     m_graph->addSeries(m_normalSeries);
 
+    QScatterDataProxy *proxyDust = new QScatterDataProxy;
+    m_dustSeries = new QScatter3DSeries(proxyDust);
+    m_dustSeries->setMesh(QAbstract3DSeries::MeshPoint);
+    m_graph->addSeries(m_dustSeries);
+
+    QScatterDataProxy *proxyH2 = new QScatterDataProxy;
+    m_H2Series = new QScatter3DSeries(proxyH2);
+    m_H2Series->setMesh(QAbstract3DSeries::MeshPoint);
+    m_graph->addSeries(m_H2Series);
+
     QScatterDataProxy *proxyFiltered = new QScatterDataProxy;
     m_filteredSeries = new QScatter3DSeries(proxyFiltered);
-    m_filteredSeries->setMesh(QAbstract3DSeries::MeshPoint);
+    m_filteredSeries->setMesh(QAbstract3DSeries::MeshCube);
     m_graph->addSeries(m_filteredSeries);
 
 }
@@ -179,6 +256,38 @@ void GalaxyData::createNormalDataView()
 
     m_normalSeries->dataProxy()->resetArray(dataArray);
     m_normalSeries->setMesh(QAbstract3DSeries::MeshPoint);
+    m_normalSeries->setBaseColor(Qt::white);
+
+    dataArray = new QScatterDataArray;
+    dataArray->resize(numOfDust);
+    ptrToDataArray = &dataArray->first();
+
+    for (uint i = 0; i < numOfDust; i++) {
+        ptrToDataArray->setPosition(QVector3D(m_pDust[i].m_pos.x(),
+                                              0.0f,
+                                              m_pDust[i].m_pos.y()));
+        ptrToDataArray++;
+    }
+
+    m_dustSeries->dataProxy()->resetArray(dataArray);
+    m_dustSeries->setMesh(QAbstract3DSeries::MeshPoint);
+    m_dustSeries->setBaseColor(QColor(131, 111, 255));
+
+    dataArray = new QScatterDataArray;
+    dataArray->resize(numOfDust);
+    ptrToDataArray = &dataArray->first();
+
+    uint H2Count = numOfH2 * 2;
+    for (uint i = 0; i < H2Count; i++) {
+        ptrToDataArray->setPosition(QVector3D(m_pH2[i].m_pos.x(),
+                                              0.0f,
+                                              m_pH2[i].m_pos.y()));
+        ptrToDataArray++;
+    }
+
+    m_H2Series->dataProxy()->resetArray(dataArray);
+    m_H2Series->setMesh(QAbstract3DSeries::MeshPoint);
+    m_H2Series->setBaseColor(Qt::red);
 }
 
 void GalaxyData::createFilteredView()
@@ -334,6 +443,21 @@ void GalaxyData::setStaticEnabled(bool enabled)
         m_graph->setOptimizationHints(QAbstract3DGraph::OptimizationStatic);
     else
         m_graph->setOptimizationHints(QAbstract3DGraph::OptimizationDefault);
+}
+
+void GalaxyData::setStarsVisible(bool enabled)
+{
+    m_normalSeries->setVisible(enabled);
+}
+
+void GalaxyData::setDustVisible(bool enabled)
+{
+    m_dustSeries->setVisible(enabled);
+}
+
+void GalaxyData::setH2Visible(bool enabled)
+{
+    m_H2Series->setVisible(enabled);
 }
 
 void GalaxyData::resetValues()

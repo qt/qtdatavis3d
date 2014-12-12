@@ -52,6 +52,9 @@ public:
     void resetValues();
     void setFilteredEnabled(bool enabled);
     void setStaticEnabled(bool enabled);
+    void setStarsVisible(bool enabled);
+    void setDustVisible(bool enabled);
+    void setH2Visible(bool enabled);
     inline void setSliders(QSlider *rg,
                            QSlider *rc,
                            QSlider *ao,
@@ -77,8 +80,12 @@ private:
 private:
     Q3DScatter *m_graph;
     QScatter3DSeries *m_normalSeries;
+    QScatter3DSeries *m_dustSeries;
+    QScatter3DSeries *m_H2Series;
     QScatter3DSeries *m_filteredSeries;
     Star *m_pStars;
+    Star *m_pDust;
+    Star *m_pH2;
 
     qreal m_elEx1;          // Excentricity of the innermost ellipse
     qreal m_elEx2;          // Excentricity of the outermost ellipse
