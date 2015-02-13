@@ -103,10 +103,10 @@ private:
     QSlider *m_eccentricityOuterSlider;
     QLabel *m_fpsLabel;
 
-    qreal m_minx = 9999.9;
-    qreal m_maxx = -9999.0;
-    qreal m_miny = 9999.9;
-    qreal m_maxy = -9999.0;
+    qreal m_minx;
+    qreal m_maxx;
+    qreal m_miny;
+    qreal m_maxy;
     int m_range;
     bool m_filtered;
 };
