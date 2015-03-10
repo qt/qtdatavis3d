@@ -27,6 +27,8 @@ import "."
 Rectangle {
     id: mainView
     //! [1]
+    width: 500
+    height: 500
 
     //! [4]
     Data {
