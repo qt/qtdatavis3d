@@ -1,15 +1,15 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc
+** Copyright (C) 2015 The Qt Company Ltd
 ** All rights reserved.
-** For any questions to Digia, please use contact form at http://qt.io
+** For any questions to The Qt Company, please use contact form at http://qt.io
 **
 ** This file is part of the Qt Data Visualization module.
 **
 ** Licensees holding valid commercial license for Qt may use this file in
 ** accordance with the Qt License Agreement provided with the Software
 ** or, alternatively, in accordance with the terms contained in a written
-** agreement between you and Digia.
+** agreement between you and The Qt Company.
 **
 ** If you have questions regarding the use of this file, please use
 ** contact form at http://qt.io
@@ -21,11 +21,11 @@
 
 #include <QtCore/qglobal.h>
 
-#define QT_DATAVISUALIZATION_VERSION_STR   "1.2.0"
+#define QT_DATAVISUALIZATION_VERSION_STR   "1.2.1"
 /*
    QT_DATAVISUALIZATION_VERSION is (major << 16) + (minor << 8) + patch.
 */
-#define QT_DATAVISUALIZATION_VERSION       0x010200
+#define QT_DATAVISUALIZATION_VERSION       0x010201
 /*
    can be used like #if (QT_DATAVISUALIZATION_VERSION >= QT_DATAVISUALIZATION_VERSION_CHECK(1, 0, 0))
 */

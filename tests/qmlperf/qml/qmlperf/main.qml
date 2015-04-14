@@ -1,15 +1,15 @@
 /****************************************************************************
 **
-** Copyright (C) 2014 Digia Plc
+** Copyright (C) 2015 The Qt Company Ltd
 ** All rights reserved.
-** For any questions to Digia, please use contact form at http://qt.io
+** For any questions to The Qt Company, please use contact form at http://qt.io
 **
 ** This file is part of the Qt Data Visualization module.
 **
 ** Licensees holding valid commercial license for Qt may use this file in
 ** accordance with the Qt License Agreement provided with the Software
 ** or, alternatively, in accordance with the terms contained in a written
-** agreement between you and Digia.
+** agreement between you and The Qt Company.
 **
 ** If you have questions regarding the use of this file, please use
 ** contact form at http://qt.io
@@ -32,7 +32,7 @@ Rectangle {
 
     Button {
         id: changeButton
-        width: 350
+        width: parent.width / 7
         height: 50
         anchors.left: parent.left
         enabled: true
@@ -54,7 +54,7 @@ Rectangle {
     Text {
         id: fpsText
         text: "Reading"
-        width: 300
+        width: (parent.width / 7) * 3
         height: 50
         anchors.left: changeButton.right
         verticalAlignment: Text.AlignVCenter
@@ -63,7 +63,7 @@ Rectangle {
 
     Button {
         id: optimization
-        width: 300
+        width: parent.width / 7
         height: 50
         anchors.left: fpsText.right
         enabled: true
@@ -82,7 +82,7 @@ Rectangle {
 
     Button {
         id: itemAdd
-        width: 300
+        width: parent.width / 7
         height: 50
         anchors.left: optimization.right
         enabled: true
@@ -90,6 +90,18 @@ Rectangle {
         onClicked: {
             itemCount = itemCount + addItems;
             dataGenerator.add(scatterSeries, addItems);
+        }
+    }
+
+    Button {
+        id: writeLine
+        width: parent.width / 7
+        height: 50
+        anchors.left: itemAdd.right
+        enabled: true
+        text: "Write"
+        onClicked: {
+            dataGenerator.writeLine(itemCount, scatterPlot.currentFps.toFixed(1));
         }
     }
 
