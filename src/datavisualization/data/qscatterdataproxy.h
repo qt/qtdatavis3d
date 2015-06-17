@@ -61,7 +61,7 @@ public:
 
     void removeItems(int index, int removeCount);
 
-signals:
+Q_SIGNALS:
     void arrayReset();
     void itemsAdded(int startIndex, int count);
     void itemsChanged(int startIndex, int count);

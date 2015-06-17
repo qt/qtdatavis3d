@@ -224,7 +224,7 @@ public:
     void setMargin(qreal margin);
     qreal margin() const;
 
-public slots:
+public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisZChanged(QAbstract3DAxis *axis) = 0;
@@ -247,7 +247,7 @@ protected:
     virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
     virtual QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
 
-signals:
+Q_SIGNALS:
     void selectionModeChanged(AbstractDeclarative::SelectionFlags mode);
     void shadowQualityChanged(AbstractDeclarative::ShadowQuality quality);
     void shadowsSupportedChanged(bool supported);

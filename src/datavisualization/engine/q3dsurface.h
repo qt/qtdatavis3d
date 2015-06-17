@@ -59,7 +59,7 @@ public:
     void setFlipHorizontalGrid(bool flip);
     bool flipHorizontalGrid() const;
 
-signals:
+Q_SIGNALS:
     void axisXChanged(QValue3DAxis *axis);
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);

@@ -63,7 +63,7 @@ public:
     void testItemChanges();
     void testAxisReverse();
 
-public slots:
+public Q_SLOTS:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void clear();
@@ -103,7 +103,7 @@ public slots:
     void setCameraTargetZ(int value);
     void setGraphMargin(int value);
 
-signals:
+Q_SIGNALS:
     void shadowQualityChanged(int quality);
 
 private:

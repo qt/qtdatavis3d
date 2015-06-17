@@ -52,7 +52,7 @@ public:
     void setReverseValueAxis(int enabled);
     void setReflection(bool enabled);
 
-public slots:
+public Q_SLOTS:
     void changeRange(int range);
     void changeStyle(int style);
     void changeSelectionMode(int selectionMode);
@@ -64,7 +64,7 @@ public slots:
     void setAxisTitleFixed(bool enabled);
     void zoomToSelectedBar();
 
-signals:
+Q_SIGNALS:
     void shadowQualityChanged(int quality);
     void backgroundEnabledChanged(bool enabled);
     void gridEnabledChanged(bool enabled);

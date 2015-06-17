@@ -195,7 +195,7 @@ protected:
     void mouseMoveEvent(QMouseEvent *event);
     void wheelEvent(QWheelEvent *event);
 
-signals:
+Q_SIGNALS:
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *theme);
     void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);

@@ -61,7 +61,7 @@ public:
                const QStringList &rowCategories,
                const QStringList &columnCategories);
     //! [2]
-signals:
+Q_SIGNALS:
     //! [3]
     void mappingChanged();
     //! [3]

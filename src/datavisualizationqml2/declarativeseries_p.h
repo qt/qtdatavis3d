@@ -76,12 +76,12 @@ public:
     void setMultiHighlightGradient(ColorGradient *gradient);
     ColorGradient *multiHighlightGradient() const;
 
-public slots:
+public Q_SLOTS:
     void handleBaseGradientUpdate();
     void handleSingleHighlightGradientUpdate();
     void handleMultiHighlightGradientUpdate();
 
-signals:
+Q_SIGNALS:
     void selectedBarChanged(QPointF position);
     void baseGradientChanged(ColorGradient *gradient);
     void singleHighlightGradientChanged(ColorGradient *gradient);
@@ -120,12 +120,12 @@ public:
 
     int invalidSelectionIndex() const;
 
-public slots:
+public Q_SLOTS:
     void handleBaseGradientUpdate();
     void handleSingleHighlightGradientUpdate();
     void handleMultiHighlightGradientUpdate();
 
-signals:
+Q_SIGNALS:
     void baseGradientChanged(ColorGradient *gradient);
     void singleHighlightGradientChanged(ColorGradient *gradient);
     void multiHighlightGradientChanged(ColorGradient *gradient);
@@ -168,12 +168,12 @@ public:
     void setMultiHighlightGradient(ColorGradient *gradient);
     ColorGradient *multiHighlightGradient() const;
 
-public slots:
+public Q_SLOTS:
     void handleBaseGradientUpdate();
     void handleSingleHighlightGradientUpdate();
     void handleMultiHighlightGradientUpdate();
 
-signals:
+Q_SIGNALS:
     void selectedPointChanged(QPointF position);
     void baseGradientChanged(ColorGradient *gradient);
     void singleHighlightGradientChanged(ColorGradient *gradient);

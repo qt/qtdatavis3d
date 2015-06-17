@@ -52,7 +52,7 @@ public:
     virtual void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void wheelEvent(QWheelEvent *event);
 
-signals:
+Q_SIGNALS:
     void rotationEnabledChanged(bool enable);
     void zoomEnabledChanged(bool enable);
     void selectionEnabledChanged(bool enable);

@@ -112,7 +112,7 @@ public:
 
     QImage renderSlice(Qt::Axis axis, int index);
 
-signals:
+Q_SIGNALS:
     void textureWidthChanged(int value);
     void textureHeightChanged(int value);
     void textureDepthChanged(int value);

@@ -48,7 +48,7 @@ public:
 
     void emitLabelsChanged();
 
-signals:
+Q_SIGNALS:
     void formatterDirty();
 
 protected:

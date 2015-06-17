@@ -51,7 +51,7 @@ public:
     QPointF selectionQueryPosition() const;
     QPoint invalidSelectionPoint() const;
 
-signals:
+Q_SIGNALS:
     void selectionQueryPositionChanged(const QPointF position);
 };
 

@@ -43,7 +43,7 @@ public:
     Q3DInputHandlerPrivate(Q3DInputHandler *q);
     ~Q3DInputHandlerPrivate();
 
-public slots:
+public Q_SLOTS:
     void handleSceneChange(Q3DScene *scene);
     void handleQueriedGraphPositionChange();
 

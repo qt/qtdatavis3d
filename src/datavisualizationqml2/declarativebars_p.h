@@ -89,12 +89,12 @@ public:
     void setFloorLevel(float level);
     float floorLevel() const;
 
-public slots:
+public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis);
     void handleAxisYChanged(QAbstract3DAxis *axis);
     void handleAxisZChanged(QAbstract3DAxis *axis);
 
-signals:
+Q_SIGNALS:
     void rowAxisChanged(QCategory3DAxis *axis);
     void valueAxisChanged(QValue3DAxis *axis);
     void columnAxisChanged(QCategory3DAxis *axis);

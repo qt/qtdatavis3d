@@ -73,7 +73,7 @@ public:
                                                 float fixedRotation,
                                                 float distanceModifier) const;
 
-signals:
+Q_SIGNALS:
     void minXRotationChanged(float rotation);
     void minYRotationChanged(float rotation);
     void maxXRotationChanged(float rotation);

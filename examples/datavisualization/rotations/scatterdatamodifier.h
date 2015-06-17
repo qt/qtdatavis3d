@@ -34,7 +34,7 @@ public:
 
     void generateData();
 
-public slots:
+public Q_SLOTS:
     void setFieldLines(int lines);
     void setArrowsPerLine(int arrows);
     void toggleRotation();

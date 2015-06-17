@@ -31,7 +31,7 @@ public:
     DataGenerator(QObject *parent = 0);
     virtual ~DataGenerator();
 
-public slots:
+public Q_SLOTS:
     void generateData(QScatter3DSeries *series, uint count);
     void add(QScatter3DSeries *series, uint count);
     void writeLine(int itemCount, float fps);

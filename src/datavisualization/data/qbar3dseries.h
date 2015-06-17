@@ -49,7 +49,7 @@ public:
     void setMeshAngle(float angle);
     float meshAngle() const;
 
-signals:
+Q_SIGNALS:
     void dataProxyChanged(QBarDataProxy *proxy);
     void selectedBarChanged(const QPoint &position);
     void meshAngleChanged(float angle);

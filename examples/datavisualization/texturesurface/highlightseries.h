@@ -35,7 +35,7 @@ public:
     void setTopographicSeries(TopographicSeries *series);
     inline void setMinHeight(float height) { m_minHeight = height; }
 
-public slots:
+public Q_SLOTS:
     void handlePositionChange(const QPoint &position);
     void handleGradientChange(float value);
 

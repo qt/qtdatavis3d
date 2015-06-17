@@ -68,7 +68,7 @@ public:
     Q3DScene *scene() const;
     void setScene(Q3DScene *scene);
 
-signals:
+Q_SIGNALS:
     void positionChanged(const QPoint &position);
     void inputViewChanged(QAbstract3DInputHandler::InputView view);
     void sceneChanged(Q3DScene *scene);

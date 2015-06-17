@@ -59,7 +59,7 @@ public:
     void setMaxZValue(float max);
     float maxZValue() const;
 
-signals:
+Q_SIGNALS:
     void heightMapChanged(const QImage &image);
     void heightMapFileChanged(const QString &filename);
     void minXValueChanged(float value);

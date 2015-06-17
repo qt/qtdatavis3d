@@ -47,13 +47,13 @@ public:
     SpectrumAnalyserThread(QObject *parent);
     ~SpectrumAnalyserThread();
 
-public slots:
+public Q_SLOTS:
     void setWindowFunction(WindowFunction type);
     void calculateSpectrum(const QByteArray &buffer,
                            int inputFrequency,
                            int bytesPerSample);
 
-signals:
+Q_SIGNALS:
     void calculationComplete(const FrequencySpectrum &spectrum);
 
 private:
@@ -124,10 +124,10 @@ public:
      */
     void cancelCalculation();
 
-signals:
+Q_SIGNALS:
     void spectrumChanged(const FrequencySpectrum &spectrum);
 
-private slots:
+private Q_SLOTS:
     void calculationComplete(const FrequencySpectrum &spectrum);
 
 private:

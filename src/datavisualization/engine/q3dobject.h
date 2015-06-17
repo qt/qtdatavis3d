@@ -45,7 +45,7 @@ public:
     QVector3D position() const;
     void setPosition(const QVector3D &position);
 
-signals:
+Q_SIGNALS:
     void positionChanged(const QVector3D &position);
 
 protected:

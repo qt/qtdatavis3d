@@ -46,7 +46,7 @@ public:
     virtual void setItemModel(QAbstractItemModel *itemModel);
     virtual QAbstractItemModel *itemModel() const;
 
-public slots:
+public Q_SLOTS:
     virtual void handleColumnsInserted(const QModelIndex &parent, int start, int end);
     virtual void handleColumnsMoved(const QModelIndex &sourceParent, int sourceStart,
                                     int sourceEnd, const QModelIndex &destinationParent,
@@ -65,7 +65,7 @@ public slots:
     virtual void handleMappingChanged();
     virtual void handlePendingResolve();
 
-signals:
+Q_SIGNALS:
     void itemModelChanged(const QAbstractItemModel *itemModel);
 
 protected:

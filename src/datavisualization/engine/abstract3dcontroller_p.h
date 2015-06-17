@@ -347,7 +347,7 @@ public:
     void markSeriesItemLabelsDirty();
     bool isOpenGLES() const;
 
-public slots:
+public Q_SLOTS:
     void destroyRenderer();
 
     void handleAxisTitleChanged(const QString &title);
@@ -380,7 +380,7 @@ public slots:
 
     void updateCustomItem();
 
-signals:
+Q_SIGNALS:
     void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *activeTheme);

@@ -39,7 +39,7 @@ public:
     void setFpsLabel(QLabel *fpsLabel);
     void setSliceLabels(QLabel *xLabel, QLabel *yLabel, QLabel *zLabel);
 
-public slots:
+public Q_SLOTS:
     void sliceX(int enabled);
     void sliceY(int enabled);
     void sliceZ(int enabled);

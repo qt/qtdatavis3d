@@ -104,7 +104,7 @@ private:
 
     bool initialize();
 
-signals:
+Q_SIGNALS:
     void dataNotification();
     void statusNotification(QKinect::KinectStatus);
 };

@@ -116,7 +116,7 @@ public:
     void setHorizontalAspectRatio(int ratio);
     void setSurfaceTexture(bool enabled);
 
-public slots:
+public Q_SLOTS:
     void changeShadowQuality(int quality);
     void changeTheme(int theme);
     void flipViews();

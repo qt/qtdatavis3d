@@ -79,7 +79,7 @@ public:
     void setFloorLevel(float level);
     float floorLevel() const;
 
-signals:
+Q_SIGNALS:
     void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(const QSizeF &spacing);

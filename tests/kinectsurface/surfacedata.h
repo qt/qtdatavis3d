@@ -60,7 +60,7 @@ public:
         MeshBars
     };
 
-public slots:
+public Q_SLOTS:
     void setResolution(int selection);
     void changeMode(int mode);
 
@@ -89,7 +89,7 @@ public:
                               QWidget *buttonOne, QWidget *buttonTwo);
     ~ContainerChanger();
 
-public slots:
+public Q_SLOTS:
     void changeContainer(int container);
 
 private:

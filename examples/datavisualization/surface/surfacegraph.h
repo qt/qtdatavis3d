@@ -59,7 +59,7 @@ public:
     void adjustZMin(int min);
     void adjustZMax(int max);
 
-public slots:
+public Q_SLOTS:
     void changeTheme(int theme);
 
 private:

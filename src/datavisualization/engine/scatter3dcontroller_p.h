@@ -119,14 +119,14 @@ public:
     virtual void handlePendingClick();
     virtual void adjustAxisRanges();
 
-public slots:
+public Q_SLOTS:
     void handleArrayReset();
     void handleItemsAdded(int startIndex, int count);
     void handleItemsChanged(int startIndex, int count);
     void handleItemsRemoved(int startIndex, int count);
     void handleItemsInserted(int startIndex, int count);
 
-signals:
+Q_SIGNALS:
     void selectedSeriesChanged(QScatter3DSeries *series);
 
 protected:

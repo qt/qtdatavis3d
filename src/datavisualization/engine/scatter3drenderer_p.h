@@ -105,7 +105,7 @@ public:
 
     void render(GLuint defaultFboHandle);
 
-public slots:
+public Q_SLOTS:
     void updateSelectedItem(int index, QScatter3DSeries *series);
 
 protected:

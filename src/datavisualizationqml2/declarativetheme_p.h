@@ -80,7 +80,7 @@ public:
     virtual void classBegin();
     virtual void componentComplete();
 
-signals:
+Q_SIGNALS:
     void singleHighlightGradientChanged(ColorGradient *gradient);
     void multiHighlightGradientChanged(ColorGradient *gradient);
 
