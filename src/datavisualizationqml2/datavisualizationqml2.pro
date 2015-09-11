@@ -52,6 +52,13 @@ CONFIG += no_cxx_module
 
 load(qml_plugin)
 
+win32 {
+    CONFIG += skip_target_version_ext
+    VERSION = $$MODULE_VERSION
+    QMAKE_TARGET_PRODUCT = "Qt Data Visualization (Qt $$QT_VERSION)"
+    QMAKE_TARGET_DESCRIPTION = "3D Data Visualization QML plugin for Qt."
+}
+
 # Copy qmldir to DESTDIR so we can use the plugin directly from there in our examples
 # without having to do 'make install'.
 !android:!ios {
