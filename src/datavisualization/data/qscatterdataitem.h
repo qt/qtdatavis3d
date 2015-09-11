@@ -37,9 +37,9 @@ public:
 
     QScatterDataItem &operator=(const QScatterDataItem &other);
 
-    inline void setPosition(const QVector3D &position) { m_position = position; }
+    inline void setPosition(const QVector3D &pos) { m_position = pos; }
     inline QVector3D position() const { return m_position; }
-    inline void setRotation(const QQuaternion &rotation) { m_rotation = rotation; }
+    inline void setRotation(const QQuaternion &rot) { m_rotation = rot; }
     inline QQuaternion rotation() const { return m_rotation; }
     inline void setX(float value) { m_position.setX(value); }
     inline void setY(float value) { m_position.setY(value); }

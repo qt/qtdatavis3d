@@ -82,8 +82,8 @@ QSurfaceDataItem &QSurfaceDataItem::operator=(const QSurfaceDataItem &other)
 }
 
 /*!
- * \fn void QSurfaceDataItem::setPosition(const QVector3D &position)
- * Sets \a position to this data item.
+ * \fn void QSurfaceDataItem::setPosition(const QVector3D &pos)
+ * Sets position \a pos to this data item.
  */
 
 /*!
