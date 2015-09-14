@@ -20,6 +20,9 @@ QMAKE_DOCS = $$PWD/doc/qtdatavisualization.qdocconf
 
 load(qt_module)
 
+QMAKE_TARGET_PRODUCT = "Qt Data Visualization (Qt $$QT_VERSION)"
+QMAKE_TARGET_DESCRIPTION = "3D Data Visualization component for Qt."
+
 include($$PWD/global/global.pri)
 include($$PWD/engine/engine.pri)
 include($$PWD/utils/utils.pri)

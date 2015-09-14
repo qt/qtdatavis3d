@@ -43,7 +43,7 @@ public:
 
     const VariantDataItemList &itemList() const;
 
-signals:
+Q_SIGNALS:
     void itemsAdded(int index, int count);
     void dataCleared();
     //! [0]

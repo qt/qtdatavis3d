@@ -102,7 +102,7 @@ public:
     void setReflectivity(int value);
     void toggleCustomItem();
 
-public slots:
+public Q_SLOTS:
     void flipViews();
     void setGradient();
     void toggleMultiseriesScaling();
@@ -128,7 +128,7 @@ public slots:
     void setFloorLevel(int value);
     void setGraphMargin(int value);
 
-signals:
+Q_SIGNALS:
     void shadowQualityChanged(int quality);
 
 private:

@@ -51,11 +51,11 @@ public:
     QDate originDate() const;
     QString selectionFormat() const;
 
-public slots:
+public Q_SLOTS:
     void setOriginDate(const QDate &date);
     void setSelectionFormat(const QString &format);
 
-signals:
+Q_SIGNALS:
     void originDateChanged(const QDate &date);
     void selectionFormatChanged(const QString &format);
 

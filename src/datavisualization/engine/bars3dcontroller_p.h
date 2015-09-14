@@ -139,7 +139,7 @@ public:
     virtual void handleAxisRangeChangedBySender(QObject *sender);
     virtual void adjustAxisRanges();
 
-public slots:
+public Q_SLOTS:
     void handleArrayReset();
     void handleRowsAdded(int startIndex, int count);
     void handleRowsChanged(int startIndex, int count);
@@ -149,7 +149,7 @@ public slots:
     void handleDataRowLabelsChanged();
     void handleDataColumnLabelsChanged();
 
-signals:
+Q_SIGNALS:
     void primarySeriesChanged(QBar3DSeries *series);
     void selectedSeriesChanged(QBar3DSeries *series);
 

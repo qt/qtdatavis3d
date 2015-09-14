@@ -58,7 +58,7 @@ public:
     void setAxis(QValue3DAxis *axis);
     void markDirty(bool labelsChange);
 
-public slots:
+public Q_SLOTS:
     void markDirtyNoLabelChange();
 
 protected:

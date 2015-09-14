@@ -79,7 +79,7 @@ public:
 
     void setTextureImage(const QImage &textureImage);
 
-signals:
+Q_SIGNALS:
     void meshFileChanged(const QString &meshFile);
     void textureFileChanged(const QString &textureFile);
     void positionChanged(const QVector3D &position);

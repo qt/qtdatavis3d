@@ -48,7 +48,7 @@ public:
     void setItemSize(float size);
     float itemSize() const;
 
-signals:
+Q_SIGNALS:
     void dataProxyChanged(QScatterDataProxy *proxy);
     void selectedItemChanged(int index);
     void itemSizeChanged(float size);

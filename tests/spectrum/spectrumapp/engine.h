@@ -117,14 +117,14 @@ public:
      */
     void setWindowFunction(WindowFunction type);
 
-public slots:
+public Q_SLOTS:
     void startRecording();
     void startPlayback();
     void suspend();
     void setAudioInputDevice(const QAudioDeviceInfo &device);
     void setAudioOutputDevice(const QAudioDeviceInfo &device);
 
-signals:
+Q_SIGNALS:
     void stateChanged(QAudio::Mode mode, QAudio::State state);
 
     /**
@@ -179,7 +179,7 @@ signals:
      */
     void bufferChanged(qint64 position, qint64 length, const QByteArray &buffer);
 
-private slots:
+private Q_SLOTS:
     void audioNotify();
     void audioStateChanged(QAudio::State state);
     void audioDataReady();

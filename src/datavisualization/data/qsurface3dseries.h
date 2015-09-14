@@ -70,7 +70,7 @@ public:
     void setTextureFile(const QString &filename);
     QString textureFile() const;
 
-signals:
+Q_SIGNALS:
     void dataProxyChanged(QSurfaceDataProxy *proxy);
     void selectedPointChanged(const QPoint &position);
     void flatShadingEnabledChanged(bool enable);

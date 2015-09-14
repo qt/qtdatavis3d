@@ -31,7 +31,7 @@ public:
     virtual ~DataSource();
 
     //! [0]
-public slots:
+public Q_SLOTS:
     void generateData(int cacheCount, int rowCount, int columnCount,
                       float xMin, float xMax, float yMin, float yMax, float zMin, float zMax);
 

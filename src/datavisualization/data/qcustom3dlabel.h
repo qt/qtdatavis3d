@@ -69,7 +69,7 @@ public:
     void setFacingCamera(bool enabled);
     bool isFacingCamera() const;
 
-signals:
+Q_SIGNALS:
     void textChanged(const QString &text);
     void fontChanged(const QFont &font);
     void textColorChanged(const QColor &color);

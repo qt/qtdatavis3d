@@ -51,7 +51,7 @@ public:
     VariantBarDataMapping *mapping();
     //! [1]
 
-public slots:
+public Q_SLOTS:
     void handleItemsAdded(int index, int count);
     void handleDataCleared();
     void handleMappingChanged();

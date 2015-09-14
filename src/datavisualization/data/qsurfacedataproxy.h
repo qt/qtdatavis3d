@@ -68,7 +68,7 @@ public:
 
     void removeRows(int rowIndex, int removeCount);
 
-signals:
+Q_SIGNALS:
     void arrayReset();
     void rowsAdded(int startIndex, int count);
     void rowsChanged(int startIndex, int count);

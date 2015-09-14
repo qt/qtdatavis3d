@@ -125,7 +125,7 @@ public:
     void setItemLabelVisible(bool visible);
     bool isItemLabelVisible() const;
 
-signals:
+Q_SIGNALS:
     void itemLabelFormatChanged(const QString &format);
     void visibilityChanged(bool visible);
     void meshChanged(QAbstract3DSeries::Mesh mesh);

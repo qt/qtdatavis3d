@@ -41,7 +41,7 @@ public:
     BarItemModelHandler(QItemModelBarDataProxy *proxy, QObject *parent = 0);
     virtual ~BarItemModelHandler();
 
-public slots:
+public Q_SLOTS:
     virtual void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
                                    const QVector<int> &roles = QVector<int> ());
 

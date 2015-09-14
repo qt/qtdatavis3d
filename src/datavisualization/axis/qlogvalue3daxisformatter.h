@@ -46,7 +46,7 @@ public:
     void setShowEdgeLabels(bool enabled);
     bool showEdgeLabels() const;
 
-signals:
+Q_SIGNALS:
     void baseChanged(qreal base);
     void autoSubGridChanged(bool enabled);
     void showEdgeLabelsChanged(bool enabled);

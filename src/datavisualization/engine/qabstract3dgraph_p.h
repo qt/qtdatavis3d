@@ -54,7 +54,7 @@ public:
 
     QImage renderToImage(int msaaSamples, const QSize &imageSize);
 
-public slots:
+public Q_SLOTS:
     void renderLater();
     void renderNow();
 

@@ -79,7 +79,7 @@ public:
     float devicePixelRatio() const;
     void setDevicePixelRatio(float pixelRatio);
 
-signals:
+Q_SIGNALS:
     void viewportChanged(const QRect &viewport);
     void primarySubViewportChanged(const QRect &subViewport);
     void secondarySubViewportChanged(const QRect &subViewport);

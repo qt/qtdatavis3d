@@ -93,7 +93,7 @@ public:
     void setTitleFixed(bool fixed);
     bool isTitleFixed() const;
 
-signals:
+Q_SIGNALS:
     void titleChanged(const QString &newTitle);
     void labelsChanged();
     void orientationChanged(QAbstract3DAxis::AxisOrientation orientation);

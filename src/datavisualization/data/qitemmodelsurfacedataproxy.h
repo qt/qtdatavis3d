@@ -146,7 +146,7 @@ public:
     void setMultiMatchBehavior(MultiMatchBehavior behavior);
     MultiMatchBehavior multiMatchBehavior() const;
 
-signals:
+Q_SIGNALS:
     void itemModelChanged(const QAbstractItemModel* itemModel);
     void rowRoleChanged(const QString &role);
     void columnRoleChanged(const QString &role);

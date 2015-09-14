@@ -112,7 +112,7 @@ public:
 
     void updateSurfaceTexture(QSurface3DSeries *series);
 
-public slots:
+public Q_SLOTS:
     void handleArrayReset();
     void handleRowsAdded(int startIndex, int count);
     void handleRowsChanged(int startIndex, int count);
@@ -122,7 +122,7 @@ public slots:
 
     void handleFlatShadingSupportedChange(bool supported);
 
-signals:
+Q_SIGNALS:
     void selectedSeriesChanged(QSurface3DSeries *series);
     void flipHorizontalGridChanged(bool flip);
 

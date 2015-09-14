@@ -95,7 +95,7 @@ public:
 
     bool isInArea(const QRect &area, int x, int y) const;
 
-signals:
+Q_SIGNALS:
     void needRender();
 
 public:

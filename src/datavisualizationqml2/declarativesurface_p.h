@@ -70,12 +70,12 @@ public:
     void setFlipHorizontalGrid(bool flip);
     bool flipHorizontalGrid() const;
 
-public slots:
+public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis);
     void handleAxisYChanged(QAbstract3DAxis *axis);
     void handleAxisZChanged(QAbstract3DAxis *axis);
 
-signals:
+Q_SIGNALS:
     void axisXChanged(QValue3DAxis *axis);
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);

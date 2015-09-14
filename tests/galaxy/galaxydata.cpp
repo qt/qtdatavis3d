@@ -60,16 +60,18 @@ GalaxyData::GalaxyData(Q3DScatter *scatter,
       m_elEx1(ex1),
       m_elEx2(ex2),
       m_radFarField(m_radGalaxy * 2),
-      m_filtered(false)
+      m_filtered(false),
+      m_minx(9999.9),
+      m_maxx(-9999.0),
+      m_miny(9999.9),
+      m_maxy(-9999.0)
 {
     m_graph->activeTheme()->setType(Q3DTheme::ThemeEbony);
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftLow);
 
     m_graph->axisX()->setRange(-25000.0f, 25000.0f);
-    //m_graph->axisY()->setRange(m_minY, m_minY + m_rangeY);
     m_graph->axisZ()->setRange(-25000.0f, 25000.0f);
     m_graph->setOptimizationHints(QAbstract3DGraph::OptimizationStatic);
-    //m_graph->activeTheme()->setType(Q3DTheme::ThemeIsabelle);
     m_graph->activeTheme()->setBackgroundColor(QColor(31, 31, 31));
     m_graph->activeTheme()->setWindowColor(QColor(31, 31, 31));
     m_graph->activeTheme()->setLabelBackgroundColor(QColor(31, 31, 31));

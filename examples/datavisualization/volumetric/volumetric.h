@@ -43,7 +43,7 @@ public:
     void setSliceLabels(QLabel *xLabel, QLabel *yLabel, QLabel *zLabel);
     void setAlphaMultiplierLabel(QLabel *label);
 
-public slots:
+public Q_SLOTS:
     void sliceX(int enabled);
     void sliceY(int enabled);
     void sliceZ(int enabled);

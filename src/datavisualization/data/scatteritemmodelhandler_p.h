@@ -41,7 +41,7 @@ public:
     ScatterItemModelHandler(QItemModelScatterDataProxy *proxy, QObject *parent = 0);
     virtual ~ScatterItemModelHandler();
 
-public slots:
+public Q_SLOTS:
     virtual void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
                                    const QVector<int> &roles = QVector<int> ());
     virtual void handleRowsInserted(const QModelIndex &parent, int start, int end);

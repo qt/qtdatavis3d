@@ -109,7 +109,7 @@ protected:
     virtual void fixCameraTarget(QVector3D &target);
     virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
 
-signals:
+Q_SIGNALS:
     void flatShadingSupportedChanged(bool supported);
 
 private:

@@ -37,7 +37,7 @@ public:
     void setLabels(const QStringList &labels);
     QStringList labels() const;
 
-signals:
+Q_SIGNALS:
     void labelsChanged();
 
 protected:

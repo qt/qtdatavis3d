@@ -93,8 +93,8 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 }
 
 /*!
- * \fn void QScatterDataItem::setPosition(const QVector3D &position)
- * Sets \a position to this data item.
+ * \fn void QScatterDataItem::setPosition(const QVector3D &pos)
+ * Sets position \a pos to this data item.
  */
 
 /*!
@@ -103,9 +103,9 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
  */
 
 /*!
- * \fn void QScatterDataItem::setRotation(const QQuaternion &rotation)
- * Sets \a rotation to this data item.
- * The \a rotation should be a normalized QQuaternion.
+ * \fn void QScatterDataItem::setRotation(const QQuaternion &rot)
+ * Sets rotation \a rot to this data item.
+ * The \a rot should be a normalized QQuaternion.
  * If the series also has rotation, item and series rotations are multiplied together.
  * Defaults to no rotation.
  */

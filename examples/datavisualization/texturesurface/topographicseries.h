@@ -35,7 +35,7 @@ public:
     float sampleCountX() { return m_sampleCountX; }
     float sampleCountZ() { return m_sampleCountZ; }
 
-public slots:
+public Q_SLOTS:
 
 private:
     float m_sampleCountX;

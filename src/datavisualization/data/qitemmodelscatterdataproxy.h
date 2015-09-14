@@ -90,7 +90,7 @@ public:
     void setRotationRoleReplace(const QString &replace);
     QString rotationRoleReplace() const;
 
-signals:
+Q_SIGNALS:
     void itemModelChanged(const QAbstractItemModel* itemModel);
     void xPosRoleChanged(const QString &role);
     void yPosRoleChanged(const QString &role);

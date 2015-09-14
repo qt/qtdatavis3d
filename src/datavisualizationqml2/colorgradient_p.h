@@ -51,7 +51,7 @@ public:
     QColor color() const;
     void setColor(const QColor &color);
 
-signals:
+Q_SIGNALS:
     void positionChanged(qreal position);
     void colorChanged(QColor color);
 

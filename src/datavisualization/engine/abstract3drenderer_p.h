@@ -173,7 +173,7 @@ public:
     QVector4D indexToSelectionColor(GLint index);
     void calculatePolarXZ(const QVector3D &dataPos, float &x, float &z) const;
 
-signals:
+Q_SIGNALS:
     void needRender(); // Emit this if something in renderer causes need for another render pass.
     void requestShadowQuality(QAbstract3DGraph::ShadowQuality quality); // For automatic quality adjustments
 

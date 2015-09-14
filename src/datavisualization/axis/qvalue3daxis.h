@@ -54,7 +54,7 @@ public:
     void setReversed(bool enable);
     bool reversed() const;
 
-signals:
+Q_SIGNALS:
     void segmentCountChanged(int count);
     void subSegmentCountChanged(int count);
     void labelFormatChanged(const QString &format);

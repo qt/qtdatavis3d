@@ -125,7 +125,7 @@ protected:
     virtual void fixCameraTarget(QVector3D &target);
     virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
 
-public slots:
+public Q_SLOTS:
     void updateMultiSeriesScaling(bool uniform);
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
                         const QSizeF &spacing = QSizeF(1.0, 1.0),

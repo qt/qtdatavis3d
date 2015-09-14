@@ -147,7 +147,7 @@ public:
     void setColorStyle(ColorStyle style);
     ColorStyle colorStyle() const;
 
-signals:
+Q_SIGNALS:
     void typeChanged(Q3DTheme::Theme themeType);
     void baseColorsChanged(const QList<QColor> &colors);
     void backgroundColorChanged(const QColor &color);

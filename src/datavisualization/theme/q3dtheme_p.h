@@ -108,7 +108,7 @@ public:
     inline bool isForcePredefinedType() { return m_forcePredefinedType; }
     inline void setForcePredefinedType(bool enable) { m_forcePredefinedType = enable; }
 
-signals:
+Q_SIGNALS:
     void needRender();
 
 public:

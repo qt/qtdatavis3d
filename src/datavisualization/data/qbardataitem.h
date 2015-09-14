@@ -36,7 +36,7 @@ public:
 
     QBarDataItem &operator=(const QBarDataItem &other);
 
-    inline void setValue(float value) { m_value = value; }
+    inline void setValue(float val) { m_value = val; }
     inline float value() const { return m_value; }
     inline void setRotation(float angle) { m_angle = angle; }
     inline float rotation() const { return m_angle; }

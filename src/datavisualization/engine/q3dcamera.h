@@ -99,7 +99,7 @@ public:
     QVector3D target() const;
     void setTarget(const QVector3D &target);
 
-signals:
+Q_SIGNALS:
     void xRotationChanged(float rotation);
     void yRotationChanged(float rotation);
     void zoomLevelChanged(float zoomLevel);

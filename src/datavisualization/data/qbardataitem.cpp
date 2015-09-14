@@ -93,8 +93,8 @@ QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 }
 
 /*!
- * \fn void QBarDataItem::setValue(float value)
- * Sets \a value to this data item.
+ * \fn void QBarDataItem::setValue(float val)
+ * Sets value \a val to this data item.
  */
 
 /*!

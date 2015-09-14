@@ -45,7 +45,7 @@ public:
     void setColor(const QColor &color);
     QColor color() const;
 
-signals:
+Q_SIGNALS:
     void colorChanged(QColor color);
 
 private:

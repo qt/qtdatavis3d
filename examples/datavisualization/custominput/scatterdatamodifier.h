@@ -41,12 +41,12 @@ public:
     void toggleCameraAnimation();
     void start();
 
-public slots:
+public Q_SLOTS:
     void changeShadowQuality(int quality);
     void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void triggerSelection();
 
-signals:
+Q_SIGNALS:
     void shadowQualityChanged(int quality);
 
 private:

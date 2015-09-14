@@ -86,7 +86,7 @@ public:
 
     QCustomItemDirtyBitField m_dirtyBits;
 
-signals:
+Q_SIGNALS:
     void needUpdate();
 
 private:
