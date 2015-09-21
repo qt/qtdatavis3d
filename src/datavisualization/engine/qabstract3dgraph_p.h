@@ -31,8 +31,10 @@
 
 #include "datavisualizationglobal_p.h"
 
+QT_BEGIN_NAMESPACE
 class QOpenGLContext;
 class QOffscreenSurface;
+QT_END_NAMESPACE
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -32,8 +32,10 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dcamera.h"
 
+QT_BEGIN_NAMESPACE
 class QMatrix4x4;
 class QPoint;
+QT_END_NAMESPACE
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

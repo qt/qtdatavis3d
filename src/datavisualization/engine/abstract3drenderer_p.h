@@ -39,7 +39,7 @@
 #include "seriesrendercache_p.h"
 #include "customrenderitem_p.h"
 
-class QOffscreenSurface;
+QT_FORWARD_DECLARE_CLASS(QOffscreenSurface)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
