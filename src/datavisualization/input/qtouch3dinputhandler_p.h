@@ -22,7 +22,7 @@
 #include "q3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
 
-class QTimer;
+QT_FORWARD_DECLARE_CLASS(QTimer)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

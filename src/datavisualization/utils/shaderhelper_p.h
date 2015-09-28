@@ -31,7 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 
-class QOpenGLShaderProgram;
+QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

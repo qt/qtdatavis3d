@@ -40,7 +40,7 @@
 #include <QtCore/QTime>
 #include <QtCore/QLocale>
 
-class QOpenGLFramebufferObject;
+QT_FORWARD_DECLARE_CLASS(QOpenGLFramebufferObject)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

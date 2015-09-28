@@ -31,7 +31,7 @@
 
 #include "datavisualizationglobal_p.h"
 
-class QLinearGradient;
+QT_FORWARD_DECLARE_CLASS(QLinearGradient)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

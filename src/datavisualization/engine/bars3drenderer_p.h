@@ -34,8 +34,10 @@
 #include "abstract3drenderer_p.h"
 #include "barrenderitem_p.h"
 
+QT_BEGIN_NAMESPACE
 class QPoint;
 class QSizeF;
+QT_END_NAMESPACE
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

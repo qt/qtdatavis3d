@@ -34,7 +34,7 @@
 #include "abstract3drenderer_p.h"
 #include "scatterrenderitem_p.h"
 
-class QSizeF;
+QT_FORWARD_DECLARE_CLASS(QSizeF)
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
