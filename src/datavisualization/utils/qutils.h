@@ -78,6 +78,8 @@ inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
         surfaceFormat.setBlueBufferSize(8);
         surfaceFormat.setGreenBufferSize(8);
     } else {
+        surfaceFormat.setVersion(2, 1);
+        surfaceFormat.setProfile(QSurfaceFormat::CoreProfile);
         // For OpenGL only attributes
         if (antialias)
             surfaceFormat.setSamples(8);
