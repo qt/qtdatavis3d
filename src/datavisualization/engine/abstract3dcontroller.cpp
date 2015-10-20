@@ -31,6 +31,7 @@
 #include "utils_p.h"
 #include <QtCore/QThread>
 #include <QtGui/QOpenGLFramebufferObject>
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -103,6 +104,7 @@ Abstract3DController::~Abstract3DController()
 
 void Abstract3DController::destroyRenderer()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
     // Renderer can be in another thread, don't delete it directly in that case
     if (m_renderer && m_renderer->thread() && m_renderer->thread() != this->thread())
         m_renderer->deleteLater();
@@ -117,6 +119,7 @@ void Abstract3DController::destroyRenderer()
  */
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
 {
+    // Note: This function must be called within render mutex
     m_renderer = renderer;
 
     // If renderer is created in different thread than controller, make sure renderer gets
@@ -527,6 +530,8 @@ void Abstract3DController::synchDataToRenderer()
 
 void Abstract3DController::render(const GLuint defaultFboHandle)
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     // If not initialized, do nothing.
     if (!m_renderer)
         return;
@@ -978,6 +983,7 @@ void Abstract3DController::markSeriesVisualsDirty()
 
 void Abstract3DController::requestRender(QOpenGLFramebufferObject *fbo)
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
     m_renderer->render(fbo->handle());
 }
 

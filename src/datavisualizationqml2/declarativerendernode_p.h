@@ -37,16 +37,21 @@
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>
 #include <QtQuick/QQuickWindow>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
+#include <QtCore/QObject>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class Abstract3DController;
 class AbstractDeclarative;
 
-class DeclarativeRenderNode : public QSGGeometryNode
+class DeclarativeRenderNode : public QObject, public QSGGeometryNode
 {
+    Q_OBJECT
 public:
-    DeclarativeRenderNode(AbstractDeclarative *declarative);
+    DeclarativeRenderNode(AbstractDeclarative *declarative,
+                          const QSharedPointer<QMutex> &nodeMutex);
     ~DeclarativeRenderNode();
 
     void setSize(const QSize &size);
@@ -60,6 +65,9 @@ public:
     void setSamples(int samples);
 
     void preprocess();
+
+public Q_SLOTS:
+    void handleControllerDestroyed();
 
 private:
     QSGTextureMaterial m_material;
@@ -76,6 +84,9 @@ private:
     int m_samples;
 
     bool m_dirtyFBO;
+
+    QSharedPointer<QMutex> m_nodeMutex;
+
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

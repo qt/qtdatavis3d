@@ -337,7 +337,8 @@ GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &f
 void TextureHelper::deleteTexture(GLuint *texture)
 {
     if (texture && *texture) {
-        glDeleteTextures(1, texture);
+        if (QOpenGLContext::currentContext())
+            glDeleteTextures(1, texture);
         *texture = 0;
     }
 }

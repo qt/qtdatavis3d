@@ -24,6 +24,7 @@
 #include "qvalue3daxis_p.h"
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -49,6 +50,8 @@ Surface3DController::~Surface3DController()
 
 void Surface3DController::initializeOpenGL()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     // Initialization is called multiple times when Qt Quick components are used
     if (isInitialized())
         return;
@@ -61,6 +64,8 @@ void Surface3DController::initializeOpenGL()
 
 void Surface3DController::synchDataToRenderer()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     if (!isInitialized())
         return;
 

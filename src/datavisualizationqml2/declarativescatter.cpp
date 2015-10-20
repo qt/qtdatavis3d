@@ -20,6 +20,7 @@
 ******************************************************************************/
 
 #include "declarativescatter_p.h"
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -39,6 +40,7 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
 
 DeclarativeScatter::~DeclarativeScatter()
 {
+    QMutexLocker locker(m_nodeMutex.data());
     delete m_scatterController;
 }
 

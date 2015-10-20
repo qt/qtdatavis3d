@@ -24,12 +24,14 @@
 
 #include <QtGui/QSurfaceFormat>
 #include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
 #include <QtCore/QCoreApplication>
 
 namespace QtDataVisualization {
 
-inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
+static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true) Q_DECL_UNUSED;
+static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
 {
     bool isES = false;
 
@@ -61,19 +63,22 @@ inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
     isES = ctx->isOpenGLES();
 #endif
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    // We support only ES2 emulation with software renderer for now
+    const GLubyte *openGLVersion = ctx->functions()->glGetString(GL_VERSION);
+    QString versionStr = QString::fromLatin1((const char *)openGLVersion).toLower();
+    if (versionStr.contains(QStringLiteral("mesa"))
+            || QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
+        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
+        isES = true;
+    }
+#endif
+
     if (dummySurface) {
         ctx->doneCurrent();
         delete ctx;
         delete dummySurface;
     }
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-    // We support only ES2 emulation with software renderer for now
-    if (QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
-        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
-        isES = true;
-    }
-#endif
 
     if (isES) {
         // For ES2 only attributes

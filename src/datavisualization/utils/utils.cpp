@@ -20,11 +20,11 @@
 ******************************************************************************/
 
 #include "utils_p.h"
-#include "qutils.h"
 
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOffscreenSurface>
+#include <QtCore/QCoreApplication>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -352,19 +352,22 @@ void Utils::resolveStatics()
 
     ctx->functions()->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    // We support only ES2 emulation with software renderer for now
+    const GLubyte *openGLVersion = ctx->functions()->glGetString(GL_VERSION);
+    QString versionStr = QString::fromLatin1((const char *)openGLVersion).toLower();
+    if (versionStr.contains(QStringLiteral("mesa"))
+            || QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
+        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
+        isES = true;
+    }
+#endif
+
     if (dummySurface) {
         ctx->doneCurrent();
         delete ctx;
         delete dummySurface;
     }
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-    // We support only ES2 emulation with software renderer for now
-    if (QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
-        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
-        isES = true;
-    }
-#endif
 
     staticsResolved = true;
 }

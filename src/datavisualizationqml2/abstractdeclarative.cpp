@@ -53,6 +53,8 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_mainThread(QThread::currentThread()),
     m_contextThread(0)
 {
+    m_nodeMutex = QSharedPointer<QMutex>(new QMutex);
+
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
 
     // Set contents to false in case we are in qml designer to make component look nice
@@ -66,6 +68,8 @@ AbstractDeclarative::~AbstractDeclarative()
 
     disconnect(this, 0, this, 0);
     checkWindowList(0);
+
+    m_nodeMutex.clear();
 }
 
 void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mode)
@@ -133,7 +137,7 @@ QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeD
     DeclarativeRenderNode *node = static_cast<DeclarativeRenderNode *>(oldNode);
 
     if (!node) {
-        node = new DeclarativeRenderNode(this);
+        node = new DeclarativeRenderNode(this, m_nodeMutex);
         node->setController(m_controller.data());
         node->setQuickWindow(window());
     }
@@ -215,7 +219,7 @@ void AbstractDeclarative::removeCustomItemAt(const QVector3D &position)
 
 void AbstractDeclarative::releaseCustomItem(QCustom3DItem *item)
 {
-    return m_controller->releaseCustomItem(item);
+    m_controller->releaseCustomItem(item);
 }
 
 int AbstractDeclarative::selectedLabelIndex() const

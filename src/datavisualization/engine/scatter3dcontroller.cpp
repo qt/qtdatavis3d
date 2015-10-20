@@ -24,6 +24,7 @@
 #include "qvalue3daxis_p.h"
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -50,12 +51,16 @@ Scatter3DController::~Scatter3DController()
 
 void Scatter3DController::initializeOpenGL()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     // Initialization is called multiple times when Qt Quick components are used
     if (isInitialized())
         return;
 
     m_renderer = new Scatter3DRenderer(this);
     setRenderer(m_renderer);
+
+    mutexLocker.unlock();
     synchDataToRenderer();
 
     emitNeedRender();
@@ -63,6 +68,8 @@ void Scatter3DController::initializeOpenGL()
 
 void Scatter3DController::synchDataToRenderer()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     if (!isInitialized())
         return;
 

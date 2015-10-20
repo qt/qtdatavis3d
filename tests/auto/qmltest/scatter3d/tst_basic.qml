@@ -28,45 +28,71 @@ Item {
     height: 150
     width: 150
 
-    Scatter3D {
-        id: empty
+    property var empty: null
+    property var basic: null
+    property var common: null
+    property var common_init: null
+
+    function constructEmpty() {
+        empty = Qt.createQmlObject("
+        import QtQuick 2.2
+        import QtDataVisualization 1.2
+        Scatter3D {
+        }", top)
     }
 
-    Scatter3D {
-        id: basic
-        anchors.fill: parent
+    function constructBasic() {
+        basic = Qt.createQmlObject("
+        import QtQuick 2.2
+        import QtDataVisualization 1.2
+        Scatter3D {
+            anchors.fill: parent
+        }", top)
+        basic.anchors.fill = top
     }
 
-    Scatter3D {
-        id: common
-        anchors.fill: parent
+    function constructCommon() {
+        common = Qt.createQmlObject("
+        import QtQuick 2.2
+        import QtDataVisualization 1.2
+        Scatter3D {
+            anchors.fill: parent
+        }", top)
+        common.anchors.fill = top
     }
 
-    Scatter3D {
-        id: common_init
-        anchors.fill: parent
-        selectionMode: AbstractGraph3D.SelectionNone
-        shadowQuality: AbstractGraph3D.ShadowQualityLow
-        msaaSamples: 2
-        theme: Theme3D { }
-        renderingMode: AbstractGraph3D.RenderIndirect
-        measureFps: true
-        orthoProjection: false
-        aspectRatio: 3.0
-        optimizationHints: AbstractGraph3D.OptimizationStatic
-        polar: false
-        radialLabelOffset: 2
-        horizontalAspectRatio: 0.2
-        reflection: true
-        reflectivity: 0.1
-        locale: Qt.locale("UK")
-        margin: 0.2
+    function constructCommonInit() {
+        common_init = Qt.createQmlObject("
+        import QtQuick 2.2
+        import QtDataVisualization 1.2
+        Scatter3D {
+            anchors.fill: parent
+            selectionMode: AbstractGraph3D.SelectionNone
+            shadowQuality: AbstractGraph3D.ShadowQualityLow
+            msaaSamples: 2
+            theme: Theme3D { }
+            renderingMode: AbstractGraph3D.RenderIndirect
+            measureFps: true
+            orthoProjection: false
+            aspectRatio: 3.0
+            optimizationHints: AbstractGraph3D.OptimizationStatic
+            polar: false
+            radialLabelOffset: 2
+            horizontalAspectRatio: 0.2
+            reflection: true
+            reflectivity: 0.1
+            locale: Qt.locale(\"UK\")
+            margin: 0.2
+        }", top)
+        common_init.anchors.fill = top
     }
 
     TestCase {
         name: "Scatter3D Empty"
+        when: windowShown
 
         function test_empty() {
+            constructEmpty()
             compare(empty.width, 0, "width")
             compare(empty.height, 0, "height")
             compare(empty.seriesList.length, 0, "seriesList")
@@ -77,6 +103,9 @@ Item {
             compare(empty.axisX.type, AbstractAxis3D.AxisTypeValue)
             compare(empty.axisZ.type, AbstractAxis3D.AxisTypeValue)
             compare(empty.axisY.type, AbstractAxis3D.AxisTypeValue)
+            waitForRendering(top)
+            empty.destroy()
+            waitForRendering(top)
         }
     }
 
@@ -85,8 +114,12 @@ Item {
         when: windowShown
 
         function test_basic() {
+            constructBasic()
             compare(basic.width, 150, "width")
             compare(basic.height, 150, "height")
+            waitForRendering(top)
+            basic.destroy()
+            waitForRendering(top)
         }
     }
 
@@ -95,6 +128,7 @@ Item {
         when: windowShown
 
         function test_1_common() {
+            constructCommon()
             compare(common.selectionMode, AbstractGraph3D.SelectionItem, "selectionMode")
             compare(common.shadowQuality, AbstractGraph3D.ShadowQualityMedium, "shadowQuality")
             if (common.shadowsSupported === true)
@@ -117,6 +151,7 @@ Item {
             compare(common.locale, Qt.locale("C"), "locale")
             compare(common.queriedGraphPosition, Qt.vector3d(0, 0, 0), "queriedGraphPosition")
             compare(common.margin, -1, "margin")
+            waitForRendering(top)
         }
 
         function test_2_change_common() {
@@ -157,6 +192,7 @@ Item {
             compare(common.reflectivity, 1.0, "reflectivity")
             compare(common.locale, Qt.locale("FI"), "locale")
             compare(common.margin, 1.0, "margin")
+            waitForRendering(top)
         }
 
         function test_3_change_invalid_common() {
@@ -176,15 +212,21 @@ Item {
             compare(common.aspectRatio, -1.0/*1.0*/, "aspectRatio") // TODO: Fix once QTRD-3367 is done
             compare(common.horizontalAspectRatio, -2/*1*/, "horizontalAspectRatio") // TODO: Fix once QTRD-3367 is done
             compare(common.reflectivity, -1.0/*1.0*/, "reflectivity") // TODO: Fix once QTRD-3367 is done
+
+            waitForRendering(top)
+            common.destroy()
+            waitForRendering(top)
         }
 
         function test_4_common_initialized() {
+            constructCommonInit()
+
             compare(common_init.selectionMode, AbstractGraph3D.SelectionNone, "selectionMode")
             if (common_init.shadowsSupported === true) {
-                compare(common_init.shadowQuality, AbstractGraph3D.ShadowQualityLow, "shadowQuality")
+                tryCompare(common_init, "shadowQuality", AbstractGraph3D.ShadowQualityLow)
                 compare(common_init.msaaSamples, 2, "msaaSamples")
             } else {
-                compare(common_init.shadowQuality, AbstractGraph3D.ShadowQualityNone, "shadowQuality")
+                tryCompare(common_init, "shadowQuality", AbstractGraph3D.ShadowQualityNone)
                 compare(common_init.msaaSamples, 0, "msaaSamples")
             }
             compare(common_init.theme.type, Theme3D.ThemeUserDefined, "theme")
@@ -201,6 +243,10 @@ Item {
             compare(common_init.reflectivity, 0.1, "reflectivity")
             compare(common_init.locale, Qt.locale("UK"), "locale")
             compare(common_init.margin, 0.2, "margin")
+
+            waitForRendering(top)
+            common_init.destroy();
+            waitForRendering(top)
         }
     }
 }

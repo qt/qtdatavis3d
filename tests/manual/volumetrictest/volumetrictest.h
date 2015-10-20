@@ -27,8 +27,7 @@
 #include <QtDataVisualization/q3dscatter.h>
 #include <QtDataVisualization/q3dsurface.h>
 #include <QtDataVisualization/q3dbars.h>
-
-class QLabel;
+#include <QtWidgets/QLabel>
 
 using namespace QtDataVisualization;
 

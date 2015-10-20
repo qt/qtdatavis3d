@@ -26,10 +26,9 @@
 #include <QtDataVisualization/qcustom3dvolume.h>
 #include <QtCore/QTimer>
 #include <QtGui/QRgb>
-
-class QLabel;
-class QRadioButton;
-class QSlider;
+#include <QtWidgets/QLabel>
+#include <QtWidgets/QSlider>
+#include <QtWidgets/QRadioButton>
 
 using namespace QtDataVisualization;
 

@@ -1,3 +1,5 @@
+requires(qtHaveModule(widgets))
+
 load(qt_parts)
 
 # We need opengl, minimum es2 or desktop

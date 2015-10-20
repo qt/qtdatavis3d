@@ -20,6 +20,7 @@
 ******************************************************************************/
 
 #include "declarativesurface_p.h"
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -41,6 +42,7 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 
 DeclarativeSurface::~DeclarativeSurface()
 {
+    QMutexLocker locker(m_nodeMutex.data());
     delete m_surfaceController;
 }
 

@@ -1,4 +1,4 @@
-INCLUDEPATH += ../../include
+INCLUDEPATH += ../../../include
 
 LIBS += -L$$OUT_PWD/../../lib
 

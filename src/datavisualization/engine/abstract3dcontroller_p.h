@@ -42,6 +42,7 @@
 #include <QtGui/QLinearGradient>
 #include <QtCore/QTime>
 #include <QtCore/QLocale>
+#include <QtCore/QMutex>
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLFramebufferObject)
 
@@ -214,6 +215,8 @@ protected:
     int m_selectedLabelIndex;
     int m_selectedCustomItemIndex;
     qreal m_margin;
+
+    QMutex m_renderMutex;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 

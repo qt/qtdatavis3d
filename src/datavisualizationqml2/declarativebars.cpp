@@ -20,6 +20,7 @@
 ******************************************************************************/
 
 #include "declarativebars_p.h"
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -41,6 +42,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 
 DeclarativeBars::~DeclarativeBars()
 {
+    QMutexLocker locker(m_nodeMutex.data());
     delete m_barsController;
 }
 

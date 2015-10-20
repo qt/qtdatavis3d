@@ -39,6 +39,8 @@
 #include <QtQuick/QQuickItem>
 #include <QtCore/QPointer>
 #include <QtCore/QThread>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
 
 #if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
 #define USE_SHARED_CONTEXT
@@ -49,8 +51,6 @@
 #endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
-
-class DeclarativeRenderNode;
 
 class AbstractDeclarative : public QQuickItem
 {
@@ -273,6 +273,9 @@ Q_SIGNALS:
     Q_REVISION(2) void localeChanged(const QLocale &locale);
     Q_REVISION(2) void queriedGraphPositionChanged(const QVector3D &data);
     Q_REVISION(2) void marginChanged(qreal margin);
+
+protected:
+    QSharedPointer<QMutex> m_nodeMutex;
 
 private:
     QPointer<Abstract3DController> m_controller;

@@ -22,10 +22,12 @@
 #include "declarativerendernode_p.h"
 #include "abstractdeclarative_p.h"
 #include <QtGui/QOpenGLFramebufferObject>
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-DeclarativeRenderNode::DeclarativeRenderNode(AbstractDeclarative *declarative)
+DeclarativeRenderNode::DeclarativeRenderNode(AbstractDeclarative *declarative,
+                                             const QSharedPointer<QMutex> &nodeMutex)
     : QSGGeometryNode(),
       m_geometry(QSGGeometry::defaultAttributes_TexturedPoint2D(), 4),
       m_texture(0),
@@ -37,6 +39,7 @@ DeclarativeRenderNode::DeclarativeRenderNode(AbstractDeclarative *declarative)
       m_samples(0),
       m_dirtyFBO(false)
 {
+    m_nodeMutex = nodeMutex;
     setMaterial(&m_material);
     setOpaqueMaterial(&m_materialO);
     setGeometry(&m_geometry);
@@ -48,6 +51,8 @@ DeclarativeRenderNode::~DeclarativeRenderNode()
     delete m_fbo;
     delete m_multisampledFBO;
     delete m_texture;
+
+    m_nodeMutex.clear();
 }
 
 void DeclarativeRenderNode::setSize(const QSize &size)
@@ -116,7 +121,12 @@ void DeclarativeRenderNode::setQuickWindow(QQuickWindow *window)
 
 void DeclarativeRenderNode::setController(Abstract3DController *controller)
 {
+    QMutexLocker locker(m_nodeMutex.data());
     m_controller = controller;
+    if (m_controller) {
+        connect(m_controller, &QObject::destroyed,
+                this, &DeclarativeRenderNode::handleControllerDestroyed, Qt::DirectConnection);
+    }
 }
 
 void DeclarativeRenderNode::setSamples(int samples)
@@ -130,6 +140,11 @@ void DeclarativeRenderNode::setSamples(int samples)
 
 void DeclarativeRenderNode::preprocess()
 {
+    QMutexLocker locker(m_nodeMutex.data());
+
+    if (!m_controller)
+        return;
+
     QOpenGLFramebufferObject *targetFBO;
     if (m_samples > 0)
         targetFBO = m_multisampledFBO;
@@ -148,6 +163,12 @@ void DeclarativeRenderNode::preprocess()
         QOpenGLFramebufferObject::blitFramebuffer(m_fbo, m_multisampledFBO);
 
     m_declarative->doneOpenGLContext(m_window);
+}
+
+// This function is called within m_nodeMutex lock
+void DeclarativeRenderNode::handleControllerDestroyed()
+{
+    m_controller = 0;
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

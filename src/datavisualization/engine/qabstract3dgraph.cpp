@@ -1105,7 +1105,6 @@ QImage QAbstract3DGraphPrivate::renderToImage(int msaaSamples, const QSize &imag
                                                               imageSize.height()));
         m_visualController->synchDataToRenderer();
         fbo->bind();
-        m_context->swapBuffers(m_offscreenSurface);
         m_visualController->requestRender(fbo);
         image = fbo->toImage();
         fbo->release();

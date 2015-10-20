@@ -27,6 +27,7 @@
 #include "qbar3dseries_p.h"
 #include "thememanager_p.h"
 #include "q3dtheme_p.h"
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -56,6 +57,8 @@ Bars3DController::~Bars3DController()
 
 void Bars3DController::initializeOpenGL()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     // Initialization is called multiple times when Qt Quick components are used
     if (isInitialized())
         return;
@@ -63,6 +66,8 @@ void Bars3DController::initializeOpenGL()
     m_renderer = new Bars3DRenderer(this);
 
     setRenderer(m_renderer);
+
+    mutexLocker.unlock();
     synchDataToRenderer();
 
     emitNeedRender();
@@ -70,6 +75,8 @@ void Bars3DController::initializeOpenGL()
 
 void Bars3DController::synchDataToRenderer()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     if (!isInitialized())
         return;
 
