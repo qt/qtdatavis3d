@@ -1,20 +1,23 @@
-/****************************************************************************
+/******************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd
-** All rights reserved.
-** For any questions to The Qt Company, please use contact form at http://qt.io
+** Copyright (C) 2015 The Qt Company Ltd.
+** Contact: http://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module.
 **
-** Licensees holding valid commercial license for Qt may use this file in
-** accordance with the Qt License Agreement provided with the Software
-** or, alternatively, in accordance with the terms contained in a written
-** agreement between you and The Qt Company.
+** $QT_BEGIN_LICENSE:COMM$
 **
-** If you have questions regarding the use of this file, please use
-** contact form at http://qt.io
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see http://www.qt.io/terms-conditions. For further
+** information use the contact form at http://www.qt.io/contact-us.
 **
-****************************************************************************/
+** $QT_END_LICENSE$
+**
+******************************************************************************/
 
 //
 //  W A R N I N G
@@ -36,6 +39,8 @@
 #include <QtQuick/QQuickItem>
 #include <QtCore/QPointer>
 #include <QtCore/QThread>
+#include <QtCore/QMutex>
+#include <QtCore/QSharedPointer>
 
 #if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
 #define USE_SHARED_CONTEXT
@@ -46,8 +51,6 @@
 #endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
-
-class DeclarativeRenderNode;
 
 class AbstractDeclarative : public QQuickItem
 {
@@ -270,6 +273,9 @@ Q_SIGNALS:
     Q_REVISION(2) void localeChanged(const QLocale &locale);
     Q_REVISION(2) void queriedGraphPositionChanged(const QVector3D &data);
     Q_REVISION(2) void marginChanged(qreal margin);
+
+protected:
+    QSharedPointer<QMutex> m_nodeMutex;
 
 private:
     QPointer<Abstract3DController> m_controller;

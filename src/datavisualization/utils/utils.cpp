@@ -1,27 +1,30 @@
-/****************************************************************************
+/******************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd
-** All rights reserved.
-** For any questions to The Qt Company, please use contact form at http://qt.io
+** Copyright (C) 2015 The Qt Company Ltd.
+** Contact: http://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module.
 **
-** Licensees holding valid commercial license for Qt may use this file in
-** accordance with the Qt License Agreement provided with the Software
-** or, alternatively, in accordance with the terms contained in a written
-** agreement between you and The Qt Company.
+** $QT_BEGIN_LICENSE:COMM$
 **
-** If you have questions regarding the use of this file, please use
-** contact form at http://qt.io
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see http://www.qt.io/terms-conditions. For further
+** information use the contact form at http://www.qt.io/contact-us.
 **
-****************************************************************************/
+** $QT_END_LICENSE$
+**
+******************************************************************************/
 
 #include "utils_p.h"
-#include "qutils.h"
 
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOffscreenSurface>
+#include <QtCore/QCoreApplication>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -349,19 +352,22 @@ void Utils::resolveStatics()
 
     ctx->functions()->glGetIntegerv(GL_MAX_TEXTURE_SIZE, &maxTextureSize);
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    // We support only ES2 emulation with software renderer for now
+    const GLubyte *openGLVersion = ctx->functions()->glGetString(GL_VERSION);
+    QString versionStr = QString::fromLatin1((const char *)openGLVersion).toLower();
+    if (versionStr.contains(QStringLiteral("mesa"))
+            || QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
+        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
+        isES = true;
+    }
+#endif
+
     if (dummySurface) {
         ctx->doneCurrent();
         delete ctx;
         delete dummySurface;
     }
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-    // We support only ES2 emulation with software renderer for now
-    if (QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
-        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
-        isES = true;
-    }
-#endif
 
     staticsResolved = true;
 }

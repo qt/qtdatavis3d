@@ -1,26 +1,30 @@
-/****************************************************************************
+/******************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd
-** All rights reserved.
-** For any questions to The Qt Company, please use contact form at http://qt.io
+** Copyright (C) 2015 The Qt Company Ltd.
+** Contact: http://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module.
 **
-** Licensees holding valid commercial license for Qt may use this file in
-** accordance with the Qt License Agreement provided with the Software
-** or, alternatively, in accordance with the terms contained in a written
-** agreement between you and The Qt Company.
+** $QT_BEGIN_LICENSE:COMM$
 **
-** If you have questions regarding the use of this file, please use
-** contact form at http://qt.io
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see http://www.qt.io/terms-conditions. For further
+** information use the contact form at http://www.qt.io/contact-us.
 **
-****************************************************************************/
+** $QT_END_LICENSE$
+**
+******************************************************************************/
 
 #include "scatter3dcontroller_p.h"
 #include "scatter3drenderer_p.h"
 #include "qvalue3daxis_p.h"
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -47,12 +51,16 @@ Scatter3DController::~Scatter3DController()
 
 void Scatter3DController::initializeOpenGL()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     // Initialization is called multiple times when Qt Quick components are used
     if (isInitialized())
         return;
 
     m_renderer = new Scatter3DRenderer(this);
     setRenderer(m_renderer);
+
+    mutexLocker.unlock();
     synchDataToRenderer();
 
     emitNeedRender();
@@ -60,6 +68,8 @@ void Scatter3DController::initializeOpenGL()
 
 void Scatter3DController::synchDataToRenderer()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     if (!isInitialized())
         return;
 

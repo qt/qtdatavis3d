@@ -1,20 +1,23 @@
-/****************************************************************************
+/******************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd
-** All rights reserved.
-** For any questions to The Qt Company, please use contact form at http://qt.io
+** Copyright (C) 2015 The Qt Company Ltd.
+** Contact: http://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module.
 **
-** Licensees holding valid commercial license for Qt may use this file in
-** accordance with the Qt License Agreement provided with the Software
-** or, alternatively, in accordance with the terms contained in a written
-** agreement between you and The Qt Company.
+** $QT_BEGIN_LICENSE:COMM$
 **
-** If you have questions regarding the use of this file, please use
-** contact form at http://qt.io
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see http://www.qt.io/terms-conditions. For further
+** information use the contact form at http://www.qt.io/contact-us.
 **
-****************************************************************************/
+** $QT_END_LICENSE$
+**
+******************************************************************************/
 
 #include "abstractdeclarative_p.h"
 #include "declarativetheme_p.h"
@@ -50,6 +53,8 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_mainThread(QThread::currentThread()),
     m_contextThread(0)
 {
+    m_nodeMutex = QSharedPointer<QMutex>(new QMutex);
+
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
 
     // Set contents to false in case we are in qml designer to make component look nice
@@ -63,6 +68,8 @@ AbstractDeclarative::~AbstractDeclarative()
 
     disconnect(this, 0, this, 0);
     checkWindowList(0);
+
+    m_nodeMutex.clear();
 }
 
 void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mode)
@@ -130,7 +137,7 @@ QSGNode *AbstractDeclarative::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeD
     DeclarativeRenderNode *node = static_cast<DeclarativeRenderNode *>(oldNode);
 
     if (!node) {
-        node = new DeclarativeRenderNode(this);
+        node = new DeclarativeRenderNode(this, m_nodeMutex);
         node->setController(m_controller.data());
         node->setQuickWindow(window());
     }
@@ -212,7 +219,7 @@ void AbstractDeclarative::removeCustomItemAt(const QVector3D &position)
 
 void AbstractDeclarative::releaseCustomItem(QCustom3DItem *item)
 {
-    return m_controller->releaseCustomItem(item);
+    m_controller->releaseCustomItem(item);
 }
 
 int AbstractDeclarative::selectedLabelIndex() const

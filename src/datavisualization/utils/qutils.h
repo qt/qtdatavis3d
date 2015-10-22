@@ -1,32 +1,37 @@
-/****************************************************************************
+/******************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd
-** All rights reserved.
-** For any questions to The Qt Company, please use contact form at http://qt.io
+** Copyright (C) 2015 The Qt Company Ltd.
+** Contact: http://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module.
 **
-** Licensees holding valid commercial license for Qt may use this file in
-** accordance with the Qt License Agreement provided with the Software
-** or, alternatively, in accordance with the terms contained in a written
-** agreement between you and The Qt Company.
+** $QT_BEGIN_LICENSE:COMM$
 **
-** If you have questions regarding the use of this file, please use
-** contact form at http://qt.io
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see http://www.qt.io/terms-conditions. For further
+** information use the contact form at http://www.qt.io/contact-us.
 **
-****************************************************************************/
+** $QT_END_LICENSE$
+**
+******************************************************************************/
 
 #ifndef QUTILS_H
 #define QUTILS_H
 
 #include <QtGui/QSurfaceFormat>
 #include <QtGui/QOpenGLContext>
+#include <QtGui/QOpenGLFunctions>
 #include <QtGui/QOffscreenSurface>
 #include <QtCore/QCoreApplication>
 
 namespace QtDataVisualization {
 
-inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
+static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true) Q_DECL_UNUSED;
+static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
 {
     bool isES = false;
 
@@ -58,19 +63,22 @@ inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
     isES = ctx->isOpenGLES();
 #endif
 
+#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
+    // We support only ES2 emulation with software renderer for now
+    const GLubyte *openGLVersion = ctx->functions()->glGetString(GL_VERSION);
+    QString versionStr = QString::fromLatin1((const char *)openGLVersion).toLower();
+    if (versionStr.contains(QStringLiteral("mesa"))
+            || QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
+        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
+        isES = true;
+    }
+#endif
+
     if (dummySurface) {
         ctx->doneCurrent();
         delete ctx;
         delete dummySurface;
     }
-
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
-    // We support only ES2 emulation with software renderer for now
-    if (QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
-        qWarning("Only OpenGL ES2 emulation is available for software rendering.");
-        isES = true;
-    }
-#endif
 
     if (isES) {
         // For ES2 only attributes
@@ -78,6 +86,8 @@ inline static QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true)
         surfaceFormat.setBlueBufferSize(8);
         surfaceFormat.setGreenBufferSize(8);
     } else {
+        surfaceFormat.setVersion(2, 1);
+        surfaceFormat.setProfile(QSurfaceFormat::CoreProfile);
         // For OpenGL only attributes
         if (antialias)
             surfaceFormat.setSamples(8);

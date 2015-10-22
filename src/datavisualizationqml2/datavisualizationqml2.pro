@@ -14,7 +14,9 @@ INCLUDEPATH += ../../include \
                ../datavisualization/engine \
                ../datavisualization/global \
                ../datavisualization/data \
-               ../datavisualization/theme
+               ../datavisualization/theme \
+               ../datavisualization/axis \
+               ../datavisualization/input
 
 SOURCES += \
     datavisualizationqml2_plugin.cpp \

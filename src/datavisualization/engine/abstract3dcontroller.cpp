@@ -1,20 +1,23 @@
-/****************************************************************************
+/******************************************************************************
 **
-** Copyright (C) 2015 The Qt Company Ltd
-** All rights reserved.
-** For any questions to The Qt Company, please use contact form at http://qt.io
+** Copyright (C) 2015 The Qt Company Ltd.
+** Contact: http://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module.
 **
-** Licensees holding valid commercial license for Qt may use this file in
-** accordance with the Qt License Agreement provided with the Software
-** or, alternatively, in accordance with the terms contained in a written
-** agreement between you and The Qt Company.
+** $QT_BEGIN_LICENSE:COMM$
 **
-** If you have questions regarding the use of this file, please use
-** contact form at http://qt.io
+** Commercial License Usage
+** Licensees holding valid commercial Qt licenses may use this file in
+** accordance with the commercial license agreement provided with the
+** Software or, alternatively, in accordance with the terms contained in
+** a written agreement between you and The Qt Company. For licensing terms
+** and conditions see http://www.qt.io/terms-conditions. For further
+** information use the contact form at http://www.qt.io/contact-us.
 **
-****************************************************************************/
+** $QT_END_LICENSE$
+**
+******************************************************************************/
 
 #include "abstract3dcontroller_p.h"
 #include "qabstract3daxis_p.h"
@@ -28,6 +31,7 @@
 #include "utils_p.h"
 #include <QtCore/QThread>
 #include <QtGui/QOpenGLFramebufferObject>
+#include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -100,6 +104,7 @@ Abstract3DController::~Abstract3DController()
 
 void Abstract3DController::destroyRenderer()
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
     // Renderer can be in another thread, don't delete it directly in that case
     if (m_renderer && m_renderer->thread() && m_renderer->thread() != this->thread())
         m_renderer->deleteLater();
@@ -114,6 +119,7 @@ void Abstract3DController::destroyRenderer()
  */
 void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
 {
+    // Note: This function must be called within render mutex
     m_renderer = renderer;
 
     // If renderer is created in different thread than controller, make sure renderer gets
@@ -524,6 +530,8 @@ void Abstract3DController::synchDataToRenderer()
 
 void Abstract3DController::render(const GLuint defaultFboHandle)
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
+
     // If not initialized, do nothing.
     if (!m_renderer)
         return;
@@ -975,6 +983,7 @@ void Abstract3DController::markSeriesVisualsDirty()
 
 void Abstract3DController::requestRender(QOpenGLFramebufferObject *fbo)
 {
+    QMutexLocker mutexLocker(&m_renderMutex);
     m_renderer->render(fbo->handle());
 }
 
