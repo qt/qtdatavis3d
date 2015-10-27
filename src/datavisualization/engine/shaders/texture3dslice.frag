@@ -20,7 +20,7 @@ void main() {
     // Find out where ray intersects the slice planes
     vec3 normRayDir = normalize(rayDir);
     highp vec3 rayStart = pos;
-    highp float minT = 2.0f;
+    highp float minT = 2.0;
     if (normRayDir.x != 0.0 && normRayDir.y != 0.0 && normRayDir.z != 0.0) {
         highp vec3 boxBounds = vec3(1.0, 1.0, 1.0);
         highp vec3 invRayDir = 1.0 / normRayDir;
