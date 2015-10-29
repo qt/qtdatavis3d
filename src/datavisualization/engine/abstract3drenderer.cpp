@@ -327,6 +327,8 @@ void Abstract3DRenderer::initCursorPositionShaders(const QString &vertexShader,
 void Abstract3DRenderer::initCursorPositionBuffer()
 {
     m_textureHelper->deleteTexture(&m_cursorPositionTexture);
+    m_textureHelper->glDeleteFramebuffers(1, &m_cursorPositionFrameBuffer);
+    m_cursorPositionFrameBuffer = 0;
 
     if (m_primarySubViewport.size().isEmpty())
         return;
