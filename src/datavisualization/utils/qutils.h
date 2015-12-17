@@ -66,7 +66,7 @@ static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
     // We support only ES2 emulation with software renderer for now
     const GLubyte *openGLVersion = ctx->functions()->glGetString(GL_VERSION);
-    QString versionStr = QString::fromLatin1((const char *)openGLVersion).toLower();
+    QString versionStr = QString::fromLatin1(reinterpret_cast<const char *>(openGLVersion)).toLower();
     if (versionStr.contains(QStringLiteral("mesa"))
             || QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
         qWarning("Only OpenGL ES2 emulation is available for software rendering.");
