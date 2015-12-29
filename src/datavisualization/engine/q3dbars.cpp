@@ -92,6 +92,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 Q3DBars::Q3DBars(const QSurfaceFormat *format, QWindow *parent)
     : QAbstract3DGraph(new Q3DBarsPrivate(this), format, parent)
 {
+    if (!dptr()->m_initialized)
+        return;
+
     dptr()->m_shared = new Bars3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
@@ -399,7 +402,8 @@ const Q3DBarsPrivate *Q3DBars::dptrc() const
 }
 
 Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
-    : QAbstract3DGraphPrivate(q)
+    : QAbstract3DGraphPrivate(q),
+      m_shared(0)
 {
 }
 

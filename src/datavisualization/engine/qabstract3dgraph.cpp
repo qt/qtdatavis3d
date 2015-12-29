@@ -189,7 +189,11 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
 
     d_ptr->m_context->setFormat(requestedFormat());
     d_ptr->m_context->create();
-    d_ptr->m_context->makeCurrent(this);
+    bool makeSuccess = d_ptr->m_context->makeCurrent(this);
+
+    // If we fail to get context, just abort
+    if (!makeSuccess || !QOpenGLContext::currentContext())
+        return;
 
     initializeOpenGLFunctions();
 
@@ -207,6 +211,8 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
         if (splitversionstr[0].toFloat() < 1.2)
             qFatal("GLSL version must be 1.20 or higher. Try installing latest display drivers.");
     }
+
+    d_ptr->m_initialized = true;
 
     d_ptr->renderLater();
 
@@ -872,6 +878,20 @@ qreal QAbstract3DGraph::margin() const
 }
 
 /*!
+ * \return \c{true} if the OpenGL context of the graph has been successfully initialized.
+ * Trying to use a graph when the context initialization has failed typically results in a crash.
+ * A common reason for a context initialization failure is lack of sufficient platform support
+ * for OpenGL.
+ */
+bool QAbstract3DGraph::hasContext() const
+{
+    if (d_ptr->m_initialized)
+        return true;
+    else
+        return false;
+}
+
+/*!
  * \internal
  */
 bool QAbstract3DGraph::event(QEvent *event)
@@ -898,9 +918,11 @@ void QAbstract3DGraph::resizeEvent(QResizeEvent *event)
 {
     Q_UNUSED(event);
 
-    Q3DScene *scene = d_ptr->m_visualController->scene();
-    scene->d_ptr->setWindowSize(QSize(width(), height()));
-    scene->d_ptr->setViewport(QRect(0, 0, width(), height()));
+    if (d_ptr->m_visualController) {
+        Q3DScene *scene = d_ptr->m_visualController->scene();
+        scene->d_ptr->setWindowSize(QSize(width(), height()));
+        scene->d_ptr->setViewport(QRect(0, 0, width(), height()));
+    }
 }
 
 /*!
@@ -968,7 +990,8 @@ QAbstract3DGraphPrivate::QAbstract3DGraphPrivate(QAbstract3DGraph *q)
       m_updatePending(false),
       m_visualController(0),
       m_devicePixelRatio(1.f),
-      m_offscreenSurface(0)
+      m_offscreenSurface(0),
+      m_initialized(false)
 {
 }
 

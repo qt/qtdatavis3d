@@ -26,12 +26,20 @@
 #include <QtWidgets/QHBoxLayout>
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QCommandLinkButton>
+#include <QtWidgets/QMessageBox>
 
 int main(int argc, char **argv)
 {
     QApplication app(argc, argv);
     Q3DScatter *graph = new Q3DScatter();
     QWidget *container = QWidget::createWindowContainer(graph);
+
+    if (!graph->hasContext()) {
+        QMessageBox msgBox;
+        msgBox.setText("Couldn't initialize the OpenGL context.");
+        msgBox.exec();
+        return -1;
+    }
 
     container->setMinimumSize(800, 600);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);

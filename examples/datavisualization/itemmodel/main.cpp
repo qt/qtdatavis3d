@@ -36,6 +36,7 @@
 #include <QtGui/QFont>
 #include <QtCore/QDebug>
 #include <QtWidgets/QHeaderView>
+#include <QtWidgets/QMessageBox>
 
 #define USE_STATIC_DATA
 
@@ -247,6 +248,13 @@ int main(int argc, char **argv)
     Q3DBars *graph = new Q3DBars();
     QWidget *container = QWidget::createWindowContainer(graph);
     //! [0]
+
+    if (!graph->hasContext()) {
+        QMessageBox msgBox;
+        msgBox.setText("Couldn't initialize the OpenGL context.");
+        msgBox.exec();
+        return -1;
+    }
 
     QSize screenSize = graph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 2));

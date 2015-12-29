@@ -75,6 +75,7 @@ public:
     Abstract3DController *m_visualController;
     float m_devicePixelRatio;
     QOffscreenSurface *m_offscreenSurface;
+    bool m_initialized;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

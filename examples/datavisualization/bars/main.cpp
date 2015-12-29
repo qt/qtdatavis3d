@@ -30,6 +30,7 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QFontComboBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QScreen>
 #include <QtGui/QFontDatabase>
 
@@ -40,6 +41,13 @@ int main(int argc, char **argv)
     Q3DBars *widgetgraph = new Q3DBars();
     QWidget *container = QWidget::createWindowContainer(widgetgraph);
     //! [0]
+
+    if (!widgetgraph->hasContext()) {
+        QMessageBox msgBox;
+        msgBox.setText("Couldn't initialize the OpenGL context.");
+        msgBox.exec();
+        return -1;
+    }
 
     QSize screenSize = widgetgraph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));

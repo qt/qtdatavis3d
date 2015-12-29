@@ -30,6 +30,7 @@
 #include <QtWidgets/QComboBox>
 #include <QtWidgets/QFontComboBox>
 #include <QtWidgets/QLabel>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QScreen>
 #include <QtGui/QFontDatabase>
 
@@ -40,6 +41,13 @@ int main(int argc, char **argv)
     Q3DScatter *graph = new Q3DScatter();
     QWidget *container = QWidget::createWindowContainer(graph);
     //! [0]
+
+    if (!graph->hasContext()) {
+        QMessageBox msgBox;
+        msgBox.setText("Couldn't initialize the OpenGL context.");
+        msgBox.exec();
+        return -1;
+    }
 
     QSize screenSize = graph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));

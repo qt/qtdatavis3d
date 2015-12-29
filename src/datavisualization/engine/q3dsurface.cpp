@@ -96,6 +96,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 Q3DSurface::Q3DSurface(const QSurfaceFormat *format, QWindow *parent)
     : QAbstract3DGraph(new Q3DSurfacePrivate(this), format, parent)
 {
+    if (!dptr()->m_initialized)
+        return;
+
     dptr()->m_shared = new Surface3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
@@ -302,7 +305,8 @@ QList<QValue3DAxis *> Q3DSurface::axes() const
 // Q3DSurfacePrivate
 
 Q3DSurfacePrivate::Q3DSurfacePrivate(Q3DSurface *q)
-    : QAbstract3DGraphPrivate(q)
+    : QAbstract3DGraphPrivate(q),
+      m_shared(0)
 {
 }
 

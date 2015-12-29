@@ -29,6 +29,12 @@ int main(int argc, char **argv)
     QGuiApplication app(argc, argv);
 
     Q3DBars *rainfall = new Q3DBars;
+
+    if (!rainfall->hasContext()) {
+        qWarning() << QStringLiteral("Couldn't initialize the OpenGL context.") ;
+        return -1;
+    }
+
     rainfall->setFlags(rainfall->flags() ^ Qt::FramelessWindowHint);
     rainfall->resize(1000, 800);
     rainfall->setPosition(QPoint(10, 30));

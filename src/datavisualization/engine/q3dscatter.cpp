@@ -81,6 +81,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 Q3DScatter::Q3DScatter(const QSurfaceFormat *format, QWindow *parent)
     : QAbstract3DGraph(new Q3DScatterPrivate(this), format, parent)
 {
+    if (!dptr()->m_initialized)
+        return;
+
     dptr()->m_shared = new Scatter3DController(geometry());
     d_ptr->setVisualController(dptr()->m_shared);
     dptr()->m_shared->initializeOpenGL();
@@ -251,7 +254,8 @@ QList<QValue3DAxis *> Q3DScatter::axes() const
 }
 
 Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
-    : QAbstract3DGraphPrivate(q)
+    : QAbstract3DGraphPrivate(q),
+    m_shared(0)
 {
 }
 

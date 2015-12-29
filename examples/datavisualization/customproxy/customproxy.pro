@@ -23,4 +23,3 @@ RESOURCES += customproxy.qrc
 OTHER_FILES += doc/src/* \
                doc/images/* \
                data/raindata.txt
-

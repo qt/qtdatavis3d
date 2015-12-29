@@ -30,6 +30,7 @@
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QGroupBox>
+#include <QtWidgets/QMessageBox>
 #include <QtGui/QScreen>
 
 int main(int argc, char **argv)
@@ -37,6 +38,13 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
     Q3DScatter *graph = new Q3DScatter();
     QWidget *container = QWidget::createWindowContainer(graph);
+
+    if (!graph->hasContext()) {
+        QMessageBox msgBox;
+        msgBox.setText("Couldn't initialize the OpenGL context.");
+        msgBox.exec();
+        return -1;
+    }
 
     QSize screenSize = graph->screen()->size();
     container->setMinimumSize(QSize(screenSize.width() / 3, screenSize.height() / 3));

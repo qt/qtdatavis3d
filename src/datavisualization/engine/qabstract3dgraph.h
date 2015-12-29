@@ -186,6 +186,8 @@ public:
     void setMargin(qreal margin);
     qreal margin() const;
 
+    bool hasContext() const;
+
 protected:
     bool event(QEvent *event);
     void resizeEvent(QResizeEvent *event);
