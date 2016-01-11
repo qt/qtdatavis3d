@@ -1,9 +1,7 @@
 TEMPLATE = subdirs
 
 qtHaveModule(quick) {
-    SUBDIRS += qmlcamera \
-               qmldynamicdata \
-               qmlmultiwindow \
+    SUBDIRS += qmldynamicdata \
                qmlmultitest \
                qmlvolume \
                qmlperf
@@ -23,8 +21,4 @@ qtHaveModule(quick) {
                minimalscatter \
                minimalsurface
 
-    # Requires Kinect drivers
-    #SUBDIRS += kinectsurface
 }
-
-qtHaveModule(multimedia):!android:!static:!winrt: SUBDIRS += spectrum

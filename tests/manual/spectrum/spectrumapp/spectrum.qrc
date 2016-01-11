@@ -1,7 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file alias="file1">soundFiles/onclassical_demo_fiati-di-parma_thuille_terzo-tempo_sestetto_small-version.wav</file>
-        <file alias="file2">soundFiles/Rockhop.wav</file>
-        <file alias="file3">soundFiles/futurebells_beat.wav</file>
-    </qresource>
-</RCC>
