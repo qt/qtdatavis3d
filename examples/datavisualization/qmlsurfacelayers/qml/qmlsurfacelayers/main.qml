@@ -30,6 +30,7 @@
 import QtQuick 2.1
 import QtQuick.Layouts 1.0
 import QtQuick.Controls 1.0
+import QtQuick.Controls.Styles 1.0
 import QtDataVisualization 1.0
 import "."
 
@@ -37,6 +38,8 @@ Item {
     id: mainview
     width: 1280
     height: 720
+
+    property real fontSize: 12
 
     Item {
         id: surfaceView
@@ -140,25 +143,48 @@ Item {
 
         //! [3]
         GroupBox {
-            title: "Layer Selection"
+            flat: true
             Layout.fillWidth: true
             Column {
+                spacing: 10
+
+                Label {
+                    font.pointSize: fontSize
+                    font.bold: true
+                    text: "Layer Selection"
+                }
+
                 CheckBox {
                     id: layerOneToggle
-                    text: "Show Ground Layer"
                     checked: true
+                    style: CheckBoxStyle {
+                        label: Label {
+                            font.pointSize: fontSize
+                            text: "Show Ground Layer"
+                        }
+                    }
                 }
 
                 CheckBox {
                     id: layerTwoToggle
-                    text: "Show Sea Layer"
                     checked: true
+                    style: CheckBoxStyle {
+                        label: Label {
+                            font.pointSize: fontSize
+                            text: "Show Sea Layer"
+                        }
+                    }
                 }
 
                 CheckBox {
                     id: layerThreeToggle
-                    text: "Show Tectonic Layer"
                     checked: true
+                    style: CheckBoxStyle {
+                        label: Label {
+                            font.pointSize: fontSize
+                            text: "Show Tectonic Layer"
+                        }
+                    }
                 }
             }
         }
@@ -166,12 +192,25 @@ Item {
 
         //! [5]
         GroupBox {
-            title: "Layer Style"
+            flat: true
             Layout.fillWidth: true
             Column {
+                spacing: 10
+
+                Label {
+                    font.pointSize: fontSize
+                    font.bold: true
+                    text: "Layer Style"
+                }
+
                 CheckBox {
                     id: layerOneGrid
-                    text: "Show Ground as Grid"
+                    style: CheckBoxStyle {
+                        label: Label {
+                            font.pointSize: fontSize
+                            text: "Show Ground as Grid"
+                        }
+                    }
                     onCheckedChanged: {
                         if (checked)
                             layerOneSeries.drawMode = Surface3DSeries.DrawWireframe
@@ -182,7 +221,12 @@ Item {
 
                 CheckBox {
                     id: layerTwoGrid
-                    text: "Show Sea as Grid"
+                    style: CheckBoxStyle {
+                        label: Label {
+                            font.pointSize: fontSize
+                            text: "Show Sea as Grid"
+                        }
+                    }
                     onCheckedChanged: {
                         if (checked)
                             layerTwoSeries.drawMode = Surface3DSeries.DrawWireframe
@@ -193,7 +237,12 @@ Item {
 
                 CheckBox {
                     id: layerThreeGrid
-                    text: "Show Tectonic as Grid"
+                    style: CheckBoxStyle {
+                        label: Label {
+                            font.pointSize: fontSize
+                            text: "Show Tectonic as Grid"
+                        }
+                    }
                     onCheckedChanged: {
                         if (checked)
                             layerThreeSeries.drawMode = Surface3DSeries.DrawWireframe
@@ -209,6 +258,7 @@ Item {
         NewButton {
             id: sliceButton
             text: "Slice All Layers"
+            fontSize: fontSize
             Layout.fillWidth: true
             Layout.minimumHeight: 40
             onClicked: {
@@ -228,6 +278,7 @@ Item {
 
         NewButton {
             id: shadowButton
+            fontSize: fontSize
             Layout.fillWidth: true
             Layout.minimumHeight: 40
             text: surfaceLayers.shadowsSupported ? "Show Shadows" : "Shadows not supported"
@@ -245,6 +296,7 @@ Item {
 
         NewButton {
             id: renderModeButton
+            fontSize: fontSize
             text: "Switch Render Mode"
             Layout.fillWidth: true
             Layout.minimumHeight: 40
@@ -280,6 +332,7 @@ Item {
 
         TextField {
             id: renderLabel
+            font.pointSize: fontSize
             Layout.fillWidth: true
             Layout.minimumHeight: 40
             enabled: false

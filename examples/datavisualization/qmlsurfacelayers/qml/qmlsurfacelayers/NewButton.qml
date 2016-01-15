@@ -35,11 +35,12 @@ Item {
     id: newbutton
 
     property alias text: buttonText.text
+    property real fontSize: 12
 
     signal clicked
 
     implicitWidth: buttonText.implicitWidth + 5
-    implicitHeight: buttonText.implicitHeight + 10
+    implicitHeight: buttonText.implicitHeight * 2
 
     Button {
         id: buttonText
@@ -50,6 +51,7 @@ Item {
             label: Component {
                 Text {
                     text: buttonText.text
+                    font.pointSize: fontSize
                     clip: true
                     wrapMode: Text.WordWrap
                     verticalAlignment: Text.AlignVCenter
