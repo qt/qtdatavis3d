@@ -362,8 +362,11 @@ void Utils::resolveStatics()
 
 #if (QT_VERSION >= QT_VERSION_CHECK(5, 4, 0))
     // We support only ES2 emulation with software renderer for now
+    QString versionStr;
+#ifdef Q_OS_WIN
     const GLubyte *openGLVersion = ctx->functions()->glGetString(GL_VERSION);
-    QString versionStr = QString::fromLatin1((const char *)openGLVersion).toLower();
+    versionStr = QString::fromLatin1(reinterpret_cast<const char *>(openGLVersion)).toLower();
+#endif
     if (versionStr.contains(QStringLiteral("mesa"))
             || QCoreApplication::testAttribute(Qt::AA_UseSoftwareOpenGL)) {
         qWarning("Only OpenGL ES2 emulation is available for software rendering.");
