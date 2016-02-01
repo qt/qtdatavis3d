@@ -1,7 +1,5 @@
 TARGET = QtDataVisualization
 
-message($$QT_CONFIG)
-
 QT += core gui
 osx: QT +=  gui-private
 DEFINES += QT_DATAVISUALIZATION_LIBRARY
