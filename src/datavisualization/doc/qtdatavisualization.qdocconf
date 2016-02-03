@@ -1,8 +1,4 @@
-include($QT_INSTALL_DOCS/global/macros.qdocconf)
-include($QT_INSTALL_DOCS/global/qt-cpp-defines.qdocconf)
-include($QT_INSTALL_DOCS/global/compat.qdocconf)
-include($QT_INSTALL_DOCS/global/fileextensions.qdocconf)
-include($QT_INSTALL_DOCS/global/qt-html-templates-offline.qdocconf)
+include($QT_INSTALL_DOCS/global/qt-module-defaults.qdocconf)
 
 project             = QtDataVisualization
 description         = Qt Data Visualization Reference Documentation
@@ -16,18 +12,14 @@ imagedirs  += ../images \
               images
 sourcedirs += ..
 
-examplesinstallpath = datavisualization
+examplesinstallpath = qtdatavisualization/datavisualization
 
-indexes +=  $QT_INSTALL_DOCS/qtcore/qtcore.index \
-            $QT_INSTALL_DOCS/qtgui/qtgui.index \
-            $QT_INSTALL_DOCS/qtqml/qtqml.index \
-            $QT_INSTALL_DOCS/qtquick/qtquick.index \
-            $QT_INSTALL_DOCS/qtmultimedia/qtmultimedia.index
+depends = qtcore qtgui qtqml qtquick qtmultimedia qtdoc
 
 qhp.projects                            = QtDataVisualization
 
 qhp.QtDataVisualization.file            = qtdatavisualization.qhp
-qhp.QtDataVisualization.namespace       = com.digia.qtdatavisualization.$QT_VERSION_TAG
+qhp.QtDataVisualization.namespace       = org.qt-project.qtdatavisualization.$QT_VERSION_TAG
 qhp.QtDataVisualization.virtualFolder   = qtdatavisualization
 qhp.QtDataVisualization.indexTitle      = Qt Data Visualization
 qhp.QtDataVisualization.indexRoot       =
@@ -56,5 +48,3 @@ qhp.QtDataVisualization.subprojects.types.sortPages             = true
 navigation.landingpage = Qt Data Visualization
 navigation.cppclassespage = Qt Data Visualization C++ Classes
 navigation.qmltypespage = Qt Data Visualization QML Types
-
-buildversion = Qt Data Visualization $QT_VERSION Reference Documentation

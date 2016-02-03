@@ -29,7 +29,7 @@
 
 /*!
     \title Qt Data Visualization
-    \page index.html
+    \page qtdatavisualization-index.html
     \brief Provides functionality for 3D visualization.
 
     Qt Data Visualization module provides a way to visualize data in 3D.
