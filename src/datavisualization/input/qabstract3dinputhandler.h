@@ -50,7 +50,7 @@ public:
     };
 
 protected:
-    explicit QAbstract3DInputHandler(QObject *parent = 0);
+    explicit QAbstract3DInputHandler(QObject *parent = Q_NULLPTR);
 public:
     virtual ~QAbstract3DInputHandler();
 

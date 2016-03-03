@@ -54,12 +54,12 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem
 
 public:
 
-    explicit QCustom3DVolume(QObject *parent = 0);
+    explicit QCustom3DVolume(QObject *parent = Q_NULLPTR);
     explicit QCustom3DVolume(const QVector3D &position, const QVector3D &scaling,
                              const QQuaternion &rotation, int textureWidth,
                              int textureHeight, int textureDepth,
                              QVector<uchar> *textureData, QImage::Format textureFormat,
-                             const QVector<QRgb> &colorTable, QObject *parent = 0);
+                             const QVector<QRgb> &colorTable, QObject *parent = Q_NULLPTR);
     virtual ~QCustom3DVolume();
 
     void setTextureWidth(int value);

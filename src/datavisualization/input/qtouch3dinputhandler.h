@@ -33,7 +33,7 @@ class QT_DATAVISUALIZATION_EXPORT QTouch3DInputHandler : public Q3DInputHandler
     Q_OBJECT
 
 public:
-    explicit QTouch3DInputHandler(QObject *parent = 0);
+    explicit QTouch3DInputHandler(QObject *parent = Q_NULLPTR);
     virtual ~QTouch3DInputHandler();
 
     // Input event listeners

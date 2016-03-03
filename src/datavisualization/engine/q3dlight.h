@@ -33,7 +33,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DLight : public Q3DObject
     Q_OBJECT
 
 public:
-    Q3DLight(QObject *parent = 0);
+    explicit Q3DLight(QObject *parent = Q_NULLPTR);
     virtual ~Q3DLight();
 
 private:

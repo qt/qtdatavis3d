@@ -45,10 +45,10 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
     Q_PROPERTY(bool scalingAbsolute READ isScalingAbsolute WRITE setScalingAbsolute NOTIFY scalingAbsoluteChanged REVISION 1)
 
 public:
-    explicit QCustom3DItem(QObject *parent = 0);
+    explicit QCustom3DItem(QObject *parent = Q_NULLPTR);
     explicit QCustom3DItem(const QString &meshFile, const QVector3D &position,
                            const QVector3D &scaling, const QQuaternion &rotation,
-                           const QImage &texture, QObject *parent = 0);
+                           const QImage &texture, QObject *parent = Q_NULLPTR);
     virtual ~QCustom3DItem();
 
     void setMeshFile(const QString &meshFile);
@@ -94,7 +94,7 @@ Q_SIGNALS:
     Q_REVISION(1) void scalingAbsoluteChanged(bool scalingAbsolute);
 
 protected:
-    QCustom3DItem(QCustom3DItemPrivate *d, QObject *parent = 0);
+    QCustom3DItem(QCustom3DItemPrivate *d, QObject *parent = Q_NULLPTR);
 
     QScopedPointer<QCustom3DItemPrivate> d_ptr;
 

@@ -38,7 +38,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DObject : public QObject
     Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged)
 
 public:
-    Q3DObject(QObject *parent = 0);
+    explicit Q3DObject(QObject *parent = Q_NULLPTR);
     virtual ~Q3DObject();
 
     virtual void copyValuesFrom(const Q3DObject &source);
