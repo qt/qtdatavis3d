@@ -47,7 +47,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScatter : public QAbstract3DGraph
     Q_PROPERTY(QScatter3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
 
 public:
-    explicit Q3DScatter(const QSurfaceFormat *format = 0, QWindow *parent = 0);
+    explicit Q3DScatter(const QSurfaceFormat *format = Q_NULLPTR, QWindow *parent = Q_NULLPTR);
     virtual ~Q3DScatter();
 
     void addSeries(QScatter3DSeries *series);

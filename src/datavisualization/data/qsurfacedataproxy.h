@@ -53,7 +53,7 @@ class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
     Q_PROPERTY(QSurface3DSeries *series READ series NOTIFY seriesChanged)
 
 public:
-    explicit QSurfaceDataProxy(QObject *parent = 0);
+    explicit QSurfaceDataProxy(QObject *parent = Q_NULLPTR);
     virtual ~QSurfaceDataProxy();
 
     QSurface3DSeries *series() const;
@@ -92,7 +92,7 @@ Q_SIGNALS:
     void seriesChanged(QSurface3DSeries *series);
 
 protected:
-    explicit QSurfaceDataProxy(QSurfaceDataProxyPrivate *d, QObject *parent = 0);
+    explicit QSurfaceDataProxy(QSurfaceDataProxyPrivate *d, QObject *parent = Q_NULLPTR);
     QSurfaceDataProxyPrivate *dptr();
     const QSurfaceDataProxyPrivate *dptrc() const;
 

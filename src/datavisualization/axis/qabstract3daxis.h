@@ -70,7 +70,7 @@ public:
     };
 
 protected:
-    explicit QAbstract3DAxis(QAbstract3DAxisPrivate *d, QObject *parent = 0);
+    explicit QAbstract3DAxis(QAbstract3DAxisPrivate *d, QObject *parent = Q_NULLPTR);
 
 public:
     virtual ~QAbstract3DAxis();

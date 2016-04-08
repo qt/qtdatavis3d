@@ -74,28 +74,28 @@ public:
         MMBCumulativeY = 3
     };
 
-    explicit QItemModelSurfaceDataProxy(QObject *parent = 0);
-    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, QObject *parent = 0);
-    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &yPosRole,
-                               QObject *parent = 0);
-    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
-                               const QString &columnRole, const QString &yPosRole,
-                               QObject *parent = 0);
-    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
-                               const QString &columnRole, const QString &xPosRole,
-                               const QString &yPosRole, const QString &zPosRole,
-                               QObject *parent = 0);
-    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
-                               const QString &columnRole, const QString &yPosRole,
-                               const QStringList &rowCategories,
-                               const QStringList &columnCategories,
-                               QObject *parent = 0);
-    QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
-                               const QString &columnRole, const QString &xPosRole,
-                               const QString &yPosRole, const QString &zPosRole,
-                               const QStringList &rowCategories,
-                               const QStringList &columnCategories,
-                               QObject *parent = 0);
+    explicit QItemModelSurfaceDataProxy(QObject *parent = Q_NULLPTR);
+    explicit QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, QObject *parent = Q_NULLPTR);
+    explicit QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &yPosRole,
+                                        QObject *parent = Q_NULLPTR);
+    explicit QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
+                                        const QString &columnRole, const QString &yPosRole,
+                                        QObject *parent = Q_NULLPTR);
+    explicit QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
+                                        const QString &columnRole, const QString &xPosRole,
+                                        const QString &yPosRole, const QString &zPosRole,
+                                        QObject *parent = Q_NULLPTR);
+    explicit QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
+                                        const QString &columnRole, const QString &yPosRole,
+                                        const QStringList &rowCategories,
+                                        const QStringList &columnCategories,
+                                        QObject *parent = Q_NULLPTR);
+    explicit QItemModelSurfaceDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
+                                        const QString &columnRole, const QString &xPosRole,
+                                        const QString &yPosRole, const QString &zPosRole,
+                                        const QStringList &rowCategories,
+                                        const QStringList &columnCategories,
+                                        QObject *parent = Q_NULLPTR);
     virtual ~QItemModelSurfaceDataProxy();
 
     void setItemModel(QAbstractItemModel *itemModel);

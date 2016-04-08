@@ -70,24 +70,24 @@ public:
         MMBCumulative = 3
     };
 
-    explicit QItemModelBarDataProxy(QObject *parent = 0);
-    QItemModelBarDataProxy(QAbstractItemModel *itemModel, QObject *parent = 0);
-    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &valueRole,
-                           QObject *parent = 0);
-    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
-                           const QString &columnRole, const QString &valueRole,
-                           QObject *parent = 0);
-    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
-                           const QString &columnRole, const QString &valueRole,
-                           const QString &rotationRole, QObject *parent = 0);
-    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
-                           const QString &columnRole, const QString &valueRole,
-                           const QStringList &rowCategories, const QStringList &columnCategories,
-                           QObject *parent = 0);
-    QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
-                           const QString &columnRole, const QString &valueRole,
-                           const QString &rotationRole, const QStringList &rowCategories,
-                           const QStringList &columnCategories, QObject *parent = 0);
+    explicit QItemModelBarDataProxy(QObject *parent = Q_NULLPTR);
+    explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, QObject *parent = Q_NULLPTR);
+    explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &valueRole,
+                                    QObject *parent = Q_NULLPTR);
+    explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
+                                    const QString &columnRole, const QString &valueRole,
+                                    QObject *parent = Q_NULLPTR);
+    explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
+                                    const QString &columnRole, const QString &valueRole,
+                                    const QString &rotationRole, QObject *parent = Q_NULLPTR);
+    explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
+                                    const QString &columnRole, const QString &valueRole,
+                                    const QStringList &rowCategories, const QStringList &columnCategories,
+                                    QObject *parent = Q_NULLPTR);
+    explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, const QString &rowRole,
+                                    const QString &columnRole, const QString &valueRole,
+                                    const QString &rotationRole, const QStringList &rowCategories,
+                                    const QStringList &columnCategories, QObject *parent = Q_NULLPTR);
     virtual ~QItemModelBarDataProxy();
 
     void setItemModel(QAbstractItemModel *itemModel);

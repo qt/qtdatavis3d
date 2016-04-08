@@ -55,7 +55,7 @@ class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
     Q_PROPERTY(QStringList columnLabels READ columnLabels WRITE setColumnLabels NOTIFY columnLabelsChanged)
     Q_PROPERTY(QBar3DSeries *series READ series NOTIFY seriesChanged)
 public:
-    explicit QBarDataProxy(QObject *parent = 0);
+    explicit QBarDataProxy(QObject *parent = Q_NULLPTR);
     virtual ~QBarDataProxy();
 
     QBar3DSeries *series() const;
@@ -110,7 +110,7 @@ Q_SIGNALS:
     void seriesChanged(QBar3DSeries *series);
 
 protected:
-    explicit QBarDataProxy(QBarDataProxyPrivate *d, QObject *parent = 0);
+    explicit QBarDataProxy(QBarDataProxyPrivate *d, QObject *parent = Q_NULLPTR);
     QBarDataProxyPrivate *dptr();
     const QBarDataProxyPrivate *dptrc() const;
 

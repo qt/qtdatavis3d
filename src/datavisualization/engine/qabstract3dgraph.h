@@ -73,7 +73,7 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected Q
 
 protected:
     explicit QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFormat *format,
-                              QWindow *parent = 0);
+                              QWindow *parent = Q_NULLPTR);
 
 public:
     enum SelectionFlag {
