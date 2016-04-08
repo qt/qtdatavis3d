@@ -88,7 +88,7 @@ public:
     };
 
 protected:
-    explicit QAbstract3DSeries(QAbstract3DSeriesPrivate *d, QObject *parent = 0);
+    explicit QAbstract3DSeries(QAbstract3DSeriesPrivate *d, QObject *parent = Q_NULLPTR);
 
 public:
     virtual ~QAbstract3DSeries();

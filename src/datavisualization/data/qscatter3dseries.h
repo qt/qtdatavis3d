@@ -45,8 +45,8 @@ class QT_DATAVISUALIZATION_EXPORT QScatter3DSeries : public QAbstract3DSeries
     Q_PROPERTY(float itemSize READ itemSize WRITE setItemSize NOTIFY itemSizeChanged)
 
 public:
-    explicit QScatter3DSeries(QObject *parent = 0);
-    explicit QScatter3DSeries(QScatterDataProxy *dataProxy, QObject *parent = 0);
+    explicit QScatter3DSeries(QObject *parent = Q_NULLPTR);
+    explicit QScatter3DSeries(QScatterDataProxy *dataProxy, QObject *parent = Q_NULLPTR);
     virtual ~QScatter3DSeries();
 
     void setDataProxy(QScatterDataProxy *proxy);
@@ -65,7 +65,7 @@ Q_SIGNALS:
     void itemSizeChanged(float size);
 
 protected:
-    explicit QScatter3DSeries(QScatter3DSeriesPrivate *d, QObject *parent = 0);
+    explicit QScatter3DSeries(QScatter3DSeriesPrivate *d, QObject *parent = Q_NULLPTR);
     QScatter3DSeriesPrivate *dptr();
     const QScatter3DSeriesPrivate *dptrc() const;
 

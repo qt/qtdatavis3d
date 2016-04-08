@@ -35,7 +35,10 @@
 using namespace QtDataVisualization;
 
 class AudioLevelsIODevice;
+
+QT_BEGIN_NAMESPACE
 class QAudioInput;
+QT_END_NAMESPACE
 
 class AudioLevels : public QObject
 {

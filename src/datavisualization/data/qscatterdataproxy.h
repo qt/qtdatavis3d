@@ -51,7 +51,7 @@ class QT_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
     Q_PROPERTY(QScatter3DSeries *series READ series NOTIFY seriesChanged)
 
 public:
-    explicit QScatterDataProxy(QObject *parent = 0);
+    explicit QScatterDataProxy(QObject *parent = Q_NULLPTR);
     virtual ~QScatterDataProxy();
 
     QScatter3DSeries *series() const;
@@ -83,7 +83,7 @@ Q_SIGNALS:
     void seriesChanged(QScatter3DSeries *series);
 
 protected:
-    explicit QScatterDataProxy(QScatterDataProxyPrivate *d, QObject *parent = 0);
+    explicit QScatterDataProxy(QScatterDataProxyPrivate *d, QObject *parent = Q_NULLPTR);
     QScatterDataProxyPrivate *dptr();
     const QScatterDataProxyPrivate *dptrc() const;
 

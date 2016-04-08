@@ -53,10 +53,10 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DLabel : public QCustom3DItem
     Q_PROPERTY(bool facingCamera READ isFacingCamera WRITE setFacingCamera NOTIFY facingCameraChanged)
 
 public:
-    explicit QCustom3DLabel(QObject *parent = 0);
+    explicit QCustom3DLabel(QObject *parent = Q_NULLPTR);
     explicit QCustom3DLabel(const QString &text, const QFont &font, const QVector3D &position,
                             const QVector3D &scaling, const QQuaternion &rotation,
-                            QObject *parent = 0);
+                            QObject *parent = Q_NULLPTR);
     virtual ~QCustom3DLabel();
 
     void setText(const QString &text);
