@@ -9,7 +9,7 @@ static: MODULE_DEFINES += QT_DATAVISUALIZATION_STATICLIB
 
 MODULE_INCNAME = QtDataVisualization
 
-QMAKE_DOCS = $$PWD/doc/qtdatavisualization.qdocconf
+QMAKE_DOCS = $$PWD/doc/qtdatavis3d.qdocconf
 
 load(qt_module)
 
@@ -24,9 +24,8 @@ include($$PWD/axis/axis.pri)
 include($$PWD/data/data.pri)
 include($$PWD/input/input.pri)
 
-OTHER_FILES += doc/qtdatavisualization.qdocconf \
+OTHER_FILES += doc/qtdatavis3d.qdocconf \
                doc/src/* \
                doc/images/* \
                doc/snippets/* \
                global/*.qdoc
-
