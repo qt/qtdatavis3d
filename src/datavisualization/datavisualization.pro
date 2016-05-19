@@ -5,7 +5,6 @@ mac:CONFIG(shared, static|shared):contains(QT_CONFIG, qt_framework) {
 } else {
     TARGET = DataVisualization
 }
-message($$QT_CONFIG)
 
 QT += core gui
 osx: QT +=  gui-private
