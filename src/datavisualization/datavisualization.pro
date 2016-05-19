@@ -17,8 +17,6 @@ MODULE_INCNAME = QtDataVisualization
 
 QMAKE_DOCS = $$PWD/doc/qtdatavisualization.qdocconf
 
-load(qt_module)
-
 QMAKE_TARGET_PRODUCT = "Qt Data Visualization (Qt $$QT_VERSION)"
 QMAKE_TARGET_DESCRIPTION = "3D Data Visualization component for Qt."
 
@@ -36,3 +34,4 @@ OTHER_FILES += doc/qtdatavisualization.qdocconf \
                doc/snippets/* \
                global/*.qdoc
 
+load(qt_module)
