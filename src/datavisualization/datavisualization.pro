@@ -8,10 +8,6 @@ mac:CONFIG(shared, static|shared):contains(QT_CONFIG, qt_framework) {
 
 QT += core gui
 osx: QT +=  gui-private
-DEFINES += QT_DATAVISUALIZATION_LIBRARY
-
-# Fix exports in static builds for applications linking datavisualization module
-static: MODULE_DEFINES += QT_DATAVISUALIZATION_STATICLIB
 
 MODULE_INCNAME = QtDataVisualization
 
