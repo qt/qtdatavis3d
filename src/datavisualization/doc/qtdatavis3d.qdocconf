@@ -18,7 +18,7 @@ depends = qtcore qtgui qtqml qtquick qtmultimedia qtdoc
 
 qhp.projects                            = QtDataVisualization
 
-qhp.QtDataVisualization.file            = qtdatavisualization.qhp
+qhp.QtDataVisualization.file            = qtdatavis3d.qhp
 qhp.QtDataVisualization.namespace       = org.qt-project.qtdatavisualization.$QT_VERSION_TAG
 qhp.QtDataVisualization.virtualFolder   = qtdatavisualization
 qhp.QtDataVisualization.indexTitle      = Qt Data Visualization

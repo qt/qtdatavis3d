@@ -1,13 +1,9 @@
 requires(qtHaveModule(widgets))
 
-load(qt_parts)
-
 # We need opengl, minimum es2 or desktop
-!contains(QT_CONFIG, opengl) {
-    error(QtDataVisualization requires OpenGL!)
-}
-contains(QT_CONFIG, opengles1) {
-    error(QtDataVisualization does not support OpenGL ES 1!)
-}
+requires(contains(QT_CONFIG, opengl))
+requires(!contains(QT_CONFIG, opengles1))
+
+load(qt_parts)
 
 OTHER_FILES += README dist/* .qmake.conf
