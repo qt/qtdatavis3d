@@ -1,8 +1,8 @@
 TARGET = datavisualizationqml2
+CXX_MODULE = datavisualization
 QT += qml quick datavisualization
 osx: QT += gui-private
 TARGETPATH = QtDataVisualization
-IMPORT_VERSION = $$MODULE_VERSION
 
 include($$PWD/designer/designer.pri)
 
@@ -44,8 +44,6 @@ HEADERS += \
     declarativerendernode_p.h \
     glstatestore_p.h \
     enumtostringmap_p.h
-
-CONFIG += no_cxx_module
 
 load(qml_plugin)
 
