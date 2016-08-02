@@ -12,7 +12,7 @@ imagedirs  += ../images \
               images
 sourcedirs += ..
 
-examplesinstallpath = qtdatavisualization/datavisualization
+examplesinstallpath = datavisualization
 
 depends = qtcore qtgui qtqml qtquick qtmultimedia qtdoc
 

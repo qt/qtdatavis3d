@@ -1,11 +1,8 @@
 TARGET = datavisualizationqml2
+CXX_MODULE = datavisualization
 QT += qml quick datavisualization
 osx: QT += gui-private
 TARGETPATH = QtDataVisualization
-IMPORT_VERSION = $$MODULE_VERSION
-
-# Only build qml plugin static if Qt itself is also built static
-!contains(QT_CONFIG, static): CONFIG -= static staticlib
 
 include($$PWD/designer/designer.pri)
 
@@ -48,18 +45,9 @@ HEADERS += \
     glstatestore_p.h \
     enumtostringmap_p.h
 
-OTHER_FILES = qmldir
-
-CONFIG += no_cxx_module
-
 load(qml_plugin)
 
 win32 {
-    CONFIG += skip_target_version_ext
-    VERSION = $$MODULE_VERSION
     QMAKE_TARGET_PRODUCT = "Qt Data Visualization (Qt $$QT_VERSION)"
     QMAKE_TARGET_DESCRIPTION = "3D Data Visualization QML plugin for Qt."
 }
-
-QML_FILES += \
-    $$PWD/plugins.qmltypes
