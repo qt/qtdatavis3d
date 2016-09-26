@@ -111,7 +111,7 @@ Item {
             compare(empty.height, 0, "height")
             compare(empty.multiSeriesUniform, false, "multiSeriesUniform")
             compare(empty.barThickness, 1.0, "barThickness")
-            compare(empty.barSpacing, Qt.size(0.2, 0.2), "barSpacing")
+            compare(empty.barSpacing, Qt.size(1.0, 1.0), "barSpacing")
             compare(empty.barSpacingRelative, true, "barSpacingRelative")
             compare(empty.seriesList.length, 0, "seriesList")
             compare(empty.selectedSeries, null, "selectedSeries")
@@ -163,7 +163,7 @@ Item {
             basic.barThickness = -1
             basic.barSpacing = Qt.size(-1.0, -1.0)
             compare(basic.barThickness, -1/*0.5*/, "barThickness") // TODO: Fix once QTRD-3367 is done
-            compare(basic.barSpacing, Qt.size(1.0, 0.0), "barSpacing")
+            compare(basic.barSpacing, Qt.size(-1.0, -1.0), "barSpacing")
             waitForRendering(top)
             basic.destroy()
             waitForRendering(top)
