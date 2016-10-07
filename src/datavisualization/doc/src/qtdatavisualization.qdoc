@@ -30,8 +30,7 @@
 /*!
     \namespace QtDataVisualization
     \inmodule QtDataVisualization
-
-    QtDataVisualization namespace holds all the classes and enumerations in the QtDataVisualization
+    \brief Contains the classes and enumerations in the Qt Data Visualization
     module.
 
     \generatelist{classesbymodule QtDataVisualization}
