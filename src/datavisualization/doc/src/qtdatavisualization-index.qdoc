@@ -80,18 +80,20 @@
 
     \section1 Articles
     \list
+        \li \l{Qt Data Visualization Getting Started}{Getting Started}
         \li \l{Qt Data Visualization Data Handling}{Data Handling}
         \li \l{Qt Data Visualization Interacting with Data}{Interacting with Data}
         \li \l{Qt Data Visualization Known Issues}{Known Issues}
     \endlist
 
-    \section1 References
+    \section1 Examples
+    \list
+        \li \l{Qt Data Visualization Examples}
+    \endlist
+
+    \section1 API Reference
     \list
         \li \l{Qt Data Visualization C++ Classes}
         \li \l{Qt Data Visualization QML Types}
     \endlist
-
-    Qt Data Visualization comes with the following examples:
-
-    \annotatedlist qtdatavisualization_examples
 */
