@@ -42,6 +42,8 @@
     we skip explaining the application creation. For more detailed QML example documentation,
     see \l{Qt Quick 2 Scatter Example}.
 
+    \include examples-run.qdocinc
+
     \section1 Adding data to the graph
 
     This example shows two methods to set data to surface graph, using the HeightMapSurfaceDataProxy

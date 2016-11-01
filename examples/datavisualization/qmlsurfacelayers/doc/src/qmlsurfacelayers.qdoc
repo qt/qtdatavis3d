@@ -42,6 +42,8 @@
     map images, so in this section we skip explaining the application creation. For a more detailed
     QML example documentation, see \l{Qt Quick 2 Scatter Example}.
 
+    \include examples-run.qdocinc
+
     \section1 Adding data to the graph
 
     This example shows how to add several surface series to one graph using using

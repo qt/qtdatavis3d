@@ -39,6 +39,8 @@
 
     \image customitems-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Adding custom meshes to the application
 
     We'll add the meshes in a resource file:

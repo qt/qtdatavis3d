@@ -42,6 +42,8 @@
 
     \image qmlscatter-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Application basics
 
     Before diving into the QML code, let's take a look at the application \c main.cpp.

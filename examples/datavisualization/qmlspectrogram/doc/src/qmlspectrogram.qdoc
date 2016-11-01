@@ -47,6 +47,8 @@
     functionality is not explained. For more detailed QML example documentation,
     see \l{Qt Quick 2 Scatter Example}.
 
+    \include examples-run.qdocinc
+
     \section1 Creating a spectrogram
 
     To create a 2D spectrogram, we define a Surface3D item:

@@ -40,6 +40,8 @@
 
     \image qmlcustominput-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Removing default input handling
 
     The default input handling mechanism is disabled by setting the inputHandler property to null.

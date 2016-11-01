@@ -159,17 +159,6 @@
 
     \snippet doc_src_qtdatavisualization.cpp 7
 
-    \section1 Running examples
-
-    Qt Data Visualization examples are found under the \c examples subdirectory. To build and run a
-    single example, in this case qmlsurface, navigate to the example directory and enter the
-    following commands:
-
-    \snippet doc_src_qtdatavisualization.cpp 8
-
-    \note On some platforms, such as Windows, the executable can be generated under debug or
-    release folders, depending on your build.
-
     \section1 Creating a simple application
 
     To create a simple application, start by creating a new Qt Gui Application project in Qt

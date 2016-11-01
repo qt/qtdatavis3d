@@ -41,6 +41,8 @@
     that and skip explaining the basic functionality - for
     more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
 
+    \include examples-run.qdocinc
+
     \section1 Legend
 
     The legend is simply a column of custom \c LegendItem items inside a transparent rectangle.

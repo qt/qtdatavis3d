@@ -41,6 +41,8 @@
     simultaneously, so most functionality is not explained in detail.
     For more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
 
+    \include examples-run.qdocinc
+
     \section1 Multiple Graphs
 
     Using multiple graphs in a single application doesn't require anything special, simply define

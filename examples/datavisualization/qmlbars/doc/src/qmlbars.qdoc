@@ -42,6 +42,8 @@
     at once. We'll concentrate on those and skip explaining the basic Bars3D functionality - for
     more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
 
+    \include examples-run.qdocinc
+
     \section1 Data
 
     The example data is monthly income and expenses of a fictional company over several years.

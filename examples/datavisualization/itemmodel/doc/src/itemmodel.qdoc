@@ -46,6 +46,8 @@
 
     \image itemmodel-example-2.png
 
+    \include examples-run.qdocinc
+
     \section1 Creating the application
 
     First, in main.cpp, we create a QApplication, instantiate Q3DBars and a window container for it:

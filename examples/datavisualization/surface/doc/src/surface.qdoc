@@ -50,6 +50,8 @@
 
     \image surface-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Creating the application
 
     First, in \c main.cpp, we create a QApplication, instantiate Q3DSurface, and a window container

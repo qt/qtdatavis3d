@@ -45,6 +45,8 @@
 
     \image texturesurface-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Texture to a surface series
 
     The image to be set as a texture to a surface can be set using QSurface3DSeries::setTextureFile().

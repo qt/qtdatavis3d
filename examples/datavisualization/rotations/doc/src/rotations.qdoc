@@ -45,6 +45,8 @@
 
     \image rotations-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Using rotations
 
     In this example we want to orient the arrow items tangentially to the origin. This requires

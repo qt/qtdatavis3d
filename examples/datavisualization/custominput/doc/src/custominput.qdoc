@@ -42,6 +42,8 @@
 
     \image custominput-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Replacing default input handling
 
     The default input handling mechanism is replaced by setting the active input handler of

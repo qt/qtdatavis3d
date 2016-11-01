@@ -40,6 +40,8 @@
 
     \image qmlaxisdrag-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Overriding default input handling
 
     First we deactivate the default input handling mechanism by setting the active input handler

@@ -42,6 +42,8 @@
     that and skip explaining the basic functionality - for
     more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
 
+    \include examples-run.qdocinc
+
     \section1 Data source in C++
 
     The item model based proxies are good for simple and/or static graphs, but to achieve

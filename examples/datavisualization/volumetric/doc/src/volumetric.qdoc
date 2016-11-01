@@ -38,6 +38,8 @@
 
     \image volumetric-example.png
 
+    \include examples-run.qdocinc
+
     \section1 Initializing volume item
 
     The QCustom3DVolume items are special custom items (see QCustom3DItem), which can be used
