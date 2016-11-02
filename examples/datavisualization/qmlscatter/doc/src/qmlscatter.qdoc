@@ -42,7 +42,7 @@
 
     \image qmlscatter-example.png
 
-    \section1 Application basics
+    \section1 Application Basics
 
     Before diving into the QML code, let's take a look at the application \c main.cpp.
 
@@ -72,7 +72,7 @@
 
     \snippet qmlscatter/main.cpp 2
 
-    \section1 Setting up the graph
+    \section1 Setting up the Graph
 
     First we'll import all the QML modules we need:
 
@@ -111,7 +111,7 @@
 
     Then it's time to start feeding the graph some data.
 
-    \section1 Adding data to the graph
+    \section1 Adding Data to the Graph
 
     Let's create a \c Data item inside the \c mainView and name it \c seriesData:
 
@@ -171,5 +171,5 @@
 
     And we're done!
 
-    \section1 Example contents
+    \section1 Example Contents
 */

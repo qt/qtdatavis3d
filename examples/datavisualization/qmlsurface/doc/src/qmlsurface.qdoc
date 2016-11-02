@@ -42,7 +42,7 @@
     we skip explaining the application creation. For more detailed QML example documentation,
     see \l{Qt Quick 2 Scatter Example}.
 
-    \section1 Adding data to the graph
+    \section1 Adding Data to the Graph
 
     This example shows two methods to set data to surface graph, using the HeightMapSurfaceDataProxy
     and ItemModelSurfaceDataProxy. First we go through setting the data using the height map specific
@@ -73,7 +73,7 @@
     \dots 0
     \snippet qmlsurface/qml/qmlsurface/main.qml 6
 
-    \section1 Showing data
+    \section1 Showing Data
 
     In the \c main.qml, we set up the Surface3D element to show the data and various UI elements
     to illustrate few interesting features.
@@ -115,5 +115,5 @@
     250 on height map proxy to show exaggerated height. At the same time the middle color position
     on the gradient is modified to match the value range change.
 
-    \section1 Example contents
+    \section1 Example Contents
 */

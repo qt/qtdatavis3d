@@ -39,7 +39,7 @@
 
     \image customitems-example.png
 
-    \section1 Adding custom meshes to the application
+    \section1 Adding Custom Meshes to the Application
 
     We'll add the meshes in a resource file:
 
@@ -53,7 +53,7 @@
     </RCC>
     \endcode
 
-    \section1 Adding custom item to a graph
+    \section1 Adding Custom Item to a Graph
 
     In this example we do not have specific textures for our meshes, so we'll just create a small
     QImage and fill it with a single color:
@@ -73,7 +73,7 @@
 
     \snippet customitems/customitemgraph.cpp 3
 
-    \section1 Removing custom item from a graph
+    \section1 Removing Custom Item from a Graph
 
     We'll just call \c removeCustomItemAt() with the position of the item:
 

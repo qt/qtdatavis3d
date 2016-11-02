@@ -50,7 +50,7 @@
 
     \image surface-example.png
 
-    \section1 Creating the application
+    \section1 Creating the Application
 
     First, in \c main.cpp, we create a QApplication, instantiate Q3DSurface, and a window container
     for it:
@@ -71,7 +71,7 @@
     signals from widgets into methods in \c surfacegraph.cpp. Next chapter explains more
     about using Q3DSurface.
 
-    \section1 Setting up proxies and data
+    \section1 Setting up Proxies and Data
 
     First we instantiate a new QSurfaceDataProxy and attach it to a new QSurface3DSeries:
 
@@ -107,7 +107,7 @@
 
     \snippet surface/surfacegraph.cpp 4
 
-    \section1 Selection modes
+    \section1 Selection Modes
 
     Q3Dsurface supports three different selection modes. These are demonstrated in the
     example with radio buttons, which the user can use to activate a suitable selection mode.
@@ -115,7 +115,7 @@
 
     \snippet surface/surfacegraph.h 0
 
-    \section1 Axis ranges for studying the graph
+    \section1 Axis Ranges for Studying the Graph
 
     The example has four slider controls for adjusting the min and max values for X and Z
     axis. When selecting the proxy these sliders are adjusted so that one step on the slider
@@ -136,7 +136,7 @@
 
     \snippet surface/surfacegraph.cpp 6
 
-    \section1 Custom surface gradients
+    \section1 Custom Surface Gradients
 
     The example demonstrates the custom surface gradients with two push buttons. The gradient
     can be defined with QLinearGradient where the desired colors are set to positions. The following

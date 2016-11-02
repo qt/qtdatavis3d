@@ -49,7 +49,7 @@
 
     \image bars-example.png
 
-    \section1 Creating the application
+    \section1 Creating the Application
 
     First, in main.cpp, we create a QApplication, instantiate Q3DBars and a window container
     for it:
@@ -78,7 +78,7 @@
 
     \snippet bars/main.cpp 3
 
-    \section1 Setting up the graph
+    \section1 Setting up the Graph
 
     Let's set up the graph in the constructor of the \c GraphModifier class we instantiated in the
     application main:
@@ -125,7 +125,7 @@
 
     That concludes setting up the graph.
 
-    \section1 Adding data to the graph
+    \section1 Adding Data to the Graph
 
     At the end of the constructor there's a call:
 
@@ -137,7 +137,7 @@
 
     Now the series have data to show.
 
-    \section1 Using widgets to control the graph
+    \section1 Using Widgets to Control the Graph
 
     There isn't much interaction yet, so let's continue by adding some widgets back in the
     application main. Let's just focus on two as an example:
@@ -185,7 +185,7 @@
         \li Axis label rotation
     \endlist
 
-    \section1 Selecting a row/column by clicking an axis label
+    \section1 Selecting a Row/column by Clicking an Axis Label
 
     Selection by axis label is default functionality for bar graphs. As an example, you can select
     rows by clicking an axis label in the following way:
@@ -199,7 +199,7 @@
     You can use the same method with \c SelectionSlice and \c SelectionItem flags, as long as
     you have either \c SelectionRow or \c SelectionColumn set as well.
 
-    \section1 Zooming to selection
+    \section1 Zooming to Selection
 
     As an example of adjusting camera target we have implemented an animation of zooming to
     selection via a button press. Animation initializations are done in the constructor:
@@ -223,6 +223,6 @@
 
     \snippet bars/graphmodifier.cpp 15
 
-    \section1 Example contents
+    \section1 Example Contents
 
 */

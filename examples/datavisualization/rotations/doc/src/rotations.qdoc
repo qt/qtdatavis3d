@@ -45,7 +45,7 @@
 
     \image rotations-example.png
 
-    \section1 Using rotations
+    \section1 Using Rotations
 
     In this example we want to orient the arrow items tangentially to the origin. This requires
     rotating them, which can be achieved by specifying rotation quaternion to each item:
@@ -58,7 +58,7 @@
     for Y-axis and one for Z-axis, and then multiply these together to get the total rotation,
     which we set to the data item.
 
-    \section1 Using custom item meshes
+    \section1 Using Custom Item Meshes
 
     The narrow arrow mesh we use for magnetic field arrow items is not a standard mesh. Instead
     we supply our own \c{narrowarrow.obj} file which contains the object definition for the mesh
@@ -66,7 +66,7 @@
 
     \snippet rotations/scatterdatamodifier.cpp 3
 
-    \section1 Using range gradient
+    \section1 Using Range Gradient
 
     Setting the color style to range gradient in a series means that the item is colored according
     to its relative Y-value on the visible Y-coordinate range. We want the arrows on the bottom
@@ -75,5 +75,5 @@
 
     \snippet rotations/scatterdatamodifier.cpp 4
 
-    \section1 Example contents
+    \section1 Example Contents
 */

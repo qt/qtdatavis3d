@@ -42,14 +42,14 @@
 
     \image custominput-example.png
 
-    \section1 Replacing default input handling
+    \section1 Replacing Default Input Handling
 
     The default input handling mechanism is replaced by setting the active input handler of
     Q3DScatter to \c CustomInputHandler that implements the custom behavior.
 
     \snippet custominput/scatterdatamodifier.cpp 0
 
-    \section1 Implementing custom selection handling
+    \section1 Implementing Custom Selection Handling
 
     The on mouseover selection handling is implemented in the \c CustomInputHandler that captures
     the mouse events. It then stores the last known coordinates to the
@@ -63,7 +63,7 @@
 
     \snippet custominput/scatterdatamodifier.cpp 1
 
-    \section1 Implementing custom zoom handling
+    \section1 Implementing Custom Zoom Handling
 
     The camera has a zoom factor that represents amount of zoom in percentages. In this example the
     zoom range is limited between 10% and 500%. This range is then divided to four subranges where
@@ -71,7 +71,7 @@
 
     \snippet custominput/custominputhandler.cpp 1
 
-    \section1 Implementing custom camera handling
+    \section1 Implementing Custom Camera Handling
 
     The camera is animated to constantly rotate around the graph with two animations. The rotation
     around the graph is done with a simple QPropertyAnimation that just increments during 20

@@ -47,7 +47,7 @@
 
     \image scatter-example.png
 
-    \section1 Creating the application
+    \section1 Creating the Application
 
     First, in main.cpp, we create a QApplication, instantiate Q3DScatter, and a window container
     for it:
@@ -76,7 +76,7 @@
 
     \snippet scatter/main.cpp 3
 
-    \section1 Setting up the graph
+    \section1 Setting up the Graph
 
     Let's set up some visual qualities for the graph in the constructor of the \c ScatterDataModifier
     class we instantiated in the application main:
@@ -93,7 +93,7 @@
 
     That concludes setting up the graph.
 
-    \section1 Adding data to the graph
+    \section1 Adding Data to the Graph
 
     The last thing we do in the \c ScatterDataModifier constructor is to add data to the graph:
 
@@ -121,7 +121,7 @@
     Now our graph has the data and is ready to be used. There isn't much interaction yet, though,
     so let's continue by adding some widgets to play with.
 
-    \section1 Using widgets to control the graph
+    \section1 Using Widgets to Control the Graph
 
     First, back in the application main, we'll create some widgets:
 
@@ -153,5 +153,5 @@
         \li Label font
     \endlist
 
-    \section1 Example contents
+    \section1 Example Contents
 */
