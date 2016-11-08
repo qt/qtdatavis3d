@@ -45,7 +45,7 @@
 
     \include examples-run.qdocinc
 
-    \section1 Custom axis formatter
+    \section1 Custom Axis Formatter
 
     Customizing axis formatters requires subclassing the QValue3DAxisFormatter, which cannot be
     done in QML code alone. In this example we want an axis that interprets the float values as

@@ -40,7 +40,7 @@
 
     \include examples-run.qdocinc
 
-    \section1 Initializing volume item
+    \section1 Initializing Volume Item
 
     The QCustom3DVolume items are special custom items (see QCustom3DItem), which can be used
     to display volumetric data. The volume items are only supported with orthographic projection,
@@ -80,7 +80,7 @@
 
     \snippet volumetric/volumetric.cpp 3
 
-    \section1 Slicing into the volume
+    \section1 Slicing into the Volume
 
     Unless the volume is largely transparent, you can only see the surface of it, which is often
     not very helpful. One way to inspect the internal structure of the volume is to view the slices
@@ -101,7 +101,7 @@
 
     \snippet volumetric/volumetric.cpp 9
 
-    \section1 Adjusting volume transparency
+    \section1 Adjusting Volume Transparency
 
     Sometimes viewing just the slices doesn't give you a good understanding of the volume's internal
     structure. QCustom3DVolume provides two properties that can be used to adjust the volume
@@ -123,7 +123,7 @@
 
     \snippet volumetric/volumetric.cpp 12
 
-    \section1 High definition vs. low definition shader
+    \section1 High Definition vs. Low Definition Shader
 
     By default the volume rendering uses the high definition shader. It accounts for each
     voxel of the volume with correct weight when ray-tracing the volume contents,
@@ -138,5 +138,5 @@
 
     \snippet volumetric/volumetric.cpp 13
 
-    \section1 Example contents
+    \section1 Example Contents
 */

@@ -44,7 +44,7 @@
 
     \include examples-run.qdocinc
 
-    \section1 Adding data to the graph
+    \section1 Adding Data to the Graph
 
     This example shows how to add several surface series to one graph using using
     HeightMapSurfaceDataProxies and how to control their visibilities individually.
@@ -67,7 +67,7 @@
     \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 2
     \dots
 
-    \section1 Controlling the graph
+    \section1 Controlling the Graph
 
     Let's add some checkboxes to control the visibility of layers:
 
@@ -89,5 +89,5 @@
 
     \snippet qmlsurfacelayers/qml/qmlsurfacelayers/main.qml 6
 
-    \section1 Example contents
+    \section1 Example Contents
 */

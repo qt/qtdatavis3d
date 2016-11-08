@@ -47,7 +47,7 @@
 
     \include examples-run.qdocinc
 
-    \section1 Texture to a surface series
+    \section1 Texture to a Surface Series
 
     The image to be set as a texture to a surface can be set using QSurface3DSeries::setTextureFile().
     In this example we have added a check box to control if the texture is set or not. The
@@ -57,7 +57,7 @@
 
     \snippet texturesurface/surfacegraph.cpp 0
 
-    \section1 Topographic surface series
+    \section1 Topographic Surface Series
 
     The topographic data for this example is obtained from National Land Survey of Finland. It
     provides a product called \c{Elevation Model 2 m}, which was suitable for our needs. We selected
@@ -78,7 +78,7 @@
     And then the actual decoding.
     \snippet texturesurface/topographicseries.cpp 1
 
-    \section1 Use custom input handler to enable zooming and panning
+    \section1 Use Custom Input Handler to Enable Zooming and Panning
 
     For the panning the implementation is similar to the \l{Axis Range Dragging With Labels Example}.
     The difference is that in this example we follow only dragging of X and Z axis and we don't
@@ -100,7 +100,7 @@
 
     \snippet texturesurface/custominputhandler.cpp 2
 
-    \section1 Highlight an area of the surface
+    \section1 Highlight an Area of the Surface
 
     The main idea on creating a highlight on the surface is to create a copy of the series and add
     a bit of offset to the y value. On this example the class \c HighlightSeries implements the
@@ -117,7 +117,7 @@
 
     \snippet texturesurface/highlightseries.cpp 1
 
-    \section1 A gradient to the highlight series
+    \section1 A Gradient to the Highlight Series
 
     Since the \c HighlightSeries is QSurface3DSeries, we can use all the decoration methods series can
     have. In this example we added a gradient to emphasize the elevation. Because the suitable gradient

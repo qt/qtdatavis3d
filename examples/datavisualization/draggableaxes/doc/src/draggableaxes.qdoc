@@ -43,7 +43,7 @@
 
     \include examples-run.qdocinc
 
-    \section1 Replacing default input handling
+    \section1 Replacing Default Input Handling
 
     The default input handling mechanism is replaced by setting the active input handler of
     Q3DScatter to \c AxesInputHandler that implements the custom behavior:
@@ -58,7 +58,7 @@
 
     \snippet draggableaxes/data.cpp 2
 
-    \section1 Extending mouse event handling
+    \section1 Extending Mouse Event Handling
 
     First of all, we inherited our input handler from Q3DInputHandler instead of
     QAbstract3DInputHandler. The reason for doing this is to keep all the functionality of the
@@ -85,7 +85,7 @@
 
     We don't need to change the functionality of mouse wheel, so we will not re-implement that.
 
-    \section1 Implementing axis dragging
+    \section1 Implementing Axis Dragging
 
     First we need to start listening to the selection signal from the graph. We do that in the
     constructor, and connect it to \c handleElementSelected method:
@@ -131,5 +131,5 @@
     The modifier could be adjusted automatically based on the axis range and camera zoom level, but
     we'll leave implementing that as an excercise for the reader.
 
-    \section1 Example contents
+    \section1 Example Contents
 */

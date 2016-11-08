@@ -42,7 +42,7 @@
 
     \include examples-run.qdocinc
 
-    \section1 Overriding default input handling
+    \section1 Overriding Default Input Handling
 
     First we deactivate the default input handling mechanism by setting the active input handler
     of Scatter3D graph to \c{null}:
@@ -73,7 +73,7 @@
     \dots 0
     \snippet qmlaxisdrag/qml/qmlaxisdrag/main.qml 4
 
-    \section1 Translating mouse movement to axis range change
+    \section1 Translating Mouse Movement to Axis Range Change
 
     in \c scatterGraph we will need to listen to \c onSelectedElementChanged signal. The signal
     is emitted after the selection query has been made in the \c{onPressed} of \c{inputArea}. We
@@ -99,7 +99,7 @@
     For a more sophisticated conversion from mouse movement to axis range update, see
     \l{Axis Range Dragging With Labels Example}{this example}.
 
-    \section1 Other features
+    \section1 Other Features
 
     The example also demonstrates how to use orthographic projection and how to update properties
     of a custom item on the fly.
@@ -119,5 +119,5 @@
     \snippet qmlaxisdrag/qml/qmlaxisdrag/main.qml 10
     \dots
 
-    \section1 Example contents
+    \section1 Example Contents
 */

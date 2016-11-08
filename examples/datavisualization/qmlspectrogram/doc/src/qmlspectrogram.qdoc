@@ -49,7 +49,7 @@
 
     \include examples-run.qdocinc
 
-    \section1 Creating a spectrogram
+    \section1 Creating a Spectrogram
 
     To create a 2D spectrogram, we define a Surface3D item:
 
@@ -68,7 +68,7 @@
 
     \snippet qmlspectrogram/qml/qmlspectrogram/main.qml 2
 
-    \section1 Polar spectrogram
+    \section1 Polar Spectrogram
 
     Depending on the data, it is sometimes more natural to use a polar graph instead of a cartesian
     one. Qt Data Visualization supports this via \l{AbstractGraph3D::polar}{polar} property.
@@ -98,5 +98,5 @@
     \l{InputHandler3D::rotationEnabled}{rotationEnabled} property of the \c{customInputHandler}
     to control the rotation.
 
-    \section1 Example contents
+    \section1 Example Contents
 */
