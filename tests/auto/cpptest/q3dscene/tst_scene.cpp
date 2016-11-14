@@ -111,21 +111,25 @@ void tst_scene::initializeProperties()
     m_scene->setPrimarySubViewport(QRect(0, 0, 50, 50));
     m_scene->setSecondarySubViewport(QRect(50, 50, 100, 100));
     m_scene->setSecondarySubviewOnTop(false);
-    m_scene->setSelectionQueryPosition(QPoint(0, 0));
     m_scene->setSlicingActive(true);
+    m_scene->setSelectionQueryPosition(QPoint(0, 0));
 
     QCOMPARE(m_scene->activeCamera(), camera1);
     QCOMPARE(m_scene->activeLight(), light1);
     QCOMPARE(m_scene->devicePixelRatio(), 2.0f);
     QCOMPARE(m_scene->graphPositionQuery(), QPoint(0, 0)); // TODO: When doing signal checks, add tests to check that queries return something (asynchronously)
-    // TODO: subviewports are not set (QTRD-2435)
-    //QCOMPARE(m_scene->primarySubViewport(), QRect(0, 0, 50, 50));
-    //QCOMPARE(m_scene->secondarySubViewport(), QRect(50, 50, 100, 100));
+    QCOMPARE(m_scene->primarySubViewport(), QRect(0, 0, 50, 50));
+    QCOMPARE(m_scene->secondarySubViewport(), QRect(50, 50, 100, 100));
     QCOMPARE(m_scene->isSecondarySubviewOnTop(), false);
     QCOMPARE(m_scene->selectionQueryPosition(), QPoint(0, 0)); // TODO: When doing signal checks, add tests to check that queries return something (asynchronously)
     QCOMPARE(m_scene->isSlicingActive(), true);
-    // TODO: viewport is not set by subviewports (QTRD-2435)
-    //QCOMPARE(m_scene->viewport(), QRect(0, 0, 100, 100));
+    QCOMPARE(m_scene->viewport(), QRect(0, 0, 150, 150));
+
+    m_scene->setPrimarySubViewport(QRect());
+    m_scene->setSecondarySubViewport(QRect());
+
+    QCOMPARE(m_scene->primarySubViewport(), QRect(0, 0, 30, 30));
+    QCOMPARE(m_scene->secondarySubViewport(), QRect(0, 0, 150, 150));
 }
 
 void tst_scene::invalidProperties()

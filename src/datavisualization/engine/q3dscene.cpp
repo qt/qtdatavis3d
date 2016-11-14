@@ -87,14 +87,19 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty rect Scene3D::primarySubViewport
  *
  * This property contains the current subviewport rectangle inside the viewport where the
- * primary view of the data visualization is targeted to.
+ * primary view of the data visualization is targeted to. If slicingActive is false, it will be
+ * equal to viewport. If slicingActive is true and it hasn't been explicitly set, it will be one
+ * fifth of viewport.
+ * \note Setting primarySubViewport larger than or outside of viewport resizes viewport accordingly.
  */
 
 /*!
  * \qmlproperty rect Scene3D::secondarySubViewport
  *
  * This property contains the secondary viewport rectangle inside the viewport. The secondary
- * viewport is used for drawing the 2D slice view in some visualizations.
+ * viewport is used for drawing the 2D slice view in some visualizations. If it hasn't been
+ * explicitly set, it will be null, or viewport if slicingActive is true.
+ * \note Setting secondarySubViewport larger than or outside of viewport resizes viewport accordingly.
  */
 
 /*!
@@ -204,24 +209,49 @@ QRect Q3DScene::viewport() const
  * \property Q3DScene::primarySubViewport
  *
  * This property contains the current subviewport rectangle inside the viewport where the
- * primary view of the data visualization is targeted to.
+ * primary view of the data visualization is targeted to. If isSlicingActive() is false, it will be
+ * equal to viewport(). If isSlicingActive() is true and it hasn't been explicitly set, it will be
+ * one fifth of viewport().
+ * \note Setting primarySubViewport larger than or outside of viewport resizes viewport accordingly.
  */
 QRect Q3DScene::primarySubViewport() const
 {
-    return d_ptr->m_primarySubViewport;
+    QRect primary = d_ptr->m_primarySubViewport;
+    if (primary.isNull()) {
+        if (d_ptr->m_isSlicingActive)
+            primary = d_ptr->m_defaultSmallViewport;
+        else
+            primary = d_ptr->m_defaultLargeViewport;
+    }
+    return primary;
 }
 
 void Q3DScene::setPrimarySubViewport(const QRect &primarySubViewport)
 {
-    QRect clipRect = QRect(0, 0, d_ptr->m_viewport.width(), d_ptr->m_viewport.height());
-    QRect intersectedViewport = primarySubViewport.intersected(clipRect);
-    if (d_ptr->m_primarySubViewport != intersectedViewport) {
-        d_ptr->m_primarySubViewport = intersectedViewport;
+    if (d_ptr->m_primarySubViewport != primarySubViewport) {
+        if (!primarySubViewport.isValid() && !primarySubViewport.isNull()) {
+            qWarning("Viewport is invalid.");
+            return;
+        }
+
+        // If viewport is smaller than primarySubViewport, enlarge it
+        if ((d_ptr->m_viewport.width() < (primarySubViewport.width()
+                                          + primarySubViewport.x()))
+                || (d_ptr->m_viewport.height() < (primarySubViewport.height()
+                                                  + primarySubViewport.y()))) {
+            d_ptr->m_viewport.setWidth(qMax(d_ptr->m_viewport.width(),
+                                            primarySubViewport.width() + primarySubViewport.x()));
+            d_ptr->m_viewport.setHeight(qMax(d_ptr->m_viewport.height(),
+                                             primarySubViewport.height() + primarySubViewport.y()));
+            d_ptr->calculateSubViewports();
+        }
+
+        d_ptr->m_primarySubViewport = primarySubViewport;
         d_ptr->updateGLSubViewports();
         d_ptr->m_changeTracker.primarySubViewportChanged = true;
         d_ptr->m_sceneDirty = true;
 
-        emit primarySubViewportChanged(intersectedViewport);
+        emit primarySubViewportChanged(primarySubViewport);
         emit d_ptr->needRender();
     }
 }
@@ -236,9 +266,9 @@ bool Q3DScene::isPointInPrimarySubView(const QPoint &point)
 {
     int x = point.x();
     int y = point.y();
-    bool isInSecondary = d_ptr->isInArea(d_ptr->m_secondarySubViewport, x, y);
+    bool isInSecondary = d_ptr->isInArea(secondarySubViewport(), x, y);
     if (!isInSecondary || (isInSecondary && !d_ptr->m_isSecondarySubviewOnTop))
-        return d_ptr->isInArea(d_ptr->m_primarySubViewport, x, y);
+        return d_ptr->isInArea(primarySubViewport(), x, y);
     else
         return false;
 }
@@ -253,9 +283,9 @@ bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
 {
     int x = point.x();
     int y = point.y();
-    bool isInPrimary = d_ptr->isInArea(d_ptr->m_primarySubViewport, x, y);
+    bool isInPrimary = d_ptr->isInArea(primarySubViewport(), x, y);
     if (!isInPrimary || (isInPrimary && d_ptr->m_isSecondarySubviewOnTop))
-        return d_ptr->isInArea(d_ptr->m_secondarySubViewport, x, y);
+        return d_ptr->isInArea(secondarySubViewport(), x, y);
     else
         return false;
 }
@@ -264,24 +294,46 @@ bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
  * \property Q3DScene::secondarySubViewport
  *
  * This property contains the secondary viewport rectangle inside the viewport. The secondary
- * viewport is used for drawing the 2D slice view in some visualizations.
+ * viewport is used for drawing the 2D slice view in some visualizations. If it hasn't been
+ * explicitly set, it will be equal to QRect(), or viewport() if isSlicingActive() is true.
+ * \note Setting secondarySubViewport larger than or outside of viewport resizes viewport accordingly.
  */
 QRect Q3DScene::secondarySubViewport() const
 {
-    return d_ptr->m_secondarySubViewport;
+    QRect secondary = d_ptr->m_secondarySubViewport;
+    if (secondary.isNull() && d_ptr->m_isSlicingActive)
+        secondary = d_ptr->m_defaultLargeViewport;
+    return secondary;
 }
 
 void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
 {
-    QRect clipRect = QRect(0, 0, d_ptr->m_viewport.width(), d_ptr->m_viewport.height());
-    QRect intersectedViewport = secondarySubViewport.intersected(clipRect);
-    if (d_ptr->m_secondarySubViewport != intersectedViewport) {
-        d_ptr->m_secondarySubViewport = intersectedViewport;
+    if (d_ptr->m_secondarySubViewport != secondarySubViewport) {
+        if (!secondarySubViewport.isValid() && !secondarySubViewport.isNull()) {
+            qWarning("Viewport is invalid.");
+            return;
+        }
+
+        // If viewport is smaller than secondarySubViewport, enlarge it
+        if ((d_ptr->m_viewport.width() < (secondarySubViewport.width()
+                                          + secondarySubViewport.x()))
+                || (d_ptr->m_viewport.height() < (secondarySubViewport.height()
+                                                  + secondarySubViewport.y()))) {
+            d_ptr->m_viewport.setWidth(qMax(d_ptr->m_viewport.width(),
+                                            secondarySubViewport.width()
+                                            + secondarySubViewport.x()));
+            d_ptr->m_viewport.setHeight(qMax(d_ptr->m_viewport.height(),
+                                             secondarySubViewport.height()
+                                             + secondarySubViewport.y()));
+            d_ptr->calculateSubViewports();
+        }
+
+        d_ptr->m_secondarySubViewport = secondarySubViewport;
         d_ptr->updateGLSubViewports();
         d_ptr->m_changeTracker.secondarySubViewportChanged = true;
         d_ptr->m_sceneDirty = true;
 
-        emit secondarySubViewportChanged(intersectedViewport);
+        emit secondarySubViewportChanged(secondarySubViewport);
         emit d_ptr->needRender();
     }
 }
@@ -527,6 +579,7 @@ Q3DScenePrivate::Q3DScenePrivate(Q3DScene *q) :
     m_isSlicingActive(false),
     m_selectionQueryPosition(Q3DScene::invalidSelectionPoint()),
     m_graphPositionQueryPosition(Q3DScene::invalidSelectionPoint()),
+    m_windowSize(QSize(0, 0)),
     m_sceneDirty(true)
 {
 }
@@ -608,7 +661,7 @@ void Q3DScenePrivate::sync(Q3DScenePrivate &other)
 
 void Q3DScenePrivate::setViewport(const QRect &viewport)
 {
-    if (m_viewport != viewport) {
+    if (m_viewport != viewport && viewport.isValid()) {
         m_viewport = viewport;
         calculateSubViewports();
         emit needRender();
@@ -617,8 +670,7 @@ void Q3DScenePrivate::setViewport(const QRect &viewport)
 
 void Q3DScenePrivate::setViewportSize(int width, int height)
 {
-    if (m_viewport.width() != width
-            || m_viewport.height() != height) {
+    if (m_viewport.width() != width || m_viewport.height() != height) {
         m_viewport.setWidth(width);
         m_viewport.setHeight(height);
         calculateSubViewports();
@@ -650,18 +702,14 @@ QSize Q3DScenePrivate::windowSize() const
 
 void Q3DScenePrivate::calculateSubViewports()
 {
-    // Calculates the default subviewport layout
+    // Calculates the default subviewport layout, used when slicing
     const float smallerViewPortRatio = 0.2f;
-    if (m_isSlicingActive) {
-        q_ptr->setPrimarySubViewport(QRect(0,
-                                           0,
-                                           m_viewport.width() * smallerViewPortRatio,
-                                           m_viewport.height() * smallerViewPortRatio));
-        q_ptr->setSecondarySubViewport(QRect(0, 0, m_viewport.width(), m_viewport.height()));
-    } else {
-        q_ptr->setPrimarySubViewport(QRect(0, 0, m_viewport.width(), m_viewport.height()));
-        q_ptr->setSecondarySubViewport(QRect(0, 0, 0, 0));
-    }
+    m_defaultSmallViewport = QRect(0, 0,
+                                   m_viewport.width() * smallerViewPortRatio,
+                                   m_viewport.height() * smallerViewPortRatio);
+    m_defaultLargeViewport = QRect(0, 0,
+                                   m_viewport.width(),
+                                   m_viewport.height());
 
     updateGLViewport();
 }
@@ -685,21 +733,36 @@ void Q3DScenePrivate::updateGLViewport()
 
 void Q3DScenePrivate::updateGLSubViewports()
 {
-    m_glPrimarySubViewport.setX((m_primarySubViewport.x() + m_viewport.x()) * m_devicePixelRatio);
-    m_glPrimarySubViewport.setY((m_windowSize.height() - (m_primarySubViewport.y() + m_viewport.y()
-                                                          + m_primarySubViewport.height()))
-                                * m_devicePixelRatio);
-    m_glPrimarySubViewport.setWidth(m_primarySubViewport.width() * m_devicePixelRatio);
-    m_glPrimarySubViewport.setHeight(m_primarySubViewport.height() * m_devicePixelRatio);
+    if (m_isSlicingActive) {
+        QRect primary = m_primarySubViewport;
+        QRect secondary = m_secondarySubViewport;
+        if (primary.isNull())
+            primary = m_defaultSmallViewport;
+        if (secondary.isNull())
+            secondary = m_defaultLargeViewport;
 
-    m_glSecondarySubViewport.setX((m_secondarySubViewport.x() + m_viewport.x())
-                                  * m_devicePixelRatio);
-    m_glSecondarySubViewport.setY((m_windowSize.height() - (m_secondarySubViewport.y()
-                                                            + m_viewport.y()
-                                                            + m_secondarySubViewport.height()))
-                                  * m_devicePixelRatio);
-    m_glSecondarySubViewport.setWidth(m_secondarySubViewport.width() * m_devicePixelRatio);
-    m_glSecondarySubViewport.setHeight(m_secondarySubViewport.height() * m_devicePixelRatio);
+        m_glPrimarySubViewport.setX((primary.x() + m_viewport.x()) * m_devicePixelRatio);
+        m_glPrimarySubViewport.setY((m_windowSize.height()
+                                     - (primary.y() + primary.height() + m_viewport.y()))
+                                    * m_devicePixelRatio);
+        m_glPrimarySubViewport.setWidth(primary.width() * m_devicePixelRatio);
+        m_glPrimarySubViewport.setHeight(primary.height() * m_devicePixelRatio);
+
+        m_glSecondarySubViewport.setX((secondary.x() + m_viewport.x()) * m_devicePixelRatio);
+        m_glSecondarySubViewport.setY((m_windowSize.height()
+                                       - (secondary.y() + secondary.height() + m_viewport.y()))
+                                      * m_devicePixelRatio);
+        m_glSecondarySubViewport.setWidth(secondary.width() * m_devicePixelRatio);
+        m_glSecondarySubViewport.setHeight(secondary.height() * m_devicePixelRatio);
+    } else {
+        m_glPrimarySubViewport.setX(m_viewport.x() * m_devicePixelRatio);
+        m_glPrimarySubViewport.setY((m_windowSize.height() - (m_viewport.y() + m_viewport.height()))
+                                    * m_devicePixelRatio);
+        m_glPrimarySubViewport.setWidth(m_viewport.width() * m_devicePixelRatio);
+        m_glPrimarySubViewport.setHeight(m_viewport.height() * m_devicePixelRatio);
+
+        m_glSecondarySubViewport = QRect();
+    }
 }
 
 QRect Q3DScenePrivate::glViewport()

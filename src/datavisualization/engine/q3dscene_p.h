@@ -129,6 +129,8 @@ public:
     QRect m_glPrimarySubViewport;
     QRect m_glSecondarySubViewport;
     bool m_sceneDirty;
+    QRect m_defaultSmallViewport;
+    QRect m_defaultLargeViewport;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

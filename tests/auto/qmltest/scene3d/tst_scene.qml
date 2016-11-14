@@ -70,12 +70,21 @@ Item {
             compare(initial.scene.devicePixelRatio, 1.0)
             compare(initial.scene.graphPositionQuery, Qt.point(-1, -1))
             compare(initial.scene.invalidSelectionPoint, Qt.point(-1, -1))
-            compare(initial.scene.primarySubViewport, Qt.rect(0, 0, 0, 0))
-            compare(initial.scene.secondarySubViewport, Qt.rect(0, 0, 0, 0))
+            compare(initial.scene.primarySubViewport.x, 0)
+            compare(initial.scene.primarySubViewport.y, 0)
+            compare(initial.scene.primarySubViewport.width, 0)
+            compare(initial.scene.primarySubViewport.height, 0)
+            compare(initial.scene.secondarySubViewport.x, 0)
+            compare(initial.scene.secondarySubViewport.y, 0)
+            compare(initial.scene.secondarySubViewport.width, 0)
+            compare(initial.scene.secondarySubViewport.height, 0)
             compare(initial.scene.secondarySubviewOnTop, true)
             compare(initial.scene.selectionQueryPosition, Qt.point(-1, -1))
             compare(initial.scene.slicingActive, false)
-            compare(initial.scene.viewport, Qt.rect(0, 0, 0, 0))
+            compare(initial.scene.viewport.x, 0)
+            compare(initial.scene.viewport.y, 0)
+            compare(initial.scene.viewport.width, 0)
+            compare(initial.scene.viewport.height, 0)
         }
     }
 
@@ -91,7 +100,7 @@ Item {
             compare(initialized.scene.secondarySubviewOnTop, false)
             compare(initialized.scene.selectionQueryPosition, Qt.point(0, 0))
             compare(initialized.scene.slicingActive, true)
-            compare(initialized.scene.viewport, Qt.rect(0, 0, 100, 100))
+            compare(initialized.scene.viewport, Qt.rect(0, 0, 150, 150))
         }
     }
 
@@ -121,7 +130,7 @@ Item {
             compare(change.scene.secondarySubviewOnTop, false)
             compare(change.scene.selectionQueryPosition, Qt.point(0, 0))
             compare(change.scene.slicingActive, true)
-            compare(change.scene.viewport, Qt.rect(0, 0, 100, 100))
+            compare(change.scene.viewport, Qt.rect(0, 0, 150, 150))
         }
     }
 
@@ -130,7 +139,10 @@ Item {
 
         function test_invalid() {
             invalid.scene.primarySubViewport = Qt.rect(0, 0, -50, -50)
-            compare(invalid.scene.primarySubViewport, Qt.rect(0, 0, 0, 0))
+            compare(invalid.scene.primarySubViewport.x, 0)
+            compare(invalid.scene.primarySubViewport.y, 0)
+            compare(invalid.scene.primarySubViewport.width, 0)
+            compare(invalid.scene.primarySubViewport.height, 0)
         }
     }
 }
