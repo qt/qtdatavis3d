@@ -116,6 +116,7 @@ tools/activeqt/testcon/testcon.tlb
 translations/*.qm
 translations/*_untranslated.ts
 qrc_*.cpp
+*.qmlc
 
 # Test generated files
 QObject.log
@@ -124,6 +125,7 @@ tst_*
 tst_*.log
 tst_*.debug
 tst_*~
+tst_*.qmlc
 
 # xemacs temporary files
 *.flc
@@ -207,6 +209,7 @@ doc-build
 build/*
 bin/*
 coverage/*
+build-*/*
 
 # runonphone crash dumps
 d_exc_*.txt
