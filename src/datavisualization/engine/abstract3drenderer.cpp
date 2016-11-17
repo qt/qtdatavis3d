@@ -134,10 +134,14 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
         QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
 
         m_funcs_2_1 = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_2_1>();
-        m_funcs_2_1->initializeOpenGLFunctions();
+        if (m_funcs_2_1)
+            m_funcs_2_1->initializeOpenGLFunctions();
 
         // Restore original message handler
         qInstallMessageHandler(handler);
+
+        if (!m_funcs_2_1)
+            qFatal("OpenGL version is too low, at least 2.1 is required");
     }
 #endif
     QObject::connect(m_drawer, &Drawer::drawerChanged, this, &Abstract3DRenderer::updateTextures);

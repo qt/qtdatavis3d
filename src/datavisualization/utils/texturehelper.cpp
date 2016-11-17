@@ -49,10 +49,14 @@ TextureHelper::TextureHelper()
 
         m_openGlFunctions_2_1 =
                 QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_2_1>();
-        m_openGlFunctions_2_1->initializeOpenGLFunctions();
+        if (m_openGlFunctions_2_1)
+            m_openGlFunctions_2_1->initializeOpenGLFunctions();
 
         // Restore original message handler
         qInstallMessageHandler(handler);
+
+        if (!m_openGlFunctions_2_1)
+            qFatal("OpenGL version is too low, at least 2.1 is required");
     }
 #endif
 }
