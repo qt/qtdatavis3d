@@ -87,9 +87,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     setActiveTheme(defaultTheme);
 
     m_scene->d_ptr->setViewport(initialViewport);
-
-    // Populate the scene
-    m_scene->activeLight()->setPosition(defaultLightPos);
+    m_scene->activeLight()->setAutoPosition(true);
 
     // Create initial default input handler
     QAbstract3DInputHandler *inputHandler;

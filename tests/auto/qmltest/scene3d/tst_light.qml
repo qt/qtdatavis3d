@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtDataVisualization 1.3
 import QtTest 1.0
 
 Item {
@@ -36,26 +36,26 @@ Item {
     height: 150
     width: 150
 
-    // TODO: Has no adjustable properties yet.
-    // Keeping this as a placeholder for future implementations (QTRD-2406)
-    /*
     Light3D {
         id: initial
     }
 
     Light3D {
         id: initialized
+        autoPosition: true
     }
 
 
     Light3D {
         id: change
+        autoPosition: true
     }
 
     TestCase {
         name: "Light3D Initial"
 
         function test_initial() {
+            compare(initial.autoPosition, false)
         }
     }
 
@@ -63,6 +63,7 @@ Item {
         name: "Light3D Initialized"
 
         function test_initialized() {
+            compare(initialized.autoPosition, true)
         }
     }
 
@@ -70,7 +71,9 @@ Item {
         name: "Light3D Change"
 
         function test_change() {
+            compare(change.autoPosition, true)
+            change.autoPosition = false
+            compare(change.autoPosition, false)
         }
     }
-    */
 }

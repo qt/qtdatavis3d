@@ -43,6 +43,28 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 */
 
 /*!
+   \qmltype Object3D
+   \inqmlmodule QtDataVisualization
+   \since QtDataVisualization 1.0
+   \ingroup datavisualization_qml
+   \instantiates Q3DObject
+   \brief Simple baseclass for all the objects in the 3D scene.
+
+    Object3D is an uncreatable base type that contains only position information for an object in
+    3D scene. The object is considered to be a single point in the coordinate space without
+    dimensions.
+*/
+
+/*!
+ * \qmlproperty vector3d Object3D::position
+ *
+ * This property contains the 3D position of the object.
+ *
+ * \note Currently setting this property has no effect for Camera3D, as the position is handled
+ * internally.
+ */
+
+/*!
  * Constructs a new 3D object with position set to origin by default. An
  * optional \a parent parameter can be given and is then passed to QObject constructor.
  */
@@ -84,8 +106,8 @@ Q3DScene *Q3DObject::parentScene()
  *
  * This property contains the 3D position of the object.
  *
- * \note Currently setting this property has no effect, as the positions of Q3DObjects in the
- * scene are handled internally.
+ * \note Currently setting this property has no effect for Q3DCamera, as the position is handled
+ * internally.
  */
 QVector3D Q3DObject::position() const
 {

@@ -81,8 +81,7 @@ void tst_light::initialProperties()
 {
     QVERIFY(m_light);
 
-    // TODO: Has no adjustable properties yet.
-    // Keeping this as a placeholder for future implementations (QTRD-2406)
+    QCOMPARE(m_light->isAutoPosition(), false);
 
     // Common (from Q3DObject)
     QVERIFY(!m_light->parentScene());
@@ -93,9 +92,11 @@ void tst_light::initializeProperties()
 {
     QVERIFY(m_light);
 
-    m_light->setPosition(QVector3D(1.0, 1.0, 1.0));
+    m_light->setAutoPosition(true);
+    QCOMPARE(m_light->isAutoPosition(), true);
 
     // Common (from Q3DObject)
+    m_light->setPosition(QVector3D(1.0, 1.0, 1.0));
     QCOMPARE(m_light->position(), QVector3D(1.0, 1.0, 1.0));
 }
 

@@ -500,6 +500,11 @@ void Abstract3DRenderer::handleShadowQualityChange()
 {
     reInitShaders();
 
+    if (m_cachedScene->activeLight()->isAutoPosition()
+            || m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+        m_cachedScene->d_ptr->setLightPositionRelativeToCamera(defaultLightPos);
+        emit needRender();
+    }
     if (m_isOpenGLES && m_cachedShadowQuality != QAbstract3DGraph::ShadowQualityNone) {
         emit requestShadowQuality(QAbstract3DGraph::ShadowQualityNone);
         qWarning("Shadows are not yet supported for OpenGL ES2");
@@ -1994,8 +1999,12 @@ void Abstract3DRenderer::updateCameraViewport()
         m_oldCameraTarget = adjustedTarget;
     }
     m_cachedScene->activeCamera()->d_ptr->updateViewMatrix(m_autoScaleAdjustment);
-    // Set light position (i.e rotate light with activeCamera, a bit above it)
-    m_cachedScene->d_ptr->setLightPositionRelativeToCamera(defaultLightPos);
+    // Set light position (i.e rotate light with activeCamera, a bit above it).
+    // Check if we want to use automatic light positioning even without shadows
+    if (m_cachedScene->activeLight()->isAutoPosition()
+            || m_cachedShadowQuality > QAbstract3DGraph::ShadowQualityNone) {
+        m_cachedScene->d_ptr->setLightPositionRelativeToCamera(defaultLightPos);
+    }
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION

@@ -39,10 +39,17 @@ class Q3DLightPrivate;
 class QT_DATAVISUALIZATION_EXPORT Q3DLight : public Q3DObject
 {
     Q_OBJECT
+    Q_PROPERTY(bool autoPosition READ isAutoPosition WRITE setAutoPosition NOTIFY autoPositionChanged REVISION 1)
 
 public:
     explicit Q3DLight(QObject *parent = Q_NULLPTR);
     virtual ~Q3DLight();
+
+    void setAutoPosition(bool enabled);
+    bool isAutoPosition();
+
+Q_SIGNALS:
+    Q_REVISION(1) void autoPositionChanged(bool autoPosition);
 
 private:
     QScopedPointer<Q3DLightPrivate> d_ptr;

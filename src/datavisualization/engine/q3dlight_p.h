@@ -57,6 +57,7 @@ public:
     void sync(Q3DLight &other);
 
 public:
+    bool m_automaticLight;
     Q3DLight *q_ptr;
 };
 

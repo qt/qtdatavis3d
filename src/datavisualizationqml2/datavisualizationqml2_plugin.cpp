@@ -67,6 +67,8 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
                                          QLatin1String("Trying to create uncreatable: Q3DTheme, use Theme3D instead."));
     qmlRegisterUncreatableType<QAbstract3DInputHandler>(uri, 1, 0, "AbstractInputHandler3D",
                                                         QLatin1String("Trying to create uncreatable: AbstractInputHandler3D."));
+    qmlRegisterUncreatableType<Q3DObject>(uri, 1, 0, "Object3D",
+                                          QLatin1String("Trying to create uncreatable: Object3D."));
 
     qmlRegisterType<DeclarativeBars>(uri, 1, 0, "Bars3D");
     qmlRegisterType<DeclarativeScatter>(uri, 1, 0, "Scatter3D");
@@ -135,6 +137,11 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterType<Q3DInputHandler>(uri, 1, 2, "InputHandler3D");
     qmlRegisterType<QTouch3DInputHandler>(uri, 1, 2, "TouchInputHandler3D");
     qmlRegisterType<QCustom3DVolume>(uri, 1, 2, "Custom3DVolume");
+
+    // QtDataVisualization 1.3
+
+    // New revisions
+    qmlRegisterType<Q3DLight, 1>(uri, 1, 3, "Light3D");
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
