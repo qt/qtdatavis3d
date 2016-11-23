@@ -1,0 +1,8 @@
+Qt Data Visualization 5.9.0
+
+Fixed issues
+------------
+
+- [QTRD-1803] Enable customer controlled light position
+- [QTRD-1807] Customer can't set the primary and secondary viewports
+- [QTRD-2116] Crash if OpenGL version is not high enough

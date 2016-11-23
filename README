@@ -1,5 +1,5 @@
 ---------------------------
-Qt Data Visualization 5.7.0
+Qt Data Visualization 5.9.0
 ---------------------------
 
 Qt Data Visualization module provides multiple graph types to visualize data in 3D space
@@ -80,8 +80,6 @@ Known Issues
 - Anti-aliasing doesn't work with OpenGL ES2 (including Angle builds in Windows).
 - QCustom3DVolume items are not supported with OpenGL ES2 (including Angle builds in Windows).
 - Surfaces with non-straight rows and columns do not always render properly.
-- Q3DLight class (and Light3D QML item) are currently not usable for anything.
-- Changing most of Q3DScene properties affecting subviewports currently has no effect.
 - Widget based examples layout incorrectly in iOS.
 - Reparenting a graph to an item in another QQuickWindow is not supported.
 - Android builds of QML applications importing QtDataVisualization also require
