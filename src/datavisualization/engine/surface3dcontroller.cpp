@@ -510,7 +510,7 @@ void Surface3DController::adjustAxisRanges()
             if (surfaceSeries->isVisible() && proxy) {
                 QVector3D minLimits;
                 QVector3D maxLimits;
-                proxy->dptrc()->limitValues(minLimits, maxLimits);
+                proxy->dptrc()->limitValues(minLimits, maxLimits, valueAxisX, valueAxisY, valueAxisZ);
                 if (adjustX) {
                     if (first) {
                         // First series initializes the values

@@ -394,7 +394,7 @@ void Scatter3DController::adjustAxisRanges()
             if (scatterSeries->isVisible() && proxy) {
                 QVector3D minLimits;
                 QVector3D maxLimits;
-                proxy->dptrc()->limitValues(minLimits, maxLimits);
+                proxy->dptrc()->limitValues(minLimits, maxLimits, valueAxisX, valueAxisY, valueAxisZ);
                 if (adjustX) {
                     if (!series) {
                         // First series initializes the values

@@ -84,6 +84,8 @@ protected:
     friend class QAbstract3DAxis;
     friend class QValue3DAxis;
     friend class QCategory3DAxis;
+    friend class QScatterDataProxyPrivate;
+    friend class QSurfaceDataProxyPrivate;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

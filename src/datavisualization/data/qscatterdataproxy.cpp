@@ -29,6 +29,7 @@
 
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
+#include "qabstract3daxis_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -366,7 +367,9 @@ void QScatterDataProxyPrivate::removeItems(int index, int removeCount)
     m_dataArray->remove(index, removeCount);
 }
 
-void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues) const
+void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues,
+                                           QAbstract3DAxis *axisX, QAbstract3DAxis *axisY,
+                                           QAbstract3DAxis *axisZ) const
 {
     if (m_dataArray->isEmpty())
         return;
@@ -385,19 +388,25 @@ void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
             const QVector3D &pos = m_dataArray->at(i).position();
 
             float value = pos.x();
-            if (minX > value)
+            if (qIsNaN(value) || qIsInf(value))
+                continue;
+            if (isValidValue(minX, value, axisX))
                 minX = value;
             if (maxX < value)
                 maxX = value;
 
             value = pos.y();
-            if (minY > value)
+            if (qIsNaN(value) || qIsInf(value))
+                continue;
+            if (isValidValue(minY, value, axisY))
                 minY = value;
             if (maxY < value)
                 maxY = value;
 
             value = pos.z();
-            if (minZ > value)
+            if (qIsNaN(value) || qIsInf(value))
+                continue;
+            if (isValidValue(minZ, value, axisZ))
                 minZ = value;
             if (maxZ < value)
                 maxZ = value;
@@ -411,6 +420,14 @@ void QScatterDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
     maxValues.setX(maxX);
     maxValues.setY(maxY);
     maxValues.setZ(maxZ);
+}
+
+bool QScatterDataProxyPrivate::isValidValue(float axisValue, float value,
+                                            QAbstract3DAxis *axis) const
+{
+    return (axisValue > value && (value > 0.0f
+                                  || (value == 0.0f && axis->d_ptr->allowZero())
+                                  || (value < 0.0f && axis->d_ptr->allowNegatives())));
 }
 
 void QScatterDataProxyPrivate::setSeries(QAbstract3DSeries *series)
