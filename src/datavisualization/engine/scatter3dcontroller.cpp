@@ -135,7 +135,12 @@ QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
 
 void Scatter3DController::handleArrayReset()
 {
-    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    QScatter3DSeries *series;
+    if (qobject_cast<QScatterDataProxy *>(sender()))
+        series = static_cast<QScatterDataProxy *>(sender())->series();
+    else
+        series = static_cast<QScatter3DSeries *>(sender());
+
     if (series->isVisible()) {
         adjustAxisRanges();
         m_isDataDirty = true;

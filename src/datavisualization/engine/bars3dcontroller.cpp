@@ -147,7 +147,12 @@ void Bars3DController::synchDataToRenderer()
 
 void Bars3DController::handleArrayReset()
 {
-    QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
+    QBar3DSeries *series;
+    if (qobject_cast<QBarDataProxy *>(sender()))
+        series = static_cast<QBarDataProxy *>(sender())->series();
+    else
+        series = static_cast<QBar3DSeries *>(sender());
+
     if (series->isVisible()) {
         adjustAxisRanges();
         m_isDataDirty = true;

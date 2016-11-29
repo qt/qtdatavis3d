@@ -306,6 +306,8 @@ void QScatter3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
                          controller, &Scatter3DController::handleItemsRemoved);
         QObject::connect(scatterDataProxy, &QScatterDataProxy::itemsInserted,
                          controller, &Scatter3DController::handleItemsInserted);
+        QObject::connect(qptr(), &QScatter3DSeries::dataProxyChanged,
+                         controller, &Scatter3DController::handleArrayReset);
     }
 }
 
