@@ -42,7 +42,9 @@
     that and skip explaining the basic functionality - for
     more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
 
-    \section1 Data source in C++
+    \include examples-run.qdocinc
+
+    \section1 Data Source in C++
 
     The item model based proxies are good for simple and/or static graphs, but to achieve
     best performance when displaying data changing in realtime, the basic proxies should be used.
@@ -110,7 +112,7 @@
 
     \snippet qmloscilloscope/qml/qmloscilloscope/main.qml 3
 
-    \section1 Enabling direct rendering
+    \section1 Enabling Direct Rendering
 
     Since this application potentially deals with a lot of rapidly changing data, we use direct
     rendering mode for performance. To enable antialiasing in this mode the surface format of the application

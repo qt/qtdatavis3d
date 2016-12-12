@@ -29,6 +29,7 @@
 
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
+#include "qabstract3daxis_p.h"
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -504,7 +505,9 @@ QSurfaceDataProxy *QSurfaceDataProxyPrivate::qptr()
     return static_cast<QSurfaceDataProxy *>(q_ptr);
 }
 
-void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues) const
+void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxValues,
+                                           QAbstract3DAxis *axisX, QAbstract3DAxis *axisY,
+                                           QAbstract3DAxis *axisZ) const
 {
     float min = 0.0f;
     float max = 0.0f;
@@ -524,7 +527,9 @@ void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
         if (row) {
             for (int j = 0; j < columns; j++) {
                 float itemValue = m_dataArray->at(i)->at(j).y();
-                if (min > itemValue)
+                if (qIsNaN(itemValue) || qIsInf(itemValue))
+                    continue;
+                if (min > itemValue && isValidValue(itemValue, axisY))
                     min = itemValue;
                 if (max < itemValue)
                     max = itemValue;
@@ -534,21 +539,57 @@ void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
 
     minValues.setY(min);
     maxValues.setY(max);
+
     if (columns) {
+        // Have some defaults
         float xLow = m_dataArray->at(0)->at(0).x();
         float xHigh = m_dataArray->at(0)->last().x();
         float zLow = m_dataArray->at(0)->at(0).z();
         float zHigh = m_dataArray->last()->at(0).z();
-        minValues.setX(qMin(xLow, xHigh));
-        minValues.setZ(qMin(zLow, zHigh));
-        maxValues.setX(qMax(xLow, xHigh));
-        maxValues.setZ(qMax(zLow, zHigh));
+        for (int i = 0; i < columns; i++) {
+            float zItemValue = m_dataArray->at(0)->at(i).z();
+            if (qIsNaN(zItemValue) || qIsInf(zItemValue))
+                continue;
+            else if (isValidValue(zItemValue, axisZ))
+                zLow = qMin(zLow,zItemValue);
+        }
+        for (int i = 0; i < columns; i++) {
+            float zItemValue = m_dataArray->last()->at(i).z();
+            if (qIsNaN(zItemValue) || qIsInf(zItemValue))
+                continue;
+            else if (isValidValue(zItemValue, axisZ))
+                zHigh = qMax(zHigh, zItemValue);
+        }
+        for (int i = 0; i < rows; i++) {
+            float xItemValue = m_dataArray->at(i)->at(0).x();
+            if (qIsNaN(xItemValue) || qIsInf(xItemValue))
+                continue;
+            else if (isValidValue(xItemValue, axisX))
+                xLow = qMin(xLow, xItemValue);
+        }
+        for (int i = 0; i < rows; i++) {
+            float xItemValue = m_dataArray->at(i)->last().x();
+            if (qIsNaN(xItemValue) || qIsInf(xItemValue))
+                continue;
+            else if (isValidValue(xItemValue, axisX))
+                xHigh = qMax(xHigh, xItemValue);
+        }
+        minValues.setX(xLow);
+        minValues.setZ(zLow);
+        maxValues.setX(xHigh);
+        maxValues.setZ(zHigh);
     } else {
-        minValues.setX(0.0f);
-        minValues.setZ(0.0f);
-        maxValues.setX(0.0f);
-        maxValues.setZ(0.0f);
+        minValues.setX(axisX->d_ptr->allowZero() ? 0.0f : 1.0f);
+        minValues.setZ(axisZ->d_ptr->allowZero() ? 0.0f : 1.0f);
+        maxValues.setX(axisX->d_ptr->allowZero() ? 0.0f : 1.0f);
+        maxValues.setZ(axisZ->d_ptr->allowZero() ? 0.0f : 1.0f);
     }
+}
+
+bool QSurfaceDataProxyPrivate::isValidValue(float value, QAbstract3DAxis *axis) const
+{
+    return (value > 0.0f || (value == 0.0f && axis->d_ptr->allowZero())
+            || (value < 0.0f && axis->d_ptr->allowNegatives()));
 }
 
 void QSurfaceDataProxyPrivate::clearRow(int rowIndex)

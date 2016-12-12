@@ -45,6 +45,10 @@
     concentrate on those and skip explaining the basic Q3DBars functionality - for that see
     \l{Bars Example}.
 
+    \include examples-run.qdocinc
+
+    \section1 Visualizing Audio Levels
+
     \c AudioLevelsIODevice subclasses QIODevice and is given as input device for QAudioInput
     class, so it receives microphone data.
 

@@ -321,7 +321,12 @@ void Surface3DController::clearSelection()
 
 void Surface3DController::handleArrayReset()
 {
-    QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    QSurface3DSeries *series;
+    if (qobject_cast<QSurfaceDataProxy *>(sender()))
+        series = static_cast<QSurfaceDataProxy *>(sender())->series();
+    else
+        series = static_cast<QSurface3DSeries *>(sender());
+
     if (series->isVisible()) {
         adjustAxisRanges();
         m_isDataDirty = true;
@@ -510,7 +515,7 @@ void Surface3DController::adjustAxisRanges()
             if (surfaceSeries->isVisible() && proxy) {
                 QVector3D minLimits;
                 QVector3D maxLimits;
-                proxy->dptrc()->limitValues(minLimits, maxLimits);
+                proxy->dptrc()->limitValues(minLimits, maxLimits, valueAxisX, valueAxisY, valueAxisZ);
                 if (adjustX) {
                     if (first) {
                         // First series initializes the values

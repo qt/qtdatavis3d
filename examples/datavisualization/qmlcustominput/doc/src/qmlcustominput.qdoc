@@ -40,7 +40,9 @@
 
     \image qmlcustominput-example.png
 
-    \section1 Removing default input handling
+    \include examples-run.qdocinc
+
+    \section1 Removing Default Input Handling
 
     The default input handling mechanism is disabled by setting the inputHandler property to null.
 
@@ -49,7 +51,7 @@
     \snippet qmlcustominput/qml/qmlcustominput/main.qml 1
     \dots 0
 
-    \section1 Implementing custom selection handling
+    \section1 Implementing Custom Selection Handling
 
     The on mouseover selection handling is implemented using standard MouseArea to capture the mouse events.
     The mouse area is configured to capture hover events and has two custom properties for \c mouseX and \c mouseY
@@ -66,7 +68,7 @@
 
     \snippet qmlcustominput/qml/qmlcustominput/main.qml 4
 
-    \section1 Implementing custom zoom handling
+    \section1 Implementing Custom Zoom Handling
 
     The camera has a zoom factor that represents amount of zoom in percentages. In this example the zoom range is limited
     between 10% and 500%. This range is then divided to four subranges where angleDelta is scaled to different amount of zoom change
@@ -76,7 +78,7 @@
     \snippet qmlcustominput/qml/qmlcustominput/main.qml 5
     \dots
 
-    \section1 Implementing custom camera handling
+    \section1 Implementing Custom Camera Handling
 
     The camera is animated to constantly rotate around the graph with two animations. The rotation around the graph is done with
     a simple NumberAnimation that just increments during 20 seconds from 0 degrees to 360 degrees and sets the \l Q3DCamera::xRotation property.

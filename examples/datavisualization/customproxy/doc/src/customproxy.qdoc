@@ -50,7 +50,7 @@
     The custom proxy we provide here is similar to item model based proxies provided by Qt
     Data Visualization in that it requires a mapping to interpret the data.
 
-    Let's take a closer look at the custom classes:
+    \include examples-run.qdocinc
 
     \section1 VariantDataSet
 

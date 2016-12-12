@@ -135,7 +135,12 @@ QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
 
 void Scatter3DController::handleArrayReset()
 {
-    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
+    QScatter3DSeries *series;
+    if (qobject_cast<QScatterDataProxy *>(sender()))
+        series = static_cast<QScatterDataProxy *>(sender())->series();
+    else
+        series = static_cast<QScatter3DSeries *>(sender());
+
     if (series->isVisible()) {
         adjustAxisRanges();
         m_isDataDirty = true;
@@ -394,7 +399,7 @@ void Scatter3DController::adjustAxisRanges()
             if (scatterSeries->isVisible() && proxy) {
                 QVector3D minLimits;
                 QVector3D maxLimits;
-                proxy->dptrc()->limitValues(minLimits, maxLimits);
+                proxy->dptrc()->limitValues(minLimits, maxLimits, valueAxisX, valueAxisY, valueAxisZ);
                 if (adjustX) {
                     if (!series) {
                         // First series initializes the values

@@ -46,7 +46,9 @@
 
     \image itemmodel-example-2.png
 
-    \section1 Creating the application
+    \include examples-run.qdocinc
+
+    \section1 Creating the Application
 
     First, in main.cpp, we create a QApplication, instantiate Q3DBars and a window container for it:
 
@@ -85,7 +87,7 @@
 
     \snippet itemmodel/main.cpp 4
 
-    \section1 Setting up the graph
+    \section1 Setting up the Graph
 
     Let's set up the visual attributes for the graph in the constructor of \c GraphDataGenerator:
 
@@ -113,7 +115,7 @@
     \note You do not need to set any of these in case you're happy with the defaults. You can
     easily try them by commenting out the contents of the constructor.
 
-    \section1 Adding data to the graph
+    \section1 Adding Data to the Graph
 
     We created the data generator in the application main and gave it the graph and the table
     widget as parameters:
@@ -163,7 +165,7 @@
     rows and columns for itself directly, as we set the QItemModelBarDataProxy::useModelCategories
     property to true, and the graph gets the data to be displayed via the series that owns the proxy.
 
-    \section1 Interacting with the data
+    \section1 Interacting with the Data
 
     We made a couple of signal connections in the application main earlier:
 
@@ -188,5 +190,5 @@
 
     \image itemmodel-example.png
 
-    \section1 Example contents
+    \section1 Example Contents
 */

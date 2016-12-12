@@ -14,7 +14,7 @@ sourcedirs += ..
 
 examplesinstallpath = datavisualization
 
-depends = qtcore qtgui qtqml qtquick qtmultimedia qtdoc
+depends = qtcore qtgui qtqml qtquick qtmultimedia qtdoc qtwidgets
 
 qhp.projects                            = QtDataVisualization
 

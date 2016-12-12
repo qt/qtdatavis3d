@@ -326,6 +326,8 @@ void QBar3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *newCon
                          &Bars3DController::handleDataRowLabelsChanged);
         QObject::connect(barDataProxy, &QBarDataProxy::columnLabelsChanged, controller,
                          &Bars3DController::handleDataColumnLabelsChanged);
+        QObject::connect(qptr(), &QBar3DSeries::dataProxyChanged, controller,
+                         &Bars3DController::handleArrayReset);
     }
 }
 

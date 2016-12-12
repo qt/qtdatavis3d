@@ -45,6 +45,8 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+class QAbstract3DAxis;
+
 class QSurfaceDataProxyPrivate : public QAbstractDataProxyPrivate
 {
     Q_OBJECT
@@ -61,7 +63,9 @@ public:
     void insertRow(int rowIndex, QSurfaceDataRow *row);
     void insertRows(int rowIndex, const QSurfaceDataArray &rows);
     void removeRows(int rowIndex, int removeCount);
-    void limitValues(QVector3D &minValues, QVector3D &maxValues) const;
+    void limitValues(QVector3D &minValues, QVector3D &maxValues, QAbstract3DAxis *axisX,
+                     QAbstract3DAxis *axisY, QAbstract3DAxis *axisZ) const;
+    bool isValidValue(float value, QAbstract3DAxis *axis) const;
 
     virtual void setSeries(QAbstract3DSeries *series);
 

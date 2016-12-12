@@ -124,6 +124,8 @@ private:
 
     friend class Abstract3DController;
     friend class Bars3DController;
+    friend class QScatterDataProxyPrivate;
+    friend class QSurfaceDataProxyPrivate;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

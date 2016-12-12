@@ -30,8 +30,7 @@
 /*!
     \namespace QtDataVisualization
     \inmodule QtDataVisualization
-
-    QtDataVisualization namespace holds all the classes and enumerations in the QtDataVisualization
+    \brief Contains the classes and enumerations in the Qt Data Visualization
     module.
 
     \generatelist{classesbymodule QtDataVisualization}
@@ -77,7 +76,7 @@
     \group qtdatavisualization_getting_started
     \title Qt Data Visualization Getting Started
 
-    \section1 Installing the Qt Data Visualization module
+    \section1 Installing the Qt Data Visualization Module
 
     Use the \c {Package Manager} in \c {Maintenance Tool} or the \c {Online installer} to install
     the Qt Data Visualization module. The module can be found under \c {Qt Enterprise Add-Ons}
@@ -159,18 +158,7 @@
 
     \snippet doc_src_qtdatavisualization.cpp 7
 
-    \section1 Running examples
-
-    Qt Data Visualization examples are found under the \c examples subdirectory. To build and run a
-    single example, in this case qmlsurface, navigate to the example directory and enter the
-    following commands:
-
-    \snippet doc_src_qtdatavisualization.cpp 8
-
-    \note On some platforms, such as Windows, the executable can be generated under debug or
-    release folders, depending on your build.
-
-    \section1 Creating a simple application
+    \section1 Creating a Simple Application
 
     To create a simple application, start by creating a new Qt Gui Application project in Qt
     Creator and add this line to the \c .pro file of the project:
@@ -213,7 +201,7 @@
 
     \snippet doc_src_qtdatavisualization.cpp 11
 
-    \section1 Data proxies
+    \section1 Data Proxies
 
     The data that users wish to visualize comes in many formats, all of which cannot obviously be
     directly supported. Therefore, Qt Data Visualization implements data proxies into which
@@ -234,7 +222,7 @@
     it is usually more efficient to store each set in a different series and just change the series,
     rather than reset the data in one proxy every time you need to switch.
 
-    \section1 Item models and data mapping
+    \section1 Item Models and Data Mapping
 
     For common use cases, Qt Data Visualization offers specialized proxies. One such case is having
     data in an item model (QAbstractItemModel subclass), which is a common way to store data in
@@ -264,7 +252,7 @@
     about how to use them: QItemModelBarDataProxy, QItemModelScatterDataProxy, and
     QItemModelSurfaceDataProxy.
 
-    \section1 Other custom proxies
+    \section1 Other Custom Proxies
 
     QHeightMapSurfaceDataProxy is a specialized proxy for generating a surface graph from a
     heightmap image. See the QHeightMapSurfaceDataProxy documentation for more information.
@@ -273,7 +261,7 @@
     defines a custom data set based on variant lists and an extension of the basic proxy to resolve
     that data with an associated mapper.
 
-    \section1 Dealing with real-time data
+    \section1 Dealing with Real-time Data
 
     When you have a data set that updates rapidly, it is important to handle data properly to
     ensure good performance. Since memory allocation is a costly operation, always use
@@ -304,13 +292,13 @@
     \page qtdatavisualization_interacting_with_data.html
     \title Qt Data Visualization Interacting with Data
 
-    \section1 Interacting with data
+    \section1 Interacting with Data
 
     You can interact with the rendered graph with either mouse or touch to rotate, zoom, or select
     data. For the default mouse controls, see Q3DInputHandler documentation, and for the default
     touch controls, see QTouch3DInputHandler documentation.
 
-    \section1 Data selection modes
+    \section1 Data Selection Modes
 
     All visualization types support selecting a single data item - a bar, a scatter item, or a surface
     vertex - using mouse, touch, and programmatically via the series APIs. The selected item is highlighted

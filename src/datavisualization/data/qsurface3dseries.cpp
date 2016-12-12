@@ -440,6 +440,8 @@ void QSurface3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *ne
                          &Surface3DController::handleRowsInserted);
         QObject::connect(surfaceDataProxy, &QSurfaceDataProxy::itemChanged, controller,
                          &Surface3DController::handleItemChanged);
+        QObject::connect(qptr(), &QSurface3DSeries::dataProxyChanged, controller,
+                         &Surface3DController::handleArrayReset);
     }
 }
 
