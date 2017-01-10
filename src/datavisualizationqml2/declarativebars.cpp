@@ -51,6 +51,7 @@ DeclarativeBars::DeclarativeBars(QQuickItem *parent)
 DeclarativeBars::~DeclarativeBars()
 {
     QMutexLocker locker(m_nodeMutex.data());
+    const QMutexLocker locker2(mutex());
     delete m_barsController;
 }
 

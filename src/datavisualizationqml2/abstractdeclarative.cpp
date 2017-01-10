@@ -77,6 +77,10 @@ AbstractDeclarative::~AbstractDeclarative()
     disconnect(this, 0, this, 0);
     checkWindowList(0);
 
+    // Make sure not deleting locked mutex
+    QMutexLocker locker(&m_mutex);
+    locker.unlock();
+
     m_nodeMutex.clear();
 }
 
@@ -518,6 +522,8 @@ void AbstractDeclarative::itemChange(ItemChange change, const ItemChangeData & v
 
 void AbstractDeclarative::updateWindowParameters()
 {
+    const QMutexLocker locker(&m_mutex);
+
     // Update the device pixel ratio, window size and bounding box
     QQuickWindow *win = window();
     if (win && !m_controller.isNull()) {

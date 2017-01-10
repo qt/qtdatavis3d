@@ -51,6 +51,7 @@ DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
 DeclarativeSurface::~DeclarativeSurface()
 {
     QMutexLocker locker(m_nodeMutex.data());
+    const QMutexLocker locker2(mutex());
     delete m_surfaceController;
 }
 

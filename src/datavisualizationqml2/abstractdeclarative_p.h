@@ -235,6 +235,8 @@ public:
     void setMargin(qreal margin);
     qreal margin() const;
 
+    QMutex *mutex() { return &m_mutex; }
+
 public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -302,6 +304,7 @@ private:
     QThread *m_mainThread;
     QThread *m_contextThread;
     bool m_runningInDesigner;
+    QMutex m_mutex;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::OptimizationHints)

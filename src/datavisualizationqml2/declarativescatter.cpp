@@ -49,6 +49,7 @@ DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
 DeclarativeScatter::~DeclarativeScatter()
 {
     QMutexLocker locker(m_nodeMutex.data());
+    const QMutexLocker locker2(mutex());
     delete m_scatterController;
 }
 
