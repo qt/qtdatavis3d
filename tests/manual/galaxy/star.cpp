@@ -31,8 +31,6 @@
 
 #include <QtCore/qmath.h>
 
-static const double DEG_TO_RAD = M_PI / 180.0;
-
 Star::Star()
     : m_theta(0),
       m_a(0),
@@ -49,7 +47,7 @@ const void Star::calcXY()
     const QVector2D &p = m_center;
 
     qreal beta  = -m_angle;
-    qreal alpha = theta * DEG_TO_RAD;
+    qreal alpha = qDegreesToRadians(theta);
 
     // temporaries to save cpu time
     qreal cosalpha = qCos(alpha);

@@ -42,7 +42,6 @@ using namespace QtDataVisualization;
 const int numberOfCols = 8;
 const int numberOfRows = 8;
 const float limit = 8.0f;
-const float PI = 3.14159f;
 #define HEDGEHOG
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
@@ -97,18 +96,18 @@ void ScatterDataModifier::addData()
 
     for (float i = 0; i < numberOfRows; i++) {
         float latAngle = float(i) * latAngleStep + 40.0f;
-        float radius = qSin(latAngle * PI / 180.0f) * limit;
-        float y = qCos(latAngle * PI / 180.0f) * 1.0f;
+        float radius = qSin(qDegreesToRadians(latAngle)) * limit;
+        float y = qCos(qDegreesToRadians(latAngle)) * 1.0f;
 #ifdef HEDGEHOG
-        float angleZ = (qAtan((y * limit / 2.0f) / radius) * 180.0f / PI);
+        float angleZ = qRadiansToDegrees(qAtan((y * limit / 2.0f) / radius));
         QQuaternion rotationZ = QQuaternion::fromAxisAndAngle(QVector3D(0.0f, 0.0f, 1.0f), angleZ - 90.0f);
 #endif
         for (float j = 0; j < numberOfCols; j++) {
             float angle = float(j) * angleStep;
-            float x = qCos(angle * PI / 180.0f) * radius;
-            float z = qSin(angle * PI / 180.0f) * radius;
+            float x = qCos(qDegreesToRadians(angle)) * radius;
+            float z = qSin(qDegreesToRadians(angle)) * radius;
 
-            float angleY = (qAtan(z / x) * 180.0f / PI);
+            float angleY = qRadiansToDegrees(qAtan(z / x));
             if (x < 0)
                 angleY = 180.0f + angleY;
             if (x > 0 && z < 0)

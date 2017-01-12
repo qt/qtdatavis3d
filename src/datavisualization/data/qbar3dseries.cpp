@@ -246,7 +246,7 @@ QPoint QBar3DSeries::invalidSelectionPosition()
 
 static inline float quaternionAngle(const QQuaternion &rotation)
 {
-    return qAcos(rotation.scalar()) * 360.0f / M_PI;
+    return qRadiansToDegrees(qAcos(rotation.scalar())) * 2.f;
 }
 
 /*!

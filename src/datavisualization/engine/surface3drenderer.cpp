@@ -1150,7 +1150,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             // Need to determine if camera is below graph top
             float distanceToCenter = activeCamera->position().length()
                     / activeCamera->zoomLevel() / m_autoScaleAdjustment * 100.0f;
-            qreal cameraAngle = qreal(activeCamera->yRotation()) / 180.0 * M_PI;
+            qreal cameraAngle = qDegreesToRadians(qreal(activeCamera->yRotation()));
             float cameraYPos = float(qSin(cameraAngle)) * distanceToCenter;
             m_yFlippedForGrid = cameraYPos < (m_scaleYWithBackground - m_oldCameraTarget.y());
         } else if (m_useOrthoProjection && activeCamera->yRotation() == 0.0f) {

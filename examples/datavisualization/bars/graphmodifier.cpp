@@ -353,7 +353,7 @@ void GraphModifier::zoomToSelectedBar()
 
         // Rotate the camera so that it always points approximately to the graph center
         //! [15]
-        qreal endAngleX = qAtan(qreal(endTarget.z() / endTarget.x())) / M_PI * -180.0 + 90.0;
+        qreal endAngleX = 90.0 - qRadiansToDegrees(qAtan(qreal(endTarget.z() / endTarget.x())));
         if (endTarget.x() > 0.0f)
             endAngleX -= 180.0f;
         float barValue = m_graph->selectedSeries()->dataProxy()->itemAt(selectedBar.x(),
