@@ -2442,7 +2442,7 @@ void Surface3DRenderer::createSelectionTexture(SurfaceSeriesRenderCache *cache,
     int idImageHeight = (sampleSpace.height() - 1) * 2;
 
     if (idImageHeight <= 0 || idImageWidth <= 0) {
-        cache->setSelectionIdRange(-1, -1);
+        cache->setSelectionIdRange(~0U, ~0U);
         cache->setSelectionTexture(0);
         return;
     }

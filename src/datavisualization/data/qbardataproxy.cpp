@@ -738,9 +738,9 @@ QPair<GLfloat, GLfloat> QBarDataProxyPrivate::limitValues(int startRow, int endR
     for (int i = startRow; i <= endRow; i++) {
         QBarDataRow *row = m_dataArray->at(i);
         if (row) {
-            endColumn = qMin(endColumn, row->size() - 1);
-            for (int j = startColumn; j <= endColumn; j++) {
-                const QBarDataItem &item = m_dataArray->at(i)->at(j);
+            int lastColumn = qMin(endColumn, row->size() - 1);
+            for (int j = startColumn; j <= lastColumn; j++) {
+                const QBarDataItem &item = row->at(j);
                 float itemValue = item.value();
                 if (limits.second < itemValue)
                     limits.second = itemValue;
