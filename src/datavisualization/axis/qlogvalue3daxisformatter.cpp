@@ -64,12 +64,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty real LogValueAxis3DFormatter::base
  *
- * The \a base of the logarithm used to map axis values. If the base is non-zero, the parent axis
+ * The base of the logarithm used to map axis values. If the base is non-zero, the parent axis
  * segment count will be ignored when the grid line and label positions are calculated.
  * If you want the range to be divided into equal segments like normal value axis, set this
  * property value to zero.
  *
- * The \a base has to be zero or positive value and not equal to one.
+ * The base has to be zero or positive value and not equal to one.
  * Defaults to ten.
  *
  * \sa ValueAxis3D::segmentCount
@@ -77,6 +77,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty bool LogValueAxis3DFormatter::autoSubGrid
+ *
+ * Defines whether sub-grid positions are generated automatically.
  *
  * If this property value is set to \c true, the parent axis sub-segment count is ignored
  * when calculating sub-grid line positions. The sub-grid positions are generated automatically
@@ -90,6 +92,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty bool LogValueAxis3DFormatter::showEdgeLabels
+ *
+ * Defines whether the first and last label on the axis are visible.
  *
  * When the base property value is non-zero, the whole axis range is often not equally divided into
  * segments. The first and last segments are often smaller than the other segments.
@@ -132,12 +136,14 @@ QLogValue3DAxisFormatter::~QLogValue3DAxisFormatter()
 /*!
  * \property QLogValue3DAxisFormatter::base
  *
- * The \a base of the logarithm used to map axis values. If the base is non-zero, the parent axis
+ * \brief The base of the logarithm used to map axis values.
+ *
+ * If the base is non-zero, the parent axis
  * segment count will be ignored when the grid line and label positions are calculated.
  * If you want the range to be divided into equal segments like normal value axis, set this
  * property value to zero.
  *
- * The \a base has to be zero or positive value and not equal to one.
+ * The base has to be zero or positive value and not equal to one.
  * Defaults to ten.
  *
  * \sa QValue3DAxis::segmentCount
@@ -164,6 +170,8 @@ qreal QLogValue3DAxisFormatter::base() const
 /*!
  * \property QLogValue3DAxisFormatter::autoSubGrid
  *
+ * \brief Whether sub-grid positions are generated automatically.
+ *
  * If this property value is set to \c true, the parent axis sub-segment count is ignored
  * when calculating sub-grid line positions. The sub-grid positions are generated automatically
  * according to the base property value.
@@ -189,6 +197,8 @@ bool QLogValue3DAxisFormatter::autoSubGrid() const
 
 /*!
  * \property QLogValue3DAxisFormatter::showEdgeLabels
+ *
+ * \brief Whether the first and last label on the axis are visible.
  *
  * When the base property value is non-zero, the whole axis range is often not equally divided into
  * segments. The first and last segments are often smaller than the other segments.

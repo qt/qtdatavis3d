@@ -60,7 +60,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty list CategoryAxis3D::labels
  *
- * Defines labels for axis applied to categories. If there are fewer labels than categories, the
+ * The labels for the axis applied to categories. If there are fewer labels than categories, the
  * remaining ones do not have a label. If category labels are not defined explicitly, labels are
  * generated from the data row (or column) labels of the primary series of the graph.
  */
@@ -84,8 +84,10 @@ QCategory3DAxis::~QCategory3DAxis()
 /*!
  * \property QCategory3DAxis::labels
  *
- * Defines \a labels for axis applied to categories. If there are fewer labels than categories, the
- * remaining ones do not have a label. If category \a labels are not defined explicitly, labels are
+ * \brief The labels for the axis applied to categories.
+ *
+ * If there are fewer labels than categories, the
+ * remaining ones do not have a label. If category labels are not defined explicitly, labels are
  * generated from the data row (or column) labels of the primary series of the graph.
  */
 QStringList QCategory3DAxis::labels() const
