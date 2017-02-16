@@ -124,21 +124,21 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string Abstract3DSeries::itemLabelFormat
  *
- * Label format for data items in this series. This format is used for single item labels,
+ * The label format for data items in this series. This format is used for single item labels,
  * for example, when an item is selected. How the format is interpreted depends on series type. See
  * each series class documentation for more information.
  */
 
 /*!
  * \qmlproperty bool Abstract3DSeries::visible
- * Sets the visibility of the series. If false, the series is not rendered.
+ * Sets the visibility of the series. If \c false, the series is not rendered.
  */
 
 /*!
  * \qmlproperty Abstract3DSeries.Mesh Abstract3DSeries::mesh
  *
- * Sets the \a mesh of the items in the series, or the selection pointer in case of
- * Surface3DSeries. If the \a mesh is \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined},
+ * Sets the mesh of the items in the series, or the selection pointer in case of
+ * Surface3DSeries. If the mesh is \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined},
  * then the userDefinedMesh property must also be set for items to render properly.
  * The default value depends on the graph type.
  */
@@ -146,7 +146,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty bool Abstract3DSeries::meshSmooth
  *
- * If \a enable is \c true, smooth versions of predefined meshes set via mesh property are used.
+ * If \c true, smooth versions of predefined meshes set via the \l mesh property are used.
  * This property doesn't affect custom meshes used when mesh is
  * \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined}.
  * Defaults to \c{false}.
@@ -155,8 +155,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty quaternion Abstract3DSeries::meshRotation
  *
- * Sets the mesh \a rotation that is applied to all items of the series.
- * The \a rotation should be a normalized quaternion.
+ * Sets the mesh rotation that is applied to all items of the series.
+ * The rotation should be a normalized quaternion.
  * For those series types that support item specific rotation, the rotations are
  * multiplied together.
  * Bar3DSeries ignores any rotation that is not around Y-axis.
@@ -167,84 +167,72 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string Abstract3DSeries::userDefinedMesh
  *
- * Sets the \a fileName for user defined custom mesh for objects that is used when mesh
+ * Sets the filename for user defined custom mesh for objects that is used when \l mesh
  * is \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined}.
- * \note The file specified by \a fileName needs to be in Wavefront obj format and include
+ * \note The file needs to be in Wavefront obj format and include
  * vertices, normals and UVs. It also needs to be in triangles.
  */
 
 /*!
  * \qmlproperty Theme3D.ColorStyle Abstract3DSeries::colorStyle
  *
- * Sets the color \a style for the series.
- * See \l{Theme3D::colorStyle}{Theme3D.colorStyle}
- * documentation for more information.
+ * Sets the color style for the series.
+ *
+ * \sa {Theme3D::colorStyle}{Theme3D.colorStyle}
  */
 
 /*!
  * \qmlproperty Color Abstract3DSeries::baseColor
  *
- * Sets the base \a color of the series.
- * See \l{Theme3D::baseColors}{Theme3D.baseColors}
- * documentation for more information.
+ * Sets the base color of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, {Theme3D::baseColors}{Theme3D.baseColors}
  */
 
 /*!
  * \qmlproperty ColorGradient Abstract3DSeries::baseGradient
  *
- * Sets the base \a gradient of the series.
- * See \l{Theme3D::baseGradients}{Theme3D.baseGradients}
- * documentation for more information.
+ * Sets the base gradient of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, {Theme3D::baseGradients}{Theme3D.baseGradients}
  */
 
 /*!
  * \qmlproperty Color Abstract3DSeries::singleHighlightColor
  *
- * Sets the single item highlight \a color of the series.
- * See \l{Theme3D::singleHighlightColor}{Theme3D.singleHighlightColor}
- * documentation for more information.
+ * Sets the single item highlight color of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, {Theme3D::singleHighlightColor}{Theme3D.singleHighlightColor}
  */
 
 /*!
  * \qmlproperty ColorGradient Abstract3DSeries::singleHighlightGradient
  *
- * Sets the single item highlight \a gradient of the series.
- * See \l{Theme3D::singleHighlightGradient}{Theme3D.singleHighlightGradient}
- * documentation for more information.
+ * Sets the single item highlight gradient of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, {Theme3D::singleHighlightGradient}{Theme3D.singleHighlightGradient}
  */
 
 /*!
  * \qmlproperty Color Abstract3DSeries::multiHighlightColor
  *
- * Sets the multiple item highlight \a color of the series.
- * See \l{Theme3D::multiHighlightColor}{Theme3D.multiHighlightColor}
- * documentation for more information.
+ * Sets the multiple item highlight color of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, {Theme3D::multiHighlightColor}{Theme3D.multiHighlightColor}
  */
 
 /*!
  * \qmlproperty ColorGradient Abstract3DSeries::multiHighlightGradient
  *
- * Sets the multiple item highlight \a gradient of the series.
- * See \l{Theme3D::multiHighlightGradient}{Theme3D.multiHighlightGradient}
- * documentation for more information.
+ * Sets the multiple item highlight gradient of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, {Theme3D::multiHighlightGradient}{Theme3D.multiHighlightGradient}
  */
 
 /*!
  * \qmlproperty string Abstract3DSeries::name
  *
- * Sets the series name.
+ * The series name.
  * Series name can be used in item label format with tag \c{@seriesName}.
  *
  * \sa itemLabelFormat
@@ -254,7 +242,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string Abstract3DSeries::itemLabel
  * \since QtDataVisualization 1.1
  *
- * Contains the formatted item label. If there is no selected item or the selected item is not
+ * The formatted item label. If there is no selected item or the selected item is not
  * visible, returns an empty string.
  *
  * \sa itemLabelFormat
@@ -298,7 +286,7 @@ QAbstract3DSeries::~QAbstract3DSeries()
 /*!
  * \property QAbstract3DSeries::type
  *
- * The type of the series.
+ * \brief The type of the series.
  */
 QAbstract3DSeries::SeriesType QAbstract3DSeries::type() const
 {
@@ -308,7 +296,9 @@ QAbstract3DSeries::SeriesType QAbstract3DSeries::type() const
 /*!
  * \property QAbstract3DSeries::itemLabelFormat
  *
- * Sets label \a format for data items in this series. This format is used for single item labels,
+ * \brief The label format for data items in this series.
+ *
+ * This format is used for single item labels,
  * for example, when an item is selected. How the format is interpreted depends on series type. See
  * each series class documentation for more information.
  *
@@ -330,7 +320,9 @@ QString QAbstract3DSeries::itemLabelFormat() const
 /*!
  * \property QAbstract3DSeries::visible
  *
- * Sets the visibility of the series. If \a visible is false, the series is not rendered.
+ * \brief The visibility of the series.
+ *
+ * If this property is \c false, the series is not rendered.
  * Defaults to \c{true}.
  */
 void QAbstract3DSeries::setVisible(bool visible)
@@ -349,8 +341,11 @@ bool QAbstract3DSeries::isVisible() const
 /*!
  * \property QAbstract3DSeries::mesh
  *
- * Sets the \a mesh of the items in the series, or the selection pointer in case of
- * QSurface3DSeries. If the \a mesh is MeshUserDefined, then the userDefinedMesh property
+ * \brief The mesh of the items in the series.
+ *
+ * For QSurface3DSeries, this property holds the selection pointer.
+ *
+ * If the mesh is MeshUserDefined, then the userDefinedMesh property
  * must also be set for items to render properly. The default value depends on the graph type.
  */
 void QAbstract3DSeries::setMesh(QAbstract3DSeries::Mesh mesh)
@@ -373,7 +368,9 @@ QAbstract3DSeries::Mesh QAbstract3DSeries::mesh() const
 /*!
  * \property QAbstract3DSeries::meshSmooth
  *
- * If \a enable is \c true, smooth versions of predefined meshes set via mesh property are used.
+ * \brief Whether smooth versions of predefined meshes are used.
+ *
+ * If \c true, smooth versions set via the \l mesh property are used.
  * This property doesn't affect custom meshes used when mesh is MeshUserDefined.
  * Defaults to \c{false}.
  */
@@ -393,8 +390,9 @@ bool QAbstract3DSeries::isMeshSmooth() const
 /*!
  * \property QAbstract3DSeries::meshRotation
  *
- * Sets the mesh \a rotation that is applied to all items of the series.
- * The \a rotation should be a normalized QQuaternion.
+ * \brief The mesh rotation that is applied to all items of the series.
+ *
+ * The rotation should be a normalized QQuaternion.
  * For those series types that support item specific rotation, the rotations are
  * multiplied together.
  * QBar3DSeries ignores any rotation that is not around Y-axis.
@@ -427,9 +425,10 @@ void QAbstract3DSeries::setMeshAxisAndAngle(const QVector3D &axis, float angle)
 /*!
  * \property QAbstract3DSeries::userDefinedMesh
  *
- * Sets the \a fileName for user defined custom mesh for objects that is used when mesh
- * is MeshUserDefined.
- * \note The file specified by \a fileName needs to be in Wavefront obj format and include
+ * \brief The filename for a user defined custom mesh for objects.
+ *
+ * The custom mesh is used when \l mesh is MeshUserDefined.
+ * \note The file needs to be in Wavefront obj format and include
  * vertices, normals and UVs. It also needs to be in triangles.
  */
 void QAbstract3DSeries::setUserDefinedMesh(const QString &fileName)
@@ -448,8 +447,9 @@ QString QAbstract3DSeries::userDefinedMesh() const
 /*!
  * \property QAbstract3DSeries::colorStyle
  *
- * Sets the color \a style for the series.
- * See Q3DTheme::ColorStyle documentation for more information.
+ * \brief The color style for the series.
+ *
+ * \sa Q3DTheme::ColorStyle
  */
 void QAbstract3DSeries::setColorStyle(Q3DTheme::ColorStyle style)
 {
@@ -468,10 +468,9 @@ Q3DTheme::ColorStyle QAbstract3DSeries::colorStyle() const
 /*!
  * \property QAbstract3DSeries::baseColor
  *
- * Sets the base \a color of the series.
- * See Q3DTheme::baseColors documentation for more information.
+ * \brief The base color of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, Q3DTheme::baseColors
  */
 void QAbstract3DSeries::setBaseColor(const QColor &color)
 {
@@ -490,10 +489,9 @@ QColor QAbstract3DSeries::baseColor() const
 /*!
  * \property QAbstract3DSeries::baseGradient
  *
- * Sets the base \a gradient of the series.
- * See Q3DTheme::baseGradients documentation for more information.
+ * \brief The base gradient of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, Q3DTheme::baseGradients
  */
 void QAbstract3DSeries::setBaseGradient(const QLinearGradient &gradient)
 {
@@ -512,10 +510,9 @@ QLinearGradient QAbstract3DSeries::baseGradient() const
 /*!
  * \property QAbstract3DSeries::singleHighlightColor
  *
- * Sets the single item highlight \a color of the series.
- * See Q3DTheme::singleHighlightColor documentation for more information.
+ * \brief The single item highlight color of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, Q3DTheme::singleHighlightColor
  */
 void QAbstract3DSeries::setSingleHighlightColor(const QColor &color)
 {
@@ -534,10 +531,9 @@ QColor QAbstract3DSeries::singleHighlightColor() const
 /*!
  * \property QAbstract3DSeries::singleHighlightGradient
  *
- * Sets the single item highlight \a gradient of the series.
- * See Q3DTheme::singleHighlightGradient documentation for more information.
+ * \brief The single item highlight gradient of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, Q3DTheme::singleHighlightGradient
  */
 void QAbstract3DSeries::setSingleHighlightGradient(const QLinearGradient &gradient)
 {
@@ -556,10 +552,9 @@ QLinearGradient QAbstract3DSeries::singleHighlightGradient() const
 /*!
  * \property QAbstract3DSeries::multiHighlightColor
  *
- * Sets the multiple item highlight \a color of the series.
- * See Q3DTheme::multiHighlightColor documentation for more information.
+ * \brief The multiple item highlight color of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, Q3DTheme::multiHighlightColor
  */
 void QAbstract3DSeries::setMultiHighlightColor(const QColor &color)
 {
@@ -578,10 +573,9 @@ QColor QAbstract3DSeries::multiHighlightColor() const
 /*!
  * \property QAbstract3DSeries::multiHighlightGradient
  *
- * Sets the multiple item highlight \a gradient of the series.
- * See Q3DTheme::multiHighlightGradient documentation for more information.
+ * \brief The multiple item highlight gradient of the series.
  *
- * \sa colorStyle
+ * \sa colorStyle, Q3DTheme::multiHighlightGradient
  */
 void QAbstract3DSeries::setMultiHighlightGradient(const QLinearGradient &gradient)
 {
@@ -600,8 +594,9 @@ QLinearGradient QAbstract3DSeries::multiHighlightGradient() const
 /*!
  * \property QAbstract3DSeries::name
  *
- * Sets the series \a name.
- * Series \a name can be used in item label format with tag \c{@seriesName}.
+ * \brief The series name.
+ *
+ * The series name can be used in item label format with the tag \c{@seriesName}.
  *
  * \sa itemLabelFormat
  */
@@ -622,7 +617,9 @@ QString QAbstract3DSeries::name() const
  * \property QAbstract3DSeries::itemLabel
  * \since QtDataVisualization 1.1
  *
- * Contains the formatted item label. If there is no selected item or the selected item is not
+ * \brief The formatted item label.
+ *
+ * If there is no selected item or the selected item is not
  * visible, returns an empty string.
  *
  * \sa itemLabelFormat
@@ -635,6 +632,8 @@ QString QAbstract3DSeries::itemLabel() const
 /*!
  * \property QAbstract3DSeries::itemLabelVisible
  * \since QtDataVisualization 1.1
+ *
+ * \brief The visibility of item labels in the graph.
  *
  * If \c true, item labels are drawn as floating labels in the graph. Otherwise item labels are not
  * drawn. If you prefer to show the item label in an external control, set this property to
