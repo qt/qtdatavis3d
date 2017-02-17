@@ -80,33 +80,33 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty color Custom3DLabel::textColor
  *
- * Color for the label text. Also affects label border, if enabled. Defaults to \c{"white"}.
+ * The color for the label text. Also affects label border, if enabled. Defaults to \c{"white"}.
  *
  * \sa borderEnabled
  */
 
 /*! \qmlproperty color Custom3DLabel::backgroundColor
  *
- * Color for the label background, if enabled. Defaults to \c{"gray"}.
+ * The color for the label background, if enabled. Defaults to \c{"gray"}.
  *
  * \sa backgroundEnabled
  */
 
 /*! \qmlproperty bool Custom3DLabel::backgroundEnabled
  *
- * Enable label background. If set to \c{false}, backgroundColor has no effect. Defaults
- * to \c{true}.
+ * Defines whether the label background is enabled. If set to \c{false},
+ * backgroundColor has no effect. Defaults to \c{true}.
  */
 
 /*! \qmlproperty bool Custom3DLabel::borderEnabled
  *
- * Enable label borders. Defaults to \c{true}.
+ * Defines whether label borders are enabled. Defaults to \c{true}.
  */
 
 /*! \qmlproperty bool Custom3DLabel::facingCamera
  *
- * Forces the label to face camera always. Defaults to \c{false}. If set to \c{true}, rotation()
- * has no effect.
+ * Defines whether the label will always face the camera. Defaults to \c{false}.
+ * If set to \c{true}, rotation() has no effect.
  */
 
 /*!
@@ -140,7 +140,9 @@ QCustom3DLabel::~QCustom3DLabel()
 
 /*! \property QCustom3DLabel::text
  *
- * The text for the label. Rich text is not supported.
+ * \brief The text for the label.
+ *
+ * Rich text is not supported.
  */
 void QCustom3DLabel::setText(const QString &text)
 {
@@ -159,7 +161,9 @@ QString QCustom3DLabel::text() const
 
 /*! \property QCustom3DLabel::font
  *
- * The font to be used for the label. Defaults to \c{QFont("Arial", 20)}. Special formatting
+ * \brief The font to be used for the label.
+ *
+ * Defaults to \c{QFont("Arial", 20)}. Special formatting
  * (for example outlined) is not supported.
  */
 void QCustom3DLabel::setFont(const QFont &font)
@@ -179,7 +183,9 @@ QFont QCustom3DLabel::font() const
 
 /*! \property QCustom3DLabel::textColor
  *
- * Color for the label text. Also affects label border, if enabled. Defaults to \c{Qt::white}.
+ * \brief Color for the label text.
+ *
+ * Also affects label border, if enabled. Defaults to \c{Qt::white}.
  *
  * \sa borderEnabled
  */
@@ -201,7 +207,9 @@ QColor QCustom3DLabel::textColor() const
 
 /*! \property QCustom3DLabel::backgroundColor
  *
- * Color for the label background, if enabled. Defaults to \c{Qt::gray}.
+ * \brief The color for the label background, if enabled.
+ *
+ * Defaults to \c{Qt::gray}.
  *
  * \sa backgroundEnabled
  */
@@ -223,7 +231,9 @@ QColor QCustom3DLabel::backgroundColor() const
 
 /*! \property QCustom3DLabel::borderEnabled
  *
- * Enable label borders. Defaults to \c{true}.
+ * \brief Whether label borders are enabled.
+ *
+ * Defaults to \c{true}.
  */
 void QCustom3DLabel::setBorderEnabled(bool enabled)
 {
@@ -243,7 +253,9 @@ bool QCustom3DLabel::isBorderEnabled() const
 
 /*! \property QCustom3DLabel::backgroundEnabled
  *
- * Enable label background. If set to \c{false}, backgroundColor() has no effect. Defaults
+ * \brief Whether the label background is enabled.
+ *
+ * If set to \c{false}, backgroundColor() has no effect. Defaults
  * to \c{true}.
  */
 void QCustom3DLabel::setBackgroundEnabled(bool enabled)
@@ -264,7 +276,9 @@ bool QCustom3DLabel::isBackgroundEnabled() const
 
 /*! \property QCustom3DLabel::facingCamera
  *
- * Forces the label to face camera always. Defaults to \c{false}. If set to \c{true}, rotation()
+ * \brief Whether the label will always face the camera.
+ *
+ * Defaults to \c{false}. If set to \c{true}, rotation()
  * has no effect.
  */
 void QCustom3DLabel::setFacingCamera(bool enabled)
