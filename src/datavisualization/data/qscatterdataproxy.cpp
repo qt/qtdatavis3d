@@ -41,7 +41,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * QScatterDataProxy handles adding, inserting, changing, and removing data items.
  *
- * QScatterDataProxy takes ownership of all QScatterDataArrays and QScatterDataItems passed to it.
+ * QScatterDataProxy takes ownership of all QScatterDataArray and QScatterDataItem
+ * objects passed to it.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -66,14 +67,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * For more complete description, see QScatterDataProxy.
- *
  * \sa ItemModelScatterDataProxy, {Qt Data Visualization Data Handling}
  */
 
 /*!
  * \qmlproperty int ScatterDataProxy::itemCount
- * Item count in the array.
+ * The number of items in the array.
  */
 
 /*!
@@ -108,7 +107,7 @@ QScatterDataProxy::~QScatterDataProxy()
 /*!
  * \property QScatterDataProxy::series
  *
- *  The series this proxy is attached to.
+ * \brief The series this proxy is attached to.
  */
 QScatter3DSeries *QScatterDataProxy::series() const
 {
@@ -151,7 +150,7 @@ void QScatterDataProxy::setItems(int index, const QScatterDataArray &items)
 /*!
  * Adds a single \a item to the end of the array.
  *
- * \return index of the added item.
+ * Returns the index of the added item.
  */
 int QScatterDataProxy::addItem(const QScatterDataItem &item)
 {
@@ -164,7 +163,7 @@ int QScatterDataProxy::addItem(const QScatterDataItem &item)
 /*!
  * Adds \a items to the end of the array.
  *
- * \return index of the first added item.
+ * Returns the index of the first added item.
  */
 int QScatterDataProxy::addItems(const QScatterDataArray &items)
 {
@@ -212,7 +211,7 @@ void QScatterDataProxy::removeItems(int index, int removeCount)
 /*!
  * \property QScatterDataProxy::itemCount
  *
- * \return item count in the array.
+ * \brief The number of items in the array.
  */
 int QScatterDataProxy::itemCount() const
 {
@@ -220,7 +219,7 @@ int QScatterDataProxy::itemCount() const
 }
 
 /*!
- * \return pointer to the data array.
+ * Returns the pointer to the data array.
  */
 const QScatterDataArray *QScatterDataProxy::array() const
 {
@@ -228,8 +227,8 @@ const QScatterDataArray *QScatterDataProxy::array() const
 }
 
 /*!
- * \return pointer to the item at \a index. It is guaranteed to be valid only until next call
- * that modifies data.
+ * Returns the pointer to the item at the index \a index. It is guaranteed to be
+ * valid only until the next call that modifies data.
  */
 const QScatterDataItem *QScatterDataProxy::itemAt(int index) const
 {
