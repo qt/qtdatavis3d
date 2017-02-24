@@ -52,34 +52,37 @@
 
 /*!
   \qmlproperty ValueAxis3D Scatter3D::axisX
-  The active X axis.
+  The active x-axis.
 
-  If an axis is not given, a temporary default axis with no labels and automatically adjusting
-  range is created.
-  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+  If an axis is not given, a temporary default axis with no labels and an
+  automatically adjusting range is created.
+  This temporary axis is destroyed if another axis is explicitly set to the same
+  orientation.
  */
 
 /*!
   \qmlproperty ValueAxis3D Scatter3D::axisY
-  The active Y axis.
+  The active y-axis.
 
-  If an axis is not given, a temporary default axis with no labels and automatically adjusting
-  range is created.
-  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+  If an axis is not given, a temporary default axis with no labels and an
+  automatically adjusting range is created.
+  This temporary axis is destroyed if another axis is explicitly set to the same
+  orientation.
  */
 
 /*!
   \qmlproperty ValueAxis3D Scatter3D::axisZ
-  The active Z axis.
+  The active z-axis.
 
-  If an axis is not given, a temporary default axis with no labels and automatically adjusting
-  range is created.
-  This temporary axis is destroyed if another axis is explicitly set to same orientation.
+  If an axis is not given, a temporary default axis with no labels and an
+  automatically adjusting range is created.
+  This temporary axis is destroyed if another axis is explicitly set to the same
+  orientation.
  */
 
 /*!
  * \qmlproperty Scatter3DSeries Scatter3D::selectedSeries
- * The selected series or \c null.
+ * The selected series or null.
  */
 
 /*!
@@ -87,7 +90,8 @@
  * \default
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
- * To set the series, either use the addSeries() function or define them as children of the graph.
+ * To set the series, either use the addSeries() method or define them as
+ * children of the graph.
  */
 
 /*!
