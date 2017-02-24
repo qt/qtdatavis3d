@@ -142,7 +142,7 @@ void Q3DSurface::removeSeries(QSurface3DSeries *series)
 }
 
 /*!
- * \return list of series added to this graph.
+ * Returns the list of series added to this graph.
  */
 QList<QSurface3DSeries *> Q3DSurface::seriesList() const
 {
@@ -162,12 +162,18 @@ const Q3DSurfacePrivate *Q3DSurface::dptrc() const
 /*!
  * \property Q3DSurface::axisX
  *
- * The active X-axis. Implicitly calls addAxis() to transfer ownership
- * of the \a axis to this graph.
+ * \brief The active x-axis.
+ */
+
+/*!
+ * Sets \a axis as the active x-axis. Implicitly calls addAxis() to transfer the
+ * ownership of the axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
- * range is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * If \a axis is null, a temporary default axis with no labels and an
+ * automatically adjusting range is created.
+ *
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -176,9 +182,6 @@ void Q3DSurface::setAxisX(QValue3DAxis *axis)
     dptr()->m_shared->setAxisX(axis);
 }
 
-/*!
- * \return used X-axis.
- */
 QValue3DAxis *Q3DSurface::axisX() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisX());
@@ -187,12 +190,18 @@ QValue3DAxis *Q3DSurface::axisX() const
 /*!
  * \property Q3DSurface::axisY
  *
- * The active Y-axis. Implicitly calls addAxis() to transfer ownership
- * of the \a axis to this graph.
+ * \brief The active y-axis.
+ */
+
+/*!
+ * Sets \a axis as the active y-axis. Implicitly calls addAxis() to transfer the
+ * ownership of the axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
- * range is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * If \a axis is null, a temporary default axis with no labels and an
+ * automatically adjusting range is created.
+ *
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -201,9 +210,6 @@ void Q3DSurface::setAxisY(QValue3DAxis *axis)
     dptr()->m_shared->setAxisY(axis);
 }
 
-/*!
- * \return used Y-axis.
- */
 QValue3DAxis *Q3DSurface::axisY() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
@@ -212,12 +218,18 @@ QValue3DAxis *Q3DSurface::axisY() const
 /*!
  * \property Q3DSurface::axisZ
  *
- * The active Z-axis. Implicitly calls addAxis() to transfer ownership
- * of the \a axis to this graph.
+ * \brief The active z-axis.
+ */
+
+/*!
+ * Sets \a axis as the active z-axis. Implicitly calls addAxis() to transfer the
+ * ownership of the axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
- * range is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * If \a axis is null, a temporary default axis with no labels and an
+ * automatically adjusting range is created.
+ *
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -226,9 +238,6 @@ void Q3DSurface::setAxisZ(QValue3DAxis *axis)
     dptr()->m_shared->setAxisZ(axis);
 }
 
-/*!
- * \return used Z-axis.
- */
 QValue3DAxis *Q3DSurface::axisZ() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisZ());
@@ -237,7 +246,9 @@ QValue3DAxis *Q3DSurface::axisZ() const
 /*!
  * \property Q3DSurface::selectedSeries
  *
- * The selected series or \c null. If selectionMode has \c SelectionMultiSeries flag set, this
+ * \brief The selected series or null.
+ *
+ * If selectionMode has \c SelectionMultiSeries set, this
  * property holds the series which owns the selected point.
  */
 QSurface3DSeries *Q3DSurface::selectedSeries() const
@@ -248,6 +259,9 @@ QSurface3DSeries *Q3DSurface::selectedSeries() const
 /*!
  * \property Q3DSurface::flipHorizontalGrid
  * \since QtDataVisualization 1.2
+ *
+ * \brief Whether the horizontal axis grid is displayed on top of the graph
+ * rather than on the bottom.
  *
  * In some use cases the horizontal axis grid is mostly covered by the surface, so it can be more
  * useful to display the horizontal axis grid on top of the graph rather than on the bottom.
@@ -296,7 +310,7 @@ void Q3DSurface::releaseAxis(QValue3DAxis *axis)
 }
 
 /*!
- * \return list of all added axes.
+ * Returns the list of all added axes.
  *
  * \sa addAxis()
  */
