@@ -35,10 +35,11 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
    \class Q3DObject
    \inmodule QtDataVisualization
-   \brief Simple baseclass for all the objects in the 3D scene.
+   \brief The Q3DObject class is a simple base class for all the objects in a
+   3D scene.
    \since QtDataVisualization 1.0
 
-    Q3DObject is a baseclass that contains only position information for an object in 3D scene.
+    Contains position information for an object in a 3D scene.
     The object is considered to be a single point in the coordinate space without dimensions.
 */
 
@@ -48,25 +49,26 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
    \since QtDataVisualization 1.0
    \ingroup datavisualization_qml
    \instantiates Q3DObject
-   \brief Simple baseclass for all the objects in the 3D scene.
+   \brief A base type for all the objects in a 3D scene.
 
-    Object3D is an uncreatable base type that contains only position information for an object in
-    3D scene. The object is considered to be a single point in the coordinate space without
+    An uncreatable base type that contains position information for an object in
+    a 3D scene. The object is considered to be a single point in the coordinate space without
     dimensions.
 */
 
 /*!
  * \qmlproperty vector3d Object3D::position
  *
- * This property contains the 3D position of the object.
+ * The 3D position of the object.
  *
  * \note Currently setting this property has no effect for Camera3D, as the position is handled
  * internally.
  */
 
 /*!
- * Constructs a new 3D object with position set to origin by default. An
- * optional \a parent parameter can be given and is then passed to QObject constructor.
+ * Constructs a new 3D object with the position set to origin by default. An
+ * optional \a parent parameter can be given and is then passed to the QObject
+ * constructor.
  */
 Q3DObject::Q3DObject(QObject *parent) :
     QObject(parent),
@@ -93,8 +95,9 @@ void Q3DObject::copyValuesFrom(const Q3DObject &source)
 /*!
  * \property Q3DObject::parentScene
  *
- * This property contains the parent scene as read only value.
- * If the object has no parent scene the value is 0.
+ * \brief The parent scene as a read only value.
+ *
+ * If the object has no parent scene, the value is 0.
  */
 Q3DScene *Q3DObject::parentScene()
 {
@@ -104,7 +107,7 @@ Q3DScene *Q3DObject::parentScene()
 /*!
  * \property Q3DObject::position
  *
- * This property contains the 3D position of the object.
+ * \brief The 3D position of the object.
  *
  * \note Currently setting this property has no effect for Q3DCamera, as the position is handled
  * internally.
@@ -124,8 +127,7 @@ void Q3DObject::setPosition(const QVector3D &position)
 }
 
 /*!
- * Sets and clears the \a dirty flag that is used to track
- * when the 3D object has changed since last update.
+ * Sets \a dirty to \c true if the 3D object has changed since the last update.
  */
 void Q3DObject::setDirty(bool dirty)
 {
@@ -135,7 +137,7 @@ void Q3DObject::setDirty(bool dirty)
 }
 
 /*!
- * \return flag that indicates if the 3D object has changed.
+ * Returns whether the 3D object has changed.
  */
 bool Q3DObject::isDirty() const
 {
