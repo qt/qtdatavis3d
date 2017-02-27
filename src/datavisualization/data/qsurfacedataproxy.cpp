@@ -107,12 +107,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty int SurfaceDataProxy::rowCount
- * Number of the rows in the array.
+ * The number of rows in the data array.
  */
 
 /*!
  * \qmlproperty int SurfaceDataProxy::columnCount
- * Number of the columns in the array.
+ * The number of columns in the data array.
  */
 
 /*!
@@ -147,7 +147,7 @@ QSurfaceDataProxy::~QSurfaceDataProxy()
 /*!
  * \property QSurfaceDataProxy::series
  *
- *  The series this proxy is attached to.
+ *  \brief The series this proxy is attached to.
  */
 QSurface3DSeries *QSurfaceDataProxy::series() const
 {
@@ -216,7 +216,7 @@ void QSurfaceDataProxy::setItem(const QPoint &position, const QSurfaceDataItem &
  * Adds a new \a row to the end of array. The new \a row must have
  * the same number of columns as the rows at the initial array.
  *
- * \return index of the added row.
+ * Returns the index of the added row.
  */
 int QSurfaceDataProxy::addRow(QSurfaceDataRow *row)
 {
@@ -230,7 +230,7 @@ int QSurfaceDataProxy::addRow(QSurfaceDataRow *row)
  * Adds new \a rows to the end of array. The new rows must have the same number of columns
  * as the rows at the initial array.
  *
- * \return index of the first added row.
+ * Returns the index of the first added row.
  */
 int QSurfaceDataProxy::addRows(const QSurfaceDataArray &rows)
 {
@@ -278,7 +278,7 @@ void QSurfaceDataProxy::removeRows(int rowIndex, int removeCount)
 }
 
 /*!
- * \return pointer to the data array.
+ * Returns the pointer to the data array.
  */
 const QSurfaceDataArray *QSurfaceDataProxy::array() const
 {
@@ -286,7 +286,7 @@ const QSurfaceDataArray *QSurfaceDataProxy::array() const
 }
 
 /*!
- * \return pointer to the item at \a rowIndex, \a columnIndex. It is guaranteed to be valid only
+ * Returns the pointer to the item at \a rowIndex, \a columnIndex. It is guaranteed to be valid only
  * until the next call that modifies data.
  */
 const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int rowIndex, int columnIndex) const
@@ -299,7 +299,7 @@ const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int rowIndex, int columnIndex)
 }
 
 /*!
- * \return pointer to the item at \a position. The X-value of \a position indicates the row
+ * Returns the pointer to the item at \a position. The X-value of \a position indicates the row
  * and the Y-value indicates the column. The item is guaranteed to be valid only
  * until the next call that modifies data.
  */
@@ -311,7 +311,7 @@ const QSurfaceDataItem *QSurfaceDataProxy::itemAt(const QPoint &position) const
 /*!
  * \property QSurfaceDataProxy::rowCount
  *
- * \return number of rows in the data.
+ * \brief The number of rows in the data array.
  */
 int QSurfaceDataProxy::rowCount() const
 {
@@ -321,7 +321,7 @@ int QSurfaceDataProxy::rowCount() const
 /*!
  * \property QSurfaceDataProxy::columnCount
  *
- * \return number of items in the columns.
+ * \brief The number of columns in the data array.
  */
 int QSurfaceDataProxy::columnCount() const
 {
