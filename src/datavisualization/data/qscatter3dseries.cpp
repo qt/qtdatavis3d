@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -91,17 +91,17 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty ScatterDataProxy Scatter3DSeries::dataProxy
  *
- * This property holds the active data \a proxy. The series assumes ownership of any proxy set to
- * it and deletes any previously set proxy when a new one is added. The \a proxy cannot be null or
- * set to another series.
+ * Sets the active data proxy. The series assumes ownership of any proxy set to
+ * it and deletes any previously set proxy when a new one is added. The proxy
+ * cannot be null or set to another series.
  */
 
 /*!
  * \qmlproperty int Scatter3DSeries::selectedItem
  *
- * Selects an item at the \a index. The \a index is the index in the data array of the series.
+ * The item that is selected at the index in the data array of the series.
  * Only one item can be selected at a time.
- * To clear selection from this series, set invalidSelectionIndex as the \a index.
+ * To clear selection from this series, set invalidSelectionIndex as the index.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
@@ -114,9 +114,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty float Scatter3DSeries::itemSize
  *
- * Set item size for the series. Size must be between 0.0 and 1.0. Setting the size to 0.0
- * causes item size to be automatically scaled based on combined item count in all the series for
- * the graph. Preset default is \c 0.0.
+ * Sets the item size for the series. The size must be between \c 0.0 and
+ * \c 1.0. Setting the size to \c 0.0 causes the item size to be automatically
+ * scaled based on the total number of items in all the series for the graph.
+ * The preset default is \c 0.0.
  */
 
 /*!
@@ -164,9 +165,14 @@ QScatter3DSeries::~QScatter3DSeries()
 /*!
  * \property QScatter3DSeries::dataProxy
  *
- * This property holds the active data \a proxy. The series assumes ownership of any proxy set to
- * it and deletes any previously set proxy when a new one is added. The \a proxy cannot be null or
- * set to another series.
+ * \brief The active data proxy.
+ */
+
+/*!
+ * Sets the active data proxy for the series to \a proxy. The series assumes
+ * ownership of any proxy set to it and deletes any previously set proxy when
+ * a new one is added. The \a proxy argument cannot be null or set to another
+ * series.
  */
 void QScatter3DSeries::setDataProxy(QScatterDataProxy *proxy)
 {
@@ -181,12 +187,18 @@ QScatterDataProxy *QScatter3DSeries::dataProxy() const
 /*!
  * \property QScatter3DSeries::selectedItem
  *
- * Selects an item at the \a index. The \a index is the index in the data array of the series.
+ * \brief The item that is selected in the series.
+ */
+
+/*!
+ * Selects the item at the index \a index in the data array of the series.
  * Only one item can be selected at a time.
- * To clear selection from this series, set invalidSelectionIndex() as the \a index.
+ *
+ * To clear selection from this series, set invalidSelectionIndex() as \a index.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
+ *
  * Removing items from or inserting items to the series before the selected item
  * will adjust the selection so that the same item will stay selected.
  *
@@ -209,9 +221,13 @@ int QScatter3DSeries::selectedItem() const
 /*!
  * \property QScatter3DSeries::itemSize
  *
- * Set item \a size for the series. Size must be between 0.0f and 1.0f. Setting the size to 0.0f
- * causes item size to be automatically scaled based on combined item count in all the series for
- * the graph. Preset default is \c 0.0f.
+ * \brief Item size for the series.
+ *
+ * The size must be between \c 0.0f and \c 1.0f. Setting the size to \c 0.0f
+ * causes the item size to be automatically scaled based on the total number of
+ * items in all the series for the graph.
+ *
+ * The preset default is \c 0.0f.
  */
 void QScatter3DSeries::setItemSize(float size)
 {
