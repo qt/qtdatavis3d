@@ -122,13 +122,20 @@ Q3DBars::~Q3DBars()
 /*!
  * \property Q3DBars::primarySeries
  *
- * Specifies the \a series that is the primary series of the graph. The primary series
- * is used to determine the row and column axis labels when the labels are not explicitly
+ * \brief The primary series of the graph.
+ */
+
+/*!
+ * Sets \a series as the primary series of the graph. The primary series
+ * determines the row and column axis labels when the labels are not explicitly
  * set to the axes.
- * If the specified \a series is not already added to the graph, setting it as the
+ *
+ * If the specified series is not yet added to the graph, setting it as the
  * primary series will also implicitly add it to the graph.
+ *
  * If the primary series itself is removed from the graph, this property
  * resets to default.
+ *
  * If \a series is null, this property resets to default.
  * Defaults to the first added series or zero if no series are added to the graph.
  */
@@ -181,7 +188,7 @@ void Q3DBars::insertSeries(int index, QBar3DSeries *series)
 }
 
 /*!
- * \return list of series added to this graph.
+ * Returns the list of series added to this graph.
  */
 QList<QBar3DSeries *> Q3DBars::seriesList() const
 {
@@ -191,9 +198,11 @@ QList<QBar3DSeries *> Q3DBars::seriesList() const
 /*!
  * \property Q3DBars::multiSeriesUniform
  *
- * This property controls if bars are to be scaled with proportions set to a single series bar even
- * if there are multiple series displayed. If set to \c {true}, \l{barSpacing}{bar spacing} will
- * affect only X-axis correctly. It is preset to \c false by default.
+ * \brief Whether bars are to be scaled with proportions set to a single series
+ * bar even if there are multiple series displayed.
+ *
+ * If set to \c {true}, \l{barSpacing}{bar spacing} will be correctly applied
+ * only to the X-axis. Preset to \c false by default.
  */
 void Q3DBars::setMultiSeriesUniform(bool uniform)
 {
@@ -211,8 +220,10 @@ bool Q3DBars::isMultiSeriesUniform() const
 /*!
  * \property Q3DBars::barThickness
  *
- * Bar thickness ratio between X and Z dimensions. 1.0 means bars are as wide as they are deep, 0.5
- * makes them twice as deep as they are wide. It is preset to \c 1.0 by default.
+ * \brief The bar thickness ratio between the X and Z dimensions.
+ *
+ * The value \c 1.0 means that the bars are as wide as they are deep, whereas
+ *\c 0.5 makes them twice as deep as they are wide. Preset to \c 1.0 by default.
  */
 void Q3DBars::setBarThickness(float thicknessRatio)
 {
@@ -231,8 +242,10 @@ float Q3DBars::barThickness() const
 /*!
  * \property Q3DBars::barSpacing
  *
- * Bar spacing, which is the empty space between bars, in X and Z dimensions. It is preset to
- * \c {(1.0, 1.0)} by default. Spacing is affected by barSpacingRelative -property.
+ * \brief Bar spacing in the X and Z dimensions.
+ *
+ * Preset to \c {(1.0, 1.0)} by default. Spacing is affected by the
+ * barSpacingRelative property.
  *
  * \sa barSpacingRelative, multiSeriesUniform
  */
@@ -252,9 +265,11 @@ QSizeF Q3DBars::barSpacing() const
 /*!
  * \property Q3DBars::barSpacingRelative
  *
- * This is used to indicate if spacing is meant to be absolute or relative to bar thickness.
- * If it is true, value of 0.0 means the bars are side-to-side and for example 1.0 means
- * there is one thickness in between the bars. It is preset to \c true.
+ * \brief Whether spacing is absolute or relative to bar thickness.
+ *
+ * If it is \c true, the value of \c 0.0 means that the bars are placed
+ * side-to-side, \c 1.0 means that a space as wide as the thickness of one bar
+ * is left between the bars, and so on. Preset to \c true.
  */
 void Q3DBars::setBarSpacingRelative(bool relative)
 {
@@ -272,11 +287,16 @@ bool Q3DBars::isBarSpacingRelative() const
 /*!
  * \property Q3DBars::rowAxis
  *
- * The active row \a axis. Implicitly calls addAxis() to transfer ownership of
- * the \a axis to this graph.
+ * \brief The axis attached to the active row.
+ */
+
+/*!
+ * Sets the axis of the active row to \a axis. Implicitly calls addAxis() to
+ * transfer the ownership of the axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * If \a axis is null, a temporary default axis with no labels is created.
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -293,11 +313,16 @@ QCategory3DAxis *Q3DBars::rowAxis() const
 /*!
  * \property Q3DBars::columnAxis
  *
- * The active column \a axis. Implicitly calls addAxis() to transfer ownership of
- * the \a axis to this graph.
+ * \brief The axis attached to the active column.
+ */
+
+/*!
+ * Sets the axis of the active column to \a axis. Implicitly calls addAxis() to
+ * transfer the ownership of the axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * If \a axis is null, a temporary default axis with no labels is created.
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -314,12 +339,13 @@ QCategory3DAxis *Q3DBars::columnAxis() const
 /*!
  * \property Q3DBars::valueAxis
  *
- * The active value \a axis (the Y-axis). Implicitly calls addAxis() to transfer ownership
- * of the \a axis to this graph.
+ * Sets the active value axis (the Y-axis) to \a axis. Implicitly calls
+ * addAxis() to transfer the ownership of \a axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
- * range is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * If \a axis is null, a temporary default axis with no labels and
+ * an automatically adjusting range is created.
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -336,8 +362,10 @@ QValue3DAxis *Q3DBars::valueAxis() const
 /*!
  * \property Q3DBars::selectedSeries
  *
- * The selected series or \c null. If selectionMode has \c SelectionMultiSeries flag set, this
- * property holds the series which owns the selected bar.
+ * \brief The selected series or a null value.
+ *
+ * If selectionMode has the \c SelectionMultiSeries flag set, this
+ * property holds the series that owns the selected bar.
  */
 QBar3DSeries *Q3DBars::selectedSeries() const
 {
@@ -347,8 +375,10 @@ QBar3DSeries *Q3DBars::selectedSeries() const
 /*!
  * \property Q3DBars::floorLevel
  *
- * The desired floor level for the bar graph in Y-axis data coordinates.
- * The actual floor level cannot go below Y-axis minimum or above Y-axis maximum.
+ * \brief The floor level for the bar graph in Y-axis data coordinates.
+ *
+ * The actual floor level will be restricted by the Y-axis minimum and maximum
+ * values.
  * Defaults to zero.
  */
 void Q3DBars::setFloorLevel(float level)
@@ -390,7 +420,7 @@ void Q3DBars::releaseAxis(QAbstract3DAxis *axis)
 }
 
 /*!
- * \return list of all added axes.
+ * Returns the list of all added axes.
  *
  * \sa addAxis()
  */
