@@ -95,7 +95,7 @@ static const float rotationSpeed      = 100.0f;
  * \qmlproperty bool InputHandler3D::rotationEnabled
  * \since QtDataVisualization 1.2
  *
- * This property specifies if this input handler allows graph rotation.
+ * Defines whether this input handler allows graph rotation.
  * Defaults to \c{true}.
  */
 
@@ -103,7 +103,7 @@ static const float rotationSpeed      = 100.0f;
  * \qmlproperty bool InputHandler3D::zoomEnabled
  * \since QtDataVisualization 1.2
  *
- * This property specifies if this input handler allows graph zooming.
+ * Defines whether this input handler allows graph zooming.
  * Defaults to \c{true}.
  */
 
@@ -111,7 +111,7 @@ static const float rotationSpeed      = 100.0f;
  * \qmlproperty bool InputHandler3D::selectionEnabled
  * \since QtDataVisualization 1.2
  *
- * This property specifies if this input handler allows selection from the graph.
+ * Defines whether this input handler allows selection from the graph.
  * Defaults to \c{true}.
  */
 
@@ -119,7 +119,7 @@ static const float rotationSpeed      = 100.0f;
  * \qmlproperty bool InputHandler3D::zoomAtTargetEnabled
  * \since QtDataVisualization 1.2
  *
- * This property specifies if zooming changes the camera target to the position of the input
+ * Defines whether zooming changes the camera target to the position of the input
  * at the time of the zoom.
  * Defaults to \c{true}.
  */
@@ -277,7 +277,8 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
  * \property Q3DInputHandler::rotationEnabled
  * \since QtDataVisualization 1.2
  *
- * This property specifies if this input handler allows graph rotation.
+ * \brief Whether this input handler allows graph rotation.
+ *
  * Defaults to \c{true}.
  */
 void Q3DInputHandler::setRotationEnabled(bool enable)
@@ -297,7 +298,8 @@ bool Q3DInputHandler::isRotationEnabled() const
  * \property Q3DInputHandler::zoomEnabled
  * \since QtDataVisualization 1.2
  *
- * This property specifies if this input handler allows graph zooming.
+ * \brief Whether this input handler allows graph zooming.
+ *
  * Defaults to \c{true}.
  */
 void Q3DInputHandler::setZoomEnabled(bool enable)
@@ -317,7 +319,8 @@ bool Q3DInputHandler::isZoomEnabled() const
  * \property Q3DInputHandler::selectionEnabled
  * \since QtDataVisualization 1.2
  *
- * This property specifies if this input handler allows selection from the graph.
+ * \brief Whether this input handler allows selection from the graph.
+ *
  * Defaults to \c{true}.
  */
 void Q3DInputHandler::setSelectionEnabled(bool enable)
@@ -337,8 +340,9 @@ bool Q3DInputHandler::isSelectionEnabled() const
  * \property Q3DInputHandler::zoomAtTargetEnabled
  * \since QtDataVisualization 1.2
  *
- * This property specifies if zooming should change the camera target so that the zoomed point
+ * \brief Whether zooming should change the camera target so that the zoomed point
  * of the graph stays at the same location after the zoom.
+ *
  * Defaults to \c{true}.
  */
 void Q3DInputHandler::setZoomAtTargetEnabled(bool enable)
