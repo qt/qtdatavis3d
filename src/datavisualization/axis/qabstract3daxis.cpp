@@ -58,31 +58,31 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty string AbstractAxis3D::title
- * Defines the title for the axis.
+ * The title for the axis.
  *
  * \sa titleVisible, titleFixed
  */
 
 /*!
  * \qmlproperty list AbstractAxis3D::labels
- * Defines the labels for the axis.
+ * The labels for the axis.
  * \note Setting this property for ValueAxis3D does nothing, as it generates labels automatically.
  */
 
 /*!
  * \qmlproperty AbstractAxis3D.AxisOrientation AbstractAxis3D::orientation
- * Defines the orientation of the axis.
+ * The orientation of the axis.
  */
 
 /*!
  * \qmlproperty AbstractAxis3D.AxisType AbstractAxis3D::type
- * Defines the type of the axis.
+ * The type of the axis.
  */
 
 /*!
  * \qmlproperty real AbstractAxis3D::min
  *
- * Defines the minimum value on the axis.
+ * The minimum value on the axis.
  * When setting this property the max is adjusted if necessary, to ensure that the range remains
  * valid.
  */
@@ -90,7 +90,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty real AbstractAxis3D::max
  *
- * Defines the maximum value on the axis.
+ * The maximum value on the axis.
  * When setting this property the min is adjusted if necessary, to ensure that the range remains
  * valid.
  */
@@ -98,14 +98,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty bool AbstractAxis3D::autoAdjustRange
  *
- * If set, the axis will automatically adjust the range so that all data fits in it.
+ * Defines whether the axis will automatically adjust the range so that all data fits in it.
  */
 
 /*!
  * \qmlproperty real AbstractAxis3D::labelAutoRotation
  *
- * Defines the maximum \a angle the labels can autorotate when the camera angle changes.
- * The \a angle can be between 0 and 90, inclusive. The default value is 0.
+ * The maximum angle the labels can autorotate when the camera angle changes.
+ * The angle can be between 0 and 90, inclusive. The default value is 0.
  * If the value is 0, axis labels do not automatically rotate.
  * If the value is greater than zero, labels attempt to orient themselves toward the camera, up to
  * the specified angle.
@@ -114,13 +114,17 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty bool AbstractAxis3D::titleVisible
  *
- * Defines if the axis title is visible in the primary graph view. The default value is \c{false}.
+ * Defines whether the axis title is visible in the primary graph view.
+ *
+ * The default value is \c{false}.
  *
  * \sa title, titleFixed
  */
 
 /*!
  * \qmlproperty bool AbstractAxis3D::titleFixed
+ *
+ * The rotation of axis titles.
  *
  * If \c{true}, axis titles in the primary graph view will be rotated towards the camera similarly
  * to the axis labels.
@@ -172,7 +176,9 @@ QAbstract3DAxis::~QAbstract3DAxis()
 /*!
  * \property QAbstract3DAxis::orientation
  *
- * Defines the orientation of the axis, one of AxisOrientation.
+ * \brief The orientation of the axis.
+ *
+ * The value is one of AxisOrientation values.
  */
 QAbstract3DAxis::AxisOrientation QAbstract3DAxis::orientation() const
 {
@@ -182,7 +188,9 @@ QAbstract3DAxis::AxisOrientation QAbstract3DAxis::orientation() const
 /*!
  * \property QAbstract3DAxis::type
  *
- * Defines the type of the axis, one of AxisType.
+ * \brief The type of the axis.
+ *
+ * The value is one of AxisType values.
  */
 QAbstract3DAxis::AxisType QAbstract3DAxis::type() const
 {
@@ -192,7 +200,7 @@ QAbstract3DAxis::AxisType QAbstract3DAxis::type() const
 /*!
  * \property QAbstract3DAxis::title
  *
- * Defines the title for the axis.
+ * \brief The title for the axis.
  *
  * \sa titleVisible, titleFixed
  */
@@ -212,7 +220,7 @@ QString QAbstract3DAxis::title() const
 /*!
  * \property QAbstract3DAxis::labels
  *
- * Defines the labels for the axis.
+ * \brief The labels for the axis.
  * \note Setting this property for QValue3DAxis does nothing, as it generates labels automatically.
  */
 void QAbstract3DAxis::setLabels(const QStringList &labels)
@@ -240,8 +248,9 @@ void QAbstract3DAxis::setRange(float min, float max)
 /*!
  * \property QAbstract3DAxis::labelAutoRotation
  *
- * Defines the maximum \a angle the labels can autorotate when the camera angle changes.
- * The \a angle can be between 0 and 90, inclusive. The default value is 0.
+ * \brief The maximum angle the labels can autorotate when the camera angle changes.
+ *
+ * The angle can be between 0 and 90, inclusive. The default value is 0.
  * If the value is 0, axis labels do not automatically rotate.
  * If the value is greater than zero, labels attempt to orient themselves toward the camera, up to
  * the specified angle.
@@ -266,7 +275,9 @@ float QAbstract3DAxis::labelAutoRotation() const
 /*!
  * \property QAbstract3DAxis::titleVisible
  *
- * Defines if the axis title is visible in the primary graph view. The default value is \c{false}.
+ * \brief Whether the axis title is visible in the primary graph view.
+ *
+ * The default value is \c{false}.
  *
  * \sa title, titleFixed
  */
@@ -285,6 +296,8 @@ bool QAbstract3DAxis::isTitleVisible() const
 
 /*!
  * \property QAbstract3DAxis::titleFixed
+ *
+ * \brief The rotation of the axis titles.
  *
  * If \c{true}, axis titles in the primary graph view will be rotated towards the camera similarly
  * to the axis labels.
@@ -311,7 +324,8 @@ bool QAbstract3DAxis::isTitleFixed() const
 /*!
  * \property QAbstract3DAxis::min
  *
- * Defines the minimum value on the axis.
+ * \brief The minimum value on the axis.
+ *
  * When setting this property the max is adjusted if necessary, to ensure that the range remains
  * valid.
  * \note For QCategory3DAxis this specifies the index of the first row or column to show.
@@ -325,7 +339,8 @@ void QAbstract3DAxis::setMin(float min)
 /*!
  * \property QAbstract3DAxis::max
  *
- * Defines the maximum value on the axis.
+ * \brief The maximum value on the axis.
+ *
  * When setting this property the min is adjusted if necessary, to ensure that the range remains
  * valid.
  * \note For QCategory3DAxis this specifies the index of the last row or column to show.
@@ -349,7 +364,7 @@ float QAbstract3DAxis::max() const
 /*!
  * \property QAbstract3DAxis::autoAdjustRange
  *
- * If set, the axis will automatically adjust the range so that all data fits in it.
+ * \brief Whether the axis will automatically adjust the range so that all data fits in it.
  *
  * \sa setRange(), setMin(), setMax()
  */

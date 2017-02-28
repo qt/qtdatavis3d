@@ -76,7 +76,9 @@ const float defaultMaxValue = 10.0f;
  * with height map data.
  *
  * There are several formats the image file can be given in, but if it is not in a directly usable
- * format, a conversion is made. \note If the result seems wrong, the automatic conversion failed
+ * format, a conversion is made.
+ *
+ * \note If the result seems wrong, the automatic conversion failed
  * and you should try converting the image yourself before setting it. Preferred format is
  * QImage::Format_RGB32 in grayscale.
  *
@@ -175,11 +177,16 @@ QHeightMapSurfaceDataProxy::~QHeightMapSurfaceDataProxy()
 /*!
  * \property QHeightMapSurfaceDataProxy::heightMap
  *
- * A height map \a image to be visualized. Setting this property replaces current data with height
- * map data.
+ * \brief The height map image to be visualized.
+ */
+
+/*!
+ * Replaces current data with the height map data specified by \a image.
  *
  * There are several formats the \a image can be given in, but if it is not in a directly usable
- * format, a conversion is made. \note If the result seems wrong, the automatic conversion failed
+ * format, a conversion is made.
+ *
+ * \note If the result seems wrong, the automatic conversion failed
  * and you should try converting the \a image yourself before setting it. Preferred format is
  * QImage::Format_RGB32 in grayscale.
  *
@@ -209,8 +216,12 @@ QImage QHeightMapSurfaceDataProxy::heightMap() const
 /*!
  * \property QHeightMapSurfaceDataProxy::heightMapFile
  *
- * A file with a height map image to be visualized. Setting this property replaces current data
- * with height map data.
+ * \brief The name of the file with a height map image to be visualized.
+ */
+
+/*!
+ * Replaces current data with height map data from the file specified by
+ * \a filename.
  *
  * \sa heightMap
  */
@@ -239,7 +250,10 @@ void QHeightMapSurfaceDataProxy::setValueRanges(float minX, float maxX, float mi
 /*!
  * \property QHeightMapSurfaceDataProxy::minXValue
  *
- * The minimum X value for the generated surface points. Defaults to \c{0.0}.
+ * \brief The minimum X value for the generated surface points.
+ *
+ * Defaults to \c{0.0}.
+ *
  * When setting this property the corresponding maximum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -256,7 +270,10 @@ float QHeightMapSurfaceDataProxy::minXValue() const
 /*!
  * \property QHeightMapSurfaceDataProxy::maxXValue
  *
- * The maximum X value for the generated surface points. Defaults to \c{10.0}.
+ * \brief The maximum X value for the generated surface points.
+ *
+ * Defaults to \c{10.0}.
+ *
  * When setting this property the corresponding minimum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -273,7 +290,10 @@ float QHeightMapSurfaceDataProxy::maxXValue() const
 /*!
  * \property QHeightMapSurfaceDataProxy::minZValue
  *
- * The minimum Z value for the generated surface points. Defaults to \c{0.0}.
+ * \brief The minimum Z value for the generated surface points.
+ *
+ * Defaults to \c{0.0}.
+ *
  * When setting this property the corresponding maximum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */
@@ -290,7 +310,10 @@ float QHeightMapSurfaceDataProxy::minZValue() const
 /*!
  * \property QHeightMapSurfaceDataProxy::maxZValue
  *
- * The maximum Z value for the generated surface points. Defaults to \c{10.0}.
+ * \brief The maximum Z value for the generated surface points.
+ *
+ * Defaults to \c{10.0}.
+ *
  * When setting this property the corresponding minimum value is adjusted if necessary,
  * to ensure that the range remains valid.
  */

@@ -96,7 +96,7 @@ QAbstractDataProxy::~QAbstractDataProxy()
 /*!
  * \property QAbstractDataProxy::type
  *
- * The type of the proxy.
+ * \brief The type of the proxy.
  */
 QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 {

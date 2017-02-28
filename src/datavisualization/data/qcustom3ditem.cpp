@@ -57,13 +57,13 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty string Custom3DItem::meshFile
  *
- * Holds item mesh file name. Item in the file must be in Wavefront obj format and include
+ * The item mesh file name. The item in the file must be in Wavefront obj format and include
  * vertices, normals, and UVs. It also needs to be in triangles.
  */
 
 /*! \qmlproperty string Custom3DItem::textureFile
  *
- * Holds the texture file name for the item. If left unset, a solid gray texture will be
+ * The texture file name for the item. If left unset, a solid gray texture will be
  * used.
  *
  * \note To conserve memory the QImage loaded from the file is cleared after a texture is created.
@@ -71,7 +71,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty vector3d Custom3DItem::position
  *
- * Holds the item \a position as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
+ * The item position as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
  *
  * Item position is either in data coordinates or in absolute coordinates, depending on the
  * positionAbsolute property. When using absolute coordinates, values between \c{-1.0...1.0} are
@@ -86,7 +86,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty bool Custom3DItem::positionAbsolute
  *
- * This property dictates if item position is to be handled in data coordinates or in absolute
+ * Defines whether item position is to be handled in data coordinates or in absolute
  * coordinates. Defaults to \c{false}. Items with absolute coordinates will always be rendered,
  * whereas items with data coordinates are only rendered if they are within axis ranges.
  *
@@ -95,7 +95,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty vector3d Custom3DItem::scaling
  *
- * Holds the item \a scaling as a vector3d. Defaults to \c {vector3d(0.1, 0.1, 0.1)}.
+ * The item scaling as a vector3d. Defaults to \c {vector3d(0.1, 0.1, 0.1)}.
  *
  * Item scaling is either in data values or in absolute values, depending on the
  * scalingAbsolute property. The default vector interpreted as absolute values sets the item to
@@ -108,7 +108,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*! \qmlproperty bool Custom3DItem::scalingAbsolute
  * \since QtDataVisualization 1.2
  *
- * This property dictates if item scaling is to be handled in data values or in absolute
+ * Defines whether item scaling is to be handled in data values or in absolute
  * values. Defaults to \c{true}. Items with absolute scaling will be rendered at the same
  * size, regardless of axis ranges. Items with data scaling will change their apparent size
  * according to the axis ranges. If positionAbsolute value is \c{true}, this property is ignored
@@ -116,10 +116,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * is calculated on the unrotated item. Similarly, for Custom3DVolume items, the range clipping
  * is calculated on the unrotated item.
  *
- * \note: Only absolute scaling is supported for Custom3DLabel items or for custom items used in
+ * \note Only absolute scaling is supported for Custom3DLabel items or for custom items used in
  * \l{AbstractGraph3D::polar}{polar} graphs.
  *
- * \note: The custom item's mesh must be normalized to range \c{[-1 ,1]}, or the data
+ * \note The custom item's mesh must be normalized to range \c{[-1 ,1]}, or the data
  * scaling will not be accurate.
  *
  * \sa scaling, positionAbsolute
@@ -127,18 +127,18 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty quaternion Custom3DItem::rotation
  *
- * Holds the item \a rotation as a quaternion. Defaults to \c {quaternion(0.0, 0.0, 0.0, 0.0)}.
+ * The item rotation as a quaternion. Defaults to \c {quaternion(0.0, 0.0, 0.0, 0.0)}.
  */
 
 /*! \qmlproperty bool Custom3DItem::visible
  *
- * Sets the item \a visible. Defaults to \c{true}.
+ * The visibility of the item. Defaults to \c{true}.
  */
 
 /*! \qmlproperty bool Custom3DItem::shadowCasting
  *
- * Sets shadow casting for the item to \a enabled. Defaults to \c{true}.
- * If set \c{false}, the item does not cast shadows regardless of
+ * Defines whether shadow casting for the item is enabled. Defaults to \c{true}.
+ * If \c{false}, the item does not cast shadows regardless of
  * \l{QAbstract3DGraph::ShadowQuality}{ShadowQuality}.
  */
 
@@ -192,7 +192,9 @@ QCustom3DItem::~QCustom3DItem()
 
 /*! \property QCustom3DItem::meshFile
  *
- * Holds item mesh file name. Item in the file must be in Wavefront obj format and include
+ * \brief The item mesh file name.
+ *
+ * The item in the file must be in Wavefront obj format and include
  * vertices, normals, and UVs. It also needs to be in triangles.
  */
 void QCustom3DItem::setMeshFile(const QString &meshFile)
@@ -212,7 +214,9 @@ QString QCustom3DItem::meshFile() const
 
 /*! \property QCustom3DItem::position
  *
- * Holds the item \a position as a QVector3D. Defaults to \c {QVector3D(0.0, 0.0, 0.0)}.
+ * \brief The item position as a QVector3D.
+ *
+ * Defaults to \c {QVector3D(0.0, 0.0, 0.0)}.
  *
  * Item position is either in data coordinates or in absolute coordinates, depending on
  * positionAbsolute property. When using absolute coordinates, values between \c{-1.0...1.0} are
@@ -241,8 +245,10 @@ QVector3D QCustom3DItem::position() const
 
 /*! \property QCustom3DItem::positionAbsolute
  *
- * This property dictates if item position is to be handled in data coordinates or in absolute
- * coordinates. Defaults to \c{false}. Items with absolute coordinates will always be rendered,
+ * \brief Whether item position is to be handled in data coordinates or in absolute
+ * coordinates.
+ *
+ * Defaults to \c{false}. Items with absolute coordinates will always be rendered,
  * whereas items with data coordinates are only rendered if they are within axis ranges.
  *
  * \sa position
@@ -264,7 +270,9 @@ bool QCustom3DItem::isPositionAbsolute() const
 
 /*! \property QCustom3DItem::scaling
  *
- * Holds the item \a scaling as a QVector3D. Defaults to \c {QVector3D(0.1, 0.1, 0.1)}.
+ * \brief The item scaling as a QVector3D.
+ *
+ * Defaults to \c {QVector3D(0.1, 0.1, 0.1)}.
  *
  * Item scaling is either in data values or in absolute values, depending on the
  * scalingAbsolute property. The default vector interpreted as absolute values sets the item to
@@ -291,18 +299,22 @@ QVector3D QCustom3DItem::scaling() const
 /*! \property QCustom3DItem::scalingAbsolute
  * \since QtDataVisualization 1.2
  *
- * This property dictates if item scaling is to be handled in data values or in absolute
- * values. Defaults to \c{true}. Items with absolute scaling will be rendered at the same
+ * \brief Whether item scaling is to be handled in data values or in absolute
+ * values.
+ *
+ * Defaults to \c{true}.
+ *
+ * Items with absolute scaling will be rendered at the same
  * size, regardless of axis ranges. Items with data scaling will change their apparent size
  * according to the axis ranges. If positionAbsolute value is \c{true}, this property is ignored
  * and scaling is interpreted as an absolute value. If the item has rotation, the data scaling
  * is calculated on the unrotated item. Similarly, for QCustom3DVolume items, the range clipping
  * is calculated on the unrotated item.
  *
- * \note: Only absolute scaling is supported for QCustom3DLabel items or for custom items used in
+ * \note Only absolute scaling is supported for QCustom3DLabel items or for custom items used in
  * \l{QAbstract3DGraph::polar}{polar} graphs.
  *
- * \note: The custom item's mesh must be normalized to range \c{[-1 ,1]}, or the data
+ * \note The custom item's mesh must be normalized to range \c{[-1 ,1]}, or the data
  * scaling will not be accurate.
  *
  * \sa scaling, positionAbsolute
@@ -326,7 +338,9 @@ bool QCustom3DItem::isScalingAbsolute() const
 
 /*! \property QCustom3DItem::rotation
  *
- * Holds the item \a rotation as a QQuaternion. Defaults to \c {QQuaternion(0.0, 0.0, 0.0, 0.0)}.
+ * \brief The item rotation as a QQuaternion.
+ *
+ * Defaults to \c {QQuaternion(0.0, 0.0, 0.0, 0.0)}.
  */
 void QCustom3DItem::setRotation(const QQuaternion &rotation)
 {
@@ -345,7 +359,9 @@ QQuaternion QCustom3DItem::rotation()
 
 /*! \property QCustom3DItem::visible
  *
- * Sets the item \a visible. Defaults to \c{true}.
+ * \brief The visibility of the item.
+ *
+ * Defaults to \c{true}.
  */
 void QCustom3DItem::setVisible(bool visible)
 {
@@ -365,8 +381,10 @@ bool QCustom3DItem::isVisible() const
 
 /*! \property QCustom3DItem::shadowCasting
  *
- * Sets shadow casting for the item to \a enabled. Defaults to \c{true}.
- * If set \c{false}, the item does not cast shadows regardless of QAbstract3DGraph::ShadowQuality.
+ * \brief Whether shadow casting for the item is enabled.
+ *
+ * Defaults to \c{true}.
+ * If \c{false}, the item does not cast shadows regardless of QAbstract3DGraph::ShadowQuality.
  */
 void QCustom3DItem::setShadowCasting(bool enabled)
 {
@@ -394,7 +412,7 @@ void QCustom3DItem::setRotationAxisAndAngle(const QVector3D &axis, float angle)
 }
 
 /*!
- * Set the \a textureImage as a QImage for the item. Texture defaults to solid gray.
+ * Sets the \a textureImage as a QImage for the item. Texture defaults to solid gray.
  *
  * \note To conserve memory the given QImage is cleared after a texture is created.
  */
@@ -420,7 +438,9 @@ void QCustom3DItem::setTextureImage(const QImage &textureImage)
 
 /*! \property QCustom3DItem::textureFile
  *
- * Holds the texture file name for the item. If both this and texture image are unset, a solid
+ * \brief The texture file name for the item.
+ *
+ * If both this property and the texture image are unset, a solid
  * gray texture will be used.
  *
  * \note To conserve memory the QImage loaded from the file is cleared after a texture is created.

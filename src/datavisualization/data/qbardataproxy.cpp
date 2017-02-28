@@ -91,20 +91,21 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty int BarDataProxy::rowCount
- * Row count in the array.
+ * The number of rows in the array.
  */
 
 /*!
  * \qmlproperty list BarDataProxy::rowLabels
  *
- * Optional row labels for the array. Indexes in this array match row indexes in data array.
- * If the list is shorter than row count, all rows will not get labels.
+ * The optional row labels for the array. Indexes in this array match the row
+ * indexes in the data array.
+ * If the list is shorter than number of rows, all rows will not get labels.
  */
 
 /*!
  * \qmlproperty list BarDataProxy::columnLabels
  *
- * Optional column labels for the array. Indexes in this array match column indexes in rows.
+ * The optional column labels for the array. Indexes in this array match column indexes in rows.
  * If the list is shorter than the longest row, all columns will not get labels.
  */
 
@@ -140,7 +141,7 @@ QBarDataProxy::~QBarDataProxy()
 /*!
  * \property QBarDataProxy::series
  *
- *  The series this proxy is attached to.
+ * \brief The series this proxy is attached to.
  */
 QBar3DSeries *QBarDataProxy::series() const
 {
@@ -370,7 +371,7 @@ void QBarDataProxy::removeRows(int rowIndex, int removeCount, bool removeLabels)
 /*!
  * \property QBarDataProxy::rowCount
  *
- * Row \a count in the array.
+ * \brief The number of rows in the array.
  */
 int QBarDataProxy::rowCount() const
 {
@@ -380,8 +381,10 @@ int QBarDataProxy::rowCount() const
 /*!
  * \property QBarDataProxy::rowLabels
  *
- * Optional row \a labels for the array. Indexes in this array match row indexes in data array.
- * If the list is shorter than row count, all rows will not get labels.
+ * \brief The optional row labels for the array.
+ *
+ * Indexes in this array match the row indexes in the data array.
+ * If the list is shorter than the number of rows, all rows will not get labels.
  */
 QStringList QBarDataProxy::rowLabels() const
 {
@@ -399,7 +402,9 @@ void QBarDataProxy::setRowLabels(const QStringList &labels)
 /*!
  * \property QBarDataProxy::columnLabels
  *
- * Optional column \a labels for the array. Indexes in this array match column indexes in rows.
+ * \brief The optional column labels for the array.
+ *
+ * Indexes in this array match column indexes in rows.
  * If the list is shorter than the longest row, all columns will not get labels.
  */
 QStringList QBarDataProxy::columnLabels() const

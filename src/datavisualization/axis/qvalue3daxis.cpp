@@ -64,7 +64,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty int ValueAxis3D::segmentCount
  *
- * Defines the number of segments on the axis. This indicates how many labels are drawn. The number
+ * The number of segments on the axis. This indicates how many labels are drawn. The number
  * of grid lines to be drawn is calculated with formula: \c {segments * subsegments + 1}.
  * The preset default is \c 5, and it can not be below \c 1.
  */
@@ -72,7 +72,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty int ValueAxis3D::subSegmentCount
  *
- * Defines the number of subsegments inside each segment on the axis. Grid lines are drawn between
+ * The number of subsegments inside each segment on the axis. Grid lines are drawn between
  * each subsegment, in addition to each segment.
  * The preset default is \c 1, and it can not be below \c 1.
  */
@@ -80,7 +80,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string ValueAxis3D::labelFormat
  *
- * Defines the label format to be used for the labels on this axis. How the format is interpreted
+ * The label format to be used for the labels on this axis. How the format is interpreted
  * depends on the axis formatter and the locale in use. Using the default formatter and default
  * locale (\c{"C"}), the formatting uses QString::sprintf(). Supported specifiers are:
  * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
@@ -96,7 +96,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty ValueAxis3DFormatter ValueAxis3D::formatter
  * \since QtDataVisualization 1.1
  *
- * Defines the axis \a formatter to be used. Any existing formatter is deleted when a new formatter
+ * The axis formatter to be used. Any existing formatter is deleted when a new formatter
  * is set.
  *
  */
@@ -129,7 +129,9 @@ QValue3DAxis::~QValue3DAxis()
 /*!
  * \property QValue3DAxis::segmentCount
  *
- * Defines the number of segments on the axis. This indicates how many labels are drawn. The number
+ * \brief The number of segments on the axis.
+ *
+ * This indicates how many labels are drawn. The number
  * of grid lines to be drawn is calculated with formula: \c {segments * subsegments + 1}.
  * The preset default is \c 5, and it can not be below \c 1.
  *
@@ -157,7 +159,9 @@ int QValue3DAxis::segmentCount() const
 /*!
  * \property QValue3DAxis::subSegmentCount
  *
- * Defines the number of subsegments inside each segment on the axis. Grid lines are drawn between
+ * \brief The number of subsegments inside each segment on the axis.
+ *
+ * Grid lines are drawn between
  * each subsegment, in addition to each segment.
  * The preset default is \c 1, and it can not be below \c 1.
  *
@@ -184,7 +188,9 @@ int QValue3DAxis::subSegmentCount() const
 /*!
  * \property QValue3DAxis::labelFormat
  *
- * Defines the label format to be used for the labels on this axis. How the format is interpreted
+ * \brief The label format to be used for the labels on this axis.
+ *
+ * How the format is interpreted
  * depends on the axis formatter and the locale in use. Using the default formatter and default
  * locale (\c{"C"}), the formatting uses QString::sprintf(). Supported specifiers are:
  * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
@@ -217,7 +223,9 @@ QString QValue3DAxis::labelFormat() const
  * \property QValue3DAxis::formatter
  * \since QtDataVisualization 1.1
  *
- * Defines the axis \a formatter to be used. Any existing formatter is deleted when a new formatter
+ * \brief The axis formatter to be used.
+ *
+ * Any existing formatter is deleted when a new formatter
  * is set.
  */
 void QValue3DAxis::setFormatter(QValue3DAxisFormatter *formatter)
@@ -245,6 +253,8 @@ QValue3DAxisFormatter *QValue3DAxis::formatter() const
 /*!
  * \property QValue3DAxis::reversed
  * \since QtDataVisualization 1.1
+ *
+ * \brief Whether the axis is rendered in reverse.
  *
  * If \c{true}, the axis will be rendered in reverse, i.e. the positions of minimum and maximum
  * values are swapped when the graph is rendered. This property doesn't affect the actual
