@@ -101,10 +101,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \inherits SurfaceDataProxy
  * \brief Proxy class for presenting data in item models with Surface3D.
  *
- * This type allows you to use AbstractItemModel derived models as a data source for Surface3D.
+ * This type allows you to use \c AbstractItemModel derived models as a data
+ * source for Surface3D.
  *
  * Data is resolved asynchronously whenever the mapping or the model changes.
- * QSurfaceDataProxy::arrayReset() is emitted when the data has been resolved.
  *
  * For ItemModelSurfaceDataProxy enums, see \l{QItemModelSurfaceDataProxy::MultiMatchBehavior}.
  *
@@ -141,7 +141,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string ItemModelSurfaceDataProxy::xPosRole
  * The item model role to map to the X position. If this role is not defined, columnRole is
- * used to determine the X-coordinate value of the resolved \l{QSurfaceDataItem}
+ * used to determine the X-coordinate value of the resolved \c QSurfaceDataItem
  * items.
  */
 
@@ -153,7 +153,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string ItemModelSurfaceDataProxy::zPosRole
  * The item model role to map to the Z position. If this role is not defined, rowRole is
- * used to determine the Z-coordinate value of resolved \l{QSurfaceDataItem}
+ * used to determine the Z-coordinate value of the resolved \c QSurfaceDataItem
  * items.
  */
 
