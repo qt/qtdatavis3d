@@ -760,17 +760,19 @@ void Surface3DRenderer::render(GLuint defaultFboHandle)
     if (m_cachedIsSlicingActivated)
         drawSlicedScene();
 
-    // Render selection ball
+    // Render selection label
     if (m_selectionActive
             && m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem)) {
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
-            SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
+        for (SeriesRenderCache *baseCache: m_renderCacheList) {
+            const SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
             if (cache->slicePointerActive() && cache->renderable() &&
                     m_cachedIsSlicingActivated ) {
-                cache->sliceSelectionPointer()->render(defaultFboHandle);
+                cache->sliceSelectionPointer()->renderSelectionLabel(defaultFboHandle);
             }
-            if (cache->mainPointerActive() && cache->renderable())
-                cache->mainSelectionPointer()->render(defaultFboHandle, m_useOrthoProjection);
+            if (cache->mainPointerActive() && cache->renderable()) {
+                cache->mainSelectionPointer()->renderSelectionLabel(defaultFboHandle,
+                                                                    m_useOrthoProjection);
+            }
         }
     }
 }
@@ -1328,6 +1330,38 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
                    m_primarySubViewport.height());
     }
 
+    // Selection handling
+    if (m_selectionDirty || m_selectionLabelDirty) {
+        QPoint visiblePoint = Surface3DController::invalidSelectionPosition();
+        if (m_selectedSeries) {
+            SurfaceSeriesRenderCache *cache =
+                    static_cast<SurfaceSeriesRenderCache *>(
+                        m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries)));
+            if (cache && m_selectedPoint != Surface3DController::invalidSelectionPosition()) {
+                const QRect &sampleSpace = cache->sampleSpace();
+                int x = m_selectedPoint.x() - sampleSpace.y();
+                int y = m_selectedPoint.y() - sampleSpace.x();
+                if (x >= 0 && y >= 0 && x < sampleSpace.height() && y < sampleSpace.width()
+                        && cache->dataArray().size()) {
+                    visiblePoint = QPoint(x, y);
+                }
+            }
+        }
+
+        if (m_cachedSelectionMode == QAbstract3DGraph::SelectionNone
+                || visiblePoint == Surface3DController::invalidSelectionPosition()) {
+            m_selectionActive = false;
+        } else {
+            if (m_cachedIsSlicingActivated)
+                updateSliceDataModel(visiblePoint);
+            if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem))
+                surfacePointSelected(visiblePoint);
+            m_selectionActive = true;
+        }
+
+        m_selectionDirty = false;
+    }
+
     // Draw the surface
     if (!m_renderCacheList.isEmpty()) {
         // For surface we can see glimpses from underneath
@@ -1452,6 +1486,22 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         }
     }
 
+    // Render selection ball
+    if (m_selectionActive
+            && m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem)) {
+        for (SeriesRenderCache *baseCache: m_renderCacheList) {
+            const SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
+            if (cache->slicePointerActive() && cache->renderable() &&
+                    m_cachedIsSlicingActivated ) {
+                cache->sliceSelectionPointer()->renderSelectionPointer(defaultFboHandle);
+            }
+            if (cache->mainPointerActive() && cache->renderable()) {
+                cache->mainSelectionPointer()->renderSelectionPointer(defaultFboHandle,
+                                                                      m_useOrthoProjection);
+            }
+        }
+    }
+
     // Bind background shader
     m_backgroundShader->bind();
     glCullFace(GL_BACK);
@@ -1481,7 +1531,13 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         MVPMatrix = projectionViewMatrix * modelMatrix;
 #endif
 
+        bool blendEnabled = false;
         QVector4D backgroundColor = Utils::vectorFromColor(m_cachedTheme->backgroundColor());
+        if (backgroundColor.w() < 1.0f) {
+            blendEnabled = true;
+            glEnable(GL_BLEND);
+            glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+        }
 
         // Set shader bindings
         m_backgroundShader->setUniformValue(m_backgroundShader->lightP(), lightPos);
@@ -1516,6 +1572,9 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             // Draw the object
             m_drawer->drawObject(m_backgroundShader, m_backgroundObj);
         }
+
+        if (blendEnabled)
+            glDisable(GL_BLEND);
     }
 
     // Draw grid lines
@@ -1865,38 +1924,6 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
     // Release shader
     glUseProgram(0);
-
-    // Selection handling
-    if (m_selectionDirty || m_selectionLabelDirty) {
-        QPoint visiblePoint = Surface3DController::invalidSelectionPosition();
-        if (m_selectedSeries) {
-            SurfaceSeriesRenderCache *cache =
-                    static_cast<SurfaceSeriesRenderCache *>(
-                        m_renderCacheList.value(const_cast<QSurface3DSeries *>(m_selectedSeries)));
-            if (cache && m_selectedPoint != Surface3DController::invalidSelectionPosition()) {
-                const QRect &sampleSpace = cache->sampleSpace();
-                int x = m_selectedPoint.x() - sampleSpace.y();
-                int y = m_selectedPoint.y() - sampleSpace.x();
-                if (x >= 0 && y >= 0 && x < sampleSpace.height() && y < sampleSpace.width()
-                        && cache->dataArray().size()) {
-                    visiblePoint = QPoint(x, y);
-                }
-            }
-        }
-
-        if (m_cachedSelectionMode == QAbstract3DGraph::SelectionNone
-                || visiblePoint == Surface3DController::invalidSelectionPosition()) {
-            m_selectionActive = false;
-        } else {
-            if (m_cachedIsSlicingActivated)
-                updateSliceDataModel(visiblePoint);
-            if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionItem))
-                surfacePointSelected(visiblePoint);
-            m_selectionActive = true;
-        }
-
-        m_selectionDirty = false;
-    }
 }
 
 void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamera,

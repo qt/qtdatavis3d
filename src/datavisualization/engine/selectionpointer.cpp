@@ -78,7 +78,7 @@ void SelectionPointer::updateScene(Q3DScene *scene)
     m_cachedScene = scene;
 }
 
-void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
+void SelectionPointer::renderSelectionPointer(GLuint defaultFboHandle, bool useOrtho)
 {
     Q_UNUSED(defaultFboHandle)
 
@@ -86,7 +86,6 @@ void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
                m_mainViewPort.width(), m_mainViewPort.height());
 
     Q3DCamera *camera = m_cachedScene->activeCamera();
-    QSize textureSize = m_labelItem.size();
 
     QMatrix4x4 itModelMatrix;
 
@@ -110,10 +109,6 @@ void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
         viewMatrix = camera->d_ptr->viewMatrix();
         projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
     }
-
-    // Calculate scale factor to get uniform font size
-    GLfloat scaledFontSize = 0.05f + m_drawer->font().pointSizeF() / 500.0f;
-    GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     QMatrix4x4 modelMatrix;
     QMatrix4x4 MVPMatrix;
@@ -152,11 +147,44 @@ void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
                                    Utils::vectorFromColor(m_cachedTheme->lightColor()));
 
     m_drawer->drawObject(m_pointShader, m_pointObj);
+}
 
-    //
-    // Draw the label
-    //
+void SelectionPointer::renderSelectionLabel(GLuint defaultFboHandle, bool useOrtho)
+{
+    Q_UNUSED(defaultFboHandle)
+
+    glViewport(m_mainViewPort.x(), m_mainViewPort.y(),
+               m_mainViewPort.width(), m_mainViewPort.height());
+
+    Q3DCamera *camera = m_cachedScene->activeCamera();
+
+    // Get view matrix
+    QMatrix4x4 viewMatrix;
     QMatrix4x4 modelMatrixLabel;
+    QMatrix4x4 projectionMatrix;
+    GLfloat viewPortRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
+    if (m_cachedIsSlicingActivated) {
+        GLfloat sliceUnitsScaled = sliceUnits / m_autoScaleAdjustment;
+        viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
+        projectionMatrix.ortho(-sliceUnitsScaled * viewPortRatio, sliceUnitsScaled * viewPortRatio,
+                               -sliceUnitsScaled, sliceUnitsScaled,
+                               -1.0f, 4.0f);
+    } else if (useOrtho) {
+        viewMatrix = camera->d_ptr->viewMatrix();
+        GLfloat orthoRatio = 2.0f;
+        projectionMatrix.ortho(-viewPortRatio * orthoRatio, viewPortRatio * orthoRatio,
+                               -orthoRatio, orthoRatio,
+                               0.0f, 100.0f);
+    } else {
+        viewMatrix = camera->d_ptr->viewMatrix();
+        projectionMatrix.perspective(45.0f, viewPortRatio, 0.1f, 100.0f);
+    }
+
+    QSize textureSize = m_labelItem.size();
+
+    // Calculate scale factor to get uniform font size
+    GLfloat scaledFontSize = 0.05f + m_drawer->font().pointSizeF() / 500.0f;
+    GLfloat scaleFactor = scaledFontSize / (GLfloat)textureSize.height();
 
     // Position label
     QVector3D labelAlign(0.0f, 1.0f * scaledFontSize + 0.05f, 0.0f);
@@ -183,6 +211,8 @@ void SelectionPointer::render(GLuint defaultFboHandle, bool useOrtho)
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
     m_labelShader->bind();
+
+    QMatrix4x4 MVPMatrix;
 
     // Set shader bindings
     MVPMatrix = projectionMatrix * viewMatrix * modelMatrixLabel;
