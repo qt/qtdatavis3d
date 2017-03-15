@@ -32,29 +32,15 @@
     \page qtdatavisualization-index.html
     \brief Provides functionality for 3D visualization.
 
-    Qt Data Visualization module provides a way to visualize data in 3D.
 
-    \section1 Features
+    Qt Data Visualization module provides a way to visualize data in 3D as bar,
+    scatter, and surface graphs. It is especially useful for visualizing depth
+    maps and large quantities of rapidly changing data, such as data received
+    from multiple sensors. The look and feel of graphs can be customized
+    by using themes or by adding custom items and labels to them.
 
-    \list
-        \li Multiple data visualization options: 3D Bars, 3D Scatter, and 3D Surface
-        \li 2D slice views of the 3D data
-        \li Interactive data: rotate, zoom, and highlight data using mouse or touch
-        \li Uses OpenGL for rendering the data
-        \li QML2 support
-        \li Customizable axes for data
-        \list
-            \li Control viewable data window with axis ranges
-            \li Customize value axis grid lines and labels with axis formatters
-            \li Polar horizontal axes support for surface and scatter graphs
-        \endlist
-        \li Customizable input handling
-        \li Customizable themes
-        \li Custom items and labels can be added to any graph
-        \li Ready-made data proxies to visualize data from Qt item models and height maps
-        \li Perspective and orthographic projections
-        \li Volumetric custom items
-    \endlist
+    Qt Data Visualization is built on Qt 5 and OpenGL to take advantage of
+    hardware acceleration and Qt Quick 2.
 
     \section1 Getting Started
 
@@ -75,13 +61,9 @@
 
     \snippet doc_src_qtdatavisualization.pro 0
 
-    For more information about creating applications that contain different
-    types of graphs, see \l{How to construct a minimal Q3DBars graph},
-    \l{How to construct a minimal Q3DScatter graph}, or
-    \l{How to construct a minimal Q3DSurface graph}.
-
     \section1 Articles
     \list
+        \li \l{Qt Data Visualization Overview}{Overview}
         \li \l{Qt Data Visualization Data Handling}{Data Handling}
         \li \l{Qt Data Visualization Interacting with Data}{Interacting with Data}
         \li \l{Qt Data Visualization Known Issues}{Known Issues}
