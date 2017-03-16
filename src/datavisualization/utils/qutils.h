@@ -38,7 +38,9 @@
 
 namespace QtDataVisualization {
 
+#ifndef Q_QDOC
 static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true) Q_DECL_UNUSED;
+#endif
 static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
 {
     bool isES = false;

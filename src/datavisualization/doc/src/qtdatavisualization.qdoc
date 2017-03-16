@@ -230,7 +230,7 @@
 */
 
 /*!
- * \fn QSurfaceFormat QtDataVisualization::qDefaultSurfaceFormat(bool antialias = true)
+ * \fn QSurfaceFormat QtDataVisualization::qDefaultSurfaceFormat(bool antialias)
  * \relates QAbstract3DGraph
  *
  * This convenience function can be used to create a custom surface format suitable for use by
@@ -239,7 +239,7 @@
  * The \a antialias parameter specifies whether or not antialiasing is activated.
  *
  * Give the surface format returned by this function to the graph constructor (C++) or set
- * it as the window format for QQuickView (QML) before calling show on it.
+ * it as the window format for QQuickView (QML) before calling \c show() on it.
  *
  * For example, disable antialiasing on C++ application:
  *
