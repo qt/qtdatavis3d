@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -35,16 +35,17 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QValue3DAxisFormatter
  * \inmodule QtDataVisualization
- * \brief QValue3DAxisFormatter is base class for value axis formatters.
+ * \brief The QValue3DAxisFormatter class is a base class for value axis
+ * formatters.
  * \since QtDataVisualization 1.1
  *
- * This class provides formatting rules for a linear QValue3DAxis. Subclass it if you
+ * This class provides formatting rules for a linear value 3D axis. Subclass it if you
  * want to implement custom value axes.
  *
  * The base class has no public API beyond constructors and destructors. It is meant to be only
  * used internally. However, subclasses may implement public properties as needed.
  *
- * \sa QLogValue3DAxisFormatter
+ * \sa QValue3DAxis, QLogValue3DAxisFormatter
  */
 
 /*!
@@ -53,11 +54,13 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since QtDataVisualization 1.1
  * \ingroup datavisualization_qml
  * \instantiates QValue3DAxisFormatter
- * \brief ValueAxis3DFormatter is base type for value axis formatters.
+ * \brief A base type for value axis formatters.
  *
- * This type provides formatting rules for a linear ValueAxis3D.
+ * This type provides formatting rules for a linear value 3D axis.
  * This type is the default type for ValueAxis3D and thus never needs to be explicitly created.
- * This type has not public functionality.
+ * This type has no public functionality.
+ *
+ * \sa ValueAxis3D
  */
 
 /*!
@@ -70,7 +73,7 @@ QValue3DAxisFormatter::QValue3DAxisFormatter(QValue3DAxisFormatterPrivate *d, QO
 }
 
 /*!
- * Constructs a new QValue3DAxisFormatter instance with an optional \a parent.
+ * Constructs a new value 3D axis formatter with the optional parent \a parent.
  */
 QValue3DAxisFormatter::QValue3DAxisFormatter(QObject *parent) :
     QObject(parent),
@@ -79,14 +82,14 @@ QValue3DAxisFormatter::QValue3DAxisFormatter(QObject *parent) :
 }
 
 /*!
- * Destroys QValue3DAxisFormatter.
+ * Deletes the value 3D axis formatter.
  */
 QValue3DAxisFormatter::~QValue3DAxisFormatter()
 {
 }
 
 /*!
- * Allow the parent axis to have negative values if \a allow is true.
+ * Allows the parent axis to have negative values if \a allow is \c true.
  */
 void QValue3DAxisFormatter::setAllowNegatives(bool allow)
 {
@@ -94,8 +97,8 @@ void QValue3DAxisFormatter::setAllowNegatives(bool allow)
 }
 
 /*!
- * \return \c true if negative values are valid values for parent axis.
- * The default implementation always returns true.
+ * Returns \c true if negative values are valid values for the parent axis.
+ * The default implementation always returns \c true.
  */
 bool QValue3DAxisFormatter::allowNegatives() const
 {
@@ -103,7 +106,7 @@ bool QValue3DAxisFormatter::allowNegatives() const
 }
 
 /*!
- * Allow the parent axis to have zero value if \a allow is true.
+ * Allows the parent axis to have a zero value if \a allow is \c true.
  */
 void QValue3DAxisFormatter::setAllowZero(bool allow)
 {
@@ -111,8 +114,8 @@ void QValue3DAxisFormatter::setAllowZero(bool allow)
 }
 
 /*!
- * \return \c true if zero is a valid value for parent axis.
- * The default implementation always returns true.
+ * Returns \c true if zero is a valid value for the parent axis.
+ * The default implementation always returns \c true.
  */
 bool QValue3DAxisFormatter::allowZero() const
 {
@@ -120,10 +123,11 @@ bool QValue3DAxisFormatter::allowZero() const
 }
 
 /*!
- * Creates a new empty instance of this formatter. Must be reimplemented in a subclass.
+ * Creates a new empty value 3D axis formatter. Must be reimplemented in a
+ * subclass.
  *
- * \return the new instance. The renderer uses this method to cache a copy of the
- * the formatter. The ownership of the new copy transfers to the caller.
+ * Returns the new formatter. The renderer uses this method to cache a copy of
+ * the formatter. The ownership of the new copy is transferred to the caller.
  */
 QValue3DAxisFormatter *QValue3DAxisFormatter::createNewInstance() const
 {
@@ -131,9 +135,9 @@ QValue3DAxisFormatter *QValue3DAxisFormatter::createNewInstance() const
 }
 
 /*!
- * This method resizes and populates the label and grid line position arrays and the label strings
- * array, as well as calculates any values needed for mapping between value and position.
- * It is allowed to access the parent axis from inside this function.
+ * Resizes and populates the label and grid line position arrays and the label
+ * strings array, as well as calculates any values needed to map a value to its
+ * position. The parent axis can be accessed from inside this function.
  *
  * This method must be reimplemented in a subclass if the default array contents are not suitable.
  *
@@ -148,12 +152,12 @@ void QValue3DAxisFormatter::recalculate()
 }
 
 /*!
- * This method is used to format a string using the specified value and the specified format.
+ * Returns the formatted label string using the specified \a value and
+ * \a format.
+ *
  * Reimplement this method in a subclass to resolve the formatted string for a given \a value
  * if the default formatting rules specified for QValue3DAxis::labelFormat property are not
  * sufficient.
- *
- * \return the formatted label string using a \a value and a \a format.
  *
  * \sa recalculate(), labelStrings(), QValue3DAxis::labelFormat
  */
@@ -163,12 +167,13 @@ QString QValue3DAxisFormatter::stringForValue(qreal value, const QString &format
 }
 
 /*!
- * Reimplement this method if the position cannot be resolved by linear interpolation
- * between the parent axis minimum and maximum values.
+ * Returns the normalized position along the axis for the given \a value.
+ * The returned value should be between \c 0.0 (the minimum value) and
+ * \c 1.0 (the maximum value), inclusive, if the value is within the parent
+ * axis range.
  *
- * \return the normalized position along the axis for the given \a value.
- * The returned value should be between 0.0 (for minimum value) and 1.0 (for maximum value),
- * inclusive, if the value is within the parent axis range.
+ * Reimplement this method if the position cannot be resolved by linear
+ * interpolation between the parent axis minimum and maximum values.
  *
  * \sa recalculate(), valueAt()
  */
@@ -178,12 +183,13 @@ float QValue3DAxisFormatter::positionAt(float value) const
 }
 
 /*!
- * Reimplement this method if the value cannot be resolved by linear interpolation
- * between the parent axis minimum and maximum values.
+ * Returns the value at the normalized \a position along the axis.
+ * The \a position value should be between \c 0.0 (the minimum value) and
+ * \c 1.0 (the maximum value), inclusive, to obtain values within the parent
+ * axis range.
  *
- * \return the value at the normalized \a position along the axis.
- * The \a position value should be between 0.0 (for minimum value) and 1.0 (for maximum value),
- * inclusive to obtain values within the parent axis range.
+ * Reimplement this method if the value cannot be resolved by linear
+ * interpolation between the parent axis minimum and maximum values.
  *
  * \sa recalculate(), positionAt()
  */
@@ -193,12 +199,12 @@ float QValue3DAxisFormatter::valueAt(float position) const
 }
 
 /*!
- * Copies all necessary values for resolving positions, values, and strings with this formatter
- * from this formatter to the \a copy.
- * When reimplementing this method in a subclass, call the the superclass version at some point.
- * The renderer uses this method to cache a copy of the the formatter.
+ * Copies all the values necessary for resolving positions, values, and strings
+ * with this formatter to the \a copy of the formatter. When reimplementing
+ * this method in a subclass, call the superclass version at some point.
+ * The renderer uses this method to cache a copy of the formatter.
  *
- * \return the new copy. The ownership of the new copy transfers to the caller.
+ * Returns the new copy. The ownership of the new copy transfers to the caller.
  */
 void QValue3DAxisFormatter::populateCopy(QValue3DAxisFormatter &copy) const
 {
@@ -208,8 +214,8 @@ void QValue3DAxisFormatter::populateCopy(QValue3DAxisFormatter &copy) const
 /*!
  * Marks this formatter dirty, prompting the renderer to make a new copy of its cache on the next
  * renderer synchronization. This method should be called by a subclass whenever the formatter
- * is changed in a way that affects the resolved values. Specify \c true for \a labelsChange
- * parameter if the change was such that it requires regenerating the parent axis label strings.
+ * is changed in a way that affects the resolved values. Set \a labelsChange to
+ * \c true if the change requires regenerating the parent axis label strings.
  */
 void QValue3DAxisFormatter::markDirty(bool labelsChange)
 {
@@ -217,7 +223,7 @@ void QValue3DAxisFormatter::markDirty(bool labelsChange)
 }
 
 /*!
- * \return the parent axis. The parent axis must only be accessed in recalculate()
+ * Returns the parent axis. The parent axis must only be accessed in the recalculate()
  * method to maintain thread safety in environments using a threaded renderer.
  *
  * \sa recalculate()
@@ -228,10 +234,11 @@ QValue3DAxis *QValue3DAxisFormatter::axis() const
 }
 
 /*!
- * \return a reference to the array of normalized grid line positions.
+ * Returns a reference to the array of normalized grid line positions.
  * The default array size is equal to the segment count of the parent axis plus one, but
- * a subclassed implementation of recalculate method may resize the array differently.
- * The values should be between 0.0 (for minimum value) and 1.0 (for maximum value), inclusive.
+ * a subclassed implementation of the recalculate() method may resize the array differently.
+ * The values should be between \c 0.0 (the minimum value) and \c 1.0 (the
+ * maximum value), inclusive.
  *
  * \sa QValue3DAxis::segmentCount, recalculate()
  */
@@ -241,11 +248,12 @@ QVector<float> &QValue3DAxisFormatter::gridPositions() const
 }
 
 /*!
- * \return a reference to the array of normalized subgrid line positions.
- * The default array size is equal to segment count of the parent axis times sub-segment count
- * of the parent axis minus one, but a subclassed implementation of recalculate method may resize
- * the array differently.
- * The values should be between 0.0 (for minimum value) and 1.0 (for maximum value), inclusive.
+ * Returns a reference to the array of normalized subgrid line positions.
+ * The default array size is equal to the segment count of the parent axis times
+ * the sub-segment count of the parent axis minus one, but a subclassed
+ * implementation of the recalculate() method may resize the array differently.
+ * The values should be between \c 0.0 (the minimum value) and \c 1.0 (the
+ * maximum value), inclusive.
  *
  * \sa QValue3DAxis::segmentCount, QValue3DAxis::subSegmentCount, recalculate()
  */
@@ -255,11 +263,12 @@ QVector<float> &QValue3DAxisFormatter::subGridPositions() const
 }
 
 /*!
- * \return a reference to the array of normalized label positions.
+ * Returns a reference to the array of normalized label positions.
  * The default array size is equal to the segment count of the parent axis plus one, but
- * a subclassed implementation of recalculate method may resize the array differently.
- * The values should be between 0.0 (for minimum value) and 1.0 (for maximum value), inclusive.
- * The default behavior is that the label at the index zero corresponds to the minimum value
+ * a subclassed implementation of the recalculate() method may resize the array
+ * differently. The values should be between \c 0.0 (the minimum value) and
+ * \c 1.0 (the maximum value), inclusive.
+ * By default, the label at the index zero corresponds to the minimum value
  * of the axis.
  *
  * \sa QValue3DAxis::segmentCount, QAbstract3DAxis::labels, recalculate()
@@ -270,9 +279,9 @@ QVector<float> &QValue3DAxisFormatter::labelPositions() const
 }
 
 /*!
- * \return a reference to the string list containing formatter label strings.
- * The array size must be equal to the size of the label positions array and
- * the indexes correspond to that array as well.
+ * Returns a reference to the string list containing formatter label strings.
+ * The array size must be equal to the size of the label positions array, which
+ * the indexes also correspond to.
  *
  * \sa labelPositions()
  */
@@ -296,7 +305,7 @@ void QValue3DAxisFormatter::setLocale(const QLocale &locale)
     markDirty(true);
 }
 /*!
- * \return the current locale this formatter is using.
+ * Returns the current locale this formatter is using.
  */
 QLocale QValue3DAxisFormatter::locale() const
 {

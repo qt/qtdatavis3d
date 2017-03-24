@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -36,12 +36,11 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QLogValue3DAxisFormatter
  * \inmodule QtDataVisualization
- * \brief QLogValue3DAxisFormatter implements logarithmic value axis formatter.
+ * \brief The QLogValue3DAxisFormatter class provides formatting rules for a
+ * logarithmic value axis.
  * \since QtDataVisualization 1.1
  *
- * This class provides formatting rules for a logarithmic QValue3DAxis.
- *
- * When a QLogValue3DAxisFormatter is attached to a QValue3DAxis, the axis range
+ * When a formatter is attached to a value axis, the axis range
  * cannot include negative values or the zero.
  *
  * \sa QValue3DAxisFormatter
@@ -54,10 +53,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QLogValue3DAxisFormatter
  * \inherits ValueAxis3DFormatter
- * \brief LogValueAxis3DFormatter implements logarithmic value axis formatter.
+ * \brief Provides formatting rules for a logarithmic value axis.
  *
- * This type provides formatting rules for a logarithmic ValueAxis3D.
- * When a LogValueAxis3DFormatter is attached to a ValueAxis3D, the axis range
+ * When a formatter is attached to a value axis, the axis range
  * cannot include negative values or the zero.
  */
 
@@ -66,10 +64,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * The base of the logarithm used to map axis values. If the base is non-zero, the parent axis
  * segment count will be ignored when the grid line and label positions are calculated.
- * If you want the range to be divided into equal segments like normal value axis, set this
+ * If you want the range to be divided into equal segments like a normal value axis, set this
  * property value to zero.
  *
- * The base has to be zero or positive value and not equal to one.
+ * The base has to be zero or a positive value and it cannot be equal to one.
  * Defaults to ten.
  *
  * \sa ValueAxis3D::segmentCount
@@ -82,9 +80,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * If this property value is set to \c true, the parent axis sub-segment count is ignored
  * when calculating sub-grid line positions. The sub-grid positions are generated automatically
- * according to the base property value.
- * The number of sub-grid lines is set to base value minus one, rounded down.
- * This property is ignored when base property value is zero.
+ * according to the \l base property value.
+ * The number of sub-grid lines is set to the base value minus one, rounded down.
+ * This property is ignored when the base value is zero.
  * Defaults to \c true.
  *
  * \sa base, ValueAxis3D::subSegmentCount
@@ -95,9 +93,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * Defines whether the first and last label on the axis are visible.
  *
- * When the base property value is non-zero, the whole axis range is often not equally divided into
+ * When the \l base property value is non-zero, the whole axis range is often
+ * not equally divided into
  * segments. The first and last segments are often smaller than the other segments.
- * In extreme cases this can lead to overlapping labels on the first and last two grid lines.
+ * In extreme cases, this can lead to overlapping labels on the first and last two grid lines.
  * By setting this property to \c false, you can suppress showing the minimum and maximum labels
  * for the axis in cases where the segments do not exactly fit the axis.
  * Defaults to \c true.
@@ -117,7 +116,8 @@ QLogValue3DAxisFormatter::QLogValue3DAxisFormatter(QLogValue3DAxisFormatterPriva
 }
 
 /*!
- * Constructs a new QLogValue3DAxisFormatter instance with optional \a parent.
+ * Constructs a new logarithmic value 3D axis formatter with the optional
+ * parent \a parent.
  */
 QLogValue3DAxisFormatter::QLogValue3DAxisFormatter(QObject *parent) :
     QValue3DAxisFormatter(new QLogValue3DAxisFormatterPrivate(this), parent)
@@ -127,7 +127,7 @@ QLogValue3DAxisFormatter::QLogValue3DAxisFormatter(QObject *parent) :
 }
 
 /*!
- * Destroys QLogValue3DAxisFormatter.
+ * Deletes the logarithmic value 3D axis formatter.
  */
 QLogValue3DAxisFormatter::~QLogValue3DAxisFormatter()
 {
@@ -140,10 +140,10 @@ QLogValue3DAxisFormatter::~QLogValue3DAxisFormatter()
  *
  * If the base is non-zero, the parent axis
  * segment count will be ignored when the grid line and label positions are calculated.
- * If you want the range to be divided into equal segments like normal value axis, set this
+ * If you want the range to be divided into equal segments like a normal value axis, set this
  * property value to zero.
  *
- * The base has to be zero or positive value and not equal to one.
+ * The base has to be zero or a positive value and it cannot be equal to one.
  * Defaults to ten.
  *
  * \sa QValue3DAxis::segmentCount
@@ -174,9 +174,9 @@ qreal QLogValue3DAxisFormatter::base() const
  *
  * If this property value is set to \c true, the parent axis sub-segment count is ignored
  * when calculating sub-grid line positions. The sub-grid positions are generated automatically
- * according to the base property value.
- * The number of sub-grid lines is set to base value minus one, rounded down.
- * This property is ignored when base property value is zero.
+ * according to the \l base property value. The number of sub-grid lines is set
+ * to the base value minus one, rounded down. This property is ignored when the
+ * base value is zero.
  * Defaults to \c true.
  *
  * \sa base, QValue3DAxis::subSegmentCount
@@ -200,9 +200,10 @@ bool QLogValue3DAxisFormatter::autoSubGrid() const
  *
  * \brief Whether the first and last label on the axis are visible.
  *
- * When the base property value is non-zero, the whole axis range is often not equally divided into
+ * When the \l base property value is non-zero, the whole axis range is often
+ * not equally divided into
  * segments. The first and last segments are often smaller than the other segments.
- * In extreme cases this can lead to overlapping labels on the first and last two grid lines.
+ * In extreme cases, this can lead to overlapping labels on the first and last two grid lines.
  * By setting this property to \c false, you can suppress showing the minimum and maximum labels
  * for the axis in cases where the segments do not exactly fit the axis.
  * Defaults to \c true.
