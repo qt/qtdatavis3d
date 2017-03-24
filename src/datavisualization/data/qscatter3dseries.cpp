@@ -35,11 +35,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QScatter3DSeries
  * \inmodule QtDataVisualization
- * \brief Base series class for Q3DScatter.
+ * \brief The QScatter3DSeries class represents a data series in a 3D scatter
+ * graph.
  * \since QtDataVisualization 1.0
  *
- * QScatter3DSeries manages the series specific visual elements, as well as series data
- * (via data proxy).
+ * This class manages the series specific visual elements, as well as the series
+ * data (via a data proxy).
  *
  * If no data proxy is set explicitly for the series, the series creates a default
  * proxy. Setting another proxy will destroy the existing proxy and all data added to it.
@@ -47,20 +48,23 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * QScatter3DSeries supports the following format tags for QAbstract3DSeries::setItemLabelFormat():
  * \table
  *   \row
- *     \li @xTitle    \li Title from X axis
+ *     \li @xTitle    \li Title from x-axis
  *   \row
- *     \li @yTitle    \li Title from Y axis
+ *     \li @yTitle    \li Title from y-axis
  *   \row
- *     \li @zTitle    \li Title from Z axis
+ *     \li @zTitle    \li Title from z-axis
  *   \row
- *     \li @xLabel    \li Item value formatted using the same format the X axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @xLabel    \li Item value formatted using the format of the x-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
- *     \li @yLabel    \li Item value formatted using the same format the Y axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @yLabel    \li Item value formatted using the format of the y-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
- *     \li @zLabel    \li Item value formatted using the same format the Z axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @zLabel    \li Item value formatted using the format of the z-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
  *     \li @seriesName \li Name of the series
  * \endtable
@@ -78,12 +82,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QScatter3DSeries
  * \inherits Abstract3DSeries
- * \brief Base series type for Scatter3D.
+ * \brief Represents a data series in a 3D scatter graph.
  *
- * This type  manages the series specific visual elements, as well as series data
- * (via data proxy).
+ * This type manages the series specific visual elements, as well as the series
+ * data (via a data proxy).
  *
- * For more complete description, see QScatter3DSeries.
+ * For a more complete description, see QScatter3DSeries.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -101,7 +105,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * The item that is selected at the index in the data array of the series.
  * Only one item can be selected at a time.
- * To clear selection from this series, set invalidSelectionIndex as the index.
+ * To clear selection from this series, invalidSelectionIndex is set as the index.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
@@ -122,14 +126,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty int Scatter3DSeries::invalidSelectionIndex
- * A constant property providing an invalid index for selection. Set this index to
- * selectedItem property if you want to clear the selection from this series.
+ * A constant property providing an invalid index for selection. This index is
+ * set to the selectedItem property to clear the selection from this series.
  *
  * \sa AbstractGraph3D::clearSelection()
  */
 
 /*!
- * Constructs QScatter3DSeries with the given \a parent.
+ * Constructs a scatter 3D series with the parent \a parent.
  */
 QScatter3DSeries::QScatter3DSeries(QObject *parent) :
     QAbstract3DSeries(new QScatter3DSeriesPrivate(this), parent)
@@ -139,7 +143,8 @@ QScatter3DSeries::QScatter3DSeries(QObject *parent) :
 }
 
 /*!
- * Constructs QScatter3DSeries with the given \a dataProxy and the \a parent.
+ * Constructs a scatter 3D series with the data proxy \a dataProxy and the
+ * parent \a parent.
  */
 QScatter3DSeries::QScatter3DSeries(QScatterDataProxy *dataProxy, QObject *parent) :
     QAbstract3DSeries(new QScatter3DSeriesPrivate(this), parent)
@@ -156,7 +161,7 @@ QScatter3DSeries::QScatter3DSeries(QScatter3DSeriesPrivate *d, QObject *parent) 
 }
 
 /*!
- * Destroys QScatter3DSeries.
+ * Deletes the scatter 3D series.
  */
 QScatter3DSeries::~QScatter3DSeries()
 {
@@ -194,7 +199,7 @@ QScatterDataProxy *QScatter3DSeries::dataProxy() const
  * Selects the item at the index \a index in the data array of the series.
  * Only one item can be selected at a time.
  *
- * To clear selection from this series, set invalidSelectionIndex() as \a index.
+ * To clear selection from this series, invalidSelectionIndex() is set as \a index.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting an item on another added series will also
  * clear the selection.
@@ -245,8 +250,8 @@ float QScatter3DSeries::itemSize() const
 }
 
 /*!
- * \return an invalid index for selection. Set this index to selectedItem property if you
- * want to clear the selection from this series.
+ * Returns an invalid index for selection. This index is set to the selectedItem
+ * property to clear the selection from this series.
  *
  * \sa QAbstract3DGraph::clearSelection()
  */

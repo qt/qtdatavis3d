@@ -36,11 +36,13 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QAbstract3DSeries
  * \inmodule QtDataVisualization
- * \brief Base class for all QtDataVisualization series.
+ * \brief The QAbstract3DSeries class is a base class for all data series.
  * \since QtDataVisualization 1.0
  *
- * You use the visualization type specific inherited classes instead of the base class.
- * \sa QBar3DSeries, QScatter3DSeries, QSurface3DSeries, {Qt Data Visualization Data Handling}
+ * There are inherited classes for each supported series type: QBar3DSeries,
+ * QScatter3DSeries, and QSurface3DSeries.
+ *
+ * For more information, see \l{Qt Data Visualization Data Handling}.
  */
 
 /*!
@@ -59,13 +61,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QAbstract3DSeries
- * \brief Base type for all QtDataVisualization series.
+ * \brief A base type for all data series.
  *
- * This type is uncreatable, but contains properties that are exposed via subtypes.
+ * This type is uncreatable, but contains properties that are exposed via the
+ * following subtypes: Bar3DSeries, Scatter3DSeries, and Surface3DSeries.
  *
- * For Abstract3DSeries enums, see \l QAbstract3DSeries::SeriesType and \l{QAbstract3DSeries::Mesh}.
- *
- * \sa Bar3DSeries, Scatter3DSeries, Surface3DSeries, {Qt Data Visualization Data Handling}
+ * For more information, see \l{Qt Data Visualization Data Handling}.
  */
 
 /*!
@@ -112,21 +113,22 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *         Arrow pointing upwards.
  *  \value MeshPoint
  *         2D point. Usable only with Q3DScatter.
- *         \b Note: Shadows do not affect this style. Color style Q3DTheme::ColorStyleObjectGradient
+ *         Shadows do not affect this style. Color style Q3DTheme::ColorStyleObjectGradient
  *         is not supported by this style.
  */
 
 /*!
  * \qmlproperty Abstract3DSeries.SeriesType Abstract3DSeries::type
- * The type of the series.
+ * The type of the series. One of the QAbstract3DSeries::SeriesType values.
+ *
  */
 
 /*!
  * \qmlproperty string Abstract3DSeries::itemLabelFormat
  *
  * The label format for data items in this series. This format is used for single item labels,
- * for example, when an item is selected. How the format is interpreted depends on series type. See
- * each series class documentation for more information.
+ * for example, when an item is selected. How the format is interpreted depends
+ * on series type: Bar3DSeries, Scatter3DSeries, Surface3DSeries.
  */
 
 /*!
@@ -141,13 +143,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Surface3DSeries. If the mesh is \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined},
  * then the userDefinedMesh property must also be set for items to render properly.
  * The default value depends on the graph type.
+ *
+ * \sa QAbstract3DSeries::Mesh
  */
 
 /*!
  * \qmlproperty bool Abstract3DSeries::meshSmooth
  *
  * If \c true, smooth versions of predefined meshes set via the \l mesh property are used.
- * This property doesn't affect custom meshes used when mesh is
+ * This property does not affect custom meshes used when the mesh is set to
  * \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined}.
  * Defaults to \c{false}.
  */
@@ -159,7 +163,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * The rotation should be a normalized quaternion.
  * For those series types that support item specific rotation, the rotations are
  * multiplied together.
- * Bar3DSeries ignores any rotation that is not around Y-axis.
+ * Bar3DSeries ignores any rotation that is not around the y-axis.
  * Surface3DSeries applies the rotation only to the selection pointer.
  * Defaults to no rotation.
  */
@@ -167,10 +171,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string Abstract3DSeries::userDefinedMesh
  *
- * Sets the filename for user defined custom mesh for objects that is used when \l mesh
+ * Sets the filename for a user defined custom mesh for objects that is used when \l mesh
  * is \l{QAbstract3DSeries::MeshUserDefined}{Abstract3DSeries.MeshUserDefined}.
- * \note The file needs to be in Wavefront obj format and include
- * vertices, normals and UVs. It also needs to be in triangles.
+ * \note The file needs to be in the Wavefront OBJ format and include
+ * vertices, normals, and UVs. It also needs to be in triangles.
  */
 
 /*!
@@ -182,7 +186,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty Color Abstract3DSeries::baseColor
+ * \qmlproperty color Abstract3DSeries::baseColor
  *
  * Sets the base color of the series.
  *
@@ -198,7 +202,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty Color Abstract3DSeries::singleHighlightColor
+ * \qmlproperty color Abstract3DSeries::singleHighlightColor
  *
  * Sets the single item highlight color of the series.
  *
@@ -214,7 +218,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * \qmlproperty Color Abstract3DSeries::multiHighlightColor
+ * \qmlproperty color Abstract3DSeries::multiHighlightColor
  *
  * Sets the multiple item highlight color of the series.
  *
@@ -233,7 +237,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string Abstract3DSeries::name
  *
  * The series name.
- * Series name can be used in item label format with tag \c{@seriesName}.
+ * It can be used in item label format with the tag \c{@seriesName}.
  *
  * \sa itemLabelFormat
  */
@@ -252,9 +256,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty bool Abstract3DSeries::itemLabelVisible
  * \since QtDataVisualization 1.1
  *
- * If \c true, item labels are drawn as floating labels in the graph. Otherwise item labels are not
- * drawn. If you prefer to show the item label in an external control, set this property to
- * \c false. Defaults to \c true.
+ * If \c true, item labels are drawn as floating labels in the graph. Otherwise,
+ * item labels are not drawn. To show the item label in an external control,
+ * this property is set to \c false. Defaults to \c true.
  *
  * \sa itemLabelFormat, itemLabel
  */
@@ -262,7 +266,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlmethod void Abstract3DSeries::setMeshAxisAndAngle(vector3d axis, real angle)
  *
- * A convenience function to construct mesh rotation quaternion from axis and angle.
+ * A convenience function to construct a mesh rotation quaternion from \a axis
+ * and \a angle.
  *
  * \sa meshRotation
  */
@@ -277,7 +282,7 @@ QAbstract3DSeries::QAbstract3DSeries(QAbstract3DSeriesPrivate *d, QObject *paren
 }
 
 /*!
- * Destroys QAbstract3DSeries.
+ * Deletes the abstract 3D series.
  */
 QAbstract3DSeries::~QAbstract3DSeries()
 {
@@ -299,10 +304,8 @@ QAbstract3DSeries::SeriesType QAbstract3DSeries::type() const
  * \brief The label format for data items in this series.
  *
  * This format is used for single item labels,
- * for example, when an item is selected. How the format is interpreted depends on series type. See
- * each series class documentation for more information.
- *
- * \sa QBar3DSeries, QScatter3DSeries, QSurface3DSeries
+ * for example, when an item is selected. How the format is interpreted depends
+ * on series type: QBar3DSeries, QScatter3DSeries, QSurface3DSeries.
  */
 void QAbstract3DSeries::setItemLabelFormat(const QString &format)
 {
@@ -371,8 +374,8 @@ QAbstract3DSeries::Mesh QAbstract3DSeries::mesh() const
  * \brief Whether smooth versions of predefined meshes are used.
  *
  * If \c true, smooth versions set via the \l mesh property are used.
- * This property doesn't affect custom meshes used when mesh is MeshUserDefined.
- * Defaults to \c{false}.
+ * This property does not affect custom meshes used when the mesh is set to
+ * MeshUserDefined. Defaults to \c{false}.
  */
 void QAbstract3DSeries::setMeshSmooth(bool enable)
 {
@@ -395,7 +398,7 @@ bool QAbstract3DSeries::isMeshSmooth() const
  * The rotation should be a normalized QQuaternion.
  * For those series types that support item specific rotation, the rotations are
  * multiplied together.
- * QBar3DSeries ignores any rotation that is not around Y-axis.
+ * QBar3DSeries ignores any rotation that is not around the y-axis.
  * QSurface3DSeries applies the rotation only to the selection pointer.
  * Defaults to no rotation.
  */
@@ -413,7 +416,8 @@ QQuaternion QAbstract3DSeries::meshRotation() const
 }
 
 /*!
- * A convenience function to construct mesh rotation quaternion from \a axis and \a angle.
+ * A convenience function to construct a mesh rotation quaternion from
+ * \a axis and \a angle.
  *
  * \sa meshRotation
  */
@@ -428,8 +432,8 @@ void QAbstract3DSeries::setMeshAxisAndAngle(const QVector3D &axis, float angle)
  * \brief The filename for a user defined custom mesh for objects.
  *
  * The custom mesh is used when \l mesh is MeshUserDefined.
- * \note The file needs to be in Wavefront obj format and include
- * vertices, normals and UVs. It also needs to be in triangles.
+ * \note The file needs to be in the Wavefront OBJ format and include
+ * vertices, normals, and UVs. It also needs to be in triangles.
  */
 void QAbstract3DSeries::setUserDefinedMesh(const QString &fileName)
 {
@@ -635,9 +639,9 @@ QString QAbstract3DSeries::itemLabel() const
  *
  * \brief The visibility of item labels in the graph.
  *
- * If \c true, item labels are drawn as floating labels in the graph. Otherwise item labels are not
- * drawn. If you prefer to show the item label in an external control, set this property to
- * \c false. Defaults to \c true.
+ * If \c true, item labels are drawn as floating labels in the graph. Otherwise,
+ * item labels are not drawn. To show the item label in an external control,
+ * this property is set to \c false. Defaults to \c true.
  *
  * \sa itemLabelFormat, itemLabel
  */

@@ -35,35 +35,39 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QSurface3DSeries
  * \inmodule QtDataVisualization
- * \brief Base series class for Q3DSurface.
+ * \brief The QSurface3DSeries class represents a data series in a 3D surface
+ * graph.
  * \since QtDataVisualization 1.0
  *
- * QSurface3DSeries manages the series specific visual elements, as well as series data
- * (via data proxy).
+ * This class manages the series specific visual elements, as well as the series
+ * data (via a data proxy).
  *
  * If no data proxy is set explicitly for the series, the series creates a default
  * proxy. Setting another proxy will destroy the existing proxy and all data added to it.
  *
- * The object mesh set via QAbstract3DSeries::mesh property defines the selection
- * pointer shape in surface series.
+ * The object mesh set via the QAbstract3DSeries::mesh property defines the selection
+ * pointer shape in a surface series.
  *
  * QSurface3DSeries supports the following format tags for QAbstract3DSeries::setItemLabelFormat():
  * \table
  *   \row
- *     \li @xTitle    \li Title from X axis
+ *     \li @xTitle    \li Title from x-axis
  *   \row
- *     \li @yTitle    \li Title from Y axis
+ *     \li @yTitle    \li Title from y-axis
  *   \row
- *     \li @zTitle    \li Title from Z axis
+ *     \li @zTitle    \li Title from z-axis
  *   \row
- *     \li @xLabel    \li Item value formatted using the same format as the X axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @xLabel    \li Item value formatted using the format of the x-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
- *     \li @yLabel    \li Item value formatted using the same format as the Y axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @yLabel    \li Item value formatted using the format of the y-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
- *     \li @zLabel    \li Item value formatted using the same format as the Z axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @zLabel    \li Item value formatted using the format of the z-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
  *     \li @seriesName \li Name of the series
  * \endtable
@@ -81,14 +85,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QSurface3DSeries
  * \inherits Abstract3DSeries
- * \brief Base series type for Surfaces3D.
+ * \brief Represents a data series in a 3D surface graph.
  *
- * This type  manages the series specific visual elements, as well as series data
- * (via data proxy).
+ * This type manages the series specific visual elements, as well as the series
+ * data (via a data proxy).
  *
- * For Surface3DSeries enums, see \l{QSurface3DSeries::DrawFlag}.
- *
- * For more complete description, see QSurface3DSeries.
+ * For a more complete description, see QSurface3DSeries.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -108,7 +110,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * in the data array of the series as selected.
  * Only one point can be selected at a time.
  *
- * To clear selection from this series, set invalidSelectionPosition as the position.
+ * To clear selection from this series, invalidSelectionPosition is set as the position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
  *
@@ -121,7 +123,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty point Surface3DSeries::invalidSelectionPosition
  * A constant property providing an invalid selection position.
- * Set this to the selectedPoint property to clear the selection from this series.
+ * This position is set to the selectedPoint property to clear the selection
+ * from this series.
  *
  * \sa AbstractGraph3D::clearSelection()
  */
@@ -158,8 +161,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string Surface3DSeries::textureFile
  *
- * The texture file name for the surface texture. To clear the texture, set an empty
- * file name.
+ * The texture file name for the surface texture. To clear the texture, an empty
+ * file name is set.
  */
 
 
@@ -178,7 +181,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * Constructs QSurface3DSeries with the given \a parent.
+ * Constructs a surface 3D series with the parent \a parent.
  */
 QSurface3DSeries::QSurface3DSeries(QObject *parent) :
     QAbstract3DSeries(new QSurface3DSeriesPrivate(this), parent)
@@ -188,7 +191,8 @@ QSurface3DSeries::QSurface3DSeries(QObject *parent) :
 }
 
 /*!
- * Constructs QSurface3DSeries with the given \a dataProxy and the \a parent.
+ * Constructs a surface 3D series with the data proxy \a dataProxy and the
+ * parent \a parent.
  */
 QSurface3DSeries::QSurface3DSeries(QSurfaceDataProxy *dataProxy, QObject *parent) :
     QAbstract3DSeries(new QSurface3DSeriesPrivate(this), parent)
@@ -205,7 +209,7 @@ QSurface3DSeries::QSurface3DSeries(QSurface3DSeriesPrivate *d, QObject *parent) 
 }
 
 /*!
- * Destroys QSurface3DSeries.
+ * Deletes the surface 3D series.
  */
 QSurface3DSeries::~QSurface3DSeries()
 {
@@ -242,7 +246,7 @@ QSurfaceDataProxy *QSurface3DSeries::dataProxy() const
  *
  * Only one point can be selected at a time.
  *
- * To clear selection from this series, set invalidSelectionPosition() as \a position.
+ * To clear selection from this series, invalidSelectionPosition() is set as \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
  *
@@ -266,7 +270,7 @@ QPoint QSurface3DSeries::selectedPoint() const
 }
 
 /*!
- * Returns the a QPoint signifying an invalid selection position. Set this to
+ * Returns the QPoint signifying an invalid selection position. This is set to
  * the selectedPoint property to clear the selection from this series.
  *
  * \sa QAbstract3DGraph::clearSelection()
