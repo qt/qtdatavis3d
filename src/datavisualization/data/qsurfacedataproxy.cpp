@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -36,38 +36,41 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QSurfaceDataProxy
  * \inmodule QtDataVisualization
- * \brief Base proxy class for Q3DSurface.
+ * \brief The QSurfaceDataProxy class is the data proxy for a 3D surface graph.
  * \since QtDataVisualization 1.0
  *
- * QSurfaceDataProxy takes care of surface related data handling. The QSurfaceDataProxy handles the
- * data in rows and for this it provides two auxiliary typedefs. QSurfaceDataArray is a QList for
- * controlling the rows. For rows there is a QVector QSurfaceDataRow which contains QSurfaceDataItem
- * objects. See Q3DSurface documentation and basic sample code there how to feed the data for the
- * QSurfaceDataProxy.
+ * A surface data proxy handles surface related data in rows. For this it
+ * provides two auxiliary typedefs: QtDataVisualization::QSurfaceDataArray and
+ * QtDataVisualization::QSurfaceDataRow. \c QSurfaceDataArray is a QList that
+ * controls the rows. \c QSurfaceDataRow is a QVector that contains
+ * QSurfaceDataItem objects. For more information about how to feed the data to
+ * the proxy, see the sample code in the Q3DSurface documentation.
  *
  * All rows must have the same number of items.
  *
- * QSurfaceDataProxy takes ownership of all QSurfaceDataRows passed to it, whether directly or
- * in a QSurfaceDataArray container.
- * If you use QSurfaceDataRow pointers to directly modify data after adding the array to the proxy,
- * you must also emit proper signal to make the graph update.
+ * QSurfaceDataProxy takes ownership of all \c QSurfaceDataRow objects passed to
+ * it, whether directly or in a \c QSurfaceDataArray container.
+ * To use surface data row pointers to directly modify data after adding the
+ * array to the proxy, the appropriate signal must be emitted to update the
+ * graph.
  *
- * To make a sensible surface, the X-value of each successive item in all rows must be
+ * To make a sensible surface, the x-value of each successive item in all rows must be
  * either ascending or descending throughout the row.
- * Similarly, the Z-value of each successive item in all columns must be either ascending or
+ * Similarly, the z-value of each successive item in all columns must be either ascending or
  * descending throughout the column.
  *
  * \note Currently only surfaces with straight rows and columns are fully supported. Any row
- * with items that do not have the exact same Z-value or any column with items that do not have
- * the exact same X-value may get clipped incorrectly if the whole surface doesn't completely fit
- * in the visible X or Z axis ranges.
+ * with items that do not have the exact same z-value or any column with items
+ * that do not have the exact same x-value may get clipped incorrectly if the
+ * whole surface does not completely fit within the visible x-axis or z-axis
+ * ranges.
  *
  * \note Surfaces with less than two rows or columns are not considered valid surfaces and will
  * not be rendered.
  *
  * \note On some environments, surfaces with a lot of visible vertices may not render, because
  * they exceed the per-draw vertex count supported by the graphics driver.
- * This is mostly an issue on 32bit and/or OpenGL ES2 platforms.
+ * This is mostly an issue on 32-bit and OpenGL ES2 platforms.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -76,14 +79,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \typedef QtDataVisualization::QSurfaceDataRow
  * \relates QSurfaceDataProxy
  *
- * A vector of \l {QSurfaceDataItem}s.
+ * A vector of \l {QSurfaceDataItem} objects.
  */
 
 /*!
  * \typedef QtDataVisualization::QSurfaceDataArray
  * \relates QSurfaceDataProxy
  *
- * A list of pointers to \l {QSurfaceDataRow}s.
+ * A list of pointers to \l {QSurfaceDataRow} objects.
  */
 
 /*!
@@ -93,7 +96,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QSurfaceDataProxy
  * \inherits AbstractDataProxy
- * \brief Base proxy class for Surface3D.
+ * \brief The data proxy for a 3D surface graph.
  *
  * This type handles surface data items. The data is arranged into rows and columns, and all rows must have
  * the same number of columns.
@@ -138,7 +141,7 @@ QSurfaceDataProxy::QSurfaceDataProxy(QSurfaceDataProxyPrivate *d, QObject *paren
 }
 
 /*!
- * Destroys QSurfaceDataProxy.
+ * Deletes the surface data proxy.
  */
 QSurfaceDataProxy::~QSurfaceDataProxy()
 {
@@ -155,9 +158,10 @@ QSurface3DSeries *QSurfaceDataProxy::series() const
 }
 
 /*!
- * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
- * different from the existing array. If it's the same array, this just triggers arrayReset()
- * signal.
+ * Takes ownership of the array \a newArray. Clears the existing array if the
+ * new array differs from it. If the arrays are the same, this function
+ * just triggers the arrayReset() signal.
+ *
  * Passing a null array deletes the old array and creates a new empty array.
  * All rows in \a newArray must be of same length.
  */
@@ -172,8 +176,9 @@ void QSurfaceDataProxy::resetArray(QSurfaceDataArray *newArray)
 }
 
 /*!
- * Changes existing row by replacing a row at \a rowIndex with a new \a row. The \a row can be
- * the same as the existing row already stored at the \a rowIndex. The new \a row must have
+ * Changes an existing row by replacing the row at the position \a rowIndex
+ * with the new row specified by \a row. The new row can be the same as the
+ * existing row already stored at the \a rowIndex. The new row must have
  * the same number of columns as the row it is replacing.
  */
 void QSurfaceDataProxy::setRow(int rowIndex, QSurfaceDataRow *row)
@@ -183,7 +188,8 @@ void QSurfaceDataProxy::setRow(int rowIndex, QSurfaceDataRow *row)
 }
 
 /*!
- * Changes existing rows by replacing a rows starting at \a rowIndex with \a rows.
+ * Changes existing rows by replacing the rows starting at the position
+ * \a rowIndex with the new rows specifies by \a rows.
  * The rows in the \a rows array can be the same as the existing rows already
  * stored at the \a rowIndex. The new rows must have the same number of columns
  * as the rows they are replacing.
@@ -195,7 +201,8 @@ void QSurfaceDataProxy::setRows(int rowIndex, const QSurfaceDataArray &rows)
 }
 
 /*!
- * Changes a single item at \a rowIndex, \a columnIndex to the \a item.
+ * Changes a single item at the position specified by \a rowIndex and
+ * \a columnIndex to the item \a item.
  */
 void QSurfaceDataProxy::setItem(int rowIndex, int columnIndex, const QSurfaceDataItem &item)
 {
@@ -204,8 +211,9 @@ void QSurfaceDataProxy::setItem(int rowIndex, int columnIndex, const QSurfaceDat
 }
 
 /*!
- * Changes a single item at \a position to the \a item.
- * The X-value of \a position indicates the row and the Y-value indicates the column.
+ * Changes a single item at the position \a position to the item \a item.
+ * The x-value of \a position indicates the row and the y-value indicates the
+ * column.
  */
 void QSurfaceDataProxy::setItem(const QPoint &position, const QSurfaceDataItem &item)
 {
@@ -213,8 +221,8 @@ void QSurfaceDataProxy::setItem(const QPoint &position, const QSurfaceDataItem &
 }
 
 /*!
- * Adds a new \a row to the end of array. The new \a row must have
- * the same number of columns as the rows at the initial array.
+ * Adds the new row \a row to the end of an array. The new row must have
+ * the same number of columns as the rows in the initial array.
  *
  * Returns the index of the added row.
  */
@@ -227,8 +235,8 @@ int QSurfaceDataProxy::addRow(QSurfaceDataRow *row)
 }
 
 /*!
- * Adds new \a rows to the end of array. The new rows must have the same number of columns
- * as the rows at the initial array.
+ * Adds new \a rows to the end of an array. The new rows must have the same
+ * number of columns as the rows in the initial array.
  *
  * Returns the index of the first added row.
  */
@@ -241,9 +249,10 @@ int QSurfaceDataProxy::addRows(const QSurfaceDataArray &rows)
 }
 
 /*!
- * Inserts a new \a row into \a rowIndex.
- * If rowIndex is equal to array size, rows are added to end of the array. The new \a row must have
- * the same number of columns as the rows at the initial array.
+ * Inserts the new row \a row into \a rowIndex.
+ * If \a rowIndex is equal to the array size, the rows are added to the end of
+ * the array. The new row must have the same number of columns as the rows in
+ * the initial array.
  */
 void QSurfaceDataProxy::insertRow(int rowIndex, QSurfaceDataRow *row)
 {
@@ -254,8 +263,9 @@ void QSurfaceDataProxy::insertRow(int rowIndex, QSurfaceDataRow *row)
 
 /*!
  * Inserts new \a rows into \a rowIndex.
- * If rowIndex is equal to array size, rows are added to end of the array. The new \a rows must have
- * the same number of columns as the rows at the initial array.
+ * If \a rowIndex is equal to the array size, the rows are added to the end of
+ * the array. The new \a rows must have the same number of columns as the rows
+ * in the initial array.
  */
 void QSurfaceDataProxy::insertRows(int rowIndex, const QSurfaceDataArray &rows)
 {
@@ -265,7 +275,8 @@ void QSurfaceDataProxy::insertRows(int rowIndex, const QSurfaceDataArray &rows)
 }
 
 /*!
- * Removes \a removeCount rows staring at \a rowIndex. Attempting to remove rows past the end of the
+ * Removes the number of rows specified by \a removeCount starting at the
+ * position \a rowIndex. Attempting to remove rows past the end of the
  * array does nothing.
  */
 void QSurfaceDataProxy::removeRows(int rowIndex, int removeCount)
@@ -286,7 +297,8 @@ const QSurfaceDataArray *QSurfaceDataProxy::array() const
 }
 
 /*!
- * Returns the pointer to the item at \a rowIndex, \a columnIndex. It is guaranteed to be valid only
+ * Returns the pointer to the item at the position specified by \a rowIndex and
+ * \a columnIndex. It is guaranteed to be valid only
  * until the next call that modifies data.
  */
 const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int rowIndex, int columnIndex) const
@@ -299,9 +311,9 @@ const QSurfaceDataItem *QSurfaceDataProxy::itemAt(int rowIndex, int columnIndex)
 }
 
 /*!
- * Returns the pointer to the item at \a position. The X-value of \a position indicates the row
- * and the Y-value indicates the column. The item is guaranteed to be valid only
- * until the next call that modifies data.
+ * Returns the pointer to the item at the position \a position. The x-value of
+ * \a position indicates the row and the y-value indicates the column. The item
+ * is guaranteed to be valid only until the next call that modifies data.
  */
 const QSurfaceDataItem *QSurfaceDataProxy::itemAt(const QPoint &position) const
 {
@@ -350,50 +362,57 @@ const QSurfaceDataProxyPrivate *QSurfaceDataProxy::dptrc() const
 /*!
  * \fn void QSurfaceDataProxy::arrayReset()
  *
- * Emitted when the data array is reset.
- * If you change the whole array contents without calling resetArray(), you need to
- * emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the data array is reset.
+ * If the contents of the whole array are changed without calling resetArray(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QSurfaceDataProxy::rowsAdded(int startIndex, int count)
  *
- * Emitted when rows have been added. Provides \a startIndex and \a count of rows added.
- * If you add rows directly to the array without calling addRow() or addRows(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * added starting at the position \a startIndex.
+ * If rows are added to the array without calling addRow() or addRows(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QSurfaceDataProxy::rowsChanged(int startIndex, int count)
  *
- * Emitted when rows have changed. Provides \a startIndex and \a count of changed rows.
- * If you change rows directly in the array without calling setRow() or setRows(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * changed starting at the position \a startIndex.
+ * If rows are changed in the array without calling setRow() or setRows(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QSurfaceDataProxy::rowsRemoved(int startIndex, int count)
  *
- * Emitted when rows have been removed. Provides \a startIndex and \a count of rows removed.
- * Index is the current array size if rows were removed from the end of the array.
- * If you remove rows directly from the array without calling removeRows(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * removed starting at the position \a startIndex.
+ *
+ * The index is the current array size if the rows were removed from the end of
+ * the array. If rows are removed from the array without calling removeRows(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QSurfaceDataProxy::rowsInserted(int startIndex, int count)
  *
- * Emitted when rows have been inserted. Provides \a startIndex and \a count of inserted rows.
- * If you insert rows directly into the array without calling insertRow() or insertRows(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * inserted at the position \a startIndex.
+ *
+ * If rows are inserted into the array without calling insertRow() or
+ * insertRows(), this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QSurfaceDataProxy::itemChanged(int rowIndex, int columnIndex)
  *
- * Emitted when an item has changed. Provides \a rowIndex and \a columnIndex of changed item.
- * If you change an item directly in the array without calling setItem(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the item at the position specified by \a rowIndex
+ * and \a columnIndex changes.
+ * If the item is changed in the array without calling setItem(),
+ * this signal needs to be emitted to update the graph.
  */
 
 //  QSurfaceDataProxyPrivate

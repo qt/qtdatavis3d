@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -36,13 +36,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QScatterDataProxy
  * \inmodule QtDataVisualization
- * \brief Base proxy class for Q3DScatter.
+ * \brief The QScatterDataProxy class is the data proxy for 3D scatter graphs.
  * \since QtDataVisualization 1.0
  *
- * QScatterDataProxy handles adding, inserting, changing, and removing data items.
+ * A scatter data proxy handles adding, inserting, changing, and removing data
+ * items.
  *
- * QScatterDataProxy takes ownership of all QScatterDataArray and QScatterDataItem
- * objects passed to it.
+ * QScatterDataProxy takes ownership of all
+ * QtDataVisualization::QScatterDataArray and QScatterDataItem objects passed to
+ * it.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -51,7 +53,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \typedef QtDataVisualization::QScatterDataArray
  * \relates QScatterDataProxy
  *
- * A vector of \l {QScatterDataItem}s.
+ * A vector of \l {QScatterDataItem} objects.
  */
 
 /*!
@@ -61,7 +63,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QScatterDataProxy
  * \inherits AbstractDataProxy
- * \brief Base proxy class for Scatter3D.
+ * \brief The data proxy for 3D scatter graphs.
  *
  * This type handles adding, inserting, changing, and removing data items.
  *
@@ -98,7 +100,7 @@ QScatterDataProxy::QScatterDataProxy(QScatterDataProxyPrivate *d, QObject *paren
 }
 
 /*!
- * Destroys QScatterDataProxy.
+ * Deletes the scatter data proxy.
  */
 QScatterDataProxy::~QScatterDataProxy()
 {
@@ -115,9 +117,10 @@ QScatter3DSeries *QScatterDataProxy::series() const
 }
 
 /*!
- * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
- * different from the existing array. If it's the same array, this just triggers arrayReset()
- * signal.
+ * Takes ownership of the array \a newArray. Clears the existing array if the
+ * new array differs from it. If the arrays are the same, this function
+ * just triggers the arrayReset() signal.
+ *
  * Passing a null array deletes the old array and creates a new empty array.
  */
 void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
@@ -130,7 +133,7 @@ void QScatterDataProxy::resetArray(QScatterDataArray *newArray)
 }
 
 /*!
- * Changes a single item at \a index with \a item.
+ * Replaces the item at the position \a index with the item \a item.
  */
 void QScatterDataProxy::setItem(int index, const QScatterDataItem &item)
 {
@@ -139,7 +142,8 @@ void QScatterDataProxy::setItem(int index, const QScatterDataItem &item)
 }
 
 /*!
- * Changes items starting from \a index with \a items.
+ * Replaces the items starting from the position \a index with the items
+ * specified by \a items.
  */
 void QScatterDataProxy::setItems(int index, const QScatterDataArray &items)
 {
@@ -148,7 +152,7 @@ void QScatterDataProxy::setItems(int index, const QScatterDataArray &items)
 }
 
 /*!
- * Adds a single \a item to the end of the array.
+ * Adds the item \a item to the end of the array.
  *
  * Returns the index of the added item.
  */
@@ -161,7 +165,7 @@ int QScatterDataProxy::addItem(const QScatterDataItem &item)
 }
 
 /*!
- * Adds \a items to the end of the array.
+ * Adds the items specified by \a items to the end of the array.
  *
  * Returns the index of the first added item.
  */
@@ -174,8 +178,8 @@ int QScatterDataProxy::addItems(const QScatterDataArray &items)
 }
 
 /*!
- * Inserts a single \a item to \a index. If index is equal to data array size, item is added to
- * the array.
+ * Inserts the item \a item to the position \a index. If the index is equal to
+ * the data array size, the item is added to the array.
  */
 void QScatterDataProxy::insertItem(int index, const QScatterDataItem &item)
 {
@@ -185,7 +189,8 @@ void QScatterDataProxy::insertItem(int index, const QScatterDataItem &item)
 }
 
 /*!
- * Inserts \a items to \a index. If index is equal to data array size, items are added to the array.
+ * Inserts the items specified by \a items to the position \a index. If the
+ * index is equal to data array size, the items are added to the array.
  */
 void QScatterDataProxy::insertItems(int index, const QScatterDataArray &items)
 {
@@ -195,7 +200,8 @@ void QScatterDataProxy::insertItems(int index, const QScatterDataArray &items)
 }
 
 /*!
- * Removes \a removeCount items starting from \a index. Attempting to remove items past the end of
+ * Removes the number of items specified by \a removeCount starting at the
+ * position \a index. Attempting to remove items past the end of
  * the array does nothing.
  */
 void QScatterDataProxy::removeItems(int index, int removeCount)
@@ -254,42 +260,46 @@ const QScatterDataProxyPrivate *QScatterDataProxy::dptrc() const
 /*!
  * \fn void QScatterDataProxy::arrayReset()
  *
- * Emitted when data array is reset.
- * If you change the whole array contents without calling resetArray(), you need to
- * emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the data array is reset.
+ * If the contents of the whole array are changed without calling resetArray(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QScatterDataProxy::itemsAdded(int startIndex, int count)
  *
- * Emitted when items have been added. Provides \a startIndex and \a count of items added.
- * If you add items directly to the array without calling addItem() or addItems(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of items specified by \a count is
+ * added starting at the position \a startIndex.
+ * If items are added to the array without calling addItem() or addItems(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QScatterDataProxy::itemsChanged(int startIndex, int count)
  *
- * Emitted when items have changed. Provides \a startIndex and \a count of changed items.
- * If you change items directly in the array without calling setItem() or setItems(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of items specified by \a count is
+ * changed starting at the position \a startIndex.
+ * If items are changed in the array without calling setItem() or setItems(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QScatterDataProxy::itemsRemoved(int startIndex, int count)
  *
- * Emitted when items have been removed. Provides \a startIndex and \a count of items removed.
- * Index may be over current array size if removed from end.
- * If you remove items directly from the array without calling removeItems(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * removed starting at the position \a startIndex.
+ * The index may be larger than the current array size if items are removed from
+ * the end. If items are removed from the array without calling removeItems(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QScatterDataProxy::itemsInserted(int startIndex, int count)
  *
- * Emitted when items have been inserted. Provides \a startIndex and \a count of inserted items.
- * If you insert items directly into the array without calling insertItem() or insertItems(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of items specified by \a count is
+ * inserted starting at the position \a startIndex.
+ * If items are inserted into the array without calling insertItem() or
+ * insertItems(), this signal needs to be emitted to update the graph.
  */
 
 // QScatterDataProxyPrivate

@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -35,22 +35,24 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QBarDataProxy
  * \inmodule QtDataVisualization
- * \brief Base proxy class for Q3DBars.
+ * \brief The QBarDataProxy class is the data proxy for a 3D bars graph.
  * \since QtDataVisualization 1.0
  *
- * QBarDataProxy handles adding, inserting, changing and removing rows of data.
+ * A bar data proxy handles adding, inserting, changing, and removing rows of
+ * data.
  *
  * The data array is a list of vectors (rows) of QBarDataItem instances.
- * Each row can contain different amount of items or even be null.
+ * Each row can contain a different number of items or even be null.
  *
- * QBarDataProxy takes ownership of all QBarDataRows passed to it, whether directly or
- * in a QBarDataArray container.
- * If you use QBarDataRow pointers to directly modify data after adding the array to the proxy,
- * you must also emit proper signal to make the graph update.
+ * QBarDataProxy takes ownership of all QtDataVisualization::QBarDataRow objects
+ * passed to it, whether directly or in a QtDataVisualization::QBarDataArray container.
+ * If bar data row pointers are used to directly modify data after adding the
+ * array to the proxy, the appropriate signal must be emitted to update the
+ * graph.
  *
  * QBarDataProxy optionally keeps track of row and column labels, which QCategory3DAxis can utilize
- * to show axis labels. The row and column labels are stored in separate array from the data and
- * row manipulation methods provide an alternate versions that don't affect the row labels.
+ * to show axis labels. The row and column labels are stored in a separate array from the data and
+ * row manipulation methods provide alternate versions that do not affect the row labels.
  * This enables the option of having row labels that relate to the position of the data in the
  * array rather than the data itself.
  *
@@ -61,14 +63,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \typedef QtDataVisualization::QBarDataRow
  * \relates QBarDataProxy
  *
- * A vector of \l {QBarDataItem}s.
+ * A vector of \l {QBarDataItem} objects.
  */
 
 /*!
  * \typedef QtDataVisualization::QBarDataArray
  * \relates QBarDataProxy
  *
- * A list of pointers to \l {QBarDataRow}s.
+ * A list of pointers to \l {QBarDataRow} objects.
  */
 
 /*!
@@ -78,13 +80,13 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QBarDataProxy
  * \inherits AbstractDataProxy
- * \brief Base proxy type for Bars3D.
+ * \brief The data proxy for a 3D bars graph.
  *
  * This type handles adding, inserting, changing, and removing rows of data with Qt Quick 2.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * For more complete description, see QBarDataProxy.
+ * For a more complete description, see QBarDataProxy.
  *
  * \sa ItemModelBarDataProxy, {Qt Data Visualization Data Handling}
  */
@@ -99,7 +101,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * The optional row labels for the array. Indexes in this array match the row
  * indexes in the data array.
- * If the list is shorter than number of rows, all rows will not get labels.
+ * If the list is shorter than the number of rows, all rows will not get labels.
  */
 
 /*!
@@ -116,7 +118,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * Constructs QBarDataProxy with the given \a parent.
+ * Constructs a bar data proxy with the given \a parent.
  */
 QBarDataProxy::QBarDataProxy(QObject *parent) :
     QAbstractDataProxy(new QBarDataProxyPrivate(this), parent)
@@ -132,7 +134,7 @@ QBarDataProxy::QBarDataProxy(QBarDataProxyPrivate *d, QObject *parent) :
 }
 
 /*!
- * Destroys QBarDataProxy.
+ * Deletes the bar data proxy.
  */
 QBarDataProxy::~QBarDataProxy()
 {
@@ -158,10 +160,11 @@ void QBarDataProxy::resetArray()
 }
 
 /*!
- * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
- * different from the existing array. If it's the same array, this just triggers arrayReset()
- * signal.
- * Passing null array deletes the old array and creates a new empty array.
+ * Takes ownership of the array \a newArray. Clears the existing array if the
+ * new array differs from it. If the arrays are the same, this function
+ * just triggers the arrayReset() signal.
+ *
+ * Passing a null array deletes the old array and creates a new empty array.
  * Row and column labels are not affected.
  */
 void QBarDataProxy::resetArray(QBarDataArray *newArray)
@@ -172,10 +175,12 @@ void QBarDataProxy::resetArray(QBarDataArray *newArray)
 }
 
 /*!
- * Takes ownership of the \a newArray. Clears the existing array if the \a newArray is
- * different from the existing array. If it's the same array, this just triggers arrayReset()
- * signal.
+ * Takes ownership of the array \a newArray. Clears the existing array if the
+ * new array differs from it. If the arrays are the same, this function
+ * just triggers the arrayReset() signal.
+ *
  * Passing a null array deletes the old array and creates a new empty array.
+ *
  * The \a rowLabels and \a columnLabels lists specify the new labels for rows and columns.
  */
 void QBarDataProxy::resetArray(QBarDataArray *newArray, const QStringList &rowLabels,
@@ -187,8 +192,9 @@ void QBarDataProxy::resetArray(QBarDataArray *newArray, const QStringList &rowLa
 }
 
 /*!
- * Changes existing rows by replacing a row at \a rowIndex with a new \a row. The \a row can be
- * the same as the existing row already stored at the \a rowIndex.
+ * Changes an existing row by replacing the row at the position \a rowIndex
+ * with the new row specified by \a row. The new row can be
+ * the same as the existing row already stored at \a rowIndex.
  * Existing row labels are not affected.
  */
 void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
@@ -198,9 +204,10 @@ void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row)
 }
 
 /*!
- * Changes existing rows by replacing a row at \a rowIndex with \a row. The \a row can be
- * the same as the existing row already stored at the \a rowIndex.
- * Changes the row label to the \a label.
+ * Changes an existing row by replacing the row at the position \a rowIndex
+ * with the new row specified by \a row. The new row can be
+ * the same as the existing row already stored at \a rowIndex.
+ * Changes the row label to \a label.
  */
 void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row, const QString &label)
 {
@@ -209,9 +216,10 @@ void QBarDataProxy::setRow(int rowIndex, QBarDataRow *row, const QString &label)
 }
 
 /*!
- * Changes existing rows by replacing a rows starting at \a rowIndex with \a rows.
+ * Changes existing rows by replacing the rows starting at the position
+ * \a rowIndex with the new rows specifies by \a rows.
  * Existing row labels are not affected. The rows in the \a rows array can be
- * the same as the existing rows already stored at the \a rowIndex.
+ * the same as the existing rows already stored at \a rowIndex.
  */
 void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows)
 {
@@ -220,9 +228,10 @@ void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows)
 }
 
 /*!
- * Changes existing rows by replacing a rows starting at \a rowIndex with \a rows.
+ * Changes existing rows by replacing the rows starting at the position
+ * \a rowIndex with the new rows specifies by \a rows.
  * The row labels are changed to \a labels. The rows in the \a rows array can be
- * the same as the existing rows already stored at the \a rowIndex.
+ * the same as the existing rows already stored at \a rowIndex.
  */
 void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows, const QStringList &labels)
 {
@@ -231,7 +240,8 @@ void QBarDataProxy::setRows(int rowIndex, const QBarDataArray &rows, const QStri
 }
 
 /*!
- * Changes a single item at \a rowIndex, \a columnIndex to the \a item.
+ * Changes a single item at the position specified by \a rowIndex and
+ * \a columnIndex to the item \a item.
  */
 void QBarDataProxy::setItem(int rowIndex, int columnIndex, const QBarDataItem &item)
 {
@@ -240,8 +250,9 @@ void QBarDataProxy::setItem(int rowIndex, int columnIndex, const QBarDataItem &i
 }
 
 /*!
- * Changes a single item at \a position to the \a item.
- * The X-value of \a position indicates the row and the Y-value indicates the column.
+ * Changes a single item at the position \a position to the item \a item.
+ * The x-value of \a position indicates the row and the y-value indicates the
+ * column.
  */
 void QBarDataProxy::setItem(const QPoint &position, const QBarDataItem &item)
 {
@@ -249,10 +260,10 @@ void QBarDataProxy::setItem(const QPoint &position, const QBarDataItem &item)
 }
 
 /*!
- * Adds a new \a row to the end of array.
+ * Adds the new row \a row to the end of an array.
  * Existing row labels are not affected.
  *
- * \return index of the added row.
+ * Returns the index of the added row.
  */
 int QBarDataProxy::addRow(QBarDataRow *row)
 {
@@ -263,9 +274,9 @@ int QBarDataProxy::addRow(QBarDataRow *row)
 }
 
 /*!
- * Adds a new \a row with the \a label to the end of array.
+ * Adds a the new row \a row with the label \a label to the end of an array.
  *
- * \return index of the added row.
+ * Returns the index of the added row.
  */
 int QBarDataProxy::addRow(QBarDataRow *row, const QString &label)
 {
@@ -276,10 +287,10 @@ int QBarDataProxy::addRow(QBarDataRow *row, const QString &label)
 }
 
 /*!
- * Adds new \a rows to the end of array.
+ * Adds the new \a rows to the end of an array.
  * Existing row labels are not affected.
  *
- * \return index of the first added row.
+ * Returns the index of the first added row.
  */
 int QBarDataProxy::addRows(const QBarDataArray &rows)
 {
@@ -290,9 +301,9 @@ int QBarDataProxy::addRows(const QBarDataArray &rows)
 }
 
 /*!
- * Adds new \a rows with \a labels to the end of array.
+ * Adds the new \a rows with \a labels to the end of the array.
  *
- * \return index of the first added row.
+ * Returns the index of the first added row.
  */
 int QBarDataProxy::addRows(const QBarDataArray &rows, const QStringList &labels)
 {
@@ -303,10 +314,11 @@ int QBarDataProxy::addRows(const QBarDataArray &rows, const QStringList &labels)
 }
 
 /*!
- * Inserts a new \a row into \a rowIndex.
- * If rowIndex is equal to array size, rows are added to end of the array.
- * Any existing row labels are not affected.
- * \note Row labels array will be out of sync with row array after this call,
+ * Inserts the new row \a row into \a rowIndex.
+ * If \a rowIndex is equal to the array size, the rows are added to the end of
+ * the array.
+ * The existing row labels are not affected.
+ * \note The row labels array will be out of sync with the row array after this call
  *       if there were labeled rows beyond the inserted row.
  */
 void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row)
@@ -317,8 +329,9 @@ void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row)
 }
 
 /*!
- * Inserts a new \a row with the \a label into \a rowIndex.
- * If rowIndex is equal to array size, rows are added to end of the array.
+ * Inserts the new row \a row with the label \a label into \a rowIndex.
+ * If \a rowIndex is equal to array size, rows are added to the end of the
+ * array.
  */
 void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row, const QString &label)
 {
@@ -329,9 +342,9 @@ void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row, const QString &lab
 
 /*!
  * Inserts new \a rows into \a rowIndex.
- * If rowIndex is equal to array size, rows are added to end of the array.
- * Any existing row labels are not affected.
- * \note Row labels array will be out of sync with row array after this call,
+ * If \a rowIndex is equal to the array size, the rows are added to the end of
+ * the array. The existing row labels are not affected.
+ * \note The row labels array will be out of sync with the row array after this call
  *       if there were labeled rows beyond the inserted rows.
  */
 void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows)
@@ -343,7 +356,8 @@ void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows)
 
 /*!
  * Inserts new \a rows with \a labels into \a rowIndex.
- * If rowIndex is equal to array size, rows are added to end of the array.
+ * If \a rowIndex is equal to the array size, the rows are added to the end of
+ * the array.
  */
 void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows, const QStringList &labels)
 {
@@ -353,11 +367,12 @@ void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows, const QS
 }
 
 /*!
- * Removes \a removeCount rows staring at \a rowIndex. Attempting to remove rows past the end of the
- * array does nothing. If \a removeLabels is true, corresponding row labels are also removed. Otherwise
- * the row labels are not affected.
- * \note If \a removeLabels is false, the row labels array will be out of sync with the row array
- *       if there are labeled rows beyond the removed rows.
+ * Removes the number of rows specified by \a removeCount starting at the
+ * position \a rowIndex. Attempting to remove rows past the end of the
+ * array does nothing. If \a removeLabels is \c true, the corresponding row
+ * labels are also removed. Otherwise, the row labels are not affected.
+ * \note If \a removeLabels is \c false, the row labels array will be out of
+ * sync with the row array if there are labeled rows beyond the removed rows.
  */
 void QBarDataProxy::removeRows(int rowIndex, int removeCount, bool removeLabels)
 {
@@ -421,7 +436,7 @@ void QBarDataProxy::setColumnLabels(const QStringList &labels)
 }
 
 /*!
- * \return pointer to the data array.
+ * Returns the pointer to the data array.
  */
 const QBarDataArray *QBarDataProxy::array() const
 {
@@ -429,8 +444,8 @@ const QBarDataArray *QBarDataProxy::array() const
 }
 
 /*!
- * \return pointer to the row at \a rowIndex. It is guaranteed to be valid only until the next call
- * that modifies data.
+ * Returns the pointer to the row at the position \a rowIndex. It is guaranteed
+ * to be valid only until the next call that modifies data.
  */
 const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
 {
@@ -440,7 +455,8 @@ const QBarDataRow *QBarDataProxy::rowAt(int rowIndex) const
 }
 
 /*!
- * \return pointer to the item at \a rowIndex, \a columnIndex. It is guaranteed to be valid only
+ * Returns the pointer to the item at the position specified by \a rowIndex and
+ * \a columnIndex. It is guaranteed to be valid only
  * until the next call that modifies data.
  */
 const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
@@ -453,9 +469,9 @@ const QBarDataItem *QBarDataProxy::itemAt(int rowIndex, int columnIndex) const
 }
 
 /*!
- * \return pointer to the item at \a position. The X-value of \a position indicates the row
- * and the Y-value indicates the column. The item is guaranteed to be valid only
- * until the next call that modifies data.
+ * Returns the pointer to the item at the position \a position. The x-value of
+ * \a position indicates the row and the y-value indicates the column. The item
+ * is guaranteed to be valid only until the next call that modifies data.
  */
 const QBarDataItem *QBarDataProxy::itemAt(const QPoint &position) const
 {
@@ -481,50 +497,57 @@ const QBarDataProxyPrivate *QBarDataProxy::dptrc() const
 /*!
  * \fn void QBarDataProxy::arrayReset()
  *
- * Emitted when data array is reset.
- * If you change the whole array contents without calling resetArray(), you need to
- * emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the data array is reset.
+ * If the contents of the whole array are changed without calling resetArray(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QBarDataProxy::rowsAdded(int startIndex, int count)
  *
- * Emitted when rows have been added. Provides \a startIndex and \a count of rows added.
- * If you add rows directly to the array without calling addRow() or addRows(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * added starting at the position \a startIndex.
+ * If rows are added to the array without calling addRow() or addRows(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QBarDataProxy::rowsChanged(int startIndex, int count)
  *
- * Emitted when rows have changed. Provides \a startIndex and \a count of changed rows.
- * If you change rows directly in the array without calling setRow() or setRows(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * changed starting at the position \a startIndex.
+ * If rows are changed in the array without calling setRow() or setRows(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QBarDataProxy::rowsRemoved(int startIndex, int count)
  *
- * Emitted when rows have been removed. Provides \a startIndex and \a count of rows removed.
- * Index is the current array size if rows were removed from the end of the array.
- * If you remove rows directly from the array without calling removeRows(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * removed starting at the position \a startIndex.
+ *
+ * The index is the current array size if the rows were removed from the end of
+ * the array. If rows are removed from the array without calling removeRows(),
+ * this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QBarDataProxy::rowsInserted(int startIndex, int count)
  *
- * Emitted when rows have been inserted. Provides \a startIndex and \a count of inserted rows.
- * If you insert rows directly into the array without calling insertRow() or insertRows(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the number of rows specified by \a count is
+ * inserted at the position \a startIndex.
+ *
+ * If rows are inserted into the array without calling insertRow() or
+ * insertRows(), this signal needs to be emitted to update the graph.
  */
 
 /*!
  * \fn void QBarDataProxy::itemChanged(int rowIndex, int columnIndex)
  *
- * Emitted when an item has changed. Provides \a rowIndex and \a columnIndex of changed item.
- * If you change an item directly in the array without calling setItem(), you
- * need to emit this signal yourself or the graph won't get updated.
+ * This signal is emitted when the item at the position specified by \a rowIndex
+ * and \a columnIndex changes.
+ * If the item is changed in the array without calling setItem(),
+ * this signal needs to be emitted to update the graph.
  */
 
 // QBarDataProxyPrivate
