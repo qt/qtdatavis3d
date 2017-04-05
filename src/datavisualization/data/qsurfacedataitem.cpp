@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -38,14 +38,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * graphs.
  * \since QtDataVisualization 1.0
  *
- * A QSurfaceDataItem holds data for a single vertex in surface graph.
- * Surface data proxies parse data into QSurfaceDataItem instances for visualizing.
+ * A surface data item holds the data for a single vertex in a surface graph.
+ * Surface data proxies parse data into QSurfaceDataItem instances for
+ * visualization.
  *
  * \sa QSurfaceDataProxy, {Qt Data Visualization C++ Classes}
  */
 
 /*!
- * Constructs QSurfaceDataItem.
+ * Constructs a surface data item.
  */
 QSurfaceDataItem::QSurfaceDataItem()
     : d_ptr(0) // private data doesn't exist by default (optimization)
@@ -54,7 +55,7 @@ QSurfaceDataItem::QSurfaceDataItem()
 }
 
 /*!
- * Constructs QSurfaceDataItem with \a position.
+ * Constructs a surface data item at the position \a position.
  */
 QSurfaceDataItem::QSurfaceDataItem(const QVector3D &position)
     : d_ptr(0),
@@ -71,7 +72,7 @@ QSurfaceDataItem::QSurfaceDataItem(const QSurfaceDataItem &other)
 }
 
 /*!
- * Destroys QSurfaceDataItem.
+ * Deletes a surface data item.
  */
 QSurfaceDataItem::~QSurfaceDataItem()
 {
@@ -94,42 +95,42 @@ QSurfaceDataItem &QSurfaceDataItem::operator=(const QSurfaceDataItem &other)
 
 /*!
  * \fn void QSurfaceDataItem::setPosition(const QVector3D &pos)
- * Sets position \a pos to this data item.
+ * Sets the position \a pos to this data item.
  */
 
 /*!
  * \fn QVector3D QSurfaceDataItem::position() const
- * \return position of this data item.
+ * Returns the position of this data item.
  */
 
 /*!
  * \fn void QSurfaceDataItem::setX(float value)
- * Sets the X component of the item position to the \a value.
+ * Sets the x-coordinate of the item position to the value \a value.
  */
 
 /*!
  * \fn void QSurfaceDataItem::setY(float value)
- * Sets the Y component of the item position to the \a value.
+ * Sets the y-coordinate of the item position to the value \a value.
  */
 
 /*!
  * \fn void QSurfaceDataItem::setZ(float value)
- * Sets the Z component of the item position to the \a value.
+ * Sets the z-coordinate of the item position to the value \a value.
  */
 
 /*!
  * \fn float QSurfaceDataItem::x() const
- * \return the X component of the position of this data item.
+ * Returns the x-coordinate of the position of this data item.
  */
 
 /*!
  * \fn float QSurfaceDataItem::y() const
- * \return the Y component of the position of this data item.
+ * Returns the y-coordinate of the position of this data item.
  */
 
 /*!
  * \fn float QSurfaceDataItem::z() const
- * \return the Z component of the position of this data item.
+ * Returns the z-coordinate of the position of this data item.
  */
 
 /*!

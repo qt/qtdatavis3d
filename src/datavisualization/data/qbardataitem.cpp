@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -37,14 +37,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \brief The QBarDataItem class provides a container for resolved data to be added to bar graphs.
  * \since QtDataVisualization 1.0
  *
- * A QBarDataItem holds data for a single rendered bar in a graph.
- * Bar data proxies parse data into QBarDataItem instances for visualizing.
+ * A bar data item holds the data for a single rendered bar in a graph.
+ * Bar data proxies parse data into QBarDataItem instances for visualization.
  *
  * \sa QBarDataProxy, {Qt Data Visualization C++ Classes}
  */
 
 /*!
- * Constructs QBarDataItem.
+ * Constructs a bar data item.
  */
 QBarDataItem::QBarDataItem()
     : d_ptr(0), // private data doesn't exist by default (optimization)
@@ -54,7 +54,7 @@ QBarDataItem::QBarDataItem()
 }
 
 /*!
- * Constructs QBarDataItem with \a value.
+ * Constructs a bar data item with the value \a value.
  */
 QBarDataItem::QBarDataItem(float value)
     : d_ptr(0),
@@ -64,7 +64,7 @@ QBarDataItem::QBarDataItem(float value)
 }
 
 /*!
- * Constructs QBarDataItem with \a value and \a angle
+ * Constructs a bar data item with the value \a value and angle \a angle.
  */
 QBarDataItem::QBarDataItem(float value, float angle)
     : d_ptr(0),
@@ -82,7 +82,7 @@ QBarDataItem::QBarDataItem(const QBarDataItem &other)
 }
 
 /*!
- * Destroys QBarDataItem.
+ * Deletes a bar data item.
  */
 QBarDataItem::~QBarDataItem()
 {
@@ -105,22 +105,22 @@ QBarDataItem &QBarDataItem::operator=(const QBarDataItem &other)
 
 /*!
  * \fn void QBarDataItem::setValue(float val)
- * Sets value \a val to this data item.
+ * Sets the value \a val to this data item.
  */
 
 /*!
  * \fn float QBarDataItem::value() const
- * \return value of this data item.
+ * Returns the value of this data item.
  */
 
 /*!
  * \fn void QBarDataItem::setRotation(float angle)
- * Sets rotation \a angle in degrees for this data item.
+ * Sets the rotation angle \a angle in degrees for this data item.
  */
 
 /*!
  * \fn float QBarDataItem::rotation() const
- * \return rotation angle in degrees for this data item.
+ * Returns the rotation angle in degrees for this data item.
  */
 
 /*!

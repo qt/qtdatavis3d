@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -38,14 +38,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * graphs.
  * \since QtDataVisualization 1.0
  *
- * A QScatterDataItem holds data for a single rendered item in a scatter graph.
- * Scatter data proxies parse data into QScatterDataItem instances for visualizing.
+ * A scatter data item holds the data for a single rendered item in a scatter
+ * graph. Scatter data proxies parse data into QScatterDataItem instances for
+ * visualization.
  *
  * \sa QScatterDataProxy, {Qt Data Visualization C++ Classes}
  */
 
 /*!
- * Constructs QScatterDataItem.
+ * Constructs a scatter data item.
  */
 QScatterDataItem::QScatterDataItem()
     : d_ptr(0) // private data doesn't exist by default (optimization)
@@ -54,7 +55,7 @@ QScatterDataItem::QScatterDataItem()
 }
 
 /*!
- * Constructs QScatterDataItem with \a position.
+ * Constructs a scatter data item at the position \a position.
  */
 QScatterDataItem::QScatterDataItem(const QVector3D &position)
     : d_ptr(0),
@@ -63,7 +64,8 @@ QScatterDataItem::QScatterDataItem(const QVector3D &position)
 }
 
 /*!
- * Constructs QScatterDataItem with \a position and \a rotation.
+ * Constructs a scatter data item at the position \a position with the rotation
+ * \a rotation.
  */
 QScatterDataItem::QScatterDataItem(const QVector3D &position, const QQuaternion &rotation)
     : d_ptr(0),
@@ -81,7 +83,7 @@ QScatterDataItem::QScatterDataItem(const QScatterDataItem &other)
 }
 
 /*!
- * Destroys QScatterDataItem.
+ * Deletes a scatter data item.
  */
 QScatterDataItem::~QScatterDataItem()
 {
@@ -105,56 +107,56 @@ QScatterDataItem &QScatterDataItem::operator=(const QScatterDataItem &other)
 
 /*!
  * \fn void QScatterDataItem::setPosition(const QVector3D &pos)
- * Sets position \a pos to this data item.
+ * Sets the position \a pos for this data item.
  */
 
 /*!
  * \fn QVector3D QScatterDataItem::position() const
- * \return position of this data item.
+ * Returns the position of this data item.
  */
 
 /*!
  * \fn void QScatterDataItem::setRotation(const QQuaternion &rot)
- * Sets rotation \a rot to this data item.
- * The \a rot should be a normalized QQuaternion.
- * If the series also has rotation, item and series rotations are multiplied together.
+ * Sets the rotation \a rot for this data item.
+ * The value of \a rot should be a normalized QQuaternion.
+ * If the series also has rotation, item rotation is multiplied by it.
  * Defaults to no rotation.
  */
 
 /*!
  * \fn QQuaternion QScatterDataItem::rotation() const
- * \return rotation of this data item.
+ * Returns the rotation of this data item.
  * \sa setRotation()
  */
 
 /*!
  * \fn void QScatterDataItem::setX(float value)
- * Sets the X component of the item position to the \a value.
+ * Sets the x-coordinate of the item position to the value \a value.
  */
 
 /*!
  * \fn void QScatterDataItem::setY(float value)
- * Sets the Y component of the item position to the \a value.
+ * Sets the y-coordinate of the item position to the value \a value.
  */
 
 /*!
  * \fn void QScatterDataItem::setZ(float value)
- * Sets the Z component of the item position to the \a value.
+ * Sets the z-coordinate of the item position to the value \a value.
  */
 
 /*!
  * \fn float QScatterDataItem::x() const
- * \return the X component of the position of this data item.
+ * Returns the x-coordinate of the position of this data item.
  */
 
 /*!
  * \fn float QScatterDataItem::y() const
- * \return the Y component of the position of this data item.
+ * Returns the y-coordinate of the position of this data item.
  */
 
 /*!
  * \fn float QScatterDataItem::z() const
- * \return the Z component of the position of this data item.
+ * Returns the z-coordinate of the position of this data item.
  */
 
 /*!
