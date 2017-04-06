@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -35,16 +35,16 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QCustom3DLabel
  * \inmodule QtDataVisualization
- * \brief The QCustom3DLabel class is for creating custom labels to be added to a graph.
+ * \brief The QCustom3DLabel class adds a custom label to a graph.
  * \since QtDataVisualization 1.1
  *
- * This class is for creating custom labels to be added to a graph. You can set text, font,
- * position, scaling, rotation, and colors. You can also toggle borders and background for the
- * label. Colors, borders and background are used from active theme unless any of them is set
- * explicitly.
+ * The text, font, position, scaling, rotation, and colors of a custom label can
+ * be set. In addition, the visibility of the borders and background of the
+ * label can be toggled. Colors, borders, and background are determined by the
+ * active theme unless set explicitly.
  *
- * \note In scaling, z has no effect. Setting the same x and y retains the original
- * font dimensions.
+ * \note In scaling, the z-coordinate has no effect. Setting the same x- and
+ * y-coordinates retains the original font dimensions.
  *
  * \sa QAbstract3DGraph::addCustomItem()
  */
@@ -56,15 +56,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QCustom3DLabel
  * \inherits Custom3DItem
- * \brief The Custom3DLabel type is for creating custom labels to be added to a graph.
+ * \brief Adds a custom label to a graph.
  *
- * This type is for creating custom labels to be added to a graph. You can set text, font,
- * position, scaling, rotation, and colors. You can also toggle borders and background for the
- * label. Colors, borders and background are used from active theme unless any of them is set
- * explicitly.
+ * The text, font, position, scaling, rotation, and colors of a custom label can
+ * be set. In addition, the visibility of the borders and background of the
+ * label can be toggled. Colors, borders, and background are determined by the
+ * active theme unless set explicitly.
  *
- * \note In scaling, z has no effect. Setting the same x and y retains the original
- * font dimensions.
+ * \note In scaling, the z-coordinate has no effect. Setting the same x- and
+ * y-coordinates retains the original font dimensions.
  */
 
 /*! \qmlproperty string Custom3DLabel::text
@@ -75,7 +75,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*! \qmlproperty font Custom3DLabel::font
  *
  * The font to be used for the label. Defaults to \c{Font {family: "Arial"; pointSize: 20}}.
- * Special formatting (for example outlined) is not supported.
+ * Special formatting (for example, outlined) is not supported.
  */
 
 /*! \qmlproperty color Custom3DLabel::textColor
@@ -106,11 +106,11 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*! \qmlproperty bool Custom3DLabel::facingCamera
  *
  * Defines whether the label will always face the camera. Defaults to \c{false}.
- * If set to \c{true}, rotation() has no effect.
+ * If set to \c{true}, \l {QCustom3DItem::}{rotation} has no effect.
  */
 
 /*!
- * Constructs QCustom3DLabel with given \a parent.
+ * Constructs a custom 3D label with the given \a parent.
  */
 QCustom3DLabel::QCustom3DLabel(QObject *parent) :
     QCustom3DItem(new QCustom3DLabelPrivate(this), parent)
@@ -118,10 +118,11 @@ QCustom3DLabel::QCustom3DLabel(QObject *parent) :
 }
 
 /*!
- * Constructs QCustom3DLabel with given \a text, \a font, \a position, \a scaling,
+ * Constructs a custom 3D label with the given \a text, \a font, \a position, \a scaling,
  * \a rotation, and optional \a parent.
  *
- * \note Setting the same x and y for \a scaling retains the original font dimensions.
+ * \note Setting the same x- and y-coordinates for \a scaling retains the
+ * original font dimensions.
  */
 QCustom3DLabel::QCustom3DLabel(const QString &text, const QFont &font,
                                const QVector3D &position, const QVector3D &scaling,
@@ -132,7 +133,7 @@ QCustom3DLabel::QCustom3DLabel(const QString &text, const QFont &font,
 }
 
 /*!
- * Destroys QCustom3DLabel.
+ * Deletes the custom 3D label.
  */
 QCustom3DLabel::~QCustom3DLabel()
 {
@@ -164,7 +165,7 @@ QString QCustom3DLabel::text() const
  * \brief The font to be used for the label.
  *
  * Defaults to \c{QFont("Arial", 20)}. Special formatting
- * (for example outlined) is not supported.
+ * (for example, outlined) is not supported.
  */
 void QCustom3DLabel::setFont(const QFont &font)
 {
@@ -183,9 +184,9 @@ QFont QCustom3DLabel::font() const
 
 /*! \property QCustom3DLabel::textColor
  *
- * \brief Color for the label text.
+ * \brief The color for the label text.
  *
- * Also affects label border, if enabled. Defaults to \c{Qt::white}.
+ * Also affects the label border, if enabled. Defaults to \c{Qt::white}.
  *
  * \sa borderEnabled
  */

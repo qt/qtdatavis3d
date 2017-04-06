@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -34,11 +34,11 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QCustom3DItem
  * \inmodule QtDataVisualization
- * \brief The QCustom3DItem class is for creating custom items to be added to a graph.
+ * \brief The QCustom3DItem class adds a custom item to a graph.
  * \since QtDataVisualization 1.1
  *
- * This class is for creating custom items to be added to a graph. The item has a custom mesh,
- * position, scaling, rotation, and an optional texture.
+ * A custom item has a custom mesh, position, scaling, rotation, and an optional
+ * texture.
  *
  * \sa QAbstract3DGraph::addCustomItem()
  */
@@ -49,15 +49,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since QtDataVisualization 1.1
  * \ingroup datavisualization_qml
  * \instantiates QCustom3DItem
- * \brief The Custom3DItem type is for creating custom items to be added to a graph.
+ * \brief Adds a custom item to a graph.
  *
- * This type is for creating custom items to be added to a graph. The item has a custom mesh,
- * position, scaling, rotation, and an optional texture.
+ * A custom item has a custom mesh, position, scaling, rotation, and an optional
+ * texture.
  */
 
 /*! \qmlproperty string Custom3DItem::meshFile
  *
- * The item mesh file name. The item in the file must be in Wavefront obj format and include
+ * The item mesh file name. The item in the file must be in Wavefront OBJ format and include
  * vertices, normals, and UVs. It also needs to be in triangles.
  */
 
@@ -66,15 +66,18 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * The texture file name for the item. If left unset, a solid gray texture will be
  * used.
  *
- * \note To conserve memory the QImage loaded from the file is cleared after a texture is created.
+ * \note To conserve memory, the QImage loaded from the file is cleared after a
+ * texture is created.
  */
 
 /*! \qmlproperty vector3d Custom3DItem::position
  *
- * The item position as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
+ * The item position as a \l vector3d type. Defaults to
+ * \c {vector3d(0.0, 0.0, 0.0)}.
  *
- * Item position is either in data coordinates or in absolute coordinates, depending on the
- * positionAbsolute property. When using absolute coordinates, values between \c{-1.0...1.0} are
+ * Item position is specified either in data coordinates or in absolute
+ * coordinates, depending on the value of the positionAbsolute property. When
+ * using absolute coordinates, values between \c{-1.0...1.0} are
  * within axis ranges.
  *
  * \note Items positioned outside any axis range are not rendered if positionAbsolute is \c{false},
@@ -95,12 +98,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty vector3d Custom3DItem::scaling
  *
- * The item scaling as a vector3d. Defaults to \c {vector3d(0.1, 0.1, 0.1)}.
+ * The item scaling as a \l vector3d type. Defaults to
+ * \c {vector3d(0.1, 0.1, 0.1)}.
  *
- * Item scaling is either in data values or in absolute values, depending on the
- * scalingAbsolute property. The default vector interpreted as absolute values sets the item to
+ * Item scaling is specified either in data values or in absolute values,
+ * depending on the value of the scalingAbsolute property. The default vector
+ * interpreted as absolute values sets the item to
  * 10% of the height of the graph, provided the item mesh is normalized and the graph aspect ratios
- * haven't been changed from the defaults.
+ * have not been changed from the defaults.
  *
  * \sa scalingAbsolute
  */
@@ -111,7 +116,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * Defines whether item scaling is to be handled in data values or in absolute
  * values. Defaults to \c{true}. Items with absolute scaling will be rendered at the same
  * size, regardless of axis ranges. Items with data scaling will change their apparent size
- * according to the axis ranges. If positionAbsolute value is \c{true}, this property is ignored
+ * according to the axis ranges. If positionAbsolute is \c{true}, this property is ignored
  * and scaling is interpreted as an absolute value. If the item has rotation, the data scaling
  * is calculated on the unrotated item. Similarly, for Custom3DVolume items, the range clipping
  * is calculated on the unrotated item.
@@ -119,7 +124,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \note Only absolute scaling is supported for Custom3DLabel items or for custom items used in
  * \l{AbstractGraph3D::polar}{polar} graphs.
  *
- * \note The custom item's mesh must be normalized to range \c{[-1 ,1]}, or the data
+ * \note The custom item's mesh must be normalized to the range \c{[-1 ,1]}, or the data
  * scaling will not be accurate.
  *
  * \sa scaling, positionAbsolute
@@ -127,7 +132,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty quaternion Custom3DItem::rotation
  *
- * The item rotation as a quaternion. Defaults to \c {quaternion(0.0, 0.0, 0.0, 0.0)}.
+ * The item rotation as a \l quaternion. Defaults to
+ * \c {quaternion(0.0, 0.0, 0.0, 0.0)}.
  */
 
 /*! \qmlproperty bool Custom3DItem::visible
@@ -145,13 +151,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlmethod void Custom3DItem::setRotationAxisAndAngle(vector3d axis, real angle)
  *
- * A convenience function to construct rotation quaternion from \a axis and \a angle.
+ * A convenience function to construct the rotation quaternion from \a axis and
+ * \a angle.
  *
  * \sa rotation
  */
 
 /*!
- * Constructs QCustom3DItem with given \a parent.
+ * Constructs a custom 3D item with the specified \a parent.
  */
 QCustom3DItem::QCustom3DItem(QObject *parent) :
     QObject(parent),
@@ -171,7 +178,7 @@ QCustom3DItem::QCustom3DItem(QCustom3DItemPrivate *d, QObject *parent) :
 }
 
 /*!
- * Constructs QCustom3DItem with given \a meshFile, \a position, \a scaling,
+ * Constructs a custom 3D item with the specified \a meshFile, \a position, \a scaling,
  * \a rotation, \a texture image, and optional \a parent.
  */
 QCustom3DItem::QCustom3DItem(const QString &meshFile, const QVector3D &position,
@@ -184,7 +191,7 @@ QCustom3DItem::QCustom3DItem(const QString &meshFile, const QVector3D &position,
 }
 
 /*!
- * Destroys QCustom3DItem.
+ * Deletes the custom 3D item.
  */
 QCustom3DItem::~QCustom3DItem()
 {
@@ -194,7 +201,7 @@ QCustom3DItem::~QCustom3DItem()
  *
  * \brief The item mesh file name.
  *
- * The item in the file must be in Wavefront obj format and include
+ * The item in the file must be in Wavefront OBJ format and include
  * vertices, normals, and UVs. It also needs to be in triangles.
  */
 void QCustom3DItem::setMeshFile(const QString &meshFile)
@@ -218,7 +225,8 @@ QString QCustom3DItem::meshFile() const
  *
  * Defaults to \c {QVector3D(0.0, 0.0, 0.0)}.
  *
- * Item position is either in data coordinates or in absolute coordinates, depending on
+ * Item position is specified either in data coordinates or in absolute
+ * coordinates, depending on the
  * positionAbsolute property. When using absolute coordinates, values between \c{-1.0...1.0} are
  * within axis ranges.
  *
@@ -277,7 +285,7 @@ bool QCustom3DItem::isPositionAbsolute() const
  * Item scaling is either in data values or in absolute values, depending on the
  * scalingAbsolute property. The default vector interpreted as absolute values sets the item to
  * 10% of the height of the graph, provided the item mesh is normalized and the graph aspect ratios
- * haven't been changed from the defaults.
+ * have not been changed from the defaults.
  *
  * \sa scalingAbsolute
  */
@@ -306,7 +314,7 @@ QVector3D QCustom3DItem::scaling() const
  *
  * Items with absolute scaling will be rendered at the same
  * size, regardless of axis ranges. Items with data scaling will change their apparent size
- * according to the axis ranges. If positionAbsolute value is \c{true}, this property is ignored
+ * according to the axis ranges. If positionAbsolute is \c{true}, this property is ignored
  * and scaling is interpreted as an absolute value. If the item has rotation, the data scaling
  * is calculated on the unrotated item. Similarly, for QCustom3DVolume items, the range clipping
  * is calculated on the unrotated item.
@@ -314,7 +322,7 @@ QVector3D QCustom3DItem::scaling() const
  * \note Only absolute scaling is supported for QCustom3DLabel items or for custom items used in
  * \l{QAbstract3DGraph::polar}{polar} graphs.
  *
- * \note The custom item's mesh must be normalized to range \c{[-1 ,1]}, or the data
+ * \note The custom item's mesh must be normalized to the range \c{[-1 ,1]}, or the data
  * scaling will not be accurate.
  *
  * \sa scaling, positionAbsolute
@@ -402,7 +410,8 @@ bool QCustom3DItem::isShadowCasting() const
 }
 
 /*!
- * A convenience function to construct rotation quaternion from \a axis and \a angle.
+ * A convenience function to construct the rotation quaternion from \a axis and
+ * \a angle.
  *
  * \sa rotation
  */
@@ -412,9 +421,11 @@ void QCustom3DItem::setRotationAxisAndAngle(const QVector3D &axis, float angle)
 }
 
 /*!
- * Sets the \a textureImage as a QImage for the item. Texture defaults to solid gray.
+ * Sets the value of \a textureImage as a QImage for the item. The texture
+ * defaults to solid gray.
  *
- * \note To conserve memory the given QImage is cleared after a texture is created.
+ * \note To conserve memory, the given QImage is cleared after a texture is
+ * created.
  */
 void QCustom3DItem::setTextureImage(const QImage &textureImage)
 {
@@ -443,7 +454,8 @@ void QCustom3DItem::setTextureImage(const QImage &textureImage)
  * If both this property and the texture image are unset, a solid
  * gray texture will be used.
  *
- * \note To conserve memory the QImage loaded from the file is cleared after a texture is created.
+ * \note To conserve memory, the QImage loaded from the file is cleared after a
+ * texture is created.
  */
 void QCustom3DItem::setTextureFile(const QString &textureFile)
 {
