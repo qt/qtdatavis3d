@@ -1029,6 +1029,7 @@ void QAbstract3DGraph::mouseMoveEvent(QMouseEvent *event)
     d_ptr->m_visualController->mouseMoveEvent(event, event->pos());
 }
 
+#if QT_CONFIG(wheelevent)
 /*!
  * \internal
  */
@@ -1036,6 +1037,7 @@ void QAbstract3DGraph::wheelEvent(QWheelEvent *event)
 {
     d_ptr->m_visualController->wheelEvent(event);
 }
+#endif
 
 QAbstract3DGraphPrivate::QAbstract3DGraphPrivate(QAbstract3DGraph *q)
     : QObject(0),

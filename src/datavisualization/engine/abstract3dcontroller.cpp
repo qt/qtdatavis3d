@@ -589,11 +589,13 @@ void Abstract3DController::mouseMoveEvent(QMouseEvent *event, const QPoint &mous
         m_activeInputHandler->mouseMoveEvent(event, mousePos);
 }
 
+#if QT_CONFIG(wheelevent)
 void Abstract3DController::wheelEvent(QWheelEvent *event)
 {
     if (m_activeInputHandler)
         m_activeInputHandler->wheelEvent(event);
 }
+#endif
 
 void Abstract3DController::handleThemeColorStyleChanged(Q3DTheme::ColorStyle style)
 {

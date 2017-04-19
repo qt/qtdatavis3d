@@ -250,7 +250,9 @@ protected:
     virtual void mousePressEvent(QMouseEvent *event);
     virtual void mouseReleaseEvent(QMouseEvent *event);
     virtual void mouseMoveEvent(QMouseEvent *event);
+#if QT_CONFIG(wheelevent)
     virtual void wheelEvent(QWheelEvent *event);
+#endif
     virtual void handleWindowChanged(QQuickWindow *win);
     virtual void itemChange(ItemChange change, const ItemChangeData &value);
     virtual void updateWindowParameters();

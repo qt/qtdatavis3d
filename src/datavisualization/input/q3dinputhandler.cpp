@@ -236,6 +236,7 @@ void Q3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 #endif
 }
 
+#if QT_CONFIG(wheelevent)
 /*!
  * Override this to change handling of wheel events.
  * The wheel event is given in the \a event.
@@ -272,6 +273,7 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
         }
     }
 }
+#endif
 
 /*!
  * \property Q3DInputHandler::rotationEnabled
