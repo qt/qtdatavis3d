@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -35,7 +35,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QCategory3DAxis
  * \inmodule QtDataVisualization
- * \brief The QCategory3DAxis class is used for manipulating an axis of a graph.
+ * \brief The QCategory3DAxis class manipulates an axis of a graph.
  * \since QtDataVisualization 1.0
  *
  * QCategory3DAxis provides an axis that can be given labels. The axis is divided into equal-sized
@@ -52,7 +52,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QCategory3DAxis
  * \inherits AbstractAxis3D
- * \brief The CategoryAxis3D type is used for manipulating an axis of a graph.
+ * \brief Manipulates an axis of a graph.
  *
  * This type provides an axis that can be given labels.
  */
@@ -66,7 +66,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * Constructs QCategory3DAxis with \a parent.
+ * Constructs a category 3D axis with the parent \a parent.
  */
 QCategory3DAxis::QCategory3DAxis(QObject *parent) :
     QAbstract3DAxis(new QCategory3DAxisPrivate(this), parent)
@@ -75,7 +75,7 @@ QCategory3DAxis::QCategory3DAxis(QObject *parent) :
 }
 
 /*!
- * Destroys QCategory3DAxis.
+ * Destroys the category 3D axis.
  */
 QCategory3DAxis::~QCategory3DAxis()
 {

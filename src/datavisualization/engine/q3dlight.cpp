@@ -58,10 +58,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty bool Light3D::autoPosition
  * \since QtDataVisualization 1.3
- * Holds a flag telling if the light position is automatic or not. If true, light position follows
- * camera automatically.
+ * Defines whether the light position follows the camera automatically.
  * \note Has no effect if shadows are enabled. Remember to disable shadows before setting light's
- * position, or it will be overwritten by automatic positioning, if autoPosition is false.
+ * position, or it will be overwritten by automatic positioning if this
+ * property is \c false.
  */
 
 /*!
@@ -84,10 +84,10 @@ Q3DLight::~Q3DLight()
 /*!
  * \property Q3DLight::autoPosition
  * \since QtDataVisualization 5.9
- * Holds a flag telling if the light position is automatic or not. If true, light position follows
- * camera automatically.
+ * \brief Whether the light position follows the camera automatically.
  * \note Has no effect if shadows are enabled. Remember to disable shadows before setting light's
- * position, or it will be overwritten by automatic positioning, if isAutoPosition() is false.
+ * position, or it will be overwritten by automatic positioning if
+ * \c isAutoPosition() is \c false.
  */
 void Q3DLight::setAutoPosition(bool enabled)
 {

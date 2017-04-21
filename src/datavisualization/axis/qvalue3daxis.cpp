@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -36,10 +36,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QValue3DAxis
  * \inmodule QtDataVisualization
- * \brief The QValue3DAxis class is used for manipulating an axis of a graph.
+ * \brief The QValue3DAxis class manipulates an axis of a graph.
  * \since QtDataVisualization 1.0
  *
- * QValue3DAxis provides an axis that can be given a range of values and segment and subsegment
+ * A value axis can be given a range of values and segment and subsegment
  * counts to divide the range into.
  *
  * Labels are drawn between each segment. Grid lines are drawn between each segment and each
@@ -54,7 +54,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QValue3DAxis
  * \inherits AbstractAxis3D
- * \brief The ValueAxis3D type is used for manipulating an axis of a graph.
+ * \brief Manipulates an axis of a graph.
  *
  * This type provides an axis that can be given a range of values and segment and subsegment
  * counts to divide the range into.
@@ -65,8 +65,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty int ValueAxis3D::segmentCount
  *
  * The number of segments on the axis. This indicates how many labels are drawn. The number
- * of grid lines to be drawn is calculated with formula: \c {segments * subsegments + 1}.
- * The preset default is \c 5, and it can not be below \c 1.
+ * of grid lines to be drawn is calculated with the following formula:
+ * \c {segments * subsegments + 1}.
+ * The preset default is \c 5. The value cannot be below \c 1.
  */
 
 /*!
@@ -74,20 +75,22 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *
  * The number of subsegments inside each segment on the axis. Grid lines are drawn between
  * each subsegment, in addition to each segment.
- * The preset default is \c 1, and it can not be below \c 1.
+ * The preset default is \c 1. The value cannot be below \c 1.
  */
 
 /*!
  * \qmlproperty string ValueAxis3D::labelFormat
  *
- * The label format to be used for the labels on this axis. How the format is interpreted
- * depends on the axis formatter and the locale in use. Using the default formatter and default
- * locale (\c{"C"}), the formatting uses QString::sprintf(). Supported specifiers are:
- * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
- * For other locales, the default formatter uses reduced set of printf format specifiers:
- * \c {d, i, f, F, e, E, g, G}. In these cases, the only supported modifier is the precision
- * modifier for the floating point and exponential formats. The decimal point and other locale
- * dependent formatting is done according to the graph locale.
+ * The label format to be used for the labels on this axis.
+ *
+ * The format string supports the following conversion specifiers, length
+ * modifiers, and flags provided by \c printf() in the standard C++ library:
+ * d, i, o, x, X, f, F, e, E, g, G, c.
+ *
+ * If AbstractGraph3D::locale is anything else than \c{"C"}, the supported
+ * specifiers are limited to: d, e, E, f, g, G, and i. Also, only the precision
+ * modifier is supported. The rest of the formatting comes from the default
+ * \l Locale of the application.
  *
  * \sa AbstractGraph3D::locale
  */
@@ -105,9 +108,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty bool ValueAxis3D::reversed
  * \since QtDataVisualization 1.1
  *
- * If \c{true}, the axis will be rendered in reverse, i.e. the positions of minimum and maximum
- * values are swapped when the graph is rendered. This property doesn't affect the actual
- * minimum and maximum values of the axis.
+ * If \c{true}, the axis will be rendered in reverse. That is, the positions of
+ * the minimum and maximum values are swapped when the graph is rendered. This
+ * property does not affect the actual minimum and maximum values of the axis.
  */
 
 /*!
@@ -133,7 +136,7 @@ QValue3DAxis::~QValue3DAxis()
  *
  * This indicates how many labels are drawn. The number
  * of grid lines to be drawn is calculated with formula: \c {segments * subsegments + 1}.
- * The preset default is \c 5, and it can not be below \c 1.
+ * The preset default is \c 5. The value cannot be below \c 1.
  *
  * \sa setSubSegmentCount()
  */
@@ -163,7 +166,7 @@ int QValue3DAxis::segmentCount() const
  *
  * Grid lines are drawn between
  * each subsegment, in addition to each segment.
- * The preset default is \c 1, and it can not be below \c 1.
+ * The preset default is \c 1. The value cannot be below \c 1.
  *
  * \sa setSegmentCount()
  */
@@ -190,14 +193,14 @@ int QValue3DAxis::subSegmentCount() const
  *
  * \brief The label format to be used for the labels on this axis.
  *
- * How the format is interpreted
- * depends on the axis formatter and the locale in use. Using the default formatter and default
- * locale (\c{"C"}), the formatting uses QString::sprintf(). Supported specifiers are:
- * \c {d, i, o, x, X, f, F, e, E, g, G, c}. See QString::sprintf() for additional details.
- * For other locales, the default formatter uses reduced set of printf format specifiers:
- * \c {d, i, f, F, e, E, g, G}. In these cases, the only supported modifier is the precision
- * modifier for the floating point and exponential formats. The decimal point and other locale
- * dependent formatting is done according to the graph locale.
+ * The format string supports the following conversion specifiers, length
+ * modifiers, and flags provided by \c printf() in the standard C++ library:
+ * d, i, o, x, X, f, F, e, E, g, G, c.
+ *
+ * If QAbstract3DGraph::locale is anything else than \c{"C"}, the supported
+ * specifiers are limited to: d, e, E, f, g, G, and i. Also, only the precision
+ * modifier is supported. The rest of the formatting comes from the default
+ * QLocale of the application.
  *
  * Usage example:
  *

@@ -35,35 +35,39 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QSurface3DSeries
  * \inmodule QtDataVisualization
- * \brief Base series class for Q3DSurface.
+ * \brief The QSurface3DSeries class represents a data series in a 3D surface
+ * graph.
  * \since QtDataVisualization 1.0
  *
- * QSurface3DSeries manages the series specific visual elements, as well as series data
- * (via data proxy).
+ * This class manages the series specific visual elements, as well as the series
+ * data (via a data proxy).
  *
  * If no data proxy is set explicitly for the series, the series creates a default
  * proxy. Setting another proxy will destroy the existing proxy and all data added to it.
  *
- * The object mesh set via QAbstract3DSeries::mesh property defines the selection
- * pointer shape in surface series.
+ * The object mesh set via the QAbstract3DSeries::mesh property defines the selection
+ * pointer shape in a surface series.
  *
  * QSurface3DSeries supports the following format tags for QAbstract3DSeries::setItemLabelFormat():
  * \table
  *   \row
- *     \li @xTitle    \li Title from X axis
+ *     \li @xTitle    \li Title from x-axis
  *   \row
- *     \li @yTitle    \li Title from Y axis
+ *     \li @yTitle    \li Title from y-axis
  *   \row
- *     \li @zTitle    \li Title from Z axis
+ *     \li @zTitle    \li Title from z-axis
  *   \row
- *     \li @xLabel    \li Item value formatted using the same format as the X axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @xLabel    \li Item value formatted using the format of the x-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
- *     \li @yLabel    \li Item value formatted using the same format as the Y axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @yLabel    \li Item value formatted using the format of the y-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
- *     \li @zLabel    \li Item value formatted using the same format as the Z axis attached to the graph uses,
- *                            see \l{QValue3DAxis::setLabelFormat()} for more information.
+ *     \li @zLabel    \li Item value formatted using the format of the z-axis.
+ *                        For more information, see
+ *                        \l{QValue3DAxis::setLabelFormat()}.
  *   \row
  *     \li @seriesName \li Name of the series
  * \endtable
@@ -81,14 +85,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QSurface3DSeries
  * \inherits Abstract3DSeries
- * \brief Base series type for Surfaces3D.
+ * \brief Represents a data series in a 3D surface graph.
  *
- * This type  manages the series specific visual elements, as well as series data
- * (via data proxy).
+ * This type manages the series specific visual elements, as well as the series
+ * data (via a data proxy).
  *
- * For Surface3DSeries enums, see \l{QSurface3DSeries::DrawFlag}.
- *
- * For more complete description, see QSurface3DSeries.
+ * For a more complete description, see QSurface3DSeries.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -96,20 +98,22 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty SurfaceDataProxy Surface3DSeries::dataProxy
  *
- * This property holds the active data \a proxy. The series assumes ownership of any proxy set to
- * it and deletes any previously set proxy when a new one is added. The \a proxy cannot be null or
+ * The active data proxy. The series assumes ownership of any proxy set to
+ * it and deletes any previously set proxy when a new one is added. The proxy cannot be null or
  * set to another series.
  */
 
 /*!
  * \qmlproperty point Surface3DSeries::selectedPoint
  *
- * Selects a surface grid point in a \a position. The position is the (row, column) position in
- * the data array of the series.
+ * Sets the surface grid point in the position specified by a row and a column
+ * in the data array of the series as selected.
  * Only one point can be selected at a time.
- * To clear selection from this series, set invalidSelectionPosition as the \a position.
+ *
+ * To clear selection from this series, invalidSelectionPosition is set as the position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
+ *
  * Removing rows from or inserting rows to the series before the row of the selected point
  * will adjust the selection so that the same point will stay selected.
  *
@@ -119,7 +123,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty point Surface3DSeries::invalidSelectionPosition
  * A constant property providing an invalid selection position.
- * Set this to selectedPoint property to clear the selection from this series.
+ * This position is set to the selectedPoint property to clear the selection
+ * from this series.
  *
  * \sa AbstractGraph3D::clearSelection()
  */
@@ -127,42 +132,45 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty bool Surface3DSeries::flatShadingEnabled
  *
- * Sets surface flat shading to \a enabled. It is preset to \c true by default.
- * When disabled, the normals on the surface are interpolated making edges looking round.
- * When enabled, the normals are kept same on a triangle making the color of the triangle solid.
+ * Sets surface flat shading to enabled. It is preset to \c true by default.
+ * When disabled, the normals on the surface are interpolated making the edges look round.
+ * When enabled, the normals are kept the same on a triangle making the color of the triangle solid.
  * This makes the data more readable from the model.
  * \note Flat shaded surfaces require at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
- * The value of flatShadingSupported property indicates if flat shading is supported at runtime.
+ * The value of the flatShadingSupported property indicates whether flat shading
+ * is supported at runtime.
  */
 
 /*!
  * \qmlproperty bool Surface3DSeries::flatShadingSupported
  *
- * Flat shading for surfaces requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
- * If true, flat shading for surfaces is supported by current system.
- * \note This read-only property is set to its correct value after first render pass.
- * Before then it is always true.
+ * Indicates whether flat shading for surfaces is supported by the current system.
+ * It requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
+ *
+ * \note This read-only property is set to its correct value after the first
+ * render pass. Until then it is always \c true.
  */
 
 /*!
  * \qmlproperty DrawFlag Surface3DSeries::drawMode
  *
- * Sets the drawing \a mode to one of \l{QSurface3DSeries::DrawFlag}{Surface3DSeries.DrawFlag}.
+ * Sets the drawing mode to one of \l{QSurface3DSeries::DrawFlag}{Surface3DSeries.DrawFlag}.
  * Clearing all flags is not allowed.
  */
 
 /*!
  * \qmlproperty string Surface3DSeries::textureFile
  *
- * Holds the texture file name for the surface texture. To clear the texture, set empty
- * file name.
+ * The texture file name for the surface texture. To clear the texture, an empty
+ * file name is set.
  */
 
 
 /*!
  * \enum QSurface3DSeries::DrawFlag
  *
- * Drawing mode of the surface. Values of this enumeration can be combined with OR operator.
+ * The drawing mode of the surface. Values of this enumeration can be combined
+ * with the OR operator.
  *
  * \value DrawWireframe
  *        Only the grid is drawn.
@@ -173,7 +181,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * Constructs QSurface3DSeries with the given \a parent.
+ * Constructs a surface 3D series with the parent \a parent.
  */
 QSurface3DSeries::QSurface3DSeries(QObject *parent) :
     QAbstract3DSeries(new QSurface3DSeriesPrivate(this), parent)
@@ -183,7 +191,8 @@ QSurface3DSeries::QSurface3DSeries(QObject *parent) :
 }
 
 /*!
- * Constructs QSurface3DSeries with the given \a dataProxy and the \a parent.
+ * Constructs a surface 3D series with the data proxy \a dataProxy and the
+ * parent \a parent.
  */
 QSurface3DSeries::QSurface3DSeries(QSurfaceDataProxy *dataProxy, QObject *parent) :
     QAbstract3DSeries(new QSurface3DSeriesPrivate(this), parent)
@@ -200,7 +209,7 @@ QSurface3DSeries::QSurface3DSeries(QSurface3DSeriesPrivate *d, QObject *parent) 
 }
 
 /*!
- * Destroys QSurface3DSeries.
+ * Deletes the surface 3D series.
  */
 QSurface3DSeries::~QSurface3DSeries()
 {
@@ -209,8 +218,10 @@ QSurface3DSeries::~QSurface3DSeries()
 /*!
  * \property QSurface3DSeries::dataProxy
  *
- * This property holds the active data \a proxy. The series assumes ownership of any proxy set to
- * it and deletes any previously set proxy when a new one is added. The \a proxy cannot be null or
+ * \brief The active data proxy.
+ *
+ * The series assumes ownership of any proxy set to it and deletes any
+ * previously set proxy when a new one is added. The proxy cannot be null or
  * set to another series.
  */
 void QSurface3DSeries::setDataProxy(QSurfaceDataProxy *proxy)
@@ -226,12 +237,19 @@ QSurfaceDataProxy *QSurface3DSeries::dataProxy() const
 /*!
  * \property QSurface3DSeries::selectedPoint
  *
- * Selects a surface grid point in a \a position. The position is the (row, column) position in
- * the data array of the series.
+ * \brief The surface grid point that is selected in the series.
+ */
+
+/*!
+ * Selects a surface grid point at the position \a position in the data array of
+ * the series specified by a row and a column.
+ *
  * Only one point can be selected at a time.
- * To clear selection from this series, set invalidSelectionPosition() as the \a position.
+ *
+ * To clear selection from this series, invalidSelectionPosition() is set as \a position.
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid.
+ *
  * Removing rows from or inserting rows to the series before the row of the selected point
  * will adjust the selection so that the same point will stay selected.
  *
@@ -252,8 +270,8 @@ QPoint QSurface3DSeries::selectedPoint() const
 }
 
 /*!
- * \return a QPoint signifying an invalid selection position. Set this to selectedPoint property
- * to clear the selection from this series.
+ * Returns the QPoint signifying an invalid selection position. This is set to
+ * the selectedPoint property to clear the selection from this series.
  *
  * \sa QAbstract3DGraph::clearSelection()
  */
@@ -265,12 +283,16 @@ QPoint QSurface3DSeries::invalidSelectionPosition()
 /*!
  * \property QSurface3DSeries::flatShadingEnabled
  *
- * Sets surface flat shading to \a enabled. It is preset to \c true by default.
- * When disabled, the normals on the surface are interpolated making edges looking round.
- * When enabled, the normals are kept same on a triangle making the color of the triangle solid.
+ * \brief Whether surface flat shading is enabled.
+ *
+ * Preset to \c true by default.
+ *
+ * When disabled, the normals on the surface are interpolated making the edges look round.
+ * When enabled, the normals are kept the same on a triangle making the color of the triangle solid.
  * This makes the data more readable from the model.
  * \note Flat shaded surfaces require at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
- * The value of flatShadingSupported property indicates if flat shading is supported at runtime.
+ * The value of the flatShadingSupported property indicates whether flat shading
+ * is supported at runtime.
  */
 void QSurface3DSeries::setFlatShadingEnabled(bool enabled)
 {
@@ -287,10 +309,13 @@ bool QSurface3DSeries::isFlatShadingEnabled() const
 
 /*!
  * \property QSurface3DSeries::flatShadingSupported
+ *
+ * \brief Whether surface flat shading is supported by the current system.
+ *
  * Flat shading for surfaces requires at least GLSL version 1.2 with GL_EXT_gpu_shader4 extension.
- * If true, flat shading for surfaces is supported by current system.
- * \note This read-only property is set to its correct value after first render pass.
- * Before then it is always true.
+ * If \c true, flat shading for surfaces is supported.
+ * \note This read-only property is set to its correct value after the first
+ * render pass. Until then it is always \c true.
  */
 bool QSurface3DSeries::isFlatShadingSupported() const
 {
@@ -303,7 +328,9 @@ bool QSurface3DSeries::isFlatShadingSupported() const
 /*!
  * \property QSurface3DSeries::drawMode
  *
- * Sets the drawing \a mode to one of DrawFlag. Clearing all flags is not allowed.
+ * The drawing mode.
+ *
+ * Possible values are the values of DrawFlag. Clearing all flags is not allowed.
  */
 void QSurface3DSeries::setDrawMode(DrawFlags mode)
 {
@@ -321,8 +348,9 @@ QSurface3DSeries::DrawFlags QSurface3DSeries::drawMode() const
 /*!
  * \property QSurface3DSeries::texture
  *
- * Set the \a texture as a QImage for the surface. To clear the texture, set empty
- * QImage as texture.
+ * \brief The texture for the surface as a QImage.
+ *
+ * Setting an empty QImage clears the texture.
  */
 void QSurface3DSeries::setTexture(const QImage &texture)
 {
@@ -342,8 +370,9 @@ QImage QSurface3DSeries::texture() const
 /*!
  * \property QSurface3DSeries::textureFile
  *
- * Holds the texture file name for the surface texture. To clear the texture, set empty
- * file name.
+ * \brief The texture for the surface as a file.
+ *
+ * Setting an empty file name clears the texture.
  */
 void QSurface3DSeries::setTextureFile(const QString &filename)
 {

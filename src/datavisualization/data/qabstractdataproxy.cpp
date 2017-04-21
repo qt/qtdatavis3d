@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -35,11 +35,14 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QAbstractDataProxy
  * \inmodule QtDataVisualization
- * \brief Base class for all QtDataVisualization data proxies.
+ * \brief The QAbstractDataProxy class is a base class for all data
+ * visualization data proxies.
  * \since QtDataVisualization 1.0
  *
- * You use the visualization type specific inherited classes instead of the base class.
- * \sa QBarDataProxy, QScatterDataProxy, QSurfaceDataProxy, {Qt Data Visualization Data Handling}
+ * The following visualization type specific inherited classes are used instead
+ * of the base class: QBarDataProxy, QScatterDataProxy, and QSurfaceDataProxy.
+ *
+ * For more information, see \l{Qt Data Visualization Data Handling}.
  */
 
 /*!
@@ -50,22 +53,21 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \instantiates QAbstractDataProxy
  * \brief Base type for all QtDataVisualization data proxies.
  *
- * This type is uncreatable, but contains properties that are exposed via subtypes.
+ * This type is uncreatable, but contains properties that are exposed via the
+ * following subtypes: BarDataProxy, ScatterDataProxy, SurfaceDataProxy.
  *
- * For AbstractDataProxy enums, see \l{QAbstractDataProxy::DataType}.
- *
- * \sa BarDataProxy, ScatterDataProxy, SurfaceDataProxy, {Qt Data Visualization Data Handling}
+ * For more information, see \l {Qt Data Visualization Data Handling}.
  */
 
 /*!
  * \qmlproperty AbstractDataProxy.DataType AbstractDataProxy::type
- * The type of the proxy.
+ * The type of the proxy. One of the QAbstractDataProxy::DataType values.
  */
 
 /*!
  * \enum QAbstractDataProxy::DataType
  *
- * Data type of the proxy.
+ * This enum type specifies the data type of the proxy.
  *
  * \value DataTypeNone
  *        No data type.
@@ -87,7 +89,7 @@ QAbstractDataProxy::QAbstractDataProxy(QAbstractDataProxyPrivate *d, QObject *pa
 }
 
 /*!
- * Destroys QAbstractDataProxy.
+ * Deletes the abstract data proxy.
  */
 QAbstractDataProxy::~QAbstractDataProxy()
 {
@@ -96,7 +98,7 @@ QAbstractDataProxy::~QAbstractDataProxy()
 /*!
  * \property QAbstractDataProxy::type
  *
- * \brief The type of the proxy.
+ * \brief The data type of the proxy.
  */
 QAbstractDataProxy::DataType QAbstractDataProxy::type() const
 {

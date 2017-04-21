@@ -143,15 +143,15 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
     \value ElementNone
            No defined element.
     \value ElementSeries
-           A series (i.e. an item in a series).
+           A series (that is, an item in a series).
     \value ElementAxisXLabel
-           X axis label.
+           The x-axis label.
     \value ElementAxisYLabel
-           Y axis label.
+           The y-axis label.
     \value ElementAxisZLabel
-           Z axis label.
+           The z-axis label.
     \value ElementCustomItem
-           Custom item.
+           A custom item.
 */
 
 /*!
@@ -269,10 +269,15 @@ void QAbstract3DGraph::releaseInputHandler(QAbstract3DInputHandler *inputHandler
 /*!
  * \property QAbstract3DGraph::activeInputHandler
  *
- * The active \a inputHandler used in the graph. Implicitly calls addInputHandler() to transfer
- * ownership of the \a inputHandler to this graph.
+ * \brief The active input handler used in the graph.
+ */
+
+/*!
+ * Sets \a inputHandler as the active input handler used in the graph.
+ * Implicitly calls addInputHandler() to transfer ownership of \a inputHandler
+ * to this graph.
  *
- * If the \a inputHandler is null, no input handler will be active after this call.
+ * If \a inputHandler is null, no input handler will be active after this call.
  *
  * \sa addInputHandler(), releaseInputHandler()
  */
@@ -287,7 +292,7 @@ QAbstract3DInputHandler *QAbstract3DGraph::activeInputHandler() const
 }
 
 /*!
- * \return list of all added input handlers.
+ * Returns the list of all added input handlers.
  *
  * \sa addInputHandler()
  */
@@ -298,7 +303,7 @@ QList<QAbstract3DInputHandler *> QAbstract3DGraph::inputHandlers() const
 
 /*!
  * Adds the given \a theme to the graph. The themes added via addTheme are not taken in to use
- * directly. Only the ownership of the a\ theme is given to the graph.
+ * directly. Only the ownership of the theme is given to the graph.
  * The \a theme must not be null or already added to another graph.
  *
  * \sa releaseTheme(), setActiveTheme()
@@ -324,11 +329,16 @@ void QAbstract3DGraph::releaseTheme(Q3DTheme *theme)
 /*!
  * \property QAbstract3DGraph::activeTheme
  *
- * The active \a theme to be used for the graph. Implicitly calls addTheme() to transfer ownership
- * of the \a theme to this graph.
- * If the \a theme is null, a temporary default theme is created. This temporary theme is destroyed
+ * \brief The active theme of the graph.
+ */
+
+/*!
+ * Sets \a theme as the active theme to be used for the graph. Implicitly calls
+ * addTheme() to transfer the ownership of the theme to this graph.
+ *
+ * If \a theme is null, a temporary default theme is created. This temporary theme is destroyed
  * if any theme is explicitly set later.
- * Properties of the \a theme can be modified even after setting it, and the modifications take
+ * Properties of the theme can be modified even after setting it, and the modifications take
  * effect immediately.
  */
 void QAbstract3DGraph::setActiveTheme(Q3DTheme *theme)
@@ -343,7 +353,7 @@ Q3DTheme *QAbstract3DGraph::activeTheme() const
 }
 
 /*!
- * \return list of all added themes.
+ * Returns the list of all added themes.
  *
  * \sa addTheme()
  */
@@ -355,10 +365,12 @@ QList<Q3DTheme *> QAbstract3DGraph::themes() const
 /*!
  * \property QAbstract3DGraph::selectionMode
  *
- * Sets selection \a mode to a combination of SelectionFlags. It is preset to
- * \c SelectionItem by default.
- * Different graph types support different selection modes. See SelectionFlags
- * documentation for details.
+ * \brief Item selection mode.
+ *
+ * A combination of SelectionFlags. By default, \c SelectionItem.
+ * Different graph types support different selection modes.
+ *
+ * \sa SelectionFlags
  */
 void QAbstract3DGraph::setSelectionMode(SelectionFlags mode)
 {
@@ -373,12 +385,15 @@ QAbstract3DGraph::SelectionFlags QAbstract3DGraph::selectionMode() const
 /*!
  * \property QAbstract3DGraph::shadowQuality
  *
- * Sets the shadow \a quality to one of the ShadowQuality enum values. It is preset to
- * \c ShadowQualityMedium by default.
+ * \brief The quality of the shadow.
+ *
+ * One of the ShadowQuality enum values. By default, \c ShadowQualityMedium.
  *
  * \note If setting the shadow quality to a certain level fails, the level is lowered
- * until it is successfully set. The \c shadowQualityChanged signal is emitted for each time
- * a change is done.
+ * until it is successfully set. The \c shadowQualityChanged signal is emitted each time
+ * a change is made.
+ *
+ * \sa ShadowQuality
  */
 void QAbstract3DGraph::setShadowQuality(ShadowQuality quality)
 {
@@ -391,7 +406,7 @@ QAbstract3DGraph::ShadowQuality QAbstract3DGraph::shadowQuality() const
 }
 
 /*!
- * \return true if shadows are supported with the current configuration.
+ * Returns \c true if shadows are supported with the current configuration.
  * OpenGL ES2 configurations do not support shadows.
  */
 bool QAbstract3DGraph::shadowsSupported() const
@@ -402,8 +417,10 @@ bool QAbstract3DGraph::shadowsSupported() const
 /*!
  * \property QAbstract3DGraph::scene
  *
- * This property is read-only and contains the Q3DScene pointer that can be used to manipulate
- * the scene and access the scene elements, such as the active camera.
+ * \brief The Q3DScene pointer that can be used to manipulate the scene and
+ * access the scene elements, such as the active camera.
+ *
+ * This property is read-only.
  */
 Q3DScene *QAbstract3DGraph::scene() const
 {
@@ -421,8 +438,9 @@ void QAbstract3DGraph::clearSelection()
 /*!
  * Adds a QCustom3DItem \a item to the graph. Graph takes ownership of the added item.
  *
- * \return index to the added item if add was successful, -1 if trying to add a null item, and
- * index of the item if trying to add an already added item.
+ * Returns the index to the added item if the add operation was successful, -1
+ * if trying to add a null item, and the index of the item if trying to add an
+ * already added item.
  *
  * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt(), customItems()
  *
@@ -479,7 +497,7 @@ void QAbstract3DGraph::releaseCustomItem(QCustom3DItem *item)
 }
 
 /*!
- * \return list of all added custom items.
+ * Returns the list of all added custom items.
  * \since QtDataVisualization 1.2
  * \sa addCustomItem()
  */
@@ -492,7 +510,7 @@ QList<QCustom3DItem *> QAbstract3DGraph::customItems() const
  * Can be used to query the index of the selected label after receiving \c selectedElementChanged
  * signal with any label type. Selection is valid until the next \c selectedElementChanged signal.
  *
- * \return index of the selected label, or -1.
+ * Returns the index of the selected label, or -1.
  *
  * \since QtDataVisualization 1.1
  *
@@ -507,7 +525,7 @@ int QAbstract3DGraph::selectedLabelIndex() const
  * Can be used to get the selected axis after receiving \c selectedElementChanged signal with any label
  * type. Selection is valid until the next \c selectedElementChanged signal.
  *
- * \return pointer to the selected axis, or null.
+ * Returns the pointer to the selected axis, or null.
  *
  * \since QtDataVisualization 1.1
  *
@@ -523,7 +541,7 @@ QAbstract3DAxis *QAbstract3DGraph::selectedAxis() const
  * signal with QAbstract3DGraph::ElementCustomItem type. Selection is valid until the next
  * \c selectedElementChanged signal.
  *
- * \return index of the selected custom item, or -1.
+ * Returns the index of the selected custom item, or -1.
  *
  * \since QtDataVisualization 1.1
  *
@@ -539,7 +557,7 @@ int QAbstract3DGraph::selectedCustomItemIndex() const
  * QAbstract3DGraph::ElementCustomItem type. Ownership of the item remains with the graph.
  * Selection is valid until the next \c selectedElementChanged signal.
  *
- * \return pointer to the selected custom item, or null.
+ * Returns the pointer to the selected custom item, or null.
  *
  * \since QtDataVisualization 1.1
  *
@@ -553,13 +571,14 @@ QCustom3DItem *QAbstract3DGraph::selectedCustomItem() const
 /*!
  * \property QAbstract3DGraph::selectedElement
  *
- * Can be used to query the selected element type.
- * Type is valid until the next \c selectedElementChanged signal.
+ * \brief The element selected in the graph.
  *
- * \c selectedElementChanged signal is emitted when a selection is made in the graph.
+ * This property can be used to query the selected element type. The type is
+ * valid until a new selection is made in the graph and the
+ * \c selectedElementChanged signal is emitted.
  *
- * Signal can be used for example for implementing custom input handlers, as demonstrated in this
- * \l {Axis Range Dragging With Labels Example}{example}.
+ * The signal can be used for example for implementing custom input handlers, as
+ * demonstrated by the \l {Axis Range Dragging With Labels Example}.
  *
  * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
  * Q3DBars::selectedSeries(), Q3DScatter::selectedSeries(), Q3DSurface::selectedSeries(),
@@ -578,7 +597,7 @@ QAbstract3DGraph::ElementType QAbstract3DGraph::selectedElement() const
  *
  * \since QtDataVisualization 1.1
  *
- * \return rendered image.
+ * Returns the rendered image.
  *
  * \note OpenGL ES2 does not support anitialiasing, so \a msaaSamples is always forced to \c{0}.
  */
@@ -594,8 +613,10 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
  * \property QAbstract3DGraph::measureFps
  * \since QtDataVisualization 1.1
  *
- * If \c {true}, the rendering is done continuously instead of on demand, and currentFps property
- * is updated. Defaults to \c{false}.
+ * \brief Whether rendering is done continuously instead of on demand.
+ *
+ * If \c {true}, rendering is continuous and the value of the currentFps
+ * property is updated. Defaults to \c{false}.
  *
  * \sa currentFps
  */
@@ -613,8 +634,11 @@ bool QAbstract3DGraph::measureFps() const
  * \property QAbstract3DGraph::currentFps
  * \since QtDataVisualization 1.1
  *
- * When fps measuring is enabled, the results for the last second are stored in this read-only
- * property. It takes at least a second before this value updates after measurement is activated.
+ * \brief The rendering results for the last second.
+ *
+ * The results are stored in this read-only property when FPS measuring is
+ * enabled. It takes at least a second before this value is updated after
+ * measuring is activated.
  *
  * \sa measureFps
  */
@@ -627,9 +651,11 @@ qreal QAbstract3DGraph::currentFps() const
  * \property QAbstract3DGraph::orthoProjection
  * \since QtDataVisualization 1.1
  *
- * If \c {true}, orthographic projection will be used for displaying the graph.
- * \note Orthographic projection can be used to create 2D graphs by replacing the default input
- * handler with one that doesn't allow rotating the graph and setting the camera to view the graph
+ * \brief Whether orthographic projection is used for displaying the graph.
+ *
+ * If \c {true}, ortographic projection is used to create 2D graphs by replacing
+ * the default input handler with one that does not allow rotating the graph and
+ * by setting the camera to view the graph
  * directly from the side or from the top. Also, axis labels typically need to be rotated when
  * viewing the graph from the sides.
  * Defaults to \c{false}.
@@ -651,8 +677,10 @@ bool QAbstract3DGraph::isOrthoProjection() const
  * \property QAbstract3DGraph::aspectRatio
  * \since QtDataVisualization 1.1
  *
- * The aspect ratio is the ratio of the graph scaling between the longest axis on the horizontal
- * plane and the Y-axis. Defaults to \c{2.0}.
+ * \brief The ratio of the graph scaling between the longest axis on the
+ * horizontal plane and the y-axis.
+ *
+ * Defaults to \c{2.0}.
  *
  * \note Has no effect on Q3DBars.
  *
@@ -671,18 +699,21 @@ qreal QAbstract3DGraph::aspectRatio() const
 /*!
  * \property QAbstract3DGraph::optimizationHints
  *
- * Defines if the rendering optimization is default or static. Default mode provides the full
- * feature set at reasonable performance. Static mode optimizes graph rendering and is ideal for
+ * \brief Whether the default or static mode is used for rendering optimization.
+ *
+ * The default mode provides the full feature set at a reasonable level of
+ * performance. The static mode optimizes graph rendering and is ideal for
  * large non-changing data sets. It is slower with dynamic data changes and item rotations.
- * Selection is not optimized, so using it with massive data sets is not advisable.
- * Static works only on the Scatter graph.
- * Defaults to \c{OptimizationDefault}.
+ * Selection is not optimized, so using the static mode with massive data sets is not advisable.
+ * Static optimization works only on scatter graphs.
+ * Defaults to \l{OptimizationDefault}.
  *
  * \note On some environments, large graphs using static optimization may not render, because
- * all of the items are rendered using a single draw call, and different graphics drivers have
- * different maximum vertice counts per call that they support.
- * This is mostly an issue on 32bit and/or OpenGL ES2 platforms.
- * To work around this issue, choose an item mesh with low vertex count or use the point mesh.
+ * all of the items are rendered using a single draw call, and different graphics drivers
+ * support different maximum vertice counts per call.
+ * This is mostly an issue on 32bit and OpenGL ES2 platforms.
+ * To work around this issue, choose an item mesh with a low vertex count or use
+ * the point mesh.
  *
  * \sa QAbstract3DSeries::mesh
  */
@@ -700,8 +731,10 @@ QAbstract3DGraph::OptimizationHints QAbstract3DGraph::optimizationHints() const
  * \property QAbstract3DGraph::polar
  * \since QtDataVisualization 1.2
  *
- * If \c {true}, the horizontal axes are changed into polar axes. The X axis becomes the
- * angular axis and the Z axis becomes the radial axis.
+ * \brief Whether horizontal axes are changed into polar axes.
+ *
+ * If \c {true}, the x-axis becomes the angular axis and the z-axis becomes the
+ * radial axis.
  * Polar mode is not available for bar graphs.
  *
  * Defaults to \c{false}.
@@ -722,11 +755,14 @@ bool QAbstract3DGraph::isPolar() const
  * \property QAbstract3DGraph::radialLabelOffset
  * \since QtDataVisualization 1.2
  *
- * This property specifies the normalized horizontal offset for the axis labels of the radial
- * polar axis. The value 0.0 indicates the labels should be drawn next to the 0-angle angular
- * axis grid line. The value 1.0 indicates the labels are drawn on their normal place at the edge
- * of the graph background.
- * This property is ignored if polar property value is \c{false}. Defaults to 1.0.
+ * \brief The normalized horizontal offset for the axis labels of the radial
+ * polar axis.
+ *
+ * The value \c 0.0 indicates that the labels should be drawn next to the 0-angle
+ * angular axis grid line. The value \c 1.0 indicates that the labels are drawn
+ * in their usual place at the edge of the graph background. Defaults to \c 1.0.
+ *
+ * This property is ignored if the \l polar property value is \c{false}.
  *
  * \sa polar
  */
@@ -744,12 +780,13 @@ float QAbstract3DGraph::radialLabelOffset() const
  * \property QAbstract3DGraph::horizontalAspectRatio
  * \since QtDataVisualization 1.2
  *
- * The horizontal aspect ratio is the ratio of the graph scaling between the X and Z axes.
- * Value of 0.0 indicates automatic scaling according to axis ranges.
+ * \brief The ratio of the graph scaling between the x-axis and z-axis.
+ *
+ * The value of \c 0.0 indicates automatic scaling according to axis ranges.
  * Defaults to \c{0.0}.
  *
- * \note Has no effect on Q3DBars, which handles scaling on the horizontal plane via
- * \l{Q3DBars::barThickness}{barThickness} and \l{Q3DBars::barSpacing}{barSpacing} properties.
+ * Has no effect on Q3DBars, which handles scaling on the horizontal plane via
+ * the \l{Q3DBars::barThickness}{barThickness} and \l{Q3DBars::barSpacing}{barSpacing} properties.
  * Polar graphs also ignore this property.
  *
  * \sa aspectRatio, polar, Q3DBars::barThickness, Q3DBars::barSpacing
@@ -768,15 +805,16 @@ qreal QAbstract3DGraph::horizontalAspectRatio() const
  * \property QAbstract3DGraph::reflection
  * \since QtDataVisualization 1.2
  *
- * Sets floor reflections on or off. Defaults to \c{false}.
+ * \brief Whether floor reflections are on or off.
  *
- * \note Affects only Q3DBars.
+ * Defaults to \c{false}.
  *
- * \note In Q3DBars graphs holding both positive and negative values, reflections are not supported
- * for custom items that intersect the floor plane. In that case, reflections should be turned off
+ * Affects only Q3DBars. However, in Q3DBars graphs holding both positive and
+ * negative values, reflections are not supported for custom items that
+ * intersect the floor plane. In that case, reflections should be turned off
  * to avoid incorrect rendering.
  *
- * \note If using custom surface format, stencil buffer needs to be defined
+ * If using a custom surface format, the stencil buffer needs to be defined
  * (QSurfaceFormat::setStencilBufferSize()) for reflections to work.
  *
  * \sa reflectivity
@@ -795,7 +833,9 @@ bool QAbstract3DGraph::isReflection() const
  * \property QAbstract3DGraph::reflectivity
  * \since QtDataVisualization 1.2
  *
- * Adjusts floor reflectivity, larger number being more reflective. Valid range is \c{[0...1]}.
+ * \brief Floor reflectivity.
+ *
+ * Larger numbers make the floor more reflective. The valid range is \c{[0...1]}.
  * Defaults to \c{0.5}.
  *
  * \note Affects only Q3DBars.
@@ -816,8 +856,9 @@ qreal QAbstract3DGraph::reflectivity() const
  * \property QAbstract3DGraph::locale
  * \since QtDataVisualization 1.2
  *
- * Sets the locale used for formatting various numeric labels.
- * Defaults to \c{"C"} locale.
+ * \brief The locale used for formatting various numeric labels.
+ *
+ * Defaults to the \c{"C"} locale.
  *
  * \sa QValue3DAxis::labelFormat
  */
@@ -835,18 +876,20 @@ QLocale QAbstract3DGraph::locale() const
  * \property QAbstract3DGraph::queriedGraphPosition
  * \since QtDataVisualization 1.2
  *
- * This read-only property contains the latest graph position values along each axis queried using
- * Q3DScene::graphPositionQuery. The values are normalized to range \c{[-1, 1]}.
- * If the queried position was outside the graph bounds, the values
- * will not reflect the real position, but will instead be some undefined position outside
- * the range \c{[-1, 1]}. The value will be undefined before any queries are made.
+ * \brief The latest queried graph position values along each axis.
  *
- * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * This read-only property contains the results from
+ * Q3DScene::graphPositionQuery. The values are normalized to the range \c{[-1, 1]}.
+ * If the queried position was outside the graph bounds, the values
+ * will not reflect the real position, but will instead indicate an undefined position outside
+ * the range \c{[-1, 1]}. The value will be undefined until a query is made.
+ *
+ * There is no single correct 3D coordinate to match a particular screen position, so to be
  * consistent, the queries are always done against the inner sides of an invisible box surrounding
  * the graph.
  *
  * \note Bar graphs only allow querying graph position at the graph floor level,
- * so the Y-value is always zero for bar graphs and the valid queries can be only made at
+ * so the y-value is always zero for bar graphs and the valid queries can be only made at
  * screen positions that contain the floor of the graph.
  *
  * \sa Q3DScene::graphPositionQuery
@@ -860,18 +903,20 @@ QVector3D QAbstract3DGraph::queriedGraphPosition() const
  * \property QAbstract3DGraph::margin
  * \since QtDataVisualization 1.2
  *
- * This property contains the absolute value used for graph margin. The graph margin is the space
- * left between the edge of the plottable graph area and the edge of the graph background.
+ * \brief The absolute value used for the space left between the edge of the
+ * plottable graph area and the edge of the graph background.
+ *
  * If the margin value is negative, the margins are determined automatically and can vary according
- * to size of the items in the series and the type of the graph.
- * The value is interpreted as a fraction of Y-axis range, provided the graph aspect ratios have
- * not beed changed from the defaults.
+ * to the size of the items in the series and the type of the graph.
+ * The value is interpreted as a fraction of the y-axis range if the graph
+ * aspect ratios have not beed changed from the default values.
  * Defaults to \c{-1.0}.
  *
- * \note Having smaller than the automatically determined margin on scatter graph can cause
- * the scatter items at the edges of the graph to overlap with the graph background.
+ * \note Setting a smaller margin for a scatter graph than the automatically
+ * determined margin can cause the scatter items at the edges of the graph to
+ * overlap with the graph background.
  *
- * \note On scatter and surface graphs, if the margin is comparatively small to the axis label
+ * \note On scatter and surface graphs, if the margin is small in comparison to the axis label
  * size, the positions of the edge labels of the axes are adjusted to avoid overlap with
  * the edge labels of the neighboring axes.
  */
@@ -886,7 +931,7 @@ qreal QAbstract3DGraph::margin() const
 }
 
 /*!
- * \return \c{true} if the OpenGL context of the graph has been successfully initialized.
+ * Returns \c{true} if the OpenGL context of the graph has been successfully initialized.
  * Trying to use a graph when the context initialization has failed typically results in a crash.
  * A common reason for a context initialization failure is lack of sufficient platform support
  * for OpenGL.

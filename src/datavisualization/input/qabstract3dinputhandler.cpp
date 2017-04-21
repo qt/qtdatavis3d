@@ -148,8 +148,14 @@ void QAbstract3DInputHandler::wheelEvent(QWheelEvent *event)
 /*!
  * \property QAbstract3DInputHandler::inputView
  *
- * Current enumerated input view based on the view of the processed input events.
- * When the view changes \c inputViewChanged signal is emitted.
+ * \brief The current enumerated input view based on the view of the processed
+ * input events.
+ *
+ * One of the InputView enum values.
+ *
+ * When the view changes, the \c inputViewChanged signal is emitted.
+ *
+ * \sa InputView
  */
 QAbstract3DInputHandler::InputView QAbstract3DInputHandler::inputView() const
 {
@@ -167,7 +173,7 @@ void QAbstract3DInputHandler::setInputView(InputView inputView)
 /*!
  * \property QAbstract3DInputHandler::inputPosition
  *
- * Last input position based on the processed input events.
+ * \brief The last input position based on the processed input events.
  */
 QPoint QAbstract3DInputHandler::inputPosition() const
 {
@@ -183,7 +189,7 @@ void QAbstract3DInputHandler::setInputPosition(const QPoint &position)
 }
 
 /*!
- * \return the manhattan length between last two input positions.
+ * Returns the manhattan length between last two input positions.
  */
 int QAbstract3DInputHandler::prevDistance() const
 {
@@ -201,9 +207,10 @@ void QAbstract3DInputHandler::setPrevDistance(int distance)
 /*!
  * \property QAbstract3DInputHandler::scene
  *
- * The 3D scene this abstract input handler is controlling. Only one scene can
- * be controlled by one input handler. Setting a \a scene to an input handler doesn't
- * transfer the ownership of the \a scene.
+ * \brief The 3D scene this abstract input handler is controlling.
+ *
+ * One input handler can control one scene. Setting a scene to an input handler
+ * does not transfer the ownership of the scene.
  */
 Q3DScene *QAbstract3DInputHandler::scene() const
 {
@@ -228,7 +235,6 @@ void QAbstract3DInputHandler::setPreviousInputPos(const QPoint &position)
 
 /*!
  * Returns the previous input position.
- * \return Previous input position.
  */
 QPoint QAbstract3DInputHandler::previousInputPos() const
 {

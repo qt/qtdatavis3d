@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -34,10 +34,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QAbstract3DAxis
  * \inmodule QtDataVisualization
- * \brief QAbstract3DAxis is base class for axes of a graph.
+ * \brief The QAbstract3DAxis class is a base class for the axes of a graph.
  * \since QtDataVisualization 1.0
  *
- * You should not need to use this class directly, but one of its subclasses instead.
+ * This class specifies the enumerations, properties, and functions shared by
+ * graph axes. It should not be used directly, but one of its subclasses should
+ * be used instead.
  *
  * \sa QCategory3DAxis, QValue3DAxis
  */
@@ -48,7 +50,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
  * \instantiates QAbstract3DAxis
- * \brief AbstractAxis3D is base type for axes of a graph.
+ * \brief A base type for the axes of a graph.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
@@ -83,16 +85,16 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty real AbstractAxis3D::min
  *
  * The minimum value on the axis.
- * When setting this property the max is adjusted if necessary, to ensure that the range remains
- * valid.
+ * When setting this property, the maximum value is adjusted if necessary, to
+ * ensure that the range remains valid.
  */
 
 /*!
  * \qmlproperty real AbstractAxis3D::max
  *
  * The maximum value on the axis.
- * When setting this property the min is adjusted if necessary, to ensure that the range remains
- * valid.
+ * When setting this property, the minimum value is adjusted if necessary, to
+ * ensure that the range remains valid.
  */
 
 /*!
@@ -130,7 +132,8 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * to the axis labels.
  * If \c{false}, axis titles are only rotated around their axis but are not otherwise oriented
  * towards the camera.
- * This property doesn't have any effect if labelAutoRotation property value is zero.
+ * This property does not have any effect if the labelAutoRotation property
+ * value is zero.
  * Default value is \c{true}.
  *
  * \sa labelAutoRotation, title, titleVisible
@@ -235,9 +238,11 @@ QStringList QAbstract3DAxis::labels() const
 }
 
 /*!
- * Sets value range of the axis from \a min to \a max.
- * When setting the range, the max is adjusted if necessary, to ensure that the range remains valid.
- * \note For QCategory3DAxis this specifies the index range of rows or columns to show.
+ * Sets the value range of the axis from \a min to \a max.
+ * When setting the range, the maximum value is adjusted if necessary, to ensure
+ * that the range remains valid.
+ * \note For QCategory3DAxis, specifies the index range of rows or columns to
+ * show.
  */
 void QAbstract3DAxis::setRange(float min, float max)
 {
@@ -303,7 +308,8 @@ bool QAbstract3DAxis::isTitleVisible() const
  * to the axis labels.
  * If \c{false}, axis titles are only rotated around their axis but are not otherwise oriented
  * towards the camera.
- * This property doesn't have any effect if labelAutoRotation property value is zero.
+ * This property does not have any effect if the labelAutoRotation property
+ * value is zero.
  * Default value is \c{true}.
  *
  * \sa labelAutoRotation, title, titleVisible
@@ -326,9 +332,10 @@ bool QAbstract3DAxis::isTitleFixed() const
  *
  * \brief The minimum value on the axis.
  *
- * When setting this property the max is adjusted if necessary, to ensure that the range remains
- * valid.
- * \note For QCategory3DAxis this specifies the index of the first row or column to show.
+ * When setting this property, the maximum value is adjusted if necessary, to
+ * ensure that the range remains valid.
+ * \note For QCategory3DAxis, specifies the index of the first row or column to
+ * show.
  */
 void QAbstract3DAxis::setMin(float min)
 {
@@ -341,9 +348,10 @@ void QAbstract3DAxis::setMin(float min)
  *
  * \brief The maximum value on the axis.
  *
- * When setting this property the min is adjusted if necessary, to ensure that the range remains
- * valid.
- * \note For QCategory3DAxis this specifies the index of the last row or column to show.
+ * When setting this property, the minimum value is adjusted if necessary, to
+ * ensure that the range remains valid.
+ * \note For QCategory3DAxis, specifies the index of the last row or column to
+ * show.
  */
 void QAbstract3DAxis::setMax(float max)
 {
@@ -384,7 +392,8 @@ bool QAbstract3DAxis::isAutoAdjustRange() const
 /*!
  * \fn QAbstract3DAxis::rangeChanged(float min, float max)
  *
- * Emits range \a min and \a max values when range changes.
+ * Emits the minimum and maximum values of the range, \a min and \a max, when
+ * the range changes.
  */
 
 // QAbstract3DAxisPrivate

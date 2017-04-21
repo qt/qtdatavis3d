@@ -38,125 +38,92 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \brief Q3DTheme class provides a visual style for graphs.
  * \since QtDataVisualization 1.0
  *
- * Q3DTheme is used to specify visual properties that affect the whole graph. There are several
- * built-in themes that can be used directly, or be modified freely. User can also create a theme
- * from scratch using \c ThemeUserDefined. Creating a theme using the default constructor
- * produces a new user-defined theme.
+ * Specifies visual properties that affect the whole graph. There are several
+ * built-in themes that can be used as is or modified freely.
  *
- * \section1 Properties controlled by theme
+ * The following properties can be overridden by using QAbstract3DSeries
+ * properties to set them explicitly in the series: baseColors, baseGradients,
+ * and colorStyle.
+ *
+ * Themes can be created from scratch using the ThemeUserDefined enum value.
+ * Creating a theme using the default constructor produces a new user-defined
+ * theme.
+ *
+ * \section1 Default Theme
+ *
+ * The following table lists the properties controlled by themes and the
+ * default values for ThemeUserDefined.
+ *
  * \table
  *   \header
  *     \li Property
- *     \li Effect
- *     \li Default in ThemeUserDefined
+ *     \li Default Value
  *   \row
  *     \li ambientLightStrength
- *     \li The strength of the ambient light in the graph. This affects how evenly and brightly the
- *         colors are shown throughout the graph regardless of light position.
  *     \li 0.25
  *   \row
  *     \li backgroundColor
- *     \li Color of the graph background.
  *     \li Qt::black
  *   \row
  *     \li backgroundEnabled
- *     \li Is the graph background drawn or not.
- *     \li true
+ *     \li \c true
  *   \row
  *     \li baseColors
- *     \li List of colors for the objects in the graph. Colors are applied to series one by one.
- *         If there are more series than colors, the color list is reused from the start.
- *         The colors in this property are used if colorStyle is ColorStyleUniform. This can be
- *         overridden by setting the \l{QAbstract3DSeries::baseColor}{baseColor} explicitly in series.
  *     \li Qt::black
  *   \row
  *     \li baseGradients
- *     \li List of gradients for the objects in the graph. Gradients are applied to series one by
- *         one. If there are more series than gradients, the gradient list is reused from the start.
- *         The gradients in this property are used if colorStyle is ColorStyleObjectGradient or
- *         ColorStyleRangeGradient. This can be overridden by setting the
- *         \l{QAbstract3DSeries::baseGradient}{baseGradient} explicitly in series.
- *     \li QLinearGradient(). Essentially fully black.
+ *     \li QLinearGradient. Essentially fully black.
  *   \row
  *     \li colorStyle
- *     \li The color style of the objects in the graph. See ColorStyle for detailed description of
- *         the styles. This can be overridden by setting the
- *         \l{QAbstract3DSeries::colorStyle}{colorStyle} explicitly in series.
  *     \li ColorStyleUniform
  *   \row
  *     \li \l font
- *     \li The font to be used for labels.
- *     \li QFont()
+ *     \li QFont
  *   \row
  *     \li gridEnabled
- *     \li Is the grid on the background drawn or not. This affects all grid lines.
- *     \li true
+ *     \li \c true
  *   \row
  *     \li gridLineColor
- *     \li The color for the grid lines.
  *     \li Qt::white
  *   \row
  *     \li highlightLightStrength
- *     \li The specular light strength for highlighted objects.
  *     \li 7.5
  *   \row
  *     \li labelBackgroundColor
- *     \li The color of the label background. This property has no effect if labelBackgroundEnabled
- *         is \c false.
  *     \li Qt::gray
  *   \row
  *     \li labelBackgroundEnabled
- *     \li Are the labels to be drawn with a background using labelBackgroundColor (including alpha),
- *         or with a fully transparent background. Labels with background are drawn to equal sizes
- *         per axis based on the longest label, and the text is centered in it. Labels without
- *         background are drawn as is and are left/right aligned based on their position in the
- *         graph.
- *     \li true
+ *     \li \c true
  *   \row
  *     \li labelBorderEnabled
- *     \li Are the labels to be drawn with a border or not. This property affects only labels with
- *         a background.
- *     \li true
+ *     \li \c true
  *   \row
  *     \li labelTextColor
- *     \li The color for the font used in labels.
  *     \li Qt::white
  *   \row
  *     \li lightColor
- *     \li The color of the light. Affects both ambient and specular light.
  *     \li Qt::white
  *   \row
  *     \li lightStrength
- *     \li The strength of the specular light in the graph. This affects the light specified in
- *         Q3DScene.
  *     \li 5.0
  *   \row
  *     \li multiHighlightColor
- *     \li The color to be used for highlighted objects, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
  *     \li Qt::blue
  *   \row
  *     \li multiHighlightGradient
- *     \li The gradient to be used for highlighted objects, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
- *     \li QLinearGradient(). Essentially fully black.
+ *     \li QLinearGradient. Essentially fully black.
  *   \row
  *     \li singleHighlightColor
- *     \li The color to be used for a highlighted object, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QAbstract3DGraph::SelectionItem flag set.
  *     \li Qt::red
  *   \row
  *     \li singleHighlightGradient
- *     \li The gradient to be used for a highlighted object, if \l{Q3DBars::selectionMode}{selectionMode}
- *         of the graph has \c QAbstract3DGraph::SelectionItem flag set.
- *     \li QLinearGradient(). Essentially fully black.
+ *     \li QLinearGradient. Essentially fully black.
  *   \row
  *     \li windowColor
- *     \li The color of the window the graph is drawn into.
  *     \li Qt::black
  * \endtable
  *
- * \section1 Usage examples
+ * \section1 Usage Examples
  *
  * Creating a built-in theme without any modifications:
  *
@@ -216,7 +183,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \value ThemeIsabelle
  *        A dark theme with yellow as the base color.
  * \value ThemeUserDefined
- *        A user-defined theme. See \l {Properties controlled by theme} for theme defaults.
+ *        A user-defined theme. For more information, see \l {Default Theme}.
  */
 
 /*!
@@ -228,10 +195,89 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \brief A visual style for graphs.
  *
  * This type is used to specify visual properties that affect the whole graph. There are several
- * built-in themes that can be used directly, or be modified freely. User can also create a theme
- * from scratch using \c Theme3D.ThemeUserDefined.
+ * built-in themes that can be used as is or modified freely.
  *
- * For a more complete description, see Q3DTheme.
+ * The following properties can be overridden by using Abstract3DSeries
+ * properties to set them explicitly in the series:
+ * baseColors, baseGradients, and colorStyle.
+ *
+ * Themes can be created from scratch by using the
+ * \l{Q3DTheme::ThemeUserDefined}{Theme3D.ThemeUserDefined} enum value.
+ *
+ * \section1 Default Theme
+ *
+ * The following table lists the properties controlled by themes and the
+ * default values for \l{Q3DTheme::ThemeUserDefined}
+ * {Theme3D.ThemeUserDefined}.
+ *
+ * \table
+ *   \header
+ *     \li Property
+ *     \li Default Value
+ *   \row
+ *     \li ambientLightStrength
+ *     \li 0.25
+ *   \row
+ *     \li backgroundColor
+ *     \li "black". For more information, see \l [QtQuick] color.
+ *   \row
+ *     \li backgroundEnabled
+ *     \li \c true
+ *   \row
+ *     \li baseColors
+ *     \li "black"
+ *   \row
+ *     \li baseGradients
+ *     \li QLinearGradient. Essentially fully black.
+ *   \row
+ *     \li colorStyle
+ *     \li ColorStyleUniform
+ *   \row
+ *     \li \l font
+ *     \li \l [QtQuick] font
+ *   \row
+ *     \li gridEnabled
+ *     \li \c true
+ *   \row
+ *     \li gridLineColor
+ *     \li "white"
+ *   \row
+ *     \li highlightLightStrength
+ *     \li 7.5
+ *   \row
+ *     \li labelBackgroundColor
+ *     \li "gray"
+ *   \row
+ *     \li labelBackgroundEnabled
+ *     \li \c true
+ *   \row
+ *     \li labelBorderEnabled
+ *     \li \c true
+ *   \row
+ *     \li labelTextColor
+ *     \li "white"
+ *   \row
+ *     \li lightColor
+ *     \li "white"
+ *   \row
+ *     \li lightStrength
+ *     \li 5.0
+ *   \row
+ *     \li multiHighlightColor
+ *     \li "blue"
+ *   \row
+ *     \li multiHighlightGradient
+ *     \li QLinearGradient. Essentially fully black.
+ *   \row
+ *     \li singleHighlightColor
+ *     \li "red"
+ *   \row
+ *     \li singleHighlightGradient
+ *     \li QLinearGradient. Essentially fully black.
+ *   \row
+ *     \li windowColor
+ *     \li "black"
+ * \endtable
  *
  * \section1 Usage examples
  *
@@ -253,142 +299,175 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty list<ThemeColor> Theme3D::baseColors
  *
- * List of base colors to be used for all the objects in the graph, series by series. If there
+ * The list of base colors to be used for all the objects in the graph, series by series. If there
  * are more series than colors, color list wraps and starts again with the first color in the list.
  * Has no immediate effect if colorStyle is not \c Theme3D.ColorStyleUniform.
+ *
+ * This can be overridden by setting \l{Abstract3DSeries::baseColor}
+ * {Abstract3DSeries.baseColor} explicitly in the series.
  */
 
 /*!
  * \qmlproperty color Theme3D::backgroundColor
  *
- * Color for the graph background.
+ * The color of the graph background.
  */
 
 /*!
  * \qmlproperty color Theme3D::windowColor
  *
- * Color for the application window.
+ * The color of the application window the graph is drawn into.
  */
 
 /*!
  * \qmlproperty color Theme3D::labelTextColor
  *
- * Color for the font used for labels.
+ * The color of the font used for labels.
  */
 
 /*!
  * \qmlproperty color Theme3D::labelBackgroundColor
  *
- * Color for the label backgrounds. Has no effect if labelBackgroundEnabled is \c false.
+ * The color of the label backgrounds. Has no effect if labelBackgroundEnabled is \c false.
  */
 
 /*!
  * \qmlproperty color Theme3D::gridLineColor
  *
- * Color for the grid lines.
+ * The color of the grid lines.
  */
 
 /*!
  * \qmlproperty color Theme3D::singleHighlightColor
  *
- * Highlight color for a highlighted object. Used if \l{AbstractGraph3D::selectionMode}{selectionMode}
- * has \c AbstractGraph3D.SelectionItem flag set.
+ * The highlight color for a selected object. Used if
+ * \l{AbstractGraph3D::selectionMode}{selectionMode}
+ * has the \c AbstractGraph3D.SelectionItem flag set.
  */
 
 /*!
  * \qmlproperty color Theme3D::multiHighlightColor
  *
- * Highlight color for highlighted objects. Used if \l{AbstractGraph3D::selectionMode}{selectionMode}
- * has \c AbstractGraph3D.SelectionRow or \c AbstractGraph3D.SelectionColumn flag set.
+ * The highlight color for selected objects. Used if
+ * \l{AbstractGraph3D::selectionMode}{selectionMode}
+ * has the \c AbstractGraph3D.SelectionRow or \c AbstractGraph3D.SelectionColumn
+ * flag set.
  */
 
 /*!
  * \qmlproperty color Theme3D::lightColor
  *
- * Color for the specular light defined in Scene3D.
+ * The color of the ambient and specular light defined in Scene3D.
  */
 
 /*!
  * \qmlproperty list<ColorGradient> Theme3D::baseGradients
  *
- * List of base gradients to be used for all the objects in the graph, series by series. If there
- * are more series than gradients, gradient list wraps and starts again with the first gradient in
- * the list
- * Has no immediate effect if colorStyle is \c Theme3D.ColorStyleUniform.
+ * The list of base gradients to be used for all the objects in the graph,
+ * series by series. If there are more series than gradients, the gradient list
+ * wraps and starts again with the first gradient in the list.
+ *
+ * Has no immediate effect if colorStyle is \l{Q3DTheme::ColorStyleUniform}
+ * {Theme3D.ColorStyleUniform}.
+ *
+ * This value can be overridden by setting \l{Abstract3DSeries::baseGradient}
+ *{Abstract3DSeries.baseGradient} explicitly in the series.
  */
 
 /*!
  * \qmlproperty ColorGradient Theme3D::singleHighlightGradient
  *
- * Highlight gradient for a highlighted object. Used if \l{AbstractGraph3D::selectionMode}{selectionMode}
- * has \c AbstractGraph3D.SelectionItem flag set.
+ * The highlight gradient for a selected object. Used if
+ * \l{AbstractGraph3D::selectionMode}{selectionMode}
+ * has the \c AbstractGraph3D.SelectionItem flag set.
  */
 
 /*!
  * \qmlproperty ColorGradient Theme3D::multiHighlightGradient
  *
- * Highlight gradient for highlighted objects. Used if \l{AbstractGraph3D::selectionMode}{selectionMode}
- * has \c AbstractGraph3D.SelectionRow or \c AbstractGraph3D.SelectionColumn flag set.
+ * The highlight gradient for selected objects. Used if
+ * \l{AbstractGraph3D::selectionMode}{selectionMode}
+ * has the \c AbstractGraph3D.SelectionRow or \c AbstractGraph3D.SelectionColumn
+ * flag set.
  */
 
 /*!
  * \qmlproperty real Theme3D::lightStrength
  *
- * Specular light strength for the whole graph. Value must be between 0.0 and 10.0.
+ * The specular light strength for the whole graph. The value must be between
+ * \c 0.0 and \c 10.0.
+ *
+ * This value affects the light specified in Scene3D.
  */
 
 /*!
  * \qmlproperty real Theme3D::ambientLightStrength
  *
- * Ambient light strength for the whole graph. Value must be between 0.0 and 1.0.
+ * The ambient light strength for the whole graph. This value determines how
+ * evenly and brightly the colors are shown throughout the graph regardless of
+ * the light position. The value must be between \c 0.0 and \c 1.0.
  */
 
 /*!
  * \qmlproperty real Theme3D::highlightLightStrength
  *
- * Specular light strength for highlighted objects. Value must be between 0.0 and 10.0.
+ * The specular light strength for selected objects. The value must be
+ * between \c 0.0 and \c 10.0.
  */
 
 /*!
  * \qmlproperty bool Theme3D::labelBorderEnabled
  *
- * Set label borders enabled or disabled. Has no effect if labelBackgroundEnabled is \c false.
+ * Defines whether label borders are drawn for labels that have a background.
+ * Has no effect if labelBackgroundEnabled is \c false.
  */
 
 /*!
  * \qmlproperty font Theme3D::font
  *
- * Set font to be used for labels.
+ * Sets the font to be used for labels.
  */
 
 /*!
  * \qmlproperty bool Theme3D::backgroundEnabled
  *
- * Set background enabled or disabled.
+ * Defines whether the background is drawn by using the value of
+ * backgroundColor.
  */
 
 /*!
  * \qmlproperty bool Theme3D::gridEnabled
  *
- * Set grid lines enabled or disabled.
+ * Defines whether the grid lines are drawn. This value affects all grid lines.
  */
 
 /*!
  * \qmlproperty bool Theme3D::labelBackgroundEnabled
  *
- * Set label backgrounds enabled or disabled.
+ * Defines whether the label is drawn with a background that uses
+ * labelBackgroundColor (including alpha), or with a fully transparent
+ * background. Labels with a background are drawn to equal sizes per axis based
+ * on the longest label, and the text is centered in them. Labels without
+ * a background are drawn as is and are left or right aligned based on their
+ * position in the graph.
  */
 
 /*!
  * \qmlproperty Theme3D.ColorStyle Theme3D::colorStyle
  *
- * The \a style of the graph colors. One of \c Theme3D.ColorStyle.
+ * The style of the graph colors. One of Q3DTheme::ColorStyle enum values.
+ *
+ * This value can be overridden by setting \l{Abstract3DSeries::colorStyle}
+ * {Abstract3DSeries.colorStyle} explicitly in the series.
+ *
+ * \sa Q3DTheme::ColorStyle
  */
 
 /*!
  * \qmlproperty Theme3D.Theme Theme3D::type
  *
- * The type of the theme. If no type is set, the type is \c Theme3D.ThemeUserDefined.
+ * The type of the theme. If no type is set, the type is
+ * \l{Q3DTheme::ThemeUserDefined}{Theme3D.ThemeUserDefined}.
  * Changing the theme type after the item has been constructed will change all other properties
  * of the theme to what the predefined theme specifies. Changing the theme type of the active theme
  * of the graph will also reset all attached series to use the new theme.
@@ -437,9 +516,16 @@ Q3DTheme::~Q3DTheme()
 /*!
  * \property Q3DTheme::baseColors
  *
- * List of base colors to be used for all the objects in the graph, series by series. If there
- * are more series than colors, color list wraps and starts again with the first color in the list.
+ * \brief The list of base colors to be used for all the objects in the graph,
+ * series by series.
+ *
+ * If there are more series than colors, the color list wraps and starts again
+ * with the first color in the list.
+ *
  * Has no immediate effect if colorStyle is not ColorStyleUniform.
+ *
+ * This value can be overridden by setting the \l{QAbstract3DSeries::baseColor}
+ * {baseColor} explicitly in the series.
  */
 void Q3DTheme::setBaseColors(const QList<QColor> &colors)
 {
@@ -463,7 +549,7 @@ QList<QColor> Q3DTheme::baseColors() const
 /*!
  * \property Q3DTheme::backgroundColor
  *
- * Color for the graph background.
+ * \brief The color of the graph background.
  */
 void Q3DTheme::setBackgroundColor(const QColor &color)
 {
@@ -483,7 +569,7 @@ QColor Q3DTheme::backgroundColor() const
 /*!
  * \property Q3DTheme::windowColor
  *
- * Color for the application window.
+ * \brief The color of the application window the graph is drawn into.
  */
 void Q3DTheme::setWindowColor(const QColor &color)
 {
@@ -503,7 +589,7 @@ QColor Q3DTheme::windowColor() const
 /*!
  * \property Q3DTheme::labelTextColor
  *
- * Color for the font used for labels.
+ * \brief The color of the font used for labels.
  */
 void Q3DTheme::setLabelTextColor(const QColor &color)
 {
@@ -523,7 +609,9 @@ QColor Q3DTheme::labelTextColor() const
 /*!
  * \property Q3DTheme::labelBackgroundColor
  *
- * Color for the label backgrounds. Has no effect if labelBackgroundEnabled is \c false.
+ * \brief The color of the label backgrounds.
+ *
+ * Has no effect if labelBackgroundEnabled is \c false.
  */
 void Q3DTheme::setLabelBackgroundColor(const QColor &color)
 {
@@ -543,7 +631,7 @@ QColor Q3DTheme::labelBackgroundColor() const
 /*!
  * \property Q3DTheme::gridLineColor
  *
- * Color for the grid lines.
+ * \brief The color of the grid lines.
  */
 void Q3DTheme::setGridLineColor(const QColor &color)
 {
@@ -563,7 +651,9 @@ QColor Q3DTheme::gridLineColor() const
 /*!
  * \property Q3DTheme::singleHighlightColor
  *
- * Highlight color for a highlighted object. Used if \l{Q3DBars::selectionMode}{selectionMode} has
+ * \brief The highlight color for a selected object.
+ *
+ * Used if \l{QAbstract3DGraph::selectionMode}{selectionMode} has the
  * \c QAbstract3DGraph::SelectionItem flag set.
  */
 void Q3DTheme::setSingleHighlightColor(const QColor &color)
@@ -583,8 +673,11 @@ QColor Q3DTheme::singleHighlightColor() const
 /*!
  * \property Q3DTheme::multiHighlightColor
  *
- * Highlight color for highlighted objects. Used if \l{Q3DBars::selectionMode}{selectionMode} has
- * \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
+ * \brief The highlight color for selected objects.
+ *
+ * Used if \l{QAbstract3DGraph::selectionMode}{selectionMode} has the
+ * \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn
+ * flag set.
  */
 void Q3DTheme::setMultiHighlightColor(const QColor &color)
 {
@@ -603,7 +696,9 @@ QColor Q3DTheme::multiHighlightColor() const
 /*!
  * \property Q3DTheme::lightColor
  *
- * Color for the specular light defined in Q3DScene.
+ * \brief The color for the ambient and specular light.
+ *
+ * This value affects the light specified in Q3DScene.
  */
 void Q3DTheme::setLightColor(const QColor &color)
 {
@@ -623,10 +718,16 @@ QColor Q3DTheme::lightColor() const
 /*!
  * \property Q3DTheme::baseGradients
  *
- * List of base gradients to be used for all the objects in the graph, series by series. If there
- * are more series than gradients, gradient list wraps and starts again with the first gradient in
- * the list
+ * \brief The list of base gradients to be used for all the objects in the
+ * graph, series by series.
+ *
+ * If there are more series than gradients, the gradient list wraps and starts
+ * again with the first gradient in the list
+ *
  * Has no immediate effect if colorStyle is ColorStyleUniform.
+ *
+ * This value can be overridden by setting the
+ * \l{QAbstract3DSeries::baseGradient}{baseGradient} explicitly in the series.
  */
 void Q3DTheme::setBaseGradients(const QList<QLinearGradient> &gradients)
 {
@@ -650,8 +751,10 @@ QList<QLinearGradient> Q3DTheme::baseGradients() const
 /*!
  * \property Q3DTheme::singleHighlightGradient
  *
- * Highlight gradient for a highlighted object. Used if \l{Q3DBars::selectionMode}{selectionMode}
- * has \c QAbstract3DGraph::SelectionItem flag set.
+ * \brief The highlight gradient for a selected object.
+ *
+ * Used if \l{QAbstract3DGraph::selectionMode}{selectionMode}
+ * has the \c QAbstract3DGraph::SelectionItem flag set.
  */
 void Q3DTheme::setSingleHighlightGradient(const QLinearGradient &gradient)
 {
@@ -670,8 +773,11 @@ QLinearGradient Q3DTheme::singleHighlightGradient() const
 /*!
  * \property Q3DTheme::multiHighlightGradient
  *
- * Highlight gradient for highlighted objects. Used if \l{Q3DBars::selectionMode}{selectionMode}
- * has \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn flag set.
+ * \brief The highlight gradient for selected objects.
+ *
+ * Used if \l{QAbstract3DGraph::selectionMode}{selectionMode}
+ * has the \c QAbstract3DGraph::SelectionRow or
+ * \c QAbstract3DGraph::SelectionColumn flag set.
  */
 void Q3DTheme::setMultiHighlightGradient(const QLinearGradient &gradient)
 {
@@ -690,7 +796,11 @@ QLinearGradient Q3DTheme::multiHighlightGradient() const
 /*!
  * \property Q3DTheme::lightStrength
  *
- * Specular light strength for the whole graph. Value must be between 0.0f and 10.0f.
+ * \brief The specular light strength for the whole graph.
+ *
+ * The value must be between \c 0.0f and \c 10.0f.
+ *
+ * This value affects the light specified in Q3DScene.
  */
 void Q3DTheme::setLightStrength(float strength)
 {
@@ -712,7 +822,12 @@ float Q3DTheme::lightStrength() const
 /*!
  * \property Q3DTheme::ambientLightStrength
  *
- * Ambient light strength for the whole graph. Value must be between 0.0f and 1.0f.
+ * \brief The ambient light strength for the whole graph.
+ *
+ * This value determines how evenly and brightly the colors are shown throughout
+ * the graph regardless of the light position.
+ *
+ * The value must be between \c 0.0f and \c 1.0f.
  */
 void Q3DTheme::setAmbientLightStrength(float strength)
 {
@@ -734,7 +849,9 @@ float Q3DTheme::ambientLightStrength() const
 /*!
  * \property Q3DTheme::highlightLightStrength
  *
- * Specular light strength for highlighted objects. Value must be between 0.0f and 10.0f.
+ * \brief The specular light strength for selected objects.
+ *
+ * The value must be between \c 0.0f and \c 10.0f.
  */
 void Q3DTheme::setHighlightLightStrength(float strength)
 {
@@ -756,7 +873,9 @@ float Q3DTheme::highlightLightStrength() const
 /*!
  * \property Q3DTheme::labelBorderEnabled
  *
- * Set label borders enabled or disabled. Has no effect if labelBackgroundEnabled is \c false.
+ * \brief Whether label borders are drawn for labels that have a background.
+ *
+ * Has no effect if labelBackgroundEnabled is \c false.
  */
 void Q3DTheme::setLabelBorderEnabled(bool enabled)
 {
@@ -776,7 +895,7 @@ bool Q3DTheme::isLabelBorderEnabled() const
 /*!
  * \property Q3DTheme::font
  *
- * Set \a font to be used for labels.
+ * \brief The font to be used for labels.
  */
 void Q3DTheme::setFont(const QFont &font)
 {
@@ -796,7 +915,9 @@ QFont Q3DTheme::font() const
 /*!
  * \property Q3DTheme::backgroundEnabled
  *
- * Set background enabled or disabled.
+ * \brief Whether the background is visible.
+ *
+ * The background is drawn by using the value of backgroundColor.
  */
 void Q3DTheme::setBackgroundEnabled(bool enabled)
 {
@@ -816,7 +937,9 @@ bool Q3DTheme::isBackgroundEnabled() const
 /*!
  * \property Q3DTheme::gridEnabled
  *
- * Set grid lines enabled or disabled.
+ * \brief Whether the grid lines are drawn.
+ *
+ * This value affects all grid lines.
  */
 void Q3DTheme::setGridEnabled(bool enabled)
 {
@@ -836,7 +959,16 @@ bool Q3DTheme::isGridEnabled() const
 /*!
  * \property Q3DTheme::labelBackgroundEnabled
  *
- * Set label backgrounds enabled or disabled.
+ *\brief Whether the label is drawn with a color background or with a fully
+ * transparent background.
+ *
+ * The labelBackgroundColor value (including alpha) is used for drawing the
+ * background.
+ *
+ * Labels with a background are drawn to equal sizes per axis based
+ * on the longest label, and the text is centered in them. Labels without a
+ * background are drawn as is and are left or right aligned based on their
+ * position in the graph.
  */
 void Q3DTheme::setLabelBackgroundEnabled(bool enabled)
 {
@@ -856,7 +988,12 @@ bool Q3DTheme::isLabelBackgroundEnabled() const
 /*!
  * \property Q3DTheme::colorStyle
  *
- * The \a style of the graph colors. One of ColorStyle.
+ * \brief The style of the graph colors.
+ *
+ * One of the ColorStyle enum values.
+ *
+ * This value can be overridden by setting \l{Abstract3DSeries::colorStyle}
+ * {colorStyle} explicitly in the series.
  */
 void Q3DTheme::setColorStyle(ColorStyle style)
 {
@@ -875,7 +1012,9 @@ Q3DTheme::ColorStyle Q3DTheme::colorStyle() const
 /*!
  * \property Q3DTheme::type
  *
- * The type of the theme. The type is automatically set when constructing a theme,
+ * \brief The type of the theme.
+ *
+ * The type is automatically set when constructing a theme,
  * but can also be changed later. Changing the theme type will change all other
  * properties of the theme to what the predefined theme specifies.
  * Changing the theme type of the active theme of the graph will also reset all

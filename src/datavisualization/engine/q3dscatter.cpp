@@ -125,7 +125,7 @@ void Q3DScatter::removeSeries(QScatter3DSeries *series)
 }
 
 /*!
- * \return list of series added to this graph.
+ * Returns the list of series added to this graph.
  */
 QList<QScatter3DSeries *> Q3DScatter::seriesList() const
 {
@@ -145,12 +145,17 @@ const Q3DScatterPrivate *Q3DScatter::dptrc() const
 /*!
  * \property Q3DScatter::axisX
  *
- * The active X-axis. Implicitly calls addAxis() to transfer ownership
- * of the \a axis to this graph.
+ * \brief The active x-axis.
+ */
+
+/*!
+ * Sets \a axis as the active x-axis. Implicitly calls addAxis() to transfer the
+ * ownership of the axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * If \a axis is null, a temporary default axis with no labels and an automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -167,12 +172,17 @@ QValue3DAxis *Q3DScatter::axisX() const
 /*!
  * \property Q3DScatter::axisY
  *
- * The active Y-axis. Implicitly calls addAxis() to transfer ownership
- * of the \a axis to this graph.
+ * \brief The active y-axis.
+ */
+
+/*!
+ * Sets \a axis as the active y-axis. Implicitly calls addAxis() to transfer the
+ * ownership of the axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * If \a axis is null, a temporary default axis with no labels and an automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -189,12 +199,17 @@ QValue3DAxis *Q3DScatter::axisY() const
 /*!
  * \property Q3DScatter::axisZ
  *
- * The active Z-axis. Implicitly calls addAxis() to transfer ownership
- * of the \a axis to this graph.
+ * \brief The active z-axis.
+ */
+
+/*!
+ * Sets \a axis as the active z-axis. Implicitly calls addAxis() to transfer the
+ * ownership of the axis to this graph.
  *
- * If the \a axis is null, a temporary default axis with no labels and automatically adjusting
+ * If \a axis is null, a temporary default axis with no labels and an automatically adjusting
  * range is created.
- * This temporary axis is destroyed if another \a axis is set explicitly to the same orientation.
+ * This temporary axis is destroyed if another axis is set explicitly to the
+ * same orientation.
  *
  * \sa addAxis(), releaseAxis()
  */
@@ -204,7 +219,7 @@ void Q3DScatter::setAxisZ(QValue3DAxis *axis)
 }
 
 /*!
- * \return used Z-axis.
+ * Returns the used z-axis.
  */
 QValue3DAxis *Q3DScatter::axisZ() const
 {
@@ -214,7 +229,7 @@ QValue3DAxis *Q3DScatter::axisZ() const
 /*!
  * \property Q3DScatter::selectedSeries
  *
- * The selected series or \c null.
+ * \brief The selected series or null.
  */
 QScatter3DSeries *Q3DScatter::selectedSeries() const
 {
@@ -247,7 +262,7 @@ void Q3DScatter::releaseAxis(QValue3DAxis *axis)
 }
 
 /*!
- * \return list of all added axes.
+ * Returns the list of all added axes.
  *
  * \sa addAxis()
  */

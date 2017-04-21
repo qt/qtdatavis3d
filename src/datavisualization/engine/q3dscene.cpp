@@ -79,50 +79,55 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty rect Scene3D::viewport
  *
- * This property contains the current viewport rectangle where all 3D rendering
- * is targeted.
+ * The current viewport rectangle where all 3D rendering is targeted.
  */
 
 /*!
  * \qmlproperty rect Scene3D::primarySubViewport
  *
- * This property contains the current subviewport rectangle inside the viewport where the
- * primary view of the data visualization is targeted to. If slicingActive is false, it will be
- * equal to viewport. If slicingActive is true and it hasn't been explicitly set, it will be one
- * fifth of viewport.
+ * The current subviewport rectangle inside the viewport where the
+ * primary view of the data visualization is targeted.
+ *
+ * If slicingActive is \c false, the primary sub viewport will be equal to the
+ * viewport. If slicingActive is \c true and the primary sub viewport has not
+ * been explicitly set, it will be one fifth of the viewport.
  * \note Setting primarySubViewport larger than or outside of viewport resizes viewport accordingly.
  */
 
 /*!
  * \qmlproperty rect Scene3D::secondarySubViewport
  *
- * This property contains the secondary viewport rectangle inside the viewport. The secondary
- * viewport is used for drawing the 2D slice view in some visualizations. If it hasn't been
- * explicitly set, it will be null, or viewport if slicingActive is true.
- * \note Setting secondarySubViewport larger than or outside of viewport resizes viewport accordingly.
- */
+ * The secondary viewport rectangle inside the viewport. The secondary viewport
+ * is used for drawing the 2D slice view in some visualizations. If it has not
+ * been explicitly set, it will be null. If slicingActive is \c true, it will
+ * be equal to the viewport.
+ * \note If the secondary sub viewport is larger than or outside of the
+ * viewport, the viewport is resized accordingly.
+*/
 
 /*!
  * \qmlproperty point Scene3D::selectionQueryPosition
  *
- * This property contains the coordinates for the user input that should be processed
- * by the scene as selection. If this is set to value other than invalidSelectionPoint the
+ * The coordinates for the user input that should be processed
+ * by the scene as a selection. If this property is set to a value other than
+ * invalidSelectionPoint, the
  * graph tries to select a data item at the given point within the primary viewport.
- * After the rendering pass the property is returned to its default state of invalidSelectionPoint.
+ * After the rendering pass, the property is returned to its default state of
+ * invalidSelectionPoint.
  */
 
 /*!
  * \qmlproperty point Scene3D::graphPositionQuery
  *
- * This property contains the coordinates for the user input that should be processed
- * by the scene as a graph position query. If this is set to value other than
- * invalidSelectionPoint, the graph tries to match a graph position to the given \a point
+ * The coordinates for the user input that should be processed by the scene as a
+ * graph position query. If this property is set to value other than
+ * invalidSelectionPoint, the graph tries to match a graph position to the given point
  * within the primary viewport.
- * After the rendering pass this property is returned to its default state of
- * invalidSelectionPoint. The queried graph position can be read from
+ * After the rendering pass, this property is returned to its default state of
+ * invalidSelectionPoint. The queried graph position can be read from the
  * AbstractGraph3D::queriedGraphPosition property after the next render pass.
  *
- * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * There is no single correct 3D coordinate to match a particular screen position, so to be
  * consistent, the queries are always done against the inner sides of an invisible box surrounding
  * the graph.
  *
@@ -134,39 +139,40 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty bool Scene3D::slicingActive
  *
- * This property contains whether 2D slicing view is currently active or not. If setting it, you
- * must make sure AbstractGraph3D::selectionMode has either
+ * Defines whether the 2D slicing view is currently active. If \c true,
+ * AbstractGraph3D::selectionMode must have either the
  * \l{QAbstract3DGraph::SelectionRow}{AbstractGraph3D.SelectionRow} or
- * \l{QAbstract3DGraph::SelectionColumn}{AbstractGraph3D.SelectionColumn} flag set, and there is a
- * valid selection.
+ * \l{QAbstract3DGraph::SelectionColumn}{AbstractGraph3D.SelectionColumn}
+ * set to a valid selection.
  * \note Not all visualizations support the 2D slicing view.
  */
 
 /*!
  * \qmlproperty bool Scene3D::secondarySubviewOnTop
  *
- * This property contains whether 2D slicing view is currently drawn on top or if the 3D view is
- * drawn on top.
+ * Defines whether the 2D slicing view or the 3D view is drawn on top.
  */
 
 /*!
  * \qmlproperty Camera3D Scene3D::activeCamera
  *
- * This property contains the currently active camera in the 3D scene.
- * When a Camera3D is set in the property it gets automatically added as child of the scene.
+ * The currently active camera in the 3D scene.
+ * When a Camera3D is set in the property, it is automatically added as child of
+ * the scene.
  */
 
 /*!
  * \qmlproperty Light3D Scene3D::activeLight
  *
- * This property contains the currently active light in the 3D scene.
- * When a Light3D is set in the property it gets automatically added as child of the scene.
+ * The currently active light in the 3D scene.
+ * When a Light3D is set in the property, it is automatically added as child of
+ * the scene.
  */
 
 /*!
  * \qmlproperty float Scene3D::devicePixelRatio
  *
- * This property contains the current device pixel ratio that is used when mapping input
+ * The current device pixel ratio that is used when mapping input
  * coordinates to pixel coordinates.
  */
 
@@ -197,8 +203,8 @@ Q3DScene::~Q3DScene()
 /*!
  * \property Q3DScene::viewport
  *
- * This read only property contains the current viewport rectangle where all 3D rendering
- * is targeted.
+ * \brief A read only property that contains the current viewport rectangle
+ * where all the 3D rendering is targeted.
  */
 QRect Q3DScene::viewport() const
 {
@@ -208,11 +214,15 @@ QRect Q3DScene::viewport() const
 /*!
  * \property Q3DScene::primarySubViewport
  *
- * This property contains the current subviewport rectangle inside the viewport where the
- * primary view of the data visualization is targeted to. If isSlicingActive() is false, it will be
- * equal to viewport(). If isSlicingActive() is true and it hasn't been explicitly set, it will be
- * one fifth of viewport().
- * \note Setting primarySubViewport larger than or outside of viewport resizes viewport accordingly.
+ * \brief The current subviewport rectangle inside the viewport where the
+ * primary view of the data visualization is targeted.
+ *
+ * If isSlicingActive() is \c false, the primary sub viewport is equal to
+ * viewport(). If isSlicingActive() is \c true and the primary sub viewport has
+ * not been explicitly set, it will be one fifth of viewport().
+ *
+ * \note Setting primarySubViewport larger than or outside of the viewport
+ * resizes the viewport accordingly.
  */
 QRect Q3DScene::primarySubViewport() const
 {
@@ -293,10 +303,13 @@ bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
 /*!
  * \property Q3DScene::secondarySubViewport
  *
- * This property contains the secondary viewport rectangle inside the viewport. The secondary
- * viewport is used for drawing the 2D slice view in some visualizations. If it hasn't been
- * explicitly set, it will be equal to QRect(), or viewport() if isSlicingActive() is true.
- * \note Setting secondarySubViewport larger than or outside of viewport resizes viewport accordingly.
+ * \brief The secondary viewport rectangle inside the viewport.
+ *
+ * The secondary viewport is used for drawing the 2D slice view in some
+ * visualizations. If it has not been explicitly set, it will be equal to
+ * QRect. If isSlicingActive() is \c true, it will be equal to \l viewport.
+ * \note If the secondary sub viewport is larger than or outside of the
+ * viewport, the viewport is resized accordingly.
  */
 QRect Q3DScene::secondarySubViewport() const
 {
@@ -341,11 +354,13 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
 /*!
  * \property Q3DScene::selectionQueryPosition
  *
- * This property contains the coordinates for the user input that should be processed
- * by the scene as a selection. If this is set to value other than invalidSelectionPoint(), the
- * graph tries to select a data item, axis label, or a custom item at the given \a point within
- * the primary viewport.
- * After the rendering pass the property is returned to its default state of
+ * \brief The coordinates for the user input that should be processed
+ * by the scene as a selection.
+ *
+ * If this property is set to a value other than invalidSelectionPoint(), the
+ * graph tries to select a data item, axis label, or a custom item at the
+ * specified coordinates within the primary viewport.
+ * After the rendering pass, the property is returned to its default state of
  * invalidSelectionPoint().
  *
  * \sa QAbstract3DGraph::selectedElement
@@ -379,15 +394,17 @@ QPoint Q3DScene::invalidSelectionPoint()
 /*!
  * \property Q3DScene::graphPositionQuery
  *
- * This property contains the coordinates for the user input that should be processed
- * by the scene as a graph position query. If this is set to value other than
- * invalidSelectionPoint(), the graph tries to match a graph position to the given \a point
+ * \brief The coordinates for the user input that should be processed
+ * by the scene as a graph position query.
+ *
+ * If this property is set to a value other than invalidSelectionPoint(), the
+ * graph tries to match a graph position to the specified coordinates
  * within the primary viewport.
- * After the rendering pass this property is returned to its default state of
- * invalidSelectionPoint(). The queried graph position can be read from
+ * After the rendering pass, this property is returned to its default state of
+ * invalidSelectionPoint(). The queried graph position can be read from the
  * QAbstract3DGraph::queriedGraphPosition property after the next render pass.
  *
- * There isn't a single correct 3D coordinate to match to each specific screen position, so to be
+ * There is no single correct 3D coordinate to match a particular screen position, so to be
  * consistent, the queries are always done against the inner sides of an invisible box surrounding
  * the graph.
  *
@@ -415,9 +432,11 @@ QPoint Q3DScene::graphPositionQuery() const
 /*!
  * \property Q3DScene::slicingActive
  *
- * This property contains whether 2D slicing view is currently active or not. If setting it, you
- * must make sure QAbstract3DGraph::selectionMode has either QAbstract3DGraph::SelectionRow or
- * QAbstract3DGraph::SelectionColumn flag set, and there is a valid selection.
+ * \brief Whether the 2D slicing view is currently active.
+ *
+ * If \c true, QAbstract3DGraph::selectionMode must have either
+ * QAbstract3DGraph::SelectionRow or QAbstract3DGraph::SelectionColumn set
+ * to a valid selection.
  * \note Not all visualizations support the 2D slicing view.
  */
 bool Q3DScene::isSlicingActive() const
@@ -445,8 +464,7 @@ void Q3DScene::setSlicingActive(bool isSlicing)
 /*!
  * \property Q3DScene::secondarySubviewOnTop
  *
- * This property contains whether 2D slicing view is currently drawn on top or if the 3D view is
- * drawn on top.
+ * \brief Whether the 2D slicing view or the 3D view is drawn on top.
  */
 bool Q3DScene::isSecondarySubviewOnTop() const
 {
@@ -468,8 +486,9 @@ void Q3DScene::setSecondarySubviewOnTop(bool isSecondaryOnTop)
 /*!
  * \property Q3DScene::activeCamera
  *
- * This property contains the currently active camera in the 3D scene.
- * When a new Q3DCamera objects is set in the property it gets automatically added as child of
+ * \brief The currently active camera in the 3D scene.
+ *
+ * When a new Q3DCamera object is set, it is automatically added as child of
  * the scene.
  */
 Q3DCamera *Q3DScene::activeCamera() const
@@ -517,8 +536,9 @@ void Q3DScene::setActiveCamera(Q3DCamera *camera)
 /*!
  * \property Q3DScene::activeLight
  *
- * This property contains the currently active light in the 3D scene.
- * When a new Q3DLight objects is set in the property it gets automatically added as child of
+ * \brief The currently active light in the 3D scene.
+ *
+ * When a new Q3DLight objects is set, it is automatically added as child of
  * the scene.
  */
 Q3DLight *Q3DScene::activeLight() const
@@ -547,7 +567,7 @@ void Q3DScene::setActiveLight(Q3DLight *light)
 /*!
  * \property Q3DScene::devicePixelRatio
  *
- * This property contains the current device pixel ratio that is used when mapping input
+ * \brief The device pixel ratio that is used when mapping input
  * coordinates to pixel coordinates.
  */
 float Q3DScene::devicePixelRatio() const

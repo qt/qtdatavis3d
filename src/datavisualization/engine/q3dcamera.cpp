@@ -99,31 +99,31 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty float Camera3D::xRotation
  *
- * This property contains the X-rotation angle of the camera around the target point in degrees
+ * The X-rotation angle of the camera around the target point in degrees
  * starting from the current base position.
  */
 
 /*!
  * \qmlproperty float Camera3D::yRotation
  *
- * This property contains the Y-rotation angle of the camera around the target point in degrees
+ * The Y-rotation angle of the camera around the target point in degrees
  * starting from the current base position.
  */
 
 /*!
  * \qmlproperty Camera3D.CameraPreset Camera3D::cameraPreset
  *
- * This property contains the currently active camera preset, which is one of
- * \l{Q3DCamera::CameraPreset}{Camera3D.CameraPreset}. If no preset is active the value
+ * The currently active camera preset, which is one of
+ * \l{Q3DCamera::CameraPreset}{Camera3D.CameraPreset}. If no preset is active, the value
  * is \l{Q3DCamera::CameraPresetNone}{Camera3D.CameraPresetNone}.
  */
 
 /*!
  * \qmlproperty float Camera3D::zoomLevel
  *
- * This property contains the the camera zoom level in percentage. The default value of \c{100.0}
+ * The camera zoom level in percentage. The default value of \c{100.0}
  * means there is no zoom in or out set in the camera.
- * The value is limited within the bounds defined by minZoomLevel and maxZoomLevel properties.
+ * The value is limited by the minZoomLevel and maxZoomLevel properties.
  *
  * \sa minZoomLevel, maxZoomLevel
  */
@@ -131,10 +131,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty float Camera3D::minZoomLevel
  *
- * This property contains the the minimum allowed camera zoom level.
- * If the new minimum level is more than the existing maximum level, the maximum level is
+ * Sets the minimum allowed camera zoom level.
+ * If the new minimum level is higher than the existing maximum level, the maximum level is
  * adjusted to the new minimum as well.
- * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * If the current zoomLevel is outside the new bounds, it is adjusted as well.
  * The minZoomLevel cannot be set below \c{1.0}.
  * Defaults to \c{10.0}.
  *
@@ -144,10 +144,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty float Camera3D::maxZoomLevel
  *
- * This property contains the the maximum allowed camera zoom level.
- * If the new maximum level is less than the existing minimum level, the minimum level is
+ * Sets the maximum allowed camera zoom level.
+ * If the new maximum level is lower than the existing minimum level, the minimum level is
  * adjusted to the new maximum as well.
- * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * If the current zoomLevel is outside the new bounds, it is adjusted as well.
  * Defaults to \c{500.0f}.
  *
  * \sa zoomLevel, minZoomLevel
@@ -156,30 +156,33 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty bool Camera3D::wrapXRotation
  *
- * This property determines the behavior of the minimum and maximum limits in the X-rotation.
- * By default the X-rotation wraps from minimum value to maximum and from maximum to minimum.
+ * The behavior of the minimum and maximum limits in the X-rotation.
+ * By default, the X-rotation wraps from minimum value to maximum and from
+ * maximum to minimum.
  *
- * If set to \c true the X-rotation of the camera is wrapped from minimum to maximum and from maximum
- * to minimum. If set to \c false the X-rotation of the camera is limited to the sector determined by
- * minimum and maximum values.
+ * If set to \c true, the X-rotation of the camera is wrapped from minimum to
+ * maximum and from maximum to minimum. If set to \c false, the X-rotation of
+ * the camera is limited to the sector determined by the minimum and maximum
+ * values.
  */
 
 /*!
  * \qmlproperty bool Camera3D::wrapYRotation
  *
- * This property determines the behavior of the minimum and maximum limits in the Y-rotation.
- * By default the Y-rotation is limited between the minimum and maximum values without any wrapping.
+ * The behavior of the minimum and maximum limits in the Y-rotation.
+ * By default, the Y-rotation is limited between the minimum and maximum values
+ * without any wrapping.
  *
- * If \c true the Y-rotation of the camera is wrapped from minimum to maximum and from maximum
- * to minimum. If \c false the Y-rotation of the camera is limited to the sector determined by minimum
- * and maximum values.
+ * If \c true, the Y-rotation of the camera is wrapped from minimum to maximum
+ * and from maximum to minimum. If \c false, the Y-rotation of the camera is
+ * limited to the sector determined by the minimum and maximum values.
  */
 
 /*!
  * \qmlproperty vector3d Camera3D::target
  * \since QtDataVisualization 1.2
  *
- * Holds the camera \a target as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
+ * The camera target as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
  *
  * Valid coordinate values are between \c{-1.0...1.0}, where the edge values indicate
  * the edges of the corresponding axis range. Any values outside this range are clamped to the edge.
@@ -238,7 +241,7 @@ void Q3DCamera::copyValuesFrom(const Q3DObject &source)
 /*!
  * \property Q3DCamera::xRotation
  *
- * This property contains the X-rotation angle of the camera around the target point in degrees.
+ * \brief The X-rotation angle of the camera around the target point in degrees.
  */
 float Q3DCamera::xRotation() const {
     return d_ptr->m_xRotation;
@@ -267,7 +270,7 @@ void Q3DCamera::setXRotation(float rotation)
 /*!
  * \property Q3DCamera::yRotation
  *
- * This property contains the Y-rotation angle of the camera around the target point in degrees.
+ * \brief The Y-rotation angle of the camera around the target point in degrees.
  */
 float Q3DCamera::yRotation() const {
     return d_ptr->m_yRotation;
@@ -296,8 +299,9 @@ void Q3DCamera::setYRotation(float rotation)
 /*!
  * \property Q3DCamera::cameraPreset
  *
- * This property contains the currently active camera preset, if no preset is active the value
- * is CameraPresetNone.
+ * \brief The currently active camera preset.
+ *
+ * If no CameraPreset value is set, CameraPresetNone is used by default.
  */
 Q3DCamera::CameraPreset Q3DCamera::cameraPreset() const
 {
@@ -445,9 +449,10 @@ void Q3DCamera::setCameraPreset(CameraPreset preset)
 /*!
  * \property Q3DCamera::zoomLevel
  *
- * This property contains the the camera zoom level in percentage. The default value of \c{100.0f}
- * means there is no zoom in or out set in the camera.
- * The value is limited within the bounds defined by minZoomLevel and maxZoomLevel properties.
+ * \brief The camera zoom level in percentage.
+ *
+ * The default value of \c{100.0f} means there is no zoom in or out set in the
+ * camera. The value is limited by the minZoomLevel and maxZoomLevel properties.
  *
  * \sa minZoomLevel, maxZoomLevel
  */
@@ -470,10 +475,11 @@ void Q3DCamera::setZoomLevel(float zoomLevel)
 /*!
  * \property Q3DCamera::minZoomLevel
  *
- * This property contains the the minimum allowed camera zoom level.
- * If the new minimum level is more than the existing maximum level, the maximum level is
- * adjusted to the new minimum as well.
- * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * \brief The minimum allowed camera zoom level.
+ *
+ * If the minimum level is set to a new value that is higher than the existing
+ * maximum level, the maximum level is adjusted to the new minimum as well.
+ * If the current zoomLevel is outside the new bounds, it is adjusted as well.
  * The minZoomLevel cannot be set below \c{1.0f}.
  * Defaults to \c{10.0f}.
  *
@@ -501,10 +507,11 @@ void Q3DCamera::setMinZoomLevel(float zoomLevel)
 /*!
  * \property Q3DCamera::maxZoomLevel
  *
- * This property contains the the maximum allowed camera zoom level.
- * If the new maximum level is less than the existing minimum level, the minimum level is
- * adjusted to the new maximum as well.
- * If current zoomLevel is outside the new bounds, it is adjusted as well.
+ * \brief The maximum allowed camera zoom level.
+ *
+ * If the maximum level is set to a new value that is lower than the existing
+ * minimum level, the minimum level is adjusted to the new maximum as well.
+ * If the current zoomLevel is outside the new bounds, it is adjusted as well.
  * Defaults to \c{500.0f}.
  *
  * \sa zoomLevel, minZoomLevel
@@ -531,12 +538,12 @@ void Q3DCamera::setMaxZoomLevel(float zoomLevel)
 /*!
  * \property Q3DCamera::wrapXRotation
  *
- * This property determines the behavior of the minimum and maximum limits in the X-rotation.
- * By default the X-rotation wraps from minimum value to maximum and from maximum to minimum.
+ * \brief The behavior of the minimum and maximum limits in the X-rotation.
  *
- * If set to \c true the X-rotation of the camera is wrapped from minimum to maximum and from
- * maximum to minimum. If set to \c false the X-rotation of the camera is limited to the sector
- * determined by minimum and maximum values.
+ * If set to \c true, the X-rotation of the camera is wrapped from minimum to
+ * maximum and from maximum to minimum. If set to \c false, the X-rotation of
+ * the camera is limited to the sector determined by the minimum and maximum
+ * values. Set to \c true by default.
  */
 bool Q3DCamera::wrapXRotation() const
 {
@@ -551,12 +558,12 @@ void Q3DCamera::setWrapXRotation(bool isEnabled)
 /*!
  * \property Q3DCamera::wrapYRotation
  *
- * This property determines the behavior of the minimum and maximum limits in the Y-rotation.
- * By default the Y-rotation is limited between the minimum and maximum values without any wrapping.
+ * \brief The behavior of the minimum and maximum limits in the Y-rotation.
  *
- * If \c true the Y-rotation of the camera is wrapped from minimum to maximum and from maximum to
- * minimum. If \c false the Y-rotation of the camera is limited to the sector determined by minimum
- * and maximum values.
+ * If \c true, the Y-rotation of the camera is wrapped from minimum to maximum
+ * and from maximum to minimum. If \c false, the Y-rotation of the camera is
+ * limited to the sector determined by the minimum and maximum values.
+ * Set to \c true by default.
  */
 bool Q3DCamera::wrapYRotation() const
 {
@@ -585,7 +592,9 @@ void Q3DCamera::setCameraPosition(float horizontal, float vertical, float zoom)
  * \property Q3DCamera::target
  * \since QtDataVisualization 1.2
  *
- * Holds the camera \a target as a QVector3D. Defaults to \c {QVector3D(0.0, 0.0, 0.0)}.
+ * \brief The camera target as a a vector or vertex in the 3D space.
+ *
+ * Defaults to \c {QVector3D(0.0, 0.0, 0.0)}.
  *
  * Valid coordinate values are between \c{-1.0...1.0}, where the edge values indicate
  * the edges of the corresponding axis range. Any values outside this range are clamped to the edge.
@@ -677,7 +686,7 @@ void Q3DCameraPrivate::setYRotation(const float rotation)
 
 /*!
  * \internal
- * This property contains the current minimum X-rotation for the camera.
+ * The current minimum X-rotation for the camera.
  * The full circle range is \c{[-180, 180]} and the minimum value is limited to \c -180.
  * Also the value can't be higher than the maximum, and is adjusted if necessary.
  *
@@ -706,7 +715,7 @@ void Q3DCameraPrivate::setMinXRotation(float minRotation)
 
 /*!
  * \internal
- * This property contains the current minimum Y-rotation for the camera.
+ * The current minimum Y-rotation for the camera.
  * The full Y angle range is \c{[-90, 90]} and the minimum value is limited to \c -90.
  * Also the value can't be higher than the maximum, and is adjusted if necessary.
  *
@@ -735,7 +744,7 @@ void Q3DCameraPrivate::setMinYRotation(float minRotation)
 
 /*!
  * \internal
- * This property contains the current maximum X-rotation for the camera.
+ * The current maximum X-rotation for the camera.
  * The full circle range is \c{[-180, 180]} and the maximum value is limited to \c 180.
  * Also the value can't be lower than the minimum, and is adjusted if necessary.
  *
@@ -765,7 +774,7 @@ void Q3DCameraPrivate::setMaxXRotation(float maxRotation)
 
 /*!
  * \internal
- * This property contains the current maximum Y-rotation for the camera.
+ * The current maximum Y-rotation for the camera.
  * The full Y angle range is \c{[-90, 90]} and the maximum value is limited to \c 90.
  * Also the value can't be lower than the minimum, and is adjusted if necessary.
  *
@@ -823,7 +832,7 @@ void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
 
 /*!
  * \internal
- * This property contains the view matrix used in the 3D calculations. When the default orbiting
+ * The view matrix used in the 3D calculations. When the default orbiting
  * camera behavior is sufficient, there is no need to touch this property. If the default
  * behavior is insufficient, the view matrix can be set directly.
  * \note When setting the view matrix directly remember to set viewMatrixAutoUpdateEnabled to

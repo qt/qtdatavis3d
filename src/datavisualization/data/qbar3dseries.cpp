@@ -36,11 +36,11 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QBar3DSeries
  * \inmodule QtDataVisualization
- * \brief Base series class for Q3DBars.
+ * \brief The QBar3DSeries class represents a data series in a 3D bar graph.
  * \since QtDataVisualization 1.0
  *
- * QBar3DSeries manages the series specific visual elements, as well as series data
- * (via data proxy).
+ * This class manages the series specific visual elements, as well as the series
+ * data (via a data proxy).
  *
  * If no data proxy is set explicitly for the series, the series creates a default
  * proxy. Setting another proxy will destroy the existing proxy and all data added to it.
@@ -54,21 +54,22 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  *   \row
  *     \li @valueTitle    \li Title from value axis
  *   \row
- *     \li @rowIdx        \li Visible row index. Localized using graph locale.
+ *     \li @rowIdx        \li Visible row index. Localized using the graph locale.
  *   \row
- *     \li @colIdx        \li Visible Column index. Localized using graph locale.
+ *     \li @colIdx        \li Visible column index. Localized using the graph locale.
  *   \row
  *     \li @rowLabel      \li Label from row axis
  *   \row
  *     \li @colLabel      \li Label from column axis
  *   \row
- *     \li @valueLabel    \li Item value formatted using the same format the value axis attached to
- *                            the graph uses. See \l{QValue3DAxis::labelFormat} for more information.
+ *     \li @valueLabel    \li Item value formatted using the format of the value
+ *                            axis attached to the graph. For more information,
+ *                            see \l{QValue3DAxis::labelFormat}.
  *   \row
  *     \li @seriesName    \li Name of the series
  *   \row
- *     \li %<format spec> \li Item value in specified format. Formatted using the same rules as
- *                            \l{QValue3DAxis::labelFormat}.
+ *     \li %<format spec> \li Item value in the specified format. Formatted
+ *                            using the same rules as \l{QValue3DAxis::labelFormat}.
  * \endtable
  *
  * For example:
@@ -84,12 +85,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QBar3DSeries
  * \inherits Abstract3DSeries
- * \brief Base series type for Bars3D.
+ * \brief Represents a data series in a 3D bar graph.
  *
- * This type  manages the series specific visual elements, as well as series data
- * (via data proxy).
+ * This type manages the series specific visual elements, as well as the series
+ * data (via a data proxy).
  *
- * For more complete description, see QBar3DSeries.
+ * For a more complete description, see QBar3DSeries.
  *
  * \sa {Qt Data Visualization Data Handling}
  */
@@ -126,8 +127,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty point Bar3DSeries::invalidSelectionPosition
- * A constant property providing an invalid position for selection. Set this position to
- * the selectedBar property if you want to clear the selection from this series.
+ * A constant property providing an invalid position for selection. This
+ * position is set to the selectedBar property to clear the selection from this
+ * series.
  *
  * \sa {AbstractGraph3D::clearSelection()}{AbstractGraph3D.clearSelection()}
  */
@@ -145,7 +147,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * Constructs QBar3DSeries with the given \a parent.
+ * Constructsa bar 3D series with the parent \a parent.
  */
 QBar3DSeries::QBar3DSeries(QObject *parent) :
     QAbstract3DSeries(new QBar3DSeriesPrivate(this), parent)
@@ -156,7 +158,8 @@ QBar3DSeries::QBar3DSeries(QObject *parent) :
 }
 
 /*!
- * Constructs QBar3DSeries with the given \a dataProxy and the \a parent.
+ * Constructs a bar 3D series with the data proxy \a dataProxy and the parent
+ * \a parent.
  */
 QBar3DSeries::QBar3DSeries(QBarDataProxy *dataProxy, QObject *parent) :
     QAbstract3DSeries(new QBar3DSeriesPrivate(this), parent)
@@ -166,7 +169,7 @@ QBar3DSeries::QBar3DSeries(QBarDataProxy *dataProxy, QObject *parent) :
 }
 
 /*!
- * Destroys QBar3DSeries.
+ * Deletes a bar 3D series.
  */
 QBar3DSeries::~QBar3DSeries()
 {
@@ -204,7 +207,8 @@ QBarDataProxy *QBar3DSeries::dataProxy() const
  *
  * Only one bar can be selected at a time.
  *
- * To clear selection from this series, set invalidSelectionPosition() as \a position.
+ * To clear selection from this series, invalidSelectionPosition() is set as
+ * \a position.
  *
  * If this series is added to a graph, the graph can adjust the selection according to user
  * interaction or if it becomes invalid. Selecting a bar on another added series will also
@@ -230,8 +234,8 @@ QPoint QBar3DSeries::selectedBar() const
 }
 
 /*!
- * \return an invalid position for selection. Set this position to selectedBar property if you
- * want to clear the selection from this series.
+ * Returns an invalid position for selection. This position is set to the
+ * selectedBar property to clear the selection from this series.
  *
  * \sa QAbstract3DGraph::clearSelection()
  */
@@ -253,7 +257,8 @@ static inline float quaternionAngle(const QQuaternion &rotation)
  * Setting this property is equivalent to the following call:
  * \code setMeshRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, angle)) \endcode
  *
- * \note When reading this property, it is calculated from QAbstract3DSeries::meshRotation value
+ * \note When reading this property, it is calculated from the
+ * QAbstract3DSeries::meshRotation value
  * using floating point precision and always returns a value from zero to 360 degrees.
  *
  * \sa QAbstract3DSeries::meshRotation

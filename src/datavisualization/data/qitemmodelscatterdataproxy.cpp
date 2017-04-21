@@ -94,28 +94,28 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty model ItemModelScatterDataProxy::itemModel
- * The item model.
+ * The item model to use as a data source for Scatter3D.
  */
 
 /*!
  * \qmlproperty string ItemModelScatterDataProxy::xPosRole
- * Defines the item model role to map into X position.
+ * The item model role to map into the X position.
  */
 
 /*!
  * \qmlproperty string ItemModelScatterDataProxy::yPosRole
- * Defines the item model role to map into Y position.
+ * The item model role to map into the Y position.
  */
 
 /*!
  * \qmlproperty string ItemModelScatterDataProxy::zPosRole
- * Defines the item model role to map into Z position.
+ * The item model role to map into the Z position.
  */
 
 /*!
  * \qmlproperty string ItemModelScatterDataProxy::rotationRole
  *
- * Defines the item model role to map into item rotation.
+ * The item model role to map into item rotation.
  * The model may supply the value for rotation as either variant that is directly convertible
  * to \l quaternion, or as one of the string representations: \c{"scalar,x,y,z"} or
  * \c{"@angle,x,y,z"}. The first format will construct the \l quaternion directly with given values,
@@ -125,8 +125,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty regExp ItemModelScatterDataProxy::xPosRolePattern
  *
- * When set, a search and replace is done on the value mapped by xPos role before it is used as
- * a item position value. This property specifies the regular expression to find the portion of the
+ * When set, a search and replace is done on the value mapped by the x position
+ * role before it is used as
+ * an item position value. This property specifies the regular expression to find the portion of the
  * mapped value to replace and xPosRoleReplace property contains the replacement string.
  *
  * \sa xPosRole, xPosRoleReplace
@@ -135,8 +136,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty regExp ItemModelScatterDataProxy::yPosRolePattern
  *
- * When set, a search and replace is done on the value mapped by yPos role before it is used as
- * a item position value. This property specifies the regular expression to find the portion of the
+ * When set, a search and replace is done on the value mapped by the y position
+ * role before it is used as
+ * an item position value. This property specifies the regular expression to find the portion of the
  * mapped value to replace and yPosRoleReplace property contains the replacement string.
  *
  * \sa yPosRole, yPosRoleReplace
@@ -145,8 +147,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty regExp ItemModelScatterDataProxy::zPosRolePattern
  *
- * When set, a search and replace is done on the value mapped by zPos role before it is used as
- * a item position value. This property specifies the regular expression to find the portion of the
+ * When set, a search and replace is done on the value mapped by the z position
+ * role before it is used as
+ * an item position value. This property specifies the regular expression to find the portion of the
  * mapped value to replace and zPosRoleReplace property contains the replacement string.
  *
  * \sa zPosRole, zPosRoleReplace
@@ -154,8 +157,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*!
  * \qmlproperty regExp ItemModelScatterDataProxy::rotationRolePattern
- * When set, a search and replace is done on the value mapped by rotation role before it is used
- * as a item rotation. This property specifies the regular expression to find the portion
+ * When set, a search and replace is done on the value mapped by the rotation
+ * role before it is used
+ * as item rotation. This property specifies the regular expression to find the portion
  * of the mapped value to replace and rotationRoleReplace property contains the replacement string.
  *
  * \sa rotationRole, rotationRoleReplace
@@ -165,7 +169,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string ItemModelScatterDataProxy::xPosRoleReplace
  *
  * This property defines the replace content to be used in conjunction with xPosRolePattern.
- * Defaults to empty string. For more information on how the search and replace using regular
+ * Defaults to an empty string. For more information on how the search and replace using regular
  * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
  * function documentation.
  *
@@ -176,7 +180,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string ItemModelScatterDataProxy::yPosRoleReplace
  *
  * This property defines the replace content to be used in conjunction with yPosRolePattern.
- * Defaults to empty string. For more information on how the search and replace using regular
+ * Defaults to an empty string. For more information on how the search and replace using regular
  * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
  * function documentation.
  *
@@ -187,7 +191,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string ItemModelScatterDataProxy::zPosRoleReplace
  *
  * This property defines the replace content to be used in conjunction with zPosRolePattern.
- * Defaults to empty string. For more information on how the search and replace using regular
+ * Defaults to an empty string. For more information on how the search and replace using regular
  * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
  * function documentation.
  *
@@ -197,7 +201,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \qmlproperty string ItemModelScatterDataProxy::rotationRoleReplace
  * This property defines the replace content to be used in conjunction with rotationRolePattern.
- * Defaults to empty string. For more information on how the search and replace using regular
+ * Defaults to an empty string. For more information on how the search and replace using regular
  * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
  * function documentation.
  *
@@ -277,8 +281,12 @@ QItemModelScatterDataProxy::~QItemModelScatterDataProxy()
 /*!
  * \property QItemModelScatterDataProxy::itemModel
  *
- * Defines the item model. Does not take ownership of the model, but does connect to it to listen for
- * changes.
+ * \brief The item model to use as a data source for a 3D scatter series.
+ */
+
+/*!
+ * Sets \a itemModel as the item model for Q3DScatter. Does not take
+ * ownership of the model, but does connect to it to listen for changes.
  */
 void QItemModelScatterDataProxy::setItemModel(QAbstractItemModel *itemModel)
 {
@@ -293,7 +301,7 @@ QAbstractItemModel *QItemModelScatterDataProxy::itemModel() const
 /*!
  * \property QItemModelScatterDataProxy::xPosRole
  *
- * Defines the item model role to map into X position.
+ * \brief The item model role to map into the X position.
  */
 void QItemModelScatterDataProxy::setXPosRole(const QString &role)
 {
@@ -311,7 +319,7 @@ QString QItemModelScatterDataProxy::xPosRole() const
 /*!
  * \property QItemModelScatterDataProxy::yPosRole
  *
- * Defines the item model role to map into Y position.
+ * \brief The item model role to map into the Y position.
  */
 void QItemModelScatterDataProxy::setYPosRole(const QString &role)
 {
@@ -329,7 +337,7 @@ QString QItemModelScatterDataProxy::yPosRole() const
 /*!
  * \property QItemModelScatterDataProxy::zPosRole
  *
- * Defines the item model role to map into Z position.
+ * \brief The item model role to map into the Z position.
  */
 void QItemModelScatterDataProxy::setZPosRole(const QString &role)
 {
@@ -347,7 +355,7 @@ QString QItemModelScatterDataProxy::zPosRole() const
 /*!
  * \property QItemModelScatterDataProxy::rotationRole
  *
- * Defines the item model role to map into item rotation.
+ * \brief The item model role to map into item rotation.
  *
  * The model may supply the value for rotation as either variant that is directly convertible
  * to QQuaternion, or as one of the string representations: \c{"scalar,x,y,z"} or \c{"@angle,x,y,z"}.
@@ -370,8 +378,10 @@ QString QItemModelScatterDataProxy::rotationRole() const
 /*!
  * \property QItemModelScatterDataProxy::xPosRolePattern
  *
- * When set, a search and replace is done on the value mapped by xPos role before it is used as
- * a item position value. This property specifies the regular expression to find the portion of the
+ * \brief Whether search and replace is done on the value mapped by the x
+ * position role before it is used as an item position value.
+ *
+ * This property specifies the regular expression to find the portion of the
  * mapped value to replace and xPosRoleReplace property contains the replacement string.
  *
  * \sa xPosRole, xPosRoleReplace
@@ -392,8 +402,10 @@ QRegExp QItemModelScatterDataProxy::xPosRolePattern() const
 /*!
  * \property QItemModelScatterDataProxy::yPosRolePattern
  *
- * When set, a search and replace is done on the value mapped by yPos role before it is used as
- * a item position value. This property specifies the regular expression to find the portion of the
+ * \brief Whether a search and replace is done on the value mapped by the
+ * y position role before it is used as an item position value.
+ *
+ * This property specifies the regular expression to find the portion of the
  * mapped value to replace and yPosRoleReplace property contains the replacement string.
  *
  * \sa yPosRole, yPosRoleReplace
@@ -414,8 +426,10 @@ QRegExp QItemModelScatterDataProxy::yPosRolePattern() const
 /*!
  * \property QItemModelScatterDataProxy::zPosRolePattern
  *
- * When set, a search and replace is done on the value mapped by zPos role before it is used as
- * a item position value. This property specifies the regular expression to find the portion of the
+ * \brief Whether a search and replace is done on the value mapped by the z
+ * position role before it is used as an item position value.
+ *
+ * This property specifies the regular expression to find the portion of the
  * mapped value to replace and zPosRoleReplace property contains the replacement string.
  *
  * \sa zPosRole, zPosRoleReplace
@@ -436,8 +450,10 @@ QRegExp QItemModelScatterDataProxy::zPosRolePattern() const
 /*!
  * \property QItemModelScatterDataProxy::rotationRolePattern
  *
- * When set, a search and replace is done on the value mapped by rotation role before it is used
- * as a item rotation. This property specifies the regular expression to find the portion
+ * \brief Whether a search and replace is done on the value mapped by the
+ * rotation role before it is used as item rotation.
+ *
+ * This property specifies the regular expression to find the portion
  * of the mapped value to replace and rotationRoleReplace property contains the replacement string.
  *
  * \sa rotationRole, rotationRoleReplace
@@ -458,8 +474,10 @@ QRegExp QItemModelScatterDataProxy::rotationRolePattern() const
 /*!
  * \property QItemModelScatterDataProxy::xPosRoleReplace
  *
- * This property defines the replace content to be used in conjunction with xPosRolePattern.
- * Defaults to empty string. For more information on how the search and replace using regular
+ * \brief The replace content to be used in conjunction with the x position role
+ * pattern.
+ *
+ * Defaults to an empty string. For more information on how the search and replace using regular
  * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
  * function documentation.
  *
@@ -481,8 +499,10 @@ QString QItemModelScatterDataProxy::xPosRoleReplace() const
 /*!
  * \property QItemModelScatterDataProxy::yPosRoleReplace
  *
- * This property defines the replace content to be used in conjunction with yPosRolePattern.
- * Defaults to empty string. For more information on how the search and replace using regular
+ * \brief The replace content to be used in conjunction with the y position role
+ * pattern.
+ *
+ * Defaults to an empty string. For more information on how the search and replace using regular
  * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
  * function documentation.
  *
@@ -504,8 +524,10 @@ QString QItemModelScatterDataProxy::yPosRoleReplace() const
 /*!
  * \property QItemModelScatterDataProxy::zPosRoleReplace
  *
- * This property defines the replace content to be used in conjunction with zPosRolePattern.
- * Defaults to empty string. For more information on how the search and replace using regular
+ * \brief The replace content to be used in conjunction with the z position role
+ * pattern.
+ *
+ * Defaults to an empty string. For more information on how the search and replace using regular
  * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
  * function documentation.
  *
@@ -527,8 +549,10 @@ QString QItemModelScatterDataProxy::zPosRoleReplace() const
 /*!
  * \property QItemModelScatterDataProxy::rotationRoleReplace
  *
- * This property defines the replace content to be used in conjunction with rotationRolePattern.
- * Defaults to empty string. For more information on how the search and replace using regular
+ * \brief The replace content to be used in conjunction with the rotation role
+ * pattern.
+ *
+ * Defaults to an empty string. For more information on how the search and replace using regular
  * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
  * function documentation.
  *

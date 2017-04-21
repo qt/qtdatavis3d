@@ -52,34 +52,34 @@
 
 /*!
   \qmlproperty ValueAxis3D Surface3D::axisX
-  The active X axis.
+  The active x-axis.
 
-  If an axis is not given, a temporary default axis with no labels and automatically adjusting
-  range is created.
+  If an axis is not given, a temporary default axis with no labels and an
+  automatically adjusting range is created.
   This temporary axis is destroyed if another axis is explicitly set to the same orientation.
  */
 
 /*!
   \qmlproperty ValueAxis3D Surface3D::axisY
-  The active Y axis.
+  The active y-axis.
 
-  If an axis is not given, a temporary default axis with no labels and automatically adjusting
-  range is created.
+  If an axis is not given, a temporary default axis with no labels and an
+  automatically adjusting range is created.
   This temporary axis is destroyed if another axis is explicitly set to the same orientation.
  */
 
 /*!
   \qmlproperty ValueAxis3D Surface3D::axisZ
-  The active Z axis.
+  The active z-axis.
 
-  If an axis is not given, a temporary default axis with no labels and automatically adjusting
-  range is created.
+  If an axis is not given, a temporary default axis with no labels and an
+  automatically adjusting range is created.
   This temporary axis is destroyed if another axis is explicitly set to the same orientation.
  */
 
 /*!
  * \qmlproperty Surface3DSeries Surface3D::selectedSeries
- * The selected series or \c null. If \l {QAbstract3DGraph::selectionMode}{selectionMode} has
+ * The selected series or null. If \l {QAbstract3DGraph::selectionMode}{selectionMode} has the
  * \c SelectionMultiSeries flag set, this property holds the series which owns the selected point.
  */
 
@@ -114,5 +114,5 @@
 
 /*!
  * \qmlmethod void Surface3D::removeSeries(Surface3DSeries series)
- * Remove the \a series from the graph.
+ * Removes the \a series from the graph.
  */

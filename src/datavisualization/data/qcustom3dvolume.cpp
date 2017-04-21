@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2017 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -35,10 +35,10 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 /*!
  * \class QCustom3DVolume
  * \inmodule QtDataVisualization
- * \brief The QCustom3DVolume class is for creating volume rendered objects to be added to a graph.
+ * \brief The QCustom3DVolume class adds a volume rendered object to a graph.
  * \since QtDataVisualization 1.2
  *
- * This class is for creating volume rendered objects to be added to a graph. A volume rendered
+ * A volume rendered
  * object is a box with a 3D texture. Three slice planes are supported for the volume, one along
  * each main axis of the volume.
  *
@@ -48,7 +48,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * smaller view or limiting the zoom level of the graph are easy ways to improve performance.
  * Similarly, the volume texture dimensions have a large impact on performance.
  * If the frame rate is more important than pixel-perfect rendering of the volume contents, consider
- * turning the high definition shader off by setting useHighDefShader property to \c{false}.
+ * turning the high definition shader off by setting the useHighDefShader property to \c{false}.
  *
  * \note Volumetric objects are only supported with orthographic projection.
  *
@@ -64,9 +64,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \ingroup datavisualization_qml
  * \instantiates QCustom3DVolume
  * \inherits Custom3DItem
- * \brief The Custom3DVolume type is for creating volume rendered objects to be added to a graph.
+ * \brief Adds a volume rendered object to a graph.
  *
- * This class is for creating volume rendered objects to be added to a graph. A volume rendered
+ * A volume rendered
  * object is a box with a 3D texture. Three slice planes are supported for the volume, one along
  * each main axis of the volume.
  *
@@ -76,11 +76,11 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * smaller view or limiting the zoom level of the graph are easy ways to improve performance.
  * Similarly, the volume texture dimensions have a large impact on performance.
  * If the frame rate is more important than pixel-perfect rendering of the volume contents, consider
- * turning the high definition shader off by setting useHighDefShader property to \c{false}.
+ * turning the high definition shader off by setting the useHighDefShader property to \c{false}.
  *
  * \note Filling in the volume data would not typically be efficient or practical from pure QML,
  * so properties directly related to that are not fully supported from QML.
- * Make a hybrid QML/C++ application if you want to use volume objects with a QML UI.
+ * Create a hybrid QML/C++ application if you want to use volume objects with a Qt Quick UI.
  *
  * \note Volumetric objects are only supported with orthographic projection.
  *
@@ -94,7 +94,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * The width of the 3D texture defining the volume content in pixels. Defaults to \c{0}.
  *
  * \note Changing this property from QML is not supported, as the texture data cannot be resized
- * to match.
+ * accordingly.
  */
 
 /*! \qmlproperty int Custom3DVolume::textureHeight
@@ -102,7 +102,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * The height of the 3D texture defining the volume content in pixels. Defaults to \c{0}.
  *
  * \note Changing this property from QML is not supported, as the texture data cannot be resized
- * to match.
+ * accordingly.
  */
 
 /*! \qmlproperty int Custom3DVolume::textureDepth
@@ -110,12 +110,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * The depth of the 3D texture defining the volume content in pixels. Defaults to \c{0}.
  *
  * \note Changing this property from QML is not supported, as the texture data cannot be resized
- * to match.
+ * accordingly.
  */
 
 /*! \qmlproperty int Custom3DVolume::sliceIndexX
  *
- * The X dimension index into the texture data indicating which vertical slice to show.
+ * The x-dimension index into the texture data indicating which vertical slice to show.
  * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
  * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
  * normally.
@@ -126,7 +126,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty int Custom3DVolume::sliceIndexY
  *
- * The Y dimension index into the texture data indicating which horizontal slice to show.
+ * The y-dimension index into the texture data indicating which horizontal slice to show.
  * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
  * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
  * normally.
@@ -137,7 +137,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 /*! \qmlproperty int Custom3DVolume::sliceIndexZ
  *
- * The Z dimension index into the texture data indicating which vertical slice to show.
+ * The z-dimension index into the texture data indicating which vertical slice to show.
  * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
  * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
  * normally.
@@ -179,11 +179,12 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * The high definition shader guarantees that every visible texel of the volume texture is sampled
  * when the volume is rendered.
  * The low definition shader renders only a rough approximation of the volume contents,
- * but at much higher frame rate. The low definition shader doesn't guarantee every texel of the
+ * but at a much higher frame rate. The low definition shader does not guarantee every texel of the
  * volume texture is sampled, so there may be flickering if the volume contains distinct thin
  * features.
  *
- * \note This value doesn't affect the level of detail when rendering the slices of the volume.
+ * \note This value does not affect the level of detail when rendering the
+ * slices of the volume.
  *
  * Defaults to \c{true}.
  */
@@ -262,7 +263,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  */
 
 /*!
- * Constructs QCustom3DVolume with given \a parent.
+ * Constructs a custom 3D volume with the given \a parent.
  */
 QCustom3DVolume::QCustom3DVolume(QObject *parent) :
     QCustom3DItem(new QCustom3DVolumePrivate(this), parent)
@@ -270,7 +271,7 @@ QCustom3DVolume::QCustom3DVolume(QObject *parent) :
 }
 
 /*!
- * Constructs QCustom3DVolume with given \a position, \a scaling, \a rotation,
+ * Constructs a custom 3D volume with the given \a position, \a scaling, \a rotation,
  * \a textureWidth, \a textureHeight, \a textureDepth, \a textureData, \a textureFormat,
  * \a colorTable, and optional \a parent.
  *
@@ -289,7 +290,7 @@ QCustom3DVolume::QCustom3DVolume(const QVector3D &position, const QVector3D &sca
 
 
 /*!
- * Destroys QCustom3DVolume.
+ * Deletes the custom 3D volume.
  */
 QCustom3DVolume::~QCustom3DVolume()
 {
@@ -301,7 +302,8 @@ QCustom3DVolume::~QCustom3DVolume()
  *
  * Defaults to \c{0}.
  *
- * \note The textureData may need to be resized or recreated if this value is changed.
+ * \note The textureData value may need to be resized or recreated if this value
+ * is changed.
  * Defaults to \c{0}.
  *
  * \sa textureData, textureHeight, textureDepth, setTextureFormat(), textureDataWidth()
@@ -331,7 +333,8 @@ int QCustom3DVolume::textureWidth() const
  *
  * Defaults to \c{0}.
  *
- * \note The textureData may need to be resized or recreated if this value is changed.
+ * \note The textureData value may need to be resized or recreated if this value
+ * is changed.
  * Defaults to \c{0}.
  *
  * \sa textureData, textureWidth, textureDepth, setTextureFormat()
@@ -362,7 +365,8 @@ int QCustom3DVolume::textureHeight() const
  *
  * Defaults to \c{0}.
  *
- * \note The textureData may need to be resized or recreated if this value is changed.
+ * \note The textureData value may need to be resized or recreated if this value
+ * is changed.
  * Defaults to \c{0}.
  *
  * \sa textureData, textureWidth, textureHeight, setTextureFormat()
@@ -401,7 +405,8 @@ void QCustom3DVolume::setTextureDimensions(int width, int height, int depth)
 
 /*!
  * Returns the actual texture data width. When the texture format is QImage::Format_Indexed8,
- * this is textureWidth aligned to 32bit boundary. Otherwise this is four times textureWidth.
+ * this value equals textureWidth aligned to a 32-bit boundary. Otherwise, this
+ * value equals four times textureWidth.
  */
 int QCustom3DVolume::textureDataWidth() const
 {
@@ -417,7 +422,8 @@ int QCustom3DVolume::textureDataWidth() const
 
 /*! \property QCustom3DVolume::sliceIndexX
  *
- * \brief The X dimension index into the texture data indicating which vertical slice to show.
+ * \brief The x-dimension index into the texture data indicating which vertical
+ * slice to show.
  *
  * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
  * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
@@ -444,7 +450,8 @@ int QCustom3DVolume::sliceIndexX() const
 
 /*! \property QCustom3DVolume::sliceIndexY
  *
- * \brief The Y dimension index into the texture data indicating which horizontal slice to show.
+ * \brief The y-dimension index into the texture data indicating which
+ * horizontal slice to show.
  *
  * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
  * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
@@ -471,7 +478,8 @@ int QCustom3DVolume::sliceIndexY() const
 
 /*! \property QCustom3DVolume::sliceIndexZ
  *
- * \brief The Z dimension index into the texture data indicating which vertical slice to show.
+ * \brief The z-dimension index into the texture data indicating which vertical
+ * slice to show.
  *
  * Setting any dimension to negative indicates no slice or slice frame for that dimension is drawn.
  * If all dimensions are negative, no slices or slice frames are drawn and the volume is drawn
@@ -541,20 +549,22 @@ QVector<QRgb> QCustom3DVolume::colorTable() const
  * (\c{textureDataWidth * textureHeight * textureDepth * texture format color depth in bytes}).
  *
  * A 3D texture is defined by a stack of 2D subtextures. Each subtexture must be of identical size
- * (\c{textureDataWidth * textureHeight}), and the depth of the stack is defined by textureDepth
- * property. Each 2D texture data is identical to a QImage data with the same format, so
+ * (\c{textureDataWidth * textureHeight}), and the depth of the stack is defined
+ * by the textureDepth property. The data in each 2D texture is identical to a
+ * QImage data with the same format, so
  * QImage::bits() can be used to supply the data for each subtexture.
  *
- * Ownership of the new array transfers to QCustom3DVolume instance.
+ * Ownership of the new array transfers to the QCustom3DVolume instance.
  * If another array is set, the previous array is deleted.
  * If the same array is set again, it is assumed that the array contents have been changed and the
  * graph rendering is triggered.
  *
- * \note Each X-line of the data needs to be 32bit aligned. If the textureFormat is
- * QImage::Format_Indexed8 and textureWidth is not divisible by four, padding bytes need
- * to be added to each X-line of the data. You can get the padded byte count with
- * textureDataWidth() function. The padding bytes should indicate an fully transparent color
- * to avoid rendering artifacts.
+ * \note Each x-dimension line of the data needs to be 32-bit aligned.
+ * If textureFormat is QImage::Format_Indexed8 and the textureWidth value is not
+ * divisible by four, padding bytes might need to be added to each x-dimension
+ * line of the \a data. The textureDataWidth() function returns the padded byte
+ * count. The padding bytes should indicate a fully transparent color to avoid
+ * rendering artifacts.
  *
  * Defaults to \c{0}.
  *
@@ -577,8 +587,9 @@ void QCustom3DVolume::setTextureData(QVector<uchar> *data)
  * Creates a new texture data array from an array of \a images and sets it as
  * textureData for this volume object. The texture dimensions are also set according to image
  * and array dimensions. All of the images in the array must be the same size. If the images are not
- * all in QImage::Format_Indexed8 format, all texture data will be converted into
- * QImage::Format_ARGB32 format. If the images are in QImage::Format_Indexed8 format, the colorTable
+ * all in the QImage::Format_Indexed8 format, all texture data will be converted into the
+ * QImage::Format_ARGB32 format. If the images are in the
+ * QImage::Format_Indexed8 format, the colorTable value
  * for the entire volume will be taken from the first image.
  *
  * Returns a pointer to the newly created array.
@@ -660,17 +671,19 @@ QVector<uchar> *QCustom3DVolume::textureData() const
  * Sets a single 2D subtexture of the 3D texture along the specified
  * \a axis of the volume.
  * The \a index parameter specifies the subtexture to set.
- * The texture \a data must be in the format specified by textureFormat property and have size of
+ * The texture \a data must be in the format specified by the textureFormat
+ * property and have the size of
  * the cross-section of the volume texture along the specified axis multiplied by
  * the texture format color depth in bytes.
- * The \a data is expected to be ordered similarly to the data in images produced by renderSlice()
- * method along the same axis.
+ * The \a data is expected to be ordered similarly to the data in images
+ * produced by the renderSlice() method along the same axis.
  *
- * \note Each X-line of the data needs to be 32bit aligned when targeting Y-axis or Z-axis.
- * If the textureFormat is QImage::Format_Indexed8 and textureWidth is not divisible by four,
- * padding bytes need to be added to each X-line of the \a data in cases it is not already
- * properly aligned. The padding bytes should indicate an fully transparent color to avoid
- * rendering artifacts.
+ * \note Each x-dimension line of the data needs to be 32-bit aligned when
+ * targeting the y-axis or z-axis. If textureFormat is QImage::Format_Indexed8
+ * and the textureWidth value is not divisible by four, padding bytes might need
+ * to be added to each x-dimension line of the \a data to properly align it. The
+ * padding bytes should indicate a fully transparent color to avoid rendering
+ * artifacts.
  *
  * \sa textureData, renderSlice()
  */
@@ -740,17 +753,18 @@ void QCustom3DVolume::setSubTextureData(Qt::Axis axis, int index, const uchar *d
  * Sets a single 2D subtexture of the 3D texture along the specified
  * \a axis of the volume.
  * The \a index parameter specifies the subtexture to set.
- * The source \a image must be in the format specified by the textureFormat property if the
- * textureFormat is indexed. If the textureFormat is QImage::Format_ARGB32, the image is converted
+ * The source \a image must be in the format specified by the textureFormat property if
+ * textureFormat is indexed. If textureFormat is QImage::Format_ARGB32, the image is converted
  * to that format. The image must have the size of the cross-section of the volume texture along
  * the specified axis. The orientation of the image should correspond to the orientation of
  * the slice image produced by renderSlice() method along the same axis.
  *
- * \note Each X-line of the data needs to be 32bit aligned when targeting Y-axis or Z-axis.
- * If the textureFormat is QImage::Format_Indexed8 and textureWidth is not divisible by four,
- * padding bytes need to be added to each X-line of the \a image in cases it is not already
- * properly aligned. The padding bytes should indicate an fully transparent color to avoid
- * rendering artifacts. It is not guaranteed QImage will do this automatically.
+ * \note Each x-dimension line of the data needs to be 32-bit aligned when
+ * targeting the y-axis or z-axis. If textureFormat is QImage::Format_Indexed8
+ * and the textureWidth value is not divisible by four, padding bytes might need
+ * to be added to each x-dimension line of the image to properly align it. The
+ * padding bytes should indicate a fully transparent color to avoid rendering
+ * artifacts. It is not guaranteed that QImage will do this automatically.
  *
  * \sa textureData, renderSlice()
  */
@@ -792,7 +806,8 @@ void QCustom3DVolume::setSubTextureData(Qt::Axis axis, int index, const QImage &
 // doesn't allow QImage::format to be a property type. Qt 5.2.1 at least has this problem.
 
 /*!
- * Sets the format of the textureData to \a format. Only two formats are supported currently:
+ * Sets the format of the textureData property to \a format. Only two formats
+ * are supported currently:
  * QImage::Format_Indexed8 and QImage::Format_ARGB32. If an indexed format is specified, colorTable
  * must also be set.
  * Defaults to QImage::Format_ARGB32.
@@ -814,7 +829,7 @@ void QCustom3DVolume::setTextureFormat(QImage::Format format)
 }
 
 /*!
- * Returns the format of the textureData.
+ * Returns the format of the textureData property value.
  *
  * \sa setTextureFormat()
  */
@@ -826,7 +841,7 @@ QImage::Format QCustom3DVolume::textureFormat() const
 /*!
  * \fn void QCustom3DVolume::textureFormatChanged(QImage::Format format)
  *
- * This signal is emitted when the textureData \a format changes.
+ * This signal is emitted when the \a format of the textureData value changes.
  *
  * \sa setTextureFormat()
  */
@@ -902,11 +917,13 @@ bool QCustom3DVolume::preserveOpacity() const
  * The high definition shader guarantees that every visible texel of the volume texture is sampled
  * when the volume is rendered.
  * The low definition shader renders only a rough approximation of the volume contents,
- * but at much higher frame rate. The low definition shader doesn't guarantee every texel of the
+ * but at a much higher frame rate. The low definition shader does not guarantee
+ * that every texel of the
  * volume texture is sampled, so there may be flickering if the volume contains distinct thin
  * features.
  *
- * \note This value doesn't affect the level of detail when rendering the slices of the volume.
+ * \note This value does not affect the level of detail when rendering the
+ * slices of the volume.
  *
  * Defaults to \c{true}.
  *
@@ -1106,10 +1123,11 @@ QVector3D QCustom3DVolume::sliceFrameThicknesses() const
 }
 
 /*!
- * Renders the slice specified by \a index along \a axis into an image.
+ * Renders the slice specified by \a index along the axis specified by \a axis
+ * into an image.
  * The texture format of this object is used.
  *
- * Returns the rendered image of the slice, or a null image if invalid index is
+ * Returns the rendered image of the slice, or a null image if an invalid index is
  * specified.
  *
  * \sa setTextureFormat()
