@@ -135,6 +135,7 @@ void QAbstract3DInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &m
     Q_UNUSED(mousePos);
 }
 
+#if QT_CONFIG(wheelevent)
 /*!
  * Override this to handle wheel events.
  * Wheel event is given in the \a event.
@@ -143,6 +144,7 @@ void QAbstract3DInputHandler::wheelEvent(QWheelEvent *event)
 {
     Q_UNUSED(event);
 }
+#endif
 
 // Property get/set
 /*!

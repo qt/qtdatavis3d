@@ -68,7 +68,9 @@ public:
     virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
+#if QT_CONFIG(wheelevent)
     virtual void wheelEvent(QWheelEvent *event);
+#endif
 
     InputView inputView() const;
     void setInputView(InputView inputView);

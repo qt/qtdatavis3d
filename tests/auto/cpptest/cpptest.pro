@@ -24,3 +24,14 @@ SUBDIRS = q3dbars \
           q3dcustom \
           q3dcustom-label \
           q3dcustom-volume
+
+# QTBUG-60268
+boot2qt {
+    SUBDIRS -= q3dbars \
+               q3dcustom-label \
+               q3dsurface-modelproxy \
+               q3dbars-modelproxy \
+               q3dscene \
+               q3dscatter \
+               q3dsurface
+}

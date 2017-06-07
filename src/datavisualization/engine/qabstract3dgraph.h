@@ -206,7 +206,9 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
+#if QT_CONFIG(wheelevent)
     void wheelEvent(QWheelEvent *event);
+#endif
 
 Q_SIGNALS:
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);

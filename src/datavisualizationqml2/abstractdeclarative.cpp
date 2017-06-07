@@ -656,10 +656,12 @@ void AbstractDeclarative::mouseMoveEvent(QMouseEvent *event)
     m_controller->mouseMoveEvent(event, mousePos);
 }
 
+#if QT_CONFIG(wheelevent)
 void AbstractDeclarative::wheelEvent(QWheelEvent *event)
 {
     m_controller->wheelEvent(event);
 }
+#endif
 
 void AbstractDeclarative::checkWindowList(QQuickWindow *window)
 {

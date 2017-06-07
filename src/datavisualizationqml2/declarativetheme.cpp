@@ -201,8 +201,8 @@ void DeclarativeTheme3D::setThemeGradient(ColorGradient *gradient, GradientType 
         Q3DTheme::setSingleHighlightGradient(newGradient);
         break;
     case GradientTypeMultiHL:
-        break;
         Q3DTheme::setMultiHighlightGradient(newGradient);
+        break;
     default:
         qWarning("Incorrect usage. Type may be GradientTypeSingleHL or GradientTypeMultiHL.");
         break;

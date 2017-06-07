@@ -117,6 +117,13 @@ QML_DECLARE_TYPE(QCustom3DItem)
 QML_DECLARE_TYPE(QCustom3DLabel)
 QML_DECLARE_TYPE(QCustom3DVolume)
 
+static void initResources()
+{
+#ifdef QT_STATIC
+    Q_INIT_RESOURCE(qmake_QtDataVisualization);
+#endif
+}
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QtDataVisualizationQml2Plugin : public QQmlExtensionPlugin
@@ -125,6 +132,7 @@ class QtDataVisualizationQml2Plugin : public QQmlExtensionPlugin
     Q_PLUGIN_METADATA(IID QQmlExtensionInterface_iid)
 
 public:
+    QtDataVisualizationQml2Plugin(QObject *parent = 0) : QQmlExtensionPlugin(parent) { initResources(); }
     void registerTypes(const char *uri);
 };
 
