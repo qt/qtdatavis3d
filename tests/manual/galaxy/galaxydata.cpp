@@ -44,6 +44,7 @@
 #include <QtDataVisualization/qscatter3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtCore/qmath.h>
+#include <QtCore/qrandom.h>
 #include <QPainter>
 
 #include <QDebug>
@@ -53,7 +54,6 @@ using namespace QtDataVisualization;
 static const int numOfStars = 70000;
 static const int numOfDust = numOfStars / 2;
 static const int numOfH2 = 200;
-static const qreal rand_max = qreal(RAND_MAX);
 
 GalaxyData::GalaxyData(Q3DScatter *scatter,
                        qreal rad,
@@ -163,12 +163,12 @@ void GalaxyData::createGalaxy()
                       1000.0);           // Anzahl der stützstellen
 
     for (int i = 3; i < numOfStars; ++i) {
-        qreal rad = cd.valFromProp(qreal(qrand()) / rand_max);
+        qreal rad = cd.valFromProp(QRandomGenerator::getReal());
 
         m_pStars[i].m_a = rad;
         m_pStars[i].m_b = rad * getExcentricity(rad);
         m_pStars[i].m_angle = getAngularOffset(rad);
-        m_pStars[i].m_theta = 360.0 * ((double)rand() / RAND_MAX);
+        m_pStars[i].m_theta = 360.0 * QRandomGenerator::getReal();
         m_pStars[i].m_center = QVector2D(0.0f, 0.0f);
         m_pStars[i].calcXY();
 
@@ -179,14 +179,14 @@ void GalaxyData::createGalaxy()
     qreal x, y, rad;
     for (int i = 0; i < numOfDust; ++i)
     {
-        x = 2.0 * m_radGalaxy * ((double)rand() / RAND_MAX) - m_radGalaxy;
-        y = 2.0 * m_radGalaxy * ((double)rand() / RAND_MAX) - m_radGalaxy;
+        x = 2.0 * m_radGalaxy * QRandomGenerator::getReal() - m_radGalaxy;
+        y = 2.0 * m_radGalaxy * QRandomGenerator::getReal() - m_radGalaxy;
         rad = sqrt(x*x + y*y);
 
         m_pDust[i].m_a = rad;
         m_pDust[i].m_b = rad * getExcentricity(rad);
         m_pDust[i].m_angle = getAngularOffset(rad);
-        m_pDust[i].m_theta = 360.0 * ((double)rand() / RAND_MAX);
+        m_pDust[i].m_theta = 360.0 * QRandomGenerator::getReal();
         m_pDust[i].m_center = QVector2D(0.0f, 0.0f);
         m_pDust[i].calcXY();
 
@@ -196,15 +196,15 @@ void GalaxyData::createGalaxy()
     // Initialize H2
     for (int i = 0; i < numOfH2; ++i)
     {
-        x = 2*(m_radGalaxy) * ((double)rand() / RAND_MAX) - (m_radGalaxy);
-        y = 2*(m_radGalaxy) * ((double)rand() / RAND_MAX) - (m_radGalaxy);
+        x = 2*(m_radGalaxy) * QRandomGenerator::getReal() - (m_radGalaxy);
+        y = 2*(m_radGalaxy) * QRandomGenerator::getReal() - (m_radGalaxy);
         rad = sqrt(x*x + y*y);
 
         int k1 = 2*i;
         m_pH2[k1].m_a = rad;
         m_pH2[k1].m_b = rad * getExcentricity(rad);
         m_pH2[k1].m_angle = getAngularOffset(rad);
-        m_pH2[k1].m_theta = 360.0 * ((double)rand() / RAND_MAX);
+        m_pH2[k1].m_theta = 360.0 * QRandomGenerator::getReal();
         m_pH2[k1].m_center = QVector2D(0.0f, 0.0f);
         m_pH2[k1].calcXY();
 

@@ -29,6 +29,7 @@
 
 #include "datagenerator.h"
 #include <QDebug>
+#include <QRandomGenerator>
 
 using namespace QtDataVisualization;
 
@@ -58,11 +59,10 @@ void DataGenerator::generateData(QScatter3DSeries *series, uint count)
     dataArray->resize(count);
     QScatterDataItem *ptrToDataArray = &dataArray->first();
 
-    float rand_max = float(RAND_MAX);
     for (uint i = 0; i < count; i++) {
-            ptrToDataArray->setPosition(QVector3D(float(qrand()) / rand_max,
-                                                  float(qrand()) / rand_max,
-                                                  float(qrand()) / rand_max));
+            ptrToDataArray->setPosition(QVector3D(QRandomGenerator::getReal(),
+                                                  QRandomGenerator::getReal(),
+                                                  QRandomGenerator::getReal()));
             ptrToDataArray++;
     }
 
@@ -74,11 +74,10 @@ void DataGenerator::add(QScatter3DSeries *series, uint count)
     QScatterDataArray appendArray;
     appendArray.resize(count);
 
-    float rand_max = float(RAND_MAX);
     for (uint i = 0; i < count; i++) {
-            appendArray[i].setPosition(QVector3D(float(qrand()) / rand_max,
-                                                 float(qrand()) / rand_max,
-                                                 float(qrand()) / rand_max));
+            appendArray[i].setPosition(QVector3D(QRandomGenerator::getReal(),
+                                                 QRandomGenerator::getReal(),
+                                                 QRandomGenerator::getReal()));
     }
 
     series->dataProxy()->addItems(appendArray);

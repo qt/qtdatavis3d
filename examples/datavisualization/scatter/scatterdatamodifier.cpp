@@ -35,6 +35,7 @@
 #include <QtDataVisualization/qscatter3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtCore/qmath.h>
+#include <QtCore/qrandom.h>
 #include <QtWidgets/QComboBox>
 
 using namespace QtDataVisualization;
@@ -208,7 +209,10 @@ void ScatterDataModifier::toggleItemCount()
 QVector3D ScatterDataModifier::randVector()
 {
     return QVector3D(
-                (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f,
-                (float)(rand() % 100) / 100.0f - (float)(rand() % 100) / 100.0f,
-                (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f);
+                (float)(QRandomGenerator::bounded(100)) / 2.0f -
+                (float)(QRandomGenerator::bounded(100)) / 2.0f,
+                (float)(QRandomGenerator::bounded(100)) / 100.0f -
+                (float)(QRandomGenerator::bounded(100)) / 100.0f,
+                (float)(QRandomGenerator::bounded(100)) / 2.0f -
+                (float)(QRandomGenerator::bounded(100)) / 2.0f);
 }

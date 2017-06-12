@@ -35,6 +35,7 @@
 #include <QtDataVisualization/Q3DInputHandler>
 
 #include <qmath.h>
+#include <qrandom.h>
 #include <QLinearGradient>
 #include <QDebug>
 #include <QComboBox>
@@ -668,8 +669,8 @@ void GraphModifier::changeStyle()
 void GraphModifier::selectButtonClicked()
 {
     QSurfaceDataProxy *proxy = m_theSeries->dataProxy();
-    int row = rand() % proxy->rowCount();
-    int col = rand() % proxy->columnCount();
+    int row = QRandomGenerator::bounded(proxy->rowCount());
+    int col = QRandomGenerator::bounded(proxy->columnCount());
 
     m_theSeries->setSelectedPoint(QPoint(row, col));
 }
@@ -700,11 +701,11 @@ void GraphModifier::timeout()
     for (int i = 0; i < rows; i++) {
         for (int j = 0; j < columns; j++) {
             (*m_planeArray->at(i))[j].setX(m_planeArray->at(i)->at(j).x()
-                                           * ((float((rand() % 10) + 5.0f) / 10000.0f) + 0.999f));
+                                           * ((float((QRandomGenerator::bounded(10)) + 5.0f) / 10000.0f) + 0.999f));
             (*m_planeArray->at(i))[j].setY(m_planeArray->at(i)->at(j).y()
-                                           * ((float((rand() % 10) + 5.0f) / 1000.0f) + 0.99f) + 0.0001f);
+                                           * ((float((QRandomGenerator::bounded(10)) + 5.0f) / 1000.0f) + 0.99f) + 0.0001f);
             (*m_planeArray->at(i))[j].setZ(m_planeArray->at(i)->at(j).z()
-                                           * ((float((rand() % 10) + 5.0f) / 10000.0f) + 0.999f));
+                                           * ((float((QRandomGenerator::bounded(10)) + 5.0f) / 10000.0f) + 0.999f));
         }
     }
 
@@ -893,7 +894,7 @@ void GraphModifier::changeRow()
         float maxZ = 10.0f;
         float stepX = (maxX - minX) / float(m_xCount - 1);
         float stepZ = (maxZ - minZ) / float(m_zCount - 1);
-        float i = float(rand() % m_zCount);
+        float i = float(QRandomGenerator::bounded(m_zCount));
 
         QSurfaceDataRow *newRow = new QSurfaceDataRow(m_xCount);
         float z = qMin(maxZ, (i * stepZ + minZ));
@@ -910,7 +911,7 @@ void GraphModifier::changeRow()
         static int changeRowSeries = 0;
         qDebug() << "Generating new values to a row at random pos for series " << changeRowSeries;
 
-        int row = rand() % m_zCount;
+        int row = QRandomGenerator::bounded(m_zCount);
         QSurfaceDataRow *newRow = createMultiRow(row, changeRowSeries, true);
         if (m_ascendingZ)
             m_multiseries[changeRowSeries]->dataProxy()->setRow(row, newRow);
@@ -984,7 +985,7 @@ void GraphModifier::changeRows()
         float maxZ = 10.0f;
         float stepX = (maxX - minX) / float(m_xCount - 1);
         float stepZ = (maxZ - minZ) / float(m_zCount - 1);
-        float start = float(rand() % (m_zCount - 3));
+        float start = float(QRandomGenerator::bounded(m_zCount - 3));
 
         QSurfaceDataArray dataArray;
 
@@ -1006,7 +1007,7 @@ void GraphModifier::changeRows()
         static int changeRowSeries = 0;
         qDebug() << "Generating new values for 3 rows at random pos for series " << changeRowSeries;
 
-        int row = rand() % (m_zCount - 3);
+        int row = QRandomGenerator::bounded(m_zCount - 3);
         QSurfaceDataArray dataArray;
         for (int i = 0; i < 3; i++) {
             QSurfaceDataRow *newRow = createMultiRow(row + i, changeRowSeries, true);
@@ -1033,8 +1034,8 @@ void GraphModifier::changeItem()
         float maxZ = 10.0f;
         float stepX = (maxX - minX) / float(m_xCount - 1);
         float stepZ = (maxZ - minZ) / float(m_zCount - 1);
-        float i = float(rand() % m_zCount);
-        float j = float(rand() % m_xCount);
+        float i = float(QRandomGenerator::bounded(m_zCount));
+        float j = float(QRandomGenerator::bounded(m_xCount));
 
         float x = qMin(maxX, (j * stepX + minX));
         float z = qMin(maxZ, (i * stepZ + minZ));
@@ -1047,8 +1048,8 @@ void GraphModifier::changeItem()
 #ifdef MULTI_SERIES
         static int changeItemSeries = 0;
         int full = m_limitX * m_limitZ;
-        float i = float(rand() % m_zCount);
-        float j = float(rand() % m_xCount);
+        float i = float(QRandomGenerator::bounded(m_zCount));
+        float j = float(QRandomGenerator::bounded(m_xCount));
         float x = float(j) - m_limitX + 0.5f + m_multiSampleOffsetX[changeItemSeries];
         float z = float(i) - m_limitZ + 0.5f + m_multiSampleOffsetZ[changeItemSeries];
         float angle = (z * x) / float(full) * 1.57f;
@@ -1290,10 +1291,10 @@ void GraphModifier::removeRow()
     if (m_zCount < 1)
         return;
 
-    int row = rand() % m_zCount;
+    int row = QRandomGenerator::bounded(m_zCount);
 
 #ifdef MULTI_SERIES
-    int series = rand() % 4;
+    int series = QRandomGenerator::bounded(4);
     m_multiseries[series]->dataProxy()->removeRows(row, 1);
 #else
     m_theSeries->dataProxy()->removeRows(row, 1);
@@ -1306,7 +1307,7 @@ void GraphModifier::resetArray()
     qDebug() << "Reset series data array";
     int rows = 10;
     int columns = 10;
-    float randFactor = float(rand() % 100) / 100.0f;
+    float randFactor = float(QRandomGenerator::bounded(100)) / 100.0f;
     QSurfaceDataArray *planeArray = new QSurfaceDataArray;
     planeArray->reserve(rows);
 
@@ -1321,7 +1322,7 @@ void GraphModifier::resetArray()
     }
 
 #ifdef MULTI_SERIES
-    int series = rand() % 4;
+    int series = QRandomGenerator::bounded(4);
     m_multiseries[series]->dataProxy()->resetArray(planeArray);
 #else
     m_theSeries->dataProxy()->resetArray(planeArray);
@@ -1332,7 +1333,7 @@ void GraphModifier::resetArrayEmpty()
 {
     QSurfaceDataArray *emptyArray = new QSurfaceDataArray;
 #ifdef MULTI_SERIES
-    int series = rand() % 4;
+    int series = QRandomGenerator::bounded(4);
     m_multiseries[series]->dataProxy()->resetArray(emptyArray);
 #else
     m_theSeries->dataProxy()->resetArray(emptyArray);
@@ -1363,7 +1364,7 @@ void GraphModifier::massiveDataTest()
         for (int i = 0; i < cacheSize; i++) {
             m_massiveTestCacheArray.append(new QSurfaceDataRow);
             m_massiveTestCacheArray[i]->resize(columns);
-            rowBase += direction * (float(rand() % 3) / 100.0f);
+            rowBase += direction * (float(QRandomGenerator::bounded(3)) / 100.0f);
             if (rowBase > maxY) {
                 rowBase = maxY;
                 direction = -1.0f;
@@ -1372,7 +1373,7 @@ void GraphModifier::massiveDataTest()
                 direction = 1.0f;
             }
             for (int j = 0; j < columns; j++) {
-                float randFactor = float(rand() % 100) / (100 / yRangeMargin);
+                float randFactor = float(QRandomGenerator::bounded(100)) / (100 / yRangeMargin);
                 (*m_massiveTestCacheArray.at(i))[j].setX(float(j));
                 (*m_massiveTestCacheArray.at(i))[j].setY(rowBase + randFactor);
                 // Z value is irrelevant, we replace it anyway when we take row to use

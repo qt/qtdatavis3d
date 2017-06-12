@@ -38,6 +38,7 @@
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/q3dinputhandler.h>
 #include <QtDataVisualization/qcustom3ditem.h>
+#include <QtCore/QRandomGenerator>
 #include <QtCore/QTime>
 #include <QtCore/qmath.h>
 
@@ -378,10 +379,11 @@ void GraphModifier::createMassiveArray()
         QBarDataRow *dataRow = new QBarDataRow(arrayDimension);
         for (int j = 0; j < arrayDimension; j++) {
             if (!m_negativeValuesOn)
-                (*dataRow)[j].setValue((float(i % 300 + 1) / 300.0) * float(rand() % int(m_maxval)));
+                (*dataRow)[j].setValue((float(i % 300 + 1) / 300.0)
+                                       * QRandomGenerator::bounded(m_maxval));
             else
-                (*dataRow)[j].setValue((float(i % 300 + 1) / 300.0) * float(rand() % int(m_maxval))
-                                       + m_minval);
+                (*dataRow)[j].setValue((float(i % 300 + 1) / 300.0)
+                                       * QRandomGenerator::bounded(m_maxval) + m_minval);
         }
         dataArray->append(dataRow);
     }
@@ -449,10 +451,12 @@ void GraphModifier::addRow()
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
     for (float i = 0; i < m_columnCount; i++) {
         if (!m_negativeValuesOn)
-            (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % int(m_maxval)));
+            (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount)
+                                   * QRandomGenerator::bounded(m_maxval));
         else
-            (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % int(m_maxval))
-                                   - (float)(rand() % int(m_minval)));
+            (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount)
+                                   * QRandomGenerator::bounded(m_maxval)
+                                   - QRandomGenerator::bounded(m_minval));
     }
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
@@ -480,8 +484,8 @@ void GraphModifier::insertRow()
 {
     QBarDataRow *dataRow = new QBarDataRow(m_columnCount);
     for (float i = 0; i < m_columnCount; i++)
-        (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount) * (float)(rand() % int(m_maxval))
-                               + m_minval);
+        (*dataRow)[i].setValue(((i + 1) / (float)m_columnCount)
+                               * QRandomGenerator::bounded(m_maxval) + m_minval);
 
     // TODO Needs to be changed to account for data window offset once it is implemented.
     int row = qMax(m_selectedBar.x(), 0);
@@ -515,7 +519,7 @@ void GraphModifier::changeItem()
     int row = m_selectedBar.x();
     int column = m_selectedBar.y();
     if (row >= 0 && column >= 0) {
-        QBarDataItem item(float(rand() % 100));
+        QBarDataItem item(float(QRandomGenerator::bounded(100)));
         m_genericData->dataProxy()->setItem(row, column, item);
     }
 }
@@ -527,7 +531,7 @@ void GraphModifier::changeRow()
     if (row >= 0) {
         QBarDataRow *newRow = new QBarDataRow(m_genericData->dataProxy()->rowAt(row)->size());
         for (int i = 0; i < newRow->size(); i++)
-            (*newRow)[i].setValue(float(rand() % int(m_maxval)) + m_minval);
+            (*newRow)[i].setValue(QRandomGenerator::bounded(m_maxval) + m_minval);
         QString label = QStringLiteral("Change %1").arg(changeCounter++);
         m_genericData->dataProxy()->setRow(row, newRow, label);
     }
@@ -544,7 +548,7 @@ void GraphModifier::changeRows()
         for (int i = startRow; i <= row; i++ ) {
             QBarDataRow *newRow = new QBarDataRow(m_genericData->dataProxy()->rowAt(i)->size());
             for (int j = 0; j < newRow->size(); j++)
-                (*newRow)[j].setValue(float(rand() % int(m_maxval)) + m_minval);
+                (*newRow)[j].setValue(QRandomGenerator::bounded(m_maxval) + m_minval);
             newArray.append(newRow);
             labels.append(QStringLiteral("Change %1").arg(changeCounter++));
         }
@@ -1453,7 +1457,7 @@ void GraphModifier::insertRemoveTimerTimeout()
         for (int k = 0; k < 1; k++) {
             QBarDataRow *dataRow = new QBarDataRow(10);
             for (float i = 0; i < 10; i++)
-                (*dataRow)[i].setValue(((i + 1) / 10.0f) * (float)(rand() % 100));
+                (*dataRow)[i].setValue(((i + 1) / 10.0f) * (float)(QRandomGenerator::bounded(100)));
 
             QString label = QStringLiteral("Insert %1").arg(insertCounter++);
             m_dummyData->dataProxy()->insertRow(0, dataRow, label);
@@ -1467,7 +1471,7 @@ void GraphModifier::insertRemoveTimerTimeout()
         for (int k = 0; k < 2; k++) {
             QBarDataRow *dataRow = new QBarDataRow(10);
             for (float i = 0; i < 10; i++)
-                (*dataRow)[i].setValue(((i + 1) / 10.0f) * (float)(rand() % 100));
+                (*dataRow)[i].setValue(((i + 1) / 10.0f) * (float)(QRandomGenerator::bounded(100)));
 
             QString label = QStringLiteral("Insert %1").arg(insertCounter++);
             m_dummyData2->dataProxy()->insertRow(0, dataRow, label);
@@ -1770,7 +1774,7 @@ void GraphModifier::toggleCustomItem()
         item->setMeshFile(":/shuttle.obj");
         item->setPosition(positionOne);
         item->setScaling(QVector3D(0.1f, 0.1f, 0.1f));
-        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rand()));
+        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, QRandomGenerator::get32()));
         item->setTextureImage(QImage(":/shuttle.png"));
         m_graph->addCustomItem(item);
     } else {
@@ -1779,7 +1783,7 @@ void GraphModifier::toggleCustomItem()
         item->setMeshFile(":/shuttle.obj");
         item->setPosition(positionTwo);
         item->setScaling(QVector3D(0.1f, 0.1f, 0.1f));
-        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, rand()));
+        item->setRotation(QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, QRandomGenerator::get32()));
         item->setTextureImage(QImage(":/shuttle.png"));
         m_graph->addCustomItem(item);
     }

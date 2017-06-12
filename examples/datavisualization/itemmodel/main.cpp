@@ -40,6 +40,7 @@
 #include <QtWidgets/QVBoxLayout>
 #include <QtWidgets/QTableWidget>
 #include <QtGui/QScreen>
+#include <QtCore/QRandomGenerator>
 #include <QtCore/QTimer>
 #include <QtGui/QFont>
 #include <QtCore/QDebug>
@@ -216,7 +217,8 @@ void GraphDataGenerator::addRow()
     for (int i = 0; i < m_columnCount; i++) {
         QModelIndex index = m_tableWidget->model()->index(0, i);
         m_tableWidget->model()->setData(index,
-            ((float)i / (float)m_columnCount) / 2.0f + (float)(rand() % 30) / 100.0f);
+            ((float)i / (float)m_columnCount) / 2.0f +
+                                        (float)(QRandomGenerator::bounded(30)) / 100.0f);
     }
     m_tableWidget->resizeColumnsToContents();
 }

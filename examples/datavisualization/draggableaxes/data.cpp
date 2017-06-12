@@ -29,6 +29,7 @@
 
 #include "data.h"
 
+#include <QtCore/QRandomGenerator>
 #include <QtDataVisualization/QScatterDataProxy>
 #include <QtDataVisualization/Q3DScene>
 #include <QtDataVisualization/Q3DCamera>
@@ -165,7 +166,10 @@ void Data::addData()
 QVector3D Data::randVector()
 {
     return QVector3D(
-                (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f,
-                (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f,
-                (float)(rand() % 100) / 2.0f - (float)(rand() % 100) / 2.0f);
+                (float)(QRandomGenerator::bounded(100)) / 2.0f -
+                (float)(QRandomGenerator::bounded(100)) / 2.0f,
+                (float)(QRandomGenerator::bounded(100)) / 2.0f -
+                (float)(QRandomGenerator::bounded(100)) / 2.0f,
+                (float)(QRandomGenerator::bounded(100)) / 2.0f -
+                (float)(QRandomGenerator::bounded(100)) / 2.0f);
 }
