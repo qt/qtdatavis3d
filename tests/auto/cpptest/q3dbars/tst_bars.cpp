@@ -34,6 +34,8 @@
 #include <QtDataVisualization/Q3DInputHandler>
 #include <QtDataVisualization/QTouch3DInputHandler>
 
+#include "cpptestutil.h"
+
 using namespace QtDataVisualization;
 
 class tst_bars: public QObject
@@ -85,6 +87,8 @@ QBar3DSeries *newSeries()
 
 void tst_bars::initTestCase()
 {
+    if (!CpptestUtil::isOpenGLSupported())
+        QSKIP("OpenGL not supported on this platform");
 }
 
 void tst_bars::cleanupTestCase()

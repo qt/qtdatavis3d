@@ -31,6 +31,8 @@
 
 #include <QtDataVisualization/QCustom3DLabel>
 
+#include "cpptestutil.h"
+
 using namespace QtDataVisualization;
 
 class tst_custom: public QObject
@@ -55,6 +57,8 @@ private:
 
 void tst_custom::initTestCase()
 {
+    if (!CpptestUtil::isOpenGLSupported())
+        QSKIP("OpenGL not supported on this platform");
 }
 
 void tst_custom::cleanupTestCase()

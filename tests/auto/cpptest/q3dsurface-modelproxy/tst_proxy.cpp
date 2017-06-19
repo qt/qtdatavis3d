@@ -33,6 +33,8 @@
 #include <QtDataVisualization/Q3DSurface>
 #include <QtWidgets/QTableWidget>
 
+#include "cpptestutil.h"
+
 using namespace QtDataVisualization;
 
 class tst_proxy: public QObject
@@ -234,6 +236,9 @@ void tst_proxy::initializeProperties()
 
 void tst_proxy::multiMatch()
 {
+    if (!CpptestUtil::isOpenGLSupported())
+        QSKIP("OpenGL not supported on this platform");
+
     Q3DSurface graph;
 
     QTableWidget table;

@@ -1,3 +1,5 @@
+include(../common/cpptestutil.pri)
+
 QT += testlib datavisualization
 
 TARGET = tst_cpptest

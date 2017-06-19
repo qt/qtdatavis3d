@@ -31,6 +31,8 @@
 
 #include <QtDataVisualization/Q3DSurface>
 
+#include "cpptestutil.h"
+
 using namespace QtDataVisualization;
 
 class tst_surface: public QObject
@@ -75,6 +77,8 @@ QSurface3DSeries *newSeries()
 
 void tst_surface::initTestCase()
 {
+    if (!CpptestUtil::isOpenGLSupported())
+        QSKIP("OpenGL not supported on this platform");
 }
 
 void tst_surface::cleanupTestCase()

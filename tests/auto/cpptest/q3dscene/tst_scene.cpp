@@ -32,6 +32,8 @@
 #include <QtDataVisualization/Q3DScene>
 #include <QtDataVisualization/Q3DBars>
 
+#include "cpptestutil.h"
+
 using namespace QtDataVisualization;
 
 class tst_scene: public QObject
@@ -142,6 +144,9 @@ void tst_scene::invalidProperties()
 
 void tst_scene::subViews()
 {
+    if (!CpptestUtil::isOpenGLSupported())
+        QSKIP("OpenGL not supported on this platform");
+
     Q3DBars graph;
     graph.setPosition(QPoint(0, 0));
     graph.setWidth(200);
