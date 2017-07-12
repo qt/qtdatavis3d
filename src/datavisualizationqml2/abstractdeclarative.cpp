@@ -38,6 +38,12 @@
 #include <qpa/qplatformnativeinterface.h>
 #endif
 
+#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
+#define USE_SHARED_CONTEXT
+#else
+#include "glstatestore_p.h"
+#endif
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 static QList<const QQuickWindow *> clearList;
@@ -52,11 +58,7 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_samples(0),
     m_windowSamples(0),
     m_initialisedSize(0, 0),
-    #ifdef USE_SHARED_CONTEXT
-    m_context(0),
-    #else
-    m_stateStore(0),
-    #endif
+    m_contextOrStateStore(0),
     m_qtContext(0),
     m_mainThread(QThread::currentThread()),
     m_contextThread(0)
@@ -352,60 +354,44 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 
 void AbstractDeclarative::activateOpenGLContext(QQuickWindow *window)
 {
-#ifdef USE_SHARED_CONTEXT
     // We can assume we are not in middle of AbstractDeclarative destructor when we are here,
     // since m_context creation is always done when this function is called from
     // synchDataToRenderer(), which blocks main thread -> no need to mutex.
-    if (!m_context || !m_qtContext || m_contextWindow != window) {
+    if (!m_contextOrStateStore || !m_qtContext || m_contextWindow != window) {
         QOpenGLContext *currentContext = QOpenGLContext::currentContext();
 
         // Note: Changing graph to different window when using multithreaded renderer will break!
 
-        delete m_context;
+        delete m_contextOrStateStore;
 
         m_contextThread = QThread::currentThread();
         m_contextWindow = window;
         m_qtContext = currentContext;
+
+#ifdef USE_SHARED_CONTEXT
         m_context = new QOpenGLContext();
         m_context->setFormat(m_qtContext->format());
         m_context->setShareContext(m_qtContext);
         m_context->create();
-
         m_context->makeCurrent(window);
-        m_controller->initializeOpenGL();
-
-        // Make sure context gets deleted.
-        QObject::connect(m_contextThread, &QThread::finished, this,
-                         &AbstractDeclarative::destroyContext, Qt::DirectConnection);
-    } else {
-        m_context->makeCurrent(window);
-    }
 #else
-    // Shared contexts don't work properly in some platforms, so just store the
-    // context state on those
-    if (!m_stateStore || !m_qtContext || m_contextWindow != window) {
-        QOpenGLContext *currentContext = QOpenGLContext::currentContext();
-
-        // Note: Changing graph to different window when using multithreaded renderer will break!
-
-        delete m_stateStore;
-
-        m_contextThread = QThread::currentThread();
-        m_contextWindow = window;
-        m_qtContext = currentContext;
-
+        // Shared contexts don't work properly in some platforms, so just store the
+        // context state on those
         m_stateStore = new GLStateStore(QOpenGLContext::currentContext());
-
         m_stateStore->storeGLState();
+#endif
         m_controller->initializeOpenGL();
 
-        // Make sure state store gets deleted.
+        // Make sure context / state store gets deleted.
         QObject::connect(m_contextThread, &QThread::finished, this,
                          &AbstractDeclarative::destroyContext, Qt::DirectConnection);
     } else {
+#ifdef USE_SHARED_CONTEXT
+        m_context->makeCurrent(window);
+#else
         m_stateStore->storeGLState();
-    }
 #endif
+    }
 }
 
 void AbstractDeclarative::doneOpenGLContext(QQuickWindow *window)
@@ -854,24 +840,14 @@ void AbstractDeclarative::windowDestroyed(QObject *obj)
 
 void AbstractDeclarative::destroyContext()
 {
-#ifdef USE_SHARED_CONTEXT
-    // Context can be in another thread, don't delete it directly in that case
     if (m_contextThread && m_contextThread != m_mainThread) {
-        if (m_context)
-            m_context->deleteLater();
+        if (m_contextOrStateStore)
+            m_contextOrStateStore->deleteLater();
     } else {
-        delete m_context;
+        delete m_contextOrStateStore;
     }
-    m_context = 0;
-#else
-    if (m_contextThread && m_contextThread != m_mainThread) {
-        if (m_stateStore)
-            m_stateStore->deleteLater();
-    } else {
-        delete m_stateStore;
-    }
-    m_stateStore = 0;
-#endif
+    m_contextOrStateStore = 0;
+
     if (m_contextThread) {
         QObject::disconnect(m_contextThread, &QThread::finished, this,
                             &AbstractDeclarative::destroyContext);

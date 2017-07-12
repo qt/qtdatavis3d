@@ -50,13 +50,7 @@
 #include <QtCore/QMutex>
 #include <QtCore/QSharedPointer>
 
-#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
-#define USE_SHARED_CONTEXT
-#endif
-
-#ifndef USE_SHARED_CONTEXT
-#include "glstatestore_p.h"
-#endif
+class GLStateStore;
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -297,11 +291,11 @@ private:
     int m_samples;
     int m_windowSamples;
     QSize m_initialisedSize;
-#ifdef USE_SHARED_CONTEXT
-    QOpenGLContext *m_context;
-#else
-    GLStateStore *m_stateStore;
-#endif
+    union {
+        QObject *m_contextOrStateStore;
+        QOpenGLContext *m_context;
+        GLStateStore *m_stateStore;
+    };
     QPointer<QOpenGLContext> m_qtContext;
     QThread *m_mainThread;
     QThread *m_contextThread;
