@@ -61,7 +61,7 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     m_mainThread(QThread::currentThread()),
     m_contextThread(0)
 {
-    m_nodeMutex = QSharedPointer<QMutex>(new QMutex);
+    m_nodeMutex = QSharedPointer<QMutex>::create();
 
     connect(this, &QQuickItem::windowChanged, this, &AbstractDeclarative::handleWindowChanged);
 
