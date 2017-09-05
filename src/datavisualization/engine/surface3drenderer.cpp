@@ -317,8 +317,12 @@ void Surface3DRenderer::updateSurfaceTextures(QVector<QSurface3DSeries *> series
             const QSurfaceDataArray &array = *dataProxy->array();
 
             if (!series->texture().isNull()) {
-                cache->setSurfaceTexture(m_textureHelper->create2DTexture(
-                                             series->texture(), true, true, true));
+                GLuint texId = m_textureHelper->create2DTexture(series->texture(),
+                                                                true, true, true, true);
+                glBindTexture(GL_TEXTURE_2D, texId);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+                glBindTexture(GL_TEXTURE_2D, 0);
+                cache->setSurfaceTexture(texId);
 
                 if (cache->isFlatShadingEnabled())
                     cache->surfaceObject()->coarseUVs(array, cache->dataArray());
