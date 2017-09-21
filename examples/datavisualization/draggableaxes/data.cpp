@@ -166,10 +166,10 @@ void Data::addData()
 QVector3D Data::randVector()
 {
     return QVector3D(
-                (float)(QRandomGenerator::bounded(100)) / 2.0f -
-                (float)(QRandomGenerator::bounded(100)) / 2.0f,
-                (float)(QRandomGenerator::bounded(100)) / 2.0f -
-                (float)(QRandomGenerator::bounded(100)) / 2.0f,
-                (float)(QRandomGenerator::bounded(100)) / 2.0f -
-                (float)(QRandomGenerator::bounded(100)) / 2.0f);
+                (float)(QRandomGenerator::global()->bounded(100)) / 2.0f -
+                (float)(QRandomGenerator::global()->bounded(100)) / 2.0f,
+                (float)(QRandomGenerator::global()->bounded(100)) / 2.0f -
+                (float)(QRandomGenerator::global()->bounded(100)) / 2.0f,
+                (float)(QRandomGenerator::global()->bounded(100)) / 2.0f -
+                (float)(QRandomGenerator::global()->bounded(100)) / 2.0f);
 }

@@ -218,7 +218,7 @@ void GraphDataGenerator::addRow()
         QModelIndex index = m_tableWidget->model()->index(0, i);
         m_tableWidget->model()->setData(index,
             ((float)i / (float)m_columnCount) / 2.0f +
-                                        (float)(QRandomGenerator::bounded(30)) / 100.0f);
+                                        (float)(QRandomGenerator::global()->bounded(30)) / 100.0f);
     }
     m_tableWidget->resizeColumnsToContents();
 }

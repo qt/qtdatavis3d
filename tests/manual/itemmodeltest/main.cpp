@@ -202,7 +202,7 @@ void GraphDataGenerator::addRow()
         QModelIndex index = m_tableWidget->model()->index(0, i);
         m_tableWidget->model()->setData(index,
                                         ((float)i / (float)m_columnCount) / 2.0f
-                                        + QRandomGenerator::bounded(30.0 / 100.0f));
+                                        + QRandomGenerator::global()->bounded(30.0 / 100.0f));
     }
     m_tableWidget->resizeColumnsToContents();
 }
@@ -235,7 +235,7 @@ void GraphDataGenerator::fixTableSize()
 void GraphDataGenerator::changeSelectedButtonClicked()
 {
     // Change all selected cells to a random value 1-10
-    QVariant value = QVariant::fromValue(QRandomGenerator::bounded(10.0) + 1);
+    QVariant value = QVariant::fromValue(QRandomGenerator::global()->bounded(10.0) + 1);
     QList<QTableWidgetItem *> selectedItems = m_tableWidget->selectedItems();
     foreach (QTableWidgetItem *item, selectedItems) {
         QString oldData = item->data(Qt::DisplayRole).toString();

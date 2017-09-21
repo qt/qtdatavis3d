@@ -96,7 +96,7 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
                 float colWave = float(qSin((2.0 * M_PI * colMod) - (1.0 / 2.0 * M_PI)) + 1.0);
                 float y = (colWave * ((float(qSin(rowColWaveAngleMul * colMod) + 1.0))))
                         * rowColWaveMul
-                        + QRandomGenerator::bounded(0.15f) * yRangeMod;
+                        + QRandomGenerator::global()->bounded(0.15f) * yRangeMod;
 
                 int index = k + cacheIndexAdjustment;
                 if (index >= columnCount) {
