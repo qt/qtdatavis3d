@@ -17,6 +17,7 @@ HEADERS += \
     star.h
 
 QT += widgets
+CONFIG += exceptions
 
 OTHER_FILES += doc/src/* \
                doc/images/*
