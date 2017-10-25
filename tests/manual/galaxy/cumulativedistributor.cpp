@@ -37,6 +37,7 @@
 #include "cumulativedistributor.h"
 
 #include <QDebug>
+#include <math.h>
 
 CumulativeDistributor::CumulativeDistributor()
     : m_pDistFun(NULL),
