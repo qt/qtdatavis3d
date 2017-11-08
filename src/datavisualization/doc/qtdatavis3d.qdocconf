@@ -50,4 +50,4 @@ navigation.cppclassespage = Qt Data Visualization C++ Classes
 navigation.qmltypespage = Qt Data Visualization QML Types
 
 manifestmeta.highlighted.names = "QtDataVisualization/Bars Example" \
-                                 "QtDataVisualization/Surface Example"
+                                 "QtDataVisualization/Qt Quick 2 Surface Multiseries Example"
