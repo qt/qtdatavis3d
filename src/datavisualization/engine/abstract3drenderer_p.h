@@ -267,6 +267,7 @@ protected:
     QPoint m_inputPosition;
     QHash<QAbstract3DSeries *, SeriesRenderCache *> m_renderCacheList;
     CustomRenderItemArray m_customRenderCache;
+    QList<QCustom3DItem *> m_customItemDrawOrder;
     QRect m_primarySubViewport;
     QRect m_secondarySubViewport;
     float m_devicePixelRatio;
