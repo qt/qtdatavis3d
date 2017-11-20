@@ -120,7 +120,7 @@ void ScatterDataModifier::massiveDataTest()
             m_massiveTestCacheArray.resize(cacheSize);
             int totalIndex = 0;
             for (int i = 0; i < unitCount && totalIndex < cacheSize; i++) {
-                unitBase += direction * (QRandomGenerator::bounded(3) / 100.0f);
+                unitBase += direction * (QRandomGenerator::global()->bounded(3) / 100.0f);
                 if (unitBase > maxY) {
                     unitBase = maxY;
                     direction = -1.0f;
@@ -129,9 +129,9 @@ void ScatterDataModifier::massiveDataTest()
                     direction = 1.0f;
                 }
                 for (int j = 0; j < itemsPerUnit && totalIndex < cacheSize; j++) {
-                    float randFactor = float(QRandomGenerator::bounded(100)) / (100 / yRangeMargin);
+                    float randFactor = float(QRandomGenerator::global()->bounded(100)) / (100 / yRangeMargin);
                     m_massiveTestCacheArray[totalIndex].setPosition(
-                                QVector3D(float(QRandomGenerator::bounded(itemsPerUnit)),
+                                QVector3D(float(QRandomGenerator::global()->bounded(itemsPerUnit)),
                                           unitBase + randFactor, 0.0f));
                     // Z value is irrelevant, we replace it anyway when we take item to use
                     totalIndex++;
@@ -781,8 +781,8 @@ void ScatterDataModifier::removeBunch()
 
 void ScatterDataModifier::timeout()
 {
-    int doWhat = QRandomGenerator::bounded(10);
-    if (!(QRandomGenerator::bounded(100)))
+    int doWhat = QRandomGenerator::global()->bounded(10);
+    if (!(QRandomGenerator::global()->bounded(100)))
         doWhat = -1;
 
     switch (doWhat) {
@@ -815,7 +815,7 @@ void ScatterDataModifier::timeout()
         break;
     case 9:
         if (m_chart->seriesList().size())
-            m_targetSeries = m_chart->seriesList().at(QRandomGenerator::bounded(m_chart->seriesList().size()));
+            m_targetSeries = m_chart->seriesList().at(QRandomGenerator::global()->bounded(m_chart->seriesList().size()));
         else
             addSeries();
         break;
@@ -938,7 +938,7 @@ void ScatterDataModifier::toggleSeriesVisibility()
 void ScatterDataModifier::changeSeriesName()
 {
     if (m_targetSeries)
-        m_targetSeries->setName(m_targetSeries->name().append("-").append(QString::number(QRandomGenerator::bounded(10))));
+        m_targetSeries->setName(m_targetSeries->name().append("-").append(QString::number(QRandomGenerator::global()->bounded(10))));
 }
 
 void ScatterDataModifier::handleAxisXChanged(QValue3DAxis *axis)
@@ -1120,9 +1120,9 @@ void ScatterDataModifier::setHorizontalAspectRatio(int ratio)
 QVector3D ScatterDataModifier::randVector()
 {
     QVector3D retvec = QVector3D(
-        (float)(QRandomGenerator::bounded(100)) / 2.0f - (float)(QRandomGenerator::bounded(100)) / 2.0f,
-        (float)(QRandomGenerator::bounded(100)) / 100.0f - (float)(QRandomGenerator::bounded(100)) / 100.0f,
-        (float)(QRandomGenerator::bounded(100)) / 2.0f - (float)(QRandomGenerator::bounded(100)) / 2.0f);
+        (float)(QRandomGenerator::global()->bounded(100)) / 2.0f - (float)(QRandomGenerator::global()->bounded(100)) / 2.0f,
+        (float)(QRandomGenerator::global()->bounded(100)) / 100.0f - (float)(QRandomGenerator::global()->bounded(100)) / 100.0f,
+        (float)(QRandomGenerator::global()->bounded(100)) / 2.0f - (float)(QRandomGenerator::global()->bounded(100)) / 2.0f);
 
     qDebug() << __FUNCTION__ << retvec;
 
@@ -1143,8 +1143,8 @@ QScatter3DSeries *ScatterDataModifier::createAndAddSeries()
     series->setItemLabelFormat(QStringLiteral("@seriesName: (X:@xLabel / Z:@zLabel) Y:@yLabel"));
     series->setMesh(QAbstract3DSeries::MeshSphere);
     series->setMeshSmooth(true);
-    series->setBaseColor(QColor(QRandomGenerator::bounded(256), QRandomGenerator::bounded(256), QRandomGenerator::bounded(256)));
-    series->setItemSize(float(QRandomGenerator::bounded(90) + 10) / 100.0f);
+    series->setBaseColor(QColor(QRandomGenerator::global()->bounded(256), QRandomGenerator::global()->bounded(256), QRandomGenerator::global()->bounded(256)));
+    series->setItemSize(float(QRandomGenerator::global()->bounded(90) + 10) / 100.0f);
 
     QObject::connect(series, &QScatter3DSeries::selectedItemChanged, this,
                      &ScatterDataModifier::handleSelectionChange);

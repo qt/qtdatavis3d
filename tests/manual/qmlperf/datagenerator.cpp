@@ -60,9 +60,9 @@ void DataGenerator::generateData(QScatter3DSeries *series, uint count)
     QScatterDataItem *ptrToDataArray = &dataArray->first();
 
     for (uint i = 0; i < count; i++) {
-            ptrToDataArray->setPosition(QVector3D(QRandomGenerator::getReal(),
-                                                  QRandomGenerator::getReal(),
-                                                  QRandomGenerator::getReal()));
+            ptrToDataArray->setPosition(QVector3D(QRandomGenerator::global()->generateDouble(),
+                                                  QRandomGenerator::global()->generateDouble(),
+                                                  QRandomGenerator::global()->generateDouble()));
             ptrToDataArray++;
     }
 
@@ -75,9 +75,9 @@ void DataGenerator::add(QScatter3DSeries *series, uint count)
     appendArray.resize(count);
 
     for (uint i = 0; i < count; i++) {
-            appendArray[i].setPosition(QVector3D(QRandomGenerator::getReal(),
-                                                 QRandomGenerator::getReal(),
-                                                 QRandomGenerator::getReal()));
+            appendArray[i].setPosition(QVector3D(QRandomGenerator::global()->generateDouble(),
+                                                 QRandomGenerator::global()->generateDouble(),
+                                                 QRandomGenerator::global()->generateDouble()));
     }
 
     series->dataProxy()->addItems(appendArray);
