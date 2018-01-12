@@ -36,7 +36,6 @@
 #include <QtWidgets/QPushButton>
 #include <QtWidgets/QCheckBox>
 #include <QtWidgets/QComboBox>
-#include <QtWidgets/QFontComboBox>
 #include <QtWidgets/QLabel>
 #include <QtWidgets/QMessageBox>
 #include <QtGui/QScreen>
