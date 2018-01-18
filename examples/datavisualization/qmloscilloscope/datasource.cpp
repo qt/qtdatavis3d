@@ -40,7 +40,7 @@ Q_DECLARE_METATYPE(QSurface3DSeries *)
 DataSource::DataSource(QObject *parent) :
     QObject(parent),
     m_index(-1),
-    m_resetArray(0)
+    m_resetArray(nullptr)
 {
     //! [4]
     qRegisterMetaType<QSurface3DSeries *>();
@@ -126,7 +126,7 @@ void DataSource::update(QSurface3DSeries *series)
 
         // If the first time or the dimensions of the cache array have changed,
         // reconstruct the reset array
-        if (m_resetArray || series->dataProxy()->rowCount() != newRowCount
+        if (!m_resetArray || series->dataProxy()->rowCount() != newRowCount
                 || series->dataProxy()->columnCount() != newColumnCount) {
             m_resetArray = new QSurfaceDataArray();
             m_resetArray->reserve(newRowCount);
