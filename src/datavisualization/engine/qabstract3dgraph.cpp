@@ -442,6 +442,9 @@ void QAbstract3DGraph::clearSelection()
  * if trying to add a null item, and the index of the item if trying to add an
  * already added item.
  *
+ * Items are rendered in the order they have been inserted. The rendering order needs to
+ * be taken into account when having solid and transparent items.
+ *
  * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt(), customItems()
  *
  * \since QtDataVisualization 1.1
