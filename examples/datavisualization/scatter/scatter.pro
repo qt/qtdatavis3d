@@ -10,6 +10,8 @@ SOURCES += main.cpp scatterdatamodifier.cpp
 HEADERS += scatterdatamodifier.h
 
 QT += widgets
+requires(qtConfig(combobox))
+requires(qtConfig(fontcombobox))
 
 OTHER_FILES += doc/src/* \
                doc/images/*

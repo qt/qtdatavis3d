@@ -12,6 +12,7 @@ SOURCES += main.cpp \
 HEADERS += surfacegraph.h
 
 QT += widgets
+requires(qtConfig(combobox))
 
 RESOURCES += surface.qrc
 

@@ -9,6 +9,7 @@ android|ios|winrt {
 SOURCES += main.cpp
 
 QT += widgets
+requires(qtConfig(tablewidget))
 
 OTHER_FILES += doc/src/* \
                doc/images/*

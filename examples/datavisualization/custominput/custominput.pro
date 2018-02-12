@@ -12,6 +12,7 @@ HEADERS += scatterdatamodifier.h \
     custominputhandler.h
 
 QT += widgets
+requires(qtConfig(combobox))
 
 RESOURCES += custominput.qrc
 
