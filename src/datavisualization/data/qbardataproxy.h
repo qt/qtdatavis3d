@@ -35,16 +35,13 @@
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
 
-namespace QtDataVisualization {
-// typedefs introduced this way because QDoc doesn't understand namespace macros
-typedef QVector<QBarDataItem> QBarDataRow;
-typedef QList<QBarDataRow *> QBarDataArray;
-}
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QBarDataProxyPrivate;
 class QBar3DSeries;
+
+typedef QVector<QBarDataItem> QBarDataRow;
+typedef QList<QBarDataRow *> QBarDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
 {
