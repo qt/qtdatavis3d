@@ -33,16 +33,13 @@
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qsurfacedataitem.h>
 
-namespace QtDataVisualization {
-// typedefs introduced this way because QDoc doesn't understand namespace macros
-typedef QVector<QSurfaceDataItem> QSurfaceDataRow;
-typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
-}
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QSurfaceDataProxyPrivate;
 class QSurface3DSeries;
+
+typedef QVector<QSurfaceDataItem> QSurfaceDataRow;
+typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 {

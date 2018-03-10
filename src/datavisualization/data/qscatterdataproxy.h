@@ -33,15 +33,12 @@
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qscatterdataitem.h>
 
-namespace QtDataVisualization {
-// typedef introduced this way because QDoc doesn't understand namespace macros
-typedef QVector<QScatterDataItem> QScatterDataArray;
-}
-
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QScatterDataProxyPrivate;
 class QScatter3DSeries;
+
+typedef QVector<QScatterDataItem> QScatterDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
 {
