@@ -48,6 +48,8 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
+using QT_PREPEND_NAMESPACE(operator|); // Get the operator|(Qt::AlignmentFlag,Qt::AlignmentFlag) for Qt < 5.12
+
 class ShaderHelper;
 class ObjectHelper;
 class AbstractObjectHelper;
@@ -98,7 +100,7 @@ public:
                    QAbstract3DGraph::SelectionFlags mode, ShaderHelper *shader, ObjectHelper *object,
                    const Q3DCamera *camera, bool useDepth = false, bool rotateAlong = false,
                    LabelPosition position = LabelOver,
-                   Qt::AlignmentFlag alignment = Qt::AlignCenter, bool isSlicing = false,
+                   Qt::Alignment alignment = Qt::AlignCenter, bool isSlicing = false,
                    bool isSelecting = false);
 
     void generateSelectionLabelTexture(Abstract3DRenderer *item);
