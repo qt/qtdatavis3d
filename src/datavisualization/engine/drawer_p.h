@@ -48,8 +48,6 @@
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
-using QT_PREPEND_NAMESPACE(operator|); // Get the operator|(Qt::AlignmentFlag,Qt::AlignmentFlag) for Qt < 5.12
-
 class ShaderHelper;
 class ObjectHelper;
 class AbstractObjectHelper;
