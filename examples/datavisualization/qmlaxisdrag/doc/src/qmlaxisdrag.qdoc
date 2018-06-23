@@ -29,7 +29,7 @@
     \example qmlaxisdrag
     \title Qt Quick 2 Axis Dragging Example
     \ingroup qtdatavisualization_examples
-    \brief Implementing axis dragging in QML
+    \brief Implementing axis dragging in QML.
     \since QtDataVisualization 1.1
 
     The Qt Quick 2 axis dragging example concentrates on showing how to implement axis range
