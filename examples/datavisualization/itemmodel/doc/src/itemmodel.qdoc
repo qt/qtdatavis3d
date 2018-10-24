@@ -118,12 +118,16 @@
     We created the data generator in the application main and gave it the graph and the table
     widget as parameters:
 
-    \code GraphDataGenerator generator(graph, tableWidget); \endcode
+    \code
+    GraphDataGenerator generator(graph, tableWidget);
+    \endcode
 
     We added a separate start method to the generator, so that it wouldn't start doing anything
     until everything else is set up. We then called the method when starting the application:
 
-    \code generator.start(); \endcode
+    \code
+    generator.start();
+    \endcode
 
     Let's have a look at the contents of the \c start() method:
 
