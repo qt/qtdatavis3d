@@ -144,7 +144,9 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     // New revisions
     qmlRegisterType<Q3DLight, 1>(uri, 1, 3, "Light3D");
 
-    qmlRegisterModule(uri, 1, QT_VERSION_MINOR);
+    // The minor version used to be the current Qt 5 minor. For compatibility it is the last
+    // Qt 5 release.
+    qmlRegisterModule(uri, 1, 15);
 }
 
 QT_END_NAMESPACE_DATAVISUALIZATION
