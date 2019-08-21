@@ -234,7 +234,7 @@ void Abstract3DRenderer::initializeOpenGL()
     loadLabelMesh();
     loadPositionMapperMesh();
 
-    QObject::connect(m_context, &QOpenGLContext::aboutToBeDestroyed,
+    QObject::connect(m_context.data(), &QOpenGLContext::aboutToBeDestroyed,
                      this, &Abstract3DRenderer::contextCleanup);
 }
 
