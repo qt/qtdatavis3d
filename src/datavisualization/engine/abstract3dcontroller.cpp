@@ -112,11 +112,9 @@ void Abstract3DController::destroyRenderer()
 {
     QMutexLocker mutexLocker(&m_renderMutex);
     // Renderer can be in another thread, don't delete it directly in that case
-    if (m_renderer && m_renderer->thread() && m_renderer->thread() != this->thread())
+    if (m_renderer)
         m_renderer->deleteLater();
-    else
-        delete m_renderer;
-    m_renderer = 0;
+    m_renderer = nullptr;
 }
 
 /**
