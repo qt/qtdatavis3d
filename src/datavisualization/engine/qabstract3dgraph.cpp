@@ -37,9 +37,9 @@
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOpenGLContext>
-#include <QtGui/QOpenGLPaintDevice>
+#include <QtOpenGL/QOpenGLPaintDevice>
 #include <QtGui/QPainter>
-#include <QtGui/QOpenGLFramebufferObject>
+#include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtGui/QOffscreenSurface>
 #if defined(Q_OS_OSX)
 #include <qpa/qplatformnativeinterface.h>

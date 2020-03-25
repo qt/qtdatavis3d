@@ -29,7 +29,7 @@
 
 #include "shaderhelper_p.h"
 
-#include <QtGui/QOpenGLShader>
+#include <QtOpenGL/QOpenGLShader>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 

@@ -1,6 +1,6 @@
 TARGET = QtDataVisualization
 
-QT += core gui
+QT += core gui opengl
 osx: QT +=  gui-private
 
 QMAKE_DOCS = $$PWD/doc/qtdatavis3d.qdocconf

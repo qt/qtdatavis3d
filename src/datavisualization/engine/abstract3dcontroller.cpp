@@ -38,7 +38,7 @@
 #include "qcustom3ditem_p.h"
 #include "utils_p.h"
 #include <QtCore/QThread>
-#include <QtGui/QOpenGLFramebufferObject>
+#include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION

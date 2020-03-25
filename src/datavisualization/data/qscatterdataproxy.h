@@ -33,6 +33,8 @@
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qscatterdataitem.h>
 
+Q_MOC_INCLUDE(<QtDataVisualization/qscatter3dseries.h>)
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QScatterDataProxyPrivate;

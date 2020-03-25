@@ -29,7 +29,7 @@
 
 #include "declarativerendernode_p.h"
 #include "abstractdeclarative_p.h"
-#include <QtGui/QOpenGLFramebufferObject>
+#include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtCore/QMutexLocker>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION

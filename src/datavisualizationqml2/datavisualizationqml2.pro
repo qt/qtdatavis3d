@@ -1,6 +1,6 @@
 TARGET = datavisualizationqml2
 CXX_MODULE = datavisualization
-QT += qml quick datavisualization
+QT += opengl qml quick datavisualization
 osx: QT += gui-private
 TARGETPATH = QtDataVisualization
 

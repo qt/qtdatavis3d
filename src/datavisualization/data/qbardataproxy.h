@@ -35,6 +35,8 @@
 #include <QtCore/QVector>
 #include <QtCore/QStringList>
 
+Q_MOC_INCLUDE(<QtDataVisualization/qbar3dseries.h>)
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QBarDataProxyPrivate;

@@ -36,6 +36,7 @@
 #include <QtDataVisualization/QScatter3DSeries>
 #include <QtDataVisualization/Q3DTheme>
 #include <QtCore/qmath.h>
+#include <QtCore/QFile>
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 

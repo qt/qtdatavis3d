@@ -33,6 +33,8 @@
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qsurfacedataitem.h>
 
+Q_MOC_INCLUDE(<QtDataVisualization/qsurface3dseries.h>)
+
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 class QSurfaceDataProxyPrivate;
