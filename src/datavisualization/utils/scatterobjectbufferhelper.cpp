@@ -74,10 +74,10 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
     }
 
     // Index vertices
-    const QVector<GLuint> indices = dotObj->indices();
-    const QVector<QVector3D> indexed_vertices = dotObj->indexedvertices();
-    const QVector<QVector2D> indexed_uvs = dotObj->indexedUVs();
-    const QVector<QVector3D> indexed_normals = dotObj->indexedNormals();
+    const QList<GLuint> indices = dotObj->indices();
+    const QList<QVector3D> indexed_vertices = dotObj->indexedvertices();
+    const QList<QVector2D> indexed_uvs = dotObj->indexedUVs();
+    const QList<QVector3D> indexed_normals = dotObj->indexedNormals();
     const int indicesCount = indices.count();
     const int verticeCount = indexed_vertices.count();
     const int uvsCount = indexed_uvs.count();
@@ -95,15 +95,15 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
     }
     modelMatrix.scale(modelScaler);
 
-    QVector<QVector3D> scaled_vertices;
+    QList<QVector3D> scaled_vertices;
     scaled_vertices.resize(verticeCount);
     for (int i = 0; i < verticeCount; i++)
         scaled_vertices[i] = indexed_vertices[i] * modelMatrix;
 
-    QVector<GLuint> buffered_indices;
-    QVector<QVector3D> buffered_vertices;
-    QVector<QVector2D> buffered_uvs;
-    QVector<QVector3D> buffered_normals;
+    QList<GLuint> buffered_indices;
+    QList<QVector3D> buffered_vertices;
+    QList<QVector2D> buffered_uvs;
+    QList<QVector3D> buffered_normals;
 
     buffered_indices.resize(indicesCount * renderArraySize);
     buffered_vertices.resize(verticeCount * renderArraySize);
@@ -204,14 +204,14 @@ void ScatterObjectBufferHelper::updateUVs(ScatterSeriesRenderCache *cache)
     if (!updateSize)
         return;
 
-    QVector<QVector2D> buffered_uvs;
+    QList<QVector2D> buffered_uvs;
     buffered_uvs.resize(uvsCount * updateSize);
 
     uint itemCount = 0;
     if (cache->colorStyle() == Q3DTheme::ColorStyleRangeGradient) {
         itemCount = createRangeGradientUVs(cache, buffered_uvs);
     } else if (cache->colorStyle() == Q3DTheme::ColorStyleObjectGradient) {
-        const QVector<QVector3D> indexed_vertices = dotObj->indexedvertices();
+        const QList<QVector3D> indexed_vertices = dotObj->indexedvertices();
         itemCount = createObjectGradientUVs(cache, buffered_uvs, indexed_vertices);
     }
 
@@ -234,7 +234,7 @@ void ScatterObjectBufferHelper::updateUVs(ScatterSeriesRenderCache *cache)
 }
 
 uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache *cache,
-                                                       QVector<QVector2D> &buffered_uvs)
+                                                       QList<QVector2D> &buffered_uvs)
 {
     ObjectHelper *dotObj = cache->object();
     const int uvsCount = dotObj->indexedUVs().count();
@@ -276,8 +276,8 @@ uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache 
 }
 
 uint ScatterObjectBufferHelper::createObjectGradientUVs(ScatterSeriesRenderCache *cache,
-                                                        QVector<QVector2D> &buffered_uvs,
-                                                        const QVector<QVector3D> &indexed_vertices)
+                                                        QList<QVector2D> &buffered_uvs,
+                                                        const QList<QVector3D> &indexed_vertices)
 {
     ObjectHelper *dotObj = cache->object();
     const int uvsCount = dotObj->indexedUVs().count();
@@ -316,7 +316,7 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
         return;
 
     // Index vertices
-    const QVector<QVector3D> indexed_vertices = dotObj->indexedvertices();
+    const QList<QVector3D> indexed_vertices = dotObj->indexedvertices();
     int verticeCount = indexed_vertices.count();
 
     float itemSize = cache->itemSize() / itemScaler;
@@ -331,12 +331,12 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
     }
     modelMatrix.scale(modelScaler);
 
-    QVector<QVector3D> scaled_vertices;
+    QList<QVector3D> scaled_vertices;
     scaled_vertices.resize(verticeCount);
     for (int i = 0; i < verticeCount; i++)
         scaled_vertices[i] = indexed_vertices[i] * modelMatrix;
 
-    QVector<QVector3D> buffered_vertices;
+    QList<QVector3D> buffered_vertices;
     buffered_vertices.resize(verticeCount * updateSize);
 
     int itemCount = 0;

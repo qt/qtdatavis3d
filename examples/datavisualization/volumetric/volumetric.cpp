@@ -117,9 +117,10 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
     toggleAreaAll(true);
 
     if (!isOpenGLES()) {
-        m_lowDetailData = new QVector<uchar>(lowDetailSize * lowDetailSize * lowDetailSize / 2);
-        m_mediumDetailData = new QVector<uchar>(mediumDetailSize * mediumDetailSize * mediumDetailSize / 2);
-        m_highDetailData = new QVector<uchar>(highDetailSize * highDetailSize * highDetailSize / 2);
+        m_lowDetailData = new QList<uchar>(lowDetailSize * lowDetailSize * lowDetailSize / 2);
+        m_mediumDetailData =
+                new QList<uchar>(mediumDetailSize * mediumDetailSize * mediumDetailSize / 2);
+        m_highDetailData = new QList<uchar>(highDetailSize * highDetailSize * highDetailSize / 2);
 
         initHeightMap(QStringLiteral(":/heightmaps/layer_ground.png"), m_groundLayer);
         initHeightMap(QStringLiteral(":/heightmaps/layer_water.png"), m_waterLayer);
@@ -149,7 +150,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
         m_volumeItem->setTextureHeight(lowDetailSize / 2);
         m_volumeItem->setTextureDepth(lowDetailSize);
         m_volumeItem->setTextureFormat(QImage::Format_Indexed8);
-        m_volumeItem->setTextureData(new QVector<uchar>(*m_lowDetailData));
+        m_volumeItem->setTextureData(new QList<uchar>(*m_lowDetailData));
         //! [1]
 
         // Generate color tables.
@@ -372,7 +373,7 @@ void VolumetricModifier::handleTimeout()
 void VolumetricModifier::toggleLowDetail(bool enabled)
 {
     if (enabled && m_volumeItem) {
-        m_volumeItem->setTextureData(new QVector<uchar>(*m_lowDetailData));
+        m_volumeItem->setTextureData(new QList<uchar>(*m_lowDetailData));
         m_volumeItem->setTextureDimensions(lowDetailSize, lowDetailSize / 2, lowDetailSize);
         adjustSliceX(m_sliceSliderX->value());
         adjustSliceY(m_sliceSliderY->value());
@@ -383,7 +384,7 @@ void VolumetricModifier::toggleLowDetail(bool enabled)
 void VolumetricModifier::toggleMediumDetail(bool enabled)
 {
     if (enabled && m_volumeItem) {
-        m_volumeItem->setTextureData(new QVector<uchar>(*m_mediumDetailData));
+        m_volumeItem->setTextureData(new QList<uchar>(*m_mediumDetailData));
         m_volumeItem->setTextureDimensions(mediumDetailSize, mediumDetailSize / 2, mediumDetailSize);
         adjustSliceX(m_sliceSliderX->value());
         adjustSliceY(m_sliceSliderY->value());
@@ -394,7 +395,7 @@ void VolumetricModifier::toggleMediumDetail(bool enabled)
 void VolumetricModifier::toggleHighDetail(bool enabled)
 {
     if (enabled && m_volumeItem) {
-        m_volumeItem->setTextureData(new QVector<uchar>(*m_highDetailData));
+        m_volumeItem->setTextureData(new QList<uchar>(*m_highDetailData));
         m_volumeItem->setTextureDimensions(highDetailSize, highDetailSize / 2, highDetailSize);
         adjustSliceX(m_sliceSliderX->value());
         adjustSliceY(m_sliceSliderY->value());
@@ -550,14 +551,14 @@ void VolumetricModifier::setDrawSliceFrames(int enabled)
         m_volumeItem->setDrawSliceFrames(enabled);
 }
 
-void VolumetricModifier::initHeightMap(QString fileName, QVector<uchar> &layerData)
+void VolumetricModifier::initHeightMap(QString fileName, QList<uchar> &layerData)
 {
     QImage heightImage(fileName);
 
     layerData.resize(layerDataSize * layerDataSize);
     const uchar *bits = heightImage.bits();
     int index = 0;
-    QVector<QRgb> colorTable = heightImage.colorTable();
+    QList<QRgb> colorTable = heightImage.colorTable();
     for (int i = 0; i < layerDataSize; i++) {
         for (int j = 0; j < layerDataSize; j++) {
             layerData[index] = qRed(colorTable.at(bits[index]));
@@ -567,16 +568,16 @@ void VolumetricModifier::initHeightMap(QString fileName, QVector<uchar> &layerDa
 }
 
 int VolumetricModifier::createVolume(int textureSize, int startIndex, int count,
-                                     QVector<uchar> *textureData)
+                                     QList<uchar> *textureData)
 {
     // Generate volume from layer data.
     int index = startIndex * textureSize * textureSize / 2.0f;
     int endIndex = startIndex + count;
     if (endIndex > textureSize)
         endIndex = textureSize;
-    QVector<uchar> magmaHeights(textureSize);
-    QVector<uchar> waterHeights(textureSize);
-    QVector<uchar> groundHeights(textureSize);
+    QList<uchar> magmaHeights(textureSize);
+    QList<uchar> waterHeights(textureSize);
+    QList<uchar> groundHeights(textureSize);
     float multiplier = float(layerDataSize) / float(textureSize);
     for (int i = startIndex; i < endIndex; i++) {
         // Generate layer height arrays
@@ -620,7 +621,7 @@ int VolumetricModifier::createVolume(int textureSize, int startIndex, int count,
 }
 
 int VolumetricModifier::excavateMineShaft(int textureSize, int startIndex, int count,
-                                          QVector<uchar> *textureData)
+                                          QList<uchar> *textureData)
 {
     int endIndex = startIndex + count;
     if (endIndex > m_mineShaftArray.size())
@@ -658,7 +659,7 @@ int VolumetricModifier::excavateMineShaft(int textureSize, int startIndex, int c
 }
 
 void VolumetricModifier::excavateMineBlock(int textureSize, int dataIndex, int size,
-                                           QVector<uchar> *textureData)
+                                           QList<uchar> *textureData)
 {
     for (int k = 0; k < size; k++) {
         int curIndex = dataIndex + (k * textureSize * textureSize / 2);

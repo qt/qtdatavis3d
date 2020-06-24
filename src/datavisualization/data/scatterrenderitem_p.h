@@ -65,7 +65,7 @@ protected:
     QVector3D m_position;
     bool m_visible;
 };
-typedef QVector<ScatterRenderItem> ScatterRenderItemArray;
+typedef QList<ScatterRenderItem> ScatterRenderItemArray;
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

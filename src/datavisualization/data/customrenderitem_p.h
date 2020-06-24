@@ -99,9 +99,9 @@ public:
     inline void setTextureDepth(int depth) { m_textureDepth = depth; setSliceIndexZ(m_sliceIndexZ); }
     inline int textureDepth() const { return m_textureDepth; }
     inline int textureSize() const { return m_textureWidth * m_textureHeight * m_textureDepth; }
-    inline void setColorTable(const QVector<QVector4D> &colors) { m_colorTable = colors; }
-    void setColorTable(const QVector<QRgb> &colors);
-    inline const QVector<QVector4D> &colorTable() const { return m_colorTable; }
+    inline void setColorTable(const QList<QVector4D> &colors) { m_colorTable = colors; }
+    void setColorTable(const QList<QRgb> &colors);
+    inline const QList<QVector4D> &colorTable() const { return m_colorTable; }
     inline void setVolume(bool volume) { m_isVolume = volume; }
     inline bool isVolume() const { return m_isVolume; }
     inline void setTextureFormat(QImage::Format format) { m_textureFormat = format; }
@@ -175,7 +175,7 @@ private:
     int m_textureWidth;
     int m_textureHeight;
     int m_textureDepth;
-    QVector<QVector4D> m_colorTable;
+    QList<QVector4D> m_colorTable;
     bool m_isVolume;
     QImage::Format m_textureFormat;
     int m_sliceIndexX;

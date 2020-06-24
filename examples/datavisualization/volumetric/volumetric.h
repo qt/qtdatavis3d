@@ -78,14 +78,11 @@ public Q_SLOTS:
     void setDrawSliceFrames(int enabled);
 
 private:
-
-    void initHeightMap(QString fileName, QVector<uchar> &layerData);
+    void initHeightMap(QString fileName, QList<uchar> &layerData);
     void initMineShaftArray();
-    int createVolume(int textureSize, int startIndex, int count,
-                      QVector<uchar> *textureData);
-    int excavateMineShaft(int textureSize, int startIndex, int count,
-                          QVector<uchar> *textureData);
-    void excavateMineBlock(int textureSize, int dataIndex, int size, QVector<uchar> *textureData);
+    int createVolume(int textureSize, int startIndex, int count, QList<uchar> *textureData);
+    int excavateMineShaft(int textureSize, int startIndex, int count, QList<uchar> *textureData);
+    void excavateMineBlock(int textureSize, int dataIndex, int size, QList<uchar> *textureData);
     void handleSlicingChanges();
 
     Q3DScatter *m_graph;
@@ -99,9 +96,9 @@ private:
     QLabel *m_fpsLabel;
     QRadioButton *m_mediumDetailRB;
     QRadioButton *m_highDetailRB;
-    QVector<uchar> *m_lowDetailData;
-    QVector<uchar> *m_mediumDetailData;
-    QVector<uchar> *m_highDetailData;
+    QList<uchar> *m_lowDetailData;
+    QList<uchar> *m_mediumDetailData;
+    QList<uchar> *m_highDetailData;
     QTimer m_timer;
     int m_mediumDetailIndex;
     int m_highDetailIndex;
@@ -110,17 +107,17 @@ private:
     QSlider *m_sliceSliderX;
     QSlider *m_sliceSliderY;
     QSlider *m_sliceSliderZ;
-    QVector<QRgb> m_colorTable1;
-    QVector<QRgb> m_colorTable2;
+    QList<QRgb> m_colorTable1;
+    QList<QRgb> m_colorTable2;
     bool m_usingPrimaryTable;
     QLabel *m_sliceLabelX;
     QLabel *m_sliceLabelY;
     QLabel *m_sliceLabelZ;
     QLabel *m_alphaMultiplierLabel;
-    QVector<uchar> m_magmaLayer;
-    QVector<uchar> m_waterLayer;
-    QVector<uchar> m_groundLayer;
-    QVector<QPair<QVector3D, QVector3D> > m_mineShaftArray;
+    QList<uchar> m_magmaLayer;
+    QList<uchar> m_waterLayer;
+    QList<uchar> m_groundLayer;
+    QList<QPair<QVector3D, QVector3D>> m_mineShaftArray;
 };
 
 #endif

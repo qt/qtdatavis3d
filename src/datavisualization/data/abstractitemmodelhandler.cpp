@@ -137,7 +137,7 @@ void AbstractItemModelHandler::handleColumnsRemoved(const QModelIndex &parent,
 
 void AbstractItemModelHandler::handleDataChanged(const QModelIndex &topLeft,
                                                  const QModelIndex &bottomRight,
-                                                 const QVector<int> &roles)
+                                                 const QList<int> &roles)
 {
     Q_UNUSED(topLeft)
     Q_UNUSED(bottomRight)

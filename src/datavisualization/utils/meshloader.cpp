@@ -31,22 +31,20 @@
 
 #include <QtCore/QFile>
 #include <QtCore/QStringList>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtGui/QVector2D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 QString slashTag = QStringLiteral("/");
 
-bool MeshLoader::loadOBJ(const QString &path,
-                         QVector<QVector3D> &out_vertices,
-                         QVector<QVector2D> &out_uvs,
-                         QVector<QVector3D> &out_normals)
+bool MeshLoader::loadOBJ(const QString &path, QList<QVector3D> &out_vertices,
+                         QList<QVector2D> &out_uvs, QList<QVector3D> &out_normals)
 {
-    QVector<unsigned int> vertexIndices, uvIndices, normalIndices;
-    QVector<QVector3D> temp_vertices;
-    QVector<QVector2D> temp_uvs;
-    QVector<QVector3D> temp_normals;
+    QList<unsigned int> vertexIndices, uvIndices, normalIndices;
+    QList<QVector3D> temp_vertices;
+    QList<QVector2D> temp_uvs;
+    QList<QVector3D> temp_normals;
 
     QFile file(path);
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {

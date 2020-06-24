@@ -38,8 +38,8 @@
 #define CUMULATIVEDISTRIBUTOR_H
 
 #include <QtCore/qglobal.h>
+#include <QtCore/QList>
 #include <QtGui/QVector2D>
-#include <QtCore/QVector>
 
 class CumulativeDistributor
 {
@@ -69,13 +69,13 @@ private:
     qreal m_a;
     qreal m_RBulge;
 
-    QVector<qreal> m_vM1;
-    QVector<qreal> m_vY1;
-    QVector<qreal> m_vX1;
+    QList<qreal> m_vM1;
+    QList<qreal> m_vY1;
+    QList<qreal> m_vX1;
 
-    QVector<qreal> m_vM2;
-    QVector<qreal> m_vY2;
-    QVector<qreal> m_vX2;
+    QList<qreal> m_vM2;
+    QList<qreal> m_vY2;
+    QList<qreal> m_vX2;
 
     void buildCDF(int nSteps);
 

@@ -77,7 +77,7 @@ void SurfaceObject::setUpSmoothData(const QSurfaceDataArray &dataArray, const QR
     if (changeGeometry)
         m_vertices.resize(totalSize);
 
-    QVector<QVector2D> uvs;
+    QList<QVector2D> uvs;
     if (changeGeometry)
         uvs.resize(totalSize);
     int totalIndex = 0;
@@ -315,7 +315,7 @@ void SurfaceObject::smoothUVs(const QSurfaceDataArray &dataArray,
     const bool zDescending = m_dataDimension.testFlag(SurfaceObject::ZDescending);
     const bool xDescending = m_dataDimension.testFlag(SurfaceObject::XDescending);
 
-    QVector<QVector2D> uvs;
+    QList<QVector2D> uvs;
     uvs.resize(m_rows * m_columns);
     int index = 0;
     for (int i = 0; i < m_rows; i++) {
@@ -534,7 +534,7 @@ void SurfaceObject::setUpData(const QSurfaceDataArray &dataArray, const QRect &s
     if (changeGeometry)
         m_vertices.resize(totalSize);
 
-    QVector<QVector2D> uvs;
+    QList<QVector2D> uvs;
     if (changeGeometry)
         uvs.resize(totalSize);
 
@@ -620,7 +620,7 @@ void SurfaceObject::coarseUVs(const QSurfaceDataArray &dataArray,
     const bool zDescending = m_dataDimension.testFlag(SurfaceObject::ZDescending);
     const bool xDescending = m_dataDimension.testFlag(SurfaceObject::XDescending);
 
-    QVector<QVector2D> uvs;
+    QList<QVector2D> uvs;
     uvs.resize(m_rows * m_columns * 2);
     int index = 0;
     int colLimit = m_columns - 1;
@@ -802,12 +802,12 @@ void SurfaceObject::createCoarseGridlineIndices(int x, int y, int endX, int endY
 
 void SurfaceObject::uploadBuffers()
 {
-    QVector<QVector2D> uvs; // Empty dummy
+    QList<QVector2D> uvs; // Empty dummy
     createBuffers(m_vertices, uvs, m_normals, 0);
 }
 
-void SurfaceObject::createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
-                                  const QVector<QVector3D> &normals, const GLint *indices)
+void SurfaceObject::createBuffers(const QList<QVector3D> &vertices, const QList<QVector2D> &uvs,
+                                  const QList<QVector3D> &normals, const GLint *indices)
 {
     // Move to buffers
     glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);

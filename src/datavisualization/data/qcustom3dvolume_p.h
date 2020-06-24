@@ -73,9 +73,9 @@ class QCustom3DVolumePrivate : public QCustom3DItemPrivate
 public:
     QCustom3DVolumePrivate(QCustom3DVolume *q);
     QCustom3DVolumePrivate(QCustom3DVolume *q, const QVector3D &position, const QVector3D &scaling,
-                           const QQuaternion &rotation, int textureWidth,
-                           int textureHeight, int textureDepth, QVector<uchar> *textureData,
-                           QImage::Format textureFormat, const QVector<QRgb> &colorTable);
+                           const QQuaternion &rotation, int textureWidth, int textureHeight,
+                           int textureDepth, QList<uchar> *textureData,
+                           QImage::Format textureFormat, const QList<QRgb> &colorTable);
     virtual ~QCustom3DVolumePrivate();
 
     void resetDirtyBits();
@@ -92,8 +92,8 @@ public:
     int m_sliceIndexZ;
 
     QImage::Format m_textureFormat;
-    QVector<QRgb> m_colorTable;
-    QVector<uchar> *m_textureData;
+    QList<QRgb> m_colorTable;
+    QList<uchar> *m_textureData;
 
     float m_alphaMultiplier;
     bool m_preserveOpacity;

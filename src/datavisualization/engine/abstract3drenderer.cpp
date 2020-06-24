@@ -685,7 +685,7 @@ void Abstract3DRenderer::updateAxisTitleFixed(QAbstract3DAxis::AxisOrientation o
         cache.setTitleFixed(fixed);
 }
 
-void Abstract3DRenderer::modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList)
+void Abstract3DRenderer::modifiedSeriesList(const QList<QAbstract3DSeries *> &seriesList)
 {
     foreach (QAbstract3DSeries *series, seriesList) {
         SeriesRenderCache *cache = m_renderCacheList.value(series, 0);
@@ -1832,7 +1832,7 @@ void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePo
                                         const QMatrix4x4 &projectionViewMatrix,
                                         const QMatrix4x4 &depthMatrix)
 {
-    static QVector<QQuaternion> lineRotations;
+    static QList<QQuaternion> lineRotations;
     if (!lineRotations.size()) {
         lineRotations.resize(polarGridRoundness);
         for (int j = 0; j < polarGridRoundness; j++) {
@@ -1841,8 +1841,8 @@ void Abstract3DRenderer::drawRadialGrid(ShaderHelper *shader, float yFloorLinePo
         }
     }
     int gridLineCount = m_axisCacheZ.gridLineCount();
-    const QVector<float> &gridPositions = m_axisCacheZ.formatter()->gridPositions();
-    const QVector<float> &subGridPositions = m_axisCacheZ.formatter()->subGridPositions();
+    const QList<float> &gridPositions = m_axisCacheZ.formatter()->gridPositions();
+    const QList<float> &subGridPositions = m_axisCacheZ.formatter()->subGridPositions();
     int mainSize = gridPositions.size();
     QVector3D translateVector(0.0f, yFloorLinePos, 0.0f);
     QQuaternion finalRotation = m_xRightAngleRotationNeg;
@@ -1896,8 +1896,8 @@ void Abstract3DRenderer::drawAngularGrid(ShaderHelper *shader, float yFloorLineP
     float halfRatio((m_polarRadius + (labelMargin / 2.0f)) / 2.0f);
     QVector3D gridLineScaler(gridLineWidth, gridLineWidth, halfRatio);
     int gridLineCount = m_axisCacheX.gridLineCount();
-    const QVector<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
-    const QVector<float> &subGridPositions = m_axisCacheX.formatter()->subGridPositions();
+    const QList<float> &gridPositions = m_axisCacheX.formatter()->gridPositions();
+    const QList<float> &subGridPositions = m_axisCacheX.formatter()->subGridPositions();
     int mainSize = gridPositions.size();
     QVector3D translateVector(0.0f, yFloorLinePos, -halfRatio);
     QQuaternion finalRotation;
@@ -1946,7 +1946,7 @@ float Abstract3DRenderer::calculatePolarBackgroundMargin()
 {
     // Check each extents of each angular label
     // Calculate angular position
-    QVector<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
+    QList<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
     float actualLabelHeight = m_drawer->scaledFontSize() * 2.0f; // All labels are same height
     float maxNeededMargin = 0.0f;
 

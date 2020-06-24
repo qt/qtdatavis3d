@@ -48,8 +48,9 @@ class QT_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem
     Q_PROPERTY(int sliceIndexX READ sliceIndexX WRITE setSliceIndexX NOTIFY sliceIndexXChanged)
     Q_PROPERTY(int sliceIndexY READ sliceIndexY WRITE setSliceIndexY NOTIFY sliceIndexYChanged)
     Q_PROPERTY(int sliceIndexZ READ sliceIndexZ WRITE setSliceIndexZ NOTIFY sliceIndexZChanged)
-    Q_PROPERTY(QVector<QRgb> colorTable READ colorTable WRITE setColorTable NOTIFY colorTableChanged)
-    Q_PROPERTY(QVector<uchar> *textureData READ textureData WRITE setTextureData NOTIFY textureDataChanged)
+    Q_PROPERTY(QList<QRgb> colorTable READ colorTable WRITE setColorTable NOTIFY colorTableChanged)
+    Q_PROPERTY(QList<uchar> *textureData READ textureData WRITE setTextureData NOTIFY
+                       textureDataChanged)
     Q_PROPERTY(float alphaMultiplier READ alphaMultiplier WRITE setAlphaMultiplier NOTIFY alphaMultiplierChanged)
     Q_PROPERTY(bool preserveOpacity READ preserveOpacity WRITE setPreserveOpacity NOTIFY preserveOpacityChanged)
     Q_PROPERTY(bool useHighDefShader READ useHighDefShader WRITE setUseHighDefShader NOTIFY useHighDefShaderChanged)
@@ -64,10 +65,10 @@ public:
 
     explicit QCustom3DVolume(QObject *parent = nullptr);
     explicit QCustom3DVolume(const QVector3D &position, const QVector3D &scaling,
-                             const QQuaternion &rotation, int textureWidth,
-                             int textureHeight, int textureDepth,
-                             QVector<uchar> *textureData, QImage::Format textureFormat,
-                             const QVector<QRgb> &colorTable, QObject *parent = nullptr);
+                             const QQuaternion &rotation, int textureWidth, int textureHeight,
+                             int textureDepth, QList<uchar> *textureData,
+                             QImage::Format textureFormat, const QList<QRgb> &colorTable,
+                             QObject *parent = nullptr);
     virtual ~QCustom3DVolume();
 
     void setTextureWidth(int value);
@@ -87,12 +88,12 @@ public:
     int sliceIndexZ() const;
     void setSliceIndices(int x, int y, int z);
 
-    void setColorTable(const QVector<QRgb> &colors);
-    QVector<QRgb> colorTable() const;
+    void setColorTable(const QList<QRgb> &colors);
+    QList<QRgb> colorTable() const;
 
-    void setTextureData(QVector<uchar> *data);
-    QVector<uchar> *createTextureData(const QVector<QImage *> &images);
-    QVector<uchar> *textureData() const;
+    void setTextureData(QList<uchar> *data);
+    QList<uchar> *createTextureData(const QList<QImage *> &images);
+    QList<uchar> *textureData() const;
     void setSubTextureData(Qt::Axis axis, int index, const uchar *data);
     void setSubTextureData(Qt::Axis axis, int index, const QImage &image);
 
@@ -131,7 +132,7 @@ Q_SIGNALS:
     void sliceIndexYChanged(int value);
     void sliceIndexZChanged(int value);
     void colorTableChanged();
-    void textureDataChanged(QVector<uchar> *data);
+    void textureDataChanged(QList<uchar> *data);
     void textureFormatChanged(QImage::Format format);
     void alphaMultiplierChanged(float mult);
     void preserveOpacityChanged(bool enabled);

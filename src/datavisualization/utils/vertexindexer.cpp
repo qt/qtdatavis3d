@@ -48,13 +48,10 @@ bool VertexIndexer::getSimilarVertexIndex_fast(const PackedVertex &packed,
     }
 }
 
-void VertexIndexer::indexVBO(const QVector<QVector3D> &in_vertices,
-                             const QVector<QVector2D> &in_uvs,
-                             const QVector<QVector3D> &in_normals,
-                             QVector<GLuint> &out_indices,
-                             QVector<QVector3D> &out_vertices,
-                             QVector<QVector2D> &out_uvs,
-                             QVector<QVector3D> &out_normals)
+void VertexIndexer::indexVBO(const QList<QVector3D> &in_vertices, const QList<QVector2D> &in_uvs,
+                             const QList<QVector3D> &in_normals, QList<GLuint> &out_indices,
+                             QList<QVector3D> &out_vertices, QList<QVector2D> &out_uvs,
+                             QList<QVector3D> &out_normals)
 {
     unique_vertices = 0;
     QMap<PackedVertex, GLuint> VertexToOutIndex;

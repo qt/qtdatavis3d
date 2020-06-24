@@ -93,8 +93,8 @@ protected:
     bool m_isNull;
 };
 
-typedef QVector<BarRenderItem> BarRenderItemRow;
-typedef QVector<BarRenderItemRow> BarRenderItemArray;
+typedef QList<BarRenderItem> BarRenderItemRow;
+typedef QList<BarRenderItemRow> BarRenderItemArray;
 
 QT_END_NAMESPACE_DATAVISUALIZATION
 

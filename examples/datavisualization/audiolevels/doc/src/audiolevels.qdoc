@@ -88,7 +88,7 @@
     the existing data array, as this allows us to avoid any extra memory allocations in our
     application code. This also means the data array dimensions do not change, which further
     improves efficiency in the bar graph renderer.
-    Secondly, since each row is a QVector of bar data items, which do not allocate any data that needs
+    Secondly, since each row is a QList of bar data items, which do not allocate any data that needs
     deletion, we can utilize \c memmove and \c memcpy functions to quickly move and copy data around.
 
     \note In the future versions of Qt Data Visualization, QBarDataItem might get extended so that

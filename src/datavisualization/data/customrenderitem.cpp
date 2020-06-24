@@ -73,7 +73,7 @@ void CustomRenderItem::setMesh(const QString &meshFile)
     ObjectHelper::resetObjectHelper(m_renderer, m_object, meshFile);
 }
 
-void CustomRenderItem::setColorTable(const QVector<QRgb> &colors)
+void CustomRenderItem::setColorTable(const QList<QRgb> &colors)
 {
     m_colorTable.resize(256);
     for (int i = 0; i < 256; i++) {

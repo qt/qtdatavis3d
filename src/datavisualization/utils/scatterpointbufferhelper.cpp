@@ -111,7 +111,7 @@ void ScatterPointBufferHelper::load(ScatterSeriesRenderCache *cache)
         }
     }
 
-    QVector<QVector2D> buffered_uvs;
+    QList<QVector2D> buffered_uvs;
     if (itemsVisible)
         m_indexCount = renderArraySize;
 
@@ -169,7 +169,7 @@ void ScatterPointBufferHelper::updateUVs(ScatterSeriesRenderCache *cache)
     // It may be that the buffer hasn't yet been initialized, in case the entire series was
     // hidden items. No need to update in that case.
     if (m_indexCount > 0) {
-        QVector<QVector2D> buffered_uvs;
+        QList<QVector2D> buffered_uvs;
         createRangeGradientUVs(cache, buffered_uvs);
 
         if (buffered_uvs.size()) {
@@ -196,7 +196,7 @@ void ScatterPointBufferHelper::updateUVs(ScatterSeriesRenderCache *cache)
 }
 
 void ScatterPointBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache *cache,
-                                                      QVector<QVector2D> &buffered_uvs)
+                                                      QList<QVector2D> &buffered_uvs)
 {
     const ScatterRenderItemArray &renderArray = cache->renderArray();
     const bool updateAll = (cache->updateIndices().size() == 0);

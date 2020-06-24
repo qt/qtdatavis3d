@@ -59,10 +59,10 @@ public:
     static void releaseObjectHelper(const Abstract3DRenderer *cacheId, ObjectHelper *&obj);
     inline const QString &objectFile() { return m_objectFile; }
 
-    inline const QVector<GLuint> &indices() const { return m_indices; }
-    inline const QVector<QVector3D> &indexedvertices() const { return m_indexedVertices; }
-    inline const QVector<QVector2D> &indexedUVs() const { return m_indexedUVs; }
-    inline const QVector<QVector3D> &indexedNormals() const { return m_indexedNormals; }
+    inline const QList<GLuint> &indices() const { return m_indices; }
+    inline const QList<QVector3D> &indexedvertices() const { return m_indexedVertices; }
+    inline const QList<QVector2D> &indexedUVs() const { return m_indexedUVs; }
+    inline const QList<QVector3D> &indexedNormals() const { return m_indexedNormals; }
 
 private:
     static ObjectHelper *getObjectHelper(const Abstract3DRenderer *cacheId,
@@ -70,10 +70,10 @@ private:
     void load();
 
     QString m_objectFile;
-    QVector<GLuint> m_indices;
-    QVector<QVector3D> m_indexedVertices;
-    QVector<QVector2D> m_indexedUVs;
-    QVector<QVector3D> m_indexedNormals;
+    QList<GLuint> m_indices;
+    QList<QVector3D> m_indexedVertices;
+    QList<QVector2D> m_indexedUVs;
+    QList<QVector3D> m_indexedNormals;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

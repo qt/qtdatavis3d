@@ -215,7 +215,7 @@ protected:
     int m_numFrames;
     qreal m_currentFps;
 
-    QVector<QAbstract3DSeries *> m_changedSeriesList;
+    QList<QAbstract3DSeries *> m_changedSeriesList;
 
     QList<QCustom3DItem *> m_customItems;
 

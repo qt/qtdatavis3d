@@ -32,7 +32,6 @@
 
 #include <QtDataVisualization/QValue3DAxisFormatter>
 #include <QtCore/QDateTime>
-#include <QtCore/QVector>
 
 using namespace QtDataVisualization;
 

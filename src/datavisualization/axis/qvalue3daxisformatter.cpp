@@ -242,7 +242,7 @@ QValue3DAxis *QValue3DAxisFormatter::axis() const
  *
  * \sa QValue3DAxis::segmentCount, recalculate()
  */
-QVector<float> &QValue3DAxisFormatter::gridPositions() const
+QList<float> &QValue3DAxisFormatter::gridPositions() const
 {
     return d_ptr->m_gridPositions;
 }
@@ -257,7 +257,7 @@ QVector<float> &QValue3DAxisFormatter::gridPositions() const
  *
  * \sa QValue3DAxis::segmentCount, QValue3DAxis::subSegmentCount, recalculate()
  */
-QVector<float> &QValue3DAxisFormatter::subGridPositions() const
+QList<float> &QValue3DAxisFormatter::subGridPositions() const
 {
     return d_ptr->m_subGridPositions;
 }
@@ -273,7 +273,7 @@ QVector<float> &QValue3DAxisFormatter::subGridPositions() const
  *
  * \sa QValue3DAxis::segmentCount, QAbstract3DAxis::labels, recalculate()
  */
-QVector<float> &QValue3DAxisFormatter::labelPositions() const
+QList<float> &QValue3DAxisFormatter::labelPositions() const
 {
     return d_ptr->m_labelPositions;
 }

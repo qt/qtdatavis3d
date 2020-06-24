@@ -42,7 +42,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * A surface data proxy handles surface related data in rows. For this it
  * provides two auxiliary typedefs: QtDataVisualization::QSurfaceDataArray and
  * QtDataVisualization::QSurfaceDataRow. \c QSurfaceDataArray is a QList that
- * controls the rows. \c QSurfaceDataRow is a QVector that contains
+ * controls the rows. \c QSurfaceDataRow is a QList that contains
  * QSurfaceDataItem objects. For more information about how to feed the data to
  * the proxy, see the sample code in the Q3DSurface documentation.
  *
@@ -79,7 +79,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \typedef QSurfaceDataRow
  * \relates QSurfaceDataProxy
  *
- * A vector of \l {QSurfaceDataItem} objects.
+ * A list of \l {QSurfaceDataItem} objects.
  */
 
 /*!

@@ -77,9 +77,9 @@ void tst_custom::construct()
     QVERIFY(custom);
     delete custom;
 
-    QVector<uchar> *tdata = new QVector<uchar>(1000);
+    QList<uchar> *tdata = new QList<uchar>(1000);
 
-    QVector<QRgb> table;
+    QList<QRgb> table;
     table << QRgb(0xff00ff) << QRgb(0x00ff00);
 
     custom = new QCustom3DVolume(QVector3D(1.0, 1.0, 1.0), QVector3D(1.0, 1.0, 1.0),

@@ -122,8 +122,8 @@ public:
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
-    void updateRows(const QVector<Bars3DController::ChangeRow> &rows);
-    void updateItems(const QVector<Bars3DController::ChangeItem> &items);
+    void updateRows(const QList<Bars3DController::ChangeRow> &rows);
+    void updateItems(const QList<Bars3DController::ChangeItem> &items);
     void updateScene(Q3DScene *scene);
     void render(GLuint defaultFboHandle = 0);
 

@@ -104,8 +104,8 @@ private:
     QVector3D createSmoothNormalBodyLineItem(int x, int y);
     QVector3D createSmoothNormalUpperLineItem(int x, int y);
     QVector3D normal(const QVector3D &a, const QVector3D &b, const QVector3D &c);
-    void createBuffers(const QVector<QVector3D> &vertices, const QVector<QVector2D> &uvs,
-                       const QVector<QVector3D> &normals, const GLint *indices);
+    void createBuffers(const QList<QVector3D> &vertices, const QList<QVector2D> &uvs,
+                       const QList<QVector3D> &normals, const GLint *indices);
     void checkDirections(const QSurfaceDataArray &array);
     inline void getNormalizedVertex(const QSurfaceDataItem &data, QVector3D &vertex, bool polar,
                                     bool flipXZ);
@@ -116,8 +116,8 @@ private:
     int m_rows = 0;
     GLuint m_gridElementbuffer;
     GLuint m_gridIndexCount = 0;
-    QVector<QVector3D> m_vertices;
-    QVector<QVector3D> m_normals;
+    QList<QVector3D> m_vertices;
+    QList<QVector3D> m_normals;
     // Caches are not owned
     AxisRenderCache &m_axisCacheX;
     AxisRenderCache &m_axisCacheY;

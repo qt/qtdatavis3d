@@ -86,10 +86,10 @@ private:
     QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
                                         // single series selection cases.
     bool m_flatShadingSupported;
-    QVector<ChangeItem> m_changedItems;
-    QVector<ChangeRow> m_changedRows;
+    QList<ChangeItem> m_changedItems;
+    QList<ChangeRow> m_changedRows;
     bool m_flipHorizontalGrid;
-    QVector<QSurface3DSeries *> m_changedTextures;
+    QList<QSurface3DSeries *> m_changedTextures;
 
 public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);

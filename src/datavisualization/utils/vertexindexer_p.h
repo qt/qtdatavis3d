@@ -42,7 +42,7 @@
 
 #include "datavisualizationglobal_p.h"
 
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtGui/QVector2D>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -59,13 +59,10 @@ public:
         }
     };
 
-    static void indexVBO(const QVector<QVector3D> &in_vertices,
-                         const QVector<QVector2D> &in_uvs,
-                         const QVector<QVector3D> &in_normals,
-                         QVector<GLuint> &out_indices,
-                         QVector<QVector3D> &out_vertices,
-                         QVector<QVector2D> &out_uvs,
-                         QVector<QVector3D> &out_normals);
+    static void indexVBO(const QList<QVector3D> &in_vertices, const QList<QVector2D> &in_uvs,
+                         const QList<QVector3D> &in_normals, QList<GLuint> &out_indices,
+                         QList<QVector3D> &out_vertices, QList<QVector2D> &out_uvs,
+                         QList<QVector3D> &out_normals);
 
 private:
     static bool getSimilarVertexIndex_fast(const PackedVertex &packed,

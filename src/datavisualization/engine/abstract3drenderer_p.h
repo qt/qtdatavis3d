@@ -142,7 +142,7 @@ public:
                                            bool visible);
     virtual void updateAxisTitleFixed(QAbstract3DAxis::AxisOrientation orientation,
                                       bool fixed);
-    virtual void modifiedSeriesList(const QVector<QAbstract3DSeries *> &seriesList);
+    virtual void modifiedSeriesList(const QList<QAbstract3DSeries *> &seriesList);
 
     virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
 

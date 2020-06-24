@@ -59,7 +59,7 @@ class TextureHelper : protected QOpenGLFunctions
     // Ownership of created texture is transferred to caller
     GLuint create2DTexture(const QImage &image, bool useTrilinearFiltering = false,
                            bool convert = true, bool smoothScale = true, bool clampY = false);
-    GLuint create3DTexture(const QVector<uchar> *data, int width, int height, int depth,
+    GLuint create3DTexture(const QList<uchar> *data, int width, int height, int depth,
                            QImage::Format dataFormat);
     GLuint createCubeMapTexture(const QImage &image, bool useTrilinearFiltering = false);
     // Returns selection texture and inserts generated framebuffers to framebuffer parameters

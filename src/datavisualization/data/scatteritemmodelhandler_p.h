@@ -54,7 +54,7 @@ public:
 
 public Q_SLOTS:
     virtual void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                                   const QVector<int> &roles = QVector<int> ());
+                                   const QList<int> &roles = QList<int>());
     virtual void handleRowsInserted(const QModelIndex &parent, int start, int end);
     virtual void handleRowsRemoved(const QModelIndex &parent, int start, int end);
 

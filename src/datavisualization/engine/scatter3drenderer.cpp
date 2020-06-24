@@ -353,7 +353,7 @@ SeriesRenderCache *Scatter3DRenderer::createNewCache(QAbstract3DSeries *series)
     return new ScatterSeriesRenderCache(series, this);
 }
 
-void Scatter3DRenderer::updateItems(const QVector<Scatter3DController::ChangeItem> &items)
+void Scatter3DRenderer::updateItems(const QList<Scatter3DController::ChangeItem> &items)
 {
     ScatterSeriesRenderCache *cache = 0;
     const QScatter3DSeries *prevSeries = 0;
@@ -1932,7 +1932,7 @@ void Scatter3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         float offsetValue = 0.0f;
         bool showLastLabel = false;
-        QVector<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
+        QList<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
         int lastLabelPosIndex = labelPositions.size() - 1;
         if (labelPositions.size()
                 && (labelPositions.at(lastLabelPosIndex) != 1.0f || labelPositions.at(0) != 0.0f)) {

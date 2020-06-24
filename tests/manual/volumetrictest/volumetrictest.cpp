@@ -251,7 +251,7 @@ void VolumetricModifier::handleFpsChange()
 void VolumetricModifier::testSubtextureSetting()
 {
     // Setting the rendered Slice as subtexture should result in identical volume
-    QVector<uchar> dataBefore = *m_volumeItem->textureData();
+    QList<uchar> dataBefore = *m_volumeItem->textureData();
     dataBefore[0] = dataBefore.at(0);    // Make sure we are detached
 
     checkRenderCase(1, Qt::XAxis, 56, dataBefore, m_volumeItem);
@@ -355,7 +355,7 @@ void VolumetricModifier::testBoundsSetting()
 }
 
 void VolumetricModifier::checkRenderCase(int id, Qt::Axis axis, int index,
-                                         const QVector<uchar> &dataBefore,
+                                         const QList<uchar> &dataBefore,
                                          QCustom3DVolume *volumeItem)
 {
     QImage slice = volumeItem->renderSlice(axis, index);
@@ -384,7 +384,7 @@ void VolumetricModifier::createVolume()
              << logo.sizeInBytes() << (logo.width() * logo.height())
              << logo.bytesPerLine();
 
-    QVector<QImage *> imageArray(imageCount);
+    QList<QImage *> imageArray(imageCount);
     for (int i = 0; i < imageCount; i++) {
         QImage *newImage = new QImage(logo);
         imageArray[i] = newImage;
@@ -399,7 +399,7 @@ void VolumetricModifier::createVolume()
     m_sliceIndexY = m_volumeItem->textureWidth() / 2;
     m_sliceIndexZ = m_volumeItem->textureWidth() / 2;
 
-    QVector<QRgb> colorTable = m_volumeItem->colorTable();
+    QList<QRgb> colorTable = m_volumeItem->colorTable();
 
     // Hack some alpha to the picture
     for (int i = 0; i < colorTable.size(); i++) {
@@ -540,7 +540,7 @@ void VolumetricModifier::createAnotherVolume()
 
     logo.save("d:/qt/goobar.png");
 
-    QVector<QImage *> imageArray(imageCount);
+    QList<QImage *> imageArray(imageCount);
     for (int i = 0; i < imageCount; i++) {
         QImage *newImage = new QImage(logo);
         imageArray[i] = newImage;
@@ -582,9 +582,9 @@ void VolumetricModifier::createYetAnotherVolume()
 //                                        m_volumeItem->textureDepth());
     m_volumeItem3->setTextureDimensions(200, 200, 200);
 
-    QVector<uchar> *tdata = new QVector<uchar>(m_volumeItem3->textureDataWidth()
-                                               * m_volumeItem3->textureHeight()
-                                               * m_volumeItem3->textureDepth());
+    QList<uchar> *tdata =
+            new QList<uchar>(m_volumeItem3->textureDataWidth() * m_volumeItem3->textureHeight()
+                             * m_volumeItem3->textureDepth());
     tdata->fill(0);
     m_volumeItem3->setTextureData(tdata);
 
@@ -592,7 +592,7 @@ void VolumetricModifier::createYetAnotherVolume()
     m_sliceIndexY = m_volumeItem3->textureWidth() / 2;
     m_sliceIndexZ = m_volumeItem3->textureWidth() / 2;
 
-    QVector<QRgb> colorTable = m_volumeItem->colorTable();
+    QList<QRgb> colorTable = m_volumeItem->colorTable();
     colorTable[0] = qRgba(0, 0, 0, 0);
     m_volumeItem3->setColorTable(colorTable);
     int redIndex = colorTable.size() - 3;

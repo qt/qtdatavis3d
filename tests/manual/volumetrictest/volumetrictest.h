@@ -67,7 +67,7 @@ private:
     void createVolume();
     void createAnotherVolume();
     void createYetAnotherVolume();
-    void checkRenderCase(int id, Qt::Axis axis, int index, const QVector<uchar> &dataBefore,
+    void checkRenderCase(int id, Qt::Axis axis, int index, const QList<uchar> &dataBefore,
                          QCustom3DVolume *volumeItem);
 
     QAbstract3DGraph *m_graph;

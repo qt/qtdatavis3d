@@ -65,11 +65,10 @@ public:
     GLuint m_pointbuffer;
 
 private:
-    void createRangeGradientUVs(ScatterSeriesRenderCache *cache,
-                                QVector<QVector2D> &buffered_uvs);
+    void createRangeGradientUVs(ScatterSeriesRenderCache *cache, QList<QVector2D> &buffered_uvs);
 
 private:
-    QVector<QVector3D> m_bufferedPoints;
+    QList<QVector3D> m_bufferedPoints;
     int m_oldRemoveIndex;
     float m_scaleY;
 };

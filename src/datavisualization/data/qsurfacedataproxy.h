@@ -40,7 +40,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 class QSurfaceDataProxyPrivate;
 class QSurface3DSeries;
 
-typedef QVector<QSurfaceDataItem> QSurfaceDataRow;
+typedef QList<QSurfaceDataItem> QSurfaceDataRow;
 typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy

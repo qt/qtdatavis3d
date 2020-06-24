@@ -142,8 +142,8 @@ private:
     Drawer *m_drawer; // Not owned
     LabelItem m_titleItem;
     QList<LabelItem *> m_labelItems;
-    QVector<float> m_adjustedGridLinePositions;
-    QVector<float> m_adjustedLabelPositions;
+    QList<float> m_adjustedGridLinePositions;
+    QList<float> m_adjustedLabelPositions;
     bool m_positionsDirty;
     float m_translate;
     float m_scale;

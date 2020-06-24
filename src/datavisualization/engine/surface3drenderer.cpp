@@ -305,7 +305,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     }
 }
 
-void Surface3DRenderer::updateSurfaceTextures(QVector<QSurface3DSeries *> seriesList)
+void Surface3DRenderer::updateSurfaceTextures(QList<QSurface3DSeries *> seriesList)
 {
     foreach (QSurface3DSeries *series, seriesList) {
         SurfaceSeriesRenderCache *cache =
@@ -348,7 +348,7 @@ void Surface3DRenderer::cleanCache(SeriesRenderCache *cache)
     m_selectionTexturesDirty = true;
 }
 
-void Surface3DRenderer::updateRows(const QVector<Surface3DController::ChangeRow> &rows)
+void Surface3DRenderer::updateRows(const QList<Surface3DController::ChangeRow> &rows)
 {
     foreach (Surface3DController::ChangeRow item, rows) {
         SurfaceSeriesRenderCache *cache =
@@ -389,7 +389,7 @@ void Surface3DRenderer::updateRows(const QVector<Surface3DController::ChangeRow>
     updateSelectedPoint(m_selectedPoint, m_selectedSeries);
 }
 
-void Surface3DRenderer::updateItems(const QVector<Surface3DController::ChangeItem> &points)
+void Surface3DRenderer::updateItems(const QList<Surface3DController::ChangeItem> &points)
 {
     foreach (Surface3DController::ChangeItem item, points) {
         SurfaceSeriesRenderCache *cache =
@@ -2225,7 +2225,7 @@ void Surface3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCa
         }
         float offsetValue = 0.0f;
         bool showLastLabel = false;
-        QVector<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
+        QList<float> &labelPositions = m_axisCacheX.formatter()->labelPositions();
         int lastLabelPosIndex = labelPositions.size() - 1;
         if (labelPositions.size()
                 && (labelPositions.at(lastLabelPosIndex) != 1.0f || labelPositions.at(0) != 0.0f)) {

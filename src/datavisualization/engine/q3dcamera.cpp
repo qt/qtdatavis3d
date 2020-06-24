@@ -592,7 +592,7 @@ void Q3DCamera::setCameraPosition(float horizontal, float vertical, float zoom)
  * \property Q3DCamera::target
  * \since QtDataVisualization 1.2
  *
- * \brief The camera target as a a vector or vertex in the 3D space.
+ * \brief The camera target as a vector or vertex in the 3D space.
  *
  * Defaults to \c {QVector3D(0.0, 0.0, 0.0)}.
  *

@@ -53,7 +53,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \typedef QScatterDataArray
  * \relates QScatterDataProxy
  *
- * A vector of \l {QScatterDataItem} objects.
+ * A list of \l {QScatterDataItem} objects.
  */
 
 /*!

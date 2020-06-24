@@ -150,7 +150,7 @@
 
     When you have a data set that updates rapidly, it is important to handle data properly to
     ensure good performance. Since memory allocation is a costly operation, always use
-    QList::reserve() and QVector::resize() where possible to avoid unnecessary reallocations when
+    QList::reserve() and QList::resize() where possible to avoid unnecessary reallocations when
     constructing the array to give to the proxy. If you need to change the entire data set
     for each frame, it is in most cases best to reuse the existing array - especially if the
     array dimensions do not change. If you need to add, insert, remove, or change several

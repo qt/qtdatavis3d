@@ -399,7 +399,7 @@ void QLogValue3DAxisFormatterPrivate::recalculate()
 
         // Since the logarithm has the same curvature across whole axis range, we can just calculate
         // subgrid positions for the first segment and replicate them to other segments.
-        QVector<float> actualSubSegmentSteps(subGridCount);
+        QList<float> actualSubSegmentSteps(subGridCount);
 
         for (int i = 0; i < subGridCount; i++) {
             float currentSubPosition = positionAt(m_min + ((i + 1) * subSegmentStep));

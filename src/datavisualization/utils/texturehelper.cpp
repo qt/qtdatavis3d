@@ -108,7 +108,7 @@ GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFilt
     return textureId;
 }
 
-GLuint TextureHelper::create3DTexture(const QVector<uchar> *data, int width, int height, int depth,
+GLuint TextureHelper::create3DTexture(const QList<uchar> *data, int width, int height, int depth,
                                       QImage::Format dataFormat)
 {
     if (Utils::isOpenGLES() || !width || !height || !depth)

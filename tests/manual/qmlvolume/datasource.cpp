@@ -57,7 +57,7 @@ void DataSource::fillVolume(QCustom3DVolume *volumeItem)
                        float(textureSize) / 2.0f,
                        float(textureSize) / 2.0f);
 
-    QVector<uchar> *textureData = new QVector<uchar>(textureSize * textureSize * textureSize / 2);
+    QList<uchar> *textureData = new QList<uchar>(textureSize * textureSize * textureSize / 2);
     for (int i = 0; i < textureSize; i++) {
         for (int j = 0; j < textureSize / 2; j++) {
             for (int k = 0; k < textureSize; k++) {
@@ -82,7 +82,7 @@ void DataSource::fillVolume(QCustom3DVolume *volumeItem)
     volumeItem->setTextureFormat(QImage::Format_Indexed8);
     volumeItem->setTextureData(textureData);
 
-    QVector<QRgb> colorTable(256);
+    QList<QRgb> colorTable(256);
 
     for (int i = 1; i < 256; i++) {
         if (i < 15)

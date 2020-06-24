@@ -64,7 +64,7 @@ public Q_SLOTS:
                                     int destinationColumn);
     virtual void handleColumnsRemoved(const QModelIndex &parent, int start, int end);
     virtual void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                                   const QVector<int> &roles = QVector<int> ());
+                                   const QList<int> &roles = QList<int>());
     virtual void handleLayoutChanged(const QList<QPersistentModelIndex> &parents = QList<QPersistentModelIndex>(),
                                      QAbstractItemModel::LayoutChangeHint hint = QAbstractItemModel::NoLayoutChangeHint);
     virtual void handleModelReset();

@@ -52,7 +52,7 @@ SurfaceItemModelHandler::~SurfaceItemModelHandler()
 
 void SurfaceItemModelHandler::handleDataChanged(const QModelIndex &topLeft,
                                                 const QModelIndex &bottomRight,
-                                                const QVector<int> &roles)
+                                                const QList<int> &roles)
 {
     // Do nothing if full reset already pending
     if (!m_fullReset) {

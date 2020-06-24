@@ -32,7 +32,7 @@
 
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qbardataitem.h>
-#include <QtCore/QVector>
+#include <QtCore/QList>
 #include <QtCore/QStringList>
 
 Q_MOC_INCLUDE(<QtDataVisualization/qbar3dseries.h>)
@@ -42,7 +42,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 class QBarDataProxyPrivate;
 class QBar3DSeries;
 
-typedef QVector<QBarDataItem> QBarDataRow;
+typedef QList<QBarDataItem> QBarDataRow;
 typedef QList<QBarDataRow *> QBarDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy

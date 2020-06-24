@@ -83,8 +83,8 @@ public:
 
 private:
     Bars3DChangeBitField m_changeTracker;
-    QVector<ChangeItem> m_changedItems;
-    QVector<ChangeRow> m_changedRows;
+    QList<ChangeItem> m_changedItems;
+    QList<ChangeRow> m_changedRows;
 
     // Interaction
     QPoint m_selectedBar;     // Points to row & column in data window.

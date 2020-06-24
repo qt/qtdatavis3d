@@ -40,7 +40,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 class QScatterDataProxyPrivate;
 class QScatter3DSeries;
 
-typedef QVector<QScatterDataItem> QScatterDataArray;
+typedef QList<QScatterDataItem> QScatterDataArray;
 
 class QT_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
 {

@@ -51,7 +51,7 @@ public Q_SLOTS:
 private:
     void clearData();
 
-    QVector<QSurfaceDataArray> m_data;
+    QList<QSurfaceDataArray> m_data;
     int m_index;
     QSurfaceDataArray *m_resetArray;
 };

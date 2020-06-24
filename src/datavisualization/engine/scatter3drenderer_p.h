@@ -100,7 +100,7 @@ public:
     void updateData();
     void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
     SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
-    void updateItems(const QVector<Scatter3DController::ChangeItem> &items);
+    void updateItems(const QList<Scatter3DController::ChangeItem> &items);
     void updateScene(Q3DScene *scene);
     void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
                           const QStringList &labels);

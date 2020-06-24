@@ -71,7 +71,7 @@ public:
     };
 private:
     Scatter3DChangeBitField m_changeTracker;
-    QVector<ChangeItem> m_changedItems;
+    QList<ChangeItem> m_changedItems;
 
     // Rendering
     Scatter3DRenderer *m_renderer;
@@ -100,7 +100,7 @@ private:
         {}
     };
 
-    QVector<InsertRemoveRecord> m_insertRemoveRecords;
+    QList<InsertRemoveRecord> m_insertRemoveRecords;
     bool m_recordInsertsAndRemoves;
 
 public:
