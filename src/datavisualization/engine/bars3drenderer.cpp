@@ -2856,7 +2856,7 @@ QVector3D Bars3DRenderer::convertPositionToTranslation(const QVector3D &position
 
 void Bars3DRenderer::updateAspectRatio(float ratio)
 {
-    Q_UNUSED(ratio)
+    Q_UNUSED(ratio);
 }
 
 void Bars3DRenderer::updateFloorLevel(float level)

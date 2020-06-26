@@ -35,9 +35,9 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
 void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg)
 {
-    Q_UNUSED(type)
-    Q_UNUSED(context)
-    Q_UNUSED(msg)
+    Q_UNUSED(type);
+    Q_UNUSED(context);
+    Q_UNUSED(msg);
     // Used to discard warnings generated during shader test compilation
 }
 

@@ -228,7 +228,7 @@ QString QAbstract3DAxis::title() const
  */
 void QAbstract3DAxis::setLabels(const QStringList &labels)
 {
-    Q_UNUSED(labels)
+    Q_UNUSED(labels);
 }
 
 QStringList QAbstract3DAxis::labels() const

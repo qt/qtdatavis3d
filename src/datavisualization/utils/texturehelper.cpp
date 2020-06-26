@@ -116,8 +116,8 @@ GLuint TextureHelper::create3DTexture(const QList<uchar> *data, int width, int h
 
     GLuint textureId = 0;
 #if defined(QT_OPENGL_ES_2)
-    Q_UNUSED(dataFormat)
-    Q_UNUSED(data)
+    Q_UNUSED(dataFormat);
+    Q_UNUSED(data);
 #else
     glEnable(GL_TEXTURE_3D);
 
@@ -291,8 +291,8 @@ GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint textureSize)
 {
     GLuint depthtextureid = 0;
 #if defined(QT_OPENGL_ES_2)
-    Q_UNUSED(size)
-    Q_UNUSED(textureSize)
+    Q_UNUSED(size);
+    Q_UNUSED(textureSize);
 #else
     if (!Utils::isOpenGLES()) {
         // Create depth texture for the shadow mapping
@@ -317,7 +317,7 @@ GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &f
 {
     GLuint depthtextureid = createDepthTexture(size, textureSize);
 #if defined(QT_OPENGL_ES_2)
-    Q_UNUSED(frameBuffer)
+    Q_UNUSED(frameBuffer);
 #else
     if (!Utils::isOpenGLES()) {
         // Create frame buffer

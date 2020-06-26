@@ -690,7 +690,7 @@ void Abstract3DController::handleThemeMultiHighlightGradientChanged(const QLinea
 
 void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
 {
-    Q_UNUSED(theme)
+    Q_UNUSED(theme);
 
     // Changing theme type is logically equivalent of changing the entire theme
     // object, so reset all attached series to the new theme.
@@ -1070,7 +1070,7 @@ void Abstract3DController::updateCustomItem()
 
 void Abstract3DController::handleAxisTitleChanged(const QString &title)
 {
-    Q_UNUSED(title)
+    Q_UNUSED(title);
     handleAxisTitleChangedBySender(sender());
 }
 
@@ -1111,8 +1111,8 @@ void Abstract3DController::handleAxisLabelsChangedBySender(QObject *sender)
 
 void Abstract3DController::handleAxisRangeChanged(float min, float max)
 {
-    Q_UNUSED(min)
-    Q_UNUSED(max)
+    Q_UNUSED(min);
+    Q_UNUSED(max);
     handleAxisRangeChangedBySender(sender());
 }
 
@@ -1135,7 +1135,7 @@ void Abstract3DController::handleAxisRangeChangedBySender(QObject *sender)
 
 void Abstract3DController::handleAxisSegmentCountChanged(int count)
 {
-    Q_UNUSED(count)
+    Q_UNUSED(count);
     handleAxisSegmentCountChangedBySender(sender());
 }
 
@@ -1154,7 +1154,7 @@ void Abstract3DController::handleAxisSegmentCountChangedBySender(QObject *sender
 
 void Abstract3DController::handleAxisSubSegmentCountChanged(int count)
 {
-    Q_UNUSED(count)
+    Q_UNUSED(count);
     handleAxisSubSegmentCountChangedBySender(sender());
 }
 
@@ -1183,13 +1183,13 @@ void Abstract3DController::handleAxisAutoAdjustRangeChanged(bool autoAdjust)
 
 void Abstract3DController::handleAxisLabelFormatChanged(const QString &format)
 {
-    Q_UNUSED(format)
+    Q_UNUSED(format);
     handleAxisLabelFormatChangedBySender(sender());
 }
 
 void Abstract3DController::handleAxisReversedChanged(bool enable)
 {
-    Q_UNUSED(enable)
+    Q_UNUSED(enable);
     handleAxisReversedChangedBySender(sender());
 }
 
@@ -1200,19 +1200,19 @@ void Abstract3DController::handleAxisFormatterDirty()
 
 void Abstract3DController::handleAxisLabelAutoRotationChanged(float angle)
 {
-    Q_UNUSED(angle)
+    Q_UNUSED(angle);
     handleAxisLabelAutoRotationChangedBySender(sender());
 }
 
 void Abstract3DController::handleAxisTitleVisibilityChanged(bool visible)
 {
-    Q_UNUSED(visible)
+    Q_UNUSED(visible);
     handleAxisTitleVisibilityChangedBySender(sender());
 }
 
 void Abstract3DController::handleAxisTitleFixedChanged(bool fixed)
 {
-    Q_UNUSED(fixed)
+    Q_UNUSED(fixed);
     handleAxisTitleFixedChangedBySender(sender());
 }
 
@@ -1229,13 +1229,13 @@ void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::Input
 
 void Abstract3DController::handleInputPositionChanged(const QPoint &position)
 {
-    Q_UNUSED(position)
+    Q_UNUSED(position);
     emitNeedRender();
 }
 
 void Abstract3DController::handleSeriesVisibilityChanged(bool visible)
 {
-    Q_UNUSED(visible)
+    Q_UNUSED(visible);
 
     handleSeriesVisibilityChangedBySender(sender());
 }
@@ -1467,7 +1467,7 @@ void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orient
 QAbstract3DAxis *Abstract3DController::createDefaultAxis(
         QAbstract3DAxis::AxisOrientation orientation)
 {
-    Q_UNUSED(orientation)
+    Q_UNUSED(orientation);
 
     // The default default axis is a value axis. If the graph type has a different default axis
     // for some orientation, this function needs to be overridden.

@@ -192,7 +192,7 @@ void tst_proxy::addModel()
     m_proxy->setZPosRoleReplace(QStringLiteral("\\1"));
 
     QScatter3DSeries *series = new QScatter3DSeries(m_proxy);
-    Q_UNUSED(series)
+    Q_UNUSED(series);
 
     QCoreApplication::processEvents();
 

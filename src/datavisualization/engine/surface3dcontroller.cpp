@@ -112,8 +112,8 @@ void Surface3DController::synchDataToRenderer()
 void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(
         QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
-    Q_UNUSED(orientation)
-    Q_UNUSED(autoAdjust)
+    Q_UNUSED(orientation);
+    Q_UNUSED(autoAdjust);
 
     adjustAxisRanges();
 }
@@ -416,8 +416,8 @@ void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
 
 void Surface3DController::handleRowsAdded(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
+    Q_UNUSED(startIndex);
+    Q_UNUSED(count);
     QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
     if (series->isVisible()) {
         adjustAxisRanges();
@@ -430,8 +430,8 @@ void Surface3DController::handleRowsAdded(int startIndex, int count)
 
 void Surface3DController::handleRowsInserted(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
+    Q_UNUSED(startIndex);
+    Q_UNUSED(count);
     QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
     if (series == m_selectedSeries) {
         // If rows inserted to selected series before the selection, adjust the selection
@@ -454,8 +454,8 @@ void Surface3DController::handleRowsInserted(int startIndex, int count)
 
 void Surface3DController::handleRowsRemoved(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
+    Q_UNUSED(startIndex);
+    Q_UNUSED(count);
     QSurface3DSeries *series = static_cast<QSurfaceDataProxy *>(sender())->series();
     if (series == m_selectedSeries) {
         // If rows removed from selected series before the selection, adjust the selection

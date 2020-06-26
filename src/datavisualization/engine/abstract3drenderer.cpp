@@ -274,8 +274,8 @@ void Abstract3DRenderer::initGradientShaders(const QString &vertexShader,
                                              const QString &fragmentShader)
 {
     // Do nothing by default
-    Q_UNUSED(vertexShader)
-    Q_UNUSED(fragmentShader)
+    Q_UNUSED(vertexShader);
+    Q_UNUSED(fragmentShader);
 }
 
 void Abstract3DRenderer::initStaticSelectedItemShaders(const QString &vertexShader,
@@ -284,10 +284,10 @@ void Abstract3DRenderer::initStaticSelectedItemShaders(const QString &vertexShad
                                                        const QString &gradientFragmentShader)
 {
     // Do nothing by default
-    Q_UNUSED(vertexShader)
-    Q_UNUSED(fragmentShader)
-    Q_UNUSED(gradientVertexShader)
-    Q_UNUSED(gradientFragmentShader)
+    Q_UNUSED(vertexShader);
+    Q_UNUSED(fragmentShader);
+    Q_UNUSED(gradientVertexShader);
+    Q_UNUSED(gradientFragmentShader);
 }
 
 void Abstract3DRenderer::initCustomItemShaders(const QString &vertexShader,
@@ -697,8 +697,8 @@ void Abstract3DRenderer::modifiedSeriesList(const QList<QAbstract3DSeries *> &se
 void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh)
 {
     // Default implementation does nothing.
-    Q_UNUSED(fileName)
-    Q_UNUSED(mesh)
+    Q_UNUSED(fileName);
+    Q_UNUSED(mesh);
 }
 
 void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)

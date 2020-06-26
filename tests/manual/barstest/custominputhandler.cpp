@@ -39,7 +39,7 @@ CustomInputHandler::CustomInputHandler(QObject *parent) :
 //! [0]
 void CustomInputHandler::mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos)
 {
-    Q_UNUSED(event)
+    Q_UNUSED(event);
     setInputPosition(mousePos);
 }
 //! [0]

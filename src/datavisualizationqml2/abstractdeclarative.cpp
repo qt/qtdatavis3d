@@ -399,7 +399,7 @@ void AbstractDeclarative::doneOpenGLContext(QQuickWindow *window)
 #ifdef USE_SHARED_CONTEXT
     m_qtContext->makeCurrent(window);
 #else
-    Q_UNUSED(window)
+    Q_UNUSED(window);
     m_stateStore->restoreGLState();
 #endif
 }

@@ -106,7 +106,7 @@ void Drawer::drawObject(ShaderHelper *shader, AbstractObjectHelper *object, GLui
                         GLuint depthTextureId, GLuint textureId3D)
 {
 #if defined(QT_OPENGL_ES_2)
-    Q_UNUSED(textureId3D)
+    Q_UNUSED(textureId3D);
 #endif
     if (textureId) {
         // Activate texture

@@ -55,14 +55,14 @@ QQmlListProperty<QObject> DeclarativeTheme3D::themeChildren()
 
 void DeclarativeTheme3D::appendThemeChildren(QQmlListProperty<QObject> *list, QObject *element)
 {
-    Q_UNUSED(list)
-    Q_UNUSED(element)
+    Q_UNUSED(list);
+    Q_UNUSED(element);
     // Nothing to do, themeChildren is there only to enable scoping gradient items in Theme3D item.
 }
 
 void DeclarativeTheme3D::handleTypeChange(Theme themeType)
 {
-    Q_UNUSED(themeType)
+    Q_UNUSED(themeType);
 
     // Theme changed, disconnect base color/gradient connections
     if (!m_colors.isEmpty()) {

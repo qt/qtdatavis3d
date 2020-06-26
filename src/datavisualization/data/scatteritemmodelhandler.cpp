@@ -97,7 +97,7 @@ void ScatterItemModelHandler::handleRowsInserted(const QModelIndex &parent, int 
 
 void ScatterItemModelHandler::handleRowsRemoved(const QModelIndex &parent, int start, int end)
 {
-    Q_UNUSED(parent)
+    Q_UNUSED(parent);
 
     // Do nothing if full reset already pending
     if (!m_fullReset) {

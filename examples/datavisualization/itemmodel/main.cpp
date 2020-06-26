@@ -229,8 +229,8 @@ void GraphDataGenerator::selectFromTable(const QPoint &selection)
 void GraphDataGenerator::selectedFromTable(int currentRow, int currentColumn,
                                            int previousRow, int previousColumn)
 {
-    Q_UNUSED(previousRow)
-    Q_UNUSED(previousColumn)
+    Q_UNUSED(previousRow);
+    Q_UNUSED(previousColumn);
     m_graph->seriesList().at(0)->setSelectedBar(QPoint(currentRow, currentColumn));
 }
 //! [14]

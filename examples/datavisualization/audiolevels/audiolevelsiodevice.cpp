@@ -57,8 +57,8 @@ AudioLevelsIODevice::AudioLevelsIODevice(QBarDataProxy *proxy, QObject *parent)
 // Implementation required for this pure virtual function
 qint64 AudioLevelsIODevice::readData(char *data, qint64 maxSize)
 {
-    Q_UNUSED(data)
-    Q_UNUSED(maxSize)
+    Q_UNUSED(data);
+    Q_UNUSED(maxSize);
     return -1;
 }
 

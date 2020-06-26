@@ -167,8 +167,8 @@ void Bars3DController::handleArrayReset()
 
 void Bars3DController::handleRowsAdded(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
+    Q_UNUSED(startIndex);
+    Q_UNUSED(count);
     QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
     if (series->isVisible()) {
         adjustAxisRanges();
@@ -217,8 +217,8 @@ void Bars3DController::handleRowsChanged(int startIndex, int count)
 
 void Bars3DController::handleRowsRemoved(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
+    Q_UNUSED(startIndex);
+    Q_UNUSED(count);
 
     QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
     if (series == m_selectedBarSeries) {
@@ -246,8 +246,8 @@ void Bars3DController::handleRowsRemoved(int startIndex, int count)
 
 void Bars3DController::handleRowsInserted(int startIndex, int count)
 {
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
+    Q_UNUSED(startIndex);
+    Q_UNUSED(count);
     QBar3DSeries *series = static_cast<QBarDataProxy *>(sender())->series();
     if (series == m_selectedBarSeries) {
         // If rows inserted to selected series before the selection, adjust the selection
@@ -325,8 +325,8 @@ void Bars3DController::handleDataColumnLabelsChanged()
 void Bars3DController::handleAxisAutoAdjustRangeChangedInOrientation(
         QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {
-    Q_UNUSED(orientation)
-    Q_UNUSED(autoAdjust)
+    Q_UNUSED(orientation);
+    Q_UNUSED(autoAdjust);
     adjustAxisRanges();
 }
 

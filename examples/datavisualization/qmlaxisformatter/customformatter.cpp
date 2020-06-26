@@ -127,7 +127,7 @@ void CustomFormatter::recalculate()
 //! [3]
 QString CustomFormatter::stringForValue(qreal value, const QString &format) const
 {
-    Q_UNUSED(format)
+    Q_UNUSED(format);
 
     return valueToDateTime(value).toString(m_selectionFormat);
 }
