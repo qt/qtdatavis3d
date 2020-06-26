@@ -97,44 +97,44 @@ public:
     explicit Scatter3DRenderer(Scatter3DController *controller);
     ~Scatter3DRenderer();
 
-    void updateData();
-    void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
-    SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
+    void updateData() override;
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList) override;
+    SeriesRenderCache *createNewCache(QAbstract3DSeries *series) override;
     void updateItems(const QList<Scatter3DController::ChangeItem> &items);
-    void updateScene(Q3DScene *scene);
+    void updateScene(Q3DScene *scene) override;
     void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
-                          const QStringList &labels);
+                          const QStringList &labels) override;
     void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
-                                   bool visible);
-    void updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint);
-    void updateMargin(float margin);
+                                   bool visible) override;
+    void updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint) override;
+    void updateMargin(float margin) override;
 
-    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
+    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute) override;
 
     inline int clickedIndex() const { return m_clickedIndex; }
     void resetClickedStatus();
 
-    void render(GLuint defaultFboHandle);
+    void render(GLuint defaultFboHandle) override;
 
 public Q_SLOTS:
     void updateSelectedItem(int index, QScatter3DSeries *series);
 
 protected:
-    void contextCleanup();
-    virtual void initializeOpenGL();
-    virtual void fixCameraTarget(QVector3D &target);
-    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
+    void contextCleanup() override;
+    void initializeOpenGL() override;
+    void fixCameraTarget(QVector3D &target) override;
+    void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds) override;
 
 private:
-    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void initStaticSelectedItemShaders(const QString &vertexShader,
-                                               const QString &fragmentShader,
-                                               const QString &gradientVertexShader,
-                                               const QString &gradientFragmentShader);
-    virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
-    virtual void updateTextures();
-    virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
+    void initShaders(const QString &vertexShader, const QString &fragmentShader) override;
+    void initGradientShaders(const QString &vertexShader, const QString &fragmentShader) override;
+    void initStaticSelectedItemShaders(const QString &vertexShader,
+                                       const QString &fragmentShader,
+                                       const QString &gradientVertexShader,
+                                       const QString &gradientFragmentShader) override;
+    void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) override;
+    void updateTextures() override;
+    void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh) override;
 
     void drawScene(GLuint defaultFboHandle);
     void drawLabels(bool drawSelection, const Q3DCamera *activeCamera,
@@ -142,11 +142,11 @@ private:
 
     void loadBackgroundMesh();
     void initSelectionShader();
-    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) override;
     void initStaticPointShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initSelectionBuffer();
+    void initSelectionBuffer() override;
     void initDepthShader();
-    void updateDepthBuffer();
+    void updateDepthBuffer() override;
     void initPointShader();
     void calculateTranslation(ScatterRenderItem &item);
     void calculateSceneScalingFactors();

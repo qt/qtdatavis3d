@@ -52,9 +52,9 @@ public:
     QScatter3DSeriesPrivate(QScatter3DSeries *q);
     virtual ~QScatter3DSeriesPrivate();
 
-    virtual void setDataProxy(QAbstractDataProxy *proxy);
-    virtual void connectControllerAndProxy(Abstract3DController *newController);
-    virtual void createItemLabel();
+    void setDataProxy(QAbstractDataProxy *proxy) override;
+    void connectControllerAndProxy(Abstract3DController *newController) override;
+    void createItemLabel() override;
 
     void setSelectedItem(int index);
     void setItemSize(float size);

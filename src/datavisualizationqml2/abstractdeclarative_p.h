@@ -181,7 +181,7 @@ public:
     static QCustom3DItem *atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list, int index);
     static void clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list);
 
-    virtual void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry);
+    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
     void setSharedController(Abstract3DController *controller);
     // Used to synch up data model from controller to renderer while main thread is locked
@@ -239,22 +239,22 @@ public Q_SLOTS:
     void destroyContext();
 
 protected:
-    virtual void mouseDoubleClickEvent(QMouseEvent *event);
-    virtual void touchEvent(QTouchEvent *event);
-    virtual void mousePressEvent(QMouseEvent *event);
-    virtual void mouseReleaseEvent(QMouseEvent *event);
-    virtual void mouseMoveEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void touchEvent(QTouchEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 #if QT_CONFIG(wheelevent)
-    virtual void wheelEvent(QWheelEvent *event);
+    void wheelEvent(QWheelEvent *event) override;
 #endif
     virtual void handleWindowChanged(QQuickWindow *win);
-    virtual void itemChange(ItemChange change, const ItemChangeData &value);
+    void itemChange(ItemChange change, const ItemChangeData &value) override;
     virtual void updateWindowParameters();
     virtual void handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode);
     virtual void handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality);
     virtual void handleSelectedElementChange(QAbstract3DGraph::ElementType type);
     virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
-    virtual QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *);
+    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *) override;
 
 Q_SIGNALS:
     void selectionModeChanged(AbstractDeclarative::SelectionFlags mode);

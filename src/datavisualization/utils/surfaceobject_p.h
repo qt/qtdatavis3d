@@ -88,7 +88,7 @@ public:
     void createCoarseGridlineIndices(int x, int y, int endX, int endY);
     void uploadBuffers();
     GLuint gridElementBuf();
-    GLuint uvBuf();
+    GLuint uvBuf() override;
     GLuint gridIndexCount();
     QVector3D vertexAt(int column, int row);
     void clear();

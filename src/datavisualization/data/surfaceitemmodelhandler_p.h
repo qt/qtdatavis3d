@@ -53,11 +53,11 @@ public:
     virtual ~SurfaceItemModelHandler();
 
 public Q_SLOTS:
-    virtual void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
-                                   const QList<int> &roles = QList<int>());
+    void handleDataChanged(const QModelIndex &topLeft, const QModelIndex &bottomRight,
+                           const QList<int> &roles = QList<int>()) override;
 
 protected:
-    void virtual resolveModel();
+    void resolveModel() override;
 
     QItemModelSurfaceDataProxy *m_proxy; // Not owned
     QSurfaceDataArray *m_proxyArray; // Not owned

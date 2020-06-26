@@ -92,34 +92,34 @@ public:
     explicit Surface3DRenderer(Surface3DController *controller);
     ~Surface3DRenderer();
 
-    void updateData();
-    void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
+    void updateData() override;
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList) override;
     void updateSurfaceTextures(QList<QSurface3DSeries *> seriesList);
-    SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
-    void cleanCache(SeriesRenderCache *cache);
-    void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode);
+    SeriesRenderCache *createNewCache(QAbstract3DSeries *series) override;
+    void cleanCache(SeriesRenderCache *cache) override;
+    void updateSelectionMode(QAbstract3DGraph::SelectionFlags mode) override;
     void updateRows(const QList<Surface3DController::ChangeRow> &rows);
     void updateItems(const QList<Surface3DController::ChangeItem> &points);
-    void updateScene(Q3DScene *scene);
+    void updateScene(Q3DScene *scene) override;
     void updateSlicingActive(bool isSlicing);
     void updateSelectedPoint(const QPoint &position, QSurface3DSeries *series);
     void updateFlipHorizontalGrid(bool flip);
     inline QPoint clickedPosition() const { return m_clickedPosition; }
     void resetClickedStatus();
-    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
+    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute) override;
     void updateAxisLabels(QAbstract3DAxis::AxisOrientation orientation,
-                          const QStringList &labels);
+                          const QStringList &labels) override;
     void updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientation orientation,
-                                   bool visible);
-    void updateMargin(float margin);
+                                   bool visible) override;
+    void updateMargin(float margin) override;
 
-    void render(GLuint defaultFboHandle = 0);
+    void render(GLuint defaultFboHandle = 0) override;
 
 protected:
-    void contextCleanup();
-    void initializeOpenGL();
-    virtual void fixCameraTarget(QVector3D &target);
-    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
+    void contextCleanup() override;
+    void initializeOpenGL() override;
+    virtual void fixCameraTarget(QVector3D &target) override;
+    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds) override;
 
 Q_SIGNALS:
     void flatShadingSupportedChanged(bool supported);
@@ -132,9 +132,9 @@ private:
     void findMatchingRow(float z, int &sample, int direction, QSurfaceDataArray &dataArray);
     void findMatchingColumn(float x, int &sample, int direction, QSurfaceDataArray &dataArray);
     void updateSliceObject(SurfaceSeriesRenderCache *cache, const QPoint &point);
-    void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
-    void updateTextures();
-    void initShaders(const QString &vertexShader, const QString &fragmentShader);
+    void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) override;
+    void updateTextures() override;
+    void initShaders(const QString &vertexShader, const QString &fragmentShader) override;
     QRect calculateSampleRect(const QSurfaceDataArray &array);
     void loadBackgroundMesh();
 
@@ -144,10 +144,10 @@ private:
                     const QMatrix4x4 &viewMatrix, const QMatrix4x4 &projectionMatrix);
 
     void calculateSceneScalingFactors();
-    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
+    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) override;
     void initSelectionShaders();
     void initSurfaceShaders();
-    void initSelectionBuffer();
+    void initSelectionBuffer() override;
     void initDepthShader();
     void updateSelectionTextures();
     void createSelectionTexture(SurfaceSeriesRenderCache *cache, uint &lastSelectionId);
@@ -156,7 +156,7 @@ private:
     void surfacePointSelected(const QPoint &point);
     void updateSelectionPoint(SurfaceSeriesRenderCache *cache, const QPoint &point, bool label);
     QPoint selectionIdToSurfacePoint(uint id);
-    void updateDepthBuffer();
+    void updateDepthBuffer() override;
     void emitSelectedPointChanged(QPoint position);
 
     Q_DISABLE_COPY(Surface3DRenderer)

@@ -101,9 +101,9 @@ public:
     float floorLevel() const;
 
 public Q_SLOTS:
-    void handleAxisXChanged(QAbstract3DAxis *axis);
-    void handleAxisYChanged(QAbstract3DAxis *axis);
-    void handleAxisZChanged(QAbstract3DAxis *axis);
+    void handleAxisXChanged(QAbstract3DAxis *axis) override;
+    void handleAxisYChanged(QAbstract3DAxis *axis) override;
+    void handleAxisZChanged(QAbstract3DAxis *axis) override;
 
 Q_SIGNALS:
     void rowAxisChanged(QCategory3DAxis *axis);

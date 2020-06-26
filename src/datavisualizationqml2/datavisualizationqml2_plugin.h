@@ -126,7 +126,7 @@ class QtDataVisualizationQml2Plugin : public QQmlExtensionPlugin
 
 public:
     QtDataVisualizationQml2Plugin(QObject *parent = 0) : QQmlExtensionPlugin(parent) { }
-    void registerTypes(const char *uri);
+    void registerTypes(const char *uri) override;
 };
 
 QT_END_NAMESPACE_DATAVISUALIZATION

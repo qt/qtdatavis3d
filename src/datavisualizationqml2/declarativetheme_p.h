@@ -88,8 +88,8 @@ public:
     ColorGradient *multiHighlightGradient() const;
 
     // From QQmlParserStatus
-    virtual void classBegin();
-    virtual void componentComplete();
+    void classBegin() override;
+    void componentComplete() override;
 
 Q_SIGNALS:
     void singleHighlightGradientChanged(ColorGradient *gradient);

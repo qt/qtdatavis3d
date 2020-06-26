@@ -52,9 +52,9 @@ public:
     QSurface3DSeriesPrivate(QSurface3DSeries *q);
     virtual ~QSurface3DSeriesPrivate();
 
-    virtual void setDataProxy(QAbstractDataProxy *proxy);
-    virtual void connectControllerAndProxy(Abstract3DController *newController);
-    virtual void createItemLabel();
+    void setDataProxy(QAbstractDataProxy *proxy) override;
+    void connectControllerAndProxy(Abstract3DController *newController) override;
+    void createItemLabel() override;
 
     void setSelectedPoint(const QPoint &position);
     void setFlatShadingEnabled(bool enabled);

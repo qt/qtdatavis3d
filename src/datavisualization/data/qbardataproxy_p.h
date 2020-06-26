@@ -66,7 +66,7 @@ public:
     QPair<GLfloat, GLfloat> limitValues(int startRow, int startColumn, int rowCount,
                                         int columnCount) const;
 
-    virtual void setSeries(QAbstract3DSeries *series);
+    void setSeries(QAbstract3DSeries *series) override;
 
 private:
     QBarDataProxy *qptr();

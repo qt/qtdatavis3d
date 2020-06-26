@@ -53,7 +53,7 @@ public:
     BarSeriesRenderCache(QAbstract3DSeries *series, Abstract3DRenderer *renderer);
     virtual ~BarSeriesRenderCache();
 
-    void cleanup(TextureHelper *texHelper);
+    void cleanup(TextureHelper *texHelper) override;
 
     inline BarRenderItemArray &renderArray() { return m_renderArray; }
     inline QBar3DSeries *series() const { return static_cast<QBar3DSeries *>(m_series); }

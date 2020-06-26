@@ -63,11 +63,11 @@ Q_SIGNALS:
     void showEdgeLabelsChanged(bool enabled);
 
 protected:
-    virtual QValue3DAxisFormatter *createNewInstance() const;
-    virtual void recalculate();
-    virtual float positionAt(float value) const;
-    virtual float valueAt(float position) const;
-    virtual void populateCopy(QValue3DAxisFormatter &copy) const;
+    QValue3DAxisFormatter *createNewInstance() const override;
+    void recalculate() override;
+    float positionAt(float value) const override;
+    float valueAt(float position) const override;
+    void populateCopy(QValue3DAxisFormatter &copy) const override;
 
     QLogValue3DAxisFormatterPrivate *dptr();
     const QLogValue3DAxisFormatterPrivate *dptrc() const;

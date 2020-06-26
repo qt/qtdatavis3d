@@ -72,7 +72,7 @@ public:
     void setQuickWindow(QQuickWindow *window);
     void setSamples(int samples);
 
-    void preprocess();
+    void preprocess() override;
 
 public Q_SLOTS:
     void handleControllerDestroyed();

@@ -67,7 +67,7 @@ public:
                      QAbstract3DAxis *axisY, QAbstract3DAxis *axisZ) const;
     bool isValidValue(float axisValue, float value, QAbstract3DAxis *axis) const;
 
-    virtual void setSeries(QAbstract3DSeries *series);
+    void setSeries(QAbstract3DSeries *series) override;
 private:
     QScatterDataProxy *qptr();
     QScatterDataArray *m_dataArray;

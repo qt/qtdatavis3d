@@ -95,27 +95,27 @@ public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
     ~Surface3DController();
 
-    virtual void initializeOpenGL();
-    virtual void synchDataToRenderer();
+    void initializeOpenGL() override;
+    void synchDataToRenderer() override;
 
-    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode) override;
     void setSelectedPoint(const QPoint &position, QSurface3DSeries *series, bool enterSlice);
-    virtual void clearSelection();
+    void clearSelection() override;
 
     inline QSurface3DSeries *selectedSeries() const { return m_selectedSeries; }
 
-    virtual void handleAxisAutoAdjustRangeChangedInOrientation(
-            QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust);
-    virtual void handleAxisRangeChangedBySender(QObject *sender);
-    virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
-    virtual void handlePendingClick();
-    virtual void adjustAxisRanges();
+    void handleAxisAutoAdjustRangeChangedInOrientation(
+            QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) override;
+    void handleAxisRangeChangedBySender(QObject *sender) override;
+    void handleSeriesVisibilityChangedBySender(QObject *sender) override;
+    void handlePendingClick() override;
+    void adjustAxisRanges() override;
 
     static QPoint invalidSelectionPosition();
     bool isFlatShadingSupported();
 
-    virtual void addSeries(QAbstract3DSeries *series);
-    virtual void removeSeries(QAbstract3DSeries *series);
+    void addSeries(QAbstract3DSeries *series) override;
+    void removeSeries(QAbstract3DSeries *series) override;
     virtual QList<QSurface3DSeries *> surfaceSeriesList();
 
     void setFlipHorizontalGrid(bool flip);

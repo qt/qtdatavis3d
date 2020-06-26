@@ -53,9 +53,9 @@ public:
     QValue3DAxisPrivate(QValue3DAxis *q);
     virtual ~QValue3DAxisPrivate();
 
-    virtual void setRange(float min, float max, bool suppressWarnings = false);
-    virtual void setMin(float min);
-    virtual void setMax (float max);
+    void setRange(float min, float max, bool suppressWarnings = false) override;
+    void setMin(float min) override;
+    void setMax (float max) override;
 
     void emitLabelsChanged();
 
@@ -63,11 +63,11 @@ Q_SIGNALS:
     void formatterDirty();
 
 protected:
-    virtual void updateLabels();
+    void updateLabels() override;
 
-    virtual bool allowZero();
-    virtual bool allowNegatives();
-    virtual bool allowMinMaxSame();
+    bool allowZero() override;
+    bool allowNegatives() override;
+    bool allowMinMaxSame() override;
 
     int m_segmentCount;
     int m_subSegmentCount;

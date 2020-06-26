@@ -58,11 +58,11 @@ public:
     bool isZoomAtTargetEnabled() const;
 
     // Input event listeners
-    virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
-    virtual void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
-    virtual void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
+    void mousePressEvent(QMouseEvent *event, const QPoint &mousePos) override;
+    void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos) override;
+    void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos) override;
 #if QT_CONFIG(wheelevent)
-    virtual void wheelEvent(QWheelEvent *event);
+    void wheelEvent(QWheelEvent *event) override;
 #endif
 
 Q_SIGNALS:

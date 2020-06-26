@@ -58,8 +58,8 @@ public:
     SurfaceSeriesRenderCache(QAbstract3DSeries *series, Surface3DRenderer *renderer);
     virtual ~SurfaceSeriesRenderCache();
 
-    virtual void populate(bool newSeries);
-    virtual void cleanup(TextureHelper *texHelper);
+    void populate(bool newSeries) override;
+    void cleanup(TextureHelper *texHelper) override;
 
     inline bool surfaceVisible() const { return m_surfaceVisible; }
     inline bool surfaceGridVisible() const { return m_surfaceGridVisible; }

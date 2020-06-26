@@ -56,9 +56,9 @@ public:
     void setDataLabels(const QStringList &labels);
 
 protected:
-    virtual bool allowZero();
-    virtual bool allowNegatives();
-    virtual bool allowMinMaxSame();
+    bool allowZero() override;
+    bool allowNegatives() override;
+    bool allowMinMaxSame() override;
 
 private:
     QCategory3DAxis *qptr();

@@ -45,7 +45,7 @@ public:
     virtual ~QTouch3DInputHandler();
 
     // Input event listeners
-    virtual void touchEvent(QTouchEvent *event);
+    void touchEvent(QTouchEvent *event) override;
 
 private:
     Q_DISABLE_COPY(QTouch3DInputHandler)

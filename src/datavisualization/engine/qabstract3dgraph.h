@@ -197,17 +197,17 @@ public:
     bool hasContext() const;
 
 protected:
-    bool event(QEvent *event);
-    void resizeEvent(QResizeEvent *event);
-    void exposeEvent(QExposeEvent *event);
+    bool event(QEvent *event) override;
+    void resizeEvent(QResizeEvent *event) override;
+    void exposeEvent(QExposeEvent *event) override;
 
-    void mouseDoubleClickEvent(QMouseEvent *event);
-    void touchEvent(QTouchEvent *event);
-    void mousePressEvent(QMouseEvent *event);
-    void mouseReleaseEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void touchEvent(QTouchEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
 #if QT_CONFIG(wheelevent)
-    void wheelEvent(QWheelEvent *event);
+    void wheelEvent(QWheelEvent *event) override;
 #endif
 
 Q_SIGNALS:

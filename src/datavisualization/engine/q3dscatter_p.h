@@ -54,9 +54,9 @@ public:
     Q3DScatterPrivate(Q3DScatter *q);
     ~Q3DScatterPrivate();
 
-    void handleAxisXChanged(QAbstract3DAxis *axis);
-    void handleAxisYChanged(QAbstract3DAxis *axis);
-    void handleAxisZChanged(QAbstract3DAxis *axis);
+    void handleAxisXChanged(QAbstract3DAxis *axis) override;
+    void handleAxisYChanged(QAbstract3DAxis *axis) override;
+    void handleAxisZChanged(QAbstract3DAxis *axis) override;
 
     Q3DScatter *qptr();
 

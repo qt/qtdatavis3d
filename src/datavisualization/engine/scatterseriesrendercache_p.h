@@ -56,7 +56,7 @@ public:
     ScatterSeriesRenderCache(QAbstract3DSeries *series, Abstract3DRenderer *renderer);
     virtual ~ScatterSeriesRenderCache();
 
-    void cleanup(TextureHelper *texHelper);
+    void cleanup(TextureHelper *texHelper) override;
 
     inline ScatterRenderItemArray &renderArray() { return m_renderArray; }
     inline QScatter3DSeries *series() const { return static_cast<QScatter3DSeries *>(m_series); }

@@ -119,25 +119,25 @@ public:
     explicit Bars3DRenderer(Bars3DController *controller);
     ~Bars3DRenderer();
 
-    void updateData();
-    void updateSeries(const QList<QAbstract3DSeries *> &seriesList);
-    SeriesRenderCache *createNewCache(QAbstract3DSeries *series);
+    void updateData() override;
+    void updateSeries(const QList<QAbstract3DSeries *> &seriesList) override;
+    SeriesRenderCache *createNewCache(QAbstract3DSeries *series) override;
     void updateRows(const QList<Bars3DController::ChangeRow> &rows);
     void updateItems(const QList<Bars3DController::ChangeItem> &items);
-    void updateScene(Q3DScene *scene);
-    void render(GLuint defaultFboHandle = 0);
+    void updateScene(Q3DScene *scene) override;
+    void render(GLuint defaultFboHandle = 0) override;
 
-    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute);
+    QVector3D convertPositionToTranslation(const QVector3D &position, bool isAbsolute) override;
 
-    void updateAspectRatio(float ratio);
+    void updateAspectRatio(float ratio) override;
     void updateFloorLevel(float level);
-    void updateMargin(float margin);
+    void updateMargin(float margin) override;
 
 protected:
-    void contextCleanup();
-    virtual void initializeOpenGL();
-    virtual void fixCameraTarget(QVector3D &target);
-    virtual void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds);
+    void contextCleanup() override;
+    void initializeOpenGL() override;
+    void fixCameraTarget(QVector3D &target) override;
+    void getVisibleItemBounds(QVector3D &minBounds, QVector3D &maxBounds) override;
 
 public Q_SLOTS:
     void updateMultiSeriesScaling(bool uniform);
@@ -150,17 +150,17 @@ public Q_SLOTS:
     void resetClickedStatus();
 
     // Overloaded from abstract renderer
-    virtual void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
-                                 float max);
-    virtual void updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation,
-                                    bool enable);
+    void updateAxisRange(QAbstract3DAxis::AxisOrientation orientation, float min,
+                         float max) override;
+    void updateAxisReversed(QAbstract3DAxis::AxisOrientation orientation,
+                            bool enable) override;
 
 private:
-    virtual void initShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void initGradientShaders(const QString &vertexShader, const QString &fragmentShader);
-    virtual void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality);
-    virtual void updateTextures();
-    virtual void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh);
+    void initShaders(const QString &vertexShader, const QString &fragmentShader) override;
+    void initGradientShaders(const QString &vertexShader, const QString &fragmentShader) override;
+    void updateShadowQuality(QAbstract3DGraph::ShadowQuality quality) override;
+    void updateTextures() override;
+    void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh mesh) override;
 
     void drawSlicedScene();
     void drawScene(GLuint defaultFboHandle);
@@ -180,10 +180,10 @@ private:
 
     void loadBackgroundMesh();
     void initSelectionShader();
-    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader);
-    void initSelectionBuffer();
+    void initBackgroundShaders(const QString &vertexShader, const QString &fragmentShader) override;
+    void initSelectionBuffer() override;
     void initDepthShader();
-    void updateDepthBuffer();
+    void updateDepthBuffer() override;
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
     Abstract3DController::SelectionType isSelected(int row, int bar,

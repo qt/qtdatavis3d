@@ -93,7 +93,7 @@ public:
     bool wrapYRotation() const;
     void setWrapYRotation(bool isEnabled);
 
-    virtual void copyValuesFrom(const Q3DObject &source);
+    void copyValuesFrom(const Q3DObject &source) override;
 
     CameraPreset cameraPreset() const;
     void setCameraPreset(CameraPreset preset);
