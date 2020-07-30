@@ -112,7 +112,7 @@ QString CustomFormatter::selectionFormat() const
     return m_selectionFormat;
 }
 
-void CustomFormatter::setOriginDate(const QDate &date)
+void CustomFormatter::setOriginDate(QDate date)
 {
     if (m_originDate != date) {
         m_originDate = date;

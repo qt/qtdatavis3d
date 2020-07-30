@@ -36,11 +36,11 @@ public:
     QString selectionFormat() const;
 
 public Q_SLOTS:
-    void setOriginDate(const QDate &date);
+    void setOriginDate(QDate date);
     void setSelectionFormat(const QString &format);
 
 Q_SIGNALS:
-    void originDateChanged(const QDate &date);
+    void originDateChanged(QDate date);
     void selectionFormatChanged(const QString &format);
 
 private:
