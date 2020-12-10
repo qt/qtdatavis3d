@@ -108,18 +108,18 @@ void BarItemModelHandler::resolveModel()
 
     // Value and rotation patterns can be reused on single item changes,
     // so store them to member variables.
-    QRegExp rowPattern(m_proxy->rowRolePattern());
-    QRegExp colPattern(m_proxy->columnRolePattern());
+    QRegularExpression rowPattern(m_proxy->rowRolePattern());
+    QRegularExpression colPattern(m_proxy->columnRolePattern());
     m_valuePattern = m_proxy->valueRolePattern();
     m_rotationPattern = m_proxy->rotationRolePattern();
     QString rowReplace = m_proxy->rowRoleReplace();
     QString colReplace = m_proxy->columnRoleReplace();
     m_valueReplace = m_proxy->valueRoleReplace();
     m_rotationReplace = m_proxy->rotationRoleReplace();
-    bool haveRowPattern = !rowPattern.isEmpty() && rowPattern.isValid();
-    bool haveColPattern = !colPattern.isEmpty() && colPattern.isValid();
-    m_haveValuePattern = !m_valuePattern.isEmpty() && m_valuePattern.isValid();
-    m_haveRotationPattern = !m_rotationPattern.isEmpty() && m_rotationPattern.isValid();
+    bool haveRowPattern = !rowPattern.namedCaptureGroups().isEmpty() && rowPattern.isValid();
+    bool haveColPattern = !colPattern.namedCaptureGroups().isEmpty() && colPattern.isValid();
+    m_haveValuePattern = !m_valuePattern.namedCaptureGroups().isEmpty() && m_valuePattern.isValid();
+    m_haveRotationPattern = !m_rotationPattern.namedCaptureGroups().isEmpty() && m_rotationPattern.isValid();
 
     QStringList rowLabels;
     QStringList columnLabels;

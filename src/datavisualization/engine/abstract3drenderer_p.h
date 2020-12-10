@@ -42,7 +42,7 @@
 
 #include <QtGui/QOpenGLFunctions>
 #if !defined(QT_OPENGL_ES_2)
-#  include <QtGui/QOpenGLFunctions_2_1>
+#  include <QtOpenGL/QOpenGLFunctions_2_1>
 #endif
 #include "datavisualizationglobal_p.h"
 #include "abstract3dcontroller_p.h"
@@ -334,7 +334,7 @@ protected:
 
     QLocale m_locale;
 #if !defined(QT_OPENGL_ES_2)
-    QOpenGLFunctions_2_1 *m_funcs_2_1;  // Not owned
+    QOpenGLFunctions_2_1 *m_funcs_2_1;
 #endif
     QPointer<QOpenGLContext> m_context; // Not owned
     bool m_isOpenGLES;

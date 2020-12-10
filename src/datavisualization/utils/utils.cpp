@@ -33,6 +33,7 @@
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOffscreenSurface>
 #include <QtCore/QCoreApplication>
+#include <QtCore/QRegularExpression>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -217,24 +218,28 @@ QImage Utils::getGradientImage(QLinearGradient &gradient)
 Utils::ParamType Utils::preParseFormat(const QString &format, QString &preStr, QString &postStr,
                                        int &precision, char &formatSpec)
 {
-    static QRegExp formatMatcher(QStringLiteral("^([^%]*)%([\\-\\+#\\s\\d\\.lhjztL]*)([dicuoxfegXFEG])(.*)$"));
-    static QRegExp precisionMatcher(QStringLiteral("\\.(\\d+)"));
+    static QRegularExpression formatMatcher(QStringLiteral("^([^%]*)%([\\-\\+#\\s\\d\\.lhjztL]*)([dicuoxfegXFEG])(.*)$"));
+    static QRegularExpression precisionMatcher(QStringLiteral("\\.(\\d+)"));
 
     Utils::ParamType retVal;
 
-    if (formatMatcher.indexIn(format, 0) != -1) {
-        preStr = formatMatcher.cap(1);
+    QRegularExpressionMatch formatMatch = formatMatcher.match(format, 0);
+
+    if (formatMatch.hasMatch()) {
+        preStr = formatMatch.captured(1);
         // Six and 'g' are defaults in Qt API
         precision = 6;
-        if (!formatMatcher.cap(2).isEmpty()) {
-            if (precisionMatcher.indexIn(formatMatcher.cap(2), 0) != -1)
-                precision = precisionMatcher.cap(1).toInt();
+        if (!formatMatch.captured(2).isEmpty()) {
+            QRegularExpressionMatch precisionMatch = precisionMatcher.match(formatMatch.captured(2),
+                                                                            0);
+            if (precisionMatch.hasMatch())
+                precision = precisionMatch.captured(1).toInt();
         }
-        if (formatMatcher.cap(3).isEmpty())
+        if (formatMatch.captured(3).isEmpty())
             formatSpec = 'g';
         else
-            formatSpec = formatMatcher.cap(3).at(0).toLatin1();
-        postStr = formatMatcher.cap(4);
+            formatSpec = formatMatch.captured(3).at(0).toLatin1();
+        postStr = formatMatch.captured(4);
         retVal = mapFormatCharToParamType(formatSpec);
     } else {
         retVal = ParamTypeUnknown;

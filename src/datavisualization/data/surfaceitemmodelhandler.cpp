@@ -123,8 +123,8 @@ void SurfaceItemModelHandler::resolveModel()
     }
 
     // Position patterns can be reused on single item changes, so store them to member variables.
-    QRegExp rowPattern(m_proxy->rowRolePattern());
-    QRegExp colPattern(m_proxy->columnRolePattern());
+    QRegularExpression rowPattern(m_proxy->rowRolePattern());
+    QRegularExpression colPattern(m_proxy->columnRolePattern());
     m_xPosPattern = m_proxy->xPosRolePattern();
     m_yPosPattern = m_proxy->yPosRolePattern();
     m_zPosPattern = m_proxy->zPosRolePattern();
@@ -133,11 +133,11 @@ void SurfaceItemModelHandler::resolveModel()
     m_xPosReplace = m_proxy->xPosRoleReplace();
     m_yPosReplace = m_proxy->yPosRoleReplace();
     m_zPosReplace = m_proxy->zPosRoleReplace();
-    bool haveRowPattern = !rowPattern.isEmpty() && rowPattern.isValid();
-    bool haveColPattern = !colPattern.isEmpty() && colPattern.isValid();
-    m_haveXPosPattern = !m_xPosPattern.isEmpty() && m_xPosPattern.isValid();
-    m_haveYPosPattern = !m_yPosPattern.isEmpty() && m_yPosPattern.isValid();
-    m_haveZPosPattern = !m_zPosPattern.isEmpty() && m_zPosPattern.isValid();
+    bool haveRowPattern = !rowPattern.namedCaptureGroups().isEmpty() && rowPattern.isValid();
+    bool haveColPattern = !colPattern.namedCaptureGroups().isEmpty() && colPattern.isValid();
+    m_haveXPosPattern = !m_xPosPattern.namedCaptureGroups().isEmpty() && m_xPosPattern.isValid();
+    m_haveYPosPattern = !m_yPosPattern.namedCaptureGroups().isEmpty() && m_yPosPattern.isValid();
+    m_haveZPosPattern = !m_zPosPattern.namedCaptureGroups().isEmpty() && m_zPosPattern.isValid();
 
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
 

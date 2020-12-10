@@ -132,7 +132,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
         // Discard warnings about deprecated functions
         QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
 
-        m_funcs_2_1 = QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_2_1>();
+        m_funcs_2_1 = new QOpenGLFunctions_2_1;
         if (m_funcs_2_1)
             m_funcs_2_1->initializeOpenGLFunctions();
 
@@ -192,6 +192,8 @@ Abstract3DRenderer::~Abstract3DRenderer()
     m_axisCacheX.clearLabels();
     m_axisCacheY.clearLabels();
     m_axisCacheZ.clearLabels();
+
+    delete m_funcs_2_1;
 }
 
 void Abstract3DRenderer::contextCleanup()

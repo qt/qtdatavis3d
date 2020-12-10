@@ -64,9 +64,9 @@ protected:
     int m_xPosRole;
     int m_yPosRole;
     int m_zPosRole;
-    QRegExp m_xPosPattern;
-    QRegExp m_yPosPattern;
-    QRegExp m_zPosPattern;
+    QRegularExpression m_xPosPattern;
+    QRegularExpression m_yPosPattern;
+    QRegularExpression m_zPosPattern;
     QString m_xPosReplace;
     QString m_yPosReplace;
     QString m_zPosReplace;

@@ -33,7 +33,7 @@
 #include <QtDataVisualization/qsurfacedataproxy.h>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QStringList>
-#include <QtCore/QRegExp>
+#include <QtCore/QRegularExpression>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -54,11 +54,11 @@ class QT_DATAVISUALIZATION_EXPORT QItemModelSurfaceDataProxy : public QSurfaceDa
     Q_PROPERTY(bool useModelCategories READ useModelCategories WRITE setUseModelCategories NOTIFY useModelCategoriesChanged)
     Q_PROPERTY(bool autoRowCategories READ autoRowCategories WRITE setAutoRowCategories NOTIFY autoRowCategoriesChanged)
     Q_PROPERTY(bool autoColumnCategories READ autoColumnCategories WRITE setAutoColumnCategories NOTIFY autoColumnCategoriesChanged)
-    Q_PROPERTY(QRegExp rowRolePattern READ rowRolePattern WRITE setRowRolePattern NOTIFY rowRolePatternChanged REVISION 1)
-    Q_PROPERTY(QRegExp columnRolePattern READ columnRolePattern WRITE setColumnRolePattern NOTIFY columnRolePatternChanged REVISION 1)
-    Q_PROPERTY(QRegExp xPosRolePattern READ xPosRolePattern WRITE setXPosRolePattern NOTIFY xPosRolePatternChanged REVISION 1)
-    Q_PROPERTY(QRegExp yPosRolePattern READ yPosRolePattern WRITE setYPosRolePattern NOTIFY yPosRolePatternChanged REVISION 1)
-    Q_PROPERTY(QRegExp zPosRolePattern READ zPosRolePattern WRITE setZPosRolePattern NOTIFY zPosRolePatternChanged REVISION 1)
+    Q_PROPERTY(QRegularExpression rowRolePattern READ rowRolePattern WRITE setRowRolePattern NOTIFY rowRolePatternChanged REVISION 1)
+    Q_PROPERTY(QRegularExpression columnRolePattern READ columnRolePattern WRITE setColumnRolePattern NOTIFY columnRolePatternChanged REVISION 1)
+    Q_PROPERTY(QRegularExpression xPosRolePattern READ xPosRolePattern WRITE setXPosRolePattern NOTIFY xPosRolePatternChanged REVISION 1)
+    Q_PROPERTY(QRegularExpression yPosRolePattern READ yPosRolePattern WRITE setYPosRolePattern NOTIFY yPosRolePatternChanged REVISION 1)
+    Q_PROPERTY(QRegularExpression zPosRolePattern READ zPosRolePattern WRITE setZPosRolePattern NOTIFY zPosRolePatternChanged REVISION 1)
     Q_PROPERTY(QString rowRoleReplace READ rowRoleReplace WRITE setRowRoleReplace NOTIFY rowRoleReplaceChanged REVISION 1)
     Q_PROPERTY(QString columnRoleReplace READ columnRoleReplace WRITE setColumnRoleReplace NOTIFY columnRoleReplaceChanged REVISION 1)
     Q_PROPERTY(QString xPosRoleReplace READ xPosRoleReplace WRITE setXPosRoleReplace NOTIFY xPosRoleReplaceChanged REVISION 1)
@@ -132,16 +132,16 @@ public:
     Q_INVOKABLE int rowCategoryIndex(const QString& category);
     Q_INVOKABLE int columnCategoryIndex(const QString& category);
 
-    void setRowRolePattern(const QRegExp &pattern);
-    QRegExp rowRolePattern() const;
-    void setColumnRolePattern(const QRegExp &pattern);
-    QRegExp columnRolePattern() const;
-    void setXPosRolePattern(const QRegExp &pattern);
-    QRegExp xPosRolePattern() const;
-    void setYPosRolePattern(const QRegExp &pattern);
-    QRegExp yPosRolePattern() const;
-    void setZPosRolePattern(const QRegExp &pattern);
-    QRegExp zPosRolePattern() const;
+    void setRowRolePattern(const QRegularExpression &pattern);
+    QRegularExpression rowRolePattern() const;
+    void setColumnRolePattern(const QRegularExpression &pattern);
+    QRegularExpression columnRolePattern() const;
+    void setXPosRolePattern(const QRegularExpression &pattern);
+    QRegularExpression xPosRolePattern() const;
+    void setYPosRolePattern(const QRegularExpression &pattern);
+    QRegularExpression yPosRolePattern() const;
+    void setZPosRolePattern(const QRegularExpression &pattern);
+    QRegularExpression zPosRolePattern() const;
 
     void setRowRoleReplace(const QString &replace);
     QString rowRoleReplace() const;
@@ -169,11 +169,11 @@ Q_SIGNALS:
     void useModelCategoriesChanged(bool enable);
     void autoRowCategoriesChanged(bool enable);
     void autoColumnCategoriesChanged(bool enable);
-    Q_REVISION(1) void rowRolePatternChanged(const QRegExp &pattern);
-    Q_REVISION(1) void columnRolePatternChanged(const QRegExp &pattern);
-    Q_REVISION(1) void xPosRolePatternChanged(const QRegExp &pattern);
-    Q_REVISION(1) void yPosRolePatternChanged(const QRegExp &pattern);
-    Q_REVISION(1) void zPosRolePatternChanged(const QRegExp &pattern);
+    Q_REVISION(1) void rowRolePatternChanged(const QRegularExpression &pattern);
+    Q_REVISION(1) void columnRolePatternChanged(const QRegularExpression &pattern);
+    Q_REVISION(1) void xPosRolePatternChanged(const QRegularExpression &pattern);
+    Q_REVISION(1) void yPosRolePatternChanged(const QRegularExpression &pattern);
+    Q_REVISION(1) void zPosRolePatternChanged(const QRegularExpression &pattern);
     Q_REVISION(1) void rowRoleReplaceChanged(const QString &replace);
     Q_REVISION(1) void columnRoleReplaceChanged(const QString &replace);
     Q_REVISION(1) void xPosRoleReplaceChanged(const QString &replace);

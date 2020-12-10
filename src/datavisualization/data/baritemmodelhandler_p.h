@@ -64,8 +64,8 @@ protected:
     int m_columnCount;
     int m_valueRole;
     int m_rotationRole;
-    QRegExp m_valuePattern;
-    QRegExp m_rotationPattern;
+    QRegularExpression m_valuePattern;
+    QRegularExpression m_rotationPattern;
     QString m_valueReplace;
     QString m_rotationReplace;
     bool m_haveValuePattern;

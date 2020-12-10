@@ -76,7 +76,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * If the fields of the model do not contain the data in the exact format you need, you can specify
  * a search pattern regular expression and a replace rule for each role to get the value in a
  * format you need. For more information how the replace using regular expressions works, see
- * QString::replace(const QRegExp &rx, const QString &after) function documentation. Note that
+ * QString::replace(const QRegularExpression &rx, const QString &after) function documentation. Note that
  * using regular expressions has an impact on the performance, so it's more efficient to utilize
  * item models where doing search and replace is not necessary to get the desired values.
  *
@@ -215,7 +215,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string ItemModelBarDataProxy::rowRoleReplace
  * This property defines the replace content to be used in conjunction with rowRolePattern.
  * Defaults to empty string. For more information on how the search and replace using regular
- * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * expressions works, see QString::replace(const QRegularExpression &rx, const QString &after)
  * function documentation.
  *
  * \sa rowRole, rowRolePattern
@@ -225,7 +225,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string ItemModelBarDataProxy::columnRoleReplace
  * This property defines the replace content to be used in conjunction with columnRolePattern.
  * Defaults to empty string. For more information on how the search and replace using regular
- * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * expressions works, see QString::replace(const QRegularExpression &rx, const QString &after)
  * function documentation.
  *
  * \sa columnRole, columnRolePattern
@@ -235,7 +235,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string ItemModelBarDataProxy::valueRoleReplace
  * This property defines the replace content to be used in conjunction with valueRolePattern.
  * Defaults to empty string. For more information on how the search and replace using regular
- * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * expressions works, see QString::replace(const QRegularExpression &rx, const QString &after)
  * function documentation.
  *
  * \sa valueRole, valueRolePattern
@@ -245,7 +245,7 @@ QT_BEGIN_NAMESPACE_DATAVISUALIZATION
  * \qmlproperty string ItemModelBarDataProxy::rotationRoleReplace
  * This property defines the replace content to be used in conjunction with rotationRolePattern.
  * Defaults to empty string. For more information on how the search and replace using regular
- * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * expressions works, see QString::replace(const QRegularExpression &rx, const QString &after)
  * function documentation.
  *
  * \sa rotationRole, rotationRolePattern
@@ -669,7 +669,7 @@ int QItemModelBarDataProxy::columnCategoryIndex(const QString &category)
  *
  * \sa rowRole, rowRoleReplace
  */
-void QItemModelBarDataProxy::setRowRolePattern(const QRegExp &pattern)
+void QItemModelBarDataProxy::setRowRolePattern(const QRegularExpression &pattern)
 {
     if (dptr()->m_rowRolePattern != pattern) {
         dptr()->m_rowRolePattern = pattern;
@@ -677,7 +677,7 @@ void QItemModelBarDataProxy::setRowRolePattern(const QRegExp &pattern)
     }
 }
 
-QRegExp QItemModelBarDataProxy::rowRolePattern() const
+QRegularExpression QItemModelBarDataProxy::rowRolePattern() const
 {
     return dptrc()->m_rowRolePattern;
 }
@@ -695,7 +695,7 @@ QRegExp QItemModelBarDataProxy::rowRolePattern() const
  *
  * \sa columnRole, columnRoleReplace
  */
-void QItemModelBarDataProxy::setColumnRolePattern(const QRegExp &pattern)
+void QItemModelBarDataProxy::setColumnRolePattern(const QRegularExpression &pattern)
 {
     if (dptr()->m_columnRolePattern != pattern) {
         dptr()->m_columnRolePattern = pattern;
@@ -703,7 +703,7 @@ void QItemModelBarDataProxy::setColumnRolePattern(const QRegExp &pattern)
     }
 }
 
-QRegExp QItemModelBarDataProxy::columnRolePattern() const
+QRegularExpression QItemModelBarDataProxy::columnRolePattern() const
 {
     return dptrc()->m_columnRolePattern;
 }
@@ -719,7 +719,7 @@ QRegExp QItemModelBarDataProxy::columnRolePattern() const
  *
  * \sa valueRole, valueRoleReplace
  */
-void QItemModelBarDataProxy::setValueRolePattern(const QRegExp &pattern)
+void QItemModelBarDataProxy::setValueRolePattern(const QRegularExpression &pattern)
 {
     if (dptr()->m_valueRolePattern != pattern) {
         dptr()->m_valueRolePattern = pattern;
@@ -727,7 +727,7 @@ void QItemModelBarDataProxy::setValueRolePattern(const QRegExp &pattern)
     }
 }
 
-QRegExp QItemModelBarDataProxy::valueRolePattern() const
+QRegularExpression QItemModelBarDataProxy::valueRolePattern() const
 {
     return dptrc()->m_valueRolePattern;
 }
@@ -743,7 +743,7 @@ QRegExp QItemModelBarDataProxy::valueRolePattern() const
  *
  * \sa rotationRole, rotationRoleReplace
  */
-void QItemModelBarDataProxy::setRotationRolePattern(const QRegExp &pattern)
+void QItemModelBarDataProxy::setRotationRolePattern(const QRegularExpression &pattern)
 {
     if (dptr()->m_rotationRolePattern != pattern) {
         dptr()->m_rotationRolePattern = pattern;
@@ -751,7 +751,7 @@ void QItemModelBarDataProxy::setRotationRolePattern(const QRegExp &pattern)
     }
 }
 
-QRegExp QItemModelBarDataProxy::rotationRolePattern() const
+QRegularExpression QItemModelBarDataProxy::rotationRolePattern() const
 {
     return dptrc()->m_rotationRolePattern;
 }
@@ -762,7 +762,7 @@ QRegExp QItemModelBarDataProxy::rotationRolePattern() const
  * \brief The replace content to be used in conjunction with rowRolePattern.
  *
  * Defaults to empty string. For more information on how the search and replace using regular
- * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * expressions works, see QString::replace(const QRegularExpression &rx, const QString &after)
  * function documentation.
  *
  * \sa rowRole, rowRolePattern
@@ -786,7 +786,7 @@ QString QItemModelBarDataProxy::rowRoleReplace() const
  * \brief The replace content to be used in conjunction with columnRolePattern.
  *
  * Defaults to empty string. For more information on how the search and replace using regular
- * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * expressions works, see QString::replace(const QRegularExpression &rx, const QString &after)
  * function documentation.
  *
  * \sa columnRole, columnRolePattern
@@ -810,7 +810,7 @@ QString QItemModelBarDataProxy::columnRoleReplace() const
  * \brief The replace content to be used in conjunction with valueRolePattern.
  *
  * Defaults to empty string. For more information on how the search and replace using regular
- * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * expressions works, see QString::replace(const QRegularExpression &rx, const QString &after)
  * function documentation.
  *
  * \sa valueRole, valueRolePattern
@@ -835,7 +835,7 @@ QString QItemModelBarDataProxy::valueRoleReplace() const
  * rotationRolePattern.
  *
  * Defaults to empty string. For more information on how the search and replace using regular
- * expressions works, see QString::replace(const QRegExp &rx, const QString &after)
+ * expressions works, see QString::replace(const QRegularExpression &rx, const QString &after)
  * function documentation.
  *
  * \sa rotationRole, rotationRolePattern

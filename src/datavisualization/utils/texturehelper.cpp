@@ -47,8 +47,7 @@ TextureHelper::TextureHelper()
         // Discard warnings about deprecated functions
         QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
 
-        m_openGlFunctions_2_1 =
-                QOpenGLContext::currentContext()->versionFunctions<QOpenGLFunctions_2_1>();
+        m_openGlFunctions_2_1 = new QOpenGLFunctions_2_1;
         if (m_openGlFunctions_2_1)
             m_openGlFunctions_2_1->initializeOpenGLFunctions();
 
@@ -63,6 +62,7 @@ TextureHelper::TextureHelper()
 
 TextureHelper::~TextureHelper()
 {
+    delete m_openGlFunctions_2_1;
 }
 
 GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering,
@@ -328,7 +328,7 @@ GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &f
         // Attach texture to depth attachment
         glFramebufferTexture2D(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_TEXTURE_2D, depthtextureid, 0);
 
-        m_openGlFunctions_2_1->glDrawBuffer(GL_NONE);
+        m_openGlFunctions_2_1->glDrawBuffers(0, GL_NONE);
         m_openGlFunctions_2_1->glReadBuffer(GL_NONE);
 
         // Verify that the frame buffer is complete

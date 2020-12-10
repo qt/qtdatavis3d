@@ -70,10 +70,10 @@ private:
     int m_yPosRole;
     int m_zPosRole;
     int m_rotationRole;
-    QRegExp m_xPosPattern;
-    QRegExp m_yPosPattern;
-    QRegExp m_zPosPattern;
-    QRegExp m_rotationPattern;
+    QRegularExpression m_xPosPattern;
+    QRegularExpression m_yPosPattern;
+    QRegularExpression m_zPosPattern;
+    QRegularExpression m_rotationPattern;
     QString m_xPosReplace;
     QString m_yPosReplace;
     QString m_zPosReplace;

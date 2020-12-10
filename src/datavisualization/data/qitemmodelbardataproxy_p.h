@@ -74,10 +74,10 @@ private:
     bool m_autoRowCategories;
     bool m_autoColumnCategories;
 
-    QRegExp m_rowRolePattern;
-    QRegExp m_columnRolePattern;
-    QRegExp m_valueRolePattern;
-    QRegExp m_rotationRolePattern;
+    QRegularExpression m_rowRolePattern;
+    QRegularExpression m_columnRolePattern;
+    QRegularExpression m_valueRolePattern;
+    QRegularExpression m_rotationRolePattern;
 
     QString m_rowRoleReplace;
     QString m_columnRoleReplace;

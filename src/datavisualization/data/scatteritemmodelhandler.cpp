@@ -211,10 +211,10 @@ void ScatterItemModelHandler::resolveModel()
     m_yPosReplace = m_proxy->yPosRoleReplace();
     m_zPosReplace = m_proxy->zPosRoleReplace();
     m_rotationReplace = m_proxy->rotationRoleReplace();
-    m_haveXPosPattern = !m_xPosPattern.isEmpty() && m_xPosPattern.isValid();
-    m_haveYPosPattern = !m_yPosPattern.isEmpty() && m_yPosPattern.isValid();
-    m_haveZPosPattern = !m_zPosPattern.isEmpty() && m_zPosPattern.isValid();
-    m_haveRotationPattern = !m_rotationPattern.isEmpty() && m_rotationPattern.isValid();
+    m_haveXPosPattern = !m_xPosPattern.namedCaptureGroups().isEmpty() && m_xPosPattern.isValid();
+    m_haveYPosPattern = !m_yPosPattern.namedCaptureGroups().isEmpty() && m_yPosPattern.isValid();
+    m_haveZPosPattern = !m_zPosPattern.namedCaptureGroups().isEmpty() && m_zPosPattern.isValid();
+    m_haveRotationPattern = !m_rotationPattern.namedCaptureGroups().isEmpty() && m_rotationPattern.isValid();
 
     QHash<int, QByteArray> roleHash = m_itemModel->roleNames();
     m_xPosRole = roleHash.key(m_proxy->xPosRole().toLatin1(), noRoleIndex);

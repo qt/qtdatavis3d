@@ -42,6 +42,7 @@
 
 #include "qdatavisualizationglobal.h"
 #include <QtGui/QOpenGLFunctions>
+#include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtGui/QVector3D>
 #include <QtGui/QQuaternion>
 #include <QtCore/QDebug>

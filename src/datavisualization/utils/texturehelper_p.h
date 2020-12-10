@@ -45,7 +45,7 @@
 #include <QtGui/QLinearGradient>
 #if !defined(QT_OPENGL_ES_2)
 // 3D Textures are not supported by ES set
-#  include <QtGui/QOpenGLFunctions_2_1>
+#  include <QtOpenGL/QOpenGLFunctions_2_1>
 #endif
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
@@ -78,7 +78,7 @@ class TextureHelper : protected QOpenGLFunctions
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
 
 #if !defined(QT_OPENGL_ES_2)
-    QOpenGLFunctions_2_1 *m_openGlFunctions_2_1; // Not owned
+    QOpenGLFunctions_2_1 *m_openGlFunctions_2_1;
 #endif
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;
