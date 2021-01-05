@@ -115,12 +115,13 @@ void DeclarativeSurface::appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *li
     reinterpret_cast<DeclarativeSurface *>(list->data)->addSeries(series);
 }
 
-int DeclarativeSurface::countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
+qsizetype DeclarativeSurface::countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
 {
     return reinterpret_cast<DeclarativeSurface *>(list->data)->m_surfaceController->surfaceSeriesList().size();
 }
 
-QSurface3DSeries *DeclarativeSurface::atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, int index)
+QSurface3DSeries *DeclarativeSurface::atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list,
+                                                   qsizetype index)
 {
     return reinterpret_cast<DeclarativeSurface *>(list->data)->m_surfaceController->surfaceSeriesList().at(index);
 }

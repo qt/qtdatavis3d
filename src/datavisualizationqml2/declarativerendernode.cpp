@@ -114,9 +114,7 @@ void DeclarativeRenderNode::updateFBO()
 
     delete m_texture;
     const uint id = m_fbo->texture();
-    m_texture =
-        m_window->createTextureFromNativeObject(QQuickWindow::NativeObjectTexture,
-                                                &id, 0 /* nativeLayout */, m_size);
+    m_texture = QNativeInterface::QSGOpenGLTexture::fromNative(id, m_window, m_size);
     m_material.setTexture(m_texture);
     m_materialO.setTexture(m_texture);
 

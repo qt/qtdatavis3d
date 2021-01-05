@@ -362,13 +362,13 @@ void DeclarativeTheme3D::appendBaseColorsFunc(QQmlListProperty<DeclarativeColor>
     reinterpret_cast<DeclarativeTheme3D *>(list->data)->addColor(color);
 }
 
-int DeclarativeTheme3D::countBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list)
+qsizetype DeclarativeTheme3D::countBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list)
 {
     return reinterpret_cast<DeclarativeTheme3D *>(list->data)->colorList().size();
 }
 
 DeclarativeColor *DeclarativeTheme3D::atBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list,
-                                                       int index)
+                                                       qsizetype index)
 {
     return reinterpret_cast<DeclarativeTheme3D *>(list->data)->colorList().at(index);
 }
@@ -393,13 +393,13 @@ void DeclarativeTheme3D::appendBaseGradientsFunc(QQmlListProperty<ColorGradient>
     reinterpret_cast<DeclarativeTheme3D *>(list->data)->addGradient(gradient);
 }
 
-int DeclarativeTheme3D::countBaseGradientsFunc(QQmlListProperty<ColorGradient> *list)
+qsizetype DeclarativeTheme3D::countBaseGradientsFunc(QQmlListProperty<ColorGradient> *list)
 {
     return reinterpret_cast<DeclarativeTheme3D *>(list->data)->gradientList().size();
 }
 
 ColorGradient *DeclarativeTheme3D::atBaseGradientsFunc(QQmlListProperty<ColorGradient> *list,
-                                                       int index)
+                                                       qsizetype index)
 {
     return reinterpret_cast<DeclarativeTheme3D *>(list->data)->gradientList().at(index);
 }

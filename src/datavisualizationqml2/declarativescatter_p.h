@@ -70,8 +70,8 @@ public:
 
     QQmlListProperty<QScatter3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, QScatter3DSeries *series);
-    static int countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list);
-    static QScatter3DSeries *atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, int index);
+    static qsizetype countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list);
+    static QScatter3DSeries *atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, qsizetype index);
     static void clearSeriesFunc(QQmlListProperty<QScatter3DSeries> *list);
     Q_INVOKABLE void addSeries(QScatter3DSeries *series);
     Q_INVOKABLE void removeSeries(QScatter3DSeries *series);

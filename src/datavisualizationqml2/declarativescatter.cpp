@@ -103,12 +103,13 @@ void DeclarativeScatter::appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *li
     reinterpret_cast<DeclarativeScatter *>(list->data)->addSeries(series);
 }
 
-int DeclarativeScatter::countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
+qsizetype DeclarativeScatter::countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
 {
     return reinterpret_cast<DeclarativeScatter *>(list->data)->m_scatterController->scatterSeriesList().size();
 }
 
-QScatter3DSeries *DeclarativeScatter::atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list, int index)
+QScatter3DSeries *DeclarativeScatter::atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list,
+                                                   qsizetype index)
 {
     return reinterpret_cast<DeclarativeScatter *>(list->data)->m_scatterController->scatterSeriesList().at(index);
 }

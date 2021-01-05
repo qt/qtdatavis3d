@@ -70,15 +70,17 @@ public:
     QQmlListProperty<DeclarativeColor> baseColors();
     static void appendBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list,
                                      DeclarativeColor *color);
-    static int countBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list);
-    static DeclarativeColor *atBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list, int index);
+    static qsizetype countBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list);
+    static DeclarativeColor *atBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list,
+                                              qsizetype index);
     static void clearBaseColorsFunc(QQmlListProperty<DeclarativeColor> *list);
 
     QQmlListProperty<ColorGradient> baseGradients();
     static void appendBaseGradientsFunc(QQmlListProperty<ColorGradient> *list,
                                         ColorGradient *gradient);
-    static int countBaseGradientsFunc(QQmlListProperty<ColorGradient> *list);
-    static ColorGradient *atBaseGradientsFunc(QQmlListProperty<ColorGradient> *list, int index);
+    static qsizetype countBaseGradientsFunc(QQmlListProperty<ColorGradient> *list);
+    static ColorGradient *atBaseGradientsFunc(QQmlListProperty<ColorGradient> *list,
+                                              qsizetype index);
     static void clearBaseGradientsFunc(QQmlListProperty<ColorGradient> *list);
 
     void setSingleHighlightGradient(ColorGradient *gradient);

@@ -272,13 +272,13 @@ void AbstractDeclarative::appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *
     decl->addCustomItem(item);
 }
 
-int AbstractDeclarative::countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
+qsizetype AbstractDeclarative::countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
 {
     return reinterpret_cast<AbstractDeclarative *>(list->data)->m_controller->m_customItems.size();
 }
 
 QCustom3DItem *AbstractDeclarative::atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
-                                                     int index)
+                                                     qsizetype index)
 {
     return reinterpret_cast<AbstractDeclarative *>(list->data)->m_controller->m_customItems.at(index);
 }
@@ -491,9 +491,9 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
 #endif
 }
 
-void AbstractDeclarative::geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry)
+void AbstractDeclarative::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
-    QQuickItem::geometryChanged(newGeometry, oldGeometry);
+    QQuickItem::geometryChange(newGeometry, oldGeometry);
 
     m_cachedGeometry = newGeometry;
 
@@ -679,8 +679,6 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
 
     if (oldWindow && !windowList.contains(oldWindow)
             && windowClearList.contains(oldWindow)) {
-        // Return window clear value
-        oldWindow->setClearBeforeRendering(windowClearList.value(oldWindow));
         windowClearList.remove(oldWindow);
     }
 
@@ -692,10 +690,6 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
     if ((m_renderMode == RenderDirectToBackground
          || m_renderMode == RenderDirectToBackground_NoClear)
             && !windowClearList.contains(window)) {
-        // Save old clear value
-        windowClearList[window] = window->clearBeforeRendering();
-        // Disable clearing of the window as we render underneath
-        window->setClearBeforeRendering(false);
     }
 }
 

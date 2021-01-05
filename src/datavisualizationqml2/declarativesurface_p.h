@@ -71,8 +71,8 @@ public:
 
     QQmlListProperty<QSurface3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, QSurface3DSeries *series);
-    static int countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
-    static QSurface3DSeries *atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, int index);
+    static qsizetype countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
+    static QSurface3DSeries *atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list, qsizetype index);
     static void clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list);
     Q_INVOKABLE void addSeries(QSurface3DSeries *series);
     Q_INVOKABLE void removeSeries(QSurface3DSeries *series);

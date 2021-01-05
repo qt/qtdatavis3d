@@ -87,8 +87,8 @@ public:
 
     QQmlListProperty<QBar3DSeries> seriesList();
     static void appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBar3DSeries *series);
-    static int countSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
-    static QBar3DSeries *atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, int index);
+    static qsizetype countSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
+    static QBar3DSeries *atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, qsizetype index);
     static void clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list);
     Q_INVOKABLE void addSeries(QBar3DSeries *series);
     Q_INVOKABLE void removeSeries(QBar3DSeries *series);

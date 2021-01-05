@@ -170,12 +170,12 @@ void DeclarativeBars::appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBa
     reinterpret_cast<DeclarativeBars *>(list->data)->addSeries(series);
 }
 
-int DeclarativeBars::countSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
+qsizetype DeclarativeBars::countSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
 {
     return reinterpret_cast<DeclarativeBars *>(list->data)->m_barsController->barSeriesList().size();
 }
 
-QBar3DSeries *DeclarativeBars::atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, int index)
+QBar3DSeries *DeclarativeBars::atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, qsizetype index)
 {
     return reinterpret_cast<DeclarativeBars *>(list->data)->m_barsController->barSeriesList().at(index);
 }

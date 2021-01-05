@@ -177,11 +177,11 @@ public:
     QQmlListProperty<QCustom3DItem> customItemList();
     static void appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
                                      QCustom3DItem *item);
-    static int countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list);
-    static QCustom3DItem *atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list, int index);
+    static qsizetype countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list);
+    static QCustom3DItem *atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list, qsizetype index);
     static void clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list);
 
-    void geometryChanged(const QRectF &newGeometry, const QRectF &oldGeometry) override;
+    void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
     void setSharedController(Abstract3DController *controller);
     // Used to synch up data model from controller to renderer while main thread is locked
