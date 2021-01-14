@@ -27,10 +27,24 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
+import QtQuick
+import QtQml.Models
 
 Item {
     property alias model: dataModel
+
+    property var modelAsJsArray: {
+        var arr = []
+        for (var i = 0; i < dataModel.count; i++) {
+            var row = dataModel.get(i)
+            arr.push({
+                         timestamp: row.timestamp,
+                         expenses: row.expenses,
+                         income: row.income
+                     })
+        }
+        return arr
+    }
 
     //! [0]
     ListModel {

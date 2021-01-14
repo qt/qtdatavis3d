@@ -27,11 +27,12 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
-import QtDataVisualization 1.1
-import QtQuick.Window 2.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtDataVisualization
+import QtQuick.Window
+import Qt.labs.qmlmodels
 import "."
 
 Rectangle {
@@ -40,6 +41,7 @@ Rectangle {
     height: 1024
 
     property int buttonLayoutHeight: 180;
+    property int currentRow
     state: Screen.width < Screen.height ? "portrait" : "landscape"
 
     Data {
@@ -54,7 +56,7 @@ Rectangle {
     selectedSeries: barSeries
 
     function handleSelectionChange(series, position) {
-        if (position != series.invalidSelectionPosition) {
+        if (position !== series.invalidSelectionPosition) {
             selectedSeries = series
         }
 
@@ -66,18 +68,13 @@ Rectangle {
         else
             colRole = series.dataProxy.columnLabels[position.y];
         var checkTimestamp = rowRole + "-" + colRole
-        var currentRow = tableView.currentRow
+
         if (currentRow === -1 || checkTimestamp !== graphData.model.get(currentRow).timestamp) {
-            var totalRows = tableView.rowCount;
+            var totalRows = tableView.rows;
             for (var i = 0; i < totalRows; i++) {
                 var modelTimestamp = graphData.model.get(i).timestamp
                 if (modelTimestamp === checkTimestamp) {
-                    tableView.currentRow = i
-                    // Workaround to 5.2 row selection issue
-                    if (typeof tableView.selection != "undefined") {
-                        tableView.selection.clear()
-                        tableView.selection.select(i)
-                    }
+                    currentRow = i
                     break
                 }
             }
@@ -179,65 +176,97 @@ Rectangle {
         }
     }
 
-    TableView {
-        id: tableView
+
+
+    ColumnLayout {
+        id: tableViewLayout
+
+
         anchors.top: parent.top
         anchors.left: parent.left
-        TableViewColumn{ role: "timestamp" ; title: "Month" ; width: tableView.width / 2 }
-        TableViewColumn{ role: "expenses" ; title: "Expenses" ; width: tableView.width / 4 }
-        TableViewColumn{ role: "income" ; title: "Income" ; width: tableView.width / 4 }
-        itemDelegate: Item {
-            Text {
-                id: delegateText
-                anchors.verticalCenter: parent.verticalCenter
-                width: parent.width
-                anchors.leftMargin: 4
-                anchors.left: parent.left
-                anchors.right: parent.right
-                color: styleData.textColor
-                elide: styleData.elideMode
-                text: customText
-                horizontalAlignment: styleData.textAlignment
 
-                property string originalText: styleData.value
-                property string customText
+        HorizontalHeaderView {
+            id: header
+            property var columnNames: ["Month", "Expenses", "Income"]
 
-                onOriginalTextChanged: {
-                    if (styleData.column === 0) {
-                        if (delegateText.originalText !== "") {
-                            var pattern = /(\d\d\d\d)-(\d\d)/
-                            var matches = pattern.exec(delegateText.originalText)
-                            var colIndex = parseInt(matches[2], 10) - 1
-                            delegateText.customText = matches[1] + " - " + graphAxes.column.labels[colIndex]
+            syncView: tableView
+            Layout.fillWidth: true
+            delegate: Text {
+                padding: 3
+                text: header.columnNames[index]
+            }
+
+        }
+
+        TableView {
+            id: tableView
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+
+            reuseItems: false
+            clip: true
+
+            model: TableModel {
+                id: tableModel
+                TableModelColumn { display: "timestamp" }
+                TableModelColumn { display: "expenses" }
+                TableModelColumn { display: "income" }
+
+                rows: graphData.modelAsJsArray
+            }
+
+
+            delegate: Rectangle {
+                implicitHeight: 30
+                implicitWidth: tableView.width / 3
+                color: row===currentRow ? "#e0e0e0" : "#ffffff"
+                MouseArea {
+                    anchors.fill: parent
+                    onClicked: currentRow = row
+                }
+
+                Text {
+                    id: delegateText
+                    anchors.verticalCenter: parent.verticalCenter
+                    width: parent.width
+                    anchors.leftMargin: 4
+                    anchors.left: parent.left
+                    anchors.right: parent.right
+                    text: formattedText
+                    property string formattedText: {
+                        if (column === 0) {
+                            if (display !== "") {
+                                var pattern = /(\d\d\d\d)-(\d\d)/
+                                var matches = pattern.exec(display)
+                                var colIndex = parseInt(matches[2], 10) - 1
+                                return matches[1] + " - " + graphAxes.column.labels[colIndex]
+                            }
+                        } else {
+                            return display
                         }
-                    } else {
-                        delegateText.customText = originalText
                     }
+
                 }
             }
         }
+    }
 
-        model: graphData.model
-
-        //! [2]
-        onCurrentRowChanged: {
-            var timestamp = graphData.model.get(currentRow).timestamp
-            var pattern = /(\d\d\d\d)-(\d\d)/
-            var matches = pattern.exec(timestamp)
-            var rowIndex = modelProxy.rowCategoryIndex(matches[1])
-            var colIndex
-            if (barGraph.columnAxis === graphAxes.total)
-                colIndex = 0 // Just one column when showing yearly totals
-            else
-                colIndex = modelProxy.columnCategoryIndex(matches[2])
-            if (selectedSeries.visible)
-                mainview.selectedSeries.selectedBar = Qt.point(rowIndex, colIndex)
-            else if (barSeries.visible)
-                barSeries.selectedBar = Qt.point(rowIndex, colIndex)
-            else
-                secondarySeries.selectedBar = Qt.point(rowIndex, colIndex)
-        }
-        //! [2]
+    onCurrentRowChanged: {
+        var timestamp = graphData.model.get(currentRow).timestamp
+        var pattern = /(\d\d\d\d)-(\d\d)/
+        var matches = pattern.exec(timestamp)
+        var rowIndex = modelProxy.rowCategoryIndex(matches[1])
+        var colIndex
+        if (barGraph.columnAxis === graphAxes.total)
+            colIndex = 0 // Just one column when showing yearly totals
+        else
+            colIndex = modelProxy.columnCategoryIndex(matches[2])
+        if (selectedSeries.visible)
+            mainview.selectedSeries.selectedBar = Qt.point(rowIndex, colIndex)
+        else if (barSeries.visible)
+            barSeries.selectedBar = Qt.point(rowIndex, colIndex)
+        else
+            secondarySeries.selectedBar = Qt.point(rowIndex, colIndex)
     }
 
     ColumnLayout {
@@ -337,7 +366,7 @@ Rectangle {
                 height: mainview.height
             }
             PropertyChanges  {
-                target: tableView
+                target: tableViewLayout
                 height: mainview.height - buttonLayoutHeight
                 anchors.right: dataView.left
                 anchors.left: mainview.left
@@ -347,7 +376,7 @@ Rectangle {
                 target: controlLayout
                 width: mainview.width / 4
                 height: buttonLayoutHeight
-                anchors.top: tableView.bottom
+                anchors.top: tableViewLayout.bottom
                 anchors.bottom: mainview.bottom
                 anchors.left: mainview.left
                 anchors.right: dataView.left
@@ -361,7 +390,7 @@ Rectangle {
                 height: mainview.width
             }
             PropertyChanges  {
-                target: tableView
+                target: tableViewLayout
                 height: mainview.width
                 anchors.right: controlLayout.left
                 anchors.left: mainview.left
