@@ -2,6 +2,5 @@
     <qresource prefix="/">
         <file>qml/qmlmultigraph/Data.qml</file>
         <file>qml/qmlmultigraph/main.qml</file>
-        <file>qml/qmlmultigraph/NewButton.qml</file>
     </qresource>
 </RCC>

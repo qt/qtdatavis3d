@@ -27,10 +27,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.0
-import QtQuick.Controls 1.0
-import QtDataVisualization 1.2
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtDataVisualization
 import "."
 
 Item {
@@ -128,7 +128,7 @@ Item {
                 anchors.bottom: parent.bottom
                 spacing: 0
 
-                NewButton {
+                Button {
                     id: sliceButton
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -147,7 +147,7 @@ Item {
                         }
                     }
                 }
-                NewButton {
+                Button {
                     id: exitButton
                     Layout.fillHeight: true
                     Layout.fillWidth: true

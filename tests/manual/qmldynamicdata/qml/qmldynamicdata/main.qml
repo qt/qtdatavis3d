@@ -27,8 +27,9 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtDataVisualization 1.0
+import QtQuick
+import QtDataVisualization
+import QtQuick.Controls
 import "."
 
 Rectangle {
@@ -227,7 +228,7 @@ Rectangle {
         }
     }
 
-    NewButton {
+    Button {
         id: shadowToggle
         width: parent.width / 3 // We're adding 3 buttons and want to divide them equally
         text: "Hide Shadows"
@@ -244,7 +245,7 @@ Rectangle {
         }
     }
 
-    NewButton {
+    Button {
         id: cameraToggle
         width: parent.width / 3
         text: "Pause Camera"
@@ -261,7 +262,7 @@ Rectangle {
         }
     }
 
-    NewButton {
+    Button {
         id: exitButton
         width: parent.width / 3
         text: "Quit"

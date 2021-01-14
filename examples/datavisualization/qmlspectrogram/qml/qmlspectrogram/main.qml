@@ -27,10 +27,11 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.0
-import QtQuick.Window 2.1
-import QtDataVisualization 1.2
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtQuick.Window
+import QtDataVisualization
 import "."
 
 Window {
@@ -171,7 +172,7 @@ Window {
         opacity: 0.5
 
         //! [3]
-        NewButton {
+        Button {
             id: polarToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -188,7 +189,7 @@ Window {
         }
         //! [3]
 
-        NewButton {
+        Button {
             id: orthoToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -214,7 +215,7 @@ Window {
             }
         }
 
-        NewButton {
+        Button {
             id: flipGridToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -230,7 +231,7 @@ Window {
             }
         }
 
-        NewButton {
+        Button {
             id: labelOffsetToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
@@ -245,7 +246,7 @@ Window {
             }
         }
 
-        NewButton {
+        Button {
             id: surfaceGridToggle
             Layout.fillWidth: true
             Layout.fillHeight: true

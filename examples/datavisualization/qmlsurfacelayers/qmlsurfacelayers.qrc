@@ -1,7 +1,6 @@
 <RCC>
     <qresource prefix="/">
         <file>qml/qmlsurfacelayers/main.qml</file>
-        <file>qml/qmlsurfacelayers/NewButton.qml</file>
     </qresource>
     <qresource prefix="/heightmaps">
         <file>layer_1.png</file>

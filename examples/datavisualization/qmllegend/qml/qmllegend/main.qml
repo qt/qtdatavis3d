@@ -27,10 +27,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Controls 1.0
-import QtQuick.Layouts 1.0
-import QtDataVisualization 1.0
+import QtQuick
+import QtQuick.Controls
+import QtQuick.Layouts
+import QtDataVisualization
 import "."
 
 Rectangle {
@@ -203,7 +203,7 @@ Rectangle {
         anchors.left: parent.left
         spacing: 0
 
-        NewButton {
+        Button {
             id: themeToggle
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -216,7 +216,7 @@ Rectangle {
                 }
             }
         }
-        NewButton {
+        Button {
             id: repositionLegend
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -229,7 +229,7 @@ Rectangle {
                 }
             }
         }
-        NewButton {
+        Button {
             id: exitButton
             Layout.fillHeight: true
             Layout.fillWidth: true

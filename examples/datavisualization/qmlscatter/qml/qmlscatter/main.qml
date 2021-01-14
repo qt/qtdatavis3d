@@ -28,9 +28,10 @@
 ****************************************************************************/
 
 //! [0]
-import QtQuick 2.1
-import QtQuick.Layouts 1.0
-import QtDataVisualization 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtDataVisualization
 import "."
 //! [0]
 
@@ -148,7 +149,7 @@ Rectangle {
         anchors.left: parent.left
         spacing: 0
         //! [7]
-        NewButton {
+        Button {
             id: shadowToggle
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -166,7 +167,7 @@ Rectangle {
         }
         //! [7]
 
-        NewButton {
+        Button {
             id: smoothToggle
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -182,7 +183,7 @@ Rectangle {
             }
         }
 
-        NewButton {
+        Button {
             id: cameraToggle
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -197,7 +198,7 @@ Rectangle {
             }
         }
 
-        NewButton {
+        Button {
             id: themeToggle
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -216,7 +217,7 @@ Rectangle {
             }
         }
 
-        NewButton {
+        Button {
             id: backgroundToggle
             Layout.fillHeight: true
             Layout.fillWidth: true
@@ -232,7 +233,7 @@ Rectangle {
             }
         }
 
-        NewButton {
+        Button {
             id: exitButton
             Layout.fillHeight: true
             Layout.fillWidth: true

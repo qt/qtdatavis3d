@@ -27,10 +27,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.0
-import QtQuick.Controls 1.0
-import QtDataVisualization 1.1
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtDataVisualization
 import "."
 
 Item {
@@ -130,7 +130,6 @@ Item {
             anchors.fill: parent
             RowLayout {
                 id: sliderLayout
-                anchors.top: parent.top
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.minimumHeight: flatShadingToggle.height
@@ -157,11 +156,10 @@ Item {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                             Layout.minimumWidth: 80
-                            minimumValue: mainView.sampleCache * 2
-                            maximumValue: minimumValue * 10
+                            from: mainView.sampleCache * 2
+                            to: from * 10
                             stepSize: mainView.sampleCache
-                            updateValueWhileDragging: false
-                            Component.onCompleted: value = minimumValue * 2
+                            Component.onCompleted: value = from * 2
                         }
 
                         Rectangle {
@@ -203,10 +201,9 @@ Item {
                             Layout.fillWidth: true
                             Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
                             Layout.minimumWidth: 80
-                            minimumValue: 2
-                            maximumValue: 60
+                            from: 2
+                            to: 60
                             stepSize: 2
-                            updateValueWhileDragging: true
                             value: 30
                         }
 
@@ -272,10 +269,9 @@ Item {
                 Layout.fillHeight: true
                 Layout.fillWidth: true
                 Layout.minimumHeight: flatShadingToggle.height
-                anchors.bottom: parent.bottom
                 spacing: 0
 
-                NewButton {
+                Button {
                     id: flatShadingToggle
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -294,7 +290,7 @@ Item {
                     }
                 }
 
-                NewButton {
+                Button {
                     id: surfaceGridToggle
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -312,7 +308,7 @@ Item {
                     }
                 }
 
-                NewButton {
+                Button {
                     id: exitButton
                     Layout.fillHeight: true
                     Layout.fillWidth: true

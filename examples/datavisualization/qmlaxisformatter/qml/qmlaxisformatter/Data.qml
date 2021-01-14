@@ -27,7 +27,7 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
+import QtQuick
 
 Item {
     property alias model: dataModel

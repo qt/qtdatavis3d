@@ -27,9 +27,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.0
-import QtDataVisualization 1.1
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtDataVisualization
 import "."
 
 Rectangle {
@@ -106,7 +107,7 @@ Rectangle {
                 anchors.bottom: parent.bottom
                 columns: 2
 
-                NewButton {
+                Button {
                     Layout.minimumWidth: parent.width / 2
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -114,7 +115,7 @@ Rectangle {
                     onClicked: clearSelections() // call a helper function to keep button itself simpler
                 }
 
-                NewButton {
+                Button {
                     Layout.minimumWidth: parent.width / 2
                     Layout.fillHeight: true
                     Layout.fillWidth: true
@@ -122,14 +123,14 @@ Rectangle {
                     onClicked: Qt.quit(0);
                 }
 
-                NewButton {
+                Button {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
                     text: "Reset Cameras"
                     onClicked: resetCameras() // call a helper function to keep button itself simpler
                 }
 
-                NewButton {
+                Button {
                     id: mmbButton
                     Layout.fillHeight: true
                     Layout.fillWidth: true

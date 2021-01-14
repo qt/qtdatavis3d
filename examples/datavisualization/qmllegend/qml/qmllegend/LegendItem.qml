@@ -27,10 +27,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.0
-import QtQuick.Window 2.1
-import QtDataVisualization 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Window
+import QtDataVisualization
 
 Rectangle {
     //! [0]

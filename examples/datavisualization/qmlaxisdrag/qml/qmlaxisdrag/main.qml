@@ -27,8 +27,9 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtDataVisualization 1.1
+import QtQuick
+import QtDataVisualization
+import QtQuick.Controls
 import "."
 
 Item {
@@ -270,7 +271,7 @@ Item {
     }
     //! [7]
 
-    NewButton {
+    Button {
         id: rangeToggle
         width: parent.width / 3 // We're adding 3 buttons and want to divide them equally
         text: "Use Preset Range"
@@ -299,7 +300,7 @@ Item {
     }
 
     //! [8]
-    NewButton {
+    Button {
         id: orthoToggle
         width: parent.width / 3
         text: "Display Orthographic"
@@ -318,7 +319,7 @@ Item {
     }
     //! [8]
 
-    NewButton {
+    Button {
         id: exitButton
         width: parent.width / 3
         text: "Quit"

@@ -27,9 +27,10 @@
 **
 ****************************************************************************/
 
-import QtQuick 2.1
-import QtQuick.Layouts 1.0
-import QtDataVisualization 1.0
+import QtQuick
+import QtQuick.Layouts
+import QtQuick.Controls
+import QtDataVisualization
 import "."
 
 Rectangle {
@@ -197,7 +198,7 @@ Rectangle {
         anchors.left: parent.left
         spacing: 0
 
-        NewButton {
+        Button {
             id: shadowToggle
             Layout.fillHeight: true
             Layout.minimumWidth: parent.width / 3 // 3 buttons divided equally in the layout
@@ -215,7 +216,7 @@ Rectangle {
             }
         }
 
-        NewButton {
+        Button {
             id: cameraToggle
             Layout.fillHeight: true
             Layout.minimumWidth: parent.width / 3
@@ -232,7 +233,7 @@ Rectangle {
             }
         }
 
-        NewButton {
+        Button {
             id: exitButton
             Layout.fillHeight: true
             Layout.minimumWidth: parent.width / 3
