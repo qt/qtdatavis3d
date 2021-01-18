@@ -67,7 +67,7 @@ const int terrainTransparency(12);
 
 static bool isOpenGLES()
 {
-#if defined(QT_OPENGL_ES_2)
+#if QT_CONFIG(opengles2)
     return true;
 #elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
     return false;

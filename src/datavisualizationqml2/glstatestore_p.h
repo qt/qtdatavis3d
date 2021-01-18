@@ -63,7 +63,7 @@ public:
     GLint m_scissorBox[4];
     GLboolean m_isScissorTestEnabled;
 
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     GLint m_drawFramebuffer;
     GLint m_readFramebuffer;
     GLint m_renderbuffer;

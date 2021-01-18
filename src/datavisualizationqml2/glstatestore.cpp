@@ -87,7 +87,7 @@ void GLStateStore::storeGLState()
     printCurrentState(true);
 #endif
 
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &m_drawFramebuffer);
     glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &m_readFramebuffer);
     glGetIntegerv(GL_RENDERBUFFER_BINDING, &m_renderbuffer);
@@ -144,7 +144,7 @@ void GLStateStore::printCurrentState(bool in)
 
     if (file->isOpen()) {
         QDebug msg(file);
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
         GLint drawFramebuffer;
         GLint readFramebuffer;
         GLint renderbuffer;
@@ -183,7 +183,7 @@ void GLStateStore::printCurrentState(bool in)
         GLfloat polygonOffsetUnits;
 
         glGetBooleanv(GL_DEPTH_WRITEMASK, &isDepthWriteEnabled);
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
         glGetIntegerv(GL_DRAW_FRAMEBUFFER_BINDING, &drawFramebuffer);
         glGetIntegerv(GL_READ_FRAMEBUFFER_BINDING, &readFramebuffer);
         glGetIntegerv(GL_RENDERBUFFER_BINDING, &renderbuffer);
@@ -226,7 +226,7 @@ void GLStateStore::printCurrentState(bool in)
         color.setRgbF(clearColor[0], clearColor[1], clearColor[2]);
         color.setAlphaF(clearColor[3]);
 
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
         msg << "---" << endl;
         msg << "    GL_DRAW_FRAMEBUFFER_BINDING "<< drawFramebuffer << endl;
         msg << "    GL_READ_FRAMEBUFFER_BINDING "<< readFramebuffer << endl;
@@ -278,7 +278,7 @@ void GLStateStore::printCurrentState(bool in)
 
 void GLStateStore::restoreGLState()
 {
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     glBindFramebuffer(GL_READ_FRAMEBUFFER, m_readFramebuffer);
     glBindFramebuffer(GL_DRAW_FRAMEBUFFER, m_drawFramebuffer);
     glBindRenderbuffer(GL_RENDERBUFFER_BINDING, m_renderbuffer);
@@ -353,7 +353,7 @@ void GLStateStore::restoreGLState()
 
 void GLStateStore::initGLDefaultState()
 {
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     m_drawFramebuffer = 0;
     m_readFramebuffer = 0;
     m_renderbuffer = 0;

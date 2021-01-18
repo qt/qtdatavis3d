@@ -118,7 +118,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
       m_oldCameraTarget(QVector3D(2000.0f, 2000.0f, 2000.0f)), // Just random invalid target
       m_reflectionEnabled(false),
       m_reflectivity(0.5),
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
       m_funcs_2_1(0),
 #endif
       m_context(0),
@@ -127,7 +127,7 @@ Abstract3DRenderer::Abstract3DRenderer(Abstract3DController *controller)
 {
     initializeOpenGLFunctions();
     m_isOpenGLES = Utils::isOpenGLES();
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     if (!m_isOpenGLES) {
         // Discard warnings about deprecated functions
         QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
@@ -193,7 +193,9 @@ Abstract3DRenderer::~Abstract3DRenderer()
     m_axisCacheY.clearLabels();
     m_axisCacheZ.clearLabels();
 
+#if !QT_CONFIG(opengles2)
     delete m_funcs_2_1;
+#endif
 }
 
 void Abstract3DRenderer::contextCleanup()
@@ -212,7 +214,7 @@ void Abstract3DRenderer::initializeOpenGL()
     glEnable(GL_CULL_FACE);
     glCullFace(GL_BACK);
 
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     if (!m_isOpenGLES) {
         glHint(GL_PERSPECTIVE_CORRECTION_HINT, GL_NICEST);
         glHint(GL_LINE_SMOOTH_HINT, GL_NICEST);

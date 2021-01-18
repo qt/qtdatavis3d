@@ -34,6 +34,7 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtCore/QCoreApplication>
 #include <QtCore/QRegularExpression>
+#include <QLocale>
 
 QT_BEGIN_NAMESPACE_DATAVISUALIZATION
 
@@ -355,7 +356,7 @@ void Utils::resolveStatics()
         ctx->makeCurrent(dummySurface);
     }
 
-#if defined(QT_OPENGL_ES_2)
+#if QT_CONFIG(opengles2)
     isES = true;
 #elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
     isES = false;

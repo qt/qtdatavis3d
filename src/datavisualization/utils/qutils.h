@@ -39,7 +39,7 @@
 namespace QtDataVisualization {
 
 #ifndef Q_QDOC
-static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true) Q_DECL_UNUSED;
+static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true);
 #endif
 static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
 {
@@ -65,7 +65,7 @@ static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
         ctx->makeCurrent(dummySurface);
     }
 
-#if defined(QT_OPENGL_ES_2)
+#if QT_CONFIG(opengles2)
     isES = true;
 #elif (QT_VERSION < QT_VERSION_CHECK(5, 3, 0))
     isES = false;

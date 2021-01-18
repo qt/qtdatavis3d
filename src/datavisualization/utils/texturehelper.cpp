@@ -42,7 +42,7 @@ extern void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, 
 TextureHelper::TextureHelper()
 {
     initializeOpenGLFunctions();
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     if (!Utils::isOpenGLES()) {
         // Discard warnings about deprecated functions
         QtMessageHandler handler = qInstallMessageHandler(discardDebugMsgs);
@@ -62,7 +62,9 @@ TextureHelper::TextureHelper()
 
 TextureHelper::~TextureHelper()
 {
+#if !QT_CONFIG(opengles2)
     delete m_openGlFunctions_2_1;
+#endif
 }
 
 GLuint TextureHelper::create2DTexture(const QImage &image, bool useTrilinearFiltering,
@@ -115,7 +117,7 @@ GLuint TextureHelper::create3DTexture(const QList<uchar> *data, int width, int h
         return 0;
 
     GLuint textureId = 0;
-#if defined(QT_OPENGL_ES_2)
+#if QT_CONFIG(opengles2)
     Q_UNUSED(dataFormat);
     Q_UNUSED(data);
 #else
@@ -290,7 +292,7 @@ GLuint TextureHelper::createGradientTexture(const QLinearGradient &gradient)
 GLuint TextureHelper::createDepthTexture(const QSize &size, GLuint textureSize)
 {
     GLuint depthtextureid = 0;
-#if defined(QT_OPENGL_ES_2)
+#if QT_CONFIG(opengles2)
     Q_UNUSED(size);
     Q_UNUSED(textureSize);
 #else
@@ -316,7 +318,7 @@ GLuint TextureHelper::createDepthTextureFrameBuffer(const QSize &size, GLuint &f
                                                     GLuint textureSize)
 {
     GLuint depthtextureid = createDepthTexture(size, textureSize);
-#if defined(QT_OPENGL_ES_2)
+#if QT_CONFIG(opengles2)
     Q_UNUSED(frameBuffer);
 #else
     if (!Utils::isOpenGLES()) {
@@ -402,7 +404,7 @@ void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcI
         const uint *p = (const uint*) srcImage.scanLine(srcImage.height() - 1);
         uint *q = (uint*) dstImage.scanLine(0);
 
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
         if (texture_format == GL_BGRA) {
 #else
         if (texture_format == GL_BGRA8_EXT) {
@@ -457,7 +459,7 @@ void TextureHelper::convertToGLFormatHelper(QImage &dstImage, const QImage &srcI
 
 QRgb TextureHelper::qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format)
 {
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     if (texture_format == GL_BGRA) {
 #else
     if (texture_format == GL_BGRA8_EXT) {

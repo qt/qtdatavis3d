@@ -554,7 +554,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
 
     ShaderHelper *pointSelectionShader;
     if (!m_isOpenGLES) {
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
         if (m_havePointSeries) {
             glEnable(GL_POINT_SMOOTH);
             glEnable(GL_PROGRAM_POINT_SIZE);
@@ -751,7 +751,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
                 float itemSize = cache->itemSize() / itemScaler;
                 if (itemSize == 0.0f)
                     itemSize = m_dotSizeScale;
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
                 if (drawingPoints && !m_isOpenGLES)
                     m_funcs_2_1->glPointSize(itemSize * activeCamera->zoomLevel());
 #endif
@@ -884,7 +884,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
             float itemSize = cache->itemSize() / itemScaler;
             if (itemSize == 0.0f)
                 itemSize = m_dotSizeScale;
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
             if (drawingPoints && !m_isOpenGLES)
                 m_funcs_2_1->glPointSize(itemSize * activeCamera->zoomLevel());
 #endif
@@ -1195,7 +1195,7 @@ void Scatter3DRenderer::drawScene(const GLuint defaultFboHandle)
         }
     }
 
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     if (m_havePointSeries) {
         glDisable(GL_POINT_SMOOTH);
         glDisable(GL_PROGRAM_POINT_SIZE);

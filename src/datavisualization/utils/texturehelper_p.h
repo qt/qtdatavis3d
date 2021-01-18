@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include <QtGui/QRgb>
 #include <QtGui/QLinearGradient>
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
 // 3D Textures are not supported by ES set
 #  include <QtOpenGL/QOpenGLFunctions_2_1>
 #endif
@@ -77,7 +77,7 @@ class TextureHelper : protected QOpenGLFunctions
     void convertToGLFormatHelper(QImage &dstImage, const QImage &srcImage, GLenum texture_format);
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
 
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     QOpenGLFunctions_2_1 *m_openGlFunctions_2_1;
 #endif
     friend class Bars3DRenderer;

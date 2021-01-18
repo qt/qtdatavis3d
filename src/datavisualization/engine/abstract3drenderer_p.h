@@ -41,7 +41,7 @@
 #define ABSTRACT3DRENDERER_P_H
 
 #include <QtGui/QOpenGLFunctions>
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
 #  include <QtOpenGL/QOpenGLFunctions_2_1>
 #endif
 #include "datavisualizationglobal_p.h"
@@ -333,7 +333,7 @@ protected:
     qreal m_reflectivity;
 
     QLocale m_locale;
-#if !defined(QT_OPENGL_ES_2)
+#if !QT_CONFIG(opengles2)
     QOpenGLFunctions_2_1 *m_funcs_2_1;
 #endif
     QPointer<QOpenGLContext> m_context; // Not owned
