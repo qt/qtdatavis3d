@@ -54,7 +54,9 @@ SOURCES += $$PWD/qabstract3dgraph.cpp \
            $$PWD/barseriesrendercache.cpp \
            $$PWD/scatterseriesrendercache.cpp
 
-RESOURCES += engine/engine.qrc
+RESOURCES += \
+    engine/meshes.qrc \
+    engine/shaders.qrc
 
 OTHER_FILES += $$PWD/meshes/* $$PWD/shaders/*
 

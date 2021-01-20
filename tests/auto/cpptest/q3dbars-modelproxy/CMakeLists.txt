@@ -1,0 +1,11 @@
+qt_add_test(q3dbars-modelproxy
+    SOURCES
+        tst_proxy.cpp
+    INCLUDE_DIRECTORIES
+        ../common
+    PUBLIC_LIBRARIES
+        Qt::Gui
+        Qt::GuiPrivate
+        Qt::Widgets
+        Qt::DataVisualization
+)

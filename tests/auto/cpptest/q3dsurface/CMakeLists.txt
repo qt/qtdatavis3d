@@ -1,0 +1,10 @@
+qt_add_test(q3dsurface
+    SOURCES
+        tst_surface.cpp
+    INCLUDE_DIRECTORIES
+        ../common
+    PUBLIC_LIBRARIES
+        Qt::Gui
+        Qt::GuiPrivate
+        Qt::DataVisualization
+)

@@ -113,7 +113,12 @@ void ShaderHelper::initialize()
         qFatal("Compiling Vertex shader failed");
     if (!m_program->addShaderFromSourceFile(QOpenGLShader::Fragment, m_fragmentShaderFile))
         qFatal("Compiling Fragment shader failed");
-    m_program->link();
+
+    if (!m_program->link()) {
+        qWarning() << "Unable to link shader program:" <<
+                      m_vertexShaderFile << m_fragmentShaderFile;
+        return;
+    }
 
     m_positionAttr = m_program->attributeLocation("vertexPosition_mdl");
     m_normalAttr = m_program->attributeLocation("vertexNormal_mdl");

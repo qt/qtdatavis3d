@@ -44,7 +44,8 @@ class StaticLibInitializer
 public:
     StaticLibInitializer()
     {
-        Q_INIT_RESOURCE(engine);
+        Q_INIT_RESOURCE(shaders);
+        Q_INIT_RESOURCE(meshes);
     }
 };
 StaticLibInitializer staticLibInitializer;

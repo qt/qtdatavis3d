@@ -30,7 +30,7 @@
 #ifndef VARIANTBARDATAPROXY_H
 #define VARIANTBARDATAPROXY_H
 
-#include "qbardataproxy.h"
+#include <QtDataVisualization/qbardataproxy.h>
 #include "variantdataset.h"
 #include "variantbardatamapping.h"
 #include <QtCore/QStringList>

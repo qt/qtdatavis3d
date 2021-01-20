@@ -1,0 +1,33 @@
+<RCC>
+    <qresource prefix="/defaultMeshes">
+        <file alias="cone">meshes/coneFlat.obj</file>
+        <file alias="coneSmooth">meshes/coneSmooth.obj</file>
+        <file alias="pyramid">meshes/pyramidFlat.obj</file>
+        <file alias="pyramidSmooth">meshes/pyramidSmooth.obj</file>
+        <file alias="bar">meshes/cubeFlat.obj</file>
+        <file alias="barSmooth">meshes/cubeSmooth.obj</file>
+        <file alias="cylinder">meshes/cylinderFlat.obj</file>
+        <file alias="cylinderSmooth">meshes/cylinderSmooth.obj</file>
+        <file alias="background">meshes/background.obj</file>
+        <file alias="plane">meshes/plane.obj</file>
+        <file alias="sphere">meshes/sphere.obj</file>
+        <file alias="sphereSmooth">meshes/sphereSmooth.obj</file>
+        <file alias="bevelbar">meshes/barFlat.obj</file>
+        <file alias="bevelbarSmooth">meshes/barSmooth.obj</file>
+        <file alias="coneFull">meshes/coneFilledFlat.obj</file>
+        <file alias="coneSmoothFull">meshes/coneFilledSmooth.obj</file>
+        <file alias="cylinderFull">meshes/cylinderFilledFlat.obj</file>
+        <file alias="cylinderSmoothFull">meshes/cylinderFilledSmooth.obj</file>
+        <file alias="pyramidFull">meshes/pyramidFilledFlat.obj</file>
+        <file alias="pyramidSmoothFull">meshes/pyramidFilledSmooth.obj</file>
+        <file alias="bevelbarFull">meshes/barFilledFlat.obj</file>
+        <file alias="bevelbarSmoothFull">meshes/barFilledSmooth.obj</file>
+        <file alias="barFull">meshes/cubeFilledFlat.obj</file>
+        <file alias="barSmoothFull">meshes/cubeFilledSmooth.obj</file>
+        <file alias="backgroundNoFloor">meshes/backgroundNoFloor.obj</file>
+        <file alias="minimal">meshes/minimalFlat.obj</file>
+        <file alias="minimalSmooth">meshes/minimalSmooth.obj</file>
+        <file alias="arrow">meshes/arrowFlat.obj</file>
+        <file alias="arrowSmooth">meshes/arrowSmooth.obj</file>
+    </qresource>
+</RCC>

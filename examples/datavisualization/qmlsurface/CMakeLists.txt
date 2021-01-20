@@ -1,0 +1,65 @@
+cmake_minimum_required(VERSION 3.14)
+project(qmlsurface LANGUAGES CXX)
+
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
+
+set(CMAKE_AUTOMOC ON)
+set(CMAKE_AUTORCC ON)
+set(CMAKE_AUTOUIC ON)
+
+if(NOT DEFINED INSTALL_EXAMPLESDIR)
+  set(INSTALL_EXAMPLESDIR "examples")
+endif()
+
+set(INSTALL_EXAMPLEDIR "${INSTALL_EXAMPLESDIR}")
+
+find_package(Qt6 COMPONENTS Core)
+find_package(Qt6 COMPONENTS Gui)
+find_package(Qt6 COMPONENTS Qml)
+find_package(Qt6 COMPONENTS Quick)
+
+qt_add_executable(qmlsurface
+    main.cpp
+)
+set_target_properties(qmlsurface PROPERTIES
+    WIN32_EXECUTABLE TRUE
+    MACOSX_BUNDLE TRUE
+)
+target_link_libraries(qmlsurface PUBLIC
+    Qt::Core
+    Qt::Gui
+    Qt::Qml
+    Qt::Quick
+    Qt::DataVisualization
+)
+
+set(qmlsurface_resource_files
+    "qml/qmlsurface/Data.qml"
+    "qml/qmlsurface/main.qml"
+)
+
+qt6_add_resources(qmlsurface "qmlsurface"
+    PREFIX
+        "/qml"
+    FILES
+        ${qmlsurface_resource_files}
+)
+set_source_files_properties("heightmap.png"
+    PROPERTIES QT_RESOURCE_ALIAS "image"
+)
+set(qmlsurface1_resource_files
+    "heightmap.png"
+)
+
+qt6_add_resources(qmlsurface "qmlsurface1"
+    PREFIX
+        "/heightmaps"
+    FILES
+        ${qmlsurface1_resource_files}
+)
+
+install(TARGETS qmlsurface
+    RUNTIME DESTINATION "${INSTALL_EXAMPLEDIR}"
+    BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
+    LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"
+)

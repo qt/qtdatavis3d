@@ -1,0 +1,10 @@
+qt_add_test(q3dcustom-label
+    SOURCES
+        tst_custom.cpp
+    INCLUDE_DIRECTORIES
+        ../common
+    PUBLIC_LIBRARIES
+        Qt::Gui
+        Qt::GuiPrivate
+        Qt::DataVisualization
+)
