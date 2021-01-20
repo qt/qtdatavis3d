@@ -39,6 +39,7 @@
 
 int main(int argc, char **argv)
 {
+    qputenv("QSG_RHI_BACKEND", "opengl");
     QApplication app(argc, argv);
     Q3DSurface *graph = new Q3DSurface();
     QWidget *container = QWidget::createWindowContainer(graph);

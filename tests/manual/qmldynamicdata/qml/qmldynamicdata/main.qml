@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 import QtQuick
-import QtDataVisualization
+import QtDataVisualization 1.2
 import QtQuick.Controls
 import "."
 

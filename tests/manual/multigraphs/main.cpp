@@ -43,6 +43,7 @@
 
 int main(int argc, char **argv)
 {
+    qputenv("QSG_RHI_BACKEND", "opengl");
     QApplication app(argc, argv);
 
     QWidget *widget = new QWidget();

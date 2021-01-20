@@ -30,7 +30,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtDataVisualization
+import QtDataVisualization 1.2
 import "."
 
 Item {

@@ -247,6 +247,7 @@ void GraphDataGenerator::fixTableSize()
 
 int main(int argc, char **argv)
 {
+    qputenv("QSG_RHI_BACKEND", "opengl");
     //! [0]
     QApplication app(argc, argv);
     Q3DBars *graph = new Q3DBars();

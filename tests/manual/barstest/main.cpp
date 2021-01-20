@@ -52,6 +52,7 @@
 
 int main(int argc, char **argv)
 {
+    qputenv("QSG_RHI_BACKEND", "opengl");
     QApplication app(argc, argv);
 
     // Test creating custom items before graph is created

@@ -46,6 +46,7 @@
 
 int main(int argc, char **argv)
 {
+    qputenv("QSG_RHI_BACKEND", "opengl");
     QApplication app(argc, argv);
     //QCoreApplication::setAttribute(Qt::AA_UseOpenGLES);
 

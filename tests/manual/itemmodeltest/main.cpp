@@ -249,6 +249,7 @@ void GraphDataGenerator::changeSelectedButtonClicked()
 
 int main(int argc, char **argv)
 {
+    qputenv("QSG_RHI_BACKEND", "opengl");
     QApplication app(argc, argv);
     Q3DBars *barGraph = new Q3DBars();
     Q3DSurface *surfaceGraph = new Q3DSurface();

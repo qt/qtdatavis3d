@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 import QtQuick
-import QtDataVisualization
+import QtDataVisualization 1.2
 
 Item {
     property alias column: columnAxis

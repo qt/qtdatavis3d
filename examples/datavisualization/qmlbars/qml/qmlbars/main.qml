@@ -30,7 +30,7 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtDataVisualization
+import QtDataVisualization 1.2
 import QtQuick.Window
 import Qt.labs.qmlmodels
 import "."
