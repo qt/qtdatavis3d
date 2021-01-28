@@ -6,6 +6,7 @@ qt_add_executable(surfacetest
     PUBLIC_LIBRARIES
         Qt::Gui
         Qt::Widgets
+        Qt::DataVisualization
 )
 
 set_source_files_properties("Heightmap.png"

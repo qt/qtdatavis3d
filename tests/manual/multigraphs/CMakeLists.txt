@@ -6,6 +6,7 @@ qt_add_executable(multigraphs
     PUBLIC_LIBRARIES
         Qt::Gui
         Qt::Widgets
+        Qt::DataVisualization
 )
 
 set(multigraphs_resource_files

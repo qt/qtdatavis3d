@@ -5,7 +5,7 @@ qt_add_executable(qmlvolume
         main.cpp
     PUBLIC_LIBRARIES
         Qt::Gui
-        datavisualization
+        Qt::DataVisualization
 )
 
 set(qmlvolume_resource_files

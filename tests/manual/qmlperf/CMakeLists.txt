@@ -5,6 +5,7 @@ qt_add_executable(qmlperf
         main.cpp
     PUBLIC_LIBRARIES
         Qt::Gui
+        Qt::DataVisualization
 )
 
 set(qmlperf_resource_files

@@ -4,6 +4,7 @@ qt_add_executable(qmlmultitest
         main.cpp
     PUBLIC_LIBRARIES
         Qt::Gui
+        Qt::DataVisualization
 )
 
 set(qmlmultitest_resource_files

@@ -7,6 +7,7 @@ qt_add_executable(barstest
     PUBLIC_LIBRARIES
         Qt::Gui
         Qt::Widgets
+        Qt::DataVisualization
 )
 
 set(barstest_resource_files
