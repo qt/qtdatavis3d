@@ -43,7 +43,7 @@
 #include "qcustom3dvolume.h"
 #include "qcustom3ditem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 struct QCustomVolumeDirtyBitField {
     bool textureDimensionsDirty : 1;
@@ -114,6 +114,6 @@ private:
     friend class QCustom3DVolume;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

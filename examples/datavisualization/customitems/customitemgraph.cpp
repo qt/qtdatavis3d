@@ -34,8 +34,6 @@
 #include <QtDataVisualization/QCustom3DLabel>
 #include <QtGui/QImage>
 
-using namespace QtDataVisualization;
-
 CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)
     : m_graph(surface),
       m_textField(label),

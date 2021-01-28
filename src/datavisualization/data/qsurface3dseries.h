@@ -33,7 +33,7 @@
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtDataVisualization/qsurfacedataproxy.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QSurface3DSeriesPrivate;
 
@@ -101,6 +101,6 @@ private:
     friend class Surface3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

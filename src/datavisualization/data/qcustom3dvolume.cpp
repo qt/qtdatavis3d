@@ -30,7 +30,7 @@
 #include "qcustom3dvolume_p.h"
 #include "utils_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QCustom3DVolume
@@ -1338,4 +1338,4 @@ QCustom3DVolume *QCustom3DVolumePrivate::qptr()
     return static_cast<QCustom3DVolume *>(q_ptr);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

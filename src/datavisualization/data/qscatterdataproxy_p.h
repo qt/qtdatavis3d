@@ -44,7 +44,7 @@
 #include "qabstractdataproxy_p.h"
 #include "qscatterdataitem.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DAxis;
 
@@ -75,6 +75,6 @@ private:
     friend class QScatterDataProxy;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

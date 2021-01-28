@@ -32,7 +32,7 @@
 
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DInputHandlerPrivate;
 
@@ -77,6 +77,6 @@ private:
     QScopedPointer<Q3DInputHandlerPrivate> d_ptr;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

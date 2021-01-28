@@ -30,7 +30,7 @@
 #include "q3dtheme_p.h"
 #include "thememanager_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DTheme
@@ -1203,4 +1203,4 @@ bool Q3DThemePrivate::sync(Q3DThemePrivate &other)
     return updateDrawer;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

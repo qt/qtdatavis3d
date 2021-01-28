@@ -32,8 +32,6 @@
 #include <QtQml/QQmlExtensionPlugin>
 #include <QtCore/QDebug>
 
-using namespace QtDataVisualization;
-
 Q_DECLARE_METATYPE(QValue3DAxisFormatter *)
 
 static const qreal oneDayMs = 60.0 * 60.0 * 24.0 * 1000.0;

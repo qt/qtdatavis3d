@@ -41,8 +41,6 @@
 #include <QtMultimedia/QAudioDeviceInfo>
 #include <QtMultimedia/QAudioInput>
 
-using namespace QtDataVisualization;
-
 AudioLevels::AudioLevels(Q3DBars *graph, QObject *parent)
     : QObject(parent),
       m_graph(graph),

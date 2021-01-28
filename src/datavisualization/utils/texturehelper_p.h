@@ -48,7 +48,7 @@
 #  include <QtOpenGL/QOpenGLFunctions_2_1>
 #endif
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class TextureHelper : protected QOpenGLFunctions
 {
@@ -86,6 +86,6 @@ class TextureHelper : protected QOpenGLFunctions
     friend class Abstract3DRenderer;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

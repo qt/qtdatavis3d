@@ -31,7 +31,7 @@
 #include <QtCore/QTimer>
 #include <QtCore/qmath.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 static const float maxTapAndHoldJitter = 20.0f;
 static const int maxPinchJitter = 10;
@@ -278,4 +278,4 @@ void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

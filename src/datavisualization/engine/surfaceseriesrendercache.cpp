@@ -31,7 +31,7 @@
 #include "surface3drenderer_p.h"
 #include "texturehelper_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 SurfaceSeriesRenderCache::SurfaceSeriesRenderCache(QAbstract3DSeries *series,
                                                    Surface3DRenderer *renderer)
@@ -95,4 +95,4 @@ void SurfaceSeriesRenderCache::cleanup(TextureHelper *texHelper)
     SeriesRenderCache::cleanup(texHelper);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

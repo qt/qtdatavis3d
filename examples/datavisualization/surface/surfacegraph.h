@@ -36,8 +36,6 @@
 #include <QtDataVisualization/QSurface3DSeries>
 #include <QtWidgets/QSlider>
 
-using namespace QtDataVisualization;
-
 class SurfaceGraph : public QObject
 {
     Q_OBJECT

@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dlight.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DScene;
 class Q3DLight;
@@ -61,7 +61,7 @@ public:
     bool m_automaticLight;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif
 

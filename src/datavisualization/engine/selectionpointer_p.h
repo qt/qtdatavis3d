@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ShaderHelper;
 class ObjectHelper;
@@ -95,6 +95,6 @@ private:
     QQuaternion m_rotation;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

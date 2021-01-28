@@ -37,7 +37,6 @@
 #include <QtDataVisualization/Q3DInputHandler>
 #include <qmath.h>
 #include <qrandom.h>
-using namespace QtDataVisualization;
 
 //#define RANDOM_SCATTER
 

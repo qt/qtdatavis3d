@@ -31,7 +31,7 @@
 #include "vertexindexer_p.h"
 #include "objecthelper_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 ObjectHelper::ObjectHelper(const QString &objectFile)
     : m_objectFile(objectFile)
@@ -177,4 +177,4 @@ void ObjectHelper::load()
     m_meshDataLoaded = true;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -44,7 +44,7 @@
 #include "glstatestore_p.h"
 #endif
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 static QList<const QQuickWindow *> clearList;
 static QHash<AbstractDeclarative *, QQuickWindow *> graphWindowList;
@@ -849,4 +849,4 @@ void AbstractDeclarative::destroyContext()
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

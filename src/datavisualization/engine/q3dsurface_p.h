@@ -43,7 +43,7 @@
 #include "surface3dcontroller_p.h"
 #include "qabstract3dgraph_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DSurface;
 
@@ -63,6 +63,6 @@ public:
     Surface3DController *m_shared;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

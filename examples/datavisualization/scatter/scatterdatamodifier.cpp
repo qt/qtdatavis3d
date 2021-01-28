@@ -38,8 +38,6 @@
 #include <QtCore/qrandom.h>
 #include <QtWidgets/QComboBox>
 
-using namespace QtDataVisualization;
-
 //#define RANDOM_SCATTER // Uncomment this to switch to random scatter
 
 const int numberOfItems = 3600;

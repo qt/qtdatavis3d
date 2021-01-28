@@ -45,7 +45,7 @@
 #include "qbar3dseries_p.h"
 #include "barrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class BarSeriesRenderCache : public SeriesRenderCache
 {
@@ -67,6 +67,6 @@ protected:
     int m_visualIndex; // order of the series is relevant
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

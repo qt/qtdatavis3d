@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qsurfacedataitem.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QSurfaceDataItemPrivate
 {
@@ -52,6 +52,6 @@ public:
     virtual ~QSurfaceDataItemPrivate();
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -29,7 +29,7 @@
 
 #include "colorgradient_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 ColorGradientStop::ColorGradientStop(QObject *parent)
     : QObject(parent)
@@ -85,4 +85,4 @@ void ColorGradient::doUpdate()
     emit updated();
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

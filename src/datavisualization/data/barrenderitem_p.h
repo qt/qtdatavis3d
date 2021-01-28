@@ -42,7 +42,7 @@
 
 #include "abstractrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class BarRenderItem : public AbstractRenderItem
 {
@@ -96,6 +96,6 @@ protected:
 typedef QList<BarRenderItem> BarRenderItemRow;
 typedef QList<BarRenderItemRow> BarRenderItemArray;
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

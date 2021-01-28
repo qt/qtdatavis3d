@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qabstract3dseries.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstractDataProxy;
 class Abstract3DController;
@@ -168,6 +168,6 @@ public:
     bool m_itemLabelVisible;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -45,7 +45,7 @@
 #include <qpa/qplatformnativeinterface.h>
 #endif
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstract3DGraph
@@ -186,7 +186,7 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
         // Make sure renderable type is correct
         surfaceFormat.setRenderableType(QSurfaceFormat::DefaultRenderableType);
     } else {
-        surfaceFormat = qDefaultSurfaceFormat();
+        surfaceFormat = QtDataVisualization::qDefaultSurfaceFormat();
     }
 
     d_ptr->m_context = new QOpenGLContext(this);
@@ -1198,4 +1198,4 @@ QImage QAbstract3DGraphPrivate::renderToImage(int msaaSamples, const QSize &imag
     return image;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

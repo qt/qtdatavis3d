@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/Q3DCamera>
 
-using namespace QtDataVisualization;
-
 class tst_camera: public QObject
 {
     Q_OBJECT

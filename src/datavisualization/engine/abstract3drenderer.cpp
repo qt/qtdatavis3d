@@ -42,7 +42,7 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtCore/QThread>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 // Defined in shaderhelper.cpp
 extern void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -1995,4 +1995,4 @@ void Abstract3DRenderer::updateCameraViewport()
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

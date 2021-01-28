@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "q3dscene.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DCamera;
 class Q3DLight;
@@ -133,6 +133,6 @@ public:
     QRect m_defaultLargeViewport;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

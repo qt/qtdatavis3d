@@ -32,7 +32,7 @@
 
 #include <QtCore/qmath.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DCamera
@@ -939,4 +939,4 @@ QVector3D Q3DCameraPrivate::calculatePositionRelativeToCamera(const QVector3D &r
                      zPos + relativePosition.z());
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

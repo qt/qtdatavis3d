@@ -47,7 +47,7 @@
 
 #include <QtQml/QQmlParserStatus>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class DeclarativeTheme3D : public Q3DTheme, public QQmlParserStatus
 {
@@ -134,6 +134,6 @@ private:
     bool m_dummyColors;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

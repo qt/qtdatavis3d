@@ -34,7 +34,7 @@
 #include <QtCore/QList>
 #include <QtGui/QVector2D>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 QString slashTag = QStringLiteral("/");
 
@@ -123,4 +123,4 @@ bool MeshLoader::loadOBJ(const QString &path, QList<QVector3D> &out_vertices,
     return true;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -33,8 +33,6 @@
 #include <QtDataVisualization/QValue3DAxis>
 #include <QtDataVisualization/Q3DTheme>
 
-using namespace QtDataVisualization;
-
 const float areaWidth = 8000.0f;
 const float areaHeight = 8000.0f;
 const float aspectRatio = 0.1389f;

@@ -30,7 +30,7 @@
 #include "qabstractdataproxy_p.h"
 #include "qabstract3dseries_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstractDataProxy
@@ -126,4 +126,4 @@ void QAbstractDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     m_series = series;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

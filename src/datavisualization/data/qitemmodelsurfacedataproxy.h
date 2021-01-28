@@ -35,7 +35,7 @@
 #include <QtCore/QStringList>
 #include <QtCore/QRegularExpression>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QItemModelSurfaceDataProxyPrivate;
 
@@ -191,6 +191,6 @@ private:
     friend class SurfaceItemModelHandler;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

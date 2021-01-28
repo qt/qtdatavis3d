@@ -34,8 +34,6 @@
 
 #include "topographicseries.h"
 
-using namespace QtDataVisualization;
-
 class HighlightSeries : public QSurface3DSeries
 {
     Q_OBJECT

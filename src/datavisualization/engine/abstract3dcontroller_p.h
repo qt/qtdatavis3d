@@ -54,7 +54,7 @@
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLFramebufferObject)
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Abstract3DRenderer;
 class QAbstract3DSeries;
@@ -435,6 +435,6 @@ private:
     friend class QAbstract3DGraphPrivate;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

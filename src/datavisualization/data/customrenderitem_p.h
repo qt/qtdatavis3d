@@ -46,7 +46,7 @@
 #include <QtGui/QImage>
 #include <QtGui/QColor>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QCustom3DItem;
 class Abstract3DRenderer;
@@ -198,6 +198,6 @@ private:
 };
 typedef QHash<QCustom3DItem *, CustomRenderItem *> CustomRenderItemArray;
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

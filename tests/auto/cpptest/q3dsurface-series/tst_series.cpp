@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/QSurface3DSeries>
 
-using namespace QtDataVisualization;
-
 class tst_series: public QObject
 {
     Q_OBJECT

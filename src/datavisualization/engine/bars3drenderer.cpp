@@ -40,7 +40,7 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 const bool sliceGridLabels = true;
 
@@ -2873,4 +2873,4 @@ void Bars3DRenderer::updateMargin(float margin)
     calculateSceneScalingFactors();
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

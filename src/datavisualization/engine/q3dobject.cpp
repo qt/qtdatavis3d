@@ -30,7 +30,7 @@
 #include "q3dobject_p.h"
 #include "q3dscene_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
    \class Q3DObject
@@ -155,4 +155,4 @@ Q3DObjectPrivate::~Q3DObjectPrivate()
 
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

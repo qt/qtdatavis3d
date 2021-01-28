@@ -45,7 +45,7 @@
 #include <QtCore/QPointer>
 #include <QtCore/QTimer>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class AbstractItemModelHandler : public QObject
 {
@@ -91,6 +91,6 @@ private:
     Q_DISABLE_COPY(AbstractItemModelHandler)
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -29,7 +29,7 @@
 
 #include "barseriesrendercache_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 BarSeriesRenderCache::BarSeriesRenderCache(QAbstract3DSeries *series,
                                            Abstract3DRenderer *renderer)
@@ -50,4 +50,4 @@ void BarSeriesRenderCache::cleanup(TextureHelper *texHelper)
     SeriesRenderCache::cleanup(texHelper);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -30,7 +30,7 @@
 #include "qsurface3dseries_p.h"
 #include "surface3dcontroller_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QSurface3DSeries
@@ -553,4 +553,4 @@ void QSurface3DSeriesPrivate::setTexture(const QImage &texture)
         static_cast<Surface3DController *>(m_controller)->updateSurfaceTexture(qptr());
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

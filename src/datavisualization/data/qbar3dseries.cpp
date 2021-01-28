@@ -31,7 +31,7 @@
 #include "bars3dcontroller_p.h"
 #include <QtCore/qmath.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QBar3DSeries
@@ -432,4 +432,4 @@ void QBar3DSeriesPrivate::connectSignals()
                      &QBar3DSeriesPrivate::handleMeshRotationChanged);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qabstract3dinputhandler.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DInputHandler;
 class Q3DScene;
@@ -77,6 +77,6 @@ private:
     friend class Abstract3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

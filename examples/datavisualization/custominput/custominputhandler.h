@@ -32,8 +32,6 @@
 
 #include <QtDataVisualization/QAbstract3DInputHandler>
 
-using namespace QtDataVisualization;
-
 class CustomInputHandler : public QAbstract3DInputHandler
 {
     Q_OBJECT

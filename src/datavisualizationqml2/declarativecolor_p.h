@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include <QtGui/QColor>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class DeclarativeColor : public QObject
 {
@@ -63,6 +63,6 @@ private:
     QColor m_color;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

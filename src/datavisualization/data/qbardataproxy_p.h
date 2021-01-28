@@ -43,7 +43,7 @@
 #include "qbardataproxy.h"
 #include "qabstractdataproxy_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QBarDataProxyPrivate : public QAbstractDataProxyPrivate
 {
@@ -82,6 +82,6 @@ private:
     friend class QBarDataProxy;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

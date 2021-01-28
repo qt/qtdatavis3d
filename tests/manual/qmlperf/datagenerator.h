@@ -33,8 +33,6 @@
 #include <QtDataVisualization/QScatter3DSeries>
 #include <QtCore/QFile>
 
-using namespace QtDataVisualization;
-
 class DataGenerator  : public QObject
 {
     Q_OBJECT

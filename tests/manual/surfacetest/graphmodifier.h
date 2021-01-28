@@ -40,8 +40,6 @@
 
 #define MULTI_SERIES
 
-using namespace QtDataVisualization;
-
 class GraphModifier : public QObject
 {
     Q_OBJECT

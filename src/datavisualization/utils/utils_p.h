@@ -44,7 +44,7 @@
 
 QT_FORWARD_DECLARE_CLASS(QLinearGradient)
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Utils
 {
@@ -87,6 +87,6 @@ private:
     static ParamType mapFormatCharToParamType(char formatSpec);
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

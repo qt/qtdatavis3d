@@ -33,7 +33,7 @@
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtGui/QVector3D>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QSurfaceDataItemPrivate;
 
@@ -65,6 +65,6 @@ private:
     QVector3D m_position;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

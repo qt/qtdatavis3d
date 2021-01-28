@@ -43,7 +43,7 @@
 #include "abstractitemmodelhandler_p.h"
 #include "qitemmodelscatterdataproxy_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ScatterItemModelHandler : public AbstractItemModelHandler
 {
@@ -84,6 +84,6 @@ private:
     bool m_haveRotationPattern;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

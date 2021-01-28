@@ -34,7 +34,7 @@
 #include "qsurface3dseries_p.h"
 #include <QtCore/QMutexLocker>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
     : Abstract3DController(rect, scene),
@@ -602,4 +602,4 @@ void Surface3DController::adjustAxisRanges()
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

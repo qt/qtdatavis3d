@@ -33,8 +33,6 @@
 
 #include "cpptestutil.h"
 
-using namespace QtDataVisualization;
-
 class tst_surface: public QObject
 {
     Q_OBJECT

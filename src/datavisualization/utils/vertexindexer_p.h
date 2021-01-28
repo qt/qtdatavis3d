@@ -45,7 +45,7 @@
 #include <QtCore/QList>
 #include <QtGui/QVector2D>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class VertexIndexer
 {
@@ -70,6 +70,6 @@ private:
                                            GLuint &result);
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

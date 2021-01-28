@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/QTouch3DInputHandler>
 
-using namespace QtDataVisualization;
-
 class tst_input: public QObject
 {
     Q_OBJECT

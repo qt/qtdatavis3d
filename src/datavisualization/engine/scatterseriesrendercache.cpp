@@ -31,7 +31,7 @@
 #include "scatterobjectbufferhelper_p.h"
 #include "scatterpointbufferhelper_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 ScatterSeriesRenderCache::ScatterSeriesRenderCache(QAbstract3DSeries *series,
                                                    Abstract3DRenderer *renderer)
@@ -60,4 +60,4 @@ void ScatterSeriesRenderCache::cleanup(TextureHelper *texHelper)
     SeriesRenderCache::cleanup(texHelper);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

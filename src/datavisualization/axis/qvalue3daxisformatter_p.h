@@ -45,7 +45,7 @@
 #include "utils_p.h"
 #include <QtCore/QLocale>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QValue3DAxis;
 
@@ -105,6 +105,6 @@ protected:
     friend class QValue3DAxisFormatter;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

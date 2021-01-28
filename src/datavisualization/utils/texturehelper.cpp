@@ -34,7 +34,7 @@
 #include <QtGui/QPainter>
 #include <QtCore/QTime>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 // Defined in shaderhelper.cpp
 extern void discardDebugMsgs(QtMsgType type, const QMessageLogContext &context, const QString &msg);
@@ -483,4 +483,4 @@ QRgb TextureHelper::qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

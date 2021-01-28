@@ -36,7 +36,7 @@
 #include <QtCore/QRegularExpression>
 #include <QLocale>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 #define NUM_IN_POWER(y, x) for (;y<x;y<<=1)
 #define MIN_POWER 2
@@ -389,4 +389,4 @@ void Utils::resolveStatics()
     staticsResolved = true;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

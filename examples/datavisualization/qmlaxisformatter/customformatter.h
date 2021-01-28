@@ -33,8 +33,6 @@
 #include <QtDataVisualization/QValue3DAxisFormatter>
 #include <QtCore/QDateTime>
 
-using namespace QtDataVisualization;
-
 //! [2]
 class CustomFormatter : public QValue3DAxisFormatter
 {

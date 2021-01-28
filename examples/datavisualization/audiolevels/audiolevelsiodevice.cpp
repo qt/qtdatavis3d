@@ -30,8 +30,6 @@
 #include "audiolevelsiodevice.h"
 #include <QtCore/QDebug>
 
-using namespace QtDataVisualization;
-
 //! [1]
 static const int resolution = 8;
 static const int rowSize = 800;

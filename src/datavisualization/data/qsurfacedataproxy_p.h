@@ -43,7 +43,7 @@
 #include "qsurfacedataproxy.h"
 #include "qabstractdataproxy_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DAxis;
 
@@ -80,6 +80,6 @@ private:
     friend class QSurfaceDataProxy;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

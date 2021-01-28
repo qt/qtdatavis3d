@@ -34,8 +34,6 @@
 #include <QtDataVisualization/QAbstract3DGraph>
 #include <QtDataVisualization/QValue3DAxis>
 
-using namespace QtDataVisualization;
-
 //! [0]
 class AxesInputHandler : public Q3DInputHandler
 //! [0]

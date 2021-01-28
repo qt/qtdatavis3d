@@ -30,7 +30,7 @@
 #include "scatterpointbufferhelper_p.h"
 #include <QtGui/QVector2D>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 const QVector3D hiddenPos(-1000.0f, -1000.0f, -1000.0f);
 
@@ -215,4 +215,4 @@ void ScatterPointBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache *
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

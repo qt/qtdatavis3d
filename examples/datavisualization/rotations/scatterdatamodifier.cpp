@@ -37,8 +37,6 @@
 #include <QtDataVisualization/QCustom3DItem>
 #include <QtCore/qmath.h>
 
-using namespace QtDataVisualization;
-
 static const float verticalRange = 8.0f;
 static const float horizontalRange = verticalRange;
 static const float ellipse_a = horizontalRange / 3.0f;

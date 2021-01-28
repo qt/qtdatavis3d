@@ -29,7 +29,7 @@
 
 #include "labelitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 LabelItem::LabelItem()
     : m_size(QSize(0, 0)),
@@ -71,4 +71,4 @@ void LabelItem::clear()
     m_size = QSize(0, 0);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

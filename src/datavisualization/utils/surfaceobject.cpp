@@ -32,7 +32,7 @@
 
 #include <QtGui/QVector2D>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 SurfaceObject::SurfaceObject(Surface3DRenderer *renderer)
     : m_axisCacheX(renderer->m_axisCacheX),
@@ -992,4 +992,4 @@ QVector3D SurfaceObject::normal(const QVector3D &a, const QVector3D &b, const QV
     return normal;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

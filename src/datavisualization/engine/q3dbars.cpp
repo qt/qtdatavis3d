@@ -29,7 +29,7 @@
 
 #include "q3dbars_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DBars
@@ -469,4 +469,4 @@ Q3DBars *Q3DBarsPrivate::qptr()
     return static_cast<Q3DBars *>(q_ptr);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

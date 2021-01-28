@@ -46,7 +46,7 @@
 #include "labelitem_p.h"
 #include "abstractrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ShaderHelper;
 class ObjectHelper;
@@ -115,6 +115,6 @@ private:
     GLfloat m_scaledFontSize;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -31,8 +31,6 @@
 #include <QtCore/qmath.h>
 #include <QtCore/qrandom.h>
 
-using namespace QtDataVisualization;
-
 //! [3]
 Q_DECLARE_METATYPE(QSurface3DSeries *)
 //! [3]

@@ -44,7 +44,7 @@
 
 QT_FORWARD_DECLARE_CLASS(QOpenGLShaderProgram)
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ShaderHelper
 {
@@ -146,6 +146,6 @@ class ShaderHelper
     GLboolean m_initialized;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

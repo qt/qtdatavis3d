@@ -29,7 +29,7 @@
 
 #include "surfaceitemmodelhandler_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 static const int noRoleIndex = -1;
 
@@ -331,4 +331,4 @@ void SurfaceItemModelHandler::resolveModel()
     m_proxy->resetArray(m_proxyArray);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

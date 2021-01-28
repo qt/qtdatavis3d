@@ -39,8 +39,6 @@
 #include <QtCore/QSequentialAnimationGroup>
 #include <QtGui/QVector3D>
 
-using namespace QtDataVisualization;
-
 class ScatterDataModifier : public QObject
 {
     Q_OBJECT

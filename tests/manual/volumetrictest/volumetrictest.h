@@ -37,8 +37,6 @@
 #include <QtDataVisualization/q3dbars.h>
 #include <QtWidgets/QLabel>
 
-using namespace QtDataVisualization;
-
 class VolumetricModifier : public QObject
 {
     Q_OBJECT

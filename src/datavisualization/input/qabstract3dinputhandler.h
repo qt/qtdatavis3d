@@ -38,7 +38,7 @@
 #include <QtGui/QMouseEvent>
 #include <QtGui/QTouchEvent>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DInputHandlerPrivate;
 
@@ -101,6 +101,6 @@ private:
     friend class QTouch3DInputHandlerPrivate;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

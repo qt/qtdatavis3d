@@ -35,7 +35,7 @@
 
 Q_MOC_INCLUDE(<QtDataVisualization/qsurface3dseries.h>)
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QSurfaceDataProxyPrivate;
 class QSurface3DSeries;
@@ -101,6 +101,6 @@ private:
     friend class Surface3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

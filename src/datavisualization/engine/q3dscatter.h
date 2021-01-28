@@ -34,7 +34,7 @@
 #include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qscatter3dseries.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DScatterPrivate;
 
@@ -78,6 +78,6 @@ private:
     Q_DISABLE_COPY(Q3DScatter)
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

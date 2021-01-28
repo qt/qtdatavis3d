@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/QCategory3DAxis>
 
-using namespace QtDataVisualization;
-
 class tst_axis: public QObject
 {
     Q_OBJECT

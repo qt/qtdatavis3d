@@ -29,7 +29,7 @@
 
 #include "barrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 BarRenderItem::BarRenderItem()
     : AbstractRenderItem(),
@@ -99,4 +99,4 @@ const QString &BarRenderSliceItem::sliceLabel() const
     return m_sliceLabel;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

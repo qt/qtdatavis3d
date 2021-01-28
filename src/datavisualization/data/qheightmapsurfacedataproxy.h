@@ -34,7 +34,7 @@
 #include <QtGui/QImage>
 #include <QtCore/QString>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QHeightMapSurfaceDataProxyPrivate;
 
@@ -89,6 +89,6 @@ private:
     friend class Surface3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

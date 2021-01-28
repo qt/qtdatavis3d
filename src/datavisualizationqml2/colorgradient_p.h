@@ -44,7 +44,7 @@
 #include <QtGui/QColor>
 #include <QtQml/QQmlListProperty>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ColorGradientStop : public QObject
 {
@@ -94,6 +94,6 @@ Q_SIGNALS:
     void updated();
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

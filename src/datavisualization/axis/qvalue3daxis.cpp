@@ -31,7 +31,7 @@
 #include "qvalue3daxisformatter_p.h"
 #include "abstract3dcontroller_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QValue3DAxis
@@ -375,4 +375,4 @@ QValue3DAxis *QValue3DAxisPrivate::qptr()
     return static_cast<QValue3DAxis *>(q_ptr);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

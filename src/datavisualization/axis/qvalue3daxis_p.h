@@ -43,7 +43,7 @@
 #include "qvalue3daxis.h"
 #include "qabstract3daxis_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QValue3DAxisPrivate : public QAbstract3DAxisPrivate
 {
@@ -83,6 +83,6 @@ private:
     friend class Abstract3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

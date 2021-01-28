@@ -40,8 +40,6 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QDebug>
 
-using namespace QtDataVisualization;
-
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_inputHandler(new CustomInputHandler())

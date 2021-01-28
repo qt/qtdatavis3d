@@ -30,7 +30,7 @@
 #include "qitemmodelscatterdataproxy_p.h"
 #include "scatteritemmodelhandler_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QItemModelScatterDataProxy
@@ -647,4 +647,4 @@ void QItemModelScatterDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -38,7 +38,7 @@
 #include <QtGui/QOpenGLFunctions>
 #include <QtCore/QLocale>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DGraphPrivate;
 class QCustom3DItem;
@@ -241,6 +241,6 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::OptimizationHints)
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

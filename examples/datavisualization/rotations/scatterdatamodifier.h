@@ -34,8 +34,6 @@
 #include <QtDataVisualization/qscatterdataproxy.h>
 #include <QtCore/QTimer>
 
-using namespace QtDataVisualization;
-
 class ScatterDataModifier : public QObject
 {
     Q_OBJECT

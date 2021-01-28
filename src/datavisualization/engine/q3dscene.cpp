@@ -31,7 +31,7 @@
 #include "q3dcamera_p.h"
 #include "q3dlight_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DScene
@@ -832,4 +832,4 @@ bool Q3DScenePrivate::isInArea(const QRect &area, int x, int y) const
     return ( x >= areaMinX && x <= areaMaxX && y >= areaMinY && y <= areaMaxY );
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

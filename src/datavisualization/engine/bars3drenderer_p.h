@@ -50,7 +50,7 @@ class QPoint;
 class QSizeF;
 QT_END_NAMESPACE
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ShaderHelper;
 class LabelItem;
@@ -197,6 +197,6 @@ private:
     Q_DISABLE_COPY(Bars3DRenderer)
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

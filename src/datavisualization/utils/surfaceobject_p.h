@@ -46,7 +46,7 @@
 
 #include <QtCore/QRect>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Surface3DRenderer;
 class AxisRenderCache;
@@ -131,6 +131,6 @@ private:
     SurfaceObject::DataDimensions m_oldDataDimension = DataDimensions(-1);
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

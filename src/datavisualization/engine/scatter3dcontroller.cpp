@@ -34,7 +34,7 @@
 #include "qscatter3dseries_p.h"
 #include <QtCore/QMutexLocker>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 static const int insertRemoveRecordReserveSize = 31;
 
@@ -485,4 +485,4 @@ void Scatter3DController::adjustAxisRanges()
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

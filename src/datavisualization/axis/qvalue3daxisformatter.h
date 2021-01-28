@@ -37,7 +37,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QStringList>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QValue3DAxisFormatterPrivate;
 class QValue3DAxis;
@@ -96,6 +96,6 @@ private:
     friend class QSurface3DSeriesPrivate;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

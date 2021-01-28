@@ -33,8 +33,6 @@
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtCore/QIODevice>
 
-using namespace QtDataVisualization;
-
 class AudioLevelsIODevice : public QIODevice
 {
     Q_OBJECT

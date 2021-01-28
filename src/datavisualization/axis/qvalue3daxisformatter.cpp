@@ -30,7 +30,7 @@
 #include "qvalue3daxisformatter_p.h"
 #include "qvalue3daxis_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QValue3DAxisFormatter
@@ -468,4 +468,4 @@ void QValue3DAxisFormatterPrivate::markDirtyNoLabelChange()
     markDirty(false);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

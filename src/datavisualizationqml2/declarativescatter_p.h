@@ -45,7 +45,7 @@
 #include "scatter3dcontroller_p.h"
 #include "qscatter3dseries.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class DeclarativeScatter : public AbstractDeclarative
 {
@@ -93,6 +93,6 @@ protected:
     Scatter3DController *m_scatterController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

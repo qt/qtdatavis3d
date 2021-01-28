@@ -43,7 +43,7 @@
 #include "abstractitemmodelhandler_p.h"
 #include "qitemmodelsurfacedataproxy_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class SurfaceItemModelHandler : public AbstractItemModelHandler
 {
@@ -75,6 +75,6 @@ protected:
     bool m_haveZPosPattern;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

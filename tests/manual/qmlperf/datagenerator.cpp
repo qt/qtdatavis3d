@@ -31,8 +31,6 @@
 #include <QDebug>
 #include <QRandomGenerator>
 
-using namespace QtDataVisualization;
-
 Q_DECLARE_METATYPE(QScatter3DSeries *)
 
 DataGenerator::DataGenerator(QObject *parent) :

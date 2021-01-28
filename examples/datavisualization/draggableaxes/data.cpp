@@ -36,8 +36,6 @@
 #include <QtDataVisualization/QScatter3DSeries>
 #include <QtDataVisualization/Q3DTheme>
 
-using namespace QtDataVisualization;
-
 const int itemCount = 500;
 
 Data::Data(Q3DScatter *scatter)

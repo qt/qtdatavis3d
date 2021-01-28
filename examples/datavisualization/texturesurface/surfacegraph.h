@@ -38,8 +38,6 @@
 
 #include "custominputhandler.h"
 
-using namespace QtDataVisualization;
-
 class SurfaceGraph : public QObject
 {
     Q_OBJECT

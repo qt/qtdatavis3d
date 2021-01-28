@@ -45,7 +45,7 @@
 #include "surface3dcontroller_p.h"
 #include "qsurface3dseries.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class DeclarativeSurface : public AbstractDeclarative
 {
@@ -97,6 +97,6 @@ private:
     Surface3DController *m_surfaceController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

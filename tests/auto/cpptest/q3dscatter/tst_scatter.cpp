@@ -33,8 +33,6 @@
 
 #include "cpptestutil.h"
 
-using namespace QtDataVisualization;
-
 class tst_scatter: public QObject
 {
     Q_OBJECT

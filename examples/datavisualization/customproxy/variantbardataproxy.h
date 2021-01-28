@@ -37,8 +37,6 @@
 #include <QtCore/QMap>
 #include <QtCore/QPointer>
 
-using namespace QtDataVisualization;
-
 //! [0]
 class VariantBarDataProxy : public QBarDataProxy
 //! [0]

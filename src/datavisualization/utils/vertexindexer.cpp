@@ -31,7 +31,7 @@
 
 #include <QtCore/qmath.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 int unique_vertices = 0;
 
@@ -78,4 +78,4 @@ void VertexIndexer::indexVBO(const QList<QVector3D> &in_vertices, const QList<QV
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

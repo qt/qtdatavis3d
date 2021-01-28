@@ -113,7 +113,7 @@ QML_DECLARE_TYPE(QCustom3DItem)
 QML_DECLARE_TYPE(QCustom3DLabel)
 QML_DECLARE_TYPE(QCustom3DVolume)
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 
 
@@ -234,5 +234,5 @@ void QtDataVisualizationQml2Plugin::registerTypes(const char *uri)
     qmlRegisterModule(uri, 1, 15);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 

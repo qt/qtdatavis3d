@@ -34,7 +34,7 @@
 #include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qsurface3dseries.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DSurfacePrivate;
 
@@ -83,6 +83,6 @@ private:
     Q_DISABLE_COPY(Q3DSurface)
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

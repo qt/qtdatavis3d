@@ -36,8 +36,6 @@
 
 #include "cpptestutil.h"
 
-using namespace QtDataVisualization;
-
 class tst_bars: public QObject
 {
     Q_OBJECT

@@ -35,7 +35,7 @@
 #include <QtDataVisualization/qcategory3daxis.h>
 #include <QtDataVisualization/qbar3dseries.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
 
@@ -108,6 +108,6 @@ private:
     Q_DISABLE_COPY(Q3DBars)
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -38,8 +38,6 @@
 #include <QtWidgets/QLabel>
 #include <QtCore/QPropertyAnimation>
 
-using namespace QtDataVisualization;
-
 class CustomItemGraph : public QObject
 {
     Q_OBJECT

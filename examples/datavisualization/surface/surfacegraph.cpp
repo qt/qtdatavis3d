@@ -34,8 +34,6 @@
 #include <QtGui/QImage>
 #include <QtCore/qmath.h>
 
-using namespace QtDataVisualization;
-
 const int sampleCountX = 50;
 const int sampleCountZ = 50;
 const int heightMapGridStepX = 6;

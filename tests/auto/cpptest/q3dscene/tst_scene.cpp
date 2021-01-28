@@ -34,8 +34,6 @@
 
 #include "cpptestutil.h"
 
-using namespace QtDataVisualization;
-
 class tst_scene: public QObject
 {
     Q_OBJECT

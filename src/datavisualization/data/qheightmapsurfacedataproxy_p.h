@@ -44,7 +44,7 @@
 #include "qsurfacedataproxy_p.h"
 #include <QtCore/QTimer>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QHeightMapSurfaceDataProxyPrivate : public QSurfaceDataProxyPrivate
 {
@@ -75,6 +75,6 @@ private:
     friend class QHeightMapSurfaceDataProxy;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

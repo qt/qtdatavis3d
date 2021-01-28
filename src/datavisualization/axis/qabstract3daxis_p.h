@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qabstract3daxis.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DAxisPrivate : public QObject
 {
@@ -88,6 +88,6 @@ protected:
     friend class QSurfaceDataProxyPrivate;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -42,8 +42,6 @@
 #include <QTimer>
 #include <QLabel>
 
-using namespace QtDataVisualization;
-
 class GraphModifier : public QObject
 {
     Q_OBJECT

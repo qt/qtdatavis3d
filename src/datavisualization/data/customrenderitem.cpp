@@ -29,7 +29,7 @@
 
 #include "customrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 CustomRenderItem::CustomRenderItem()
     : AbstractRenderItem(),
@@ -116,4 +116,4 @@ void CustomRenderItem::setSliceFrameColor(const QColor &color)
                                   float(1.0f)); // Alpha not supported for frames
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -47,7 +47,7 @@ class QOpenGLContext;
 class QOffscreenSurface;
 QT_END_NAMESPACE
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DGraph;
 class Abstract3DController;
@@ -86,6 +86,6 @@ public:
     bool m_initialized;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

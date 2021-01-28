@@ -43,7 +43,7 @@
 #include "qcategory3daxis.h"
 #include "qabstract3daxis_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QCategory3DAxisPrivate : public QAbstract3DAxisPrivate
 {
@@ -67,6 +67,6 @@ private:
     friend class QCategory3DAxis;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

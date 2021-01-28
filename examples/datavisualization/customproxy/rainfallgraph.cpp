@@ -40,8 +40,6 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
 
-using namespace QtDataVisualization;
-
 RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     : m_graph(rainfall)
 {

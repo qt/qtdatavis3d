@@ -29,7 +29,7 @@
 
 #include "qabstract3daxis_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstract3DAxis
@@ -574,4 +574,4 @@ void QAbstract3DAxisPrivate::setMax(float max)
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

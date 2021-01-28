@@ -30,8 +30,6 @@
 #include <QtDataVisualization/Q3DBars>
 #include <QtDataVisualization/Q3DTheme>
 
-using namespace QtDataVisualization;
-
 int main(int argc, char **argv)
 {
     //! [0]

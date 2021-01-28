@@ -48,7 +48,7 @@ class QMatrix4x4;
 class QPoint;
 QT_END_NAMESPACE
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class CameraHelper : public QObject
 {
@@ -95,6 +95,6 @@ public:
     void setCameraPreset(Q3DCamera::CameraPreset preset);
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

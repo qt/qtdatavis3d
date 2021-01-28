@@ -33,7 +33,7 @@
 #include <QtGui/QMatrix4x4>
 #include <QtCore/qmath.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 const GLfloat itemScaler = 3.0f;
 
@@ -386,4 +386,4 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
     m_meshDataLoaded = true;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

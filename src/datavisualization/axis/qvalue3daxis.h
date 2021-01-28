@@ -33,7 +33,7 @@
 #include <QtDataVisualization/qabstract3daxis.h>
 #include <QtDataVisualization/qvalue3daxisformatter.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QValue3DAxisPrivate;
 
@@ -85,6 +85,6 @@ private:
     friend class QValue3DAxisFormatterPrivate;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

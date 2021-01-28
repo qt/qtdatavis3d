@@ -37,7 +37,7 @@
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QCustom3DLabelPrivate;
 
@@ -99,6 +99,6 @@ private:
     friend class Abstract3DRenderer;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

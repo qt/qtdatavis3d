@@ -32,8 +32,6 @@
 #include <QtGui/QRgb>
 #include <QtGui/QVector3D>
 
-using namespace QtDataVisualization;
-
 Q_DECLARE_METATYPE(QCustom3DVolume *)
 
 DataSource::DataSource(QObject *parent) :

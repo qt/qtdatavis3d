@@ -49,8 +49,6 @@
 
 #define USE_STATIC_DATA
 
-using namespace QtDataVisualization;
-
 class GraphDataGenerator : public QObject
 {
 public:

@@ -26,7 +26,6 @@
 ****************************************************************************/
 
 /*!
-    \namespace QtDataVisualization
     \inmodule QtDataVisualization
     \brief Contains the classes and enumerations in the Qt Data Visualization
     module.

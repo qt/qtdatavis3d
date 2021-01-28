@@ -30,7 +30,7 @@
 #include "declarativescatter_p.h"
 #include <QtCore/QMutexLocker>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 DeclarativeScatter::DeclarativeScatter(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -149,4 +149,4 @@ void DeclarativeScatter::handleAxisZChanged(QAbstract3DAxis *axis)
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

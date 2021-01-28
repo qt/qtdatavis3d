@@ -42,8 +42,6 @@
 #include <QtCore/QDebug>
 #include <QtGui/QOpenGLContext>
 
-using namespace QtDataVisualization;
-
 const int lowDetailSize(128);
 const int mediumDetailSize(256);
 const int highDetailSize(512);

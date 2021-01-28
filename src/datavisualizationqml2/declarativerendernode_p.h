@@ -49,7 +49,7 @@
 #include <QtCore/QSharedPointer>
 #include <QtCore/QObject>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Abstract3DController;
 class AbstractDeclarative;
@@ -97,6 +97,6 @@ private:
 
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

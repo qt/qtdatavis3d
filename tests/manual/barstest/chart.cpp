@@ -42,8 +42,6 @@
 #include <QtCore/QElapsedTimer>
 #include <QtCore/qmath.h>
 
-using namespace QtDataVisualization;
-
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
 GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)

@@ -36,7 +36,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QRect>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DScenePrivate;
 
@@ -121,6 +121,6 @@ private:
     friend class Q3DObject;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

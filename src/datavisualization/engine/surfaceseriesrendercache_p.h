@@ -48,7 +48,7 @@
 
 #include <QtGui/QMatrix4x4>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Surface3DRenderer;
 
@@ -121,6 +121,6 @@ protected:
     GLuint m_surfaceTexture;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

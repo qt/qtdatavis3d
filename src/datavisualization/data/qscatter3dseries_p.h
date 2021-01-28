@@ -43,7 +43,7 @@
 #include "qscatter3dseries.h"
 #include "qabstract3dseries_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QScatter3DSeriesPrivate : public QAbstract3DSeriesPrivate
 {
@@ -68,6 +68,6 @@ private:
     friend class QScatter3DSeries;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

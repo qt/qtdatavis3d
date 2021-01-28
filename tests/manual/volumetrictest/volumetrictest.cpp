@@ -40,8 +40,6 @@
 #include <QtWidgets/QLabel>
 #include <QtCore/QDebug>
 
-using namespace QtDataVisualization;
-
 const int imageCount = 512;
 const float xMiddle = 100.0f;
 const float yMiddle = 2.5f;

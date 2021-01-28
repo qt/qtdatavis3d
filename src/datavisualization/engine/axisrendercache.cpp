@@ -31,7 +31,7 @@
 
 #include <QtGui/QFontMetrics>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 AxisRenderCache::AxisRenderCache()
     : m_type(QAbstract3DAxis::AxisTypeNone),
@@ -208,4 +208,4 @@ int AxisRenderCache::maxLabelWidth(const QStringList &labels) const
     return labelWidth;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -29,7 +29,7 @@
 
 #include "scatterrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 ScatterRenderItem::ScatterRenderItem()
     : AbstractRenderItem(),
@@ -48,4 +48,4 @@ ScatterRenderItem::~ScatterRenderItem()
 {
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

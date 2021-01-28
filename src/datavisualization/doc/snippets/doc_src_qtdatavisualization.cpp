@@ -29,8 +29,6 @@
 
 //! [0]
 #include <QtDataVisualization>
-
-using namespace QtDataVisualization;
 //! [0]
 
 //! [1]

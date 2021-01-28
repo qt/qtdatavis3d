@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include <QtGui/QVector2D>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class MeshLoader
 {
@@ -52,6 +52,6 @@ class MeshLoader
                             QList<QVector2D> &out_uvs, QList<QVector3D> &out_normals);
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

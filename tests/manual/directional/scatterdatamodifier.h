@@ -35,8 +35,6 @@
 #include <QtGui/QFont>
 #include <QtCore/QTimer>
 
-using namespace QtDataVisualization;
-
 class ScatterDataModifier : public QObject
 {
     Q_OBJECT

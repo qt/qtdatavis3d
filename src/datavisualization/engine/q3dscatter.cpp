@@ -30,7 +30,7 @@
 #include "q3dscatter.h"
 #include "q3dscatter_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DScatter
@@ -306,5 +306,5 @@ Q3DScatter *Q3DScatterPrivate::qptr()
     return static_cast<Q3DScatter *>(q_ptr);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 

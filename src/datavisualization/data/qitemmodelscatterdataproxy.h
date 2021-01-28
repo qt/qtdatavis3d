@@ -35,7 +35,7 @@
 #include <QtCore/QString>
 #include <QtCore/QRegularExpression>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QItemModelScatterDataProxyPrivate;
 
@@ -126,6 +126,6 @@ private:
     friend class ScatterItemModelHandler;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

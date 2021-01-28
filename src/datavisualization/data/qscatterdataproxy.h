@@ -35,7 +35,7 @@
 
 Q_MOC_INCLUDE(<QtDataVisualization/qscatter3dseries.h>)
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QScatterDataProxyPrivate;
 class QScatter3DSeries;
@@ -92,6 +92,6 @@ private:
     friend class Scatter3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

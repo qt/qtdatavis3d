@@ -29,7 +29,7 @@
 
 #include "qcustom3ditem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QCustom3DItem
@@ -537,4 +537,4 @@ void QCustom3DItemPrivate::resetDirtyBits()
     m_dirtyBits.shadowCastingDirty = false;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

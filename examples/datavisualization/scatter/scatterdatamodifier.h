@@ -34,8 +34,6 @@
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtGui/QFont>
 
-using namespace QtDataVisualization;
-
 class ScatterDataModifier : public QObject
 {
     Q_OBJECT

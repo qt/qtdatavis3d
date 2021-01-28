@@ -35,7 +35,7 @@
 #include <QtCore/QScopedPointer>
 #include <QtCore/QStringList>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DAxisPrivate;
 
@@ -128,6 +128,6 @@ private:
     friend class QSurfaceDataProxyPrivate;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

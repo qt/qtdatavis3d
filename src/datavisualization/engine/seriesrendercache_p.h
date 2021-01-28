@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qabstract3dseries_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Abstract3DRenderer;
 class ObjectHelper;
@@ -110,7 +110,7 @@ protected:
     bool m_staticObjectUVDirty;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif
 

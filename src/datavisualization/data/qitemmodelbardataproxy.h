@@ -34,7 +34,7 @@
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QRegularExpression>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QItemModelBarDataProxyPrivate;
 
@@ -174,6 +174,6 @@ private:
     friend class BarItemModelHandler;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

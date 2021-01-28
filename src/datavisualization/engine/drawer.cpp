@@ -50,7 +50,7 @@ public:
 };
 StaticLibInitializer staticLibInitializer;
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 // Vertex array buffer for point
 const GLfloat point_data[] = {0.0f, 0.0f, 0.0f};
@@ -452,4 +452,4 @@ void Drawer::generateLabelItem(LabelItem &item, const QString &text, int widestL
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qabstractdataproxy.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstract3DSeries;
 
@@ -66,6 +66,6 @@ private:
     friend class QAbstractDataProxy;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

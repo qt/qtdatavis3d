@@ -33,7 +33,7 @@
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtDataVisualization/qscatterdataproxy.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QScatter3DSeriesPrivate;
 
@@ -75,6 +75,6 @@ private:
     friend class Scatter3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

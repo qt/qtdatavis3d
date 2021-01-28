@@ -33,8 +33,6 @@
 #include <QtDataVisualization/Q3DScatter>
 #include <QtWidgets/QTableWidget>
 
-using namespace QtDataVisualization;
-
 class tst_proxy: public QObject
 {
     Q_OBJECT

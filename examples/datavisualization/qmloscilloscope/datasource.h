@@ -32,8 +32,6 @@
 
 #include <QtDataVisualization/QSurface3DSeries>
 
-using namespace QtDataVisualization;
-
 class DataSource : public QObject
 {
     Q_OBJECT

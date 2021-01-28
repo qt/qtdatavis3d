@@ -29,7 +29,7 @@
 
 #include "baritemmodelhandler_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 static const int noRoleIndex = -1;
 
@@ -299,4 +299,4 @@ void BarItemModelHandler::resolveModel()
     m_proxy->resetArray(m_proxyArray, rowLabels, columnLabels);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

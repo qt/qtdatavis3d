@@ -34,7 +34,7 @@
 #include "q3dcamera_p.h"
 #include "utils_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 const GLfloat sliceUnits = 2.5;
 
@@ -305,4 +305,4 @@ void SelectionPointer::initShaders()
     m_pointShader->initialize();
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

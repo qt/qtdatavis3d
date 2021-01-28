@@ -38,8 +38,6 @@
 #include <QTimer>
 #include <QLabel>
 
-using namespace QtDataVisualization;
-
 class ScatterDataModifier : public QObject
 {
     Q_OBJECT

@@ -29,8 +29,6 @@
 
 #include "topographicseries.h"
 
-using namespace QtDataVisualization;
-
 //! [0]
 // Value used to encode height data as RGB value on PNG file
 const float packingFactor = 11983.0f;

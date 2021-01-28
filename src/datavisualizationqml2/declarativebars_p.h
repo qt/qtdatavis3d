@@ -44,7 +44,7 @@
 #include "abstractdeclarative_p.h"
 #include "bars3dcontroller_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class DeclarativeBars : public AbstractDeclarative
 {
@@ -122,6 +122,6 @@ private:
     Bars3DController *m_barsController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

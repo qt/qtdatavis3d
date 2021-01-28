@@ -42,7 +42,7 @@
 // You should see the scene from  where the light is
 //#define SHOW_DEPTH_TEXTURE_SCENE
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 const GLfloat defaultMinSize = 0.01f;
 const GLfloat defaultMaxSize = 0.1f;
@@ -2528,4 +2528,4 @@ QVector3D Scatter3DRenderer::convertPositionToTranslation(const QVector3D &posit
     return QVector3D(xTrans, yTrans, zTrans);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -30,7 +30,7 @@
 #include "qcategory3daxis_p.h"
 #include "bars3dcontroller_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QCategory3DAxis
@@ -171,4 +171,4 @@ QCategory3DAxis *QCategory3DAxisPrivate::qptr()
     return static_cast<QCategory3DAxis *>(q_ptr);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

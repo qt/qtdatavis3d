@@ -42,7 +42,7 @@
 
 #include "datavisualizationglobal_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DObject;
 class Q3DScene;
@@ -59,6 +59,6 @@ public:
     bool m_isDirty;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

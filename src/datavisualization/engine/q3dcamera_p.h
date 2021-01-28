@@ -44,7 +44,7 @@
 #include "q3dcamera.h"
 #include <QtGui/QMatrix4x4>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DCamera;
 
@@ -123,6 +123,6 @@ public:
     friend class QTouch3DInputHandler;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

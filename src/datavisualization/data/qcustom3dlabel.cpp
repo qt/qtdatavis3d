@@ -30,7 +30,7 @@
 #include "qcustom3dlabel_p.h"
 #include "utils_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QCustom3DLabel
@@ -382,4 +382,4 @@ void QCustom3DLabelPrivate::handleTextureChange()
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

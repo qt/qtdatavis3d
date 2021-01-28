@@ -37,7 +37,7 @@
 
 Q_MOC_INCLUDE(<QtDataVisualization/qbar3dseries.h>)
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QBarDataProxyPrivate;
 class QBar3DSeries;
@@ -119,6 +119,6 @@ private:
     friend class Bars3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

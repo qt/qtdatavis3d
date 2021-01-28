@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/QLogValue3DAxisFormatter>
 
-using namespace QtDataVisualization;
-
 class tst_axis: public QObject
 {
     Q_OBJECT

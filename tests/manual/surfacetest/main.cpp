@@ -45,8 +45,6 @@
 #include <QFrame>
 #include <QDebug>
 
-using namespace QtDataVisualization;
-
 const int initialTheme = 4;
 
 int main(int argc, char *argv[])

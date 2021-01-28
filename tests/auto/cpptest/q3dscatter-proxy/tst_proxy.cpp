@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/QScatterDataProxy>
 
-using namespace QtDataVisualization;
-
 class tst_proxy: public QObject
 {
     Q_OBJECT

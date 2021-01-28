@@ -45,7 +45,7 @@
 #include "qscatter3dseries_p.h"
 #include "scatterrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ScatterObjectBufferHelper;
 class ScatterPointBufferHelper;
@@ -93,6 +93,6 @@ protected:
     bool m_visibilityChanged; // Used to detect if full buffer change needed
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

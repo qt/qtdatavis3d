@@ -32,7 +32,7 @@
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QBarDataItemPrivate;
 
@@ -62,6 +62,6 @@ private:
     float m_angle;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -40,8 +40,6 @@
 #include <QSize>
 #include <QImage>
 
-using namespace QtDataVisualization;
-
 Data::Data(Q3DSurface *surface, Q3DScatter *scatter, Q3DBars *bars,
            QTextEdit *statusArea, QWidget *widget) :
     m_surface(surface),

@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/QCustom3DVolume>
 
-using namespace QtDataVisualization;
-
 class tst_custom: public QObject
 {
     Q_OBJECT

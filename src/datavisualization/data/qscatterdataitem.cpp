@@ -29,7 +29,7 @@
 
 #include "qscatterdataitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QScatterDataItem
@@ -176,4 +176,4 @@ QScatterDataItemPrivate::~QScatterDataItemPrivate()
 {
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

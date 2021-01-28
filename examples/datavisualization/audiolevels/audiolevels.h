@@ -32,8 +32,6 @@
 
 #include <QtDataVisualization/q3dbars.h>
 
-using namespace QtDataVisualization;
-
 class AudioLevelsIODevice;
 
 QT_BEGIN_NAMESPACE

@@ -32,7 +32,7 @@
 #include <QtCore/qmath.h>
 #include <QtGui/QMatrix4x4>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 CameraHelper::CameraHelper(QObject *parent) :
     QObject(parent),
@@ -265,4 +265,4 @@ void CameraHelper::setCameraPreset(Q3DCamera::CameraPreset preset)
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

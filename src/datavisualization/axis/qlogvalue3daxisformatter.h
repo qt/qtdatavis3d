@@ -32,7 +32,7 @@
 
 #include <QtDataVisualization/qvalue3daxisformatter.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QLogValue3DAxisFormatterPrivate;
 
@@ -78,6 +78,6 @@ private:
     friend class QLogValue3DAxisFormatterPrivate;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -30,7 +30,7 @@
 #include "declarativesurface_p.h"
 #include <QtCore/QMutexLocker>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 DeclarativeSurface::DeclarativeSurface(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -161,4 +161,4 @@ void DeclarativeSurface::handleAxisZChanged(QAbstract3DAxis *axis)
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -31,7 +31,7 @@
 #include "qabstractdataproxy_p.h"
 #include "abstract3dcontroller_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstract3DSeries
@@ -903,4 +903,4 @@ void QAbstract3DSeriesPrivate::setItemLabelVisible(bool visible)
     m_changeTracker.itemLabelVisibilityChanged = true;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

@@ -40,8 +40,6 @@
 #include <QtCore/QPointer>
 #include <QtCore/QPropertyAnimation>
 
-using namespace QtDataVisualization;
-
 class GraphModifier : public QObject
 {
     Q_OBJECT

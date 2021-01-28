@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include <QtCore/QSize>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class LabelItem
 {
@@ -64,6 +64,6 @@ private:
     GLuint m_textureId;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

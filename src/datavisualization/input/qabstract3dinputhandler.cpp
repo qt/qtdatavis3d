@@ -29,7 +29,7 @@
 
 #include "qabstract3dinputhandler_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstract3DInputHandler
@@ -259,4 +259,4 @@ QAbstract3DInputHandlerPrivate::~QAbstract3DInputHandlerPrivate()
 
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

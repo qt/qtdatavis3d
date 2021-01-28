@@ -31,7 +31,7 @@
 #include "qscatter3dseries_p.h"
 #include "qabstract3daxis_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QScatterDataProxy
@@ -451,4 +451,4 @@ QScatterDataProxy *QScatterDataProxyPrivate::qptr()
     return static_cast<QScatterDataProxy *>(q_ptr);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

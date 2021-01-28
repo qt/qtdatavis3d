@@ -44,7 +44,7 @@
 #include "qlogvalue3daxisformatter.h"
 #include "qvalue3daxisformatter_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QLogValue3DAxisFormatterPrivate : public QValue3DAxisFormatterPrivate
 {
@@ -77,6 +77,6 @@ private:
     friend class QLogValue3DAxisFormatter;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

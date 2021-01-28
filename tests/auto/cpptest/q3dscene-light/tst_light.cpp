@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/Q3DLight>
 
-using namespace QtDataVisualization;
-
 class tst_light: public QObject
 {
     Q_OBJECT

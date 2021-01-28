@@ -33,11 +33,7 @@
 #include <QtQml/QQmlExtensionPlugin>
 #include "datavisualizationglobal_p.h"
 
-using namespace QtDataVisualization;
-
-
-
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QtDataVisualizationQml2Plugin : public QQmlExtensionPlugin
 {
@@ -49,7 +45,7 @@ public:
     void registerTypes(const char *uri) override;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif // DATAVISUALIZATIONQML2_PLUGIN_H
 

@@ -43,7 +43,7 @@
 #include "qbar3dseries.h"
 #include "qabstract3dseries_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QBar3DSeriesPrivate : public QAbstract3DSeriesPrivate
 {
@@ -71,6 +71,6 @@ private:
     friend class QBar3DSeries;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

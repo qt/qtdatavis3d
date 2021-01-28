@@ -44,7 +44,7 @@
 #include "abstractobjecthelper_p.h"
 #include "scatterseriesrendercache_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ScatterObjectBufferHelper : public AbstractObjectHelper
 {
@@ -65,6 +65,6 @@ private:
     float m_scaleY;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

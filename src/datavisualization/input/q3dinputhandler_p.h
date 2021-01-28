@@ -43,7 +43,7 @@
 #include "qabstract3dinputhandler_p.h"
 #include "q3dinputhandler.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Abstract3DController;
 
@@ -77,6 +77,6 @@ protected:
     friend class Q3DInputHandler;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -38,8 +38,6 @@
 #include <QtWidgets/QSlider>
 #include <QtWidgets/QRadioButton>
 
-using namespace QtDataVisualization;
-
 class VolumetricModifier : public QObject
 {
     Q_OBJECT

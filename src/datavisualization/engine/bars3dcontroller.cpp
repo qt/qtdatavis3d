@@ -37,7 +37,7 @@
 #include "q3dtheme_p.h"
 #include <QtCore/QMutexLocker>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
@@ -730,4 +730,4 @@ QAbstract3DAxis *Bars3DController::createDefaultAxis(QAbstract3DAxis::AxisOrient
     return defaultAxis;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

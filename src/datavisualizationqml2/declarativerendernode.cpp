@@ -32,7 +32,7 @@
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtCore/QMutexLocker>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 DeclarativeRenderNode::DeclarativeRenderNode(AbstractDeclarative *declarative,
                                              const QSharedPointer<QMutex> &nodeMutex)
@@ -180,4 +180,4 @@ void DeclarativeRenderNode::handleControllerDestroyed()
     m_controller = 0;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

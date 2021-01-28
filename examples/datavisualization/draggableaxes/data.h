@@ -35,8 +35,6 @@
 #include <QtDataVisualization/q3dscatter.h>
 #include <QtGui/QVector3D>
 
-using namespace QtDataVisualization;
-
 class Data : public QObject
 {
     Q_OBJECT

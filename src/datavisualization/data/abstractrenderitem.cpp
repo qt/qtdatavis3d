@@ -29,7 +29,7 @@
 
 #include "abstractrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 AbstractRenderItem::AbstractRenderItem()
 {
@@ -45,4 +45,4 @@ AbstractRenderItem::~AbstractRenderItem()
 {
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

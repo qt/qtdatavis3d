@@ -34,7 +34,7 @@
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QAbstractDataProxyPrivate;
 
@@ -69,6 +69,6 @@ private:
     friend class QAbstract3DSeriesPrivate;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

@@ -38,8 +38,6 @@
 #include <QtDataVisualization/QHeightMapSurfaceDataProxy>
 #include <QTextEdit>
 
-using namespace QtDataVisualization;
-
 class Data : public QObject
 {
     Q_OBJECT

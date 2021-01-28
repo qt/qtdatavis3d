@@ -52,7 +52,7 @@
 
 class GLStateStore;
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class AbstractDeclarative : public QQuickItem
 {
@@ -305,6 +305,6 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(AbstractDeclarative::OptimizationHints)
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

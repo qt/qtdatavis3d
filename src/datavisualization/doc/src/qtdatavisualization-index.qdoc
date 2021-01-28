@@ -50,7 +50,7 @@
     \endqml
 
     If you intend to use Qt Data Visualization C++ classes in your application, use the
-    following include and using directives:
+    following include:
 
     \snippet doc_src_qtdatavisualization.cpp 0
 

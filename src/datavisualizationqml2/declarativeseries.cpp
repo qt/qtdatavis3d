@@ -30,7 +30,7 @@
 #include "declarativeseries_p.h"
 #include <QtCore/QMetaMethod>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 static void setSeriesGradient(QAbstract3DSeries *series, const ColorGradient &gradient,
                               GradientType type)
@@ -359,4 +359,4 @@ void DeclarativeSurface3DSeries::handleMultiHighlightGradientUpdate()
         setSeriesGradient(this, *m_multiHighlightGradient, GradientTypeMulti);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

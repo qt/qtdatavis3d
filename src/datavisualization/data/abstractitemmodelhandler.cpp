@@ -29,7 +29,7 @@
 
 #include "abstractitemmodelhandler_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 AbstractItemModelHandler::AbstractItemModelHandler(QObject *parent)
     : QObject(parent),
@@ -237,4 +237,4 @@ void AbstractItemModelHandler::handlePendingResolve()
     m_fullReset = false;
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

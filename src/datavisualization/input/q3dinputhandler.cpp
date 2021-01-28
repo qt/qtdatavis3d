@@ -31,7 +31,7 @@
 #include "q3dinputhandler_p.h"
 #include "abstract3dcontroller_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 static const int halfSizeZoomLevel      = 50;
 static const int oneToOneZoomLevel      = 100;
@@ -435,4 +435,4 @@ void Q3DInputHandlerPrivate::handleQueriedGraphPositionChange()
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

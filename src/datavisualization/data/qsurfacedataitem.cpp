@@ -29,7 +29,7 @@
 
 #include "qsurfacedataitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QSurfaceDataItem
@@ -150,4 +150,4 @@ QSurfaceDataItemPrivate::~QSurfaceDataItemPrivate()
 {
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

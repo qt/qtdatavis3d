@@ -41,7 +41,7 @@
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtCore/QMutexLocker>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scene,
                                            QObject *parent) :
@@ -1744,4 +1744,4 @@ qreal Abstract3DController::margin() const
 }
 
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

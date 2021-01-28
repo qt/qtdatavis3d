@@ -35,8 +35,6 @@
 #include <QtDataVisualization/QValue3DAxis>
 #include "highlightseries.h"
 
-using namespace QtDataVisualization;
-
 class CustomInputHandler : public Q3DInputHandler
 {
     Q_OBJECT

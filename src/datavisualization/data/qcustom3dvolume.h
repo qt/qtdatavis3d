@@ -35,7 +35,7 @@
 #include <QtGui/QColor>
 #include <QtGui/QImage>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QCustom3DVolumePrivate;
 
@@ -154,6 +154,6 @@ private:
     friend class Abstract3DRenderer;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

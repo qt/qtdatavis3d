@@ -44,7 +44,7 @@
 #include "drawer_p.h"
 #include <QtCore/QPointer>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class AxisRenderCache : public QObject
 {
@@ -154,6 +154,6 @@ private:
     Q_DISABLE_COPY(AxisRenderCache)
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

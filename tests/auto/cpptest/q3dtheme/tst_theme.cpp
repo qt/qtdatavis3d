@@ -31,8 +31,6 @@
 
 #include <QtDataVisualization/Q3DTheme>
 
-using namespace QtDataVisualization;
-
 class tst_theme: public QObject
 {
     Q_OBJECT

@@ -30,7 +30,7 @@
 #include "declarativebars_p.h"
 #include <QtCore/QMutexLocker>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 DeclarativeBars::DeclarativeBars(QQuickItem *parent)
     : AbstractDeclarative(parent),
@@ -230,4 +230,4 @@ void DeclarativeBars::handleAxisZChanged(QAbstract3DAxis *axis)
     emit rowAxisChanged(static_cast<QCategory3DAxis *>(axis));
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

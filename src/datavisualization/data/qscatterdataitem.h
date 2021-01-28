@@ -33,7 +33,7 @@
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtGui/QQuaternion>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QScatterDataItemPrivate;
 
@@ -69,6 +69,6 @@ private:
     QQuaternion m_rotation;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

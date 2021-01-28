@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "qcustom3ditem.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 struct QCustomItemDirtyBitField {
     bool textureDirty               : 1;
@@ -106,6 +106,6 @@ private:
     friend class QCustom3DItem;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

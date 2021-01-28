@@ -31,7 +31,7 @@
 #include "qvalue3daxis_p.h"
 #include <QtCore/qmath.h>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QLogValue3DAxisFormatter
@@ -452,4 +452,4 @@ QLogValue3DAxisFormatter *QLogValue3DAxisFormatterPrivate::qptr()
     return static_cast<QLogValue3DAxisFormatter *>(q_ptr);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

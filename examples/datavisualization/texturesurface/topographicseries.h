@@ -32,8 +32,6 @@
 
 #include <QtDataVisualization/QSurface3DSeries>
 
-using namespace QtDataVisualization;
-
 class TopographicSeries : public QSurface3DSeries
 {
     Q_OBJECT

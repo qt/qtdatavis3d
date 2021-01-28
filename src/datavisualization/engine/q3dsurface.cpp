@@ -30,7 +30,7 @@
 #include "q3dsurface.h"
 #include "q3dsurface_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DSurface
@@ -356,4 +356,4 @@ Q3DSurface *Q3DSurfacePrivate::qptr()
     return static_cast<Q3DSurface *>(q_ptr);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

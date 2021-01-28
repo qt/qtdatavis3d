@@ -33,8 +33,6 @@
 #include <QtDataVisualization/QCustom3DVolume>
 #include <QtCore/QObject>
 
-using namespace QtDataVisualization;
-
 class DataSource : public QObject
 {
     Q_OBJECT

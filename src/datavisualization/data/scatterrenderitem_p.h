@@ -42,7 +42,7 @@
 
 #include "abstractrenderitem_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class ScatterRenderItem : public AbstractRenderItem
 {
@@ -67,6 +67,6 @@ protected:
 };
 typedef QList<ScatterRenderItem> ScatterRenderItemArray;
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

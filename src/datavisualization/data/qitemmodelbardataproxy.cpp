@@ -30,7 +30,7 @@
 #include "qitemmodelbardataproxy_p.h"
 #include "baritemmodelhandler_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QItemModelBarDataProxy
@@ -959,4 +959,4 @@ void QItemModelBarDataProxyPrivate::connectItemModelHandler()
                      m_itemModelHandler, &AbstractItemModelHandler::handleMappingChanged);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

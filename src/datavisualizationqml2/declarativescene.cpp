@@ -29,7 +29,7 @@
 
 #include "declarativescene_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 Declarative3DScene::Declarative3DScene(QObject *parent)
     : Q3DScene(parent)
@@ -57,4 +57,4 @@ QPoint Declarative3DScene::invalidSelectionPoint() const
     return Q3DScene::invalidSelectionPoint();
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

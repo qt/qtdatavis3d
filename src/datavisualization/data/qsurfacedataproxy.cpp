@@ -31,7 +31,7 @@
 #include "qsurface3dseries_p.h"
 #include "qabstract3daxis_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 /*!
  * \class QSurfaceDataProxy
@@ -634,4 +634,4 @@ void QSurfaceDataProxyPrivate::setSeries(QAbstract3DSeries *series)
     emit qptr()->seriesChanged(surfaceSeries);
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

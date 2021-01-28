@@ -43,7 +43,7 @@
 #include "datavisualizationglobal_p.h"
 #include "abstractobjecthelper_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Abstract3DRenderer;
 
@@ -76,6 +76,6 @@ private:
     QList<QVector3D> m_indexedNormals;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

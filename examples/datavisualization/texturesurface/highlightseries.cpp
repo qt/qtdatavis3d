@@ -29,8 +29,6 @@
 
 #include "highlightseries.h"
 
-using namespace QtDataVisualization;
-
 //! [2]
 const float darkRedPos = 1.0f;
 const float redPos = 0.8f;

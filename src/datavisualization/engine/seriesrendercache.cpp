@@ -32,7 +32,7 @@
 #include "texturehelper_p.h"
 #include "utils_p.h"
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 const QString smoothString(QStringLiteral("Smooth"));
 
@@ -206,4 +206,4 @@ void SeriesRenderCache::cleanup(TextureHelper *texHelper)
     }
 }
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE

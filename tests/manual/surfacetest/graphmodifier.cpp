@@ -42,7 +42,6 @@
 #ifndef QT_NO_CURSOR
 #include <QtGui/QCursor>
 #endif
-using namespace QtDataVisualization;
 
 //#define JITTER_PLANE
 //#define WONKY_PLANE

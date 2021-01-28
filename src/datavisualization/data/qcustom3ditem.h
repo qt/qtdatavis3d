@@ -35,7 +35,7 @@
 #include <QtGui/QVector3D>
 #include <QtGui/QQuaternion>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class QCustom3DItemPrivate;
 
@@ -113,6 +113,6 @@ private:
     friend class Abstract3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif

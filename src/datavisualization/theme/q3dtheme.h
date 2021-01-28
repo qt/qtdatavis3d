@@ -36,7 +36,7 @@
 #include <QtGui/QFont>
 #include <QtGui/QColor>
 
-QT_BEGIN_NAMESPACE_DATAVISUALIZATION
+QT_BEGIN_NAMESPACE
 
 class Q3DThemePrivate;
 
@@ -197,6 +197,6 @@ private:
     friend class Abstract3DController;
 };
 
-QT_END_NAMESPACE_DATAVISUALIZATION
+QT_END_NAMESPACE
 
 #endif
