@@ -6,4 +6,5 @@ qt_add_executable(directional
     PUBLIC_LIBRARIES
         Qt::Gui
         Qt::Widgets
+        Qt::DataVisualization
 )

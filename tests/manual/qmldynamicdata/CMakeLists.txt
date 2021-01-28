@@ -4,6 +4,7 @@ qt_add_executable(qmldynamicdata
         main.cpp
     PUBLIC_LIBRARIES
         Qt::Gui
+        Qt::DataVisualization
 )
 
 set(qmldynamicdata_resource_files

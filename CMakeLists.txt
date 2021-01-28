@@ -8,8 +8,9 @@ project(QtDataVisualization
     LANGUAGES CXX C
 )
 
-find_package(Qt6 ${PROJECT_VERSION} CONFIG REQUIRED COMPONENTS BuildInternals Core OpenGL Quick Qml)
-find_package(Qt6 ${PROJECT_VERSION} CONFIG OPTIONAL_COMPONENTS Gui Widgets OpenGLWidgets QuickTest Test)
+find_package(Qt6 ${PROJECT_VERSION} CONFIG REQUIRED COMPONENTS BuildInternals)
+find_package(Qt6 ${PROJECT_VERSION} CONFIG OPTIONAL_COMPONENTS
+    Core OpenGL Quick Qml Gui Widgets QuickTest Test)
 
 macro(assertTargets)
     foreach(qtTarget IN ITEMS ${ARGN})
