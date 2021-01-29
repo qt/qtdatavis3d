@@ -36,7 +36,7 @@
 #include <QtGui/QOffscreenSurface>
 #include <QtCore/QCoreApplication>
 
-namespace QtDataVisualization {
+QT_BEGIN_NAMESPACE
 
 #ifndef Q_QDOC
 static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true);
@@ -111,6 +111,6 @@ static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
     return surfaceFormat;
 }
 
-}
+QT_END_NAMESPACE
 
 #endif

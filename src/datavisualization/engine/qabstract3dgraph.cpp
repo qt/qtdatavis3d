@@ -186,7 +186,7 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
         // Make sure renderable type is correct
         surfaceFormat.setRenderableType(QSurfaceFormat::DefaultRenderableType);
     } else {
-        surfaceFormat = QtDataVisualization::qDefaultSurfaceFormat();
+        surfaceFormat = qDefaultSurfaceFormat();
     }
 
     d_ptr->m_context = new QOpenGLContext(this);

@@ -32,6 +32,8 @@
 
 #include <QtCore/qglobal.h>
 
+QT_BEGIN_NAMESPACE
+
 #define QT_DATAVISUALIZATION_VERSION_STR QT_VERSION_STR
 /*
    QT_DATAVISUALIZATION_VERSION is (major << 16) + (minor << 8) + patch.
@@ -51,5 +53,7 @@
 #else
 #  define QT_DATAVISUALIZATION_EXPORT
 #endif
+
+QT_END_NAMESPACE
 
 #endif
