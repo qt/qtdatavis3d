@@ -28,4 +28,9 @@
 ****************************************************************************/
 
 #include <QtQuickTest/quicktest.h>
-QUICK_TEST_MAIN(qmltest)
+int main(int argc, char **argv)
+{
+    qputenv("QSG_RHI_BACKEND", "opengl");
+    QTEST_SET_MAIN_SOURCE_PATH
+    return quick_test_main(argc, argv, "qmltest", QUICK_TEST_SOURCE_DIR);
+}

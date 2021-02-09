@@ -268,6 +268,7 @@ void tst_proxy::multiMatch()
     m_proxy->setYPosRoleReplace(QStringLiteral("\\3"));
     m_proxy->setColumnRolePattern(QRegularExpression(QStringLiteral("^(\\d*)(\\/)(\\d*)\\/\\d*[\\.\\,]?\\d*\\/\\d*[\\.\\,]?\\d*$")));
     m_proxy->setColumnRoleReplace(QStringLiteral("\\1"));
+    QCoreApplication::processEvents();
 
     QSurface3DSeries *series = new QSurface3DSeries(m_proxy);
 

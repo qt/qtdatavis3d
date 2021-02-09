@@ -78,6 +78,7 @@ void tst_proxy::construct()
     QImage image(QSize(10, 10), QImage::Format_ARGB32);
     image.fill(0);
     proxy = new QHeightMapSurfaceDataProxy(image);
+    QCoreApplication::processEvents();
     QVERIFY(proxy);
     QCoreApplication::processEvents();
     QCOMPARE(proxy->columnCount(), 10);
@@ -85,6 +86,7 @@ void tst_proxy::construct()
     delete proxy;
 
     proxy = new QHeightMapSurfaceDataProxy(":/customtexture.jpg");
+    QCoreApplication::processEvents();
     QVERIFY(proxy);
     QCoreApplication::processEvents();
     QCOMPARE(proxy->columnCount(), 24);
