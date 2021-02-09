@@ -78,7 +78,7 @@ class TextureHelper : protected QOpenGLFunctions
     QRgb qt_gl_convertToGLFormatHelper(QRgb src_pixel, GLenum texture_format);
 
 #if !QT_CONFIG(opengles2)
-    QOpenGLFunctions_2_1 *m_openGlFunctions_2_1;
+    QOpenGLFunctions_2_1 *m_openGlFunctions_2_1 = nullptr;
 #endif
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;
