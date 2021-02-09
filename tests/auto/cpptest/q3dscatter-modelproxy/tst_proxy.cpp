@@ -188,6 +188,7 @@ void tst_proxy::addModel()
     m_proxy->setYPosRoleReplace(QStringLiteral("\\3"));
     m_proxy->setZPosRolePattern(QRegularExpression(QStringLiteral("^(\\d*)(\\/)(\\d*)\\/\\d*[\\.\\,]?\\d*\\/\\d*[\\.\\,]?\\d*$")));
     m_proxy->setZPosRoleReplace(QStringLiteral("\\1"));
+    QCoreApplication::processEvents();
 
     QScatter3DSeries *series = new QScatter3DSeries(m_proxy);
     Q_UNUSED(series);

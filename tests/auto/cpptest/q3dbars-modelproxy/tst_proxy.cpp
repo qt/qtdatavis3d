@@ -251,6 +251,7 @@ void tst_proxy::multiMatch()
     m_proxy->setValueRoleReplace(QStringLiteral("\\3"));
     m_proxy->setColumnRolePattern(QRegularExpression(QStringLiteral("^(\\d*)(\\/)(\\d*)\\/\\d*[\\.\\,]?\\d*\\/\\d*[\\.\\,]?\\d*$")));
     m_proxy->setColumnRoleReplace(QStringLiteral("\\1"));
+    QCoreApplication::processEvents();
 
     QBar3DSeries *series = new QBar3DSeries(m_proxy);
 
