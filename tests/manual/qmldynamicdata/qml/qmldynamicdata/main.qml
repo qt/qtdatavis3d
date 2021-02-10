@@ -267,6 +267,6 @@ Rectangle {
         width: parent.width / 3
         text: "Quit"
         anchors.left: cameraToggle.right
-        onClicked: Qt.quit(0);
+        onClicked: Qt.quit();
     }
 }
