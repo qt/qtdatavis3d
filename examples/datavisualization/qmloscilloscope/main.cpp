@@ -48,7 +48,7 @@ int main(int argc, char *argv[])
 
     // Enable antialiasing in direct rendering mode
     //! [1]
-    viewer.setFormat(qDefaultSurfaceFormat());
+    viewer.setFormat(qDefaultSurfaceFormat(true));
     //! [1]
 
     // The following are needed to make examples run without having to install the module

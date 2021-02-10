@@ -38,8 +38,8 @@
 
 QT_BEGIN_NAMESPACE
 
-#ifndef Q_QDOC
-static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias = true);
+#ifdef Q_OS_MACOS
+#pragma clang diagnostic ignored "-Wunused-function"
 #endif
 static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
 {

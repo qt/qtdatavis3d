@@ -268,7 +268,7 @@
  * // ...
  *
  * QQuickView viewer;
- * viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat());
+ * viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat(true));
  * \endcode
  *
  * \note Antialiasing is not supported in OpenGL ES2 environments.
