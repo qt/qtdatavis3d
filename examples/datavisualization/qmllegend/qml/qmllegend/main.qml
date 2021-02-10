@@ -234,7 +234,7 @@ Rectangle {
             Layout.fillHeight: true
             Layout.fillWidth: true
             text: "Quit"
-            onClicked: Qt.quit(0);
+            onClicked: Qt.quit();
         }
     }
 

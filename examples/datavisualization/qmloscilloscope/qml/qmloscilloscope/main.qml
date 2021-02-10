@@ -315,7 +315,7 @@ Item {
 
                     text: "Quit"
 
-                    onClicked: Qt.quit(0);
+                    onClicked: Qt.quit();
                 }
             }
         }

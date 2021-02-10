@@ -238,7 +238,7 @@ Rectangle {
             Layout.fillHeight: true
             Layout.minimumWidth: parent.width / 3
             text: "Quit"
-            onClicked: Qt.quit(0);
+            onClicked: Qt.quit();
         }
     }
 }

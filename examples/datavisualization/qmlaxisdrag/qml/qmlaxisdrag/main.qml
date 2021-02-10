@@ -324,6 +324,6 @@ Item {
         width: parent.width / 3
         text: "Quit"
         anchors.left: orthoToggle.right
-        onClicked: Qt.quit(0);
+        onClicked: Qt.quit();
     }
 }
