@@ -104,8 +104,8 @@ Rectangle {
     //! [4]
     Connections {
         target: series
-        onSelectedBarChanged: {
-            if (position != series.invalidSelectionPosition) {
+        function onSelectedBarChanged(position) {
+            if (position !== series.invalidSelectionPosition) {
                 previousSelection = position
             }
         }
