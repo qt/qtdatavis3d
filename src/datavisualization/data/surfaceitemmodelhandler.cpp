@@ -313,12 +313,14 @@ void SurfaceItemModelHandler::resolveModel()
             for (int j = 0; j < columnList.size(); j++) {
                 QVector3D &itemPos = itemValueMap[rowKey][columnList.at(j)];
                 if (cumulative) {
-                    if (average) {
-                        itemPos /= float((*matchCountMap)[rowKey][columnList.at(j)]);
-                    } else { // cumulativeY
-                        float divisor = float((*matchCountMap)[rowKey][columnList.at(j)]);
-                        itemPos.setX(itemPos.x() / divisor);
-                        itemPos.setZ(itemPos.z() / divisor);
+                    float divisor = float((*matchCountMap)[rowKey][columnList.at(j)]);
+                    if (divisor) {
+                        if (average) {
+                            itemPos /= divisor;
+                        } else { // cumulativeY
+                            itemPos.setX(itemPos.x() / divisor);
+                            itemPos.setZ(itemPos.z() / divisor);
+                        }
                     }
                 }
                 newProxyRow[j].setPosition(itemPos);
