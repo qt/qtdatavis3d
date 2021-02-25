@@ -30,6 +30,10 @@
 #include <QtQuickTest/quicktest.h>
 int main(int argc, char **argv)
 {
+    if (!qEnvironmentVariableIsEmpty("QEMU_LD_PREFIX")) {
+        qWarning("This test will fail due to QEMU emulation shortcomings.");
+        return 0;
+    }
     qputenv("QSG_RHI_BACKEND", "opengl");
     QTEST_SET_MAIN_SOURCE_PATH
     return quick_test_main(argc, argv, "qmltest", QUICK_TEST_SOURCE_DIR);
