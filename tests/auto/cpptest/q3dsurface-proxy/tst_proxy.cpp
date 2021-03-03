@@ -45,6 +45,7 @@ private slots:
 
     void initialProperties();
     void initializeProperties();
+    void initialRow();
 
 private:
     QSurfaceDataProxy *m_proxy;
@@ -101,6 +102,15 @@ void tst_proxy::initializeProperties()
 
     QCOMPARE(m_proxy->columnCount(), 2);
     QCOMPARE(m_proxy->rowCount(), 2);
+}
+
+void tst_proxy::initialRow()
+{
+    QSurfaceDataProxy proxy;
+    QSurfaceDataRow row{QSurfaceDataItem{QVector3D{0, 0, 0}},
+                        QSurfaceDataItem{QVector3D{1, 1, 1}}};
+    proxy.addRow(new QSurfaceDataRow(row));
+    proxy.addRow(new QSurfaceDataRow(row));
 }
 
 QTEST_MAIN(tst_proxy)

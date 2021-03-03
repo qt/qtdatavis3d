@@ -475,7 +475,8 @@ void QSurfaceDataProxyPrivate::setItem(int rowIndex, int columnIndex, const QSur
 
 int QSurfaceDataProxyPrivate::addRow(QSurfaceDataRow *row)
 {
-    Q_ASSERT(m_dataArray->at(0)->size() == row->size());
+    Q_ASSERT(m_dataArray->isEmpty()
+             || m_dataArray->at(0)->size() == row->size());
     int currentSize = m_dataArray->size();
     m_dataArray->append(row);
     return currentSize;
@@ -485,7 +486,8 @@ int QSurfaceDataProxyPrivate::addRows(const QSurfaceDataArray &rows)
 {
     int currentSize = m_dataArray->size();
     for (int i = 0; i < rows.size(); i++) {
-        Q_ASSERT(m_dataArray->at(0)->size() == rows.at(i)->size());
+        Q_ASSERT(m_dataArray->isEmpty()
+                 || m_dataArray->at(0)->size() == rows.at(i)->size());
         m_dataArray->append(rows.at(i));
     }
     return currentSize;
@@ -494,7 +496,8 @@ int QSurfaceDataProxyPrivate::addRows(const QSurfaceDataArray &rows)
 void QSurfaceDataProxyPrivate::insertRow(int rowIndex, QSurfaceDataRow *row)
 {
     Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray->size());
-    Q_ASSERT(m_dataArray->at(0)->size() == row->size());
+    Q_ASSERT(m_dataArray->isEmpty()
+             || m_dataArray->at(0)->size() == row->size());
     m_dataArray->insert(rowIndex, row);
 }
 
@@ -503,7 +506,8 @@ void QSurfaceDataProxyPrivate::insertRows(int rowIndex, const QSurfaceDataArray 
     Q_ASSERT(rowIndex >= 0 && rowIndex <= m_dataArray->size());
 
     for (int i = 0; i < rows.size(); i++) {
-        Q_ASSERT(m_dataArray->at(0)->size() == rows.at(i)->size());
+        Q_ASSERT(m_dataArray->isEmpty()
+                 || m_dataArray->at(0)->size() == rows.at(i)->size());
         m_dataArray->insert(rowIndex++, rows.at(i));
     }
 }
