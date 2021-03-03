@@ -224,6 +224,11 @@
     \title Qt Data Visualization Known Issues
 
     \list
+        \li As OpenGL is not necessarily the default rendering backend anymore in Qt 6.x (it is
+            Metal on macOS and Direct3D on Windows, for example), it is necessary to define
+            the rendering backend explicitly either on your environment variables, or in your
+            application main. It can be defined by adding \c {qputenv("QSG_RHI_BACKEND", "opengl");}
+            in the beginning of your main function.
         \li Some platforms like Android and WinRT cannot handle multiple native windows properly,
             so only the Qt Quick 2 graphs are available in practice for those platforms.
         \li Surfaces with non-straight rows and columns do not always render properly.
