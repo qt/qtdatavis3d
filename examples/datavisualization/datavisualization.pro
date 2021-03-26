@@ -6,7 +6,7 @@ qtHaveModule(quick) {
                qmlcustominput \
                qmllegend \
                qmlmultigraph \
-               qmloscilloscope \
+               qml3doscilloscope \
                qmlsurfacelayers \
                qmlaxisformatter \
                qmlaxisdrag \
