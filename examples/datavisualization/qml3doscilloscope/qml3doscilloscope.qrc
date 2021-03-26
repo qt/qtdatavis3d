@@ -1,5 +1,5 @@
 <RCC>
     <qresource prefix="/">
-        <file>qml/qmloscilloscope/main.qml</file>
+        <file>qml/qml3doscilloscope/main.qml</file>
     </qresource>
 </RCC>

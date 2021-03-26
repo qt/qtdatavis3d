@@ -9,8 +9,8 @@ SOURCES += main.cpp \
            datasource.cpp
 HEADERS += datasource.h
 
-RESOURCES += qmloscilloscope.qrc
+RESOURCES += qml3doscilloscope.qrc
 
 OTHER_FILES += doc/src/* \
                doc/images/* \
-               qml/qmloscilloscope/*
+               qml/qml3doscilloscope/*

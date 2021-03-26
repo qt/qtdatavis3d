@@ -69,7 +69,7 @@ int main(int argc, char *argv[])
     viewer.rootContext()->setContextProperty("dataSource", &dataSource);
     //! [0]
 
-    viewer.setSource(QUrl("qrc:/qml/qmloscilloscope/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/qml3doscilloscope/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
 

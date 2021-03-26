@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.14)
-project(qmloscilloscope LANGUAGES CXX)
+project(qml3doscilloscope LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -18,15 +18,15 @@ find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Qml)
 find_package(Qt6 COMPONENTS Quick)
 
-qt_add_executable(qmloscilloscope
+qt_add_executable(qml3doscilloscope
     datasource.cpp datasource.h
     main.cpp
 )
-set_target_properties(qmloscilloscope PROPERTIES
+set_target_properties(qml3doscilloscope PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
 )
-target_link_libraries(qmloscilloscope PUBLIC
+target_link_libraries(qml3doscilloscope PUBLIC
     Qt::Core
     Qt::Gui
     Qt::Qml
@@ -34,18 +34,18 @@ target_link_libraries(qmloscilloscope PUBLIC
     Qt::DataVisualization
 )
 
-set(qmloscilloscope_resource_files
-    "qml/qmloscilloscope/main.qml"
+set(qml3doscilloscope_resource_files
+    "qml/qml3doscilloscope/main.qml"
 )
 
-qt6_add_resources(qmloscilloscope "qmloscilloscope"
+qt6_add_resources(qml3doscilloscope "qml3doscilloscope"
     PREFIX
         "/"
     FILES
-        ${qmloscilloscope_resource_files}
+        ${qml3doscilloscope_resource_files}
 )
 
-install(TARGETS qmloscilloscope
+install(TARGETS qml3doscilloscope
     RUNTIME DESTINATION "${INSTALL_EXAMPLEDIR}"
     BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
     LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"
