@@ -74,15 +74,15 @@ void tst_custom::construct()
     QVERIFY(custom);
     delete custom;
 
-    custom = new QCustom3DItem(":/customitem.obj", QVector3D(1.0, 1.0, 1.0),
-                               QVector3D(1.0, 1.0, 1.0), QQuaternion(1.0, 1.0, 10.0, 100.0),
+    custom = new QCustom3DItem(":/customitem.obj", QVector3D(1.0f, 1.0f, 1.0f),
+                               QVector3D(1.0f, 1.0f, 1.0f), QQuaternion(1.0f, 1.0f, 10.0f, 100.0f),
                                QImage(":/customtexture.jpg"));
     QVERIFY(custom);
     QCOMPARE(custom->meshFile(), QString(":/customitem.obj"));
-    QCOMPARE(custom->position(), QVector3D(1.0, 1.0, 1.0));
+    QCOMPARE(custom->position(), QVector3D(1.0f, 1.0f, 1.0f));
     QCOMPARE(custom->isPositionAbsolute(), false);
-    QCOMPARE(custom->rotation(), QQuaternion(1.0, 1.0, 10.0, 100.0));
-    QCOMPARE(custom->scaling(), QVector3D(1.0, 1.0, 1.0));
+    QCOMPARE(custom->rotation(), QQuaternion(1.0f, 1.0f, 10.0f, 100.0f));
+    QCOMPARE(custom->scaling(), QVector3D(1.0f, 1.0f, 1.0f));
     QCOMPARE(custom->isScalingAbsolute(), true);
     QCOMPARE(custom->isShadowCasting(), true);
     QCOMPARE(custom->textureFile(), QString());
@@ -110,20 +110,20 @@ void tst_custom::initializeProperties()
     QVERIFY(m_custom);
 
     m_custom->setMeshFile(":/customitem.obj");
-    m_custom->setPosition(QVector3D(1.0, 1.0, 1.0));
+    m_custom->setPosition(QVector3D(1.0f, 1.0f, 1.0f));
     m_custom->setPositionAbsolute(true);
-    m_custom->setRotation(QQuaternion(1.0, 1.0, 10.0, 100.0));
-    m_custom->setScaling(QVector3D(1.0, 1.0, 1.0));
+    m_custom->setRotation(QQuaternion(1.0f, 1.0f, 10.0f, 100.0f));
+    m_custom->setScaling(QVector3D(1.0f, 1.0f, 1.0f));
     m_custom->setScalingAbsolute(false);
     m_custom->setShadowCasting(false);
     m_custom->setTextureFile(":/customtexture.jpg");
     m_custom->setVisible(false);
 
     QCOMPARE(m_custom->meshFile(), QString(":/customitem.obj"));
-    QCOMPARE(m_custom->position(), QVector3D(1.0, 1.0, 1.0));
+    QCOMPARE(m_custom->position(), QVector3D(1.0f, 1.0f, 1.0f));
     QCOMPARE(m_custom->isPositionAbsolute(), true);
-    QCOMPARE(m_custom->rotation(), QQuaternion(1.0, 1.0, 10.0, 100.0));
-    QCOMPARE(m_custom->scaling(), QVector3D(1.0, 1.0, 1.0));
+    QCOMPARE(m_custom->rotation(), QQuaternion(1.0f, 1.0f, 10.0f, 100.0f));
+    QCOMPARE(m_custom->scaling(), QVector3D(1.0f, 1.0f, 1.0f));
     QCOMPARE(m_custom->isScalingAbsolute(), false);
     QCOMPARE(m_custom->isShadowCasting(), false);
     QCOMPARE(m_custom->textureFile(), QString(":/customtexture.jpg"));
