@@ -94,8 +94,8 @@ void tst_light::initializeProperties()
     QCOMPARE(m_light->isAutoPosition(), true);
 
     // Common (from Q3DObject)
-    m_light->setPosition(QVector3D(1.0, 1.0, 1.0));
-    QCOMPARE(m_light->position(), QVector3D(1.0, 1.0, 1.0));
+    m_light->setPosition(QVector3D(1.0f, 1.0f, 1.0f));
+    QCOMPARE(m_light->position(), QVector3D(1.0f, 1.0f, 1.0f));
 }
 
 QTEST_MAIN(tst_light)
