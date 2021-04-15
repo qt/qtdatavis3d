@@ -1,6 +1,6 @@
 qt_internal_add_qml_module(DataVisualizationQml2
     URI "QtDataVisualization"
-    VERSION "1.${CMAKE_PROJECT_VERSION_MINOR}"
+    VERSION "1.${PROJECT_VERSION_MINOR}"
     CLASSNAME QtDataVisualizationQml2Plugin
     SKIP_TYPE_REGISTRATION
     SOURCES
