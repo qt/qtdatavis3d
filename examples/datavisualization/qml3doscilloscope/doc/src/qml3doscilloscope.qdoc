@@ -110,6 +110,7 @@
 
     \snippet qml3doscilloscope/qml/qml3doscilloscope/main.qml 3
 
+    \omit
     \section1 Enabling Direct Rendering
 
     Since this application potentially deals with a lot of rapidly changing data, we use direct
@@ -121,8 +122,6 @@
     \snippet qml3doscilloscope/main.cpp 1
     \dots 0
     \snippet qml3doscilloscope/main.cpp 2
+    \endomit
 
-    On the QML side, direct rendering mode is enabled via \l{AbstractGraph3D::renderingMode}{renderingMode} property:
-
-    \snippet qml3doscilloscope/qml/qml3doscilloscope/main.qml 5
 */

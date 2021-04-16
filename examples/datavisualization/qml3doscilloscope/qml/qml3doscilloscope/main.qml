@@ -60,9 +60,6 @@ Item {
             height: dataView.height
             shadowQuality: AbstractGraph3D.ShadowQualityNone
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
-            //! [5]
-            renderingMode: AbstractGraph3D.RenderDirectToBackground
-            //! [5]
 
             axisX.labelFormat: "%d ms"
             axisY.labelFormat: "%d W"
@@ -132,7 +129,7 @@ Item {
                 id: sliderLayout
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.minimumHeight: flatShadingToggle.height
+                Layout.minimumHeight: flatShadingToggle.implicitHeight
                 spacing: 0
 
                 Rectangle {
@@ -268,7 +265,7 @@ Item {
                 id: buttonLayout
                 Layout.fillHeight: true
                 Layout.fillWidth: true
-                Layout.minimumHeight: flatShadingToggle.height
+                Layout.minimumHeight: flatShadingToggle.implicitHeight
                 spacing: 0
 
                 Button {
