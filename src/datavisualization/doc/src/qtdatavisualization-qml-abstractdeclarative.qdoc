@@ -96,7 +96,7 @@
   items, the regular QML window clearing before rendering is suppressed. The graphs handle the clearing
   themselves instead.
   If the surface format of the window supports antialiasing, it will be used (see
-  \c {QtDataVisualization::qDefaultSurfaceFormat()}).
+  \c {qDefaultSurfaceFormat()}).
   This rendering mode offers the best performance at the expense of non-standard QML behavior. For example,
   the graphs do not obey the z ordering of QML items and the opacity value has no effect on them.
 
