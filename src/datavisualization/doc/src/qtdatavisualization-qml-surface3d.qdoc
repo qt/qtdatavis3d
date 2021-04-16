@@ -83,7 +83,7 @@
 
 /*!
  * \qmlproperty list<Surface3DSeries> Surface3D::seriesList
- * \default
+ * \qmldefault
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
  * To set the series, either use the addSeries() function or define them as children of the graph.
