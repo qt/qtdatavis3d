@@ -85,7 +85,7 @@
 
 /*!
  * \qmlproperty list<Scatter3DSeries> Scatter3D::seriesList
- * \default
+ * \qmldefault
  * This property holds the series of the graph.
  * By default, this property contains an empty list.
  * To set the series, either use the addSeries() method or define them as

@@ -116,7 +116,7 @@
 
 /*!
  * \qmlproperty list<Bar3DSeries> Bars3D::seriesList
- * \default
+ * \qmldefault
  * The series of the graph.
  * By default, this property contains an empty list.
  * To set the series, either use the addSeries() function or define them as children of the graph.
