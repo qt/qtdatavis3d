@@ -26,14 +26,6 @@
 ****************************************************************************/
 
 /*!
-    \inmodule QtDataVisualization
-    \brief Contains the classes and enumerations in the Qt Data Visualization
-    module.
-
-    \generatelist{classesbymodule QtDataVisualization}
-*/
-
-/*!
     \module QtDataVisualization
     \title Qt Data Visualization C++ Classes
     \ingroup modules
@@ -244,7 +236,7 @@
 */
 
 /*!
- * \fn QSurfaceFormat QtDataVisualization::qDefaultSurfaceFormat(bool antialias)
+ * \fn QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
  * \relates QAbstract3DGraph
  *
  * This convenience function can be used to create a custom surface format suitable for use by
@@ -262,7 +254,7 @@
  *
  * // ...
  *
- * Q3DBars *graph = new Q3DBars(QtDataVisualization::qDefaultSurfaceFormat(false));
+ * Q3DBars *graph = new Q3DBars(qDefaultSurfaceFormat(false));
  * \endcode
  *
  * For example, enable antialiasing for direct rendering modes on QML application:
@@ -273,7 +265,7 @@
  * // ...
  *
  * QQuickView viewer;
- * viewer.setFormat(QtDataVisualization::qDefaultSurfaceFormat(true));
+ * viewer.setFormat(qDefaultSurfaceFormat(true));
  * \endcode
  *
  * \note Antialiasing is not supported in OpenGL ES2 environments.
