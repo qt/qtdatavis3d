@@ -6,17 +6,16 @@ description         = Qt Data Visualization Reference Documentation
 version             = $QT_VERSION
 buildversion        = Qt Data Visualization | Commercial or GPLv3
 
+examplesinstallpath = datavisualization
 exampledirs += ../../../examples/datavisualization \
                snippets
 
-headerdirs += ..
+{headerdirs,sourcedirs} += ..
+
 imagedirs  += ../images \
               images
-sourcedirs += ..
 
-examplesinstallpath = datavisualization
-
-depends = qtcore qtgui qtqml qtquick qtmultimedia qtdoc qtwidgets
+depends = qtcore qtgui qtqml qtquick qtmultimedia qtdoc qtcmake qtwidgets
 
 qhp.projects                            = QtDataVisualization
 
@@ -32,11 +31,11 @@ qhp.QtDataVisualization.customFilters.Qt.filterAttributes       = qtdatavisualiz
 qhp.QtDataVisualization.subprojects                             = gettingstarted examples classes types
 qhp.QtDataVisualization.subprojects.gettingstarted.title        = Getting Started
 qhp.QtDataVisualization.subprojects.gettingstarted.indexTitle   = Qt Data Visualization Getting Started
-qhp.QtDataVisualization.subprojects.gettingstarted.selectors    = fake:page
+qhp.QtDataVisualization.subprojects.gettingstarted.selectors    = doc:page
 qhp.QtDataVisualization.subprojects.gettingstarted.sortPages    = true
 qhp.QtDataVisualization.subprojects.examples.title              = Examples
 qhp.QtDataVisualization.subprojects.examples.indexTitle         = Qt Data Visualization Examples
-qhp.QtDataVisualization.subprojects.examples.selectors          = fake:example
+qhp.QtDataVisualization.subprojects.examples.selectors          = doc:example
 qhp.QtDataVisualization.subprojects.examples.sortPages          = true
 qhp.QtDataVisualization.subprojects.classes.title               = C++ Classes
 qhp.QtDataVisualization.subprojects.classes.indexTitle          = Qt Data Visualization C++ Classes
