@@ -251,6 +251,7 @@ Rectangle {
         }
     }
 
+    //! [2]
     onCurrentRowChanged: {
         var timestamp = graphData.model.get(currentRow).timestamp
         var pattern = /(\d\d\d\d)-(\d\d)/
@@ -268,6 +269,7 @@ Rectangle {
         else
             secondarySeries.selectedBar = Qt.point(rowIndex, colIndex)
     }
+    //! [2]
 
     ColumnLayout {
         id: controlLayout
