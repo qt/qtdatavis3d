@@ -17,6 +17,7 @@ find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Qml)
 find_package(Qt6 COMPONENTS Quick)
+find_package(Qt6 COMPONENTS DataVisualization)
 
 qt_add_executable(qmlaxisformatter
     customformatter.cpp customformatter.h
