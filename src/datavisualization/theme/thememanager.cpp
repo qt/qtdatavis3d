@@ -101,7 +101,8 @@ void ThemeManager::setActiveTheme(Q3DTheme *theme)
     m_activeTheme = theme;
 
     // Reset all bits to dirty for sync
-    m_activeTheme->d_ptr->resetDirtyBits();
+    if (theme->d_ptr->isForcePredefinedType())
+        m_activeTheme->d_ptr->resetDirtyBits();
 
     // Connect signals from new one
     connectThemeSignals();
