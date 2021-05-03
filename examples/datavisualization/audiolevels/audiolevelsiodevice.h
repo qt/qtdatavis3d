@@ -37,7 +37,7 @@ class AudioLevelsIODevice : public QIODevice
 {
     Q_OBJECT
 public:
-    explicit AudioLevelsIODevice(QBarDataProxy *proxy, QObject *parent = 0);
+    explicit AudioLevelsIODevice(QBarDataProxy *proxy, QObject *parent = nullptr);
 
 protected:
     qint64 readData(char *data, qint64 maxSize);
