@@ -84,6 +84,7 @@ qt_internal_add_module(DataVisualization
         input
         theme
         utils
+        ../datavisualizationqml2
     PUBLIC_LIBRARIES
         Qt::Core
         Qt::Gui

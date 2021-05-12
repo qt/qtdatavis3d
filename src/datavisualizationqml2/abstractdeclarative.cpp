@@ -293,6 +293,7 @@ void AbstractDeclarative::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);
     m_controller = controller;
+    m_controller->m_qml = this;
 
     if (!m_controller->isOpenGLES())
         m_samples = 4;

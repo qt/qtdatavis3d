@@ -27,6 +27,7 @@
 **
 ****************************************************************************/
 
+#include "abstractdeclarative_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
@@ -692,12 +693,16 @@ void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
 {
     Q_UNUSED(theme);
 
+    if (!m_qml)
+        return;
+
     // Changing theme type is logically equivalent of changing the entire theme
     // object, so reset all attached series to the new theme.
-
+    bool force = m_qml->isReady();
     Q3DTheme *activeTheme = m_themeManager->activeTheme();
     for (int i = 0; i < m_seriesList.size(); i++)
-        m_seriesList.at(i)->d_ptr->resetToTheme(*activeTheme, i, true);
+        m_seriesList.at(i)->d_ptr->resetToTheme(*activeTheme, i, force);
+
     markSeriesVisualsDirty();
 }
 

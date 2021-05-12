@@ -56,6 +56,7 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLFramebufferObject)
 
 QT_BEGIN_NAMESPACE
 
+class AbstractDeclarative;
 class Abstract3DRenderer;
 class QAbstract3DSeries;
 class ThemeManager;
@@ -225,6 +226,7 @@ protected:
     qreal m_margin;
 
     QMutex m_renderMutex;
+    AbstractDeclarative *m_qml = nullptr;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
