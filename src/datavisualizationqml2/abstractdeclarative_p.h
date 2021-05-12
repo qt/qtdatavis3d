@@ -231,6 +231,8 @@ public:
 
     QMutex *mutex() { return &m_mutex; }
 
+    bool isReady() { return isComponentComplete(); }
+
 public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
