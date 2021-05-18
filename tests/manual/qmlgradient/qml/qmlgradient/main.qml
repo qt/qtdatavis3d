@@ -122,7 +122,7 @@ Rectangle {
             axisX.title: "Latitude"
             axisZ.title: "Longitude"
 
-            Surface3DSeries{
+            Surface3DSeries {
                 id: heightSeries
                 drawMode: Surface3DSeries.DrawSurface
                 visible: true

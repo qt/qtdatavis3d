@@ -75,7 +75,7 @@ Item {
             axisZ.segmentCount: 4
             measureFps: true
 
-            onCurrentFpsChanged: {
+            onCurrentFpsChanged: (fps)=> {
                 if (fps > 10)
                     fpsText.text = "FPS: " + Math.round(surfaceGraph.currentFps)
                 else
@@ -118,7 +118,7 @@ Item {
 
     Rectangle {
         width: parent.width
-        height: flatShadingToggle.height * 2
+        height: flatShadingToggle.implicitHeight * 2
         anchors.left: parent.left
         anchors.top: parent.top
         color: surfaceGraph.theme.backgroundColor

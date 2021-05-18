@@ -142,7 +142,7 @@ Rectangle {
                     ColorGradientStop { position: 0.0; color: "#600000" }
                 }
 
-                onSelectedBarChanged: handleSelectionChange(secondarySeries, position)
+                onSelectedBarChanged: (position)=> handleSelectionChange(secondarySeries, position)
             }
 
             //! [3]
@@ -171,7 +171,7 @@ Rectangle {
                     ColorGradientStop { position: 0.0; color: "#006000" }
                 }
 
-                onSelectedBarChanged: handleSelectionChange(barSeries, position)
+                onSelectedBarChanged: (position)=> handleSelectionChange(barSeries, position)
             }
         }
     }

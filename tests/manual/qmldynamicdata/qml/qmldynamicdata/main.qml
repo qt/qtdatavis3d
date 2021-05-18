@@ -158,12 +158,12 @@ Rectangle {
             property int mouseX: -1
             property int mouseY: -1
 
-            onPositionChanged: {
+            onPositionChanged: (mouse)=> {
                 mouseX = mouse.x;
                 mouseY = mouse.y;
             }
 
-            onWheel: {
+            onWheel: (wheel)=> {
                 // Adjust zoom level based on what zoom range we're in.
                 var zoomLevel = scatterGraph.scene.activeCamera.zoomLevel;
                 if (zoomLevel > 100)
