@@ -136,17 +136,17 @@ Rectangle {
                 fpsText.text = itemCount + " : " + scatterPlot.currentFps.toFixed(1);
             }
 
-//            theme: Theme3D {
-//                type: Theme3D.ThemeRetro
-//                colorStyle: Theme3D.ColorStyleRangeGradient
-//                baseGradients: customGradient
+            theme: Theme3D {
+                type: Theme3D.ThemeRetro
+                colorStyle: Theme3D.ColorStyleRangeGradient
+                baseGradients: customGradient
 
-//                ColorGradient {
-//                    id: customGradient
-//                    ColorGradientStop { position: 1.0; color: "red" }
-//                    ColorGradientStop { position: 0.0; color: "blue" }
-//                }
-//            }
+                ColorGradient {
+                    id: customGradient
+                    ColorGradientStop { position: 1.0; color: "red" }
+                    ColorGradientStop { position: 0.0; color: "blue" }
+                }
+            }
 
             Scatter3DSeries {
                 id: scatterSeries

@@ -186,7 +186,7 @@ Item {
             //! [1]
 
             //! [3]
-            onPositionChanged: {
+            onPositionChanged: (mouse)=> {
                 currentMouseX = mouse.x;
                 currentMouseY = mouse.y;
                 //! [3]
@@ -201,7 +201,7 @@ Item {
             //! [4]
 
             //! [2]
-            onPressed: {
+            onPressed: (mouse)=> {
                 scatterGraph.scene.selectionQueryPosition = Qt.point(mouse.x, mouse.y);
             }
             //! [2]
