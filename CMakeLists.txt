@@ -8,6 +8,9 @@ project(QtDataVisualization
     LANGUAGES CXX C
 )
 
+# Make sure we use the fixed BASE argument of qt_add_resource.
+set(QT_USE_FIXED_QT_ADD_RESOURCE_BASE TRUE)
+
 find_package(Qt6 ${PROJECT_VERSION} CONFIG REQUIRED COMPONENTS BuildInternals)
 find_package(Qt6 ${PROJECT_VERSION} CONFIG OPTIONAL_COMPONENTS
     Core OpenGL Quick Qml Gui Widgets QuickTest Test)
@@ -24,4 +27,3 @@ endmacro()
 assertTargets(Gui Widgets OpenGL Quick Qml QuickTest Test)
 
 qt_build_repo()
-
