@@ -15,7 +15,7 @@ set(barstest_resource_files
     "shuttle.png"
 )
 
-qt_add_resource(barstest "barstest"
+qt_internal_add_resource(barstest "barstest"
     PREFIX
         "/"
     FILES

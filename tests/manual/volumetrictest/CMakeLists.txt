@@ -18,7 +18,7 @@ set(volumetrictest_resource_files
     "logo_no_padding.png"
 )
 
-qt_add_resource(volumetrictest "volumetrictest"
+qt_internal_add_resource(volumetrictest "volumetrictest"
     PREFIX
         "/"
     FILES

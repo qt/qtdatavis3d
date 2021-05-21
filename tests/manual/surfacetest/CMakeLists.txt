@@ -20,7 +20,7 @@ set(surfacetest_resource_files
     "mapimage.png"
 )
 
-qt_add_resource(surfacetest "surfacetest"
+qt_internal_add_resource(surfacetest "surfacetest"
     PREFIX
         "/maps"
     FILES

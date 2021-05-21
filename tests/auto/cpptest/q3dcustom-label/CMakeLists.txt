@@ -1,4 +1,4 @@
-qt_add_test(q3dcustom-label
+qt_internal_add_test(q3dcustom-label
     SOURCES
         tst_custom.cpp
     INCLUDE_DIRECTORIES

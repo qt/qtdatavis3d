@@ -11,7 +11,7 @@ set(qmldynamicdata_resource_files
     "qml/qmldynamicdata/main.qml"
 )
 
-qt_add_resource(qmldynamicdata "qmldynamicdata"
+qt_internal_add_resource(qmldynamicdata "qmldynamicdata"
     PREFIX
         "/"
     FILES

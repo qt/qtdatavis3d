@@ -1,4 +1,4 @@
-qt_add_test(q3daxis-logvalue
+qt_internal_add_test(q3daxis-logvalue
     SOURCES
         tst_axis.cpp
     PUBLIC_LIBRARIES

@@ -12,7 +12,7 @@ set(qmlmultitest_resource_files
     "qml/qmlmultitest/main.qml"
 )
 
-qt_add_resource(qmlmultitest "qmlmultitest"
+qt_internal_add_resource(qmlmultitest "qmlmultitest"
     PREFIX
         "/"
     FILES

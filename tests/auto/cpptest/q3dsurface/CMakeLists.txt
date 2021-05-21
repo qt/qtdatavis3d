@@ -1,4 +1,4 @@
-qt_add_test(q3dsurface
+qt_internal_add_test(q3dsurface
     SOURCES
         tst_surface.cpp
     INCLUDE_DIRECTORIES

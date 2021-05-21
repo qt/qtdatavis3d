@@ -1,4 +1,4 @@
-qt_add_test(q3dsurface-heightproxy
+qt_internal_add_test(q3dsurface-heightproxy
     SOURCES
         tst_proxy.cpp
     PUBLIC_LIBRARIES
@@ -10,7 +10,7 @@ set(q3dsurface-heightproxy_resource_files
     "customtexture.jpg"
 )
 
-qt_add_resource(q3dsurface-heightproxy "q3dsurface-heightproxy"
+qt_internal_add_resource(q3dsurface-heightproxy "q3dsurface-heightproxy"
     PREFIX
         "/"
     FILES

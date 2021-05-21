@@ -1,4 +1,4 @@
-qt_add_test(q3dscatter-modelproxy
+qt_internal_add_test(q3dscatter-modelproxy
     SOURCES
         tst_proxy.cpp
     PUBLIC_LIBRARIES

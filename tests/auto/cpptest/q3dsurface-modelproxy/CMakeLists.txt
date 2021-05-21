@@ -1,4 +1,4 @@
-qt_add_test(q3dsurface-modelproxy
+qt_internal_add_test(q3dsurface-modelproxy
     SOURCES
         tst_proxy.cpp
     INCLUDE_DIRECTORIES

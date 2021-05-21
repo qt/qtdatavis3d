@@ -1,4 +1,4 @@
-qt_add_test(q3dscene
+qt_internal_add_test(q3dscene
     SOURCES
         tst_scene.cpp
     INCLUDE_DIRECTORIES

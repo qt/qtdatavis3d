@@ -35,7 +35,7 @@ qt_internal_add_qml_module(DataVisualizationQml2
         DataVisualization
 )
 
-qt_extend_target(DataVisualizationQml2 CONDITION MACOS
+qt_internal_extend_target(DataVisualizationQml2 CONDITION MACOS
     PUBLIC_LIBRARIES
         Qt::GuiPrivate
 )

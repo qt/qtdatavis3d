@@ -13,7 +13,7 @@ set(multigraphs_resource_files
     "australia.png"
 )
 
-qt_add_resource(multigraphs "multigraphs"
+qt_internal_add_resource(multigraphs "multigraphs"
     PREFIX
         "/"
     FILES

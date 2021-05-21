@@ -1,4 +1,4 @@
-qt_add_test(q3dbars
+qt_internal_add_test(q3dbars
     SOURCES
         tst_bars.cpp
     INCLUDE_DIRECTORIES

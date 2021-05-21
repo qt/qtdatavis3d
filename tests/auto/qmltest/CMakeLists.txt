@@ -1,4 +1,4 @@
-qt_add_test(tst_qmltest
+qt_internal_add_test(tst_qmltest
     QMLTEST
     SOURCES
         tst_qmltest.cpp
@@ -11,7 +11,7 @@ set(qmltest_resource_files
     "customtexture.jpg"
 )
 
-qt_add_resource(tst_qmltest "qmltest"
+qt_internal_add_resource(tst_qmltest "qmltest"
     PREFIX
         "/"
     FILES
