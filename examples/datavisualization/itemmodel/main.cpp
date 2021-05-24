@@ -114,7 +114,9 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     m_graph->activeTheme()->setType(Q3DTheme::ThemeDigia);
 
     // Set font
-    m_graph->activeTheme()->setFont(QFont("Impact", 20));
+    QFont font = QFont("Impact", 20);
+    font.setStyleHint(QFont::SansSerif);
+    m_graph->activeTheme()->setFont(font);
 
     // Set preset camera position
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
