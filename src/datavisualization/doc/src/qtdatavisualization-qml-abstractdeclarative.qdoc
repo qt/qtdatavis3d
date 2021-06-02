@@ -89,26 +89,19 @@
   How the graph will be rendered. Defaults to \c{RenderIndirect}.
 
   \value RenderDirectToBackground
-         Indicates that the graph will be rendered directly on the window background.
+         Indicates that the graph will be rendered directly on the window background and QML items are
+  rendered on top of it. Using non-transparent QML item as a background will hide the graph.
   Clears the whole window before rendering the graph, including the areas
-  outside the graph.
-  Since the graphs in this rendering mode are drawn on the window background under other QML
-  items, the regular QML window clearing before rendering is suppressed. The graphs handle the clearing
-  themselves instead.
-  If the surface format of the window supports antialiasing, it will be used (see
-  \c {qDefaultSurfaceFormat()}).
+  outside the graph. If the surface format of the window supports antialiasing, it will be used (see
+  \c {QtDataVisualization::qDefaultSurfaceFormat()}).
   This rendering mode offers the best performance at the expense of non-standard QML behavior. For example,
   the graphs do not obey the z ordering of QML items and the opacity value has no effect on them.
 
+
   \value RenderDirectToBackground_NoClear
-         Similar to \c RenderDirectToBackground mode, except that the graph will not clear the whole
-  window before rendering the graph. This mode is better for windows where you have other custom items
-  besides the graphs that also draw on the window background. In that case you need to either take care
-  of the window clearing yourself or ensure that all areas of the window are fully covered with opaque
-  items.
-  If one graph in the window uses either of the direct rendering modes, then all other graphs in the
-  same window also drawn in direct modes should use the exact same direct rendering mode.
-  Otherwise some graphs may not show up, depending on the drawing order of the graphs.
+  \obsolete
+  \note This will work exactly the same way as \c RenderDirectToBackground does in Qt 6
+  as not clearing the window is not supported anymore.
 
   \value RenderIndirect
          Indicates the graph will be first rendered to an offscreen surface that

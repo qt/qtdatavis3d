@@ -34,7 +34,7 @@ import QtQuick.Controls
 import QtDataVisualization 1.2
 import "."
 
-Rectangle {
+Item {
     id: mainwindow
 
     function updateinfoLabels()
