@@ -37,33 +37,67 @@
 //
 // We mean it.
 
-#ifndef DECLARATIVESCENE_P_H
-#define DECLARATIVESCENE_P_H
+#ifndef COLORGRADIENT_P_H
+#define COLORGRADIENT_P_H
 
-#include "datavisualizationglobal_p.h"
-#include "q3dscene.h"
+#include <private/datavisualizationglobal_p.h>
+#include <QtGui/QColor>
+#include <QtQml/qqml.h>
 
 QT_BEGIN_NAMESPACE
 
-class Declarative3DScene : public Q3DScene
+class ColorGradientStop : public QObject
 {
     Q_OBJECT
-    // This property is overloaded to use QPointF instead of QPoint to work around qml bug
-    // where Qt.point(0, 0) can't be assigned due to error "Cannot assign QPointF to QPoint".
-    Q_PROPERTY(QPointF selectionQueryPosition READ selectionQueryPosition WRITE setSelectionQueryPosition NOTIFY selectionQueryPositionChanged)
-    // This is static method in parent class, overload as constant property for qml.
-    Q_PROPERTY(QPoint invalidSelectionPoint READ invalidSelectionPoint CONSTANT)
+
+    Q_PROPERTY(qreal position READ position WRITE setPosition NOTIFY positionChanged)
+    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+
+    QML_ELEMENT
+    QML_ADDED_IN_VERSION(1, 0)
 
 public:
-    Declarative3DScene(QObject *parent = 0);
-    virtual ~Declarative3DScene();
+    ColorGradientStop(QObject *parent = 0);
 
-    void setSelectionQueryPosition(const QPointF &point);
-    QPointF selectionQueryPosition() const;
-    QPoint invalidSelectionPoint() const;
+    qreal position() const;
+    void setPosition(qreal position);
+
+    QColor color() const;
+    void setColor(const QColor &color);
 
 Q_SIGNALS:
-    void selectionQueryPositionChanged(const QPointF position);
+    void positionChanged(qreal position);
+    void colorChanged(QColor color);
+
+private:
+    void updateGradient();
+
+private:
+    qreal m_position;
+    QColor m_color;
+};
+
+class ColorGradient : public QObject
+{
+    Q_OBJECT
+
+    Q_PROPERTY(QQmlListProperty<ColorGradientStop> stops READ stops)
+    Q_CLASSINFO("DefaultProperty", "stops")
+
+    QML_ELEMENT
+    QML_ADDED_IN_VERSION(1, 0)
+
+public:
+    ColorGradient(QObject *parent = 0);
+    ~ColorGradient();
+
+    QQmlListProperty<ColorGradientStop> stops();
+
+    void doUpdate();
+    QList<ColorGradientStop *> m_stops;
+
+Q_SIGNALS:
+    void updated();
 };
 
 QT_END_NAMESPACE

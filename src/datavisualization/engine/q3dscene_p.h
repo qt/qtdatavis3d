@@ -40,8 +40,8 @@
 #ifndef Q3DSCENE_P_H
 #define Q3DSCENE_P_H
 
-#include "datavisualizationglobal_p.h"
-#include "q3dscene.h"
+#include <private/datavisualizationglobal_p.h>
+#include <QtDataVisualization/q3dscene.h>
 
 QT_BEGIN_NAMESPACE
 

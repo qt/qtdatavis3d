@@ -40,12 +40,13 @@
 #ifndef DECLARATIVESERIES_P_H
 #define DECLARATIVESERIES_P_H
 
-#include "datavisualizationglobal_p.h"
 #include "qbar3dseries.h"
 #include "qscatter3dseries.h"
 #include "qsurface3dseries.h"
 #include "colorgradient_p.h"
-#include <QtQml/QQmlListProperty>
+
+#include <private/datavisualizationglobal_p.h>
+#include <QtQml/qqml.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -68,6 +69,9 @@ class DeclarativeBar3DSeries : public QBar3DSeries
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
+
+    QML_NAMED_ELEMENT(Bar3DSeries)
+    QML_ADDED_IN_VERSION(1, 0)
 
 public:
     DeclarativeBar3DSeries(QObject *parent = 0);
@@ -115,6 +119,9 @@ class DeclarativeScatter3DSeries : public QScatter3DSeries
     Q_PROPERTY(int invalidSelectionIndex READ invalidSelectionIndex CONSTANT)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
 
+    QML_NAMED_ELEMENT(Scatter3DSeries)
+    QML_ADDED_IN_VERSION(1, 0)
+
 public:
     DeclarativeScatter3DSeries(QObject *parent = 0);
     virtual ~DeclarativeScatter3DSeries();
@@ -160,6 +167,9 @@ class DeclarativeSurface3DSeries : public QSurface3DSeries
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
+
+    QML_NAMED_ELEMENT(Surface3DSeries)
+    QML_ADDED_IN_VERSION(1, 0)
 
 public:
     DeclarativeSurface3DSeries(QObject *parent = 0);

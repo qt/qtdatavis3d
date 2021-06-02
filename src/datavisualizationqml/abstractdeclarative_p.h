@@ -40,9 +40,10 @@
 #ifndef ABSTRACTDECLARATIVE_P_H
 #define ABSTRACTDECLARATIVE_P_H
 
-#include "datavisualizationglobal_p.h"
-#include "abstract3dcontroller_p.h"
 #include "declarativescene_p.h"
+
+#include <private/datavisualizationglobal_p.h>
+#include <private/abstract3dcontroller_p.h>
 
 #include <QtQuick/QQuickItem>
 #include <QtCore/QPointer>
@@ -57,11 +58,6 @@ QT_BEGIN_NAMESPACE
 class AbstractDeclarative : public QQuickItem
 {
     Q_OBJECT
-    Q_ENUMS(ShadowQuality)
-    Q_ENUMS(RenderingMode)
-    Q_ENUMS(ElementType)
-    Q_FLAGS(SelectionFlag SelectionFlags)
-    Q_FLAGS(OptimizationHint OptimizationHints)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(bool shadowsSupported READ shadowsSupported NOTIFY shadowsSupportedChanged)
@@ -70,21 +66,25 @@ class AbstractDeclarative : public QQuickItem
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
-    Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged REVISION 1)
-    Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged REVISION 1)
-    Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList REVISION 1)
-    Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged REVISION 1)
-    Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged REVISION 1)
-    Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged REVISION 1)
-    Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged REVISION 1)
-    Q_PROPERTY(bool polar READ isPolar WRITE setPolar NOTIFY polarChanged REVISION 2)
-    Q_PROPERTY(float radialLabelOffset READ radialLabelOffset WRITE setRadialLabelOffset NOTIFY radialLabelOffsetChanged REVISION 2)
-    Q_PROPERTY(qreal horizontalAspectRatio READ horizontalAspectRatio WRITE setHorizontalAspectRatio NOTIFY horizontalAspectRatioChanged REVISION 2)
-    Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged REVISION 2)
-    Q_PROPERTY(qreal reflectivity READ reflectivity WRITE setReflectivity NOTIFY reflectivityChanged REVISION 2)
-    Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged REVISION 2)
-    Q_PROPERTY(QVector3D queriedGraphPosition READ queriedGraphPosition NOTIFY queriedGraphPositionChanged REVISION 2)
-    Q_PROPERTY(qreal margin READ margin WRITE setMargin NOTIFY marginChanged REVISION 2)
+    Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged REVISION(1, 1))
+    Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged REVISION(1, 1))
+    Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList REVISION(1, 1))
+    Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged REVISION(1, 1))
+    Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged REVISION(1, 1))
+    Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged REVISION(1, 1))
+    Q_PROPERTY(OptimizationHints optimizationHints READ optimizationHints WRITE setOptimizationHints NOTIFY optimizationHintsChanged REVISION(1, 1))
+    Q_PROPERTY(bool polar READ isPolar WRITE setPolar NOTIFY polarChanged REVISION(1, 2))
+    Q_PROPERTY(float radialLabelOffset READ radialLabelOffset WRITE setRadialLabelOffset NOTIFY radialLabelOffsetChanged REVISION(1, 2))
+    Q_PROPERTY(qreal horizontalAspectRatio READ horizontalAspectRatio WRITE setHorizontalAspectRatio NOTIFY horizontalAspectRatioChanged REVISION(1, 2))
+    Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged REVISION(1, 2))
+    Q_PROPERTY(qreal reflectivity READ reflectivity WRITE setReflectivity NOTIFY reflectivityChanged REVISION(1, 2))
+    Q_PROPERTY(QLocale locale READ locale WRITE setLocale NOTIFY localeChanged REVISION(1, 2))
+    Q_PROPERTY(QVector3D queriedGraphPosition READ queriedGraphPosition NOTIFY queriedGraphPositionChanged REVISION(1, 2))
+    Q_PROPERTY(qreal margin READ margin WRITE setMargin NOTIFY marginChanged REVISION(1, 2))
+
+    QML_NAMED_ELEMENT(AbstractGraph3D)
+    QML_ADDED_IN_VERSION(1, 0)
+    QML_UNCREATABLE("Trying to create uncreatable: AbstractGraph3D.")
 
 public:
     enum SelectionFlag {
@@ -132,6 +132,12 @@ public:
     };
     Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
 
+    Q_ENUM(ShadowQuality)
+    Q_ENUM(RenderingMode)
+    Q_ENUM(ElementType)
+    Q_FLAGS(SelectionFlag SelectionFlags)
+    Q_FLAGS(OptimizationHint OptimizationHints)
+
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
     virtual ~AbstractDeclarative();
@@ -162,17 +168,17 @@ public:
 
     Q_INVOKABLE virtual void clearSelection();
 
-    Q_REVISION(1) Q_INVOKABLE virtual int addCustomItem(QCustom3DItem *item);
-    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItems();
-    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItem(QCustom3DItem *item);
-    Q_REVISION(1) Q_INVOKABLE virtual void removeCustomItemAt(const QVector3D &position);
-    Q_REVISION(1) Q_INVOKABLE virtual void releaseCustomItem(QCustom3DItem *item);
+    Q_REVISION(1, 1) Q_INVOKABLE virtual int addCustomItem(QCustom3DItem *item);
+    Q_REVISION(1, 1) Q_INVOKABLE virtual void removeCustomItems();
+    Q_REVISION(1, 1) Q_INVOKABLE virtual void removeCustomItem(QCustom3DItem *item);
+    Q_REVISION(1, 1) Q_INVOKABLE virtual void removeCustomItemAt(const QVector3D &position);
+    Q_REVISION(1, 1) Q_INVOKABLE virtual void releaseCustomItem(QCustom3DItem *item);
 
-    Q_REVISION(1) Q_INVOKABLE virtual int selectedLabelIndex() const;
-    Q_REVISION(1) Q_INVOKABLE virtual QAbstract3DAxis *selectedAxis() const;
+    Q_REVISION(1, 1) Q_INVOKABLE virtual int selectedLabelIndex() const;
+    Q_REVISION(1, 1) Q_INVOKABLE virtual QAbstract3DAxis *selectedAxis() const;
 
-    Q_REVISION(1) Q_INVOKABLE virtual int selectedCustomItemIndex() const;
-    Q_REVISION(1) Q_INVOKABLE virtual QCustom3DItem *selectedCustomItem() const;
+    Q_REVISION(1, 1) Q_INVOKABLE virtual int selectedCustomItemIndex() const;
+    Q_REVISION(1, 1) Q_INVOKABLE virtual QCustom3DItem *selectedCustomItem() const;
 
     QQmlListProperty<QCustom3DItem> customItemList();
     static void appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
@@ -267,20 +273,20 @@ Q_SIGNALS:
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
     void renderingModeChanged(AbstractDeclarative::RenderingMode mode);
-    Q_REVISION(1) void measureFpsChanged(bool enabled);
-    Q_REVISION(1) void currentFpsChanged(qreal fps);
-    Q_REVISION(1) void selectedElementChanged(AbstractDeclarative::ElementType type);
-    Q_REVISION(1) void orthoProjectionChanged(bool enabled);
-    Q_REVISION(1) void aspectRatioChanged(qreal ratio);
-    Q_REVISION(1) void optimizationHintsChanged(AbstractDeclarative::OptimizationHints hints);
-    Q_REVISION(2) void polarChanged(bool enabled);
-    Q_REVISION(2) void radialLabelOffsetChanged(float offset);
-    Q_REVISION(2) void horizontalAspectRatioChanged(qreal ratio);
-    Q_REVISION(2) void reflectionChanged(bool enabled);
-    Q_REVISION(2) void reflectivityChanged(qreal reflectivity);
-    Q_REVISION(2) void localeChanged(const QLocale &locale);
-    Q_REVISION(2) void queriedGraphPositionChanged(const QVector3D &data);
-    Q_REVISION(2) void marginChanged(qreal margin);
+    Q_REVISION(1, 1) void measureFpsChanged(bool enabled);
+    Q_REVISION(1, 1) void currentFpsChanged(qreal fps);
+    Q_REVISION(1, 1) void selectedElementChanged(AbstractDeclarative::ElementType type);
+    Q_REVISION(1, 1) void orthoProjectionChanged(bool enabled);
+    Q_REVISION(1, 1) void aspectRatioChanged(qreal ratio);
+    Q_REVISION(1, 1) void optimizationHintsChanged(AbstractDeclarative::OptimizationHints hints);
+    Q_REVISION(1, 2) void polarChanged(bool enabled);
+    Q_REVISION(1, 2) void radialLabelOffsetChanged(float offset);
+    Q_REVISION(1, 2) void horizontalAspectRatioChanged(qreal ratio);
+    Q_REVISION(1, 2) void reflectionChanged(bool enabled);
+    Q_REVISION(1, 2) void reflectivityChanged(qreal reflectivity);
+    Q_REVISION(1, 2) void localeChanged(const QLocale &locale);
+    Q_REVISION(1, 2) void queriedGraphPositionChanged(const QVector3D &data);
+    Q_REVISION(1, 2) void marginChanged(qreal margin);
 
 protected:
     QSharedPointer<QMutex> m_nodeMutex;

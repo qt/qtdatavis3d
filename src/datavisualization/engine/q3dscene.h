@@ -52,7 +52,7 @@ class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
     Q_PROPERTY(Q3DCamera* activeCamera READ activeCamera WRITE setActiveCamera NOTIFY activeCameraChanged)
     Q_PROPERTY(Q3DLight* activeLight READ activeLight WRITE setActiveLight NOTIFY activeLightChanged)
     Q_PROPERTY(float devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio NOTIFY devicePixelRatioChanged)
-    Q_PROPERTY(QPoint graphPositionQuery READ graphPositionQuery WRITE setGraphPositionQuery NOTIFY graphPositionQueryChanged REVISION 1)
+    Q_PROPERTY(QPoint graphPositionQuery READ graphPositionQuery WRITE setGraphPositionQuery NOTIFY graphPositionQueryChanged REVISION(1, 2))
 
 public:
     explicit Q3DScene(QObject *parent = nullptr);
@@ -100,7 +100,7 @@ Q_SIGNALS:
     void activeLightChanged(Q3DLight *light);
     void devicePixelRatioChanged(float pixelRatio);
     void selectionQueryPositionChanged(const QPoint &position);
-    Q_REVISION(1) void graphPositionQueryChanged(const QPoint &position);
+    Q_REVISION(1, 2) void graphPositionQueryChanged(const QPoint &position);
 
 private:
     QScopedPointer<Q3DScenePrivate> d_ptr;

@@ -40,7 +40,7 @@
 #ifndef Q3DTHEME_P_H
 #define Q3DTHEME_P_H
 
-#include "datavisualizationglobal_p.h"
+#include <private/datavisualizationglobal_p.h>
 #include "q3dtheme.h"
 
 QT_BEGIN_NAMESPACE

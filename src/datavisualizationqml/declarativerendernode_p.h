@@ -40,7 +40,7 @@
 #ifndef DECLARATIVERENDERNODE_P_H
 #define DECLARATIVERENDERNODE_P_H
 
-#include "datavisualizationglobal_p.h"
+#include <private/datavisualizationglobal_p.h>
 
 #include <QtQuick/QSGGeometryNode>
 #include <QtQuick/QSGTextureMaterial>

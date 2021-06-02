@@ -46,9 +46,9 @@ class QT_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
     Q_PROPERTY(CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset NOTIFY cameraPresetChanged)
     Q_PROPERTY(bool wrapXRotation READ wrapXRotation WRITE setWrapXRotation NOTIFY wrapXRotationChanged)
     Q_PROPERTY(bool wrapYRotation READ wrapYRotation WRITE setWrapYRotation NOTIFY wrapYRotationChanged)
-    Q_PROPERTY(QVector3D target READ target WRITE setTarget NOTIFY targetChanged REVISION 1)
-    Q_PROPERTY(float minZoomLevel READ minZoomLevel WRITE setMinZoomLevel NOTIFY minZoomLevelChanged REVISION 1)
-    Q_PROPERTY(float maxZoomLevel READ maxZoomLevel WRITE setMaxZoomLevel NOTIFY maxZoomLevelChanged REVISION 1)
+    Q_PROPERTY(QVector3D target READ target WRITE setTarget NOTIFY targetChanged REVISION(1, 2))
+    Q_PROPERTY(float minZoomLevel READ minZoomLevel WRITE setMinZoomLevel NOTIFY minZoomLevelChanged REVISION(1, 2))
+    Q_PROPERTY(float maxZoomLevel READ maxZoomLevel WRITE setMaxZoomLevel NOTIFY maxZoomLevelChanged REVISION(1, 2))
 
 public:
     enum CameraPreset {
@@ -117,9 +117,9 @@ Q_SIGNALS:
     void cameraPresetChanged(Q3DCamera::CameraPreset preset);
     void wrapXRotationChanged(bool isEnabled);
     void wrapYRotationChanged(bool isEnabled);
-    Q_REVISION(1) void targetChanged(const QVector3D &target);
-    Q_REVISION(1) void minZoomLevelChanged(float zoomLevel);
-    Q_REVISION(1) void maxZoomLevelChanged(float zoomLevel);
+    Q_REVISION(1, 2) void targetChanged(const QVector3D &target);
+    Q_REVISION(1, 2) void minZoomLevelChanged(float zoomLevel);
+    Q_REVISION(1, 2) void maxZoomLevelChanged(float zoomLevel);
 
 private:
     QScopedPointer<Q3DCameraPrivate> d_ptr;

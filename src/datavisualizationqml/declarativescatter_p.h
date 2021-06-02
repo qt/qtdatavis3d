@@ -40,10 +40,11 @@
 #ifndef DECLARATIVESCATTER_P_H
 #define DECLARATIVESCATTER_P_H
 
-#include "datavisualizationglobal_p.h"
 #include "abstractdeclarative_p.h"
-#include "scatter3dcontroller_p.h"
 #include "qscatter3dseries.h"
+
+#include <private/datavisualizationglobal_p.h>
+#include <private/scatter3dcontroller_p.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -56,6 +57,9 @@ class DeclarativeScatter : public AbstractDeclarative
     Q_PROPERTY(QScatter3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList)
     Q_CLASSINFO("DefaultProperty", "seriesList")
+
+    QML_NAMED_ELEMENT(Scatter3D)
+    QML_ADDED_IN_VERSION(1, 0)
 
 public:
     explicit DeclarativeScatter(QQuickItem *parent = 0);

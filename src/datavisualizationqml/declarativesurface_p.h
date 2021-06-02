@@ -40,10 +40,11 @@
 #ifndef DECLARATIVESURFACE_P_H
 #define DECLARATIVESURFACE_P_H
 
-#include "datavisualizationglobal_p.h"
 #include "abstractdeclarative_p.h"
-#include "surface3dcontroller_p.h"
 #include "qsurface3dseries.h"
+
+#include <private/datavisualizationglobal_p.h>
+#include <private/surface3dcontroller_p.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -55,8 +56,11 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
     Q_PROPERTY(QSurface3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
-    Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged REVISION 1)
+    Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged REVISION(1, 2))
     Q_CLASSINFO("DefaultProperty", "seriesList")
+
+    QML_NAMED_ELEMENT(Surface3D)
+    QML_ADDED_IN_VERSION(1, 0)
 
 public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);
@@ -91,7 +95,7 @@ Q_SIGNALS:
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);
     void selectedSeriesChanged(QSurface3DSeries *series);
-    Q_REVISION(1) void flipHorizontalGridChanged(bool flip);
+    Q_REVISION(1, 2) void flipHorizontalGridChanged(bool flip);
 
 private:
     Surface3DController *m_surfaceController;

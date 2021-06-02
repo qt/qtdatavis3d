@@ -40,8 +40,8 @@
 #ifndef ABSTRACTRENDERITEM_P_H
 #define ABSTRACTRENDERITEM_P_H
 
-#include "datavisualizationglobal_p.h"
-#include "labelitem_p.h"
+#include <private/datavisualizationglobal_p.h>
+#include <private/labelitem_p.h>
 
 #include <QtGui/QVector3D>
 #include <QtGui/QQuaternion>

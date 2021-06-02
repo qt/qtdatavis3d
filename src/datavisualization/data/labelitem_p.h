@@ -40,7 +40,7 @@
 #ifndef LABELITEM_P_H
 #define LABELITEM_P_H
 
-#include "datavisualizationglobal_p.h"
+#include <private/datavisualizationglobal_p.h>
 #include <QtCore/QSize>
 
 QT_BEGIN_NAMESPACE

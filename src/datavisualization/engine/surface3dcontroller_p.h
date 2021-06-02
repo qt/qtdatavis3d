@@ -40,8 +40,8 @@
 #ifndef SURFACE3DCONTROLLER_P_H
 #define SURFACE3DCONTROLLER_P_H
 
-#include "abstract3dcontroller_p.h"
-#include "datavisualizationglobal_p.h"
+#include <private/abstract3dcontroller_p.h>
+#include <private/datavisualizationglobal_p.h>
 
 QT_BEGIN_NAMESPACE
 

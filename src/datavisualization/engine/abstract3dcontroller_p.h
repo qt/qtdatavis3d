@@ -40,7 +40,8 @@
 #ifndef ABSTRACT3DCONTROLLER_P_H
 #define ABSTRACT3DCONTROLLER_P_H
 
-#include "datavisualizationglobal_p.h"
+#include <private/datavisualizationglobal_p.h>
+
 #include "qabstract3daxis.h"
 #include "drawer_p.h"
 #include "qabstract3dinputhandler.h"

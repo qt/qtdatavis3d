@@ -40,8 +40,8 @@
 #ifndef Q3DBARSCONTROLLER_p_H
 #define Q3DBARSCONTROLLER_p_H
 
-#include "datavisualizationglobal_p.h"
-#include "abstract3dcontroller_p.h"
+#include <private/datavisualizationglobal_p.h>
+#include <private/abstract3dcontroller_p.h>
 
 QT_BEGIN_NAMESPACE
 

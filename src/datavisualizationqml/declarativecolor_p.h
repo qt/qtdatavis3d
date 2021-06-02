@@ -40,8 +40,9 @@
 #ifndef DECLARATIVECOLOR_P_H
 #define DECLARATIVECOLOR_P_H
 
-#include "datavisualizationglobal_p.h"
+#include <private/datavisualizationglobal_p.h>
 #include <QtGui/QColor>
+#include <QtQml/qqml.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -49,6 +50,9 @@ class DeclarativeColor : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
+
+    QML_NAMED_ELEMENT(ThemeColor)
+    QML_ADDED_IN_VERSION(1, 0)
 
 public:
     DeclarativeColor(QObject *parent = 0);

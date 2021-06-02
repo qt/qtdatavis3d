@@ -40,12 +40,14 @@
 #ifndef DECLARATIVETHEME_P_H
 #define DECLARATIVETHEME_P_H
 
-#include "datavisualizationglobal_p.h"
+#include <private/datavisualizationglobal_p.h>
+#include <private/q3dtheme_p.h>
+
 #include "declarativecolor_p.h"
 #include "colorgradient_p.h"
-#include "q3dtheme_p.h"
 
-#include <QtQml/QQmlParserStatus>
+#include <QtQml/qqml.h>
+#include <QtQml/qqmlparserstatus.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -59,6 +61,8 @@ class DeclarativeTheme3D : public Q3DTheme, public QQmlParserStatus
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_CLASSINFO("DefaultProperty", "themeChildren")
+    QML_NAMED_ELEMENT(Theme3D)
+    QML_ADDED_IN_VERSION(1, 0)
 
 public:
     DeclarativeTheme3D(QObject *parent = 0);

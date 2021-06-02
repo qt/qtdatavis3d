@@ -37,61 +37,38 @@
 //
 // We mean it.
 
-#ifndef COLORGRADIENT_P_H
-#define COLORGRADIENT_P_H
+#ifndef DECLARATIVESCENE_P_H
+#define DECLARATIVESCENE_P_H
 
-#include "datavisualizationglobal_p.h"
-#include <QtGui/QColor>
-#include <QtQml/QQmlListProperty>
+#include <QtQml/qqml.h>
+#include <private/datavisualizationglobal_p.h>
+#include <QtDataVisualization/q3dscene.h>
 
 QT_BEGIN_NAMESPACE
 
-class ColorGradientStop : public QObject
+class Declarative3DScene : public Q3DScene
 {
     Q_OBJECT
+    // This property is overloaded to use QPointF instead of QPoint to work around qml bug
+    // where Qt.point(0, 0) can't be assigned due to error "Cannot assign QPointF to QPoint".
+    Q_PROPERTY(QPointF selectionQueryPosition READ selectionQueryPosition WRITE setSelectionQueryPosition NOTIFY selectionQueryPositionChanged)
+    // This is static method in parent class, overload as constant property for qml.
+    Q_PROPERTY(QPoint invalidSelectionPoint READ invalidSelectionPoint CONSTANT)
 
-    Q_PROPERTY(qreal position READ position WRITE setPosition NOTIFY positionChanged)
-    Q_PROPERTY(QColor color READ color WRITE setColor NOTIFY colorChanged)
-
-public:
-    ColorGradientStop(QObject *parent = 0);
-
-    qreal position() const;
-    void setPosition(qreal position);
-
-    QColor color() const;
-    void setColor(const QColor &color);
-
-Q_SIGNALS:
-    void positionChanged(qreal position);
-    void colorChanged(QColor color);
-
-private:
-    void updateGradient();
-
-private:
-    qreal m_position;
-    QColor m_color;
-};
-
-class ColorGradient : public QObject
-{
-    Q_OBJECT
-
-    Q_PROPERTY(QQmlListProperty<ColorGradientStop> stops READ stops)
-    Q_CLASSINFO("DefaultProperty", "stops")
+    QML_NAMED_ELEMENT(Scene3D)
+    QML_ADDED_IN_VERSION(1, 0)
+    QML_UNCREATABLE("Trying to create uncreatable: Scene3D.")
 
 public:
-    ColorGradient(QObject *parent = 0);
-    ~ColorGradient();
+    Declarative3DScene(QObject *parent = 0);
+    virtual ~Declarative3DScene();
 
-    QQmlListProperty<ColorGradientStop> stops();
-
-    void doUpdate();
-    QList<ColorGradientStop *> m_stops;
+    void setSelectionQueryPosition(const QPointF &point);
+    QPointF selectionQueryPosition() const;
+    QPoint invalidSelectionPoint() const;
 
 Q_SIGNALS:
-    void updated();
+    void selectionQueryPositionChanged(const QPointF position);
 };
 
 QT_END_NAMESPACE

@@ -61,8 +61,8 @@ class QT_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
     Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
     Q_PROPERTY(QLinearGradient multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString itemLabel READ itemLabel NOTIFY itemLabelChanged REVISION 1)
-    Q_PROPERTY(bool itemLabelVisible READ isItemLabelVisible WRITE setItemLabelVisible NOTIFY itemLabelVisibilityChanged REVISION 1)
+    Q_PROPERTY(QString itemLabel READ itemLabel NOTIFY itemLabelChanged REVISION(1, 1))
+    Q_PROPERTY(bool itemLabelVisible READ isItemLabelVisible WRITE setItemLabelVisible NOTIFY itemLabelVisibilityChanged REVISION(1, 1))
 
 public:
     enum SeriesType {
@@ -151,8 +151,8 @@ Q_SIGNALS:
     void multiHighlightColorChanged(const QColor &color);
     void multiHighlightGradientChanged(const QLinearGradient &gradient);
     void nameChanged(const QString &name);
-    Q_REVISION(1) void itemLabelChanged(const QString &label);
-    Q_REVISION(1) void itemLabelVisibilityChanged(bool visible);
+    Q_REVISION(1, 1) void itemLabelChanged(const QString &label);
+    Q_REVISION(1, 1) void itemLabelVisibilityChanged(bool visible);
 
 protected:
     QScopedPointer<QAbstract3DSeriesPrivate> d_ptr;

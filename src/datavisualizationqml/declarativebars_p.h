@@ -40,12 +40,12 @@
 #ifndef DECLARATIVEBARS_P_H
 #define DECLARATIVEBARS_P_H
 
-#include "datavisualizationglobal_p.h"
 #include "abstractdeclarative_p.h"
-#include "bars3dcontroller_p.h"
+
+#include <private/datavisualizationglobal_p.h>
+#include <private/bars3dcontroller_p.h>
 
 QT_BEGIN_NAMESPACE
-
 class DeclarativeBars : public AbstractDeclarative
 {
     Q_OBJECT
@@ -59,8 +59,11 @@ class DeclarativeBars : public AbstractDeclarative
     Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
     Q_PROPERTY(QBar3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QBar3DSeries *primarySeries READ primarySeries WRITE setPrimarySeries NOTIFY primarySeriesChanged)
-    Q_PROPERTY(float floorLevel READ floorLevel WRITE setFloorLevel NOTIFY floorLevelChanged REVISION 1)
+    Q_PROPERTY(float floorLevel READ floorLevel WRITE setFloorLevel NOTIFY floorLevelChanged REVISION(1, 2))
     Q_CLASSINFO("DefaultProperty", "seriesList")
+
+    QML_NAMED_ELEMENT(Bars3D)
+    QML_ADDED_IN_VERSION(1, 0)
 
 public:
     explicit DeclarativeBars(QQuickItem *parent = 0);
@@ -116,7 +119,7 @@ Q_SIGNALS:
     void meshFileNameChanged(QString filename);
     void primarySeriesChanged(QBar3DSeries *series);
     void selectedSeriesChanged(QBar3DSeries *series);
-    Q_REVISION(1) void floorLevelChanged(float level);
+    Q_REVISION(1, 2) void floorLevelChanged(float level);
 
 private:
     Bars3DController *m_barsController;

@@ -40,11 +40,12 @@
 #ifndef DRAWER_P_H
 #define DRAWER_P_H
 
-#include "datavisualizationglobal_p.h"
-#include "q3dbars.h"
-#include "q3dtheme.h"
-#include "labelitem_p.h"
-#include "abstractrenderitem_p.h"
+#include <private/datavisualizationglobal_p.h>
+#include <private/labelitem_p.h>
+#include <private/abstractrenderitem_p.h>
+
+#include <QtDataVisualization/q3dbars.h>
+#include <QtDataVisualization/q3dtheme.h>
 
 QT_BEGIN_NAMESPACE
 
