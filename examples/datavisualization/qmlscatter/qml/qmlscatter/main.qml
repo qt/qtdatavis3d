@@ -36,7 +36,7 @@ import "."
 //! [0]
 
 //! [1]
-Rectangle {
+Item {
     id: mainView
     //! [1]
     width: 500

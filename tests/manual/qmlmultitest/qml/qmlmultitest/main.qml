@@ -33,7 +33,7 @@ import QtQuick.Controls
 import QtDataVisualization 1.2
 import "."
 
-Rectangle {
+Item {
     id: mainView
     width: 800
     height: 600
@@ -57,6 +57,7 @@ Rectangle {
             Layout.fillWidth: true
             border.color: surfaceGraph.theme.gridLineColor
             border.width: 2
+            color: "#00000000"
 
             Surface3D {
                 id: surfaceGraph
@@ -145,6 +146,7 @@ Rectangle {
             Layout.fillWidth: true
             border.color: scatterGraph.theme.gridLineColor
             border.width: 2
+            color: "#00000000"
 
             Scatter3D {
                 id: scatterGraph
@@ -185,6 +187,7 @@ Rectangle {
             Layout.fillWidth: true
             border.color: barGraph.theme.gridLineColor
             border.width: 2
+            color: "#00000000"
 
             Bars3D {
                 id: barGraph

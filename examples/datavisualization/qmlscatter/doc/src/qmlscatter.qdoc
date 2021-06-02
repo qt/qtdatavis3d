@@ -80,11 +80,11 @@
     The last \c import just imports all the qml files in the same directory as our \c {main.qml},
     because that's where \c Data.qml is.
 
-    Then we create our main \c Rectangle and call it \c mainView:
+    Then we create our main \c Item and call it \c mainView:
 
     \snippet qmlscatter/qml/qmlscatter/main.qml 1
 
-    Then we'll add another \c Item inside the main \c Rectangle, and call it \c dataView.
+    Then we'll add another \c Item inside the main \c Item, and call it \c dataView.
     This will be the item to hold the Scatter3D graph. We'll anchor it to the parent bottom:
 
     \snippet qmlscatter/qml/qmlscatter/main.qml 9

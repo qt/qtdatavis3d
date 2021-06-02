@@ -33,7 +33,7 @@ import QtQuick.Controls
 import QtDataVisualization 1.2
 import "."
 
-Rectangle {
+Item {
     id: mainview
     width: 1280
     height: 1024

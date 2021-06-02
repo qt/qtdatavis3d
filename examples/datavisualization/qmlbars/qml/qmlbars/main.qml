@@ -35,7 +35,7 @@ import QtQuick.Window
 import Qt.labs.qmlmodels
 import "."
 
-Rectangle {
+Item {
     id: mainview
     width: 1280
     height: 1024

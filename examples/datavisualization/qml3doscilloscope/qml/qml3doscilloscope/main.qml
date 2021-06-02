@@ -74,6 +74,7 @@ Item {
             axisY.segmentCount: 4
             axisZ.segmentCount: 4
             measureFps: true
+            renderingMode: AbstractGraph3D.RenderDirectToBackground
 
             onCurrentFpsChanged: (fps)=> {
                 if (fps > 10)

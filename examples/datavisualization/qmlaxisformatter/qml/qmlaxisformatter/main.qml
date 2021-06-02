@@ -34,7 +34,7 @@ import QtDataVisualization 1.2
 import CustomFormatter
 import "."
 
-Rectangle {
+Item {
     id: mainView
     width: 1280
     height: 1024
