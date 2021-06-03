@@ -25,7 +25,5 @@ qtHaveModule(quick) {
                customitems \
                texturesurface \
                volumetric
-
-    qtHaveModule(multimedia): SUBDIRS += audiolevels
 }
 
