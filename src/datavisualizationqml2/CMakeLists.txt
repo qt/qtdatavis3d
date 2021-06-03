@@ -1,8 +1,35 @@
+set(qml_files
+    "designer/Bars3DSpecifics.qml"
+    "designer/Scatter3DSpecifics.qml"
+    "designer/Surface3DSpecifics.qml"
+    "designer/default/Bars3D.qml"
+    "designer/default/Scatter3D.qml"
+    "designer/default/Surface3D.qml"
+    "designer/qtdatavisualization.metainfo"
+    "designer/images/bars3d-icon.png"
+    "designer/images/bars3d-icon16.png"
+    "designer/images/scatter3d-icon.png"
+    "designer/images/scatter3d-icon16.png"
+    "designer/images/surface3d-icon.png"
+    "designer/images/surface3d-icon16.png"
+)
+
+set_source_files_properties(
+    ${qml_files}
+    PROPERTIES
+        QT_QML_SKIP_QMLDIR_ENTRY TRUE
+)
+
 qt_internal_add_qml_module(DataVisualizationQml2
     URI "QtDataVisualization"
-    VERSION "1.${PROJECT_VERSION_MINOR}"
-    CLASSNAME QtDataVisualizationQml2Plugin
-    SKIP_TYPE_REGISTRATION
+    VERSION "${PROJECT_VERSION}"
+    PAST_MAJOR_VERSIONS 1
+    CLASS_NAME QtDataVisualizationQml2Plugin
+    PLUGIN_TARGET DataVisualizationQml2
+    NO_PLUGIN_OPTIONAL
+    NO_GENERATE_PLUGIN_SOURCE
+    NO_GENERATE_QMLTYPES
+    INSTALL_SOURCE_QMLTYPES "plugins.qmltypes"
     SOURCES
         abstractdeclarative.cpp abstractdeclarative_p.h
         colorgradient.cpp colorgradient_p.h
@@ -26,6 +53,8 @@ qt_internal_add_qml_module(DataVisualizationQml2
         ../datavisualization/global
         ../datavisualization/input
         ../datavisualization/theme
+    QML_FILES
+        ${qml_files}
     PUBLIC_LIBRARIES
         Qt::Core
         Qt::Gui
@@ -40,62 +69,3 @@ qt_internal_extend_target(DataVisualizationQml2 CONDITION MACOS
         Qt::GuiPrivate
 )
 
-set(qml_files
-    "designer/Bars3DSpecifics.qml"
-    "designer/Scatter3DSpecifics.qml"
-    "designer/Surface3DSpecifics.qml"
-    "designer/default/Bars3D.qml"
-    "designer/default/Scatter3D.qml"
-    "designer/default/Surface3D.qml"
-    "designer/qtdatavisualization.metainfo"
-    "designer/images/bars3d-icon.png"
-    "designer/images/bars3d-icon16.png"
-    "designer/images/scatter3d-icon.png"
-    "designer/images/scatter3d-icon16.png"
-    "designer/images/surface3d-icon.png"
-    "designer/images/surface3d-icon16.png"
-)
-set_source_files_properties(designer/Bars3DSpecifics.qml PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/Scatter3DSpecifics.qml PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/Surface3DSpecifics.qml PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/default/Bars3D.qml PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/default/Scatter3D.qml PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/default/Surface3D.qml PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/qtdatavisualization.metainfo PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/images/bars3d-icon.png PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/images/bars3d-icon16.png PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/images/scatter3d-icon.png PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/images/scatter3d-icon16.png PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/images/surface3d-icon.png PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-set_source_files_properties(designer/images/surface3d-icon16.png PROPERTIES
-    QT_QML_SKIP_QMLDIR_ENTRY TRUE
-)
-
-qt6_target_qml_files(DataVisualizationQml2
-    FILES
-        ${qml_files}
-)
