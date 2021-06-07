@@ -15,7 +15,7 @@ exampledirs += ../../../examples/datavisualization \
 imagedirs  += ../images \
               images
 
-depends = qtcore qtgui qtqml qtquick qtmultimedia qtdoc qtcmake qtwidgets
+depends = qtcore qtgui qtqml qtquick qtdoc qtcmake qtwidgets
 
 qhp.projects                            = QtDataVisualization
 
