@@ -1,9 +1,10 @@
-qt_add_executable(itemmodeltest
+qt_internal_add_manual_test(itemmodeltest
     GUI
     SOURCES
         main.cpp
-    PUBLIC_LIBRARIES
-        Qt::Gui
-        Qt::Widgets
-        Qt::DataVisualization
-)
+    )
+target_link_libraries(itemmodeltest PUBLIC
+    Qt::Gui
+    Qt::Widgets
+    Qt::DataVisualization
+    )

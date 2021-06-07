@@ -1,8 +1,9 @@
-qt_add_executable(MinimalBars
+qt_internal_add_manual_test(MinimalBars
     GUI
     SOURCES
         ../../../src/datavisualization/doc/snippets/doc_src_q3dbars_construction.cpp
-    PUBLIC_LIBRARIES
-        Qt::Gui
-        Qt::DataVisualization
-)
+    )
+target_link_libraries(MinimalBars PUBLIC
+    Qt::Gui
+    Qt::DataVisualization
+    )

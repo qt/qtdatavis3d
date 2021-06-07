@@ -1,19 +1,20 @@
-qt_add_executable(qmldynamicdata
+qt_internal_add_manual_test(qmldynamicdata
     GUI
     SOURCES
         main.cpp
-    PUBLIC_LIBRARIES
-        Qt::Gui
-        Qt::DataVisualization
-)
+    )
+target_link_libraries(qmldynamicdata PUBLIC
+    Qt::Gui
+    Qt::DataVisualization
+    )
 
 set(qmldynamicdata_resource_files
     "qml/qmldynamicdata/main.qml"
-)
+    )
 
 qt_internal_add_resource(qmldynamicdata "qmldynamicdata"
     PREFIX
-        "/"
+    "/"
     FILES
-        ${qmldynamicdata_resource_files}
-)
+    ${qmldynamicdata_resource_files}
+    )
