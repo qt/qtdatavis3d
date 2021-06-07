@@ -97,6 +97,7 @@ void ScatterPointBufferHelper::load(ScatterSeriesRenderCache *cache)
         m_bufferedPoints.clear();
         m_pointbuffer = 0;
         m_uvbuffer = 0;
+        m_meshDataLoaded = false;
     }
 
     bool itemsVisible = false;
