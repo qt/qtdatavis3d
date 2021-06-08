@@ -36,7 +36,7 @@ class QtConanError(Exception):
 
 class QtDataVisualization(ConanFile):
     name = "qtdatavis3d"
-    version = "6.1.1"
+    version = "6.1.2"
     license = "GPL-3.0+, Commercial Qt License Agreement"
     author = "The Qt Company <https://www.qt.io/contact-us>"
     url = "https://code.qt.io/cgit/qt/qtdatavis3d.git/"
