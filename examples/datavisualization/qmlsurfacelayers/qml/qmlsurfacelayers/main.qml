@@ -300,6 +300,7 @@ Item {
             font.pointSize: fontSize
             Layout.fillWidth: true
             Layout.minimumHeight: 40
+            color: "gray"
             enabled: false
             horizontalAlignment: TextInput.AlignHCenter
             text: "Indirect, " + surfaceLayers.msaaSamples + "xMSAA"
