@@ -5,6 +5,9 @@ set(qml_files
     "designer/default/Bars3D.qml"
     "designer/default/Scatter3D.qml"
     "designer/default/Surface3D.qml"
+)
+
+set(resources
     "designer/qtdatavisualization.metainfo"
     "designer/images/bars3d-icon.png"
     "designer/images/bars3d-icon16.png"
@@ -55,6 +58,8 @@ qt_internal_add_qml_module(DataVisualizationQml2
         ../datavisualization/theme
     QML_FILES
         ${qml_files}
+    RESOURCES
+        ${resources}
     PUBLIC_LIBRARIES
         Qt::Core
         Qt::Gui
