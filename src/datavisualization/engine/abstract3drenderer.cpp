@@ -941,11 +941,26 @@ void Abstract3DRenderer::drawAxisTitleX(const QVector3D &labelRotation,
                 xRotation = -90.0f - labelRotation.z();
                 extraRotation = -extraRotation;
             }
+            if (m_yFlipped) {
+                alignment = Qt::AlignBottom;
+                extraRotation = -extraRotation;
+                if (m_xFlipped)
+                    xRotation = 90.0f + labelRotation.z();
+                else
+                    xRotation = 90.0f - labelRotation.z();
+            }
         } else {
             if (m_xFlipped) {
                 offsetRotation = -offsetRotation;
                 xRotation = -90.0f - labelRotation.z();
                 extraRotation = -extraRotation;
+            }
+            if (m_yFlipped) {
+                xRotation = 90.0f + labelRotation.z();
+                alignment = Qt::AlignBottom;
+                extraRotation = -extraRotation;
+                if (m_xFlipped)
+                    xRotation = 90.0f - labelRotation.z();
             }
         }
     }
@@ -1037,6 +1052,11 @@ void Abstract3DRenderer::drawAxisTitleZ(const QVector3D &labelRotation,
             } else {
                 yRotation = -yRotation;
             }
+        }
+        if (m_yFlipped) {
+            xRotation = -xRotation;
+            alignment = Qt::AlignBottom;
+            extraRotation = -extraRotation;
         }
     }
 
