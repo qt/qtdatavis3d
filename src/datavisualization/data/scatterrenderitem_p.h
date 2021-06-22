@@ -49,6 +49,7 @@ class ScatterRenderItem : public AbstractRenderItem
 public:
     ScatterRenderItem();
     ScatterRenderItem(const ScatterRenderItem &other);
+    ScatterRenderItem &operator=(const ScatterRenderItem &) = default;
     virtual ~ScatterRenderItem();
 
     inline const QVector3D &position() const { return m_position; }

@@ -49,6 +49,7 @@ class BarRenderItem : public AbstractRenderItem
 public:
     BarRenderItem();
     BarRenderItem(const BarRenderItem &other);
+    BarRenderItem &operator=(const BarRenderItem &) = default;
     virtual ~BarRenderItem();
 
     // Position relative to data window (for bar label generation)
@@ -76,6 +77,7 @@ class BarRenderSliceItem : public BarRenderItem
 public:
     BarRenderSliceItem();
     BarRenderSliceItem(const BarRenderSliceItem &other);
+    BarRenderSliceItem &operator=(const BarRenderSliceItem &other) = default;
     virtual ~BarRenderSliceItem();
 
     void setItem(const BarRenderItem &renderItem);

@@ -53,6 +53,7 @@ class AbstractRenderItem
 public:
     AbstractRenderItem();
     AbstractRenderItem(const AbstractRenderItem &other);
+    AbstractRenderItem &operator=(const AbstractRenderItem &other) = default;
     virtual ~AbstractRenderItem();
 
     // Position in 3D scene
