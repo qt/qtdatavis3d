@@ -50,7 +50,7 @@ QT_BEGIN_NAMESPACE
 class ShaderHelper;
 class Q3DScene;
 
-class QT_DATAVISUALIZATION_EXPORT Surface3DRenderer : public Abstract3DRenderer
+class Q_DATAVISUALIZATION_EXPORT Surface3DRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 

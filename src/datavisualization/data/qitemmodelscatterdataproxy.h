@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE
 
 class QItemModelScatterDataProxyPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QItemModelScatterDataProxy : public QScatterDataProxy
+class Q_DATAVISUALIZATION_EXPORT QItemModelScatterDataProxy : public QScatterDataProxy
 {
     Q_OBJECT
     Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)

@@ -38,7 +38,7 @@ QT_BEGIN_NAMESPACE
 
 class QAbstractDataProxyPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QAbstractDataProxy : public QObject
+class Q_DATAVISUALIZATION_EXPORT QAbstractDataProxy : public QObject
 {
     Q_OBJECT
     Q_ENUMS(DataType)

@@ -42,7 +42,7 @@ class QScatter3DSeries;
 
 typedef QList<QScatterDataItem> QScatterDataArray;
 
-class QT_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
+class Q_DATAVISUALIZATION_EXPORT QScatterDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 

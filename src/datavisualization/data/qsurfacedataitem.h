@@ -37,7 +37,7 @@ QT_BEGIN_NAMESPACE
 
 class QSurfaceDataItemPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QSurfaceDataItem
+class Q_DATAVISUALIZATION_EXPORT QSurfaceDataItem
 {
 public:
     QSurfaceDataItem();

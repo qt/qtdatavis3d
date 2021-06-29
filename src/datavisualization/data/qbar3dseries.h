@@ -38,7 +38,7 @@ QT_BEGIN_NAMESPACE
 
 class QBar3DSeriesPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QBar3DSeries : public QAbstract3DSeries
+class Q_DATAVISUALIZATION_EXPORT QBar3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QBarDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)

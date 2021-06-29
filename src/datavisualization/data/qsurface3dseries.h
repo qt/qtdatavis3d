@@ -37,7 +37,7 @@ QT_BEGIN_NAMESPACE
 
 class QSurface3DSeriesPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
+class Q_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_FLAGS(DrawFlag DrawFlags)

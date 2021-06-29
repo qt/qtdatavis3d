@@ -37,7 +37,7 @@ QT_BEGIN_NAMESPACE
 
 class QScatterDataItemPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QScatterDataItem
+class Q_DATAVISUALIZATION_EXPORT QScatterDataItem
 {
 public:
     QScatterDataItem();

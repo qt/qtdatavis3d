@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DCameraPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
+class Q_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
 {
     Q_OBJECT
     Q_ENUMS(CameraPreset)

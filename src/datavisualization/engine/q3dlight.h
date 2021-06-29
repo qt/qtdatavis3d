@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DLightPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DLight : public Q3DObject
+class Q_DATAVISUALIZATION_EXPORT Q3DLight : public Q3DObject
 {
     Q_OBJECT
     Q_PROPERTY(bool autoPosition READ isAutoPosition WRITE setAutoPosition NOTIFY autoPositionChanged REVISION(1, 3))

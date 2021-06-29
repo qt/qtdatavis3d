@@ -45,7 +45,7 @@ class QBar3DSeries;
 typedef QList<QBarDataItem> QBarDataRow;
 typedef QList<QBarDataRow *> QBarDataArray;
 
-class QT_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
+class Q_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 

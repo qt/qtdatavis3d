@@ -60,7 +60,7 @@ struct Scatter3DChangeBitField {
     }
 };
 
-class QT_DATAVISUALIZATION_EXPORT Scatter3DController : public Abstract3DController
+class Q_DATAVISUALIZATION_EXPORT Scatter3DController : public Abstract3DController
 {
     Q_OBJECT
 

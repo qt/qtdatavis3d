@@ -96,7 +96,7 @@ struct Q3DThemeDirtyBitField {
     }
 };
 
-class QT_DATAVISUALIZATION_EXPORT Q3DThemePrivate : public QObject
+class Q_DATAVISUALIZATION_EXPORT Q3DThemePrivate : public QObject
 {
     Q_OBJECT
 public:

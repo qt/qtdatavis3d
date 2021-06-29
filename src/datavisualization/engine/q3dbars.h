@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
+class Q_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
 {
     Q_OBJECT
     Q_PROPERTY(bool multiSeriesUniform READ isMultiSeriesUniform WRITE setMultiSeriesUniform NOTIFY multiSeriesUniformChanged)

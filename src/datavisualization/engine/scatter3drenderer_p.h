@@ -54,7 +54,7 @@ class Q3DScene;
 class ScatterSeriesRenderCache;
 class QScatterDataItem;
 
-class QT_DATAVISUALIZATION_EXPORT Scatter3DRenderer : public Abstract3DRenderer
+class Q_DATAVISUALIZATION_EXPORT Scatter3DRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 

@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE
 
 class QItemModelSurfaceDataProxyPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QItemModelSurfaceDataProxy : public QSurfaceDataProxy
+class Q_DATAVISUALIZATION_EXPORT QItemModelSurfaceDataProxy : public QSurfaceDataProxy
 {
     Q_OBJECT
     Q_ENUMS(MultiMatchBehavior)

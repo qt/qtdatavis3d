@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE
 
 class QCustom3DVolumePrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem
+class Q_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem
 {
     Q_OBJECT
     Q_PROPERTY(int textureWidth READ textureWidth WRITE setTextureWidth NOTIFY textureWidthChanged)

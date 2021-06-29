@@ -40,7 +40,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DThemePrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
+class Q_DATAVISUALIZATION_EXPORT Q3DTheme : public QObject
 {
     Q_OBJECT
     Q_ENUMS(ColorStyle)

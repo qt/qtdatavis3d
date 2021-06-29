@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 
 class QBarDataItemPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QBarDataItem
+class Q_DATAVISUALIZATION_EXPORT QBarDataItem
 {
 public:
     QBarDataItem();

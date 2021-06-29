@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DInputHandlerPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DInputHandler : public QAbstract3DInputHandler
+class Q_DATAVISUALIZATION_EXPORT Q3DInputHandler : public QAbstract3DInputHandler
 {
     Q_OBJECT
     Q_PROPERTY(bool rotationEnabled READ isRotationEnabled WRITE setRotationEnabled NOTIFY rotationEnabledChanged)

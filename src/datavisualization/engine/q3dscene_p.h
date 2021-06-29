@@ -77,7 +77,7 @@ struct Q3DSceneChangeBitField {
     }
 };
 
-class QT_DATAVISUALIZATION_EXPORT Q3DScenePrivate : public QObject
+class Q_DATAVISUALIZATION_EXPORT Q3DScenePrivate : public QObject
 {
     Q_OBJECT
 public:

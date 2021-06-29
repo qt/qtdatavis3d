@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE
 
 class QAbstract3DAxisPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QAbstract3DAxis : public QObject
+class Q_DATAVISUALIZATION_EXPORT QAbstract3DAxis : public QObject
 {
     Q_OBJECT
     Q_ENUMS(AxisOrientation)

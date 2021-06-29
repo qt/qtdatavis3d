@@ -40,7 +40,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DScenePrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
+class Q_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QRect viewport READ viewport NOTIFY viewportChanged)

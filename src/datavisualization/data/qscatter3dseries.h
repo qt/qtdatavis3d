@@ -37,7 +37,7 @@ QT_BEGIN_NAMESPACE
 
 class QScatter3DSeriesPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QScatter3DSeries : public QAbstract3DSeries
+class Q_DATAVISUALIZATION_EXPORT QScatter3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QScatterDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)

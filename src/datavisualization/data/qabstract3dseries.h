@@ -41,7 +41,7 @@ QT_BEGIN_NAMESPACE
 
 class QAbstract3DSeriesPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
+class Q_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
 {
     Q_OBJECT
     Q_ENUMS(SeriesType)

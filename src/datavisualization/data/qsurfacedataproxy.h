@@ -43,7 +43,7 @@ class QSurface3DSeries;
 typedef QList<QSurfaceDataItem> QSurfaceDataRow;
 typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
 
-class QT_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
+class Q_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 

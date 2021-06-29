@@ -37,7 +37,7 @@ QT_BEGIN_NAMESPACE
 
 class QValue3DAxisPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QValue3DAxis : public QAbstract3DAxis
+class Q_DATAVISUALIZATION_EXPORT QValue3DAxis : public QAbstract3DAxis
 {
     Q_OBJECT
     Q_PROPERTY(int segmentCount READ segmentCount WRITE setSegmentCount NOTIFY segmentCountChanged)

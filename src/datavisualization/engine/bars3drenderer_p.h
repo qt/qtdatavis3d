@@ -57,7 +57,7 @@ class LabelItem;
 class Q3DScene;
 class BarSeriesRenderCache;
 
-class QT_DATAVISUALIZATION_EXPORT Bars3DRenderer : public Abstract3DRenderer
+class Q_DATAVISUALIZATION_EXPORT Bars3DRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 

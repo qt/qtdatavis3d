@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 
 class QCategory3DAxisPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QCategory3DAxis : public QAbstract3DAxis
+class Q_DATAVISUALIZATION_EXPORT QCategory3DAxis : public QAbstract3DAxis
 {
     Q_OBJECT
     Q_PROPERTY(QStringList labels READ labels WRITE setLabels NOTIFY labelsChanged)

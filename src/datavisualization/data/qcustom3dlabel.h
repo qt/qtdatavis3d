@@ -41,7 +41,7 @@ QT_BEGIN_NAMESPACE
 
 class QCustom3DLabelPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QCustom3DLabel : public QCustom3DItem
+class Q_DATAVISUALIZATION_EXPORT QCustom3DLabel : public QCustom3DItem
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)

@@ -165,7 +165,7 @@ struct Abstract3DChangeBitField {
     }
 };
 
-class QT_DATAVISUALIZATION_EXPORT Abstract3DController : public QObject
+class Q_DATAVISUALIZATION_EXPORT Abstract3DController : public QObject
 {
     Q_OBJECT
 

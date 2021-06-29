@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 
 class QTouch3DInputHandlerPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QTouch3DInputHandler : public Q3DInputHandler
+class Q_DATAVISUALIZATION_EXPORT QTouch3DInputHandler : public Q3DInputHandler
 {
     Q_OBJECT
 

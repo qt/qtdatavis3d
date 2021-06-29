@@ -65,7 +65,7 @@ struct Surface3DChangeBitField {
     }
 };
 
-class QT_DATAVISUALIZATION_EXPORT Surface3DController : public Abstract3DController
+class Q_DATAVISUALIZATION_EXPORT Surface3DController : public Abstract3DController
 {
     Q_OBJECT
 

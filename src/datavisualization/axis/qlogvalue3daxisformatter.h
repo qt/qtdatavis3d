@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
 
 class QLogValue3DAxisFormatterPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QLogValue3DAxisFormatter : public QValue3DAxisFormatter
+class Q_DATAVISUALIZATION_EXPORT QLogValue3DAxisFormatter : public QValue3DAxisFormatter
 {
     Q_OBJECT
 

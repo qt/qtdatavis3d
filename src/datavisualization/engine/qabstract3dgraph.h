@@ -45,7 +45,7 @@ class QCustom3DItem;
 class QAbstract3DAxis;
 class QAbstract3DSeries;
 
-class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
+class Q_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
     Q_ENUMS(ShadowQuality)

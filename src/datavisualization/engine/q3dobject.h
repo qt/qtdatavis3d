@@ -41,7 +41,7 @@ QT_BEGIN_NAMESPACE
 class Q3DObjectPrivate;
 class Q3DScene;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DObject : public QObject
+class Q_DATAVISUALIZATION_EXPORT Q3DObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Q3DScene* parentScene READ parentScene)

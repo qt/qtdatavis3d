@@ -31,6 +31,7 @@
 #define QDATAVISUALIZATIONGLOBAL_H
 
 #include <QtCore/qglobal.h>
+#include <QtDataVisualization/qtdatavisualizationexports.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -43,16 +44,6 @@ QT_BEGIN_NAMESPACE
    can be used like #if (QT_DATAVISUALIZATION_VERSION >= QT_DATAVISUALIZATION_VERSION_CHECK(1, 0, 0))
 */
 #define QT_DATAVISUALIZATION_VERSION_CHECK(major, minor, patch) ((major<<16)|(minor<<8)|(patch))
-
-#ifndef QT_STATIC
-#  if defined(QT_BUILD_DATAVISUALIZATION_LIB)
-#    define QT_DATAVISUALIZATION_EXPORT Q_DECL_EXPORT
-#  else
-#    define QT_DATAVISUALIZATION_EXPORT Q_DECL_IMPORT
-#  endif
-#else
-#  define QT_DATAVISUALIZATION_EXPORT
-#endif
 
 QT_END_NAMESPACE
 

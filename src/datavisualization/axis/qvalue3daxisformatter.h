@@ -42,7 +42,7 @@ QT_BEGIN_NAMESPACE
 class QValue3DAxisFormatterPrivate;
 class QValue3DAxis;
 
-class QT_DATAVISUALIZATION_EXPORT QValue3DAxisFormatter : public QObject
+class Q_DATAVISUALIZATION_EXPORT QValue3DAxisFormatter : public QObject
 {
     Q_OBJECT
 protected:

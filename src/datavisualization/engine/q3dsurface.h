@@ -38,7 +38,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DSurfacePrivate;
 
-class QT_DATAVISUALIZATION_EXPORT Q3DSurface : public QAbstract3DGraph
+class Q_DATAVISUALIZATION_EXPORT Q3DSurface : public QAbstract3DGraph
 {
     Q_OBJECT
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)

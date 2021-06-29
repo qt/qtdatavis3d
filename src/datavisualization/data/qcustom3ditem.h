@@ -39,7 +39,7 @@ QT_BEGIN_NAMESPACE
 
 class QCustom3DItemPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
+class Q_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString meshFile READ meshFile WRITE setMeshFile NOTIFY meshFileChanged)

@@ -38,7 +38,7 @@ QT_BEGIN_NAMESPACE
 
 class QItemModelBarDataProxyPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QItemModelBarDataProxy : public QBarDataProxy
+class Q_DATAVISUALIZATION_EXPORT QItemModelBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
     Q_ENUMS(MultiMatchBehavior)

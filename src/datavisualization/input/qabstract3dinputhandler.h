@@ -42,7 +42,7 @@ QT_BEGIN_NAMESPACE
 
 class QAbstract3DInputHandlerPrivate;
 
-class QT_DATAVISUALIZATION_EXPORT QAbstract3DInputHandler : public QObject
+class Q_DATAVISUALIZATION_EXPORT QAbstract3DInputHandler : public QObject
 {
     Q_OBJECT
     Q_ENUMS(InputView)
