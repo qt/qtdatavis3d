@@ -197,6 +197,10 @@ void Drawer::drawSelectionObject(ShaderHelper *shader, AbstractObjectHelper *obj
 
 void Drawer::drawSurfaceGrid(ShaderHelper *shader, SurfaceObject *object)
 {
+    // Get grid line color
+    QVector4D lineColor = Utils::vectorFromColor(object->wireFrameColor());
+    shader->setUniformValue(shader->color(), lineColor);
+
     // 1st attribute buffer : vertices
     glEnableVertexAttribArray(shader->posAtt());
     glBindBuffer(GL_ARRAY_BUFFER, object->vertexBuf());

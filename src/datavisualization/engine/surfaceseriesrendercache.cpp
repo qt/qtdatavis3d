@@ -66,6 +66,10 @@ void SurfaceSeriesRenderCache::populate(bool newSeries)
     QSurface3DSeries::DrawFlags drawMode = series()->drawMode();
     m_surfaceVisible = drawMode.testFlag(QSurface3DSeries::DrawSurface);
     m_surfaceGridVisible = drawMode.testFlag(QSurface3DSeries::DrawWireframe);
+    QColor lineColor = series()->wireFrameColor();
+    m_surfaceObj->setLineColor(lineColor);
+    m_sliceSurfaceObj->setLineColor(lineColor);
+
     if (m_flatChangeAllowed && m_surfaceFlatShading != series()->isFlatShadingEnabled()) {
         m_surfaceFlatShading = series()->isFlatShadingEnabled();
         m_flatStatusDirty = true;

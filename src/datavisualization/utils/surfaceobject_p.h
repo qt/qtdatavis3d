@@ -45,6 +45,7 @@
 #include "qsurfacedataproxy.h"
 
 #include <QtCore/QRect>
+#include <QtGui/QColor>
 
 QT_BEGIN_NAMESPACE
 
@@ -95,6 +96,8 @@ public:
     float minYValue() const { return m_minY; }
     float maxYValue() const { return m_maxY; }
     inline void activateSurfaceTexture(bool value) { m_returnTextureBuffer = value; }
+    inline void setLineColor(const QColor &color) { m_wireFrameColor = color; }
+    inline const QColor &wireFrameColor() const { return m_wireFrameColor; }
 
 private:
     void createCoarseIndices(GLint *indices, int &p, int row, int upperRow, int j);
@@ -129,6 +132,7 @@ private:
     bool m_returnTextureBuffer = false;
     SurfaceObject::DataDimensions m_dataDimension;
     SurfaceObject::DataDimensions m_oldDataDimension = DataDimensions(-1);
+    QColor m_wireFrameColor;
 };
 
 QT_END_NAMESPACE

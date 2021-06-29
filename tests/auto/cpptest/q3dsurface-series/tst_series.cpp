@@ -92,7 +92,7 @@ void tst_series::initialProperties()
     QCOMPARE(m_series->isFlatShadingEnabled(), true);
     QCOMPARE(m_series->isFlatShadingSupported(), true);
     QCOMPARE(m_series->selectedPoint(), m_series->invalidSelectionPosition());
-
+    QCOMPARE(m_series->wireFrameColor(), QColor(Qt::black));
     // Common properties. The ones identical between different series are tested in QBar3DSeries tests
     QCOMPARE(m_series->itemLabelFormat(), QString("@xLabel, @yLabel, @zLabel"));
     QCOMPARE(m_series->mesh(), QAbstract3DSeries::MeshSphere);
@@ -107,10 +107,12 @@ void tst_series::initializeProperties()
     m_series->setDrawMode(QSurface3DSeries::DrawWireframe);
     m_series->setFlatShadingEnabled(false);
     m_series->setSelectedPoint(QPoint(0, 0));
+    m_series->setWireFrameColor(QColor(Qt::red));
 
     QCOMPARE(m_series->drawMode(), QSurface3DSeries::DrawWireframe);
     QCOMPARE(m_series->isFlatShadingEnabled(), false);
     QCOMPARE(m_series->selectedPoint(), QPoint(0, 0));
+    QCOMPARE(m_series->wireFrameColor(), QColor(Qt::red));
 
     // Common properties. The ones identical between different series are tested in QBar3DSeries tests
     m_series->setMesh(QAbstract3DSeries::MeshPyramid);

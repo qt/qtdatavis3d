@@ -165,6 +165,12 @@ QT_BEGIN_NAMESPACE
  * file name is set.
  */
 
+/*!
+ * \qmlproperty color Surface3DSeries::wireFrameColor
+ * \since 6.3
+ *
+ * The color used to draw the gridlines of the surface wireframe.
+ */
 
 /*!
  * \enum QSurface3DSeries::DrawFlag
@@ -399,6 +405,24 @@ QString QSurface3DSeries::textureFile() const
 }
 
 /*!
+ * \property QSurface3DSeries::wireFrameColor
+ * \since 6.3
+ *
+ * \brief The color for the surface wireframe.
+ */
+void QSurface3DSeries::setWireFrameColor(const QColor &color)
+{
+    if (dptr()->m_wireFrameColor != color) {
+        dptr()->setWireFrameColor(color);
+        emit wireFrameColorChanged(color);
+    }
+}
+
+QColor QSurface3DSeries::wireFrameColor() const
+{
+    return dptrc()->m_wireFrameColor;
+}
+/*!
  * \internal
  */
 QSurface3DSeriesPrivate *QSurface3DSeries::dptr()
@@ -420,7 +444,8 @@ QSurface3DSeriesPrivate::QSurface3DSeriesPrivate(QSurface3DSeries *q)
     : QAbstract3DSeriesPrivate(q, QAbstract3DSeries::SeriesTypeSurface),
       m_selectedPoint(Surface3DController::invalidSelectionPosition()),
       m_flatShadingEnabled(true),
-      m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe)
+      m_drawMode(QSurface3DSeries::DrawSurfaceAndWireframe),
+      m_wireFrameColor(Qt::black)
 {
     m_itemLabelFormat = QStringLiteral("@xLabel, @yLabel, @zLabel");
     m_mesh = QAbstract3DSeries::MeshSphere;
@@ -551,6 +576,13 @@ void QSurface3DSeriesPrivate::setTexture(const QImage &texture)
     m_texture = texture;
     if (static_cast<Surface3DController *>(m_controller))
         static_cast<Surface3DController *>(m_controller)->updateSurfaceTexture(qptr());
+}
+
+void QSurface3DSeriesPrivate::setWireFrameColor(const QColor &color)
+{
+    m_wireFrameColor = color;
+    if (m_controller)
+        m_controller->markSeriesVisualsDirty();
 }
 
 QT_END_NAMESPACE

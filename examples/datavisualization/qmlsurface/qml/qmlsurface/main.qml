@@ -155,6 +155,26 @@ Rectangle {
         }
 
         Button {
+            id: surfaceGridColor
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            text: "Red surface grid color"
+            onClicked: {
+                if (Qt.colorEqual(surfaceSeries.wireFrameColor, "#000000")
+                        && Qt.colorEqual(heightSeries.wireFrameColor, "#000000")) {
+                    surfaceSeries.wireFrameColor = "red"
+                    heightSeries.wireFrameColor = "red"
+                    text = "Black surface grid color"
+                }
+                else {
+                    surfaceSeries.wireFrameColor = "black"
+                    heightSeries.wireFrameColor = "black"
+                    text = "Red surface grid color"
+                }
+            }
+        }
+
+        Button {
             id: surfaceToggle
             Layout.fillWidth: true
             Layout.fillHeight: true
