@@ -870,7 +870,8 @@ void SurfaceObject::getNormalizedVertex(const QSurfaceDataItem &data, QVector3D 
     }
     float normalizedY = m_axisCacheY.positionAt(data.y());
     m_minY = qMin(normalizedY, m_minY);
-    m_maxY = qMax(normalizedY, m_maxY);
+    if (!qIsNaN(normalizedY) && !qIsInf(normalizedY))
+        m_maxY = qMax(normalizedY, m_maxY);
     vertex.setX(normalizedX);
     vertex.setY(normalizedY);
     vertex.setZ(normalizedZ);
