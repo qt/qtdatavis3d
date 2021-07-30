@@ -68,6 +68,9 @@ AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     // Set contents to false in case we are in qml designer to make component look nice
     m_runningInDesigner = QGuiApplication::applicationDisplayName() == QLatin1String("Qml2Puppet");
     setFlag(ItemHasContents, !m_runningInDesigner);
+
+    // Accept touchevents
+    setAcceptTouchEvents(true);
 }
 
 AbstractDeclarative::~AbstractDeclarative()
