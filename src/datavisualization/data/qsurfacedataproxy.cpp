@@ -552,9 +552,11 @@ void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
                 float itemValue = m_dataArray->at(i)->at(j).y();
                 if (qIsNaN(itemValue) || qIsInf(itemValue))
                     continue;
-                if (min > itemValue && isValidValue(itemValue, axisY))
+                if ((min > itemValue || (qIsNaN(min) || qIsInf(min)))
+                        && isValidValue(itemValue, axisY)) {
                     min = itemValue;
-                if (max < itemValue)
+                }
+                if (max < itemValue  || (qIsNaN(max) || qIsInf(max)))
                     max = itemValue;
             }
         }
@@ -569,33 +571,59 @@ void QSurfaceDataProxyPrivate::limitValues(QVector3D &minValues, QVector3D &maxV
         float xHigh = m_dataArray->at(0)->last().x();
         float zLow = m_dataArray->at(0)->at(0).z();
         float zHigh = m_dataArray->last()->at(0).z();
-        for (int i = 0; i < columns; i++) {
-            float zItemValue = m_dataArray->at(0)->at(i).z();
-            if (qIsNaN(zItemValue) || qIsInf(zItemValue))
-                continue;
-            else if (isValidValue(zItemValue, axisZ))
-                zLow = qMin(zLow,zItemValue);
-        }
-        for (int i = 0; i < columns; i++) {
-            float zItemValue = m_dataArray->last()->at(i).z();
-            if (qIsNaN(zItemValue) || qIsInf(zItemValue))
-                continue;
-            else if (isValidValue(zItemValue, axisZ))
-                zHigh = qMax(zHigh, zItemValue);
-        }
         for (int i = 0; i < rows; i++) {
-            float xItemValue = m_dataArray->at(i)->at(0).x();
-            if (qIsNaN(xItemValue) || qIsInf(xItemValue))
-                continue;
-            else if (isValidValue(xItemValue, axisX))
-                xLow = qMin(xLow, xItemValue);
+            for (int j = 0; j < columns; j++) {
+                float zItemValue = m_dataArray->at(i)->at(j).z();
+                if (qIsNaN(zItemValue) || qIsInf(zItemValue))
+                    continue;
+                else if (isValidValue(zItemValue, axisZ))
+                    zLow = qMin(zLow,zItemValue);
+            }
+            if (!qIsNaN(zLow) && !qIsInf(zLow))
+                break;
         }
-        for (int i = 0; i < rows; i++) {
-            float xItemValue = m_dataArray->at(i)->last().x();
-            if (qIsNaN(xItemValue) || qIsInf(xItemValue))
-                continue;
-            else if (isValidValue(xItemValue, axisX))
-                xHigh = qMax(xHigh, xItemValue);
+        for (int i = rows - 1; i >= 0; i--) {
+            for (int j = 0; j < columns; j++) {
+                float zItemValue = m_dataArray->at(i)->at(j).z();
+                if (qIsNaN(zItemValue) || qIsInf(zItemValue))
+                    continue;
+                else if (isValidValue(zItemValue, axisZ))
+                {
+                    if (!qIsNaN(zHigh) && !qIsInf(zHigh))
+                        zHigh = qMax(zHigh, zItemValue);
+                    else
+                        zHigh = zItemValue;
+                }
+            }
+            if (!qIsNaN(zHigh) && !qIsInf(zHigh))
+                break;
+        }
+        for (int j = 0; j<columns; j++){
+            for (int i = 0; i < rows; i++) {
+                float xItemValue = m_dataArray->at(i)->at(j).x();
+                if (qIsNaN(xItemValue) || qIsInf(xItemValue))
+                    continue;
+                else if (isValidValue(xItemValue, axisX))
+                    xLow = qMin(xLow, xItemValue);
+            }
+            if (!qIsNaN(xLow) && !qIsInf(xLow))
+                break;
+        }
+        for (int j = columns-1; j >= 0; j--){
+            for (int i = 0; i < rows; i++) {
+                float xItemValue = m_dataArray->at(i)->at(j).x();
+                if (qIsNaN(xItemValue) || qIsInf(xItemValue))
+                    continue;
+                else if (isValidValue(xItemValue, axisX))
+                {
+                    if (!qIsNaN(xHigh) && !qIsInf(xHigh))
+                        xHigh = qMax(xHigh, xItemValue);
+                    else
+                        xHigh = xItemValue;
+                }
+            }
+            if (!qIsNaN(xHigh) && !qIsInf(xHigh))
+                break;
         }
         minValues.setX(xLow);
         minValues.setZ(zLow);

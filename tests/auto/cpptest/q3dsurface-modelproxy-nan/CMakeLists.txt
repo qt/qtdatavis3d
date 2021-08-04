@@ -1,0 +1,11 @@
+qt_internal_add_test(q3dsurface-modelproxy-nan
+    SOURCES
+        tst_proxy.cpp
+    INCLUDE_DIRECTORIES
+        ../common
+    PUBLIC_LIBRARIES
+        Qt::Gui
+        Qt::GuiPrivate
+        Qt::Widgets
+        Qt::DataVisualization
+)
