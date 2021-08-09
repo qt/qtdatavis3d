@@ -52,7 +52,6 @@ Item {
     Theme3D {
         id: themeIsabelle
         type: Theme3D.ThemeIsabelle
-        font.family: "Lucida Handwriting"
         font.pointSize: 40
     }
     //! [13]
