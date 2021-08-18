@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtDataVisualization
 import QtTest 1.0
 
 Item {

@@ -68,6 +68,7 @@ private:
     bool m_cachedIsSlicingActivated;
     int m_cachedRowCount;
     int m_cachedColumnCount;
+    QSizeF m_cachedBarSeriesMargin;
 
     // Internal state
     BarRenderItem *m_selectedBar; // points to renderitem array
@@ -144,6 +145,7 @@ public Q_SLOTS:
     void updateBarSpecs(GLfloat thicknessRatio = 1.0f,
                         const QSizeF &spacing = QSizeF(1.0, 1.0),
                         bool relative = true);
+    void updateBarSeriesMargin(const QSizeF &margin);
     void updateSlicingActive(bool isSlicing);
     void updateSelectedBar(const QPoint &position, QBar3DSeries *series);
     inline QPoint clickedPosition() const { return m_clickedPosition; }
@@ -186,6 +188,7 @@ private:
     void updateDepthBuffer() override;
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
+    void calculateSeriesStartPosition();
     Abstract3DController::SelectionType isSelected(int row, int bar,
                                                    const BarSeriesRenderCache *cache);
     QPoint selectionColorToArrayPosition(const QVector4D &selectionColor);

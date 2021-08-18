@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtDataVisualization
 import QtTest 1.0
 
 Item {
@@ -41,7 +41,7 @@ Item {
     function constructBars() {
         bars3d = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtDataVisualization
         Bars3D {
             anchors.fill: parent
         }", top)
@@ -104,7 +104,7 @@ Item {
     function constructBarsWithCustomItemList() {
         bars3d = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtDataVisualization
         Bars3D {
             anchors.fill: parent
             customItemList: [item1, item2]

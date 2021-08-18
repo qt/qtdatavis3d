@@ -54,6 +54,8 @@ GraphModifier::GraphModifier(Q3DBars *barchart, QColorDialog *colorDialog)
       m_static(true),
       m_barSpacingX(0.1f),
       m_barSpacingZ(0.1f),
+      m_barSeriesMarginX(0.0f),
+      m_barSeriesMarginZ(0.0f),
       m_fontSize(20),
       m_segments(10),
       m_subSegments(3),
@@ -1622,6 +1624,18 @@ void GraphModifier::setSpacingSpecsZ(int spacing)
 {
     m_barSpacingZ = (float)spacing / 100.0f;
     m_graph->setBarSpacing(QSizeF(m_barSpacingX, m_barSpacingZ));
+}
+
+void GraphModifier::setMarginX(int margin)
+{
+    m_barSeriesMarginX = (float)margin / 100.0f;
+    m_graph->setBarSeriesMargin(QSizeF(m_barSeriesMarginX, m_barSeriesMarginZ));
+}
+
+void GraphModifier::setMarginZ(int margin)
+{
+   m_barSeriesMarginZ = (float)margin / 100.0f;
+   m_graph->setBarSeriesMargin(QSizeF(m_barSeriesMarginX, m_barSeriesMarginZ));
 }
 
 void GraphModifier::setSampleCountX(int samples)

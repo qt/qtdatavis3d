@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtDataVisualization
 import QtTest 1.0
 
 Item {
@@ -44,7 +44,7 @@ Item {
     function constructEmpty() {
         empty = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtDataVisualization
         Bars3D {
         }", top)
     }
@@ -52,13 +52,15 @@ Item {
     function constructBasic() {
         basic = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtDataVisualization
         Bars3D {
             anchors.fill: parent
             multiSeriesUniform: true
             barThickness: 0.1
             barSpacing.width: 0.1
             barSpacing.height: 0.1
+            barSeriesMargin.width: 0.3
+            barSeriesMargin.height: 0.3
             barSpacingRelative: false
             floorLevel: 1.0
         }", top)
@@ -68,7 +70,7 @@ Item {
     function constructCommon() {
         common = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtDataVisualization
         Bars3D {
             anchors.fill: parent
         }", top)
@@ -78,7 +80,7 @@ Item {
     function constructCommonInit() {
         common_init = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtDataVisualization
         Bars3D {
             anchors.fill: parent
             selectionMode: AbstractGraph3D.SelectionNone
@@ -112,6 +114,7 @@ Item {
             compare(empty.multiSeriesUniform, false, "multiSeriesUniform")
             compare(empty.barThickness, 1.0, "barThickness")
             compare(empty.barSpacing, Qt.size(1.0, 1.0), "barSpacing")
+            compare(empty.barSeriesMargin, Qt.size(0.0, 0.0), "barSeriesMargin")
             compare(empty.barSpacingRelative, true, "barSpacingRelative")
             compare(empty.seriesList.length, 0, "seriesList")
             compare(empty.selectedSeries, null, "selectedSeries")
@@ -140,6 +143,7 @@ Item {
             compare(basic.multiSeriesUniform, true, "multiSeriesUniform")
             compare(basic.barThickness, 0.1, "barThickness")
             compare(basic.barSpacing, Qt.size(0.1, 0.1), "barSpacing")
+            compare(basic.barSeriesMargin, Qt.size(0.3, 0.3), "barSeriesMargin")
             compare(basic.barSpacingRelative, false, "barSpacingRelative")
             compare(basic.floorLevel, 1.0, "floorLevel")
             waitForRendering(top)
@@ -149,11 +153,13 @@ Item {
             basic.multiSeriesUniform = false
             basic.barThickness = 0.5
             basic.barSpacing = Qt.size(1.0, 0.0)
+            basic.barSeriesMargin = Qt.size(0.5, 0.0)
             basic.barSpacingRelative = true
             basic.floorLevel = 0.2
             compare(basic.multiSeriesUniform, false, "multiSeriesUniform")
             compare(basic.barThickness, 0.5, "barThickness")
             compare(basic.barSpacing, Qt.size(1.0, 0.0), "barSpacing")
+            compare(basic.barSeriesMargin, Qt.size(0.5, 0.0), "barSeriesMargin")
             compare(basic.barSpacingRelative, true, "barSpacingRelative")
             compare(basic.floorLevel, 0.2, "floorLevel")
             waitForRendering(top)
@@ -162,8 +168,10 @@ Item {
         function test_3_basic_change_invalid() {
             basic.barThickness = -1
             basic.barSpacing = Qt.size(-1.0, -1.0)
+            basic.barSeriesMargin = Qt.size(-1.0, -1.0)
             compare(basic.barThickness, -1/*0.5*/, "barThickness") // TODO: Fix once QTRD-3367 is done
             compare(basic.barSpacing, Qt.size(-1.0, -1.0), "barSpacing")
+            compare(basic.barSeriesMargin, Qt.size(-1.0, -1.0), "barSeriesMargin")
             waitForRendering(top)
             basic.destroy()
             waitForRendering(top)

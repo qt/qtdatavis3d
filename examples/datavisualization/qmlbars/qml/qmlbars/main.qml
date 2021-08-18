@@ -357,6 +357,26 @@ Item {
             }
             //! [0]
         }
+
+        Button {
+            id: marginToggle
+            Layout.fillWidth: true
+            Layout.fillHeight: true
+            text: "Use Margin"
+            clip: true
+
+            onClicked: {
+                if (text === "Use Margin") {
+                    barGraph.barSeriesMargin = Qt.size(0.2, 0.2)
+                    barGraph.barSpacing = Qt.size(0.0, 0.0)
+                    text = "Use Spacing"
+                } else if (text === "Use Spacing") {
+                    barGraph.barSeriesMargin = Qt.size(0.0, 0.0)
+                    barGraph.barSpacing = Qt.size(0.5, 0.5)
+                    text = "Use Margin"
+                }
+            }
+        }
     }
 
     states: [

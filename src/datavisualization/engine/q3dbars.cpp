@@ -247,7 +247,7 @@ float Q3DBars::barThickness() const
  * Preset to \c {(1.0, 1.0)} by default. Spacing is affected by the
  * barSpacingRelative property.
  *
- * \sa barSpacingRelative, multiSeriesUniform
+ * \sa barSpacingRelative, multiSeriesUniform, barSeriesMargin
  */
 void Q3DBars::setBarSpacing(const QSizeF &spacing)
 {
@@ -282,6 +282,31 @@ void Q3DBars::setBarSpacingRelative(bool relative)
 bool Q3DBars::isBarSpacingRelative() const
 {
     return dptrc()->m_shared->isBarSpecRelative();
+}
+
+/*!
+ * \property Q3DBars::barSeriesMargin
+ * \since 6.3
+ *
+ * \brief Margin between series columns in X and Z dimensions.
+ * Sensible values are on the range [0,1).
+ *
+ * Preset to \c {(0.0, 0.0)} by default. This property enables
+ * showing bars from different series side by side, but with space between columns.
+ *
+ * \sa barSpacing
+ */
+void Q3DBars::setBarSeriesMargin(const QSizeF &margin)
+{
+    if (margin != barSeriesMargin()) {
+        dptr()->m_shared->setBarSeriesMargin(margin);
+        emit barSeriesMarginChanged(margin);
+    }
+}
+
+QSizeF Q3DBars::barSeriesMargin() const
+{
+    return dptrc()->m_shared->barSeriesMargin();
 }
 
 /*!

@@ -49,6 +49,7 @@ Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
       m_barThicknessRatio(1.0f),
       m_barSpacing(QSizeF(1.0, 1.0)),
       m_floorLevel(0.0f),
+      m_barSeriesMargin(0.0f, 0.0f),
       m_renderer(0)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
@@ -106,6 +107,11 @@ void Bars3DController::synchDataToRenderer()
     if (m_changeTracker.floorLevelChanged) {
         m_renderer->updateFloorLevel(m_floorLevel);
         m_changeTracker.floorLevelChanged = false;
+    }
+
+    if (m_changeTracker.barSeriesMarginChanged) {
+        m_renderer->updateBarSeriesMargin(m_barSeriesMargin);
+        m_changeTracker.barSeriesMarginChanged = false;
     }
 
     Abstract3DController::synchDataToRenderer();
@@ -508,6 +514,18 @@ GLfloat Bars3DController::barThickness()
 QSizeF Bars3DController::barSpacing()
 {
     return m_barSpacing;
+}
+
+void Bars3DController::setBarSeriesMargin(const QSizeF &margin)
+{
+    m_barSeriesMargin = margin;
+    m_changeTracker.barSeriesMarginChanged = true;
+    emitNeedRender();
+}
+
+QSizeF Bars3DController::barSeriesMargin()
+{
+    return m_barSeriesMargin;
 }
 
 bool Bars3DController::isBarSpecRelative()

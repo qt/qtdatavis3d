@@ -304,6 +304,18 @@ int main(int argc, char **argv)
     spacingSliderZ->setValue(10);
     spacingSliderZ->setMaximum(200);
 
+    QSlider *marginSliderX = new QSlider(Qt::Horizontal, widget);
+    marginSliderX->setTickInterval(1);
+    marginSliderX->setMinimum(0);
+    marginSliderX->setValue(0);
+    marginSliderX->setMaximum(100);
+
+    QSlider *marginSliderZ = new QSlider(Qt::Horizontal, widget);
+    marginSliderZ->setTickInterval(1);
+    marginSliderZ->setMinimum(0);
+    marginSliderZ->setValue(0);
+    marginSliderZ->setMaximum(100);
+
     QSlider *sampleSliderX = new QSlider(Qt::Horizontal, widget);
     sampleSliderX->setTickInterval(1);
     sampleSliderX->setMinimum(1);
@@ -433,6 +445,9 @@ int main(int argc, char **argv)
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust relative bar spacing")), 0, Qt::AlignTop);
     vLayout2->addWidget(spacingSliderX, 0, Qt::AlignTop);
     vLayout2->addWidget(spacingSliderZ, 0, Qt::AlignTop);
+    vLayout2->addWidget(new QLabel(QStringLiteral("Adjust margin")), 0, Qt::AlignTop);
+    vLayout2->addWidget(marginSliderX, 0, Qt::AlignTop);
+    vLayout2->addWidget(marginSliderZ, 0, Qt::AlignTop);
     vLayout2->addWidget(new QLabel(QStringLiteral("Adjust sample count")), 0, Qt::AlignTop);
     vLayout2->addWidget(sampleSliderX, 0, Qt::AlignTop);
     vLayout2->addWidget(sampleSliderZ, 0, Qt::AlignTop);
@@ -472,7 +487,7 @@ int main(int argc, char **argv)
     vLayout3->addWidget(toggleCustomItemButton, 0, Qt::AlignTop);
     vLayout3->addWidget(new QLabel(QStringLiteral("Adjust floor level")), 0, Qt::AlignTop);
     vLayout3->addWidget(floorLevelSlider, 0, Qt::AlignTop);
-    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust margin")), 0, Qt::AlignTop);
+    vLayout3->addWidget(new QLabel(QStringLiteral("Adjust bar series margin")), 0, Qt::AlignTop);
     vLayout3->addWidget(marginSlider, 1, Qt::AlignTop);
 
     widget->show();
@@ -488,6 +503,9 @@ int main(int argc, char **argv)
                      &GraphModifier::setSpacingSpecsX);
     QObject::connect(spacingSliderZ, &QSlider::valueChanged, modifier,
                      &GraphModifier::setSpacingSpecsZ);
+
+    QObject::connect(marginSliderX, &QSlider::valueChanged, modifier, &GraphModifier::setMarginX);
+    QObject::connect(marginSliderZ, &QSlider::valueChanged, modifier, &GraphModifier::setMarginZ);
 
     QObject::connect(sampleSliderX, &QSlider::valueChanged, modifier,
                      &GraphModifier::setSampleCountX);

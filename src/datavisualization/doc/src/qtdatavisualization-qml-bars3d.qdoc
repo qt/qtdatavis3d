@@ -108,6 +108,14 @@
  */
 
 /*!
+ * \qmlproperty size Bars3D::barSeriesMargin
+ * \since 6.3
+ *
+ * Margin between series columns in X and Z dimensions. Preset to \c {(0.0, 0.0)} by default.
+ * Sensible values are on the range [0,1).
+ */
+
+/*!
  * \qmlproperty Bar3DSeries Bars3D::selectedSeries
  * The selected series or \c null. If \l {QAbstract3DGraph::selectionMode}{selectionMode} has
  * the \c SelectionMultiSeries flag set, this property holds the series that

@@ -112,7 +112,7 @@ float DeclarativeBars::barThickness() const
     return m_barsController->barThickness();
 }
 
-void DeclarativeBars::setBarSpacing(QSizeF spacing)
+void DeclarativeBars::setBarSpacing(const QSizeF &spacing)
 {
     if (spacing != barSpacing()) {
         m_barsController->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
@@ -136,6 +136,19 @@ void DeclarativeBars::setBarSpacingRelative(bool relative)
 bool DeclarativeBars::isBarSpacingRelative() const
 {
     return m_barsController->isBarSpecRelative();
+}
+
+void DeclarativeBars::setBarSeriesMargin(const QSizeF &margin)
+{
+    if (margin != barSeriesMargin()) {
+        m_barsController->setBarSeriesMargin(margin);
+        emit barSeriesMarginChanged(barSeriesMargin());
+    }
+}
+
+QSizeF DeclarativeBars::barSeriesMargin() const
+{
+    return m_barsController->barSeriesMargin();
 }
 
 QBar3DSeries *DeclarativeBars::selectedSeries() const

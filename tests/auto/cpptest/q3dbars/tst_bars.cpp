@@ -121,6 +121,7 @@ void tst_bars::initialProperties()
     QCOMPARE(m_graph->isMultiSeriesUniform(), false);
     QCOMPARE(m_graph->barThickness(), 1.0);
     QCOMPARE(m_graph->barSpacing(), QSizeF(1.0f, 1.0f));
+    QCOMPARE(m_graph->barSeriesMargin(), QSizeF(0.0f, 0.0f));
     QCOMPARE(m_graph->isBarSpacingRelative(), true);
     QCOMPARE(m_graph->seriesList().length(), 0);
     QVERIFY(!m_graph->selectedSeries());
@@ -157,12 +158,14 @@ void tst_bars::initializeProperties()
     m_graph->setMultiSeriesUniform(true);
     m_graph->setBarThickness(0.2f);
     m_graph->setBarSpacing(QSizeF(0.1f, 0.1f));
+    m_graph->setBarSeriesMargin(QSizeF(0.3f, 0.3f));
     m_graph->setBarSpacingRelative(false);
     m_graph->setFloorLevel(1.0f);
 
     QCOMPARE(m_graph->isMultiSeriesUniform(), true);
     QCOMPARE(m_graph->barThickness(), 0.2f);
     QCOMPARE(m_graph->barSpacing(), QSizeF(0.1f, 0.1f));
+    QCOMPARE(m_graph->barSeriesMargin(), QSizeF(0.3f, 0.3f));
     QCOMPARE(m_graph->isBarSpacingRelative(), false);
     QCOMPARE(m_graph->floorLevel(), 1.0f);
 

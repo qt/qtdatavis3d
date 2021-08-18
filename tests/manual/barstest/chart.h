@@ -75,6 +75,8 @@ public:
     void setSpecsZ(int bardepth);
     void setSpacingSpecsX(int spacing);
     void setSpacingSpecsZ(int spacing);
+    void setMarginX(int margin);
+    void setMarginZ(int margin);
     void setSampleCountX(int samples);
     void setSampleCountZ(int samples);
     void setMinX(int min);
@@ -153,6 +155,8 @@ private:
     bool m_static;
     float m_barSpacingX;
     float m_barSpacingZ;
+    float m_barSeriesMarginX;
+    float m_barSeriesMarginZ;
     int m_fontSize;
     int m_segments;
     int m_subSegments;
