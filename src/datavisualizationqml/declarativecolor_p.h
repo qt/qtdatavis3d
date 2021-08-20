@@ -61,7 +61,7 @@ public:
     QColor color() const;
 
 Q_SIGNALS:
-    void colorChanged(QColor color);
+    void colorChanged(const QColor &color);
 
 private:
     QColor m_color;

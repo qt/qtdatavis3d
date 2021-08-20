@@ -68,7 +68,7 @@ public:
     QPoint invalidSelectionPoint() const;
 
 Q_SIGNALS:
-    void selectionQueryPositionChanged(const QPointF position);
+    void selectionQueryPositionChanged(const QPointF &position);
 };
 
 QT_END_NAMESPACE

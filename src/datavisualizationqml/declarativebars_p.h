@@ -118,10 +118,10 @@ Q_SIGNALS:
     void columnAxisChanged(QCategory3DAxis *axis);
     void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
-    void barSpacingChanged(QSizeF spacing);
+    void barSpacingChanged(const QSizeF &spacing);
     void barSpacingRelativeChanged(bool relative);
-    Q_REVISION(6, 3) void barSeriesMarginChanged(QSizeF margin);
-    void meshFileNameChanged(QString filename);
+    Q_REVISION(6, 3) void barSeriesMarginChanged(const QSizeF &margin);
+    void meshFileNameChanged(const QString &filename);
     void primarySeriesChanged(QBar3DSeries *series);
     void selectedSeriesChanged(QBar3DSeries *series);
     Q_REVISION(1, 2) void floorLevelChanged(float level);
