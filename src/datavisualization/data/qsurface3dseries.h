@@ -48,7 +48,7 @@ class QT_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
     Q_PROPERTY(DrawFlags drawMode READ drawMode WRITE setDrawMode NOTIFY drawModeChanged)
     Q_PROPERTY(QImage texture READ texture WRITE setTexture NOTIFY textureChanged)
     Q_PROPERTY(QString textureFile READ textureFile WRITE setTextureFile NOTIFY textureFileChanged)
-    Q_PROPERTY(QColor wireFrameColor READ wireFrameColor WRITE setWireFrameColor NOTIFY wireFrameColorChanged)
+    Q_PROPERTY(QColor wireFrameColor READ wireFrameColor WRITE setWireFrameColor NOTIFY wireFrameColorChanged REVISION(6, 3))
 
 public:
     enum DrawFlag {
@@ -93,7 +93,7 @@ Q_SIGNALS:
     void drawModeChanged(QSurface3DSeries::DrawFlags mode);
     void textureChanged(const QImage &image);
     void textureFileChanged(const QString &filename);
-    void wireFrameColorChanged(const QColor &color);
+    Q_REVISION(6, 3) void wireFrameColorChanged(const QColor &color);
 
 protected:
     explicit QSurface3DSeries(QSurface3DSeriesPrivate *d, QObject *parent = nullptr);
