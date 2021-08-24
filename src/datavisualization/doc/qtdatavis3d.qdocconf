@@ -25,9 +25,6 @@ qhp.QtDataVisualization.virtualFolder   = qtdatavisualization
 qhp.QtDataVisualization.indexTitle      = Qt Data Visualization
 qhp.QtDataVisualization.indexRoot       =
 
-qhp.QtDataVisualization.filterAttributes                        = qtdatavisualization $QT_VERSION qtrefdoc
-qhp.QtDataVisualization.customFilters.Qt.name                   = QtDataVisualization $QT_VERSION
-qhp.QtDataVisualization.customFilters.Qt.filterAttributes       = qtdatavisualization $QT_VERSION
 qhp.QtDataVisualization.subprojects                             = gettingstarted examples classes types
 qhp.QtDataVisualization.subprojects.gettingstarted.title        = Getting Started
 qhp.QtDataVisualization.subprojects.gettingstarted.indexTitle   = Qt Data Visualization Getting Started
