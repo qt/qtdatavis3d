@@ -59,6 +59,9 @@ public:
     void setMaxXValue(float max);
     void setMinZValue(float min);
     void setMaxZValue(float max);
+    void setMinYValue(float min);
+    void setMaxYValue(float max);
+    void setAutoScaleY(bool enabled);
 private:
     QHeightMapSurfaceDataProxy *qptr();
     void handlePendingResolve();
@@ -71,6 +74,9 @@ private:
     float m_maxXValue;
     float m_minZValue;
     float m_maxZValue;
+    float m_minYValue;
+    float m_maxYValue;
+    bool m_autoScaleY;
 
     friend class QHeightMapSurfaceDataProxy;
 };
