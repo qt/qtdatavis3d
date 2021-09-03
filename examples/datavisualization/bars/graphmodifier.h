@@ -77,7 +77,7 @@ Q_SIGNALS:
     void shadowQualityChanged(int quality);
     void backgroundEnabledChanged(bool enabled);
     void gridEnabledChanged(bool enabled);
-    void fontChanged(QFont font);
+    void fontChanged(const QFont &font);
     void fontSizeChanged(int size);
 
 private:

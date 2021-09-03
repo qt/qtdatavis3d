@@ -93,7 +93,7 @@ public Q_SLOTS:
     void handleMultiHighlightGradientUpdate();
 
 Q_SIGNALS:
-    void selectedBarChanged(QPointF position);
+    void selectedBarChanged(const QPointF &position);
     void baseGradientChanged(ColorGradient *gradient);
     void singleHighlightGradientChanged(ColorGradient *gradient);
     void multiHighlightGradientChanged(ColorGradient *gradient);
@@ -185,7 +185,7 @@ public Q_SLOTS:
     void handleMultiHighlightGradientUpdate();
 
 Q_SIGNALS:
-    void selectedPointChanged(QPointF position);
+    void selectedPointChanged(const QPointF &position);
     void baseGradientChanged(ColorGradient *gradient);
     void singleHighlightGradientChanged(ColorGradient *gradient);
     void multiHighlightGradientChanged(ColorGradient *gradient);

@@ -89,7 +89,7 @@ Q_SIGNALS:
     void minYRotationChanged(float rotation);
     void maxXRotationChanged(float rotation);
     void maxYRotationChanged(float rotation);
-    void viewMatrixChanged(QMatrix4x4 viewMatrix);
+    void viewMatrixChanged(const QMatrix4x4 &viewMatrix);
     void viewMatrixAutoUpdateChanged(bool enabled);
 
 public:
