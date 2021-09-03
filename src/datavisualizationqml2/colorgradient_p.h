@@ -64,7 +64,7 @@ public:
 
 Q_SIGNALS:
     void positionChanged(qreal position);
-    void colorChanged(QColor color);
+    void colorChanged(const QColor &color);
 
 private:
     void updateGradient();

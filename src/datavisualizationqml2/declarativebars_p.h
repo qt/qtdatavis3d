@@ -79,7 +79,7 @@ public:
     void setBarThickness(float thicknessRatio);
     float barThickness() const;
 
-    void setBarSpacing(QSizeF spacing);
+    void setBarSpacing(const QSizeF &spacing);
     QSizeF barSpacing() const;
 
     void setBarSpacingRelative(bool relative);
@@ -111,9 +111,9 @@ Q_SIGNALS:
     void columnAxisChanged(QCategory3DAxis *axis);
     void multiSeriesUniformChanged(bool uniform);
     void barThicknessChanged(float thicknessRatio);
-    void barSpacingChanged(QSizeF spacing);
+    void barSpacingChanged(const QSizeF &spacing);
     void barSpacingRelativeChanged(bool relative);
-    void meshFileNameChanged(QString filename);
+    void meshFileNameChanged(const QString &filename);
     void primarySeriesChanged(QBar3DSeries *series);
     void selectedSeriesChanged(QBar3DSeries *series);
     Q_REVISION(1) void floorLevelChanged(float level);

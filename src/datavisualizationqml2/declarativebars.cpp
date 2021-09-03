@@ -112,7 +112,7 @@ float DeclarativeBars::barThickness() const
     return m_barsController->barThickness();
 }
 
-void DeclarativeBars::setBarSpacing(QSizeF spacing)
+void DeclarativeBars::setBarSpacing(const QSizeF &spacing)
 {
     if (spacing != barSpacing()) {
         m_barsController->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
