@@ -243,6 +243,7 @@ public:
     virtual void addSeries(QAbstract3DSeries *series);
     virtual void insertSeries(int index, QAbstract3DSeries *series);
     virtual void removeSeries(QAbstract3DSeries *series);
+    virtual bool hasSeries(QAbstract3DSeries *series);
     QList<QAbstract3DSeries *> seriesList();
 
     virtual void setAxisX(QAbstract3DAxis *axis);

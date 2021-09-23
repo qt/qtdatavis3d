@@ -436,6 +436,16 @@ void QAbstract3DGraph::clearSelection()
 }
 
 /*!
+ * Returns whether the \a series has already been added to the graph.
+ *
+ * \since 6.3
+ */
+bool QAbstract3DGraph::hasSeries(QAbstract3DSeries *series)
+{
+    return d_ptr->m_visualController->hasSeries(series);
+}
+
+/*!
  * Adds a QCustom3DItem \a item to the graph. Graph takes ownership of the added item.
  *
  * Returns the index to the added item if the add operation was successful, -1

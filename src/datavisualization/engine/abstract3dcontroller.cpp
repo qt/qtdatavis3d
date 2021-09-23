@@ -179,6 +179,11 @@ void Abstract3DController::removeSeries(QAbstract3DSeries *series)
     }
 }
 
+bool Abstract3DController::hasSeries(QAbstract3DSeries *series)
+{
+    return m_seriesList.contains(series);
+}
+
 QList<QAbstract3DSeries *> Abstract3DController::seriesList()
 {
     return m_seriesList;

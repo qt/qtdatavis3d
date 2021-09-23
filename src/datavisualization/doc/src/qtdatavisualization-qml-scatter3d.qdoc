@@ -97,9 +97,11 @@
  * Adds the \a series to the graph. A graph can contain multiple series, but has only one set of
  * axes. If the newly added series has specified a selected item, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
+ * \sa AbstractGraph3D::hasSeries()
  */
 
 /*!
  * \qmlmethod void Scatter3D::removeSeries(Scatter3DSeries series)
  * Remove the \a series from the graph.
+ * \sa AbstractGraph3D::hasSeries()
  */

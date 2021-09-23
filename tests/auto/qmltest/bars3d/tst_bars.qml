@@ -89,6 +89,14 @@ Item {
             compare(bars3d.selectedSeries, series1)
 
             waitForRendering(top)
+        }
+
+        function test_6_has_series() {
+            bars3d.seriesList = [series1]
+            compare(bars3d.hasSeries(series1), true)
+            compare(bars3d.hasSeries(series2), false)
+
+            waitForRendering(top)
             bars3d.destroy()
             waitForRendering(top)
         }

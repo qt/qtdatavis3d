@@ -57,6 +57,7 @@ private slots:
     void selectSeries();
     void removeSeries();
     void removeMultipleSeries();
+    void hasSeries();
 
     // The following tests are not required for scatter or surface, as they are handled identically
     void addInputHandler();
@@ -298,6 +299,15 @@ void tst_bars::removeMultipleSeries()
     delete series;
     delete series2;
     delete series3;
+}
+
+void tst_bars::hasSeries()
+{
+    QBar3DSeries *series1 = newSeries();
+    m_graph->addSeries(series1);
+    QCOMPARE(m_graph->hasSeries(series1), true);
+    QBar3DSeries *series2 = newSeries();
+    QCOMPARE(m_graph->hasSeries(series2), false);
 }
 
 // The following tests are not required for scatter or surface, as they are handled identically

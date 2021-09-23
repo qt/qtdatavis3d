@@ -190,6 +190,12 @@
  */
 
 /*!
+ * \qmlmethod bool AbstractGraph3D::hasSeries(Abstract3DSeries series)
+ * \since 6.3
+ * Returns whether the \a series has already been added to the graph.
+ */
+
+/*!
  * \qmlmethod int AbstractGraph3D::addCustomItem(Custom3DItem item)
  *
  * Adds a Custom3DItem \a item to the graph. Graph takes ownership of the added item.

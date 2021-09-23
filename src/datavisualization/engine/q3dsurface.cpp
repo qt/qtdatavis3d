@@ -127,6 +127,8 @@ Q3DSurface::~Q3DSurface()
  * Adds the \a series to the graph.  A graph can contain multiple series, but has only one set of
  * axes. If the newly added series has specified a selected item, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
+ *
+ * \sa  QAbstract3DGraph::hasSeries()
  */
 void Q3DSurface::addSeries(QSurface3DSeries *series)
 {
@@ -135,6 +137,8 @@ void Q3DSurface::addSeries(QSurface3DSeries *series)
 
 /*!
  * Removes the \a series from the graph.
+ *
+ * \sa QAbstract3DGraph::hasSeries()
  */
 void Q3DSurface::removeSeries(QSurface3DSeries *series)
 {
@@ -143,6 +147,8 @@ void Q3DSurface::removeSeries(QSurface3DSeries *series)
 
 /*!
  * Returns the list of series added to this graph.
+ *
+ * \sa QAbstract3DGraph::hasSeries()
  */
 QList<QSurface3DSeries *> Q3DSurface::seriesList() const
 {

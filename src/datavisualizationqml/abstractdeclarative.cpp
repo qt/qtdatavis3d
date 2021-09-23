@@ -185,6 +185,11 @@ void AbstractDeclarative::clearSelection()
     m_controller->clearSelection();
 }
 
+bool AbstractDeclarative::hasSeries(QAbstract3DSeries *series)
+{
+    return m_controller->hasSeries(series);
+}
+
 void AbstractDeclarative::setSelectionMode(SelectionFlags mode)
 {
     int intmode = int(mode);

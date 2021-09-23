@@ -43,6 +43,7 @@ QT_BEGIN_NAMESPACE
 class QAbstract3DGraphPrivate;
 class QCustom3DItem;
 class QAbstract3DAxis;
+class QAbstract3DSeries;
 
 class QT_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
@@ -140,6 +141,8 @@ public:
     Q3DScene *scene() const;
 
     void clearSelection();
+
+    virtual bool hasSeries(QAbstract3DSeries *series);
 
     int addCustomItem(QCustom3DItem *item);
     void removeCustomItems();

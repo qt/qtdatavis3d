@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtDataVisualization
 import QtTest 1.0
 
 Item {
@@ -66,6 +66,12 @@ Item {
             series.seriesList = [series1, series2]
             series.seriesList[0].selectedItem = 0
             compare(series.selectedSeries, series1)
+        }
+
+        function test_5_has_series() {
+            series.seriesList = [series1]
+            compare(series.hasSeries(series1), true)
+            compare(series.hasSeries(series2), false)
         }
     }
 }

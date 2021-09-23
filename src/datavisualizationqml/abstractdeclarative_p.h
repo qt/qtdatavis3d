@@ -168,6 +168,8 @@ public:
 
     Q_INVOKABLE virtual void clearSelection();
 
+    Q_REVISION(6, 3) Q_INVOKABLE virtual bool hasSeries(QAbstract3DSeries *series);
+
     Q_REVISION(1, 1) Q_INVOKABLE virtual int addCustomItem(QCustom3DItem *item);
     Q_REVISION(1, 1) Q_INVOKABLE virtual void removeCustomItems();
     Q_REVISION(1, 1) Q_INVOKABLE virtual void removeCustomItem(QCustom3DItem *item);

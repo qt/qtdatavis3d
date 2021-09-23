@@ -108,9 +108,11 @@
 /*!
  * \qmlmethod void Surface3D::addSeries(Surface3DSeries series)
  * Adds the \a series to the graph.
+ * \sa AbstractGraph3D::hasSeries()
  */
 
 /*!
  * \qmlmethod void Surface3D::removeSeries(Surface3DSeries series)
  * Removes the \a series from the graph.
+ * \sa AbstractGraph3D::hasSeries()
  */

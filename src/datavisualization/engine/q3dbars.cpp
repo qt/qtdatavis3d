@@ -157,7 +157,7 @@ QBar3DSeries *Q3DBars::primarySeries() const
  * to the axes. If the newly added series has specified a selected bar, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  *
- * \sa seriesList(), primarySeries
+ * \sa seriesList(), primarySeries, QAbstract3DGraph::hasSeries()
  */
 void Q3DBars::addSeries(QBar3DSeries *series)
 {
@@ -166,6 +166,8 @@ void Q3DBars::addSeries(QBar3DSeries *series)
 
 /*!
  * Removes the \a series from the graph.
+ *
+ * \sa QAbstract3DGraph::hasSeries()
  */
 void Q3DBars::removeSeries(QBar3DSeries *series)
 {
@@ -180,7 +182,7 @@ void Q3DBars::removeSeries(QBar3DSeries *series)
  * the new position in list is calculated as if the series was still in its old
  * index, so the final index is actually the \a index decremented by one.
  *
- * \sa addSeries(), seriesList()
+ * \sa addSeries(), seriesList(), QAbstract3DGraph::hasSeries()
  */
 void Q3DBars::insertSeries(int index, QBar3DSeries *series)
 {
@@ -189,6 +191,8 @@ void Q3DBars::insertSeries(int index, QBar3DSeries *series)
 
 /*!
  * Returns the list of series added to this graph.
+ *
+ * \sa QAbstract3DGraph::hasSeries()
  */
 QList<QBar3DSeries *> Q3DBars::seriesList() const
 {

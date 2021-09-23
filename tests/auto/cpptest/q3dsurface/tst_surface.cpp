@@ -54,6 +54,7 @@ private slots:
     void selectSeries();
     void removeSeries();
     void removeMultipleSeries();
+    void hasSeries();
 
 private:
     Q3DSurface *m_graph;
@@ -261,6 +262,15 @@ void tst_surface::removeMultipleSeries()
     delete series;
     delete series2;
     delete series3;
+}
+
+void tst_surface::hasSeries()
+{
+    QSurface3DSeries *series1 = newSeries();
+    m_graph->addSeries(series1);
+    QCOMPARE(m_graph->hasSeries(series1), true);
+    QSurface3DSeries *series2 = newSeries();
+    QCOMPARE(m_graph->hasSeries(series2), false);
 }
 
 QTEST_MAIN(tst_surface)
