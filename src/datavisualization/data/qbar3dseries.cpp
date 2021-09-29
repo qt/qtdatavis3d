@@ -147,6 +147,18 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
+ * \qmlproperty list<ThemeColor> Bar3DSeries::rowColors
+ * \since 6.3
+ * This property can be used to draw the rows of the series in different colors.
+ * The \l{Theme3D::colorStyle}{Theme3D.colorStyle} must be set to
+ * \c ColorStyleUniform to use this property.
+ * \note If the property is set and the theme is changed,
+ * the rowColors list is not cleared automatically.
+ *
+ * \sa Q3DTheme::ColorStyleUniform
+ */
+
+/*!
  * Constructsa bar 3D series with the parent \a parent.
  */
 QBar3DSeries::QBar3DSeries(QObject *parent) :
@@ -282,6 +294,27 @@ float QBar3DSeries::meshAngle() const
 }
 
 /*!
+ * \property QBar3DSeries::rowColors
+ * \since 6.3
+ *
+ * \brief The list of row colors in the series.
+ *
+ * This property can be used to color
+ * the rows of the series in different colors.
+ * The Q3DTheme::ColorStyle must be set to
+ * Q3DTheme::ColorStyleUniform to use this property.
+ *
+ * \sa Q3DTheme::ColorStyleUniform
+ */
+void QBar3DSeries::setRowColors(const QList<QColor> &colors)
+{
+    dptr()->setRowColors(colors);
+}
+QList<QColor> QBar3DSeries::rowColors() const
+{
+    return dptrc()->m_rowColors;
+}
+/*!
  * \internal
  */
 QBar3DSeriesPrivate *QBar3DSeries::dptr()
@@ -355,6 +388,8 @@ void QBar3DSeriesPrivate::connectControllerAndProxy(Abstract3DController *newCon
                          &Bars3DController::handleDataColumnLabelsChanged);
         QObject::connect(qptr(), &QBar3DSeries::dataProxyChanged, controller,
                          &Bars3DController::handleArrayReset);
+        QObject::connect(qptr(), &QBar3DSeries::rowColorsChanged, controller,
+                         &Bars3DController::handleRowColorsChanged);
     }
 }
 
@@ -430,6 +465,14 @@ void QBar3DSeriesPrivate::connectSignals()
 {
     QObject::connect(q_ptr, &QAbstract3DSeries::meshRotationChanged, this,
                      &QBar3DSeriesPrivate::handleMeshRotationChanged);
+}
+
+void QBar3DSeriesPrivate::setRowColors(const QList<QColor> &colors)
+{
+    if (m_rowColors != colors) {
+        m_rowColors = colors;
+        emit qptr()->rowColorsChanged(m_rowColors);
+    }
 }
 
 QT_END_NAMESPACE

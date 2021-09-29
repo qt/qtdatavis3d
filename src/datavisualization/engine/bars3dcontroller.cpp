@@ -328,6 +328,11 @@ void Bars3DController::handleDataColumnLabelsChanged()
     }
 }
 
+void Bars3DController::handleRowColorsChanged()
+{
+    emitNeedRender();
+}
+
 void Bars3DController::handleAxisAutoAdjustRangeChangedInOrientation(
         QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust)
 {

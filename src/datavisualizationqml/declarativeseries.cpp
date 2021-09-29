@@ -103,7 +103,8 @@ DeclarativeBar3DSeries::DeclarativeBar3DSeries(QObject *parent)
     : QBar3DSeries(parent),
       m_baseGradient(0),
       m_singleHighlightGradient(0),
-      m_multiHighlightGradient(0)
+      m_multiHighlightGradient(0),
+      m_dummyColors(false)
 {
     QObject::connect(this, &QBar3DSeries::selectedBarChanged, this,
                      &DeclarativeBar3DSeries::selectedBarChanged);
@@ -171,6 +172,37 @@ ColorGradient *DeclarativeBar3DSeries::multiHighlightGradient() const
     return m_multiHighlightGradient;
 }
 
+QQmlListProperty<DeclarativeColor> DeclarativeBar3DSeries::rowColors()
+{
+    return QQmlListProperty<DeclarativeColor>(this, this,
+                                              &DeclarativeBar3DSeries::appendRowColorsFunc,
+                                              &DeclarativeBar3DSeries::countRowColorsFunc,
+                                              &DeclarativeBar3DSeries::atRowColorsFunc,
+                                              &DeclarativeBar3DSeries::clearRowColorsFunc);
+}
+
+void DeclarativeBar3DSeries::appendRowColorsFunc(QQmlListProperty<DeclarativeColor> *list,
+                                                 DeclarativeColor *color)
+{
+    reinterpret_cast<DeclarativeBar3DSeries *>(list->data)->addColor(color);
+}
+
+qsizetype DeclarativeBar3DSeries::countRowColorsFunc(QQmlListProperty<DeclarativeColor> *list)
+{
+    return reinterpret_cast<DeclarativeBar3DSeries *>(list->data)->colorList().count();
+}
+
+DeclarativeColor *DeclarativeBar3DSeries::atRowColorsFunc(QQmlListProperty<DeclarativeColor> *list,
+                                                          qsizetype index)
+{
+    return reinterpret_cast<DeclarativeBar3DSeries *>(list->data)->colorList().at(index);
+}
+
+void DeclarativeBar3DSeries::clearRowColorsFunc(QQmlListProperty<DeclarativeColor> *list)
+{
+    reinterpret_cast<DeclarativeBar3DSeries *>(list->data)->clearColors();
+}
+
 void DeclarativeBar3DSeries::handleBaseGradientUpdate()
 {
     if (m_baseGradient)
@@ -187,6 +219,73 @@ void DeclarativeBar3DSeries::handleMultiHighlightGradientUpdate()
 {
     if (m_multiHighlightGradient)
         setSeriesGradient(this, *m_multiHighlightGradient, GradientTypeMulti);
+}
+
+void DeclarativeBar3DSeries::handleRowColorUpdate()
+{
+    int colorCount = m_rowColors.size();
+    int changed = 0;
+
+    DeclarativeColor *color = qobject_cast<DeclarativeColor*>(QObject::sender());
+    for (int i = 0; i < colorCount; i++) {
+        if (color == m_rowColors.at(i)) {
+            changed = i;
+            break;
+        }
+    }
+    QList<QColor> list = QBar3DSeries::rowColors();
+    list[changed] = m_rowColors.at(changed)->color();
+    QBar3DSeries::setRowColors(list);
+}
+
+void DeclarativeBar3DSeries::addColor(DeclarativeColor *color)
+{
+    if (!color) {
+        qWarning("Color is invalid, use ThemeColor");
+        return;
+    }
+    clearDummyColors();
+    m_rowColors.append(color);
+    connect(color, &DeclarativeColor::colorChanged, this,
+            &DeclarativeBar3DSeries::handleRowColorUpdate);
+    QList<QColor> list = QBar3DSeries::rowColors();
+    list.append(color->color());
+    QBar3DSeries::setRowColors(list);
+}
+
+QList<DeclarativeColor *> DeclarativeBar3DSeries::colorList()
+{
+    if (m_rowColors.isEmpty()) {
+        m_dummyColors = true;
+        const QList<QColor> list = QBar3DSeries::rowColors();
+        for (const QColor &item : list) {
+            DeclarativeColor *color = new DeclarativeColor(this);
+            color->setColor(item);
+            m_rowColors.append(color);
+            connect(color, &DeclarativeColor::colorChanged, this,
+                    &DeclarativeBar3DSeries::handleRowColorUpdate);
+        }
+    }
+    return m_rowColors;
+}
+
+void DeclarativeBar3DSeries::clearColors()
+{
+    clearDummyColors();
+    for (const auto color : qAsConst(m_rowColors))
+        disconnect(color, 0, this, 0);
+
+    m_rowColors.clear();
+    QBar3DSeries::setRowColors(QList<QColor>());
+}
+
+void DeclarativeBar3DSeries::clearDummyColors()
+{
+    if (m_dummyColors) {
+        qDeleteAll(m_rowColors);
+        m_rowColors.clear();
+        m_dummyColors = false;
+    }
 }
 
 DeclarativeScatter3DSeries::DeclarativeScatter3DSeries(QObject *parent)

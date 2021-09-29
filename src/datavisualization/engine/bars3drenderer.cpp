@@ -1628,10 +1628,17 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
                         }
                         case Bars3DController::SelectionNone: {
                             // Current bar is not selected, nor on a row or column
-                            if (colorStyleIsUniform)
-                                barColor = baseColor;
-                            else
+                            if (colorStyleIsUniform) {
+                                QList<QColor> rowColors = cache->series()->rowColors();
+                                if (rowColors.size() == 0) {
+                                    barColor = baseColor;
+                                } else {
+                                    int rowColorIndex = row % rowColors.size();
+                                    barColor =  Utils::vectorFromColor(rowColors[rowColorIndex]);
+                                }
+                            } else {
                                 gradientTexture = cache->baseGradientTexture();
+                            }
                             break;
                         }
                         }

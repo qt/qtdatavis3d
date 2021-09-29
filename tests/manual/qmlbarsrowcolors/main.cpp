@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2021 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -27,54 +27,33 @@
 **
 ****************************************************************************/
 
-//
-//  W A R N I N G
-//  -------------
-//
-// This file is not part of the QtDataVisualization API.  It exists purely as an
-// implementation detail.  This header file may change from version to
-// version without notice, or even be removed.
-//
-// We mean it.
+#include <QtGui/QGuiApplication>
+#include <QtCore/QDir>
+#include <QtQuick/QQuickView>
+#include <QtQml/QQmlEngine>
 
-#ifndef QBAR3DSERIES_P_H
-#define QBAR3DSERIES_P_H
-
-#include "qbar3dseries.h"
-#include "qabstract3dseries_p.h"
-
-QT_BEGIN_NAMESPACE
-
-class QBar3DSeriesPrivate : public QAbstract3DSeriesPrivate
+int main(int argc, char *argv[])
 {
-    Q_OBJECT
-public:
-    QBar3DSeriesPrivate(QBar3DSeries *q);
-    virtual ~QBar3DSeriesPrivate();
+    qputenv("QSG_RHI_BACKEND", "opengl");
+    QGuiApplication app(argc, argv);
 
-    void setDataProxy(QAbstractDataProxy *proxy) override;
-    void connectControllerAndProxy(Abstract3DController *newController) override;
-    void createItemLabel() override;
+    QQuickView viewer;
 
-    void handleMeshRotationChanged(const QQuaternion &rotation);
-
-    void setSelectedBar(const QPoint &position);
-
-    void connectSignals();
-
-    void setRowColors(const QList<QColor> &colors);
-
-private:
-    QBar3DSeries *qptr();
-
-    QPoint m_selectedBar;
-
-    QList<QColor> m_rowColors;
-
-private:
-    friend class QBar3DSeries;
-};
-
-QT_END_NAMESPACE
-
+    // The following are needed to make examples run without having to install the module
+    // in desktop environments.
+#ifdef Q_OS_WIN
+    QString extraImportPath(QStringLiteral("%1/../../../../%2"));
+#else
+    QString extraImportPath(QStringLiteral("%1/../../../%2"));
 #endif
+    viewer.engine()->addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
+                                      QString::fromLatin1("qml")));
+
+    viewer.setTitle(QStringLiteral("Monthly income/expenses"));
+
+    viewer.setSource(QUrl("qrc:/qml/qmlbarsrowcolors/main.qml"));
+    viewer.setResizeMode(QQuickView::SizeRootObjectToView);
+    viewer.show();
+
+    return app.exec();
+}

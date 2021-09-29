@@ -44,6 +44,7 @@ class Q_DATAVISUALIZATION_EXPORT QBar3DSeries : public QAbstract3DSeries
     Q_PROPERTY(QBarDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
     Q_PROPERTY(QPoint selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_PROPERTY(float meshAngle READ meshAngle WRITE setMeshAngle NOTIFY meshAngleChanged)
+    Q_PROPERTY(QList<QColor> rowColors READ rowColors WRITE setRowColors NOTIFY rowColorsChanged REVISION(6, 3))
 
 public:
     explicit QBar3DSeries(QObject *parent = nullptr);
@@ -60,10 +61,14 @@ public:
     void setMeshAngle(float angle);
     float meshAngle() const;
 
+    QList<QColor> rowColors() const;
+    void setRowColors(const QList<QColor> &colors);
+
 Q_SIGNALS:
     void dataProxyChanged(QBarDataProxy *proxy);
     void selectedBarChanged(const QPoint &position);
     void meshAngleChanged(float angle);
+    Q_REVISION(6, 3) void rowColorsChanged(const QList<QColor> &rowcolors);
 
 protected:
     QBar3DSeriesPrivate *dptr();

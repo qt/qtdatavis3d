@@ -90,6 +90,7 @@ void tst_series::initialProperties()
     QVERIFY(m_series->dataProxy());
     QCOMPARE(m_series->meshAngle(), 0.0f);
     QCOMPARE(m_series->selectedBar(), m_series->invalidSelectionPosition());
+    QCOMPARE(m_series->rowColors().size(), 0);
 
     // Common properties
     QCOMPARE(m_series->baseColor(), QColor(Qt::black));
@@ -132,6 +133,13 @@ void tst_series::initializeProperties()
     gradient3.setColorAt(0.0, Qt::white);
     gradient3.setColorAt(1.0, Qt::gray);
 
+    QList<QColor> rowColors;
+    rowColors.append(QColor(Qt::green));
+    rowColors.append(QColor(Qt::blue));
+    rowColors.append(QColor(Qt::red));
+
+    m_series->setRowColors(rowColors);
+
     // Common properties
     m_series->setBaseColor(QColor(Qt::blue));
     m_series->setBaseGradient(gradient1);
@@ -165,6 +173,11 @@ void tst_series::initializeProperties()
     QCOMPARE(m_series->singleHighlightGradient().stops().at(0).second, QColor(Qt::white));
     QCOMPARE(m_series->userDefinedMesh(), QString(":/customitem.obj"));
     QCOMPARE(m_series->isVisible(), false);
+
+    QCOMPARE(m_series->rowColors().size(), 3);
+    QCOMPARE(m_series->rowColors().at(0), QColor(Qt::green));
+    QCOMPARE(m_series->rowColors().at(1), QColor(Qt::blue));
+    QCOMPARE(m_series->rowColors().at(2), QColor(Qt::red));
 }
 
 void tst_series::invalidProperties()

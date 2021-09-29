@@ -64,6 +64,20 @@ Item {
         ]
     }
 
+    ThemeColor {
+        id: rowColor1
+        color: "green"
+    }
+
+    ThemeColor {
+        id: rowColor2
+        color: "blue"
+    }
+    ThemeColor {
+        id: rowColor3
+        color: "red"
+    }
+
     Bar3DSeries {
         id: initialized
         dataProxy: ItemModelBarDataProxy {
@@ -92,6 +106,7 @@ Item {
         singleHighlightGradient: gradient3
         userDefinedMesh: ":/customitem.obj"
         visible: false
+        rowColors: [ rowColor1, rowColor2, rowColor3 ]
     }
 
     ItemModelBarDataProxy {
@@ -118,6 +133,7 @@ Item {
             compare(initial.invalidSelectionPosition, Qt.point(-1, -1))
             compare(initial.meshAngle, 0)
             compare(initial.selectedBar, Qt.point(-1, -1))
+            compare(initial.rowColors.length, 0)
         }
 
         function test_2_initial_common() {
@@ -149,6 +165,7 @@ Item {
             compare(initialized.dataProxy.rowCount, 2)
             fuzzyCompare(initialized.meshAngle, 15.0, 0.01)
             compare(initialized.selectedBar, Qt.point(0, 0))
+            compare(initialized.rowColors.length, 3)
         }
 
         function test_2_initialized_common() {
@@ -177,6 +194,7 @@ Item {
             change.dataProxy = proxy1
             change.meshAngle = 15.0
             change.selectedBar = Qt.point(0, 0)
+            change.rowColors = [rowColor1, rowColor2, rowColor3]
         }
 
         function test_2_test_change() {
@@ -221,6 +239,11 @@ Item {
         function test_4_change_gradient_stop() {
             gradient1.stops[0].color = "yellow"
             compare(change.baseGradient.stops[0].color, "#ffff00")
+        }
+
+        function test_5_change_rowColors() {
+            rowColor2.color = "purple"
+            compare(change.rowColors[1].color, "#800080")
         }
     }
 }

@@ -165,6 +165,7 @@ public Q_SLOTS:
     void handleItemChanged(int rowIndex, int columnIndex);
     void handleDataRowLabelsChanged();
     void handleDataColumnLabelsChanged();
+    void handleRowColorsChanged();
 
 Q_SIGNALS:
     void primarySeriesChanged(QBar3DSeries *series);

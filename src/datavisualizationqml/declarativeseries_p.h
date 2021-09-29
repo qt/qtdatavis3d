@@ -44,6 +44,7 @@
 #include "qscatter3dseries.h"
 #include "qsurface3dseries.h"
 #include "colorgradient_p.h"
+#include "declarativecolor_p.h"
 
 #include <private/datavisualizationglobal_p.h>
 #include <QtQml/qqml.h>
@@ -68,6 +69,7 @@ class DeclarativeBar3DSeries : public QBar3DSeries
     Q_PROPERTY(ColorGradient *baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
+    Q_PROPERTY(QQmlListProperty<DeclarativeColor> rowColors READ rowColors REVISION(6, 3))
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
 
     QML_NAMED_ELEMENT(Bar3DSeries)
@@ -91,10 +93,19 @@ public:
     void setMultiHighlightGradient(ColorGradient *gradient);
     ColorGradient *multiHighlightGradient() const;
 
+    QQmlListProperty<DeclarativeColor> rowColors();
+    static void appendRowColorsFunc(QQmlListProperty<DeclarativeColor> *list,
+                                    DeclarativeColor *color);
+    static qsizetype countRowColorsFunc(QQmlListProperty<DeclarativeColor> *list);
+    static DeclarativeColor *atRowColorsFunc(QQmlListProperty<DeclarativeColor> *list,
+                                             qsizetype index);
+    static void clearRowColorsFunc(QQmlListProperty<DeclarativeColor> *list);
+
 public Q_SLOTS:
     void handleBaseGradientUpdate();
     void handleSingleHighlightGradientUpdate();
     void handleMultiHighlightGradientUpdate();
+    void handleRowColorUpdate();
 
 Q_SIGNALS:
     void selectedBarChanged(const QPointF &position);
@@ -106,6 +117,14 @@ private:
     ColorGradient *m_baseGradient; // Not owned
     ColorGradient *m_singleHighlightGradient; // Not owned
     ColorGradient *m_multiHighlightGradient; // Not owned
+
+    QList<DeclarativeColor *> m_rowColors;
+    bool m_dummyColors;
+
+    void addColor(DeclarativeColor *color);
+    QList<DeclarativeColor *> colorList();
+    void clearColors();
+    void clearDummyColors();
 };
 
 class DeclarativeScatter3DSeries : public QScatter3DSeries
