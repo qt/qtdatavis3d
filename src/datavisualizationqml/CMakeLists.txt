@@ -45,7 +45,7 @@ qt_internal_add_qml_module(DataVisualizationQml
         ${qml_files}
     RESOURCES
         ${resources}
-    PUBLIC_LIBRARIES
+    LIBRARIES
         Qt::Core
         Qt::Gui
         Qt::OpenGL
