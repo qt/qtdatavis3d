@@ -258,7 +258,9 @@ void tst_proxy::multiMatch()
 
     graph.addSeries(series);
 
-    QCoreApplication::processEvents();
+    QSignalSpy spy(graph.valueAxis(), SIGNAL(maxChanged(float)));
+    spy.wait(1000);
+
     QCOMPARE(graph.valueAxis()->max(), 6.5f);
     m_proxy->setMultiMatchBehavior(QItemModelBarDataProxy::MMBFirst);
     QCoreApplication::processEvents();
