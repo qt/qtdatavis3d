@@ -142,7 +142,7 @@ public:
 
     void clearSelection();
 
-    virtual bool hasSeries(QAbstract3DSeries *series);
+    bool hasSeries(QAbstract3DSeries *series) const;
 
     int addCustomItem(QCustom3DItem *item);
     void removeCustomItems();
