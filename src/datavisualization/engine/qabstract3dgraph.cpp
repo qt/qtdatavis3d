@@ -440,7 +440,7 @@ void QAbstract3DGraph::clearSelection()
  *
  * \since 6.3
  */
-bool QAbstract3DGraph::hasSeries(QAbstract3DSeries *series)
+bool QAbstract3DGraph::hasSeries(QAbstract3DSeries *series) const
 {
     return d_ptr->m_visualController->hasSeries(series);
 }
