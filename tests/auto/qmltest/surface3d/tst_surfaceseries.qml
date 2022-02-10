@@ -79,7 +79,7 @@ Item {
         flatShadingEnabled: false
         selectedPoint: Qt.point(0, 0)
         textureFile: ":\customtexture.jpg"
-        wireFrameColor: "red"
+        wireframeColor: "red"
 
         baseColor: "blue"
         baseGradient: gradient1
@@ -124,7 +124,7 @@ Item {
             compare(initial.flatShadingEnabled, true)
             compare(initial.flatShadingSupported, true)
             compare(initial.selectedPoint, Qt.point(-1, -1))
-            compare(initial.wireFrameColor, "#000000")
+            compare(initial.wireframeColor, "#000000")
         }
 
         function test_2_initial_common() {
@@ -158,7 +158,7 @@ Item {
             compare(initialized.flatShadingEnabled, false)
             compare(initialized.selectedPoint, Qt.point(0, 0))
             compare(initialized.textureFile, ":\customtexture.jpg")
-            compare(initialized.wireFrameColor, "#ff0000")
+            compare(initialized.wireframeColor, "#ff0000")
         }
 
         function test_2_initialized_common() {
@@ -190,7 +190,7 @@ Item {
             change.flatShadingEnabled = false
             change.selectedPoint = Qt.point(0, 0)
             change.textureFile = ":\customtexture.jpg"
-            change.wireFrameColor = "green"
+            change.wireframeColor = "green"
         }
 
         function test_2_test_change() {
@@ -200,7 +200,7 @@ Item {
             compare(change.flatShadingEnabled, false)
             compare(change.selectedPoint, Qt.point(0, 0))
             compare(change.textureFile, ":\customtexture.jpg")
-            compare(change.wireFrameColor, "#008000")
+            compare(change.wireframeColor, "#008000")
         }
 
         function test_3_change_common() {

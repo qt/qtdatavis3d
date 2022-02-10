@@ -96,8 +96,8 @@ public:
     float minYValue() const { return m_minY; }
     float maxYValue() const { return m_maxY; }
     inline void activateSurfaceTexture(bool value) { m_returnTextureBuffer = value; }
-    inline void setLineColor(const QColor &color) { m_wireFrameColor = color; }
-    inline const QColor &wireFrameColor() const { return m_wireFrameColor; }
+    inline void setLineColor(const QColor &color) { m_wireframeColor = color; }
+    inline const QColor &wireframeColor() const { return m_wireframeColor; }
 
 private:
     void createCoarseIndices(GLint *indices, int &p, int row, int upperRow, int j);
@@ -132,7 +132,7 @@ private:
     bool m_returnTextureBuffer = false;
     SurfaceObject::DataDimensions m_dataDimension;
     SurfaceObject::DataDimensions m_oldDataDimension = DataDimensions(-1);
-    QColor m_wireFrameColor;
+    QColor m_wireframeColor;
 };
 
 QT_END_NAMESPACE

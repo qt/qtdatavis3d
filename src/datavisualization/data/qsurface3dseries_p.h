@@ -60,7 +60,7 @@ public:
     void setFlatShadingEnabled(bool enabled);
     void setDrawMode(QSurface3DSeries::DrawFlags mode);
     void setTexture(const QImage &texture);
-    void setWireFrameColor(const QColor &color);
+    void setWireframeColor(const QColor &color);
 
 private:
     QSurface3DSeries *qptr();
@@ -70,7 +70,7 @@ private:
     QSurface3DSeries::DrawFlags m_drawMode;
     QImage m_texture;
     QString m_textureFile;
-    QColor m_wireFrameColor;
+    QColor m_wireframeColor;
 
 private:
     friend class QSurface3DSeries;
