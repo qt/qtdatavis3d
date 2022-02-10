@@ -160,15 +160,15 @@ Rectangle {
             Layout.fillHeight: true
             text: "Red surface grid color"
             onClicked: {
-                if (Qt.colorEqual(surfaceSeries.wireFrameColor, "#000000")
-                        && Qt.colorEqual(heightSeries.wireFrameColor, "#000000")) {
-                    surfaceSeries.wireFrameColor = "red"
-                    heightSeries.wireFrameColor = "red"
+                if (Qt.colorEqual(surfaceSeries.wireframeColor, "#000000")
+                        && Qt.colorEqual(heightSeries.wireframeColor, "#000000")) {
+                    surfaceSeries.wireframeColor = "red"
+                    heightSeries.wireframeColor = "red"
                     text = "Black surface grid color"
                 }
                 else {
-                    surfaceSeries.wireFrameColor = "black"
-                    heightSeries.wireFrameColor = "black"
+                    surfaceSeries.wireframeColor = "black"
+                    heightSeries.wireframeColor = "black"
                     text = "Red surface grid color"
                 }
             }

@@ -66,7 +66,7 @@ void SurfaceSeriesRenderCache::populate(bool newSeries)
     QSurface3DSeries::DrawFlags drawMode = series()->drawMode();
     m_surfaceVisible = drawMode.testFlag(QSurface3DSeries::DrawSurface);
     m_surfaceGridVisible = drawMode.testFlag(QSurface3DSeries::DrawWireframe);
-    QColor lineColor = series()->wireFrameColor();
+    QColor lineColor = series()->wireframeColor();
     m_surfaceObj->setLineColor(lineColor);
     m_sliceSurfaceObj->setLineColor(lineColor);
 
