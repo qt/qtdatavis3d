@@ -72,6 +72,7 @@
 #include <QtDataVisualization/qtouch3dinputhandler.h>
 #include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qvalue3daxisformatter.h>
+#include <QtCore/private/qglobal_p.h>
 
 QT_BEGIN_NAMESPACE
 

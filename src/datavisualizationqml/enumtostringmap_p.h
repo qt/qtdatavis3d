@@ -1,6 +1,6 @@
 /****************************************************************************
 **
-** Copyright (C) 2016 The Qt Company Ltd.
+** Copyright (C) 2021 The Qt Company Ltd.
 ** Contact: https://www.qt.io/licensing/
 **
 ** This file is part of the Qt Data Visualization module of the Qt Toolkit.
@@ -47,6 +47,7 @@
 #include <QtGui/qopengl.h>
 #include <QMap>
 #include <QString>
+#include <private/qglobal_p.h>
 
 class EnumToStringMap
 {
