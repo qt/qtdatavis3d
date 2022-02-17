@@ -31,47 +31,39 @@
     \brief Provides functionality for 3D visualization.
 
 
-    Qt Data Visualization module provides a way to visualize data in 3D as bar,
-    scatter, and surface graphs. It is especially useful for visualizing depth
-    maps and large quantities of rapidly changing data, such as data received
-    from multiple sensors. The look and feel of graphs can be customized
-    by using themes or by adding custom items and labels to them.
+    The Qt Data Visualization module enables you to visualize data in 3D as
+    bar, scatter, and surface graphs. It's especially useful for visualizing
+    depth maps and large quantities of rapidly changing data, such as data
+    received from multiple sensors. The look and feel of graphs can be
+    customized by using themes or by adding custom items and labels.
 
-    Qt Data Visualization is built on Qt 5 and OpenGL to take advantage of
+    Qt Data Visualization is built on Qt 6 and OpenGL to take advantage of
     hardware acceleration and Qt Quick 2.
 
-    \section1 Getting Started
+    \section1 Using the Module
 
-    To import Qt Data Visualization QML types, add the following import statement to your \c .qml
-    file:
+    \section2 QML API
 
-    \qml \QtMinorVersion
-    import QtDataVisualization 1.\1
-    \endqml
+    \include {module-use.qdocinc} {using the qml api} {QtDataVisualization}
 
-    If you intend to use Qt Data Visualization C++ classes in your application, use the
-    following include:
+    \section2 C++ API
 
-    \snippet doc_src_qtdatavisualization.cpp 0
+    \include {module-use.qdocinc} {using the c++ api}
 
-    \note If you are only using a few classes from this module, we recommend including only those
-    specific classes instead of the whole module.
+    \section3 Building with CMake
 
-    To link against the Qt Data Visualization module, add this line to your \c qmake project file:
+    \include {module-use.qdocinc} {building with cmake} {DataVisualization}
 
-    \snippet doc_src_qtdatavisualization.pro 0
+    \section3 Building with qmake
 
-    \section1 Licenses
+    \include {module-use.qdocinc} {building_with_qmake} {datavisualization}
 
-    Qt Data Visualization is available under commercial licenses from \l{The Qt Company}.
-    In addition, it is available under the \l{GNU General Public License, version 3}.
-    See \l{Qt Licensing} for further details.
-
-    \section1 Articles
+    \section1 Articles and Guides
     \list
         \li \l{Qt Data Visualization Overview}{Overview}
         \li \l{Qt Data Visualization Data Handling}{Data Handling}
-        \li \l{Qt Data Visualization Interacting with Data}{Interacting with Data}
+        \li \l{Qt Data Visualization Interacting with Data}{Interacting with
+        Data}
         \li \l{Qt Data Visualization Known Issues}{Known Issues}
     \endlist
 
@@ -85,4 +77,9 @@
         \li \l{Qt Data Visualization C++ Classes}
         \li \l{Qt Data Visualization QML Types}
     \endlist
+
+    \section1 Licenses and Attributions
+    Qt Data Visualization is available under commercial licenses from \l{The Qt
+    Company}. In addition, it is available under the \l{GNU General Public
+    License, version 3}. See \l{Qt Licensing} for further details.
 */
