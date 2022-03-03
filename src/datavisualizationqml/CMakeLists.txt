@@ -51,7 +51,7 @@ qt_internal_add_qml_module(DataVisualizationQml
         Qt::OpenGL
         Qt::Qml
         Qt::Quick
-        DataVisualizationPrivate
+        Qt::DataVisualizationPrivate
 )
 
 qt_internal_extend_target(DataVisualizationQml CONDITION MACOS
