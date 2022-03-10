@@ -30,6 +30,7 @@
 #include "vertexindexer_p.h"
 
 #include <QtCore/qmath.h>
+#include <QtCore/qmap.h>
 
 QT_BEGIN_NAMESPACE
 

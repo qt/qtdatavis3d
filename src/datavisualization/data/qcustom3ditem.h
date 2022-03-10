@@ -34,6 +34,7 @@
 #include <QtGui/QImage>
 #include <QtGui/QVector3D>
 #include <QtGui/QQuaternion>
+#include <QtCore/QObject>
 
 QT_BEGIN_NAMESPACE
 
