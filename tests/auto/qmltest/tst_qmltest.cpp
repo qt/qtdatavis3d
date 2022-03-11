@@ -34,6 +34,14 @@ int main(int argc, char **argv)
         qWarning("This test will fail due to QEMU emulation shortcomings.");
         return 0;
     }
+#ifdef Q_OS_QNX
+    if (qEnvironmentVariable("QTEST_ENVIRONMENT").split(' ').contains("ci") &&
+        qEnvironmentVariable("QT_QPA_PLATFORM").split(' ').contains("offscreen")
+    ) {
+        qWarning("This test will fail on CI QNX QEMU without OpenGL support.");
+        return 0;
+    }
+#endif
     qputenv("QSG_RHI_BACKEND", "opengl");
     QTEST_SET_MAIN_SOURCE_PATH
     return quick_test_main(argc, argv, "qmltest", QUICK_TEST_SOURCE_DIR);
