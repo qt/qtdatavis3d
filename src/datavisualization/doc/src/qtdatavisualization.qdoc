@@ -29,6 +29,8 @@
     \module QtDataVisualization
     \title Qt Data Visualization C++ Classes
     \ingroup modules
+    \qtcmakepackage DataVisualization
+    \qtvariable datavisualization
 
     \brief C++ classes for the Qt Data Visualization API.
 
