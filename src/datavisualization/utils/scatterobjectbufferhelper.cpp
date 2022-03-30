@@ -98,7 +98,7 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
     QList<QVector3D> scaled_vertices;
     scaled_vertices.resize(verticeCount);
     for (int i = 0; i < verticeCount; i++)
-        scaled_vertices[i] = indexed_vertices[i] * modelMatrix;
+        scaled_vertices[i] = (QVector4D(indexed_vertices[i]) * modelMatrix).toVector3D();
 
     QList<GLuint> buffered_indices;
     QList<QVector3D> buffered_vertices;
@@ -141,9 +141,11 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
             modelMatrix = matrix.transposed(); // Because of row-column major difference
 
             for (int j = 0; j < verticeCount; j++) {
-                buffered_vertices[j + offset] = indexed_vertices[j] * modelMatrix
+                buffered_vertices[j + offset]
+                        = (QVector4D(indexed_vertices[j]) * modelMatrix).toVector3D()
                         + item.translation();
-                buffered_normals[j + offset] = indexed_normals[j] * itModelMatrix;
+                buffered_normals[j + offset]
+                        = (QVector4D(indexed_normals[j]) * itModelMatrix).toVector3D();
             }
         }
 
@@ -334,7 +336,7 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
     QList<QVector3D> scaled_vertices;
     scaled_vertices.resize(verticeCount);
     for (int i = 0; i < verticeCount; i++)
-        scaled_vertices[i] = indexed_vertices[i] * modelMatrix;
+        scaled_vertices[i] = (QVector4D(indexed_vertices[i]) * modelMatrix).toVector3D();
 
     QList<QVector3D> buffered_vertices;
     buffered_vertices.resize(verticeCount * updateSize);
@@ -356,9 +358,11 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
             modelMatrix = matrix.transposed();
             modelMatrix.scale(modelScaler);
 
-            for (int j = 0; j < verticeCount; j++)
-                buffered_vertices[j + offset] = indexed_vertices[j] * modelMatrix
+            for (int j = 0; j < verticeCount; j++) {
+                buffered_vertices[j + offset]
+                        = (QVector4D(indexed_vertices[j]) * modelMatrix).toVector3D()
                         + item.translation();
+            }
         }
         itemCount++;
     }
