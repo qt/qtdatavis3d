@@ -83,20 +83,20 @@ QT_BEGIN_NAMESPACE
         QML_ADDED_IN_VERSION(1, minor) \
 
 #define DEFINE_FOREIGN_UNCREATABLE_TYPE(type, name) \
-    struct type##Foreign \
+    struct type##DataVisForeign \
     { \
         DEFINE_FOREIGN_BASE_ATTRIBUTES(type, name, 0) \
         QML_UNCREATABLE("Trying to create uncreatable: " #name ".") \
     };
 
 #define DEFINE_FOREIGN_CREATABLE_TYPE(type, name, minor) \
-    struct type##Foreign \
+    struct type##DataVisForeign \
     { \
         DEFINE_FOREIGN_BASE_ATTRIBUTES(type, name, minor) \
     };
 
 #define DEFINE_FOREIGN_REPLACED_TYPE(type, name, better) \
-    struct type##Foreign \
+    struct type##DataVisForeign \
     { \
         DEFINE_FOREIGN_BASE_ATTRIBUTES(type, name, 0) \
         QML_UNCREATABLE("Trying to create uncreatable: " #name ", use " #better " instead.") \
