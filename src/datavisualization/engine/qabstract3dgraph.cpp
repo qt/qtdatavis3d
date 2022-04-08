@@ -110,6 +110,8 @@ QT_BEGIN_NAMESPACE
     \value SelectionMultiSeries
            Setting this mode means that items for all series at same position are highlighted, instead
            of just the selected item. The actual selection in the other series doesn't change.
+           When setting this mode flag, one or more of the basic selection flags (\c {SelectionItem},
+           \c {SelectionRow}, or \c SelectionColumn) must also be set.
            Multi-series selection is not supported for Q3DScatter.
 */
 
