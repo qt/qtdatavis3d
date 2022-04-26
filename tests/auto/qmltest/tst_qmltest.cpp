@@ -29,7 +29,7 @@
 
 #include <QtQuickTest/quicktest.h>
 
-class tst_skiptest: public QObject
+class tst_qmltest: public QObject
 {
     Q_OBJECT
 private slots:
@@ -40,16 +40,16 @@ int main(int argc, char **argv)
 {
     if (!qEnvironmentVariableIsEmpty("QEMU_LD_PREFIX")) {
         qWarning("This test would fail due to QEMU emulation shortcomings, so it will be skipped.");
-        tst_skiptest skip;
-        return QTest::qExec(&skip);
+        tst_qmltest skip;
+        return QTest::qExec(&skip, argc, argv);
     }
 #ifdef Q_OS_QNX
     if (qEnvironmentVariable("QTEST_ENVIRONMENT").split(' ').contains("ci") &&
         qEnvironmentVariable("QT_QPA_PLATFORM").split(' ').contains("offscreen")
     ) {
         qWarning("This test would fail on CI QNX QEMU without OpenGL support, so it will be skipped.");
-        tst_skiptest skip;
-        return QTest::qExec(&skip);
+        tst_qmltest skip;
+        return QTest::qExec(&skip, argc, argv);
     }
 #endif
     qputenv("QSG_RHI_BACKEND", "opengl");
