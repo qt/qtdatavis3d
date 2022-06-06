@@ -244,7 +244,7 @@ void ScatterDataModifier::massiveTestAppendAndScroll()
     m_chart->axisZ()->setRange(min, max);
 }
 
-void ScatterDataModifier::setFpsMeasurement(bool enable)
+void ScatterDataModifier::setFpsMeasurement(int enable)
 {
     m_chart->setMeasureFps(enable);
 }
@@ -973,14 +973,14 @@ void ScatterDataModifier::changeRadialLabelOffset(int offset)
     m_chart->setRadialLabelOffset(float(offset) / 100.0f);
 }
 
-void ScatterDataModifier::toggleAxisTitleVisibility(bool enabled)
+void ScatterDataModifier::toggleAxisTitleVisibility(int enabled)
 {
     m_chart->axisX()->setTitleVisible(enabled);
     m_chart->axisY()->setTitleVisible(enabled);
     m_chart->axisZ()->setTitleVisible(enabled);
 }
 
-void ScatterDataModifier::toggleAxisTitleFixed(bool enabled)
+void ScatterDataModifier::toggleAxisTitleFixed(int enabled)
 {
     m_chart->axisX()->setTitleFixed(enabled);
     m_chart->axisY()->setTitleFixed(enabled);
@@ -1009,12 +1009,12 @@ void ScatterDataModifier::renderToImage()
     }
 }
 
-void ScatterDataModifier::togglePolar(bool enable)
+void ScatterDataModifier::togglePolar(int enable)
 {
     m_chart->setPolar(enable);
 }
 
-void ScatterDataModifier::toggleStatic(bool enable)
+void ScatterDataModifier::toggleStatic(int enable)
 {
     if (enable)
         m_chart->setOptimizationHints(QAbstract3DGraph::OptimizationStatic);
@@ -1022,7 +1022,7 @@ void ScatterDataModifier::toggleStatic(bool enable)
         m_chart->setOptimizationHints(QAbstract3DGraph::OptimizationDefault);
 }
 
-void ScatterDataModifier::toggleOrtho(bool enable)
+void ScatterDataModifier::toggleOrtho(int enable)
 {
     m_chart->setOrthoProjection(enable);
 }
