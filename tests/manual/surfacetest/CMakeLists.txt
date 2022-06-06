@@ -6,6 +6,8 @@ set(CMAKE_AUTOUIC ON)
 qt_internal_add_manual_test(surfacetest
     GUI
     SOURCES
+        buttonwrapper.cpp buttonwrapper.h
+        checkboxwrapper.cpp checkboxwrapper.h
         graphmodifier.cpp graphmodifier.h
         main.cpp
     )

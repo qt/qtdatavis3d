@@ -7,6 +7,8 @@ qt_internal_add_manual_test(barstest
     GUI
     SOURCES
         chart.cpp chart.h
+        sliderwrapper.cpp sliderwrapper.h
+        buttonwrapper.cpp buttonwrapper.h
         custominputhandler.cpp custominputhandler.h
         main.cpp
     )

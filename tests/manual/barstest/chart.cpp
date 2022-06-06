@@ -268,7 +268,7 @@ void GraphModifier::start()
     restart(false);
 }
 
-void GraphModifier::restart(bool dynamicData)
+void GraphModifier::restart(int dynamicData)
 {
     m_static = !dynamicData;
 
@@ -343,7 +343,7 @@ void GraphModifier::releaseSeries()
         m_graph->removeSeries(series);
 }
 
-void GraphModifier::flipViews()
+void GraphModifier::flipViews(bool checked)
 {
     m_graph->scene()->setSecondarySubviewOnTop(!m_graph->scene()->isSecondarySubviewOnTop());
     qDebug() << "secondary subview on top:" << m_graph->scene()->isSecondarySubviewOnTop();
@@ -735,7 +735,7 @@ void GraphModifier::handleSelectionChange(const QPoint &position)
     qDebug() << "Selected bar position:" << position << "series:" << index;
 }
 
-void GraphModifier::setUseNullInputHandler(bool useNull)
+void GraphModifier::setUseNullInputHandler(int useNull)
 {
     qDebug() << "setUseNullInputHandler" << useNull;
     if (m_useNullInputHandler == useNull)
@@ -828,7 +828,7 @@ QBarDataArray *GraphModifier::makeDummyData()
 }
 
 // Executes one step of the primary series test
-void GraphModifier::primarySeriesTest()
+void GraphModifier::primarySeriesTest(bool checked)
 {
     static int nextStep = 0;
 
@@ -1050,7 +1050,7 @@ void GraphModifier::insertRemoveTestToggle()
     }
 }
 
-void GraphModifier::toggleRotation()
+void GraphModifier::toggleRotation(bool checked)
 {
     if (m_rotationTimer.isActive())
         m_rotationTimer.stop();
@@ -1058,7 +1058,7 @@ void GraphModifier::toggleRotation()
         m_rotationTimer.start(20);
 }
 
-void GraphModifier::useLogAxis()
+void GraphModifier::useLogAxis(bool checked)
 {
     static int counter = -1;
     static QLogValue3DAxisFormatter *logFormatter = 0;
@@ -1214,7 +1214,7 @@ void GraphModifier::addRemoveSeries()
     counter++;
 }
 
-void GraphModifier::testItemAndRowChanges()
+void GraphModifier::testItemAndRowChanges(bool checked)
 {
     static int counter = 0;
     const int rowCount = 12;
@@ -1604,7 +1604,7 @@ void GraphModifier::rotateY(int rotation)
     m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
 }
 
-void GraphModifier::setFpsMeasurement(bool enable)
+void GraphModifier::setFpsMeasurement(int enable)
 {
     m_graph->setMeasureFps(enable);
 }
@@ -1673,7 +1673,7 @@ void GraphModifier::setMaxY(int max)
     m_maxval = max;
 }
 
-void GraphModifier::changeColorStyle()
+void GraphModifier::changeColorStyle(bool checked)
 {
     int style = m_graph->activeTheme()->colorStyle();
 
@@ -1683,7 +1683,7 @@ void GraphModifier::changeColorStyle()
     m_graph->activeTheme()->setColorStyle(Q3DTheme::ColorStyle(style));
 }
 
-void GraphModifier::useOwnTheme()
+void GraphModifier::useOwnTheme(bool checked)
 {
     // Own theme is persistent, any changes to it via UI will be remembered
     if (!m_ownTheme) {
@@ -1722,7 +1722,7 @@ void GraphModifier::changeBaseColor(const QColor &color)
     m_graph->activeTheme()->setBaseColors(colors);
 }
 
-void GraphModifier::setGradient()
+void GraphModifier::setGradient(bool checked)
 {
     QLinearGradient barGradient(0, 0, 1, 100);
     barGradient.setColorAt(1.0, Qt::lightGray);
@@ -1762,7 +1762,7 @@ void GraphModifier::toggleMultiseriesScaling()
     m_graph->setMultiSeriesUniform(!m_graph->isMultiSeriesUniform());
 }
 
-void GraphModifier::setReflection(bool enabled)
+void GraphModifier::setReflection(int enabled)
 {
     m_graph->setReflection(enabled);
 }
