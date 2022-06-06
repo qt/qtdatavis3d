@@ -67,7 +67,7 @@ public:
     void massiveDataTest();
     void massiveTestScroll();
     void massiveTestAppendAndScroll();
-    void setFpsMeasurement(bool enable);
+    void setFpsMeasurement(int enable);
     void setFpsLabel(QLabel *fpsLabel) { m_fpsLabel = fpsLabel; }
     void testItemChanges();
     void testAxisReverse();
@@ -101,12 +101,12 @@ public Q_SLOTS:
     void handleFpsChange(qreal fps);
     void changeLabelRotation(int rotation);
     void changeRadialLabelOffset(int offset);
-    void toggleAxisTitleVisibility(bool enabled);
-    void toggleAxisTitleFixed(bool enabled);
+    void toggleAxisTitleVisibility(int enabled);
+    void toggleAxisTitleFixed(int enabled);
     void renderToImage();
-    void togglePolar(bool enable);
-    void toggleStatic(bool enable);
-    void toggleOrtho(bool enable);
+    void togglePolar(int enable);
+    void toggleStatic(int enable);
+    void toggleOrtho(int enable);
     void setCameraTargetX(int value);
     void setCameraTargetY(int value);
     void setCameraTargetZ(int value);
