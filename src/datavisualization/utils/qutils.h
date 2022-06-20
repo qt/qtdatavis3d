@@ -12,9 +12,7 @@
 
 QT_BEGIN_NAMESPACE
 
-#ifdef Q_OS_MACOS
-#pragma clang diagnostic ignored "-Wunused-function"
-#endif
+[[maybe_unused]]
 static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
 {
     bool isES = false;
