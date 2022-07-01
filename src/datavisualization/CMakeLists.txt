@@ -34,6 +34,7 @@ qt_internal_add_module(DataVisualization
         data/scatteritemmodelhandler.cpp data/scatteritemmodelhandler_p.h
         data/scatterrenderitem.cpp data/scatterrenderitem_p.h
         data/surfaceitemmodelhandler.cpp data/surfaceitemmodelhandler_p.h
+        engine/abstractdeclarativeinterface.cpp engine/abstractdeclarativeinterface_p.h
         engine/abstract3dcontroller.cpp engine/abstract3dcontroller_p.h
         engine/abstract3drenderer.cpp engine/abstract3drenderer_p.h
         engine/axisrendercache.cpp engine/axisrendercache_p.h

@@ -44,6 +44,7 @@
 
 #include <private/datavisualizationglobal_p.h>
 #include <private/abstract3dcontroller_p.h>
+#include <QtDataVisualization/private/abstractdeclarativeinterface_p.h>
 
 #include <QtQuick/QQuickItem>
 #include <QtCore/QPointer>
@@ -55,7 +56,7 @@ class GLStateStore;
 
 QT_BEGIN_NAMESPACE
 
-class AbstractDeclarative : public QQuickItem
+class AbstractDeclarative : public QQuickItem, public AbstractDeclarativeInterface
 {
     Q_OBJECT
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
@@ -239,7 +240,7 @@ public:
 
     QMutex *mutex() { return &m_mutex; }
 
-    bool isReady() { return isComponentComplete(); }
+    bool isReady() const override { return isComponentComplete(); }
 
 public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
