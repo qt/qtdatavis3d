@@ -24,6 +24,7 @@ static QHash<AbstractDeclarative *, QQuickWindow *> graphWindowList;
 
 AbstractDeclarative::AbstractDeclarative(QQuickItem *parent) :
     QQuickItem(parent),
+    AbstractDeclarativeInterface(),
     m_controller(0),
     m_contextWindow(0),
     m_renderMode(RenderIndirect),
