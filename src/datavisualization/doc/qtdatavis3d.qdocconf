@@ -5,6 +5,7 @@ project             = QtDataVis3D
 description         = Qt Data Visualization Reference Documentation
 version             = $QT_VERSION
 buildversion        = Qt Data Visualization | Commercial or GPLv3
+moduleheader        = QtDataVisualization
 
 examplesinstallpath = datavisualization
 exampledirs += ../../../examples/datavisualization \
