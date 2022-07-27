@@ -3,7 +3,7 @@ qt_internal_add_test(q3dbars
         tst_bars.cpp
     INCLUDE_DIRECTORIES
         ../common
-    PUBLIC_LIBRARIES
+    LIBRARIES
         Qt::Gui
         Qt::GuiPrivate
         Qt::DataVisualization
