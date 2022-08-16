@@ -48,7 +48,6 @@ ScatterObjectBufferHelper::~ScatterObjectBufferHelper()
 
 void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal dotScale)
 {
-    m_meshDataLoaded = false;
     m_indexCount = 0;
 
     ObjectHelper *dotObj = cache->object();
@@ -71,6 +70,7 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
         m_uvbuffer = 0;
         m_normalbuffer = 0;
         m_elementbuffer = 0;
+        m_meshDataLoaded = false;
     }
 
     // Index vertices

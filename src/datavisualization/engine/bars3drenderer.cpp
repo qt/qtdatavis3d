@@ -2051,10 +2051,14 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
 
     glEnable(GL_POLYGON_OFFSET_FILL);
 
+    // If camera x rotation is 180, side labels face wrong direction
+    float activeCameraXRotation = (activeCamera->xRotation() >= 180.0f) ? -180.0f
+                                                                        : activeCamera->xRotation();
+
     float labelAutoAngle = m_axisCacheY.labelAutoRotation();
     float labelAngleFraction = labelAutoAngle / 90.0f;
     float fractionCamY = activeCamera->yRotation() * labelAngleFraction;
-    float fractionCamX = activeCamera->xRotation() * labelAngleFraction;
+    float fractionCamX = activeCameraXRotation * labelAngleFraction;
     float labelsMaxWidth = 0.0f;
 
     int startIndex;
@@ -2168,7 +2172,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     labelAutoAngle = m_axisCacheZ.labelAutoRotation();
     labelAngleFraction = labelAutoAngle / 90.0f;
     fractionCamY = activeCamera->yRotation() * labelAngleFraction;
-    fractionCamX = activeCamera->xRotation() * labelAngleFraction;
+    fractionCamX = activeCameraXRotation * labelAngleFraction;
     GLfloat labelYAdjustment = 0.005f;
     GLfloat colPosValue = m_scaleXWithBackground + labelMargin;
     GLfloat rowPosValue = m_scaleZWithBackground + labelMargin;
@@ -2293,7 +2297,7 @@ void Bars3DRenderer::drawLabels(bool drawSelection, const Q3DCamera *activeCamer
     labelAutoAngle = m_axisCacheX.labelAutoRotation();
     labelAngleFraction = labelAutoAngle / 90.0f;
     fractionCamY = activeCamera->yRotation() * labelAngleFraction;
-    fractionCamX = activeCamera->xRotation() * labelAngleFraction;
+    fractionCamX = activeCameraXRotation * labelAngleFraction;
     alignment = (m_xFlipped != m_zFlipped) ? Qt::AlignLeft : Qt::AlignRight;
     if (labelAutoAngle == 0.0f) {
         labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
