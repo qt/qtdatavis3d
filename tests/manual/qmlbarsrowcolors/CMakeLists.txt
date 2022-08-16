@@ -20,7 +20,7 @@ set_target_properties(qmlbarsrowcolors PROPERTIES
     MACOSX_BUNDLE TRUE
 )
 target_compile_definitions(qmlbarsrowcolors PUBLIC
-    QT_DISABLE_DEPRECATED_BEFORE=0x050F00
+    QT_DISABLE_DEPRECATED_UP_TO=0x050F00
 )
 
 target_link_libraries(qmlbarsrowcolors PUBLIC
