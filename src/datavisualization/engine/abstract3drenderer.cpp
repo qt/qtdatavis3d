@@ -749,8 +749,10 @@ void Abstract3DRenderer::updateCustomData(const QList<QCustom3DItem *> &customIt
         CustomRenderItem *renderItem = m_customRenderCache.value(item);
         if (!renderItem)
             renderItem = addCustomItem(item);
-        renderItem->setValid(true);
-        renderItem->setIndex(i); // always update index, as it must match the custom item index
+        if (renderItem) {
+            renderItem->setValid(true);
+            renderItem->setIndex(i); // always update index, as it must match the custom item index
+        }
     }
 
     // Check render item cache and remove items that are not in customItems list anymore
@@ -1133,7 +1135,10 @@ CustomRenderItem *Abstract3DRenderer::addCustomItem(QCustom3DItem *item)
     CustomRenderItem *newItem = new CustomRenderItem();
     newItem->setRenderer(this);
     newItem->setItemPointer(item); // Store pointer for render item updates
-    newItem->setMesh(item->meshFile());
+    if (!newItem->setMesh(item->meshFile())) {
+        delete newItem;
+        return nullptr;
+    }
     newItem->setOrigPosition(item->position());
     newItem->setOrigScaling(item->scaling());
     newItem->setScalingAbsolute(item->isScalingAbsolute());

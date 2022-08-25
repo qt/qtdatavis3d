@@ -113,10 +113,19 @@ ObjectHelper *ObjectHelper::getObjectHelper(const Abstract3DRenderer *cacheId,
         objRef = new ObjectHelperRef;
         objRef->refCount = 0;
         objRef->obj = new ObjectHelper(objectFile);
-        objectTable->insert(objectFile, objRef);
+        if (objRef->obj->m_meshDataLoaded) {
+            objectTable->insert(objectFile, objRef);
+        } else {
+            delete objRef->obj;
+            delete objRef;
+            objRef = nullptr;
+        }
     }
-    objRef->refCount++;
-    return objRef->obj;
+    if (objRef) {
+        objRef->refCount++;
+        return objRef->obj;
+    }
+    return nullptr;
 }
 
 void ObjectHelper::load()
@@ -140,41 +149,44 @@ void ObjectHelper::load()
     QList<QVector2D> uvs;
     QList<QVector3D> normals;
     bool loadOk = MeshLoader::loadOBJ(m_objectFile, vertices, uvs, normals);
-    if (!loadOk)
-        qFatal("loading failed");
 
-    // Index vertices
-    VertexIndexer::indexVBO(vertices, uvs, normals, m_indices, m_indexedVertices, m_indexedUVs,
-                            m_indexedNormals);
+    if (!loadOk) {
+        qCritical() << "Loading" << m_objectFile << "failed";
+        m_meshDataLoaded = false;
+    } else {
+        // Index vertices
+        VertexIndexer::indexVBO(vertices, uvs, normals, m_indices, m_indexedVertices, m_indexedUVs,
+                                m_indexedNormals);
 
-    m_indexCount = m_indices.size();
+        m_indexCount = m_indices.size();
 
-    glGenBuffers(1, &m_vertexbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_indexedVertices.size() * sizeof(QVector3D),
-                 &m_indexedVertices.at(0),
-                 GL_STATIC_DRAW);
+        glGenBuffers(1, &m_vertexbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_vertexbuffer);
+        glBufferData(GL_ARRAY_BUFFER, m_indexedVertices.size() * sizeof(QVector3D),
+                     &m_indexedVertices.at(0),
+                     GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_normalbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_indexedNormals.size() * sizeof(QVector3D),
-                 &m_indexedNormals.at(0),
-                 GL_STATIC_DRAW);
+        glGenBuffers(1, &m_normalbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_normalbuffer);
+        glBufferData(GL_ARRAY_BUFFER, m_indexedNormals.size() * sizeof(QVector3D),
+                     &m_indexedNormals.at(0),
+                     GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_uvbuffer);
-    glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
-    glBufferData(GL_ARRAY_BUFFER, m_indexedUVs.size() * sizeof(QVector2D),
-                 &m_indexedUVs.at(0), GL_STATIC_DRAW);
+        glGenBuffers(1, &m_uvbuffer);
+        glBindBuffer(GL_ARRAY_BUFFER, m_uvbuffer);
+        glBufferData(GL_ARRAY_BUFFER, m_indexedUVs.size() * sizeof(QVector2D),
+                     &m_indexedUVs.at(0), GL_STATIC_DRAW);
 
-    glGenBuffers(1, &m_elementbuffer);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(GLuint),
-                 &m_indices.at(0), GL_STATIC_DRAW);
+        glGenBuffers(1, &m_elementbuffer);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_elementbuffer);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_indices.size() * sizeof(GLuint),
+                     &m_indices.at(0), GL_STATIC_DRAW);
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-    m_meshDataLoaded = true;
+        m_meshDataLoaded = true;
+    }
 }
 
 QT_END_NAMESPACE

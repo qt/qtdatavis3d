@@ -58,7 +58,9 @@ QT_BEGIN_NAMESPACE
 /*! \qmlproperty string Custom3DItem::meshFile
  *
  * The item mesh file name. The item in the file must be in Wavefront OBJ format and include
- * vertices, normals, and UVs. It also needs to be in triangles.
+ * vertices, normals, and UVs. It also needs to be in triangles. If the file is missing either
+ * normals or UVs, loading will fail with an error message to the console output and the item will
+ * not be rendered.
  */
 
 /*! \qmlproperty string Custom3DItem::textureFile
@@ -203,6 +205,9 @@ QCustom3DItem::~QCustom3DItem()
  *
  * The item in the file must be in Wavefront OBJ format and include
  * vertices, normals, and UVs. It also needs to be in triangles.
+ * If the file is missing either normals or UVs, loading will fail
+ * with an error message to the console output and the item will
+ * not be rendered.
  */
 void QCustom3DItem::setMeshFile(const QString &meshFile)
 {

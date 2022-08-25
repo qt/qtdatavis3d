@@ -68,9 +68,10 @@ CustomRenderItem::~CustomRenderItem()
     ObjectHelper::releaseObjectHelper(m_renderer, m_object);
 }
 
-void CustomRenderItem::setMesh(const QString &meshFile)
+bool CustomRenderItem::setMesh(const QString &meshFile)
 {
     ObjectHelper::resetObjectHelper(m_renderer, m_object, meshFile);
+    return m_object ? true : false;
 }
 
 void CustomRenderItem::setColorTable(const QList<QRgb> &colors)
