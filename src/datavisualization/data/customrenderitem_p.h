@@ -33,7 +33,7 @@ public:
 
     inline void setTexture(GLuint texture) { m_texture = texture; }
     inline GLuint texture() const { return m_texture; }
-    void setMesh(const QString &meshFile);
+    bool setMesh(const QString &meshFile);
     inline ObjectHelper *mesh() const { return m_object; }
     inline void setScaling(const QVector3D &scaling) { m_scaling = scaling; }
     inline const QVector3D &scaling() const { return m_scaling; }
