@@ -410,6 +410,7 @@ private:
                        QAbstract3DAxis **axisPtr);
 
     friend class AbstractDeclarative;
+    friend class QQuickDataVisItem;
     friend class Bars3DController;
     friend class QAbstract3DGraphPrivate;
 };

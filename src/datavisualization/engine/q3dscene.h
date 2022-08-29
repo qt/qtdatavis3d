@@ -93,6 +93,7 @@ private:
     friend class Scatter3DRenderer;
     friend class Q3DCameraPrivate;
     friend class Q3DObject;
+    friend class QQuickDataVisItem;
 };
 
 QT_END_NAMESPACE
