@@ -44,7 +44,8 @@ qt_internal_add_qml_module(DataVisualizationQml
         enumtostringmap.cpp enumtostringmap_p.h
         foreigntypes_p.h
         glstatestore.cpp glstatestore_p.h
-        qquickdatavisitem_p.h qquickdatavisitem.cpp
+        qquickdatavisitem.cpp qquickdatavisitem_p.h
+        qquickdatavissurface.cpp qquickdatavissurface_p.h
     QML_FILES
         ${qml_files}
     RESOURCES

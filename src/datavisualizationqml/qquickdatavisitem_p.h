@@ -282,9 +282,9 @@ protected:
 
     void componentComplete() override;
 
-private:
     QSharedPointer<QMutex> m_nodeMutex;
 
+private:
     QQuick3DModel *m_background = nullptr;
     QQuick3DModel *m_backgroundBB = nullptr;
     QQuick3DNode *m_backgroundScale = nullptr;
