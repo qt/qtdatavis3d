@@ -5,6 +5,10 @@
 #include <QtCore/QMutexLocker>
 #include <private/declarativescene_p.h>
 
+#include <private/declarativescene_p.h>
+#include <private/surface3dcontroller_p.h>
+#include <private/qsurface3dseries_p.h>
+
 QT_BEGIN_NAMESPACE
 
 QQuickDataVisSurface::QQuickDataVisSurface(QQuickItem *parent)
@@ -134,6 +138,19 @@ void QQuickDataVisSurface::handleAxisYChanged(QAbstract3DAxis *axis)
 void QQuickDataVisSurface::handleAxisZChanged(QAbstract3DAxis *axis)
 {
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void QQuickDataVisSurface::componentComplete()
+{
+    QQuickDataVisItem::componentComplete();
+
+    m_model = new QQuick3DModel();
+    m_model->setParent(QQuick3DViewport::scene());
+    m_model->setParentItem(QQuick3DViewport::scene());
+
+    m_gridModel = new QQuick3DModel();
+    m_gridModel->setParent(QQuick3DViewport::scene());
+    m_gridModel->setParentItem(QQuick3DViewport::scene());
 }
 
 QT_END_NAMESPACE

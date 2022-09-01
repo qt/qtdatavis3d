@@ -162,75 +162,53 @@ void QQuickDataVisItem::componentComplete()
     setUpLight();
 
     // Create repeaters for each axis X, Y, Z
-    QQuick3DRepeater *repeaterX = createRepeater();
-    QQuick3DRepeater *repeaterY = createRepeater();
-    QQuick3DRepeater *repeaterZ = createRepeater();
+    m_repeaterX = createRepeater();
+    m_repeaterY = createRepeater();
+    m_repeaterZ = createRepeater();
 
     auto delegateModelX = createRepeaterDelegateComponent(QStringLiteral(":/axis/AxisLabel"));
     auto delegateModelY = createRepeaterDelegateComponent(QStringLiteral(":/axis/AxisLabel"));
     auto delegateModelZ = createRepeaterDelegateComponent(QStringLiteral(":/axis/AxisLabel"));
 
-    repeaterX->setDelegate(delegateModelX);
-    repeaterY->setDelegate(delegateModelY);
-    repeaterZ->setDelegate(delegateModelZ);
-
-//    m_controller->setRepeaterAxisX(repeaterX);
-//    m_controller->setRepeaterAxisY(repeaterY);
-//    m_controller->setRepeaterAxisZ(repeaterZ);
-
+    m_repeaterX->setDelegate(delegateModelX);
+    m_repeaterY->setDelegate(delegateModelY);
+    m_repeaterZ->setDelegate(delegateModelZ);
 
     // title labels for axes
-    auto titleLabelAxisX = createTitleLabel();
-    auto titleLabelAxisY = createTitleLabel();
-    auto titleLabelAxisZ = createTitleLabel();
-
-    Q_UNUSED(titleLabelAxisX);
-    Q_UNUSED(titleLabelAxisY);
-    Q_UNUSED(titleLabelAxisZ);
-
-//    m_controller->setTitleLabelAxisX(titleLabelAxisX);
-//    m_controller->setTitleLabelAxisY(titleLabelAxisY);
-//    m_controller->setTitleLabelAxisZ(titleLabelAxisZ);
+    m_titleLabelX = createTitleLabel();
+    m_titleLabelY = createTitleLabel();
+    m_titleLabelZ = createTitleLabel();
 
     // Testing gridline
 
     // X lines
-    auto segmentGridLineRepeaterAxisX = createRepeater();
+    m_segmentLineRepeaterX = createRepeater();
 
     auto segmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
-    segmentGridLineRepeaterAxisX->setDelegate(segmentLineDelegate);
-//    m_controller->m_segmentGridLineRepeaterAxisX = segmentGridLineRepeaterAxisX;
+    m_segmentLineRepeaterX->setDelegate(segmentLineDelegate);
 
-    auto subsegmentLineRepeaterAxisX = createRepeater();
+    m_subsegmentLineRepeaterX = createRepeater();
     auto subsegmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
-    subsegmentLineRepeaterAxisX->setDelegate(subsegmentLineDelegate);
-//    m_controller->m_subSegmentGridLineRepeaterAxisX = subsegmentLineRepeaterAxisX;
+    m_subsegmentLineRepeaterX->setDelegate(subsegmentLineDelegate);
 
     // Y lines
-    auto segmentLineRepeaterAxisY = createRepeater();
-
+    m_segmentLineRepeaterY = createRepeater();
     segmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
-    segmentLineRepeaterAxisY->setDelegate(segmentLineDelegate);
-//    m_controller->m_segmentGridLineRepeaterAxisY = segmentLineRepeaterAxisY;
+    m_segmentLineRepeaterY->setDelegate(segmentLineDelegate);
 
-    auto subsegmentLineRepeaterAxisY = createRepeater();
+    m_subsegmentLineRepeaterY = createRepeater();
     subsegmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
-    subsegmentLineRepeaterAxisY->setDelegate(subsegmentLineDelegate);
-//    m_controller->m_subSegmentGridLineRepeaterAxisY = subsegmentLineRepeaterAxisY;
+    m_subsegmentLineRepeaterY->setDelegate(subsegmentLineDelegate);
 
     // Z lines
-    auto segmentLineRepeaterAxisZ = createRepeater();
+    m_segmentLineRepeaterZ = createRepeater();
 
     segmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
-    segmentLineRepeaterAxisZ->setDelegate(segmentLineDelegate);
-//    m_controller->m_segmentGridLineRepeaterAxisZ = segmentLineRepeaterAxisZ;
+    m_segmentLineRepeaterZ->setDelegate(segmentLineDelegate);
 
-    auto subsegmentLineRepeaterAxisZ = createRepeater();
+    m_subsegmentLineRepeaterZ = createRepeater();
     subsegmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
-    subsegmentLineRepeaterAxisZ->setDelegate(subsegmentLineDelegate);
-//    m_controller->m_subSegmentGridLineRepeaterAxisZ = subsegmentLineRepeaterAxisZ;
-
-//    m_controller->qmlReady();
+    m_subsegmentLineRepeaterZ->setDelegate(subsegmentLineDelegate);
 }
 
 QQuick3DDirectionalLight *QQuickDataVisItem::light() const
@@ -432,9 +410,8 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
                      &QQuickDataVisItem::marginChanged);
 }
 
-void QQuickDataVisItem::synchDataToRenderer()
+void QQuickDataVisItem::synchData()
 {
-    m_controller->synchDataToRenderer();
 }
 
 int QQuickDataVisItem::msaaSamples() const
@@ -489,7 +466,7 @@ void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
         m_windowSamples = 0;
 
     connect(window, &QQuickWindow::beforeSynchronizing,
-            this, &QQuickDataVisItem::synchDataToRenderer,
+            this, &QQuickDataVisItem::synchData,
             Qt::DirectConnection);
 
     if (m_renderMode == RenderDirectToBackground_NoClear
@@ -649,7 +626,7 @@ void QQuickDataVisItem::checkWindowList(QQuickWindow *window)
         QObject::disconnect(oldWindow, &QObject::destroyed, this,
                             &QQuickDataVisItem::windowDestroyed);
         QObject::disconnect(oldWindow, &QQuickWindow::beforeSynchronizing, this,
-                            &QQuickDataVisItem::synchDataToRenderer);
+                            &QQuickDataVisItem::synchData);
         if (!m_controller.isNull()) {
             QObject::disconnect(m_controller.data(), &Abstract3DController::needRender,
                                 oldWindow, &QQuickWindow::update);

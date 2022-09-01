@@ -166,7 +166,7 @@ public:
 
     void setSharedController(Abstract3DController *controller);
     // Used to synch up data model from controller to renderer while main thread is locked
-    void synchDataToRenderer();
+    void synchData();
 
     void checkWindowList(QQuickWindow *window);
 
@@ -225,6 +225,22 @@ public:
 
     QQuick3DModel *backgroundBB() const;
     void setBackgroundBB(QQuick3DModel *newBackgroundBB);
+
+    QQuick3DRepeater *repeaterX() const { return m_repeaterX; }
+    QQuick3DRepeater *repeaterY() const { return m_repeaterY; }
+    QQuick3DRepeater *repeaterZ() const { return m_repeaterZ; }
+
+    QQuick3DNode *titleLabelX() const { return m_titleLabelX; }
+    QQuick3DNode *titleLabelY() const { return m_titleLabelY; }
+    QQuick3DNode *titleLabelZ() const { return m_titleLabelZ; }
+
+    QQuick3DRepeater *segmentLineRepeaterX() const { return m_segmentLineRepeaterX; }
+    QQuick3DRepeater *segmentLineRepeaterY() const { return m_segmentLineRepeaterY; }
+    QQuick3DRepeater *segmentLineRepeaterZ() const { return m_segmentLineRepeaterZ; }
+
+    QQuick3DRepeater *subsegmentLineRepeaterX() const { return m_subsegmentLineRepeaterX; }
+    QQuick3DRepeater *subsegmentLineRepeaterY() const { return m_subsegmentLineRepeaterY; }
+    QQuick3DRepeater *subsegmentLineRepeaterZ() const { return m_subsegmentLineRepeaterZ; }
 
 public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
@@ -289,6 +305,21 @@ private:
     QQuick3DModel *m_backgroundBB = nullptr;
     QQuick3DNode *m_backgroundScale = nullptr;
     QQuick3DNode *m_backgroundRotation = nullptr;
+
+    QQuick3DRepeater *m_repeaterX = nullptr;
+    QQuick3DRepeater *m_repeaterY = nullptr;
+    QQuick3DRepeater *m_repeaterZ = nullptr;
+
+    QQuick3DNode *m_titleLabelX = nullptr;
+    QQuick3DNode *m_titleLabelY = nullptr;
+    QQuick3DNode *m_titleLabelZ = nullptr;
+
+    QQuick3DRepeater *m_segmentLineRepeaterX = nullptr;
+    QQuick3DRepeater *m_subsegmentLineRepeaterX = nullptr;
+    QQuick3DRepeater *m_segmentLineRepeaterY = nullptr;
+    QQuick3DRepeater *m_subsegmentLineRepeaterY = nullptr;
+    QQuick3DRepeater *m_segmentLineRepeaterZ = nullptr;
+    QQuick3DRepeater *m_subsegmentLineRepeaterZ = nullptr;
 
     QPointer<Abstract3DController> m_controller;
     QQuick3DNode *m_cameraTarget = nullptr;

@@ -22,6 +22,10 @@
 
 QT_BEGIN_NAMESPACE
 
+class QValue3DAxis;
+class QSurface3DSeries;
+class Surface3DController;
+
 class QQuickDataVisSurface : public QQuickDataVisItem
 {
     Q_OBJECT
@@ -59,6 +63,9 @@ public:
     void setFlipHorizontalGrid(bool flip);
     bool flipHorizontalGrid() const;
 
+protected:
+    void componentComplete() override;
+
 public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
     void handleAxisYChanged(QAbstract3DAxis *axis) override;
@@ -72,6 +79,8 @@ Q_SIGNALS:
     Q_REVISION(1, 2) void flipHorizontalGridChanged(bool flip);
 
 private:
+    QQuick3DModel *m_model = nullptr;
+    QQuick3DModel *m_gridModel = nullptr;
     Surface3DController *m_surfaceController;
 };
 
