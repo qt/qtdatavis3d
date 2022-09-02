@@ -1,6 +1,9 @@
 // Copyright (C) 2022 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
+#ifndef QQUICKDATAVISITEM_H
+#define QQUICKDATAVISITEM_H
+
 //
 //  W A R N I N G
 //  -------------
@@ -11,38 +14,35 @@
 //
 // We mean it.
 
-#ifndef QQUICKDATAVISITEM_P_H
-#define QQUICKDATAVISITEM_P_H
+#include "qabstract3dgraph.h"
 
-#include "declarativescene_p.h"
-
-#include <private/datavisualizationglobal_p.h>
-#include <private/abstract3dcontroller_p.h>
-#include <QtDataVisualization/private/abstractdeclarativeinterface_p.h>
-
-#include <QtQuick/QQuickItem>
-#include <QtCore/QPointer>
-#include <QtCore/QThread>
-#include <QtCore/QMutex>
-#include <QtCore/QSharedPointer>
-
-class GLStateStore;
+#include <QtQuick3D/private/qquick3dviewport_p.h>
 
 QT_BEGIN_NAMESPACE
 
-class QQuickDataVisItem : public QQuickItem, public AbstractDeclarativeInterface
+class Abstract3DController;
+class Q3DTheme;
+class QAbstract3DAxis;
+class QAbstract3DInputHandler;
+class QAbstract3DSeries;
+class QCustom3DItem;
+class QQuick3DCustomMaterial;
+class QQuick3DDirectionalLight;
+class QQuick3DPrincipledMaterial;
+class QQuick3DRepeater;
+
+class QQuickDataVisItem : public QQuick3DViewport
 {
     Q_OBJECT
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(bool shadowsSupported READ shadowsSupported NOTIFY shadowsSupportedChanged)
     Q_PROPERTY(int msaaSamples READ msaaSamples WRITE setMsaaSamples NOTIFY msaaSamplesChanged)
-    Q_PROPERTY(Declarative3DScene* scene READ scene NOTIFY sceneChanged)
     Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
     Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged REVISION(1, 1))
-    Q_PROPERTY(qreal currentFps READ currentFps NOTIFY currentFpsChanged REVISION(1, 1))
+    Q_PROPERTY(int currentFps READ currentFps NOTIFY currentFpsChanged REVISION(1, 1))
     Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList REVISION(1, 1))
     Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged REVISION(1, 1))
     Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged REVISION(1, 1))
@@ -133,8 +133,6 @@ public:
     virtual void setMsaaSamples(int samples);
     virtual int msaaSamples() const;
 
-    virtual Declarative3DScene *scene() const;
-
     virtual QAbstract3DInputHandler *inputHandler() const;
     virtual void setInputHandler(QAbstract3DInputHandler *inputHandler);
 
@@ -169,16 +167,12 @@ public:
     void setSharedController(Abstract3DController *controller);
     // Used to synch up data model from controller to renderer while main thread is locked
     void synchDataToRenderer();
-    void render();
-
-    void activateOpenGLContext(QQuickWindow *window);
-    void doneOpenGLContext(QQuickWindow *window);
 
     void checkWindowList(QQuickWindow *window);
 
     void setMeasureFps(bool enable);
     bool measureFps() const;
-    qreal currentFps() const;
+    int currentFps() const;
 
     void setOrthoProjection(bool enable);
     bool isOrthoProjection() const;
@@ -214,44 +208,41 @@ public:
 
     QMutex *mutex() { return &m_mutex; }
 
-    bool isReady() const override { return isComponentComplete(); }
+    bool isReady() { return isComponentComplete(); }
+    QQuick3DNode *rootNode() const;
+
+    QQuick3DNode *cameraTarget() { return m_cameraTarget; }
+    void setCameraTarget(QQuick3DNode *target) { m_cameraTarget = target; }
+
+    QQuick3DModel *background() const;
+    void setBackground(QQuick3DModel *newBackground);
+
+    QQuick3DDirectionalLight *light() const;
+    QQuick3DCustomMaterial *createQmlCustomMaterial(const QString &fileName);
+    QQuick3DPrincipledMaterial *createPrincipledMaterial();
+
+    QQuick3DModel *m_targetVisualizer;
+
+    QQuick3DModel *backgroundBB() const;
+    void setBackgroundBB(QQuick3DModel *newBackgroundBB);
 
 public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisZChanged(QAbstract3DAxis *axis) = 0;
+    void handleFpsChanged();
     void windowDestroyed(QObject *obj);
-    void destroyContext();
-
-protected:
-    void mouseDoubleClickEvent(QMouseEvent *event) override;
-    void touchEvent(QTouchEvent *event) override;
-    void mousePressEvent(QMouseEvent *event) override;
-    void mouseReleaseEvent(QMouseEvent *event) override;
-    void mouseMoveEvent(QMouseEvent *event) override;
-#if QT_CONFIG(wheelevent)
-    void wheelEvent(QWheelEvent *event) override;
-#endif
-    virtual void handleWindowChanged(QQuickWindow *win);
-    void itemChange(ItemChange change, const ItemChangeData &value) override;
-    virtual void updateWindowParameters();
-    virtual void handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode);
-    virtual void handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality);
-    virtual void handleSelectedElementChange(QAbstract3DGraph::ElementType type);
-    virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
-    QSGNode *updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *) override;
 
 Q_SIGNALS:
     void selectionModeChanged(QQuickDataVisItem::SelectionFlags mode);
     void shadowQualityChanged(QQuickDataVisItem::ShadowQuality quality);
     void shadowsSupportedChanged(bool supported);
     void msaaSamplesChanged(int samples);
-    void sceneChanged(Q3DScene *scene);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
     void renderingModeChanged(QQuickDataVisItem::RenderingMode mode);
     Q_REVISION(1, 1) void measureFpsChanged(bool enabled);
-    Q_REVISION(1, 1) void currentFpsChanged(qreal fps);
+    Q_REVISION(1, 1) void currentFpsChanged(int fps);
     Q_REVISION(1, 1) void selectedElementChanged(QQuickDataVisItem::ElementType type);
     Q_REVISION(1, 1) void orthoProjectionChanged(bool enabled);
     Q_REVISION(1, 1) void aspectRatioChanged(qreal ratio);
@@ -266,30 +257,55 @@ Q_SIGNALS:
     Q_REVISION(1, 2) void marginChanged(qreal margin);
 
 protected:
-    QSharedPointer<QMutex> m_nodeMutex;
+    QQmlComponent *createRepeaterDelegateComponent(const QString &fileName);
+    QQuick3DRepeater *createRepeater();
+
+    QQuick3DNode *createTitleLabel();
+
+    bool event(QEvent *event) override;
+    void mouseDoubleClickEvent(QMouseEvent *event) override;
+    void touchEvent(QTouchEvent *event) override;
+    void mousePressEvent(QMouseEvent *event) override;
+    void mouseReleaseEvent(QMouseEvent *event) override;
+    void mouseMoveEvent(QMouseEvent *event) override;
+#if QT_CONFIG(wheelevent)
+    void wheelEvent(QWheelEvent *event) override;
+#endif
+    virtual void handleWindowChanged(/*QQuickWindow *win*/);
+    void itemChange(ItemChange change, const ItemChangeData &value) override;
+    virtual void updateWindowParameters();
+    virtual void handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode);
+    virtual void handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality);
+    virtual void handleSelectedElementChange(QAbstract3DGraph::ElementType type);
+    virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
+    virtual void keyPressEvent(QKeyEvent *ev) override;
+
+    void componentComplete() override;
 
 private:
+    QSharedPointer<QMutex> m_nodeMutex;
+
+    QQuick3DModel *m_background = nullptr;
+    QQuick3DModel *m_backgroundBB = nullptr;
+    QQuick3DNode *m_backgroundScale = nullptr;
+    QQuick3DNode *m_backgroundRotation = nullptr;
+
     QPointer<Abstract3DController> m_controller;
+    QQuick3DNode *m_cameraTarget = nullptr;
+    QQuick3DDirectionalLight *m_light = nullptr;
     QRectF m_cachedGeometry;
-    QPointer<QQuickWindow> m_contextWindow;
     QQuickDataVisItem::RenderingMode m_renderMode;
     int m_samples;
     int m_windowSamples;
     QSize m_initialisedSize;
-    union {
-        QObject *m_contextOrStateStore;
-        QOpenGLContext *m_context;
-        GLStateStore *m_stateStore;
-    };
-    QPointer<QOpenGLContext> m_qtContext;
-    QThread *m_mainThread;
-    QThread *m_contextThread;
     bool m_runningInDesigner;
     QMutex m_mutex;
+    void setUpCamera();
+    void setUpLight();
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::OptimizationHints)
 
 QT_END_NAMESPACE
 
-#endif  // QQUICKDATAVISITEM_P_H
+#endif

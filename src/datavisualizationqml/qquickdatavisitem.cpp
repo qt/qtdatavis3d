@@ -3,19 +3,24 @@
 
 #include "qquickdatavisitem_p.h"
 #include "declarativetheme_p.h"
-#include "declarativerendernode_p.h"
+
+#include <private/abstract3dcontroller_p.h>
+
 #include <QtGui/QGuiApplication>
+
+#include <QtQuick3D/private/qquick3dperspectivecamera_p.h>
+#include <QtQuick3D/private/qquick3dorthographiccamera_p.h>
+#include <QtQuick3D/private/qquick3dcustommaterial_p.h>
+#include <QtQuick3D/private/qquick3dprincipledmaterial_p.h>
+#include <QtQuick3D/private/qquick3ddirectionallight_p.h>
+#include <QtQuick3D/private/qquick3drepeater_p.h>
+
 #if defined(Q_OS_IOS)
 #include <QtCore/QTimer>
 #endif
+
 #if defined(Q_OS_MACOS)
 #include <qpa/qplatformnativeinterface.h>
-#endif
-
-#if !defined(Q_OS_MACOS) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
-#define USE_SHARED_CONTEXT
-#else
-#include "glstatestore_p.h"
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -23,26 +28,21 @@ QT_BEGIN_NAMESPACE
 static QHash<QQuickDataVisItem *, QQuickWindow *> graphWindowList;
 
 QQuickDataVisItem::QQuickDataVisItem(QQuickItem *parent) :
-    QQuickItem(parent),
-    AbstractDeclarativeInterface(),
+    QQuick3DViewport(parent),
     m_controller(0),
-    m_contextWindow(0),
     m_renderMode(RenderIndirect),
     m_samples(0),
     m_windowSamples(0),
-    m_initialisedSize(0, 0),
-    m_contextOrStateStore(0),
-    m_qtContext(0),
-    m_mainThread(QThread::currentThread()),
-    m_contextThread(0)
+    m_initialisedSize(0, 0)
 {
     m_nodeMutex = QSharedPointer<QMutex>::create();
 
-    connect(this, &QQuickItem::windowChanged, this, &QQuickDataVisItem::handleWindowChanged);
-
+    auto sceneManager = QQuick3DObjectPrivate::get(rootNode())->sceneManager;
+    connect(sceneManager.data(), &QQuick3DSceneManager::windowChanged, this, &QQuickDataVisItem::handleWindowChanged);
+    environment()->setAntialiasingMode(QQuick3DSceneEnvironment::QQuick3DEnvironmentAAModeValues::NoAA);
     // Set contents to false in case we are in qml designer to make component look nice
     m_runningInDesigner = QGuiApplication::applicationDisplayName() == QLatin1String("Qml2Puppet");
-    setFlag(ItemHasContents, !m_runningInDesigner);
+    setFlag(ItemHasContents/*, !m_runningInDesigner*/); // Is this relevant anymore?
 
     // Accept touchevents
     setAcceptTouchEvents(true);
@@ -50,8 +50,6 @@ QQuickDataVisItem::QQuickDataVisItem(QQuickItem *parent) :
 
 QQuickDataVisItem::~QQuickDataVisItem()
 {
-    destroyContext();
-
     disconnect(this, 0, this, 0);
     checkWindowList(0);
 
@@ -71,38 +69,26 @@ void QQuickDataVisItem::setRenderingMode(QQuickDataVisItem::RenderingMode mode)
 
     m_renderMode = mode;
 
-    QQuickWindow *win = window();
+    m_initialisedSize = QSize(0, 0);
+    setFlag(ItemHasContents/*, !m_runningInDesigner*/);
 
+    // TODO - Need to check if the mode is set properly
     switch (mode) {
     case RenderDirectToBackground:
         // Intentional flowthrough
     case RenderDirectToBackground_NoClear:
-        m_initialisedSize = QSize(0, 0);
+        update();
+        setRenderMode(QQuick3DViewport::Underlay);
         if (previousMode == RenderIndirect) {
-            update();
-            setFlag(ItemHasContents, false);
-            if (win) {
-                QObject::connect(win, &QQuickWindow::beforeRenderPassRecording, this,
-                                 &QQuickDataVisItem::render, Qt::DirectConnection);
-                checkWindowList(win);
+                checkWindowList(window());
                 setAntialiasing(m_windowSamples > 0);
                 if (m_windowSamples != m_samples)
                     emit msaaSamplesChanged(m_windowSamples);
-            }
         }
         break;
     case RenderIndirect:
-        m_initialisedSize = QSize(0, 0);
-        setFlag(ItemHasContents, !m_runningInDesigner);
         update();
-        if (win) {
-            QObject::disconnect(win, &QQuickWindow::beforeRenderPassRecording, this,
-                                &QQuickDataVisItem::render);
-            checkWindowList(win);
-        }
-        setAntialiasing(m_samples > 0);
-        if (m_windowSamples != m_samples)
-            emit msaaSamplesChanged(m_samples);
+        setRenderMode(QQuick3DViewport::Offscreen);
         break;
     }
 
@@ -116,34 +102,140 @@ QQuickDataVisItem::RenderingMode QQuickDataVisItem::renderingMode() const
     return m_renderMode;
 }
 
-QSGNode *QQuickDataVisItem::updatePaintNode(QSGNode *oldNode, UpdatePaintNodeData *)
+void QQuickDataVisItem::keyPressEvent(QKeyEvent *ev)
 {
-    Q_UNUSED(oldNode);
-//    QSize boundingSize = boundingRect().size().toSize() * m_controller->scene()->devicePixelRatio();
-//    if (m_runningInDesigner || boundingSize.width() <= 0 || boundingSize.height() <= 0
-//            || m_controller.isNull() || !window()) {
-//        delete oldNode;
-//        return 0;
-//    }
-//    DeclarativeRenderNode *node = static_cast<DeclarativeRenderNode *>(oldNode);
-
-//    if (!node) {
-//        node = new DeclarativeRenderNode(this, m_nodeMutex);
-//        node->setController(m_controller.data());
-//        node->setQuickWindow(window());
-//    }
-
-//    node->setSize(boundingSize);
-//    node->setSamples(m_samples);
-//    node->update();
-//    node->markDirty(QSGNode::DirtyMaterial);
-
-    return nullptr;
+    ev->ignore();
+    setFlag(ItemHasContents);
+    update();
 }
 
-Declarative3DScene* QQuickDataVisItem::scene() const
+QQuick3DModel *QQuickDataVisItem::backgroundBB() const
 {
-    return static_cast<Declarative3DScene *>(m_controller->scene());
+    return m_backgroundBB;
+}
+
+void QQuickDataVisItem::setBackgroundBB(QQuick3DModel *newBackgroundBB)
+{
+    m_backgroundBB = newBackgroundBB;
+}
+
+void QQuickDataVisItem::handleFpsChanged()
+{
+    int fps = renderStats()->fps();
+    emit currentFpsChanged(fps);
+}
+
+void QQuickDataVisItem::componentComplete()
+{
+    qDebug()<<staticMetaObject.className()<<__func__;
+    QQuick3DViewport::componentComplete();
+    auto url = QUrl(QStringLiteral("defaultMeshes/backgroundMesh"));
+    auto background = new QQuick3DModel();
+    m_backgroundScale = new QQuick3DNode();
+    m_backgroundRotation = new QQuick3DNode();
+
+    m_backgroundScale->setParent(rootNode());
+    m_backgroundScale->setParentItem(rootNode());
+
+    m_backgroundRotation->setParent    (m_backgroundScale);
+    m_backgroundRotation->setParentItem(m_backgroundScale);
+
+
+    background->setObjectName("Background");
+    background->setParent    (m_backgroundRotation);
+    background->setParentItem(m_backgroundRotation);
+
+    background->setSource(url);
+//    background->setPickable(true);
+
+    auto backgroundBB = new QQuick3DModel();
+    backgroundBB->setObjectName("BackgroundBB");
+    backgroundBB->setParent    (background);
+    backgroundBB->setParentItem(background);
+//    backgroundBB->setScale(QVector3D(0.1f,0.1f,0.1f));
+    backgroundBB->setSource(QUrl(QStringLiteral("defaultMeshes/barMeshFull")));
+    backgroundBB->setPickable(true);
+
+    setBackground(background);
+    setBackgroundBB(backgroundBB);
+    setUpCamera();
+    setUpLight();
+
+    // Create repeaters for each axis X, Y, Z
+    QQuick3DRepeater *repeaterX = createRepeater();
+    QQuick3DRepeater *repeaterY = createRepeater();
+    QQuick3DRepeater *repeaterZ = createRepeater();
+
+    auto delegateModelX = createRepeaterDelegateComponent(QStringLiteral(":/axis/AxisLabel"));
+    auto delegateModelY = createRepeaterDelegateComponent(QStringLiteral(":/axis/AxisLabel"));
+    auto delegateModelZ = createRepeaterDelegateComponent(QStringLiteral(":/axis/AxisLabel"));
+
+    repeaterX->setDelegate(delegateModelX);
+    repeaterY->setDelegate(delegateModelY);
+    repeaterZ->setDelegate(delegateModelZ);
+
+//    m_controller->setRepeaterAxisX(repeaterX);
+//    m_controller->setRepeaterAxisY(repeaterY);
+//    m_controller->setRepeaterAxisZ(repeaterZ);
+
+
+    // title labels for axes
+    auto titleLabelAxisX = createTitleLabel();
+    auto titleLabelAxisY = createTitleLabel();
+    auto titleLabelAxisZ = createTitleLabel();
+
+    Q_UNUSED(titleLabelAxisX);
+    Q_UNUSED(titleLabelAxisY);
+    Q_UNUSED(titleLabelAxisZ);
+
+//    m_controller->setTitleLabelAxisX(titleLabelAxisX);
+//    m_controller->setTitleLabelAxisY(titleLabelAxisY);
+//    m_controller->setTitleLabelAxisZ(titleLabelAxisZ);
+
+    // Testing gridline
+
+    // X lines
+    auto segmentGridLineRepeaterAxisX = createRepeater();
+
+    auto segmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
+    segmentGridLineRepeaterAxisX->setDelegate(segmentLineDelegate);
+//    m_controller->m_segmentGridLineRepeaterAxisX = segmentGridLineRepeaterAxisX;
+
+    auto subsegmentLineRepeaterAxisX = createRepeater();
+    auto subsegmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
+    subsegmentLineRepeaterAxisX->setDelegate(subsegmentLineDelegate);
+//    m_controller->m_subSegmentGridLineRepeaterAxisX = subsegmentLineRepeaterAxisX;
+
+    // Y lines
+    auto segmentLineRepeaterAxisY = createRepeater();
+
+    segmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
+    segmentLineRepeaterAxisY->setDelegate(segmentLineDelegate);
+//    m_controller->m_segmentGridLineRepeaterAxisY = segmentLineRepeaterAxisY;
+
+    auto subsegmentLineRepeaterAxisY = createRepeater();
+    subsegmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
+    subsegmentLineRepeaterAxisY->setDelegate(subsegmentLineDelegate);
+//    m_controller->m_subSegmentGridLineRepeaterAxisY = subsegmentLineRepeaterAxisY;
+
+    // Z lines
+    auto segmentLineRepeaterAxisZ = createRepeater();
+
+    segmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
+    segmentLineRepeaterAxisZ->setDelegate(segmentLineDelegate);
+//    m_controller->m_segmentGridLineRepeaterAxisZ = segmentLineRepeaterAxisZ;
+
+    auto subsegmentLineRepeaterAxisZ = createRepeater();
+    subsegmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
+    subsegmentLineRepeaterAxisZ->setDelegate(subsegmentLineDelegate);
+//    m_controller->m_subSegmentGridLineRepeaterAxisZ = subsegmentLineRepeaterAxisZ;
+
+//    m_controller->qmlReady();
+}
+
+QQuick3DDirectionalLight *QQuickDataVisItem::light() const
+{
+    return m_light;
 }
 
 void QQuickDataVisItem::setTheme(Q3DTheme *theme)
@@ -256,13 +348,18 @@ void QQuickDataVisItem::appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *li
 
 qsizetype QQuickDataVisItem::countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
 {
-    return reinterpret_cast<QQuickDataVisItem *>(list->data)->m_controller->m_customItems.size();
+    Q_UNUSED(list);
+    return 0;
+//    return reinterpret_cast<QQuickDataVisItem *>(list->data)->m_controller->m_customItems.size();
 }
 
 QCustom3DItem *QQuickDataVisItem::atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
                                                      qsizetype index)
 {
-    return reinterpret_cast<QQuickDataVisItem *>(list->data)->m_controller->m_customItems.at(index);
+    Q_UNUSED(list);
+    Q_UNUSED(index);
+    return new QCustom3DItem();
+//    return reinterpret_cast<QQuickDataVisItem *>(list->data)->m_controller->m_customItems.at(index);
 }
 
 void QQuickDataVisItem::clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
@@ -275,7 +372,7 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);
     m_controller = controller;
-    m_controller->m_qml = this;
+//    m_controller->m_qml = this;
 
     if (!m_controller->isOpenGLES())
         m_samples = 4;
@@ -307,8 +404,8 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
 
     QObject::connect(m_controller.data(), &Abstract3DController::measureFpsChanged, this,
                      &QQuickDataVisItem::measureFpsChanged);
-    QObject::connect(m_controller.data(), &Abstract3DController::currentFpsChanged, this,
-                     &QQuickDataVisItem::currentFpsChanged);
+//    QObject::connect(m_controller.data(), &Abstract3DController::currentFpsChanged, this,
+//                     &QQuickDataVisItem::currentFpsChanged);
 
     QObject::connect(m_controller.data(), &Abstract3DController::orthoProjectionChanged, this,
                      &QQuickDataVisItem::orthoProjectionChanged);
@@ -335,64 +432,9 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
                      &QQuickDataVisItem::marginChanged);
 }
 
-void QQuickDataVisItem::activateOpenGLContext(QQuickWindow *window)
-{
-    // We can assume we are not in middle of QQuickDataVisItem destructor when we are here,
-    // since m_context creation is always done when this function is called from
-    // synchDataToRenderer(), which blocks main thread -> no need to mutex.
-    if (!m_contextOrStateStore || !m_qtContext || m_contextWindow != window) {
-        QOpenGLContext *currentContext = QOpenGLContext::currentContext();
-
-        // Note: Changing graph to different window when using multithreaded renderer will break!
-
-        delete m_contextOrStateStore;
-
-        m_contextThread = QThread::currentThread();
-        m_contextWindow = window;
-        m_qtContext = currentContext;
-
-#ifdef USE_SHARED_CONTEXT
-        m_context = new QOpenGLContext();
-        m_context->setFormat(m_qtContext->format());
-        m_context->setShareContext(m_qtContext);
-        m_context->create();
-        m_context->makeCurrent(window);
-#else
-        // Shared contexts don't work properly in some platforms, so just store the
-        // context state on those
-        m_stateStore = new GLStateStore(QOpenGLContext::currentContext());
-        m_stateStore->storeGLState();
-#endif
-        m_controller->initializeOpenGL();
-
-        // Make sure context / state store gets deleted.
-        QObject::connect(m_contextThread, &QThread::finished, this,
-                         &QQuickDataVisItem::destroyContext, Qt::DirectConnection);
-    } else {
-#ifdef USE_SHARED_CONTEXT
-        m_context->makeCurrent(window);
-#else
-        m_stateStore->storeGLState();
-#endif
-    }
-}
-
-void QQuickDataVisItem::doneOpenGLContext(QQuickWindow *window)
-{
-#ifdef USE_SHARED_CONTEXT
-    m_qtContext->makeCurrent(window);
-#else
-    Q_UNUSED(window);
-    m_stateStore->restoreGLState();
-#endif
-}
-
 void QQuickDataVisItem::synchDataToRenderer()
 {
-    QQuickWindow *win = window();
-    activateOpenGLContext(win);
     m_controller->synchDataToRenderer();
-    doneOpenGLContext(win);
 }
 
 int QQuickDataVisItem::msaaSamples() const
@@ -420,8 +462,9 @@ void QQuickDataVisItem::setMsaaSamples(int samples)
     }
 }
 
-void QQuickDataVisItem::handleWindowChanged(QQuickWindow *window)
+void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
 {
+    auto window = QQuick3DObjectPrivate::get(rootNode())->sceneManager->window();
     checkWindowList(window);
     if (!window)
         return;
@@ -451,15 +494,12 @@ void QQuickDataVisItem::handleWindowChanged(QQuickWindow *window)
 
     if (m_renderMode == RenderDirectToBackground_NoClear
             || m_renderMode == RenderDirectToBackground) {
-        connect(window, &QQuickWindow::beforeRenderPassRecording, this, &QQuickDataVisItem::render,
-                Qt::DirectConnection);
         setAntialiasing(m_windowSamples > 0);
         if (m_windowSamples != oldWindowSamples)
             emit msaaSamplesChanged(m_windowSamples);
     }
 
     connect(m_controller.data(), &Abstract3DController::needRender, window, &QQuickWindow::update);
-
     updateWindowParameters();
 
 #if defined(Q_OS_IOS)
@@ -481,12 +521,13 @@ void QQuickDataVisItem::geometryChange(const QRectF &newGeometry, const QRectF &
 
 void QQuickDataVisItem::itemChange(ItemChange change, const ItemChangeData & value)
 {
-    QQuickItem::itemChange(change, value);
+    QQuick3DViewport::itemChange(change, value);
     updateWindowParameters();
 }
 
 void QQuickDataVisItem::updateWindowParameters()
 {
+    /*
     const QMutexLocker locker(&m_mutex);
 
     // Update the device pixel ratio, window size and bounding box
@@ -524,6 +565,7 @@ void QQuickDataVisItem::updateWindowParameters()
                                             m_cachedGeometry.height() + 0.5f));
         }
     }
+    */
 }
 
 void QQuickDataVisItem::handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode)
@@ -546,38 +588,6 @@ void QQuickDataVisItem::handleOptimizationHintChange(QAbstract3DGraph::Optimizat
 {
     int intHints = int(hints);
     emit optimizationHintsChanged(OptimizationHints(intHints));
-}
-
-void QQuickDataVisItem::render()
-{
-    updateWindowParameters();
-
-    // If we're not rendering directly to the background, return
-    if (m_renderMode != RenderDirectToBackground && m_renderMode != RenderDirectToBackground_NoClear)
-        return;
-
-    // Clear the background once per window as that is not done by default
-    QQuickWindow *win = window();
-    win->beginExternalCommands();
-    activateOpenGLContext(win);
-
-    QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
-
-    if (isVisible()) {
-        funcs->glDepthMask(GL_TRUE);
-        funcs->glEnable(GL_DEPTH_TEST);
-        funcs->glDepthFunc(GL_LESS);
-        funcs->glEnable(GL_CULL_FACE);
-        funcs->glCullFace(GL_BACK);
-        funcs->glDisable(GL_BLEND);
-
-        m_controller->render();
-
-        funcs->glEnable(GL_BLEND);
-    }
-
-    doneOpenGLContext(win);
-    win->endExternalCommands();
 }
 
 QAbstract3DInputHandler* QQuickDataVisItem::inputHandler() const
@@ -622,7 +632,11 @@ void QQuickDataVisItem::mouseMoveEvent(QMouseEvent *event)
 #if QT_CONFIG(wheelevent)
 void QQuickDataVisItem::wheelEvent(QWheelEvent *event)
 {
+
+//    m_background->setPickable(true);
     m_controller->wheelEvent(event);
+
+//    m_background->setPickable(false);
 }
 #endif
 
@@ -636,8 +650,6 @@ void QQuickDataVisItem::checkWindowList(QQuickWindow *window)
                             &QQuickDataVisItem::windowDestroyed);
         QObject::disconnect(oldWindow, &QQuickWindow::beforeSynchronizing, this,
                             &QQuickDataVisItem::synchDataToRenderer);
-        QObject::disconnect(oldWindow, &QQuickWindow::beforeRenderPassRecording, this,
-                            &QQuickDataVisItem::render);
         if (!m_controller.isNull()) {
             QObject::disconnect(m_controller.data(), &Abstract3DController::needRender,
                                 oldWindow, &QQuickWindow::update);
@@ -662,6 +674,11 @@ void QQuickDataVisItem::checkWindowList(QQuickWindow *window)
 void QQuickDataVisItem::setMeasureFps(bool enable)
 {
     m_controller->setMeasureFps(enable);
+    if (enable)
+        QObject::connect(renderStats(), &QQuick3DRenderStats::fpsChanged, this, &QQuickDataVisItem::handleFpsChanged);
+    else
+        QObject::disconnect(renderStats(), 0, this, 0);
+
 }
 
 bool QQuickDataVisItem::measureFps() const
@@ -669,7 +686,7 @@ bool QQuickDataVisItem::measureFps() const
     return m_controller->measureFps();
 }
 
-qreal QQuickDataVisItem::currentFps() const
+int QQuickDataVisItem::currentFps() const
 {
     return m_controller->currentFps();
 }
@@ -786,6 +803,21 @@ qreal QQuickDataVisItem::margin() const
     return m_controller->margin();
 }
 
+QQuick3DNode *QQuickDataVisItem::rootNode() const
+{
+    return QQuick3DViewport::scene();
+}
+
+QQuick3DModel *QQuickDataVisItem::background() const
+{
+    return m_background;
+}
+
+void QQuickDataVisItem::setBackground(QQuick3DModel *newBackground)
+{
+    m_background = newBackground;
+}
+
 void QQuickDataVisItem::windowDestroyed(QObject *obj)
 {
     // Remove destroyed window from window lists
@@ -796,21 +828,129 @@ void QQuickDataVisItem::windowDestroyed(QObject *obj)
         graphWindowList.remove(this);
 }
 
-void QQuickDataVisItem::destroyContext()
+QQmlComponent *QQuickDataVisItem::createRepeaterDelegateComponent(const QString &fileName)
 {
-    if (m_contextThread && m_contextThread != m_mainThread) {
-        if (m_contextOrStateStore)
-            m_contextOrStateStore->deleteLater();
-    } else {
-        delete m_contextOrStateStore;
-    }
-    m_contextOrStateStore = 0;
+    QQmlComponent component(qmlEngine(this), fileName);
+    return qobject_cast<QQmlComponent *>(component.create());
+}
 
-    if (m_contextThread) {
-        QObject::disconnect(m_contextThread, &QThread::finished, this,
-                            &QQuickDataVisItem::destroyContext);
-        m_contextThread = 0;
+QQuick3DRepeater *QQuickDataVisItem::createRepeater()
+{
+    auto engine = qmlEngine(this);
+    QQmlComponent repeaterComponent(engine);
+    repeaterComponent.setData("import QtQuick3D; Repeater3D{}",QUrl());
+    auto repeater = qobject_cast<QQuick3DRepeater *>(repeaterComponent.create());
+    repeater->setParent(rootNode());
+    repeater->setParentItem(rootNode());
+    return repeater;
+}
+
+QQuick3DNode *QQuickDataVisItem::createTitleLabel()
+{
+    QQmlComponent comp(qmlEngine(this), QStringLiteral(":/axis/ItemLabel"));
+    auto titleLabel = qobject_cast<QQuick3DNode *>(comp.create());
+    titleLabel->setParent(rootNode());
+    titleLabel->setParentItem(rootNode());
+    titleLabel->setVisible(false);
+    return titleLabel;
+}
+
+QQuick3DCustomMaterial *QQuickDataVisItem::createQmlCustomMaterial(const QString &fileName)
+{
+    QQmlComponent component(qmlEngine(this), fileName);
+    QQuick3DCustomMaterial *material = qobject_cast<QQuick3DCustomMaterial *>(component.create());
+    return material;
+}
+
+QQuick3DPrincipledMaterial *QQuickDataVisItem::createPrincipledMaterial()
+{
+    QQmlComponent component(qmlEngine(this));
+    component.setData("import QtQuick3D; PrincipledMaterial{}", QUrl());
+    return qobject_cast<QQuick3DPrincipledMaterial *>(component.create());
+}
+
+bool QQuickDataVisItem::event(QEvent *event)
+{
+    /*
+    if (event->type() == QEvent::MouseButtonPress) {
+        auto mouseEvent = static_cast<QMouseEvent *>(event);
+        m_controller->mousePressEvent(mouseEvent, mouseEvent->pos());
     }
+    static QEventPoint::State lastState = QEventPoint::Unknown;
+    qDebug()<<staticMetaObject.className()<<__func__<<event;
+    if (event->isPointerEvent()) {
+        auto pev = static_cast<QPointerEvent *>(event);
+        for (auto &p : pev->points()) {
+            qDebug()<<staticMetaObject.className()<<__func__<<"state"<<p.state();
+        }
+        if (pev->pointingDevice()->pointerType() == QPointingDevice::PointerType::Generic) {
+            auto spev = static_cast<QSinglePointEvent *>(event);
+            switch (spev->point(0).state()) {
+            case QEventPoint::Pressed:
+                qDebug()<<staticMetaObject.className()<<__func__<<spev->point(0).state();
+                m_controller->mousePressEvent(static_cast<QMouseEvent *>(spev), spev->point(0).position().toPoint());
+                break;
+            case QEventPoint::Released:
+                qDebug()<<staticMetaObject.className()<<__func__<<spev->point(0).state();
+                m_controller->mouseReleaseEvent(static_cast<QMouseEvent *>(spev), spev->point(0).position().toPoint());
+                break;
+            case QEventPoint::Updated:
+                qDebug()<<staticMetaObject.className()<<__func__<<spev->point(0).state();
+                m_controller->mouseMoveEvent(static_cast<QMouseEvent *>(spev), spev->point(0).position().toPoint());
+                break;
+            default:
+                qDebug()<<staticMetaObject.className()<<__func__<<spev->point(0).state();
+            }
+        }
+    }
+
+    return QQuick3DViewport::event(event);
+    */
+    return QQuickItem::event(event);
+}
+
+void QQuickDataVisItem::setUpCamera()
+{
+    bool useOrtho = false;
+//    auto useOrtho = m_controller->m_useOrthoProjection;
+    QQuick3DCamera *camera;
+    if (!useOrtho) {
+        auto persCamera = new QQuick3DPerspectiveCamera(rootNode());
+        persCamera->setClipNear(0.001f);
+        camera = persCamera;
+    }
+    else {
+        auto orthCamera = new QQuick3DOrthographicCamera(rootNode());
+        camera = orthCamera;
+    }
+
+    QQuick3DObjectPrivate::get(camera)->refSceneManager(
+                *QQuick3DObjectPrivate::get(rootNode())->sceneManager);
+    auto cameraTarget = new QQuick3DNode(rootNode());
+
+    setCameraTarget(cameraTarget);
+    cameraTarget->setPosition(QVector3D(0, 0, 0));
+    QQuick3DObjectPrivate::get(cameraTarget)->refSceneManager(
+                *QQuick3DObjectPrivate::get(rootNode())->sceneManager);
+
+    camera->setParent(cameraTarget);
+    camera->setParentItem(cameraTarget);
+
+    camera->setPosition(QVector3D(0,0,5));
+    camera->lookAt(cameraTarget);
+    setCamera(camera);
+}
+
+void QQuickDataVisItem::setUpLight()
+{
+    auto light = new QQuick3DDirectionalLight(rootNode());
+    QQuick3DObjectPrivate::get(light)->refSceneManager(
+                *QQuick3DObjectPrivate::get(rootNode())->sceneManager);
+    light->setParent(camera());
+    light->setParentItem(camera());
+//    light->setPosition(QVector3D(0, 0, 0));
+    light->setEulerRotation(QVector3D(0,0,0));
+    m_light = light;
 }
 
 QT_END_NAMESPACE
