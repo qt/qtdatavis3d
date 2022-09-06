@@ -14,7 +14,7 @@
 #ifndef UTILS_P_H
 #define UTILS_P_H
 
-#include "datavisualizationglobal_p.h"
+#include <private/datavisualizationglobal_p.h>
 
 QT_FORWARD_DECLARE_CLASS(QLinearGradient)
 

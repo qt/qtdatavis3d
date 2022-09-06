@@ -250,6 +250,11 @@ bool QValue3DAxis::reversed() const
     return dptrc()->m_reversed;
 }
 
+void QValue3DAxis::recalculate()
+{
+    formatter()->d_ptr->recalculate();
+}
+
 /*!
  * \internal
  */

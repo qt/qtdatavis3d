@@ -165,6 +165,7 @@ private:
     qreal m_reflectivity;
     QLocale m_locale;
     QVector3D m_queriedGraphPosition;
+    bool m_graphPositionQueryPending;
 
 protected:
     Q3DScene *m_scene;
@@ -304,6 +305,7 @@ public:
     QLocale locale() const;
 
     QVector3D queriedGraphPosition() const;
+    void setQueriedGraphPosition(const QVector3D &position) { m_queriedGraphPosition = position; }
 
     void setMargin(qreal margin);
     qreal margin() const;
@@ -341,6 +343,19 @@ public:
 
     void markSeriesItemLabelsDirty();
     bool isOpenGLES() const;
+
+    QQuaternion calculateRotation(const QVector3D &rotation);
+    float xGridPositionAt(int gridLine);
+    float xSubGridPositionAt(int gridLine);
+    float yGridPositionAt(int gridLine);
+    float ySubGridPositionAt(int gridLine);
+    float zGridPositionAt(int gridLine);
+    float zSubGridPositionAt(int gridLine);
+
+    bool graphPositionQueryPending() const { return m_graphPositionQueryPending; }
+    void setGraphPositionQueryPending(const bool &pending) { m_graphPositionQueryPending = pending; }
+
+    void updateChangedSeriesList();
 
 public Q_SLOTS:
     void destroyRenderer();

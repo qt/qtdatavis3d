@@ -39,6 +39,8 @@ public:
     void setReversed(bool enable);
     bool reversed() const;
 
+    void recalculate();
+
 Q_SIGNALS:
     void segmentCountChanged(int count);
     void subSegmentCountChanged(int count);

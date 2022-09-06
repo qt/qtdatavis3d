@@ -38,8 +38,8 @@ class QQuickDataVisItem : public QQuick3DViewport
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(bool shadowsSupported READ shadowsSupported NOTIFY shadowsSupportedChanged)
     Q_PROPERTY(int msaaSamples READ msaaSamples WRITE setMsaaSamples NOTIFY msaaSamplesChanged)
-    Q_PROPERTY(QAbstract3DInputHandler* inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
-    Q_PROPERTY(Q3DTheme* theme READ theme WRITE setTheme NOTIFY themeChanged)
+    Q_PROPERTY(QAbstract3DInputHandler *inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
+    Q_PROPERTY(Q3DTheme *theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
     Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged REVISION(1, 1))
     Q_PROPERTY(int currentFps READ currentFps NOTIFY currentFpsChanged REVISION(1, 1))
@@ -165,8 +165,6 @@ public:
     void geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry) override;
 
     void setSharedController(Abstract3DController *controller);
-    // Used to synch up data model from controller to renderer while main thread is locked
-    void synchData();
 
     void checkWindowList(QQuickWindow *window);
 
@@ -242,6 +240,14 @@ public:
     QQuick3DRepeater *subsegmentLineRepeaterY() const { return m_subsegmentLineRepeaterY; }
     QQuick3DRepeater *subsegmentLineRepeaterZ() const { return m_subsegmentLineRepeaterZ; }
 
+    void changeLabelBackgroundColor(QQuick3DRepeater *repeater, const QColor &color);
+    void changeLabelBackgroundEnabled(QQuick3DRepeater *repeater, const bool &enabled);
+    void changeLabelBorderEnabled(QQuick3DRepeater *repeater, const bool &enabled);
+    void changeLabelTextColor(QQuick3DRepeater *repeater, const QColor &color);
+    void changeLabelFont(QQuick3DRepeater *repeater, const QFont &font);
+    void changeGridLineColor(QQuick3DRepeater *repeater, const QColor &color);
+    void updateTitleLabels();
+
 public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -273,11 +279,6 @@ Q_SIGNALS:
     Q_REVISION(1, 2) void marginChanged(qreal margin);
 
 protected:
-    QQmlComponent *createRepeaterDelegateComponent(const QString &fileName);
-    QQuick3DRepeater *createRepeater();
-
-    QQuick3DNode *createTitleLabel();
-
     bool event(QEvent *event) override;
     void mouseDoubleClickEvent(QMouseEvent *event) override;
     void touchEvent(QTouchEvent *event) override;
@@ -298,6 +299,15 @@ protected:
 
     void componentComplete() override;
 
+    QQmlComponent *createRepeaterDelegateComponent(const QString &fileName);
+    QQuick3DRepeater *createRepeater();
+
+    QQuick3DNode *createTitleLabel();
+
+    virtual void synchData();
+
+    virtual void updateGrid();
+
     QSharedPointer<QMutex> m_nodeMutex;
 
 private:
@@ -313,6 +323,8 @@ private:
     QQuick3DNode *m_titleLabelX = nullptr;
     QQuick3DNode *m_titleLabelY = nullptr;
     QQuick3DNode *m_titleLabelZ = nullptr;
+
+    QQuick3DNode *m_itemLabel = nullptr;
 
     QQuick3DRepeater *m_segmentLineRepeaterX = nullptr;
     QQuick3DRepeater *m_subsegmentLineRepeaterX = nullptr;
@@ -331,8 +343,40 @@ private:
     QSize m_initialisedSize;
     bool m_runningInDesigner;
     QMutex m_mutex;
+
+    bool m_xFlipped;
+    bool m_yFlipped;
+    bool m_zFlipped;
+
+    bool m_flipScales;
+
+    float m_scaleXWithBackground;
+    float m_scaleYWithBackground;
+    float m_scaleZWithBackground;
+
+    bool m_manualRotation;
+
+    float m_xRot;
+    float m_yRot;
+    float m_zRot;
+
+    float m_xScaleOffset;
+    float m_yScaleOffset;
+    float m_zScaleOffset;
+
+    float m_xTranslate;
+    float m_yTranslate;
+    float m_zTranslate;
+
+    float m_gridOffset = 0.002f;
+    float m_lineWidthScaleFactor = 0.0001f;
+    float m_lineLengthScaleFactor = 0.011f;
+
     void setUpCamera();
     void setUpLight();
+    void positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position);
+    void graphPositionAt(const QPoint& point);
+    void updateCamera();
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::OptimizationHints)

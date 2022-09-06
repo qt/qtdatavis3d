@@ -236,6 +236,7 @@ void Q3DInputHandler::wheelEvent(QWheelEvent *event)
         zoomLevel = qBound(minZoomLevel, zoomLevel, maxZoomLevel);
 
         if (isZoomAtTargetEnabled()) {
+            d_ptr->m_controller->setGraphPositionQueryPending(true);
             scene()->setGraphPositionQuery(event->position().toPoint());
             d_ptr->m_zoomAtTargetPending = true;
             // If zoom at target is enabled, we don't want to zoom yet, as that causes

@@ -129,6 +129,7 @@ void QQuickDataVisItem::componentComplete()
 {
     qDebug()<<staticMetaObject.className()<<__func__;
     QQuick3DViewport::componentComplete();
+
     auto url = QUrl(QStringLiteral("defaultMeshes/backgroundMesh"));
     auto background = new QQuick3DModel();
     m_backgroundScale = new QQuick3DNode();
@@ -209,6 +210,42 @@ void QQuickDataVisItem::componentComplete()
     m_subsegmentLineRepeaterZ = createRepeater();
     subsegmentLineDelegate = createRepeaterDelegateComponent(QStringLiteral(":/axis/GridLine"));
     m_subsegmentLineRepeaterZ->setDelegate(subsegmentLineDelegate);
+
+    m_itemLabel = createTitleLabel();
+
+    if (m_controller->axisX()->type() & QAbstract3DAxis::AxisTypeValue) {
+        QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(m_controller->axisX());
+        int segmentCount = valueAxis->segmentCount();
+        int subSegmentCount = valueAxis->subSegmentCount();
+        int gridLineCount = 2 * (segmentCount + 1);
+        int subGridLineCount = 2 * (segmentCount * (subSegmentCount - 1));
+        m_segmentLineRepeaterX->setModel(gridLineCount);
+        m_subsegmentLineRepeaterX->setModel(subGridLineCount);
+        m_repeaterX->setModel(valueAxis->labels().count());
+        m_controller->handleAxisLabelsChangedBySender(m_controller->axisX());
+    }
+    if (m_controller->axisY()->type() & QAbstract3DAxis::AxisTypeValue) {
+        QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(m_controller->axisY());
+        int segmentCount = valueAxis->segmentCount();
+        int subSegmentCount = valueAxis->subSegmentCount();
+        int gridLineCount = 2 * (segmentCount + 1);
+        int subGridLineCount = 2 * (segmentCount * (subSegmentCount - 1));
+        m_segmentLineRepeaterY->setModel(gridLineCount);
+        m_subsegmentLineRepeaterY->setModel(subGridLineCount);
+        m_repeaterY->setModel(2 * valueAxis->labels().count());
+        m_controller->handleAxisLabelsChangedBySender(m_controller->axisY());
+    }
+    if (m_controller->axisZ()->type() & QAbstract3DAxis::AxisTypeValue) {
+        QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(m_controller->axisZ());
+        int segmentCount = valueAxis->segmentCount();
+        int subSegmentCount = valueAxis->subSegmentCount();
+        int gridLineCount = 2 * (segmentCount + 1);
+        int subGridLineCount = 2 * (segmentCount * (subSegmentCount - 1));
+        m_segmentLineRepeaterZ->setModel(gridLineCount);
+        m_subsegmentLineRepeaterZ->setModel(subGridLineCount);
+        m_repeaterZ->setModel(valueAxis->labels().count());
+        m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
+    }
 }
 
 QQuick3DDirectionalLight *QQuickDataVisItem::light() const
@@ -412,6 +449,486 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
 
 void QQuickDataVisItem::synchData()
 {
+    if (m_controller->m_changeTracker.axisXFormatterChanged) {
+        m_controller->m_changeTracker.axisXFormatterChanged = false;
+        QAbstract3DAxis *axisX = m_controller->axisX();
+        if (axisX->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(axisX);
+            valueAxisX->recalculate();
+        }
+    }
+
+    if (m_controller->m_changeTracker.axisYFormatterChanged) {
+        m_controller->m_changeTracker.axisYFormatterChanged = false;
+        QAbstract3DAxis *axisY = m_controller->axisY();
+        if (axisY->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(axisY);
+            valueAxisY->recalculate();
+        }
+    }
+
+    if (m_controller->m_changeTracker.axisZFormatterChanged) {
+        m_controller->m_changeTracker.axisZFormatterChanged = false;
+        QAbstract3DAxis *axisZ = m_controller->axisZ();
+        if (axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(axisZ);
+            valueAxisZ->recalculate();
+        }
+    }
+
+    QVector3D forward = camera()->forward();
+    auto targetRotation = cameraTarget()->rotation();
+    if (targetRotation.x() > 0)
+        m_yFlipped = true;
+    else
+        m_yFlipped = false;
+
+    if (forward.x() > 0)
+        m_xFlipped = true;
+    else
+        m_xFlipped = false;
+
+    if (forward.z() >= 0)
+        m_zFlipped = true;
+    else
+        m_zFlipped = false;
+
+    QMatrix4x4 modelMatrix;
+    QVector3D bgScale;
+    if (!m_flipScales)
+        bgScale = QVector3D(m_scaleXWithBackground, m_scaleYWithBackground, m_scaleZWithBackground);
+    else
+        bgScale = QVector3D(m_scaleZWithBackground, m_scaleYWithBackground, m_scaleXWithBackground);
+    m_backgroundScale->setScale(bgScale);
+
+    QVector3D rotVec;
+    if (m_manualRotation) {
+        if (!m_yFlipped) {
+            rotVec = QVector3D(0, 270, 0);
+            if (m_xFlipped && m_zFlipped)
+                rotVec.setY(90);
+            else if (!m_xFlipped && m_zFlipped)
+                rotVec.setY(0);
+            else if (m_xFlipped && !m_zFlipped)
+                rotVec.setY(180);
+        } else {
+            rotVec = QVector3D(0, 180, 180);
+            if (m_xFlipped && m_zFlipped)
+                rotVec.setY(0);
+            else if (!m_xFlipped && m_zFlipped)
+                rotVec.setY(270);
+            else if (m_xFlipped && !m_zFlipped)
+                rotVec.setY(90);
+        }
+    } else {
+        rotVec = QVector3D(m_xRot, m_yRot, m_zRot);
+    }
+
+    auto rotation = m_controller->calculateRotation(rotVec);
+    if (m_yFlipped) {
+        m_backgroundRotation->setRotation(/*xFlipRot **/ rotation);
+    } else {
+        modelMatrix.rotate(rotation);
+        m_backgroundRotation->setRotation(rotation);
+    }
+
+    updateGrid();
+
+    if (m_controller->graphPositionQueryPending())
+        graphPositionAt(m_controller->scene()->graphPositionQuery());
+
+    updateCamera();
+
+    Q3DTheme *theme = m_controller->activeTheme();
+    if (m_controller->m_changeTracker.themeChanged) {
+        environment()->setClearColor(theme->windowColor());
+
+        m_controller->m_changeTracker.themeChanged = false;
+    }
+
+    Q3DThemeDirtyBitField themeDirtyBits = theme->d_ptr->m_dirtyBits;
+
+    if (themeDirtyBits.lightStrengthDirty) {
+        light()->setBrightness(theme->lightStrength() * 0.5f + 0.000002f);
+        themeDirtyBits.lightStrengthDirty = false;
+    }
+
+    if (themeDirtyBits.ambientLightStrengthDirty) {
+        float ambientStrength = theme->ambientLightStrength();
+        QColor ambientColor = QColor::fromRgbF(ambientStrength, ambientStrength, ambientStrength);
+        light()->setAmbientColor(ambientColor);
+        themeDirtyBits.ambientLightStrengthDirty = false;
+    }
+
+    if (themeDirtyBits.lightColorDirty) {
+        light()->setColor(theme->lightColor());
+        themeDirtyBits.lightColorDirty = false;
+    }
+
+    // label Adjustments
+    if (themeDirtyBits.labelBackgroundColorDirty) {
+        QColor labelBackgroundColor = theme->labelBackgroundColor();
+        changeLabelBackgroundColor(m_repeaterX, labelBackgroundColor);
+        changeLabelBackgroundColor(m_repeaterY, labelBackgroundColor);
+        changeLabelBackgroundColor(m_repeaterZ, labelBackgroundColor);
+        m_titleLabelX->setProperty("backgroundColor", labelBackgroundColor);
+        m_titleLabelY->setProperty("backgroundColor", labelBackgroundColor);
+        m_titleLabelZ->setProperty("backgroundColor", labelBackgroundColor);
+        m_itemLabel->setProperty("backgroundColor", labelBackgroundColor);
+        themeDirtyBits.labelBackgroundColorDirty = false;
+    }
+
+    if (themeDirtyBits.labelBackgroundEnabledDirty) {
+        bool enabled = theme->isLabelBackgroundEnabled();
+        changeLabelBackgroundEnabled(m_repeaterX, enabled);
+        changeLabelBackgroundEnabled(m_repeaterY, enabled);
+        changeLabelBackgroundEnabled(m_repeaterZ, enabled);
+        m_titleLabelX->setProperty("backgroundEnabled", enabled);
+        m_titleLabelY->setProperty("backgroundEnabled", enabled);
+        m_titleLabelZ->setProperty("backgroundEnabled", enabled);
+        m_itemLabel->setProperty("backgroundEnabled", enabled);
+        themeDirtyBits.labelBackgroundEnabledDirty = false;
+    }
+
+    if (themeDirtyBits.labelBorderEnabledDirty) {
+        bool enabled = theme->isLabelBorderEnabled();
+        changeLabelBorderEnabled(m_repeaterX, enabled);
+        changeLabelBorderEnabled(m_repeaterY, enabled);
+        changeLabelBorderEnabled(m_repeaterZ, enabled);
+        m_titleLabelX->setProperty("borderEnabled", enabled);
+        m_titleLabelY->setProperty("borderEnabled", enabled);
+        m_titleLabelZ->setProperty("borderEnabled", enabled);
+        m_itemLabel->setProperty("borderEnabled", enabled);
+        themeDirtyBits.labelBorderEnabledDirty = false;
+    }
+
+    if (themeDirtyBits.labelTextColorDirty) {
+        QColor labelTextColor = theme->labelTextColor();
+        changeLabelTextColor(m_repeaterX, labelTextColor);
+        changeLabelTextColor(m_repeaterY, labelTextColor);
+        changeLabelTextColor(m_repeaterZ, labelTextColor);
+        m_titleLabelX->setProperty("labelTextColor", labelTextColor);
+        m_titleLabelY->setProperty("labelTextColor", labelTextColor);
+        m_titleLabelZ->setProperty("labelTextColor", labelTextColor);
+        m_itemLabel->setProperty("labelTextColor", labelTextColor);
+        themeDirtyBits.labelTextColorDirty = false;
+    }
+
+    if (themeDirtyBits.fontDirty) {
+        auto font = theme->font();
+        if (font.pixelSize() == -1)
+            font.setPointSizeF(font.pointSizeF() * 0.3);
+        changeLabelFont(m_repeaterX, font);
+        changeLabelFont(m_repeaterY, font);
+        changeLabelFont(m_repeaterZ, font);
+        m_titleLabelX->setProperty("labelFont", font);
+        m_titleLabelY->setProperty("labelFont", font);
+        m_titleLabelZ->setProperty("labelFont", font);
+        m_itemLabel->setProperty("labelFont", font);
+        themeDirtyBits.fontDirty = false;
+    }
+
+    // Grid and background adjustments
+    if (themeDirtyBits.backgroundColorDirty) {
+        auto bg = background();
+        QQmlListReference materialsRef(bg, "materials");
+        QQuick3DPrincipledMaterial *bgMat;
+        if (!materialsRef.count()) {
+            bgMat = new QQuick3DPrincipledMaterial();
+            bgMat->setSpecularAmount(.5f);
+            bgMat->setRoughness(.5f);
+            bgMat->setBaseColor(Qt::gray);
+            bgMat->setBaseColor(Qt::green);
+            materialsRef.append(bgMat);
+        } else {
+            bgMat = static_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0));
+        }
+        bgMat->setBaseColor(theme->backgroundColor());
+
+        themeDirtyBits.backgroundColorDirty = false;
+    }
+
+    if (themeDirtyBits.backgroundEnabledDirty) {
+        background()->setVisible(theme->isBackgroundEnabled());
+        themeDirtyBits.backgroundEnabledDirty = false;
+    }
+
+    if (themeDirtyBits.gridEnabledDirty) {
+        bool enabled = theme->isGridEnabled();
+        m_segmentLineRepeaterX->setVisible(enabled);
+        m_segmentLineRepeaterY->setVisible(enabled);
+        m_segmentLineRepeaterZ->setVisible(enabled);
+
+        m_subsegmentLineRepeaterX->setVisible(enabled);
+        m_subsegmentLineRepeaterY->setVisible(enabled);
+        m_subsegmentLineRepeaterZ->setVisible(enabled);
+        themeDirtyBits.gridEnabledDirty = false;
+    }
+
+    if (themeDirtyBits.gridLineColorDirty) {
+        QColor gridLineColor = theme->gridLineColor();
+        changeGridLineColor(m_segmentLineRepeaterX, gridLineColor);
+        changeGridLineColor(m_subsegmentLineRepeaterX, gridLineColor);
+        changeGridLineColor(m_segmentLineRepeaterY, gridLineColor);
+        changeGridLineColor(m_subsegmentLineRepeaterY, gridLineColor);
+        changeGridLineColor(m_segmentLineRepeaterZ, gridLineColor);
+        changeGridLineColor(m_subsegmentLineRepeaterZ, gridLineColor);
+        themeDirtyBits.gridLineColorDirty = false;
+    }
+
+    // Other adjustments
+    if (themeDirtyBits.windowColorDirty) {
+        environment()->setClearColor(theme->windowColor());
+        themeDirtyBits.windowColorDirty = false;
+    }
+
+    m_controller->updateChangedSeriesList();
+}
+
+void QQuickDataVisItem::updateGrid()
+{
+    int gridLineCountX = m_segmentLineRepeaterX->count() / 2;
+    int subGridLineCountX = m_subsegmentLineRepeaterX->count() / 2;
+    int gridLineCountY = m_segmentLineRepeaterY->count() / 2;
+    int subGridLineCountY = m_subsegmentLineRepeaterY->count() / 2;
+    int gridLineCountZ = m_segmentLineRepeaterZ->count() / 2;
+    int subGridLineCountZ = m_subsegmentLineRepeaterZ->count() / 2;
+
+    QVector3D scaleX(m_xScaleOffset * m_lineLengthScaleFactor, m_lineWidthScaleFactor, m_lineWidthScaleFactor);
+    QVector3D scaleY(m_lineWidthScaleFactor, m_yScaleOffset * m_lineLengthScaleFactor, m_lineWidthScaleFactor);
+    QVector3D scaleZ(m_lineWidthScaleFactor, m_zScaleOffset * m_lineLengthScaleFactor, 1);
+
+    QVector3D lineBackRotationX(0, 0, 0);
+    QVector3D lineBackRotationY(0, 0, 0);
+
+    QVector3D lineSideRotationY(0, 90, -90);
+    QVector3D lineSideRotationZ(0, 90, 0);
+
+    QVector3D lineFloorRotationX(-90,0,0);
+    QVector3D lineFloorRotationZ(-90,0,0);
+    float linePosX = 0;
+    float linePosY = 0;
+    float linePosZ = 0;
+    // Wall lines
+
+    // Back
+
+    // X = Column
+    linePosY = 0;
+    if (!m_zFlipped) {
+        linePosZ = -m_scaleZWithBackground + m_gridOffset;
+    } else {
+        linePosZ = m_scaleZWithBackground - m_gridOffset;
+        lineBackRotationX = QVector3D(0, 180, 0);
+        lineBackRotationY = QVector3D(0, 180, 0);
+    }
+
+    for (int i  = 0; i < gridLineCountX; i++) {
+        QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterX->objectAt(i));
+        linePosX = m_controller->xGridPositionAt(i);
+        if (qIsNaN(linePosX))
+            Q_ASSERT("Invalid Axis Type");
+        linePosX = linePosX * m_xScaleOffset + m_xTranslate;
+        positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineBackRotationX);
+    }
+
+    for (int i = 0; i <subGridLineCountX; i++) {
+        QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterX->objectAt(i));
+        linePosX = m_controller->xSubGridPositionAt(i);
+        if (qIsNaN(linePosX))
+            Q_ASSERT("Invalid Axis Type");
+        linePosX = linePosX * m_xScaleOffset + m_xTranslate;
+        positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineBackRotationX);
+    }
+
+    // Y = Row
+    linePosX = 0;
+    for (int i  = 0; i < gridLineCountY; i++) {
+        QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterY->objectAt(i));
+        linePosY = m_controller->yGridPositionAt(i);
+        if (qIsNaN(linePosY))
+            Q_ASSERT("Invalid Axis Type");
+        linePosY = linePosY * m_yScaleOffset + m_yTranslate;
+        positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineBackRotationY);
+    }
+
+    for (int i = 0; i <subGridLineCountY; i++) {
+        QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterY->objectAt(i));
+        linePosY = m_controller->ySubGridPositionAt(i);
+        if (qIsNaN(linePosY))
+            Q_ASSERT("Invalid Axis Type");
+        linePosY = linePosY * m_yScaleOffset + m_yTranslate;
+        positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineBackRotationY);
+    }
+
+    // Side
+    // Y = Row
+    linePosZ = 0;
+    int k = 0;
+    if (!m_xFlipped) {
+        linePosX = -m_scaleXWithBackground + m_gridOffset;
+    } else {
+        linePosX = m_scaleXWithBackground - m_gridOffset;
+        lineSideRotationY = QVector3D(0, -90, 90);
+        lineSideRotationZ = QVector3D(0, -90, 0);
+    }
+
+    for (int i = gridLineCountY; i < m_segmentLineRepeaterY->count(); i++)
+    {
+        auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterY->objectAt(i));
+        linePosY = m_controller->yGridPositionAt(k);
+        if (qIsNaN(linePosY))
+            Q_ASSERT("Invalid Axis Type");
+        linePosY = linePosY * m_yScaleOffset + m_yTranslate;
+        positionAndScaleLine(lineNode,scaleZ, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineSideRotationY);
+        k++;
+    }
+
+    k = 0;
+    for (int i = subGridLineCountY; i < m_subsegmentLineRepeaterY->count(); i++) {
+        auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterY->objectAt(i));
+        linePosY = m_controller->ySubGridPositionAt(k);
+        if (qIsNaN(linePosY))
+            Q_ASSERT("Invalid Axis Type");
+        linePosY = linePosY * m_yScaleOffset + m_yTranslate;
+        positionAndScaleLine(lineNode,scaleZ, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineSideRotationY);
+        k++;
+    }
+
+    // Z = Column
+    linePosY = 0;
+    for (int i = 0; i < gridLineCountZ; i++) {
+        auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterZ->objectAt(i));
+        linePosZ = m_controller->zGridPositionAt(i);
+        if (qIsNaN(linePosZ))
+            Q_ASSERT("Invalid Axis Type");
+        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineSideRotationZ);
+    }
+
+    for (int i = 0; i < subGridLineCountZ; i++) {
+        auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterZ->objectAt(i));
+        linePosZ = m_controller->zSubGridPositionAt(i);
+        if (qIsNaN(linePosZ))
+            Q_ASSERT("Invalid Axis Type");
+        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineSideRotationZ);
+    }
+
+    // Floor lines
+    // X = Column
+    linePosZ = 0;
+    k = 0;
+    if (!m_yFlipped) {
+        linePosY = -m_scaleYWithBackground + m_gridOffset;
+    } else {
+        linePosY = m_scaleYWithBackground - m_gridOffset;
+        lineFloorRotationX = QVector3D(90, 0, 0);
+        lineFloorRotationZ = QVector3D(90, 0, 0);
+    }
+    for (int i  = gridLineCountX; i < m_segmentLineRepeaterX->count(); i++) {
+        auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterX->objectAt(i));
+        linePosZ = m_controller->zGridPositionAt(k);
+        if (qIsNaN(linePosZ))
+            Q_ASSERT("Invalid Axis Type");
+        linePosZ = linePosZ* m_zScaleOffset + m_zTranslate;
+        positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineFloorRotationX);
+        k++;
+    }
+
+    k = 0;
+    for (int i = subGridLineCountX; i < m_subsegmentLineRepeaterX->count(); i++) {
+        auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterX->objectAt(i));
+        linePosZ = m_controller->zSubGridPositionAt(k);
+        if (qIsNaN(linePosZ))
+            Q_ASSERT("Invalid Axis Type");
+        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineFloorRotationX);
+        k++;
+    }
+
+    // Z = Row
+    linePosX = 0;
+    k = 0;
+    for (int i = gridLineCountZ; i < m_segmentLineRepeaterZ->count(); i++) {
+        auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterZ->objectAt(i));
+        linePosZ = m_controller->zGridPositionAt(k);
+        if (qIsNaN(linePosZ))
+            Q_ASSERT("Invalid Axis Type");
+        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineFloorRotationZ);
+        k++;
+    }
+
+    k = 0;
+    for (int i = subGridLineCountZ; i < m_subsegmentLineRepeaterZ->count(); i++) {
+        auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterZ->objectAt(i));
+        linePosZ = m_controller->zSubGridPositionAt(k);
+        if (qIsNaN(linePosZ))
+            Q_ASSERT("Invalid Axis Type");
+        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setEulerRotation(lineFloorRotationZ);
+        k++;
+    }
+}
+
+void QQuickDataVisItem::positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position)
+{
+    lineNode->setScale(scale);
+    lineNode->setPosition(position);
+}
+
+void QQuickDataVisItem::graphPositionAt(const QPoint &point)
+{
+    bool isHitted = false;
+    auto results = pickAll(point.x(), point.y());
+
+    for (auto &result : results) {
+        if (auto hit = result.objectHit()) {
+            isHitted = true;
+            m_controller->setQueriedGraphPosition(QVector3D(
+                        result.scenePosition().x(),
+                        result.scenePosition().y(),
+                        result.scenePosition().z()
+                        ));
+            if (backgroundBB() == hit) {
+                m_controller->queriedGraphPosition().setZ(backgroundBB()->bounds().minimum().z());
+            }
+            else {
+                m_controller->setQueriedGraphPosition(hit->position());
+                break;
+            }
+        }
+    }
+
+    if (!isHitted)
+        m_controller->setQueriedGraphPosition(QVector3D(0,0,0));
+
+    emit queriedGraphPositionChanged(m_controller->queriedGraphPosition());
+    m_controller->setGraphPositionQueryPending(false);
+}
+
+void QQuickDataVisItem::updateCamera()
+{
+    float zoom = 500.0f / m_controller->scene()->activeCamera()->zoomLevel();
+    camera()->setZ(zoom);
+    cameraTarget()->setPosition(m_controller->scene()->activeCamera()->target());
+    cameraTarget()->setEulerRotation(QVector3D(
+                                         -m_controller->scene()->activeCamera()->yRotation(),
+                                         -m_controller->scene()->activeCamera()->xRotation(),
+                                         0));
 }
 
 int QQuickDataVisItem::msaaSamples() const
@@ -496,7 +1013,7 @@ void QQuickDataVisItem::geometryChange(const QRectF &newGeometry, const QRectF &
     updateWindowParameters();
 }
 
-void QQuickDataVisItem::itemChange(ItemChange change, const ItemChangeData & value)
+void QQuickDataVisItem::itemChange(ItemChange change, const ItemChangeData  &value)
 {
     QQuick3DViewport::itemChange(change, value);
     updateWindowParameters();
@@ -504,7 +1021,6 @@ void QQuickDataVisItem::itemChange(ItemChange change, const ItemChangeData & val
 
 void QQuickDataVisItem::updateWindowParameters()
 {
-    /*
     const QMutexLocker locker(&m_mutex);
 
     // Update the device pixel ratio, window size and bounding box
@@ -542,7 +1058,6 @@ void QQuickDataVisItem::updateWindowParameters()
                                             m_cachedGeometry.height() + 0.5f));
         }
     }
-    */
 }
 
 void QQuickDataVisItem::handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode)
@@ -567,7 +1082,7 @@ void QQuickDataVisItem::handleOptimizationHintChange(QAbstract3DGraph::Optimizat
     emit optimizationHintsChanged(OptimizationHints(intHints));
 }
 
-QAbstract3DInputHandler* QQuickDataVisItem::inputHandler() const
+QAbstract3DInputHandler *QQuickDataVisItem::inputHandler() const
 {
     return m_controller->activeInputHandler();
 }
@@ -609,11 +1124,7 @@ void QQuickDataVisItem::mouseMoveEvent(QMouseEvent *event)
 #if QT_CONFIG(wheelevent)
 void QQuickDataVisItem::wheelEvent(QWheelEvent *event)
 {
-
-//    m_background->setPickable(true);
     m_controller->wheelEvent(event);
-
-//    m_background->setPickable(false);
 }
 #endif
 
@@ -795,6 +1306,92 @@ void QQuickDataVisItem::setBackground(QQuick3DModel *newBackground)
     m_background = newBackground;
 }
 
+void QQuickDataVisItem::changeLabelBackgroundColor(QQuick3DRepeater *repeater, const QColor &color)
+{
+    int count = repeater->count();
+    for (int i = 0; i < count; i++) {
+        auto label = static_cast<QQuick3DNode *>(repeater->objectAt(i));
+        label->setProperty("backgroundColor", color);
+    }
+}
+
+void QQuickDataVisItem::changeLabelBackgroundEnabled(QQuick3DRepeater *repeater, const bool &enabled)
+{
+    int count = repeater->count();
+    for (int i = 0; i < count; i++) {
+        auto label = static_cast<QQuick3DNode *>(repeater->objectAt(i));
+        label->setProperty("backgroundEnabled", enabled);
+    }
+}
+
+void QQuickDataVisItem::changeLabelBorderEnabled(QQuick3DRepeater *repeater, const bool &enabled)
+{
+    int count = repeater->count();
+    for (int i = 0; i < count; i++) {
+        auto label = static_cast<QQuick3DNode *>(repeater->objectAt(i));
+        label->setProperty("borderEnabled", enabled);
+    }
+}
+
+void QQuickDataVisItem::changeLabelTextColor(QQuick3DRepeater *repeater, const QColor &color)
+{
+    int count = repeater->count();
+    for (int i = 0; i < count; i++) {
+        auto label = static_cast<QQuick3DNode *>(repeater->objectAt(i));
+        label->setProperty("labelTextColor", color);
+    }
+}
+
+void QQuickDataVisItem::changeLabelFont(QQuick3DRepeater *repeater, const QFont &font)
+{
+    int count = repeater->count();
+    for (int i = 0; i < count; i++) {
+        auto label = static_cast<QQuick3DNode *>(repeater->objectAt(i));
+        label->setProperty("labelFont", font);
+    }
+}
+
+void QQuickDataVisItem::changeGridLineColor(QQuick3DRepeater *repeater, const QColor &color)
+{
+    for (int i = 0; i < repeater->count(); i++) {
+        auto lineNode = static_cast<QQuick3DNode *>(repeater->objectAt(i));
+        lineNode->setProperty("lineColor", color);
+    }
+}
+
+void QQuickDataVisItem::updateTitleLabels()
+{
+    if (m_controller->m_changeTracker.axisXTitleVisibilityChanged) {
+        m_titleLabelX->setVisible(m_controller->axisX()->isTitleVisible());
+        m_controller->m_changeTracker.axisXTitleVisibilityChanged = false;
+    }
+
+    if (m_controller->m_changeTracker.axisYTitleVisibilityChanged) {
+        m_titleLabelY->setVisible(m_controller->axisY()->isTitleVisible());
+        m_controller->m_changeTracker.axisYTitleVisibilityChanged = false;
+    }
+
+    if (m_controller->m_changeTracker.axisZTitleVisibilityChanged) {
+        m_titleLabelZ->setVisible(m_controller->axisZ()->isTitleVisible());
+        m_controller->m_changeTracker.axisZTitleVisibilityChanged = false;
+    }
+
+    if (m_controller->m_changeTracker.axisXTitleChanged) {
+        m_titleLabelX->setProperty("labelText", m_controller->axisX()->title());
+        m_controller->m_changeTracker.axisXTitleChanged = false;
+    }
+
+    if (m_controller->m_changeTracker.axisYTitleChanged) {
+        m_titleLabelY->setProperty("labelText", m_controller->axisY()->title());
+        m_controller->m_changeTracker.axisYTitleChanged = false;
+    }
+
+    if (m_controller->m_changeTracker.axisZTitleChanged) {
+        m_titleLabelZ->setProperty("labelText", m_controller->axisZ()->title());
+        m_controller->m_changeTracker.axisZTitleChanged = false;
+    }
+}
+
 void QQuickDataVisItem::windowDestroyed(QObject *obj)
 {
     // Remove destroyed window from window lists
@@ -848,48 +1445,12 @@ QQuick3DPrincipledMaterial *QQuickDataVisItem::createPrincipledMaterial()
 
 bool QQuickDataVisItem::event(QEvent *event)
 {
-    /*
-    if (event->type() == QEvent::MouseButtonPress) {
-        auto mouseEvent = static_cast<QMouseEvent *>(event);
-        m_controller->mousePressEvent(mouseEvent, mouseEvent->pos());
-    }
-    static QEventPoint::State lastState = QEventPoint::Unknown;
-    qDebug()<<staticMetaObject.className()<<__func__<<event;
-    if (event->isPointerEvent()) {
-        auto pev = static_cast<QPointerEvent *>(event);
-        for (auto &p : pev->points()) {
-            qDebug()<<staticMetaObject.className()<<__func__<<"state"<<p.state();
-        }
-        if (pev->pointingDevice()->pointerType() == QPointingDevice::PointerType::Generic) {
-            auto spev = static_cast<QSinglePointEvent *>(event);
-            switch (spev->point(0).state()) {
-            case QEventPoint::Pressed:
-                qDebug()<<staticMetaObject.className()<<__func__<<spev->point(0).state();
-                m_controller->mousePressEvent(static_cast<QMouseEvent *>(spev), spev->point(0).position().toPoint());
-                break;
-            case QEventPoint::Released:
-                qDebug()<<staticMetaObject.className()<<__func__<<spev->point(0).state();
-                m_controller->mouseReleaseEvent(static_cast<QMouseEvent *>(spev), spev->point(0).position().toPoint());
-                break;
-            case QEventPoint::Updated:
-                qDebug()<<staticMetaObject.className()<<__func__<<spev->point(0).state();
-                m_controller->mouseMoveEvent(static_cast<QMouseEvent *>(spev), spev->point(0).position().toPoint());
-                break;
-            default:
-                qDebug()<<staticMetaObject.className()<<__func__<<spev->point(0).state();
-            }
-        }
-    }
-
-    return QQuick3DViewport::event(event);
-    */
     return QQuickItem::event(event);
 }
 
 void QQuickDataVisItem::setUpCamera()
 {
-    bool useOrtho = false;
-//    auto useOrtho = m_controller->m_useOrthoProjection;
+    auto useOrtho = m_controller->isOrthoProjection();
     QQuick3DCamera *camera;
     if (!useOrtho) {
         auto persCamera = new QQuick3DPerspectiveCamera(rootNode());
@@ -925,7 +1486,6 @@ void QQuickDataVisItem::setUpLight()
                 *QQuick3DObjectPrivate::get(rootNode())->sceneManager);
     light->setParent(camera());
     light->setParentItem(camera());
-//    light->setPosition(QVector3D(0, 0, 0));
     light->setEulerRotation(QVector3D(0,0,0));
     m_light = light;
 }
