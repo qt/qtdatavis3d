@@ -656,11 +656,6 @@ qreal QAbstract3DGraph::currentFps() const
  *
  * \brief Whether orthographic projection is used for displaying the graph.
  *
- * If \c {true}, ortographic projection is used to create 2D graphs by replacing
- * the default input handler with one that does not allow rotating the graph and
- * by setting the camera to view the graph
- * directly from the side or from the top. Also, axis labels typically need to be rotated when
- * viewing the graph from the sides.
  * Defaults to \c{false}.
  * \note Shadows will be disabled when set to \c{true}.
  *
