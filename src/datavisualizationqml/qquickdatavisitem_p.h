@@ -21,6 +21,7 @@
 QT_BEGIN_NAMESPACE
 
 class Abstract3DController;
+class Declarative3DScene;
 class Q3DTheme;
 class QAbstract3DAxis;
 class QAbstract3DInputHandler;
@@ -38,6 +39,7 @@ class QQuickDataVisItem : public QQuick3DViewport
     Q_PROPERTY(ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(bool shadowsSupported READ shadowsSupported NOTIFY shadowsSupportedChanged)
     Q_PROPERTY(int msaaSamples READ msaaSamples WRITE setMsaaSamples NOTIFY msaaSamplesChanged)
+    Q_PROPERTY(Declarative3DScene *scene READ scene NOTIFY sceneChanged)
     Q_PROPERTY(QAbstract3DInputHandler *inputHandler READ inputHandler WRITE setInputHandler NOTIFY inputHandlerChanged)
     Q_PROPERTY(Q3DTheme *theme READ theme WRITE setTheme NOTIFY themeChanged)
     Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
@@ -132,6 +134,8 @@ public:
 
     virtual void setMsaaSamples(int samples);
     virtual int msaaSamples() const;
+
+    virtual Declarative3DScene *scene() const;
 
     virtual QAbstract3DInputHandler *inputHandler() const;
     virtual void setInputHandler(QAbstract3DInputHandler *inputHandler);
@@ -240,6 +244,24 @@ public:
     QQuick3DRepeater *subsegmentLineRepeaterY() const { return m_subsegmentLineRepeaterY; }
     QQuick3DRepeater *subsegmentLineRepeaterZ() const { return m_subsegmentLineRepeaterZ; }
 
+    QVector3D flipped() const { return m_flipped; }
+    void setFlipped(const QVector3D &flipped) { m_flipped = flipped; }
+    QVector3D scaleWithBackground() const { return m_scaleWithBackground; }
+    void setScaleWithBackground(const QVector3D &scale) { m_scaleWithBackground = scale; }
+    QVector3D rotation() const { return m_rot; }
+    void setRotation(const QVector3D &rotation) { m_rot = rotation; }
+    QVector3D scale() const { return m_scale; }
+    void setScale(const QVector3D &scale) { m_scale = scale; }
+    QVector3D scaleOffset() const { return m_scaleOffset; }
+    void setScaleOffset(const QVector3D &scaleOffset) { m_scaleOffset = scaleOffset; }
+    QVector3D translate() const { return m_translate; }
+    void setTranslate(const QVector3D &translate) { m_translate = translate;}
+
+    float lineLengthScaleFactor() const { return m_lineLengthScaleFactor; }
+    void setLineLengthScaleFactor(float scaleFactor) { m_lineLengthScaleFactor = scaleFactor; }
+    float lineWidthScaleFactor() const { return m_lineWidthScaleFactor; }
+    float gridOffset() const { return m_gridOffset; }
+
     void changeLabelBackgroundColor(QQuick3DRepeater *repeater, const QColor &color);
     void changeLabelBackgroundEnabled(QQuick3DRepeater *repeater, const bool &enabled);
     void changeLabelBorderEnabled(QQuick3DRepeater *repeater, const bool &enabled);
@@ -304,6 +326,8 @@ protected:
 
     QQuick3DNode *createTitleLabel();
 
+    void positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position);
+
     virtual void synchData();
 
     virtual void updateGrid();
@@ -344,29 +368,21 @@ private:
     bool m_runningInDesigner;
     QMutex m_mutex;
 
-    bool m_xFlipped;
-    bool m_yFlipped;
-    bool m_zFlipped;
+    QVector3D m_flipped = QVector3D(false, false, false);
 
     bool m_flipScales;
 
-    float m_scaleXWithBackground;
-    float m_scaleYWithBackground;
-    float m_scaleZWithBackground;
+    QVector3D m_scaleWithBackground = QVector3D(1.0f, 1.0f, 1.0f);
 
     bool m_manualRotation;
 
-    float m_xRot;
-    float m_yRot;
-    float m_zRot;
+    QVector3D m_rot = QVector3D(1.0f, 1.0f, 1.0f);
 
-    float m_xScaleOffset;
-    float m_yScaleOffset;
-    float m_zScaleOffset;
+    QVector3D m_scale = QVector3D(1.0f, 1.0f, 1.0f);
 
-    float m_xTranslate;
-    float m_yTranslate;
-    float m_zTranslate;
+    QVector3D m_scaleOffset = QVector3D(1.0f, 1.0f, 1.0f);
+
+    QVector3D m_translate = QVector3D(1.0f, 1.0f, 1.0f);
 
     float m_gridOffset = 0.002f;
     float m_lineWidthScaleFactor = 0.0001f;
@@ -374,7 +390,6 @@ private:
 
     void setUpCamera();
     void setUpLight();
-    void positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position);
     void graphPositionAt(const QPoint& point);
     void updateCamera();
 };
