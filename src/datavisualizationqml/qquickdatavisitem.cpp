@@ -618,6 +618,8 @@ void QQuickDataVisItem::synchData()
         themeDirtyBits.fontDirty = false;
     }
 
+    updateLabels();
+
     // Grid and background adjustments
     if (themeDirtyBits.backgroundColorDirty) {
         auto bg = background();
@@ -876,6 +878,225 @@ void QQuickDataVisItem::graphPositionAt(const QPoint &point)
 
     emit queriedGraphPositionChanged(m_controller->queriedGraphPosition());
     m_controller->setGraphPositionQueryPending(false);
+}
+
+int QQuickDataVisItem::findLabelsMaxWidth(const QStringList &labels)
+{
+    int labelWidth = 0;
+    QFontMetrics labelFM(m_controller->activeTheme()->font());
+
+    for (const auto &label : qAsConst(labels)) {
+        auto width = labelFM.horizontalAdvance(label);
+        if (labelWidth < width)
+            labelWidth = width;
+    }
+    return labelWidth;
+}
+
+void QQuickDataVisItem::updateXTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                                     const QQuaternion &totalRotation, float labelsMaxWidth)
+{
+    float scaledFontSize = (0.05 + m_controller->activeTheme()->font().pointSizeF()) / 500.0f;
+    float scaleFactor = scaledFontSize / 115.0f;
+    float titleOffset;
+
+    bool radial = false;
+    if (radial)
+        titleOffset = -2.0f * (m_labelMargin + scaledFontSize);
+    else
+        titleOffset = 2.0f * (m_labelMargin + (labelsMaxWidth * scaleFactor));
+
+    float zRotation = 0.0f;
+    float yRotation = 0.0f;
+    float xRotation = -90.0f + labelRotation.z();
+    float offsetRotation = labelRotation.z();
+    float extraRotation = -90.0f;
+    if (m_flipped.y()) {
+        zRotation = 180.0f;
+        if (m_flipped.z()) {
+            titleOffset = -titleOffset;
+            if (m_flipped.x()) {
+                offsetRotation = -offsetRotation;
+                extraRotation = -extraRotation;
+            } else {
+                xRotation = -90.0f - labelRotation.z();
+            }
+        } else {
+            yRotation = 180.0f;
+            if (m_flipped.x()) {
+                offsetRotation = -offsetRotation;
+                xRotation = -90.0f - labelRotation.z();
+            } else {
+                extraRotation = -extraRotation;
+            }
+        }
+    } else {
+        if (m_flipped.z()) {
+            titleOffset = -titleOffset;
+            if (m_flipped.x()) {
+                yRotation = 180.0f;
+                offsetRotation = -offsetRotation;
+            } else {
+                yRotation = 180.0f;
+                xRotation = -90.0f - labelRotation.z();
+                extraRotation = -extraRotation;
+            }
+            if (m_flipped.y()) {
+                extraRotation = -extraRotation;
+                if (m_flipped.x())
+                    xRotation = 90.0f + labelRotation.z();
+                else
+                    xRotation = 90.0f - labelRotation.z();
+            }
+        } else {
+            if (m_flipped.x()) {
+                offsetRotation = -offsetRotation;
+                xRotation = -90.0f - labelRotation.z();
+                extraRotation = -extraRotation;
+            }
+            if (m_flipped.y()) {
+                xRotation = 90.0f + labelRotation.z();
+                extraRotation = -extraRotation;
+                if (m_flipped.x())
+                    xRotation = 90.0f - labelRotation.z();
+            }
+        }
+    }
+
+    if (offsetRotation == 180.0f || offsetRotation == -180.0f)
+        offsetRotation = 0.0f;
+
+    QQuaternion offsetRotator = QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, offsetRotation);
+    QVector3D titleOffsetVector =
+            offsetRotator.rotatedVector(QVector3D(0.0f, 0.0f, titleOffset));
+
+    QQuaternion titleRotation;
+    if (m_controller->axisX()->isTitleFixed()) {
+        titleRotation = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, zRotation)
+                * QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation)
+                * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, xRotation);
+    } else {
+        titleRotation = totalRotation
+                * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, extraRotation);
+    }
+
+    m_titleLabelX->setPosition(labelTrans + titleOffsetVector);
+    m_titleLabelX->setRotation(titleRotation);
+}
+
+void QQuickDataVisItem::updateYTitle(const QVector3D &sideLabelRotation, const QVector3D &backLabelRotation,
+                                     const QVector3D &sideLabelTrans, const QVector3D &backLabelTrans,
+                                     const QQuaternion &totalSideRotation, const QQuaternion &totalBackRotation,
+                                     float labelsMaxWidth)
+{
+    float scaledFontSize = (0.05 + m_controller->activeTheme()->font().pointSizeF()) / 500.0f;
+    float scaleFactor = scaledFontSize / 115.0f;
+    float titleOffset = 2.0f * (m_labelMargin + (labelsMaxWidth * scaleFactor));
+
+    QQuaternion zRightAngleRotation = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, 90.0f);
+    float yRotation;
+    QVector3D titleTrans;
+    QQuaternion totalRotation;
+    if (m_flipped.x() == m_flipped.z()) {
+        yRotation = backLabelRotation.y();
+        titleTrans = backLabelTrans;
+        totalRotation = totalBackRotation;
+    } else {
+        yRotation = sideLabelRotation.y();
+        titleTrans = sideLabelTrans;
+        totalRotation = totalSideRotation;
+    }
+
+    QQuaternion offsetRotator = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation);
+    QVector3D titleOffsetVector =
+            offsetRotator.rotatedVector(QVector3D(-titleOffset, 0.0f, 0.0f));
+
+    QQuaternion titleRotation;
+    if (m_controller->axisY()->isTitleFixed()) {
+        titleRotation = QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation)
+                * zRightAngleRotation;
+    } else {
+        titleRotation = totalRotation * zRightAngleRotation;
+    }
+
+    m_titleLabelY->setPosition(titleTrans + titleOffsetVector);
+    m_titleLabelY->setRotation(titleRotation);
+}
+
+void QQuickDataVisItem::updateZTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                                     const QQuaternion &totalRotation, float labelsMaxWidth)
+{
+    float scaledFontSize = (0.05 + m_controller->activeTheme()->font().pointSizeF()) / 500.0f;
+    float scaleFactor = scaledFontSize / 115.0f;
+    float titleOffset = 2.0f * (m_labelMargin + (labelsMaxWidth * scaleFactor));
+    float zRotation = labelRotation.z();
+    float yRotation = -90.0f;
+    float xRotation = -90.0f;
+    float extraRotation = 90.0f;
+
+    if (m_flipped.y()) {
+
+        xRotation = -xRotation;
+        if (m_flipped.z()) {
+            if (m_flipped.x()) {
+                titleOffset = -titleOffset;
+                zRotation = -zRotation;
+                extraRotation = -extraRotation;
+            } else {
+                zRotation = -zRotation;
+                yRotation = -yRotation;
+            }
+        } else {
+            if (m_flipped.x()) {
+                titleOffset = -titleOffset;
+            } else {
+                extraRotation = -extraRotation;
+                yRotation = -yRotation;
+            }
+        }
+    } else {
+        if (m_flipped.z()) {
+            zRotation = -zRotation;
+            if (m_flipped.x()) {
+                titleOffset = -titleOffset;
+            } else {
+                extraRotation = -extraRotation;
+                yRotation = -yRotation;
+            }
+        } else {
+            if (m_flipped.x()) {
+                titleOffset = -titleOffset;
+                extraRotation = -extraRotation;
+            } else {
+                yRotation = -yRotation;
+            }
+        }
+        if (m_flipped.y()) {
+            xRotation = -xRotation;
+            extraRotation = -extraRotation;
+        }
+    }
+
+    float offsetRotation = zRotation;
+    if (offsetRotation == 180.0f || offsetRotation == -180.0f)
+        offsetRotation = 0.0f;
+
+    QQuaternion offsetRotator = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, offsetRotation);
+    QVector3D titleOffsetVector =
+            offsetRotator.rotatedVector(QVector3D(titleOffset, 0.0f, 0.0f));
+
+    QQuaternion titleRotation;
+    if (m_controller->axisZ()->isTitleFixed()) {
+        titleRotation = QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, zRotation)
+                * QQuaternion::fromAxisAndAngle(0.0f, 1.0f, 0.0f, yRotation)
+                * QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, xRotation);
+    } else {
+        titleRotation = totalRotation
+                * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, extraRotation);
+    }
+
+    m_titleLabelZ->setPosition(labelTrans + titleOffsetVector);
+    m_titleLabelZ->setRotation(titleRotation);
 }
 
 void QQuickDataVisItem::updateCamera()

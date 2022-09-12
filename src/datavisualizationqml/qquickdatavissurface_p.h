@@ -66,6 +66,7 @@ public:
 protected:
     void componentComplete() override;
     void updateGrid() override;
+    void updateLabels() override;
 
 public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;

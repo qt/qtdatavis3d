@@ -265,6 +265,11 @@ float QValue3DAxis::subGridPositionAt(int gridLine)
     return formatter()->subGridPositions().at(gridLine);
 }
 
+float QValue3DAxis::labelPositionAt(int index)
+{
+    return formatter()->labelPositions().at(index);
+}
+
 /*!
  * \internal
  */

@@ -260,7 +260,10 @@ public:
     float lineLengthScaleFactor() const { return m_lineLengthScaleFactor; }
     void setLineLengthScaleFactor(float scaleFactor) { m_lineLengthScaleFactor = scaleFactor; }
     float lineWidthScaleFactor() const { return m_lineWidthScaleFactor; }
+    void setLineWidthScaleFactor(float scaleFactor) { m_lineWidthScaleFactor = scaleFactor; }
     float gridOffset() const { return m_gridOffset; }
+    void setLabelMargin(float margin) { m_labelMargin = margin; }
+    float labelMargin() const { return m_labelMargin; }
 
     void changeLabelBackgroundColor(QQuick3DRepeater *repeater, const QColor &color);
     void changeLabelBackgroundEnabled(QQuick3DRepeater *repeater, const bool &enabled);
@@ -325,12 +328,23 @@ protected:
     QQuick3DRepeater *createRepeater();
 
     QQuick3DNode *createTitleLabel();
+    void updateXTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                      const QQuaternion &totalRotation, float labelsMaxWidth);
+    void updateYTitle(const QVector3D &sideLabelRotation, const QVector3D &backLabelRotation,
+                      const QVector3D &sideLabelTrans, const QVector3D &backLabelTrans,
+                      const QQuaternion &totalSideRotation, const QQuaternion &totalBackRotation,
+                      float labelsMaxWidth);
+    void updateZTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                      const QQuaternion &totalRotation, float labelsMaxWidth);
 
     void positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position);
+    int findLabelsMaxWidth(const QStringList &labels);
 
     virtual void synchData();
 
     virtual void updateGrid();
+
+    virtual void updateLabels() {}
 
     QSharedPointer<QMutex> m_nodeMutex;
 
@@ -387,6 +401,8 @@ private:
     float m_gridOffset = 0.002f;
     float m_lineWidthScaleFactor = 0.0001f;
     float m_lineLengthScaleFactor = 0.011f;
+
+    float m_labelMargin = 0.0f;
 
     void setUpCamera();
     void setUpLight();
