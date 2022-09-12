@@ -345,12 +345,6 @@ public:
     bool isOpenGLES() const;
 
     QQuaternion calculateRotation(const QVector3D &rotation);
-    float xGridPositionAt(int gridLine);
-    float xSubGridPositionAt(int gridLine);
-    float yGridPositionAt(int gridLine);
-    float ySubGridPositionAt(int gridLine);
-    float zGridPositionAt(int gridLine);
-    float zSubGridPositionAt(int gridLine);
 
     bool graphPositionQueryPending() const { return m_graphPositionQueryPending; }
     void setGraphPositionQueryPending(const bool &pending) { m_graphPositionQueryPending = pending; }

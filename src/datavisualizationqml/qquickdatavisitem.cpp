@@ -694,6 +694,10 @@ void QQuickDataVisItem::updateGrid()
     int gridLineCountZ = m_segmentLineRepeaterZ->count() / 2;
     int subGridLineCountZ = m_subsegmentLineRepeaterZ->count() / 2;
 
+    auto axisX = static_cast<QValue3DAxis *>(m_controller->axisX());
+    auto axisY = static_cast<QValue3DAxis *>(m_controller->axisY());
+    auto axisZ = static_cast<QValue3DAxis *>(m_controller->axisZ());
+
     QVector3D scaleX(m_xScaleOffset * m_lineLengthScaleFactor, m_lineWidthScaleFactor, m_lineWidthScaleFactor);
     QVector3D scaleY(m_lineWidthScaleFactor, m_yScaleOffset * m_lineLengthScaleFactor, m_lineWidthScaleFactor);
     QVector3D scaleZ(m_lineWidthScaleFactor, m_zScaleOffset * m_lineLengthScaleFactor, 1);
@@ -725,20 +729,14 @@ void QQuickDataVisItem::updateGrid()
 
     for (int i  = 0; i < gridLineCountX; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterX->objectAt(i));
-        linePosX = m_controller->xGridPositionAt(i);
-        if (qIsNaN(linePosX))
-            Q_ASSERT("Invalid Axis Type");
-        linePosX = linePosX * m_xScaleOffset + m_xTranslate;
+        linePosX = axisX->gridPositionAt(i) * m_xScaleOffset + m_xTranslate;
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineBackRotationX);
     }
 
     for (int i = 0; i <subGridLineCountX; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterX->objectAt(i));
-        linePosX = m_controller->xSubGridPositionAt(i);
-        if (qIsNaN(linePosX))
-            Q_ASSERT("Invalid Axis Type");
-        linePosX = linePosX * m_xScaleOffset + m_xTranslate;
+        linePosX = axisX->subGridPositionAt(i) * m_xScaleOffset + m_xTranslate;
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineBackRotationX);
     }
@@ -747,20 +745,14 @@ void QQuickDataVisItem::updateGrid()
     linePosX = 0;
     for (int i  = 0; i < gridLineCountY; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterY->objectAt(i));
-        linePosY = m_controller->yGridPositionAt(i);
-        if (qIsNaN(linePosY))
-            Q_ASSERT("Invalid Axis Type");
-        linePosY = linePosY * m_yScaleOffset + m_yTranslate;
+        linePosY = axisY->gridPositionAt(i) * m_yScaleOffset + m_yTranslate;
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineBackRotationY);
     }
 
     for (int i = 0; i <subGridLineCountY; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterY->objectAt(i));
-        linePosY = m_controller->ySubGridPositionAt(i);
-        if (qIsNaN(linePosY))
-            Q_ASSERT("Invalid Axis Type");
-        linePosY = linePosY * m_yScaleOffset + m_yTranslate;
+        linePosY = axisY->subGridPositionAt(i) * m_yScaleOffset + m_yTranslate;
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineBackRotationY);
     }
@@ -780,10 +772,7 @@ void QQuickDataVisItem::updateGrid()
     for (int i = gridLineCountY; i < m_segmentLineRepeaterY->count(); i++)
     {
         auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterY->objectAt(i));
-        linePosY = m_controller->yGridPositionAt(k);
-        if (qIsNaN(linePosY))
-            Q_ASSERT("Invalid Axis Type");
-        linePosY = linePosY * m_yScaleOffset + m_yTranslate;
+        linePosY = axisY->gridPositionAt(k) * m_yScaleOffset + m_yTranslate;
         positionAndScaleLine(lineNode,scaleZ, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineSideRotationY);
         k++;
@@ -792,10 +781,7 @@ void QQuickDataVisItem::updateGrid()
     k = 0;
     for (int i = subGridLineCountY; i < m_subsegmentLineRepeaterY->count(); i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterY->objectAt(i));
-        linePosY = m_controller->ySubGridPositionAt(k);
-        if (qIsNaN(linePosY))
-            Q_ASSERT("Invalid Axis Type");
-        linePosY = linePosY * m_yScaleOffset + m_yTranslate;
+        linePosY = axisY->subGridPositionAt(k) * m_yScaleOffset + m_yTranslate;
         positionAndScaleLine(lineNode,scaleZ, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineSideRotationY);
         k++;
@@ -805,20 +791,14 @@ void QQuickDataVisItem::updateGrid()
     linePosY = 0;
     for (int i = 0; i < gridLineCountZ; i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterZ->objectAt(i));
-        linePosZ = m_controller->zGridPositionAt(i);
-        if (qIsNaN(linePosZ))
-            Q_ASSERT("Invalid Axis Type");
-        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        linePosZ = axisZ->gridPositionAt(i) * m_zScaleOffset + m_zTranslate;
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineSideRotationZ);
     }
 
     for (int i = 0; i < subGridLineCountZ; i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterZ->objectAt(i));
-        linePosZ = m_controller->zSubGridPositionAt(i);
-        if (qIsNaN(linePosZ))
-            Q_ASSERT("Invalid Axis Type");
-        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        linePosZ = axisZ->subGridPositionAt(i) * m_zScaleOffset + m_zTranslate;
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineSideRotationZ);
     }
@@ -836,10 +816,7 @@ void QQuickDataVisItem::updateGrid()
     }
     for (int i  = gridLineCountX; i < m_segmentLineRepeaterX->count(); i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterX->objectAt(i));
-        linePosZ = m_controller->zGridPositionAt(k);
-        if (qIsNaN(linePosZ))
-            Q_ASSERT("Invalid Axis Type");
-        linePosZ = linePosZ* m_zScaleOffset + m_zTranslate;
+        linePosZ = axisZ->gridPositionAt(k) * m_zScaleOffset + m_zTranslate;
         positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationX);
         k++;
@@ -848,10 +825,7 @@ void QQuickDataVisItem::updateGrid()
     k = 0;
     for (int i = subGridLineCountX; i < m_subsegmentLineRepeaterX->count(); i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterX->objectAt(i));
-        linePosZ = m_controller->zSubGridPositionAt(k);
-        if (qIsNaN(linePosZ))
-            Q_ASSERT("Invalid Axis Type");
-        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        linePosZ = axisZ->subGridPositionAt(k) * m_zScaleOffset + m_zTranslate;
         positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationX);
         k++;
@@ -862,10 +836,7 @@ void QQuickDataVisItem::updateGrid()
     k = 0;
     for (int i = gridLineCountZ; i < m_segmentLineRepeaterZ->count(); i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterZ->objectAt(i));
-        linePosZ = m_controller->zGridPositionAt(k);
-        if (qIsNaN(linePosZ))
-            Q_ASSERT("Invalid Axis Type");
-        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        linePosZ = axisZ->gridPositionAt(k) * m_zScaleOffset + m_zTranslate;
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationZ);
         k++;
@@ -874,10 +845,7 @@ void QQuickDataVisItem::updateGrid()
     k = 0;
     for (int i = subGridLineCountZ; i < m_subsegmentLineRepeaterZ->count(); i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterZ->objectAt(i));
-        linePosZ = m_controller->zSubGridPositionAt(k);
-        if (qIsNaN(linePosZ))
-            Q_ASSERT("Invalid Axis Type");
-        linePosZ = linePosZ * m_zScaleOffset + m_zTranslate;
+        linePosZ = axisZ->subGridPositionAt(k) * m_zScaleOffset + m_zTranslate;
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationZ);
         k++;

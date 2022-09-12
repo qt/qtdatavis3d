@@ -1370,60 +1370,6 @@ QQuaternion Abstract3DController::calculateRotation(const QVector3D &rotation)
     return Utils::calculateRotation(rotation);
 }
 
-float Abstract3DController::xGridPositionAt(int gridLine)
-{
-    if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
-        QValue3DAxis *xAxis = static_cast<QValue3DAxis *>(m_axisX);
-        return xAxis->formatter()->gridPositions().at(gridLine);
-    }
-    return qQNaN();
-}
-
-float Abstract3DController::xSubGridPositionAt(int gridLine)
-{
-    if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
-        QValue3DAxis *xAxis = static_cast<QValue3DAxis *>(m_axisX);
-        return xAxis->formatter()->subGridPositions().at(gridLine);
-    }
-    return qQNaN();
-}
-
-float Abstract3DController::yGridPositionAt(int gridLine)
-{
-    if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
-        QValue3DAxis *yAxis = static_cast<QValue3DAxis *>(m_axisY);
-        return yAxis->formatter()->gridPositions().at(gridLine);
-    }
-    return qQNaN();
-}
-
-float Abstract3DController::ySubGridPositionAt(int gridLine)
-{
-    if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
-        QValue3DAxis *yAxis = static_cast<QValue3DAxis *>(m_axisY);
-        return yAxis->formatter()->subGridPositions().at(gridLine);
-    }
-    return qQNaN();
-}
-
-float Abstract3DController::zGridPositionAt(int gridLine)
-{
-    if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
-        QValue3DAxis *zAxis = static_cast<QValue3DAxis *>(m_axisZ);
-        return zAxis->formatter()->gridPositions().at(gridLine);
-    }
-    return qQNaN();
-}
-
-float Abstract3DController::zSubGridPositionAt(int gridLine)
-{
-    if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
-        QValue3DAxis *zAxis = static_cast<QValue3DAxis *>(m_axisZ);
-        return zAxis->formatter()->subGridPositions().at(gridLine);
-    }
-    return qQNaN();
-}
-
 void Abstract3DController::updateChangedSeriesList()
 {
     if (m_changedSeriesList.size())

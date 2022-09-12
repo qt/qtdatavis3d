@@ -40,6 +40,8 @@ public:
     bool reversed() const;
 
     void recalculate();
+    float gridPositionAt(int gridLine);
+    float subGridPositionAt(int gridLine);
 
 Q_SIGNALS:
     void segmentCountChanged(int count);
