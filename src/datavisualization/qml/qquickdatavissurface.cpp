@@ -3,11 +3,11 @@
 
 #include "qquickdatavissurface_p.h"
 #include <QtCore/QMutexLocker>
-#include <private/declarativescene_p.h>
 
-#include <private/declarativescene_p.h>
-#include <private/surface3dcontroller_p.h>
-#include <private/qsurface3dseries_p.h>
+#include "declarativescene_p.h"
+#include "surface3dcontroller_p.h"
+#include "qsurface3dseries_p.h"
+#include "utils_p.h"
 
 #include <QtQuick3D/private/qquick3drepeater_p.h>
 
@@ -181,7 +181,7 @@ void QQuickDataVisSurface::updateGrid()
     auto axisY = static_cast<QValue3DAxis *>(m_surfaceController->axisY());
     auto axisZ = static_cast<QValue3DAxis *>(m_surfaceController->axisZ());
 
-    auto lineFloorRotation = m_surfaceController->calculateRotation(QVector3D(0, -90, 0));
+    auto lineFloorRotation = Utils::calculateRotation(QVector3D(0, -90, 0));
     float linePosX = scaleX.x() / 2.0f;
     float linePosY = -scaleWithBackground().y() + 0.01f;
     float linePosZ = 0;
@@ -384,7 +384,7 @@ void QQuickDataVisSurface::updateLabels()
         zPos = scaleWithBackground().z() + labelMargin();
 
     auto scale = this->scale().x() * scaleWithBackground().x() + scaleOffset().x();
-    auto totalRotation = m_surfaceController->calculateRotation(labelRotation);
+    auto totalRotation = Utils::calculateRotation(labelRotation);
     auto labelTrans = QVector3D(0.0f, yPos, zPos);
     float labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisX->labels())));
@@ -450,7 +450,7 @@ void QQuickDataVisSurface::updateLabels()
     backLabelRotation.setX(-fractionCamY);
     sideLabelRotation.setX(-fractionCamY);
 
-    totalRotation = m_surfaceController->calculateRotation(sideLabelRotation);
+    totalRotation = Utils::calculateRotation(sideLabelRotation);
     scale = this->scale().y() * scaleWithBackground().y() + scaleOffset().y();
 
     labelsMaxWidth = 0;
@@ -556,7 +556,7 @@ void QQuickDataVisSurface::updateLabels()
         else
             yPos = scaleWithBackground().y();
     }
-    totalRotation = m_surfaceController->calculateRotation(labelRotation);
+    totalRotation = Utils::calculateRotation(labelRotation);
     labelTrans = QVector3D(xPos, yPos, 0);
 
     scale = -this->scale().z() * scaleWithBackground().z() - scaleOffset().z();
@@ -580,7 +580,7 @@ void QQuickDataVisSurface::updateLabels()
     }
 
     labels = axisY->labels();
-    totalRotation = m_surfaceController->calculateRotation(backLabelRotation);
+    totalRotation = Utils::calculateRotation(backLabelRotation);
     scale = this->scale().y() * scaleWithBackground().y() + scaleOffset().y();
     labelsMaxWidth = 0;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisY->labels())));

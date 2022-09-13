@@ -344,8 +344,6 @@ public:
     void markSeriesItemLabelsDirty();
     bool isOpenGLES() const;
 
-    QQuaternion calculateRotation(const QVector3D &rotation);
-
     bool graphPositionQueryPending() const { return m_graphPositionQueryPending; }
     void setGraphPositionQueryPending(const bool &pending) { m_graphPositionQueryPending = pending; }
 

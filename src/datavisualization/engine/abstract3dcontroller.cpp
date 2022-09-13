@@ -1365,11 +1365,6 @@ bool Abstract3DController::isOpenGLES() const
     return Utils::isOpenGLES();
 }
 
-QQuaternion Abstract3DController::calculateRotation(const QVector3D &rotation)
-{
-    return Utils::calculateRotation(rotation);
-}
-
 void Abstract3DController::updateChangedSeriesList()
 {
     if (m_changedSeriesList.size())

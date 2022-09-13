@@ -5,7 +5,8 @@
 #include "declarativetheme_p.h"
 #include "declarativescene_p.h"
 
-#include <private/abstract3dcontroller_p.h>
+#include "abstract3dcontroller_p.h"
+#include "utils_p.h"
 
 #include <QtGui/QGuiApplication>
 
@@ -514,7 +515,7 @@ void QQuickDataVisItem::synchData()
         rotVec = QVector3D(m_rot.x(), m_rot.y(), m_rot.z());
     }
 
-    auto rotation = m_controller->calculateRotation(rotVec);
+    auto rotation = Utils::calculateRotation(rotVec);
     if (m_flipped.y()) {
         m_backgroundRotation->setRotation(/*xFlipRot **/ rotation);
     } else {
