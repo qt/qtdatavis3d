@@ -1,9 +1,29 @@
 # Copyright (C) 2022 The Qt Company Ltd.
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 
-qt_internal_add_module(DataVisualization
+set(qml_files
+    "qml/designer/Bars3DSpecifics.qml"
+    "qml/designer/Scatter3DSpecifics.qml"
+    "qml/designer/Surface3DSpecifics.qml"
+    "qml/designer/default/Bars3D.qml"
+    "qml/designer/default/Scatter3D.qml"
+    "qml/designer/default/Surface3D.qml"
+)
+
+set_source_files_properties(${qml_files} PROPERTIES
+    QT_QML_SKIP_QMLDIR_ENTRY TRUE
+)
+
+qt_internal_add_qml_module(DataVisualization
+    URI "QtDataVisualization"
     TARGET_PRODUCT "Qt Data Visualization (Qt $$QT_VERSION)"
     TARGET_DESCRIPTION "3D Data Visualization component for Qt."
+    VERSION "${PROJECT_VERSION}"
+    PAST_MAJOR_VERSIONS 1
+    DEPENDENCIES
+        QtQuick
+        QML_FILES
+            ${qml_files}
     SOURCES
         axis/qabstract3daxis.cpp axis/qabstract3daxis.h axis/qabstract3daxis_p.h
         axis/qcategory3daxis.cpp axis/qcategory3daxis.h axis/qcategory3daxis_p.h
@@ -80,6 +100,21 @@ qt_internal_add_module(DataVisualization
         utils/texturehelper.cpp utils/texturehelper_p.h
         utils/utils.cpp utils/utils_p.h
         utils/vertexindexer.cpp utils/vertexindexer_p.h
+        qml/abstractdeclarative.cpp qml/abstractdeclarative_p.h
+        qml/colorgradient.cpp qml/colorgradient_p.h
+        qml/declarativebars.cpp qml/declarativebars_p.h
+        qml/declarativecolor.cpp qml/declarativecolor_p.h
+        qml/declarativerendernode.cpp qml/declarativerendernode_p.h
+        qml/declarativescatter.cpp qml/declarativescatter_p.h
+        qml/declarativescene.cpp qml/declarativescene_p.h
+        qml/declarativeseries.cpp qml/declarativeseries_p.h
+        qml/declarativesurface.cpp qml/declarativesurface_p.h
+        qml/declarativetheme.cpp qml/declarativetheme_p.h
+        qml/enumtostringmap.cpp qml/enumtostringmap_p.h
+        qml/foreigntypes_p.h
+        qml/glstatestore.cpp qml/glstatestore_p.h
+        qml/qquickdatavisitem.cpp qml/qquickdatavisitem_p.h
+        qml/qquickdatavissurface.cpp qml/qquickdatavissurface_p.h
     INCLUDE_DIRECTORIES
         axis
         data
@@ -88,14 +123,83 @@ qt_internal_add_module(DataVisualization
         input
         theme
         utils
-        ../datavisualizationqml
+        qml
     PUBLIC_LIBRARIES
         Qt::Core
         Qt::Gui
         Qt::OpenGL
         Qt::Qml
         Qt::Quick
+        Qt::Quick3D
+        Qt::Quick3DPrivate
+        Qt::Quick3DRuntimeRenderPrivate
+    PRIVATE_MODULE_INTERFACE
+        Qt::Quick3DPrivate
+        Qt::Quick3DRuntimeRenderPrivate
     GENERATE_CPP_EXPORTS
+)
+
+set_source_files_properties("qml/resources/DatapointSphere.qml"
+    PROPERTIES QT_RESOURCE_ALIAS "DatapointSphere"
+)
+
+set_source_files_properties("qml/resources/DatapointCube.qml"
+    PROPERTIES QT_RESOURCE_ALIAS "DatapointCube"
+)
+
+set_source_files_properties("qml/resources/AxisLabel.qml"
+    PROPERTIES QT_RESOURCE_ALIAS "AxisLabel"
+)
+
+set_source_files_properties("qml/resources/GridLine.qml"
+    PROPERTIES QT_RESOURCE_ALIAS "GridLine"
+)
+
+set_source_files_properties("qml/resources/ItemLabel.qml"
+    PROPERTIES QT_RESOURCE_ALIAS "ItemLabel"
+)
+
+set_source_files_properties("qml/resources/RangeGradientMaterial.qml"
+    PROPERTIES QT_RESOURCE_ALIAS "RangeGradientMaterial"
+)
+set_source_files_properties("qml/resources/RangeGradientMaterialInstancing.qml"
+    PROPERTIES QT_RESOURCE_ALIAS "RangeGradientMaterialInstancing"
+)
+
+set(qml_files
+    "qml/designer/Bars3DSpecifics.qml"
+    "qml/designer/Scatter3DSpecifics.qml"
+    "qml/designer/Surface3DSpecifics.qml"
+    "qml/designer/default/Bars3D.qml"
+    "qml/designer/default/Scatter3D.qml"
+    "qml/designer/default/Surface3D.qml"
+)
+
+set(qml_component_resources
+    "qml/resources/DatapointSphere.qml"
+    "qml/resources/DatapointCube.qml"
+)
+
+set(qml_axis_resurces
+    "qml/resources/AxisLabel.qml"
+    "qml/resources/GridLine.qml"
+    "qml/resources/ItemLabel.qml"
+)
+
+set(qml_material_resources
+    "qml/resources/RangeGradientMaterial.qml"
+    "qml/resources/RangeGradientMaterialInstancing.qml"
+    "qml/resources/SurfaceShadowNoTex.qml"
+)
+
+set(resources
+    "qml/designer/qtdatavisualization.metainfo"
+    "qml/designer/images/bars3d-icon.png"
+    "qml/designer/images/bars3d-icon16.png"
+    "qml/designer/images/scatter3d-icon.png"
+    "qml/designer/images/scatter3d-icon16.png"
+    "qml/designer/images/surface3d-icon.png"
+    "qml/designer/images/surface3d-icon16.png"
 )
 
 set_source_files_properties("engine/meshes/arrowFlat.obj"
@@ -185,7 +289,126 @@ set_source_files_properties("engine/meshes/sphere.obj"
 set_source_files_properties("engine/meshes/sphereSmooth.obj"
     PROPERTIES QT_RESOURCE_ALIAS "sphereSmooth"
 )
+
+# .mesh file aliases
+set_source_files_properties("engine/meshes/arrowFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "arrowMesh"
+)
+set_source_files_properties("engine/meshes/arrowSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "arrowMeshSmooth"
+)
+set_source_files_properties("engine/meshes/background.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "backgroundMesh"
+)
+set_source_files_properties("engine/meshes/barFilledFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "BevelBarMeshFull"
+)
+set_source_files_properties("engine/meshes/barFilledSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "BevelBarMeshSmoothFull"
+)
+set_source_files_properties("engine/meshes/barFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "bevelBarMesh"
+)
+set_source_files_properties("engine/meshes/barSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "bevelBarMeshSmooth"
+)
+set_source_files_properties("engine/meshes/cubeFilledFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "barMeshFull"
+)
+set_source_files_properties("engine/meshes/cubeFilledSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "barMeshSmoothFull"
+)
+set_source_files_properties("engine/meshes/cubeFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "barMesh"
+)
+set_source_files_properties("engine/meshes/cubeSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "barMeshSmooth"
+)
+set_source_files_properties("engine/meshes/coneFilledFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "coneMeshFull"
+)
+set_source_files_properties("engine/meshes/coneFilledSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "coneMeshSmoothFull"
+)
+set_source_files_properties("engine/meshes/coneFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "coneMesh"
+)
+set_source_files_properties("engine/meshes/coneSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "coneMeshSmooth"
+)
+set_source_files_properties("engine/meshes/cylinderFilledFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "cylinderMeshFull"
+)
+set_source_files_properties("engine/meshes/cylinderFilledSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "cylinderMeshSmoothFull"
+)
+set_source_files_properties("engine/meshes/cylinderFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "cylinderMesh"
+)
+set_source_files_properties("engine/meshes/cylinderSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "cylinderMeshSmooth"
+)
+set_source_files_properties("engine/meshes/minimalFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "minimalMesh"
+)
+set_source_files_properties("engine/meshes/minimalSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "minimalMeshSmooth"
+)
+set_source_files_properties("engine/meshes/plane.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "planeMesh"
+)
+set_source_files_properties("engine/meshes/pyramidFilledFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "pyramidMeshFull"
+)
+set_source_files_properties("engine/meshes/pyramidFilledSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "pyramidMeshSmoothFull"
+)
+set_source_files_properties("engine/meshes/pyramidFlat.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "pyramidMesh"
+)
+set_source_files_properties("engine/meshes/pyramidSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "pyramidMeshSmooth"
+)
+set_source_files_properties("engine/meshes/sphere.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "sphereMesh"
+)
+set_source_files_properties("engine/meshes/sphereSmooth.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "sphereMeshSmooth"
+)
+
 set(mesh_resource_files
+    # .mesh files
+    "engine/meshes/background.mesh"
+    "engine/meshes/arrowFlat.mesh"
+    "engine/meshes/arrowSmooth.mesh"
+    "engine/meshes/barFilledFlat.mesh"
+    "engine/meshes/barFilledSmooth.mesh"
+    "engine/meshes/barFlat.mesh"
+    "engine/meshes/barSmooth.mesh"
+    "engine/meshes/coneFilledFlat.mesh"
+    "engine/meshes/coneFilledSmooth.mesh"
+    "engine/meshes/coneFlat.mesh"
+    "engine/meshes/coneSmooth.mesh"
+    "engine/meshes/cubeFilledFlat.mesh"
+    "engine/meshes/cubeFilledSmooth.mesh"
+    "engine/meshes/cubeFlat.mesh"
+    "engine/meshes/cubeSmooth.mesh"
+    "engine/meshes/cylinderFilledFlat.mesh"
+    "engine/meshes/cylinderFilledSmooth.mesh"
+    "engine/meshes/cylinderFlat.mesh"
+    "engine/meshes/cylinderSmooth.mesh"
+    "engine/meshes/minimalFlat.mesh"
+    "engine/meshes/minimalSmooth.mesh"
+    "engine/meshes/plane.mesh"
+    "engine/meshes/pyramidFilledFlat.mesh"
+    "engine/meshes/pyramidFilledSmooth.mesh"
+    "engine/meshes/pyramidFlat.mesh"
+    "engine/meshes/pyramidSmooth.mesh"
+    "engine/meshes/sphere.mesh"
+    "engine/meshes/sphereSmooth.mesh"
+)
+
+set(obj_resource_files
     "engine/meshes/arrowFlat.obj"
     "engine/meshes/arrowSmooth.obj"
     "engine/meshes/background.obj"
@@ -392,6 +615,34 @@ qt_internal_add_resource(DataVisualization "meshes"
         "engine/meshes"
     FILES
         ${mesh_resource_files}
+        ${obj_resource_files}
+)
+
+qt_internal_add_resource(DataVisualization "qml_component_resources"
+    PREFIX
+        "/datapointModels"
+    BASE
+        "qml"
+    FILES
+        ${qml_component_resources}
+)
+
+qt_internal_add_resource(DataVisualization "qml_axis_resurces"
+    PREFIX
+        "/axis"
+    BASE
+        "qml"
+    FILES
+        ${qml_axis_resurces}
+)
+
+qt_internal_add_resource(DataVisualization "qml_material_resources"
+    PREFIX
+        "/materials"
+    BASE
+        "qml"
+    FILES
+        ${qml_material_resources}
 )
 
 qt_internal_extend_target(DataVisualization CONDITION MACOS

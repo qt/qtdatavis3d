@@ -2,6 +2,3 @@
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 
 add_subdirectory(datavisualization)
-if(TARGET Qt::Quick)
-    add_subdirectory(datavisualizationqml)
-endif()
