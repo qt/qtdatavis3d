@@ -67,6 +67,7 @@ protected:
     void componentComplete() override;
     void updateGrid() override;
     void updateLabels() override;
+    void updateGraph() override;
 
 public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
@@ -81,9 +82,25 @@ Q_SIGNALS:
     Q_REVISION(1, 2) void flipHorizontalGridChanged(bool flip);
 
 private:
+    QVector3D getNormalizedVertex(const QSurfaceDataItem &data, bool polar, bool flipXZ);
+    void createSmoothNormalBodyLine(int &totalIndex, int column);
+    void createSmoothNormalUpperLine(int &totalIndex);
+    void createSmoothIndices(int x, int y, int endX, int endY);
+    void createSmoothGridlineIndices(int x, int y, int endX, int endY);
+
+    struct SurfaceVertex {
+        QVector3D position;
+        QVector3D normal;
+        QVector2D uv;
+    };
+
     QQuick3DModel *m_model = nullptr;
     QQuick3DModel *m_gridModel = nullptr;
     Surface3DController *m_surfaceController;
+
+    QVector<SurfaceVertex> m_vertices;
+    QVector<quint32> m_indices;
+    QVector<float> m_height;
 };
 
 QT_END_NAMESPACE

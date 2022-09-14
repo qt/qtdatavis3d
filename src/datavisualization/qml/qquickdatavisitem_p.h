@@ -346,6 +346,8 @@ protected:
 
     virtual void updateLabels() {}
 
+    virtual void updateGraph() {}
+
     QSharedPointer<QMutex> m_nodeMutex;
 
 private:

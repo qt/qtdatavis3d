@@ -676,6 +676,8 @@ void QQuickDataVisItem::synchData()
     }
 
     m_controller->updateChangedSeriesList();
+
+    updateGraph();
 }
 
 void QQuickDataVisItem::updateGrid()

@@ -52,6 +52,13 @@ public:
         QSurface3DSeries *series;
         int row;
     };
+    enum DataDimension {
+        BothAscending = 0,
+        XDescending = 1,
+        ZDescending = 2,
+        BothDescending = XDescending | ZDescending
+    };
+    Q_DECLARE_FLAGS(DataDimensions, DataDimension)
 
 private:
     Surface3DChangeBitField m_changeTracker;
@@ -64,6 +71,11 @@ private:
     QList<ChangeRow> m_changedRows;
     bool m_flipHorizontalGrid;
     QList<QSurface3DSeries *> m_changedTextures;
+    QSurface3DSeries* m_visibleSeries;
+
+    int m_columnCount;
+    int m_rowCount;
+    Surface3DController::DataDimensions m_dataDimensions;
 
 public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
@@ -77,6 +89,7 @@ public:
     void clearSelection() override;
 
     inline QSurface3DSeries *selectedSeries() const { return m_selectedSeries; }
+    inline QSurface3DSeries *visibleSeries() const { return m_visibleSeries; }
 
     void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) override;
@@ -96,6 +109,14 @@ public:
     bool flipHorizontalGrid() const;
 
     void updateSurfaceTexture(QSurface3DSeries *series);
+
+    void setRowCount(int count) { m_rowCount = count; }
+    int rowCount() { return m_rowCount; }
+    void setColumnCount(int count) { m_columnCount = count; }
+    int columnCount() { return m_columnCount; }
+
+    void setDataDimensions(DataDimensions dimension) { m_dataDimensions = dimension; }
+    DataDimensions dataDimensions() { return m_dataDimensions; }
 
 public Q_SLOTS:
     void handleArrayReset();
