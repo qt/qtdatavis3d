@@ -814,6 +814,30 @@ void QQuickDataVisSurface::updateGraph()
         material->setRoughness(0.3f);
         material->setSpecularAmount(0.6f);
         materialRef.append(material);
+
+        createSmoothGridlineIndices(0, 0, colLimit, rowLimit);
+
+        QQuick3DGeometry *gridGeometry = new QQuick3DGeometry();
+        gridGeometry->setVertexData(vertexBuffer);
+        gridGeometry->setStride(sizeof(SurfaceVertex));
+        QByteArray gridIndexBuffer(reinterpret_cast<char *>(m_gridIndices.data()), m_gridIndices.size() * sizeof(quint32));
+        gridGeometry->setIndexData(gridIndexBuffer);
+        gridGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
+        gridGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
+                                   0,
+                                   QQuick3DGeometry::Attribute::F32Type);
+        gridGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
+                                   0,
+                                   QQuick3DGeometry::Attribute::U32Type);
+        m_gridModel->setGeometry(gridGeometry);
+
+        // TODO :: create material regarding grid color value
+        QQmlListReference gridMaterialRef(m_gridModel, "materials");
+        QQuick3DPrincipledMaterial* gridMaterial = new QQuick3DPrincipledMaterial();
+        gridMaterial->setBaseColor(QColor::fromString("#000000"));
+        gridMaterial->setRoughness(0.3f);
+        gridMaterial->setSpecularAmount(0.6f);
+        gridMaterialRef.append(gridMaterial);
     }
 }
 
@@ -1011,6 +1035,39 @@ void QQuickDataVisSurface::createSmoothIndices(int x, int y, int endX, int endY)
                 m_indices.push_back(row + columnCount + j + 1);
                 m_indices.push_back(row + j + 1);
             }
+        }
+    }
+}
+
+void QQuickDataVisSurface::createSmoothGridlineIndices(int x, int y, int endX, int endY)
+{
+    int columnCount = m_surfaceController->columnCount();
+    int rowCount = m_surfaceController->rowCount();
+
+    if (endX >= columnCount)
+        endX = columnCount - 1;
+    if (endY >= rowCount)
+        endY = rowCount - 1;
+    if (x > endX)
+        x = endX - 1;
+    if (y > endY)
+        y = endY - 1;
+
+    int nColumns = endX - x + 1;
+    int nRows = endY - y + 1;
+
+    int m_gridIndexCount = 2 * nColumns * (nRows - 1) + 2 * nRows * (nColumns - 1);
+    m_gridIndices.resize(m_gridIndexCount);
+    for (int i = y, row = columnCount * y ; i <= endY ; i++, row += columnCount) {
+        for (int j = x ; j < endX ; j++) {
+            m_gridIndices.push_back(row + j);
+            m_gridIndices.push_back(row + j + 1);
+        }
+    }
+    for (int i = y, row = columnCount * y ; i < endY ; i++, row += columnCount) {
+        for (int j = x ; j <= endX ; j++) {
+            m_gridIndices.push_back(row + j);
+            m_gridIndices.push_back(row + j + columnCount);
         }
     }
 }

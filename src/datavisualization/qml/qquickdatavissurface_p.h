@@ -100,6 +100,7 @@ private:
 
     QVector<SurfaceVertex> m_vertices;
     QVector<quint32> m_indices;
+    QVector<quint32> m_gridIndices;
     QVector<float> m_height;
 };
 
