@@ -43,7 +43,7 @@ public:
     float gridPositionAt(int gridLine);
     float subGridPositionAt(int gridLine);
     float labelPositionAt(int index);
-    float positionAt(int x);
+    float positionAt(float x);
 
 Q_SIGNALS:
     void segmentCountChanged(int count);

@@ -270,7 +270,7 @@ float QValue3DAxis::labelPositionAt(int index)
     return formatter()->labelPositions().at(index);
 }
 
-float QValue3DAxis::positionAt(int x)
+float QValue3DAxis::positionAt(float x)
 {
     return formatter()->positionAt(x);
 }
