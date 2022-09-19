@@ -273,6 +273,9 @@ public:
     void changeGridLineColor(QQuick3DRepeater *repeater, const QColor &color);
     void updateTitleLabels();
 
+    QQuick3DNode *itemSelectionLabel() const;
+    void setItemSelectionLabel(QQuick3DNode *newItemSelectionLabel);
+
 public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
     virtual void handleAxisYChanged(QAbstract3DAxis *axis) = 0;
@@ -348,6 +351,8 @@ protected:
 
     virtual void updateGraph() {}
 
+    virtual void adjustAxisRanges() {}
+
     QSharedPointer<QMutex> m_nodeMutex;
 
 private:
@@ -365,6 +370,7 @@ private:
     QQuick3DNode *m_titleLabelZ = nullptr;
 
     QQuick3DNode *m_itemLabel = nullptr;
+    QQuick3DNode *m_itemSelectionLabel = nullptr;
 
     QQuick3DRepeater *m_segmentLineRepeaterX = nullptr;
     QQuick3DRepeater *m_subsegmentLineRepeaterX = nullptr;
@@ -410,6 +416,9 @@ private:
     void setUpLight();
     void graphPositionAt(const QPoint& point);
     void updateCamera();
+
+    friend class Scatter3DController;
+    friend class ScatterSeriesVisualizer;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::OptimizationHints)

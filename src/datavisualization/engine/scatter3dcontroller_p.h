@@ -119,6 +119,7 @@ protected:
 
 private:
 
+    friend class QQuickDataVisScatter;
     Q_DISABLE_COPY(Scatter3DController)
 };
 

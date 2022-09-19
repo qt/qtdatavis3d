@@ -115,6 +115,7 @@ public:
     void markItemLabelDirty();
     inline bool itemLabelDirty() const { return m_itemLabelDirty; }
     void setItemLabelVisible(bool visible);
+    bool isUsingGradient();
 
     QAbstract3DSeriesChangeBitField m_changeTracker;
     QAbstract3DSeriesThemeOverrideBitField m_themeTracker;

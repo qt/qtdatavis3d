@@ -143,7 +143,6 @@ void QQuickDataVisItem::componentComplete()
     m_backgroundRotation->setParent    (m_backgroundScale);
     m_backgroundRotation->setParentItem(m_backgroundScale);
 
-
     background->setObjectName("Background");
     background->setParent    (m_backgroundRotation);
     background->setParentItem(m_backgroundRotation);
@@ -811,7 +810,7 @@ void QQuickDataVisItem::updateGrid()
     }
     for (int i  = gridLineCountX; i < m_segmentLineRepeaterX->count(); i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_segmentLineRepeaterX->objectAt(i));
-        linePosZ = axisZ->gridPositionAt(k) * m_scaleOffset.z() + m_translate.z();
+        linePosX = axisX->gridPositionAt(k) * m_scaleOffset.z() + m_translate.z();
         positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationX);
         k++;
@@ -820,7 +819,7 @@ void QQuickDataVisItem::updateGrid()
     k = 0;
     for (int i = subGridLineCountX; i < m_subsegmentLineRepeaterX->count(); i++) {
         auto lineNode = static_cast<QQuick3DNode *>(m_subsegmentLineRepeaterX->objectAt(i));
-        linePosZ = axisZ->subGridPositionAt(k) * m_scaleOffset.z() + m_translate.z();
+        linePosX = axisX->subGridPositionAt(k) * m_scaleOffset.z() + m_translate.z();
         positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationX);
         k++;
@@ -845,6 +844,16 @@ void QQuickDataVisItem::updateGrid()
         lineNode->setEulerRotation(lineFloorRotationZ);
         k++;
     }
+}
+
+QQuick3DNode *QQuickDataVisItem::itemSelectionLabel() const
+{
+    return m_itemSelectionLabel;
+}
+
+void QQuickDataVisItem::setItemSelectionLabel(QQuick3DNode *newItemSelectionLabel)
+{
+    m_itemSelectionLabel = newItemSelectionLabel;
 }
 
 void QQuickDataVisItem::positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position)

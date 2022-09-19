@@ -60,10 +60,13 @@ qt_internal_add_qml_module(DataVisualization
         engine/abstractdeclarativeinterface.cpp engine/abstractdeclarativeinterface_p.h
         engine/abstract3dcontroller.cpp engine/abstract3dcontroller_p.h
         engine/abstract3drenderer.cpp engine/abstract3drenderer_p.h
+        engine/axishelper.cpp engine/axishelper_p.h
         engine/axisrendercache.cpp engine/axisrendercache_p.h
         engine/bars3dcontroller.cpp engine/bars3dcontroller_p.h
         engine/bars3drenderer.cpp engine/bars3drenderer_p.h
         engine/barseriesrendercache.cpp engine/barseriesrendercache_p.h
+        engine/datavisquick3dinstancing.cpp engine/datavisquick3dinstancing_p.h
+        engine/datavisquick3dtexturedata.cpp engine/datavisquick3dtexturedata.cpp
         engine/drawer.cpp engine/drawer_p.h
         engine/q3dbars.cpp engine/q3dbars.h engine/q3dbars_p.h
         engine/q3dcamera.cpp engine/q3dcamera.h engine/q3dcamera_p.h
@@ -115,6 +118,8 @@ qt_internal_add_qml_module(DataVisualization
         qml/glstatestore.cpp qml/glstatestore_p.h
         qml/qquickdatavisitem.cpp qml/qquickdatavisitem_p.h
         qml/qquickdatavissurface.cpp qml/qquickdatavissurface_p.h
+        qml/qquickdatavisscatter.cpp qml/qquickdatavisscatter_p.h
+        qml/scatterseriesvisualizer.cpp qml/scatterseriesvisualizer_p.h
     INCLUDE_DIRECTORIES
         axis
         data

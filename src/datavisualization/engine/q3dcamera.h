@@ -106,9 +106,11 @@ private:
     friend class Bars3DRenderer;
     friend class Surface3DRenderer;
     friend class Scatter3DRenderer;
+    friend class Scatter3DController;
     friend class SelectionPointer;
     friend class Q3DInputHandler;
     friend class QTouch3DInputHandlerPrivate;
+    friend class QQuickDataVisScatter;
 };
 
 QT_END_NAMESPACE

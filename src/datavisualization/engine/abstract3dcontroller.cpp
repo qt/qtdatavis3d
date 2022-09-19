@@ -1,10 +1,11 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "abstractdeclarative_p.h"
+#include "qquickdatavisitem_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
+#include "abstractdeclarativeinterface_p.h"
 #include "abstract3drenderer_p.h"
 #include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
@@ -52,6 +53,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_selectedCustomItemIndex(-1),
     m_margin(-1.0)
 {
+    qDebug()<<__func__;
     if (!m_scene)
         m_scene = new Q3DScene;
     m_scene->setParent(this);

@@ -877,4 +877,9 @@ void QAbstract3DSeriesPrivate::setItemLabelVisible(bool visible)
     m_changeTracker.itemLabelVisibilityChanged = true;
 }
 
+bool QAbstract3DSeriesPrivate::isUsingGradient()
+{
+    return m_colorStyle != Q3DTheme::ColorStyleUniform ? true : false;
+}
+
 QT_END_NAMESPACE

@@ -64,6 +64,7 @@ private:
     Q_DISABLE_COPY(QScatterDataProxy)
 
     friend class Scatter3DController;
+    friend class QQuickDataVisScatter;
 };
 
 QT_END_NAMESPACE
