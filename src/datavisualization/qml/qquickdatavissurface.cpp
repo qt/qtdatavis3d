@@ -663,6 +663,9 @@ inline static int binarySearchArray(const QSurfaceDataArray &array, int maxIndex
 
 void QQuickDataVisSurface::updateGraph()
 {
+    m_gridModel->setVisible(m_surfaceController->visibleSeries()->drawMode().testFlag(QSurface3DSeries::DrawWireframe));
+    m_model->setVisible(m_surfaceController->visibleSeries()->drawMode().testFlag(QSurface3DSeries::DrawSurface));
+
     const QSurfaceDataArray &array = *(m_surfaceController->visibleSeries()->dataProxy())->array();
 
     // calculateSampleRect
