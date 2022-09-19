@@ -1008,6 +1008,7 @@ void QQuickDataVisSurface::createSmoothIndices(int x, int y, int endX, int endY)
 
     int indexCount = 6 * (endX - x) * (endY - y);
     m_indices.resize(indexCount);
+    m_indices.clear();
 
     int rowEnd = endY * columnCount;
     for (int row = y * columnCount ; row < rowEnd ; row += columnCount) {
@@ -1061,6 +1062,8 @@ void QQuickDataVisSurface::createSmoothGridlineIndices(int x, int y, int endX, i
 
     int m_gridIndexCount = 2 * nColumns * (nRows - 1) + 2 * nRows * (nColumns - 1);
     m_gridIndices.resize(m_gridIndexCount);
+    m_gridIndices.clear();
+
     for (int i = y, row = columnCount * y ; i <= endY ; i++, row += columnCount) {
         for (int j = x ; j < endX ; j++) {
             m_gridIndices.push_back(row + j);
