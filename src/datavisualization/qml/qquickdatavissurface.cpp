@@ -886,50 +886,58 @@ void QQuickDataVisSurface::createSmoothNormalBodyLine(int &totalIndex, int colum
     if (dataDimensions == Surface3DController::BothAscending) {
         int end = colLimit + column;
         for (int j = column ; j < end ; j++) {
-            SurfaceVertex vertex = m_vertices.at(totalIndex++);
+            SurfaceVertex vertex = m_vertices.at(totalIndex);
             vertex.normal = normal(m_vertices.at(j).position,
                                    m_vertices.at(j + 1).position,
                                    m_vertices.at(j + columnCount).position);
+            m_vertices.replace(totalIndex++, vertex);
         }
-        SurfaceVertex vertex = m_vertices.at(totalIndex++);
+        SurfaceVertex vertex = m_vertices.at(totalIndex);
         vertex.normal = normal(m_vertices.at(end).position,
                                m_vertices.at(end + columnCount).position,
                                m_vertices.at(end - 1).position);
+        m_vertices.replace(totalIndex++, vertex);
     } else if (dataDimensions == Surface3DController::XDescending) {
-        SurfaceVertex vertex = m_vertices.at(totalIndex++);
+        SurfaceVertex vertex = m_vertices.at(totalIndex);
         vertex.normal = normal(m_vertices.at(column).position,
                                m_vertices.at(column + columnCount).position,
                                m_vertices.at(column + 1).position);
+        m_vertices.replace(totalIndex++, vertex);
         int end = column + columnCount;
         for (int j = column + 1 ; j < end ; j++) {
-            SurfaceVertex vertex = m_vertices.at(totalIndex++);
+            SurfaceVertex vertex = m_vertices.at(totalIndex);
             vertex.normal = normal(m_vertices.at(j).position,
                                    m_vertices.at(j - 1).position,
                                    m_vertices.at(j + columnCount).position);
+            m_vertices.replace(totalIndex++, vertex);
         }
     } else if (dataDimensions == Surface3DController::ZDescending) {
         int end = colLimit + column;
         for (int j = column; j < end ; j++) {
-            SurfaceVertex vertex = m_vertices.at(totalIndex++);
+            SurfaceVertex vertex = m_vertices.at(totalIndex);
             vertex.normal = normal(m_vertices.at(j).position,
                                    m_vertices.at(j + 1).position,
                                    m_vertices.at(j - columnCount).position);
+            m_vertices.replace(totalIndex++, vertex);
         }
-        SurfaceVertex vertex = m_vertices.at(totalIndex++);
+        SurfaceVertex vertex = m_vertices.at(totalIndex);
         vertex.normal = normal(m_vertices.at(end).position,
                                m_vertices.at(end - columnCount).position,
                                m_vertices.at(end - 1).position);
+        m_vertices.replace(totalIndex++, vertex);
     } else {
-        SurfaceVertex vertex = m_vertices.at(totalIndex++);
+        SurfaceVertex vertex = m_vertices.at(totalIndex);
         vertex.normal = normal(m_vertices.at(column).position,
                                m_vertices.at(column - columnCount).position,
                                m_vertices.at(column + 1).position);
+        m_vertices.replace(totalIndex++, vertex);
         int end = column + columnCount;
         for (int j = 0 ; j < end ; j++) {
-            SurfaceVertex vertex = m_vertices.at(totalIndex++);
+            SurfaceVertex vertex = m_vertices.at(totalIndex);
             vertex.normal = normal(m_vertices.at(j).position,
                                    m_vertices.at(j-1).position,
                                    m_vertices.at(j - columnCount).position);
+            m_vertices.replace(totalIndex++, vertex);
         }
     }
 }
@@ -943,50 +951,58 @@ void QQuickDataVisSurface::createSmoothNormalUpperLine(int &totalIndex)
     if (dataDimensions == Surface3DController::BothAscending) {
         int lineEnd = rowCount * columnCount - 1;
         for (int j = (rowCount - 1) * columnCount; j < lineEnd; j++) {
-            SurfaceVertex vertex = m_vertices.at(totalIndex++);
+            SurfaceVertex vertex = m_vertices.at(totalIndex);
             vertex.normal = normal(m_vertices.at(j).position,
                                    m_vertices.at(j - columnCount).position,
                                    m_vertices.at(j + 1).position);
+            m_vertices.replace(totalIndex++, vertex);
         }
-        SurfaceVertex vertex = m_vertices.at(totalIndex++);
+        SurfaceVertex vertex = m_vertices.at(totalIndex);
         vertex.normal = normal(m_vertices.at(lineEnd).position,
                                m_vertices.at(lineEnd - 1).position,
                                m_vertices.at(lineEnd - columnCount).position);
+        m_vertices.replace(totalIndex++, vertex);
     } else if (dataDimensions == Surface3DController::XDescending) {
         int lineStart = (rowCount - 1) * columnCount;
         int lineEnd = rowCount * columnCount;
-        SurfaceVertex vertex = m_vertices.at(totalIndex++);
+        SurfaceVertex vertex = m_vertices.at(totalIndex);
         vertex.normal = normal(m_vertices.at(lineStart).position,
                                m_vertices.at(lineStart + 1).position,
                                m_vertices.at(lineStart - columnCount).position);
+        m_vertices.replace(totalIndex++, vertex);
         for (int j = lineStart + 1; j < lineEnd; j++) {
-            SurfaceVertex vertex = m_vertices.at(totalIndex++);
+            SurfaceVertex vertex = m_vertices.at(totalIndex);
             vertex.normal = normal(m_vertices.at(j).position,
                                    m_vertices.at(j - columnCount).position,
                                    m_vertices.at(j - 1).position);
+            m_vertices.replace(totalIndex++, vertex);
         }
     } else if (dataDimensions == Surface3DController::ZDescending) {
         int colLimit = columnCount - 1;
         for (int j = 0; j < colLimit; j++) {
-            SurfaceVertex vertex = m_vertices.at(totalIndex++);
+            SurfaceVertex vertex = m_vertices.at(totalIndex);
             vertex.normal = normal(m_vertices.at(j).position,
                                    m_vertices.at(j + columnCount).position,
                                    m_vertices.at(j + 1).position);
+            m_vertices.replace(totalIndex++, vertex);
         }
-        SurfaceVertex vertex = m_vertices.at(totalIndex++);
+        SurfaceVertex vertex = m_vertices.at(totalIndex);
         vertex.normal = normal(m_vertices.at(colLimit).position,
                                m_vertices.at(colLimit - 1).position,
                                m_vertices.at(colLimit + columnCount).position);
+        m_vertices.replace(totalIndex++, vertex);
     } else { // BothDescending
-        SurfaceVertex vertex = m_vertices.at(totalIndex++);
+        SurfaceVertex vertex = m_vertices.at(totalIndex);
         vertex.normal = normal(m_vertices.at(0).position,
                                m_vertices.at(1).position,
                                m_vertices.at(columnCount).position);
+        m_vertices.replace(totalIndex++, vertex);
         for (int j = 1; j < columnCount; j++) {
-            SurfaceVertex vertex = m_vertices.at(totalIndex++);
+            SurfaceVertex vertex = m_vertices.at(totalIndex);
             vertex.normal = normal(m_vertices.at(j).position,
                                    m_vertices.at(j + columnCount).position,
                                    m_vertices.at(j - 1).position);
+            m_vertices.replace(totalIndex++, vertex);
         }
     }
 }
