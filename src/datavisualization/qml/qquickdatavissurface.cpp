@@ -782,9 +782,8 @@ void QQuickDataVisSurface::updateGraph()
         }
         else {
             createSmoothNormalUpperLine(totalIndex);
-            for (int row = 1 ; row < rowCount ; row++) {
+            for (int row = 1 ; row < rowCount ; row++)
                 createSmoothNormalBodyLine(totalIndex, row * columnCount);
-            }
         }
 
         createSmoothIndices(0, 0, colLimit, rowLimit);
@@ -812,11 +811,62 @@ void QQuickDataVisSurface::updateGraph()
 
         // TODO :: create material regarding height value
         QQmlListReference materialRef(m_model, "materials");
-        QQuick3DPrincipledMaterial* material = new QQuick3DPrincipledMaterial();
-        material->setBaseColor(QColor::fromString("#ffffff"));
-        material->setRoughness(0.3f);
-        material->setSpecularAmount(0.6f);
-        materialRef.append(material);
+        QQuick3DPrincipledMaterial *material;
+        if (materialRef.size() > 0)
+            material = static_cast<QQuick3DPrincipledMaterial *>(materialRef.at(0));
+        else
+            material = new QQuick3DPrincipledMaterial();
+        auto axisY = m_surfaceController->axisY();
+        maxY = axisY->max();
+        minY = axisY->min();
+        QQuick3DTextureData *textureData = new QQuick3DTextureData();
+        textureData->setSize(QSize(rowCount, columnCount));
+        textureData->setFormat(QQuick3DTextureData::RGBA8);
+        QByteArray imageData;
+        imageData.resize(m_height.size() * 4);
+        QLinearGradient gradient = m_surfaceController->visibleSeries()->baseGradient();
+        auto stops = gradient.stops();
+        for (int i = 0; i < m_height.size(); i++) {
+            float height = m_height.at(i);
+            float normalizedHeight = (height - minY) / (maxY - minY);
+            for (int j = 0; j < stops.size(); j++) {
+                QColor color;
+                if (normalizedHeight < stops.at(j).first) {
+                    float normalLowerBound = stops.at(j - 1).first;
+                    float normalUpperBound = stops.at(j).first;
+                    normalizedHeight = (normalizedHeight - normalLowerBound) / (normalUpperBound - normalLowerBound);
+                    QColor start = stops.at(j - 1).second;
+                    QColor end = stops.at(j).second;
+                    float red = start.redF() + ((end.redF() - start.redF()) * normalizedHeight);
+                    float green = start.greenF() + ((end.greenF() - start.greenF()) * normalizedHeight);
+                    float blue = start.blueF() + ((end.blueF() - start.blueF()) * normalizedHeight);
+                    color.setRedF(red);
+                    color.setGreenF(green);
+                    color.setBlueF(blue);
+                    imageData.data()[i * 4 + 0] = char(color.red());
+                    imageData.data()[i * 4 + 1] = char(color.green());
+                    imageData.data()[i * 4 + 2] = char(color.blue());
+                    imageData.data()[i * 4 + 3] = char(color.alpha());
+                    break;
+                }
+                else if (normalizedHeight == stops.at(j).first) {
+                    color = stops.at(j).second;
+                    imageData.data()[i * 4 + 0] = char(color.red());
+                    imageData.data()[i * 4 + 1] = char(color.green());
+                    imageData.data()[i * 4 + 2] = char(color.blue());
+                    imageData.data()[i * 4 + 3] = char(color.alpha());
+                    break;
+                }
+            }
+        }
+        textureData->setTextureData(imageData);
+        QQuick3DTexture *texture = new QQuick3DTexture();
+        texture->setTextureData(textureData);
+        material->setBaseColorMap(texture);
+        if (materialRef.size() > 0)
+            materialRef.replace(0, material);
+        else
+            materialRef.append(material);
 
         createSmoothGridlineIndices(0, 0, colLimit, rowLimit);
 
@@ -861,7 +911,7 @@ QVector3D QQuickDataVisSurface::getNormalizedVertex(const QSurfaceDataItem &data
     normalizedX = axisX->positionAt(data.x()) * scale - translate;
     scale = this->scale().y() * scaleWithBackground().y() + scaleOffset().y();
     translate = scaleOffset().y();
-    m_height.push_back(axisY->positionAt(data.y()));
+    m_height.push_back(data.y());
     normalizedY = axisY->positionAt(data.y()) * scale - translate;
     scale = this->scale().z() * scaleWithBackground().z() + scaleOffset().z();
     translate = scaleOffset().z();
