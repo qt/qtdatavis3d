@@ -830,27 +830,24 @@ void QQuickDataVisSurface::updateGraph()
             float height = m_height.at(i);
             float normalizedHeight = (height - minY) / (maxY - minY);
             for (int j = 0; j < stops.size(); j++) {
-                QColor color;
-                if (normalizedHeight < stops.at(j).first) {
-                    float normalLowerBound = stops.at(j - 1).first;
-                    float normalUpperBound = stops.at(j).first;
-                    normalizedHeight = (normalizedHeight - normalLowerBound) / (normalUpperBound - normalLowerBound);
-                    QColor start = stops.at(j - 1).second;
-                    QColor end = stops.at(j).second;
-                    float red = start.redF() + ((end.redF() - start.redF()) * normalizedHeight);
-                    float green = start.greenF() + ((end.greenF() - start.greenF()) * normalizedHeight);
-                    float blue = start.blueF() + ((end.blueF() - start.blueF()) * normalizedHeight);
-                    color.setRedF(red);
-                    color.setGreenF(green);
-                    color.setBlueF(blue);
-                    imageData.data()[i * 4 + 0] = char(color.red());
-                    imageData.data()[i * 4 + 1] = char(color.green());
-                    imageData.data()[i * 4 + 2] = char(color.blue());
-                    imageData.data()[i * 4 + 3] = char(color.alpha());
-                    break;
-                }
-                else if (normalizedHeight == stops.at(j).first) {
-                    color = stops.at(j).second;
+                if (normalizedHeight < stops.at(j).first ||
+                        (normalizedHeight >= (float)stops.at(j).first && j == stops.size() - 1)) {
+                    QColor color;
+                    if (j == 0 || normalizedHeight >= (float)stops.at(j).first) {
+                        color = stops.at(j).second;
+                    } else {
+                        float normalLowerBound = stops.at(j - 1).first;
+                        float normalUpperBound = stops.at(j).first;
+                        normalizedHeight = (normalizedHeight - normalLowerBound) / (normalUpperBound - normalLowerBound);
+                        QColor start = stops.at(j - 1).second;
+                        QColor end = stops.at(j).second;
+                        float red = start.redF() + ((end.redF() - start.redF()) * normalizedHeight);
+                        float green = start.greenF() + ((end.greenF() - start.greenF()) * normalizedHeight);
+                        float blue = start.blueF() + ((end.blueF() - start.blueF()) * normalizedHeight);
+                        color.setRedF(red);
+                        color.setGreenF(green);
+                        color.setBlueF(blue);
+                    }
                     imageData.data()[i * 4 + 0] = char(color.red());
                     imageData.data()[i * 4 + 1] = char(color.green());
                     imageData.data()[i * 4 + 2] = char(color.blue());
