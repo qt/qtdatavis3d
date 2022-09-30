@@ -484,34 +484,25 @@ void QQuickDataVisItem::synchData()
     m_flipped.setZ(forward.z() >= 0);
 
     QMatrix4x4 modelMatrix;
-    QVector3D bgScale;
-    if (!m_flipScales)
-        bgScale = QVector3D(m_scaleWithBackground.x(), m_scaleWithBackground.y(), m_scaleWithBackground.z());
-    else
-        bgScale = QVector3D(m_scaleWithBackground.z(), m_scaleWithBackground.y(), m_scaleWithBackground.x());
-    m_backgroundScale->setScale(bgScale);
+    m_backgroundScale->setScale(m_scaleWithBackground);
 
     QVector3D rotVec;
-    if (!m_manualRotation) {
-        if (!m_flipped.y()) {
-            rotVec = QVector3D(0, 270, 0);
-            if (m_flipped.x() && m_flipped.z())
-                rotVec.setY(90);
-            else if (!m_flipped.x() && m_flipped.z())
-                rotVec.setY(0);
-            else if (m_flipped.x() && !m_flipped.z())
-                rotVec.setY(180);
-        } else {
-            rotVec = QVector3D(0, 180, 180);
-            if (m_flipped.x() && m_flipped.z())
-                rotVec.setY(0);
-            else if (!m_flipped.x() && m_flipped.z())
-                rotVec.setY(270);
-            else if (m_flipped.x() && !m_flipped.z())
-                rotVec.setY(90);
-        }
+    if (!m_flipped.y()) {
+        rotVec = QVector3D(0, 270, 0);
+        if (m_flipped.x() && m_flipped.z())
+            rotVec.setY(90);
+        else if (!m_flipped.x() && m_flipped.z())
+            rotVec.setY(0);
+        else if (m_flipped.x() && !m_flipped.z())
+            rotVec.setY(180);
     } else {
-        rotVec = QVector3D(m_rot.x(), m_rot.y(), m_rot.z());
+        rotVec = QVector3D(0, 180, 180);
+        if (m_flipped.x() && m_flipped.z())
+            rotVec.setY(0);
+        else if (!m_flipped.x() && m_flipped.z())
+            rotVec.setY(270);
+        else if (m_flipped.x() && !m_flipped.z())
+            rotVec.setY(90);
     }
 
     auto rotation = Utils::calculateRotation(rotVec);

@@ -390,11 +390,7 @@ private:
 
     QVector3D m_flipped = QVector3D(false, false, false);
 
-    bool m_flipScales;
-
     QVector3D m_scaleWithBackground = QVector3D(1.0f, 1.0f, 1.0f);
-
-    bool m_manualRotation;
 
     QVector3D m_rot = QVector3D(1.0f, 1.0f, 1.0f);
 
