@@ -18,8 +18,6 @@
 
 QT_BEGIN_NAMESPACE
 
-static const int insertRemoveRecordReserveSize = 31;
-
 QQuickDataVisScatter::QQuickDataVisScatter(QQuickItem *parent)
     : QQuickDataVisItem(parent),
       m_scatterController(0)
@@ -131,7 +129,7 @@ QQmlListProperty<QScatter3DSeries> QQuickDataVisScatter::seriesList()
 }
 
 void QQuickDataVisScatter::appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list,
-                                          QScatter3DSeries *series)
+                                            QScatter3DSeries *series)
 {
     reinterpret_cast<QQuickDataVisScatter *>(list->data)->addSeries(series);
 }
@@ -142,7 +140,7 @@ qsizetype QQuickDataVisScatter::countSeriesFunc(QQmlListProperty<QScatter3DSerie
 }
 
 QScatter3DSeries *QQuickDataVisScatter::atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list,
-                                                   qsizetype index)
+                                                     qsizetype index)
 {
     return reinterpret_cast<QQuickDataVisScatter *>(list->data)->m_scatterController->scatterSeriesList().at(index);
 }
@@ -161,14 +159,13 @@ void QQuickDataVisScatter::addSeries(QScatter3DSeries *series)
     m_scatterController->addSeries(series);
     auto visualizer = new ScatterSeriesVisualizer();
     visualizer->m_controller = m_scatterController;
+    visualizer->m_qml = this;
     visualizer->setup();
     visualizer->connectSeries(series);
     visualizer->m_helperAxisX = &m_helperAxisX;
     visualizer->m_helperAxisY = &m_helperAxisY;
     visualizer->m_helperAxisZ = &m_helperAxisZ;
     setVisualizerForSeries(series, visualizer);
-    if (isReady())
-        visualizer->generatePoints(series->dataProxy()->itemCount());
 
     if (series->selectedItem() != invalidSelectionIndex())
         setSelectedItem(series->selectedItem(), series);
@@ -193,131 +190,6 @@ void QQuickDataVisScatter::handleAxisYChanged(QAbstract3DAxis *axis)
 void QQuickDataVisScatter::handleAxisZChanged(QAbstract3DAxis *axis)
 {
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
-}
-
-void QQuickDataVisScatter::handleArrayReset()
-{
-    QScatter3DSeries *series;
-    if (qobject_cast<QScatterDataProxy *>(sender()))
-        series = static_cast<QScatterDataProxy *>(sender())->series();
-    else
-        series = static_cast<QScatter3DSeries *>(sender());
-
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_scatterController->m_isDataDirty = true;
-    }
-    auto visualizer = visualizerForSeries(series);
-
-    if (visualizer) {
-        visualizer->dummiesCreated = false;
-        visualizer->generatePoints(series->dataProxy()->itemCount());
-    }
-
-    if (!m_scatterController->m_changedSeriesList.contains(series))
-        m_scatterController->m_changedSeriesList.append(series);
-    setSelectedItem(m_selectedItem, m_selectedItemSeries);
-    series->d_ptr->markItemLabelDirty();
-}
-
-void QQuickDataVisScatter::handleItemsAdded(int startIndex, int count)
-{
-    Q_UNUSED(startIndex)
-    Q_UNUSED(count)
-    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_scatterController->m_isDataDirty = true;
-    }
-    if (!m_scatterController->m_changedSeriesList.contains(series))
-        m_scatterController->m_changedSeriesList.append(series);
-}
-
-void QQuickDataVisScatter::handleItemsChanged(int startIndex, int count)
-{
-    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
-    int oldChangeCount = m_scatterController->m_changedItems.size();
-    if (!oldChangeCount)
-        m_scatterController->m_changedItems.reserve(count);
-
-    for (int i = 0; i < count; i++) {
-        bool newItem = true;
-        int candidate = startIndex + i;
-        for (int j = 0; j < oldChangeCount; j++) {
-            const Scatter3DController::ChangeItem &oldChangeItem = m_scatterController->m_changedItems.at(j);
-            if (oldChangeItem.index == candidate && series == oldChangeItem.series) {
-                newItem = false;
-                break;
-            }
-        }
-        if (newItem) {
-            Scatter3DController::ChangeItem newChangeItem = {series, candidate};
-            m_scatterController->m_changedItems.append(newChangeItem);
-            if (series == m_selectedItemSeries && m_selectedItem == candidate)
-                series->d_ptr->markItemLabelDirty();
-        }
-    }
-
-    if (count) {
-        m_scatterController->m_changeTracker.itemChanged = true;
-        if (series->isVisible())
-            adjustAxisRanges();
-        m_scatterController->emitNeedRender();
-    }
-}
-
-void QQuickDataVisScatter::handleItemsRemoved(int startIndex, int count)
-{
-    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
-    if (series == m_selectedItemSeries) {
-        // If items removed from selected series before the selection, adjust the selection
-        int selectedItem = m_selectedItem;
-        if (startIndex <= selectedItem) {
-            if ((startIndex + count) > selectedItem)
-                selectedItem = -1; // Selected item removed
-            else
-                selectedItem -= count; // Move selected item down by amount of item removed
-
-            setSelectedItem(selectedItem, m_selectedItemSeries);
-        }
-    }
-
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_scatterController->m_isDataDirty = true;
-    }
-    if (!m_scatterController->m_changedSeriesList.contains(series))
-        m_scatterController->m_changedSeriesList.append(series);
-
-    if (m_scatterController->m_recordInsertsAndRemoves) {
-        Scatter3DController::InsertRemoveRecord record(false, startIndex, count, series);
-        m_scatterController->m_insertRemoveRecords.append(record);
-    }
-}
-
-void QQuickDataVisScatter::handleItemsInserted(int startIndex, int count)
-{
-    QScatter3DSeries *series = static_cast<QScatterDataProxy *>(sender())->series();
-    if (series == m_selectedItemSeries) {
-        // If items inserted to selected series before the selection, adjust the selection
-        int selectedItem = m_selectedItem;
-        if (startIndex <= selectedItem) {
-            selectedItem += count;
-            setSelectedItem(selectedItem, m_selectedItemSeries);
-        }
-    }
-
-    if (series->isVisible()) {
-        adjustAxisRanges();
-        m_scatterController->m_isDataDirty = true;
-    }
-    if (!m_scatterController->m_changedSeriesList.contains(series))
-        m_scatterController->m_changedSeriesList.append(series);
-
-    if (m_scatterController->m_recordInsertsAndRemoves) {
-        Scatter3DController::InsertRemoveRecord record(true, startIndex, count, series);
-        m_scatterController->m_insertRemoveRecords.append(record);
-    }
 }
 
 QQmlComponent *QQuickDataVisScatter::createRepeaterDelegate(QAbstract3DSeries::Mesh meshType)
@@ -348,41 +220,43 @@ void QQuickDataVisScatter::calculateSceneScalingFactors()
     float horizontalAspectRatio;
     horizontalAspectRatio = m_graphHorizontalAspectRatio;
 
-   QSizeF areaSize;
-   auto *axisX = static_cast<QValue3DAxis *>(m_scatterController->axisX());
-   auto *axisZ = static_cast<QValue3DAxis *>(m_scatterController->axisZ());
+    QSizeF areaSize;
+    auto *axisX = static_cast<QValue3DAxis *>(m_scatterController->axisX());
+    auto *axisZ = static_cast<QValue3DAxis *>(m_scatterController->axisZ());
 
-   if (horizontalAspectRatio == 0.0f) {
-       areaSize.setHeight(axisZ->max() - axisZ->min());
-       areaSize.setWidth(axisX->max() - axisX->min());
-   } else {
-       areaSize.setHeight(1.0f);
-       areaSize.setWidth(horizontalAspectRatio);
-   }
+    if (horizontalAspectRatio == 0.0f) {
+        areaSize.setHeight(axisZ->max() - axisZ->min());
+        areaSize.setWidth(axisX->max() - axisX->min());
+    } else {
+        areaSize.setHeight(1.0f);
+        areaSize.setWidth(horizontalAspectRatio);
+    }
 
-   float horizontalMaxDimension;
+    float horizontalMaxDimension;
 
-   if (m_graphAspectRatio > 2.0f) {
+    if (m_graphAspectRatio > 2.0f) {
         horizontalMaxDimension = 2.0f;
         m_scaleY = 2.0f / m_graphAspectRatio;
-   } else {
-       horizontalMaxDimension = m_graphAspectRatio;
-       m_scaleY = 1.0f;
-   }
-   float scaleFactor = qMax(areaSize.width(), areaSize.height());
-   m_scaleX = horizontalMaxDimension * areaSize.width() / scaleFactor;
-   m_scaleZ = horizontalMaxDimension * areaSize.height() / scaleFactor;
+    } else {
+        horizontalMaxDimension = m_graphAspectRatio;
+        m_scaleY = 1.0f;
+    }
+    float scaleFactor = qMax(areaSize.width(), areaSize.height());
+    m_scaleX = horizontalMaxDimension * areaSize.width() / scaleFactor;
+    m_scaleZ = horizontalMaxDimension * areaSize.height() / scaleFactor;
 
-   m_scaleXWithBackground = m_scaleX + m_hBackgroundMargin;
-   m_scaleYWithBackground = m_scaleY + m_vBackgroundMargin;
-   m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
+    m_scaleXWithBackground = m_scaleX + m_hBackgroundMargin;
+    m_scaleYWithBackground = m_scaleY + m_vBackgroundMargin;
+    m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
 
-   m_helperAxisX.setScale(m_scaleX * 2.0f);
-   m_helperAxisY.setScale(m_scaleY * 2.0f);
-   m_helperAxisZ.setScale(-m_scaleZ * 2.0f);
-   m_helperAxisX.setTranslate(-m_scaleX);
-   m_helperAxisY.setTranslate(-m_scaleY);
-   m_helperAxisZ.setTranslate(m_scaleZ);
+    setScaleWithBackground(QVector3D(m_scaleXWithBackground, m_scaleYWithBackground, m_scaleZWithBackground));
+
+    m_helperAxisX.setScale(m_scaleX * 2.0f);
+    m_helperAxisY.setScale(m_scaleY * 2.0f);
+    m_helperAxisZ.setScale(-m_scaleZ * 2.0f);
+    m_helperAxisX.setTranslate(-m_scaleX);
+    m_helperAxisY.setTranslate(-m_scaleY);
+    m_helperAxisZ.setTranslate(m_scaleZ);
 }
 
 float QQuickDataVisScatter::calculatePointScaleSize()
@@ -679,15 +553,15 @@ void QQuickDataVisScatter::updateLabels()
             obj->setProperty("labelText", labels[label]);
             label++;
         }
-       backLabelTrans.setY(0.0f);
-       SideLabelTrans.setY(0.0f);
+        backLabelTrans.setY(0.0f);
+        SideLabelTrans.setY(0.0f);
 
-       float labelsMaxWidth = 0.0f;
-       labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisX()->labels())));
+        float labelsMaxWidth = 0.0f;
+        labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisX()->labels())));
 
-       updateYTitle(sideLabelRotation, backLabelRotation,
-                        SideLabelTrans,    backLabelTrans,
-                        totalSideLabelRotation, totalBackLabelRotation,1);
+        updateYTitle(sideLabelRotation, backLabelRotation,
+                     SideLabelTrans,    backLabelTrans,
+                     totalSideLabelRotation, totalBackLabelRotation,1);
     }
 
     // Z labels
@@ -1000,10 +874,28 @@ void QQuickDataVisScatter::updateGrid()
     }
 }
 
+void QQuickDataVisScatter::updateGraph()
+{
+    //     for each series one visualizer
+    auto scatterSeriesList = m_scatterController->scatterSeriesList();
+
+    for (auto *scatterSeries : qAsConst(scatterSeriesList)) {
+        auto *visualizer = visualizerForSeries(scatterSeries);
+        if (visualizer && scatterSeries->isVisible()) {
+            if (!visualizer->pointsGenerated())
+                visualizer->generatePoints(scatterSeries->dataProxy()->itemCount());
+
+            if (m_scatterController->m_isDataDirty)
+                updateDataPoints(scatterSeries);
+
+            if (m_scatterController->m_isSeriesVisualsDirty)
+                updateDataPointVisuals(scatterSeries);
+        }
+    }
+}
+
 void QQuickDataVisScatter::synchData()
 {
-    QElapsedTimer timer;
-    timer.start();
 
     QList<QScatter3DSeries *> seriesList = m_scatterController->scatterSeriesList();
 
@@ -1031,20 +923,8 @@ void QQuickDataVisScatter::synchData()
     aY->formatter()->d_ptr->recalculate();
     aZ->formatter()->d_ptr->recalculate();
 
-        int seriesCount = seriesList.count();
-        m_pointScale = calculatePointScaleSize();
-        for (int i = 0 ; i < seriesCount; i++) {
-            QScatter3DSeries *series = seriesList.at(i);
+    m_pointScale = calculatePointScaleSize();
 
-            if (m_scatterController->m_isDataDirty)
-                updateDataPoints(series);
-
-            if (m_scatterController->m_isSeriesVisualsDirty)
-                updateDataPointVisuals(series);
-
-        }
-        m_scatterController->m_isSeriesVisualsDirty = false;
-        m_scatterController->m_isDataDirty =   false;
 
     updateLabels();
 
@@ -1063,134 +943,6 @@ void QQuickDataVisScatter::synchData()
             itemSelectionLabel()->setProperty("labelText", itemLabelText);
         }
         m_scatterController->m_changeTracker.selectedItemChanged = false;
-    }
-}
-
-void QQuickDataVisScatter::adjustAxisRanges()
-{
-    if (m_selectedItemSeries) {
-        auto visualizer = visualizerForSeries(m_selectedItemSeries);
-        visualizer->resetSelection();
-    }
-    QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_scatterController->m_axisX);
-    QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_scatterController->m_axisY);
-    QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_scatterController->m_axisZ);
-    bool adjustX = (valueAxisX && valueAxisX->isAutoAdjustRange());
-    bool adjustY = (valueAxisY && valueAxisY->isAutoAdjustRange());
-    bool adjustZ = (valueAxisZ && valueAxisZ->isAutoAdjustRange());
-
-    if (adjustX || adjustY || adjustZ) {
-        float minValueX = 0.0f;
-        float maxValueX = 0.0f;
-        float minValueY = 0.0f;
-        float maxValueY = 0.0f;
-        float minValueZ = 0.0f;
-        float maxValueZ = 0.0f;
-        int seriesCount = m_scatterController->m_seriesList.size();
-        for (int series = 0; series < seriesCount; series++) {
-            const QScatter3DSeries *scatterSeries =
-                    static_cast<QScatter3DSeries *>(m_scatterController->m_seriesList.at(series));
-            const QScatterDataProxy *proxy = scatterSeries->dataProxy();
-            if (scatterSeries->isVisible() && proxy) {
-                QVector3D minLimits;
-                QVector3D maxLimits;
-                proxy->dptrc()->limitValues(minLimits, maxLimits, valueAxisX, valueAxisY, valueAxisZ);
-                if (adjustX) {
-                    if (!series) {
-                        // First series initializes the values
-                        minValueX = minLimits.x();
-                        maxValueX = maxLimits.x();
-                    } else {
-                        minValueX = qMin(minValueX, minLimits.x());
-                        maxValueX = qMax(maxValueX, maxLimits.x());
-                    }
-                }
-                if (adjustY) {
-                    if (!series) {
-                        // First series initializes the values
-                        minValueY = minLimits.y();
-                        maxValueY = maxLimits.y();
-                    } else {
-                        minValueY = qMin(minValueY, minLimits.y());
-                        maxValueY = qMax(maxValueY, maxLimits.y());
-                    }
-                }
-                if (adjustZ) {
-                    if (!series) {
-                        // First series initializes the values
-                        minValueZ = minLimits.z();
-                        maxValueZ = maxLimits.z();
-                    } else {
-                        minValueZ = qMin(minValueZ, minLimits.z());
-                        maxValueZ = qMax(maxValueZ, maxLimits.z());
-                    }
-                }
-            }
-        }
-
-        static const float adjustmentRatio = 20.0f;
-        static const float defaultAdjustment = 1.0f;
-
-        if (adjustX) {
-            // If all points at same coordinate, need to default to some valid range
-            float adjustment = 0.0f;
-            if (minValueX == maxValueX) {
-                if (adjustZ) {
-                    // X and Z are linked to have similar unit size, so choose the valid range based on it
-                    if (minValueZ == maxValueZ)
-                        adjustment = defaultAdjustment;
-                    else
-                        adjustment = qAbs(maxValueZ - minValueZ) / adjustmentRatio;
-                } else {
-                    if (valueAxisZ)
-                        adjustment = qAbs(valueAxisZ->max() - valueAxisZ->min()) / adjustmentRatio;
-                    else
-                        adjustment = defaultAdjustment;
-                }
-            }
-            valueAxisX->dptr()->setRange(minValueX - adjustment, maxValueX + adjustment, true);
-        }
-        if (adjustY) {
-            // If all points at same coordinate, need to default to some valid range
-            // Y-axis unit is not dependent on other axes, so simply adjust +-1.0f
-            float adjustment = 0.0f;
-            if (minValueY == maxValueY)
-                adjustment = defaultAdjustment;
-            valueAxisY->dptr()->setRange(minValueY - adjustment, maxValueY + adjustment, true);
-        }
-        if (adjustZ) {
-            // If all points at same coordinate, need to default to some valid range
-            float adjustment = 0.0f;
-            if (minValueZ == maxValueZ) {
-                if (adjustX) {
-                    // X and Z are linked to have similar unit size, so choose the valid range based on it
-                    if (minValueX == maxValueX)
-                        adjustment = defaultAdjustment;
-                    else
-                        adjustment = qAbs(maxValueX - minValueX) / adjustmentRatio;
-                } else {
-                    if (valueAxisX)
-                        adjustment = qAbs(valueAxisX->max() - valueAxisX->min()) / adjustmentRatio;
-                    else
-                        adjustment = defaultAdjustment;
-                }
-            }
-            valueAxisZ->dptr()->setRange(minValueZ - adjustment, maxValueZ + adjustment, true);
-        }
-    }
-}
-
-void QQuickDataVisScatter::startRecordingRemovesAndInserts()
-{
-    m_scatterController->m_recordInsertsAndRemoves = false;
-
-    if (scene()->selectionQueryPosition() != Q3DScene::invalidSelectionPoint()) {
-        m_scatterController->m_recordInsertsAndRemoves = true;
-        if (m_scatterController->m_insertRemoveRecords.size()) {
-            m_scatterController->m_insertRemoveRecords.clear();
-            // Reserve some space for remove/insert records to avoid unnecessary reallocations.
-            m_scatterController->m_insertRemoveRecords.reserve(insertRemoveRecordReserveSize);
-        }
     }
 }
 

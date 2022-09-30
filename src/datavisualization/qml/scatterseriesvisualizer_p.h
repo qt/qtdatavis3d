@@ -101,6 +101,8 @@ public:
     void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
     QString getMeshFileName();
 
+    bool pointsGenerated() const;
+
 public Q_SLOTS:
     void handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh);
     void handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);

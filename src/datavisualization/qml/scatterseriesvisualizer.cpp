@@ -83,6 +83,14 @@ void ScatterSeriesVisualizer::handleItemCountChanged(int count)
     m_itemCount = count;
 }
 
+bool ScatterSeriesVisualizer::pointsGenerated() const
+{
+    if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault)
+        return m_itemCount == m_itemList.size();
+    else
+        return m_instancingRootItem ? true : false;
+}
+
 void ScatterSeriesVisualizer::setup()
 {
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationHint::OptimizationDefault) {
@@ -133,6 +141,7 @@ void ScatterSeriesVisualizer::generatePoints(int count)
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         if (count > 0)
             m_itemList.resize(count);
+
         for (int i = 0; i < count; i++) {
             auto item = createDataItem();
             item->setPickable(true);

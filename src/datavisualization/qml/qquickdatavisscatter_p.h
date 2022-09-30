@@ -65,11 +65,6 @@ public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
     void handleAxisYChanged(QAbstract3DAxis *axis) override;
     void handleAxisZChanged(QAbstract3DAxis *axis) override;
-    void handleArrayReset();
-    void handleItemsAdded(int startIndex, int count);
-    void handleItemsChanged(int startIndex, int count);
-    void handleItemsRemoved(int startIndex, int count);
-    void handleItemsInserted(int startIndex, int count);
 
 Q_SIGNALS:
     void axisXChanged(QValue3DAxis *axis);
@@ -141,13 +136,12 @@ private:
 
     void setVisualizerForSeries(QScatter3DSeries *series, ScatterSeriesVisualizer * visualizer);
     ScatterSeriesVisualizer *visualizerForSeries(QScatter3DSeries * series);
-    void updateLabels() override;
     int findLabelsMaxWidth(const QStringList &labels);
-
+    void updateLabels() override;
     void updateGrid() override;
+    void updateGraph() override;
     void synchData() override;
-    void adjustAxisRanges() override;
-    void startRecordingRemovesAndInserts();
+
     // Change selection mode
     void setSelectionModeNG(QAbstract3DGraph::SelectionFlags mode);
 

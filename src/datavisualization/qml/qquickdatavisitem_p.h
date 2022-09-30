@@ -351,8 +351,6 @@ protected:
 
     virtual void updateGraph() {}
 
-    virtual void adjustAxisRanges() {}
-
     QSharedPointer<QMutex> m_nodeMutex;
 
 private:

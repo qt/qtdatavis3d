@@ -516,7 +516,7 @@ void QQuickDataVisItem::synchData()
 
     auto rotation = Utils::calculateRotation(rotVec);
     if (m_flipped.y()) {
-        m_backgroundRotation->setRotation(/*xFlipRot **/ rotation);
+        m_backgroundRotation->setRotation(rotation);
     } else {
         modelMatrix.rotate(rotation);
         m_backgroundRotation->setRotation(rotation);
