@@ -882,12 +882,19 @@ void QQuickDataVisSurface::updateGraph()
         m_gridModel->setDepthBias(1.0f);
         m_gridModel->setGeometry(gridGeometry);
 
-        // TODO :: create material regarding grid color value
         QQmlListReference gridMaterialRef(m_gridModel, "materials");
-        QQuick3DPrincipledMaterial* gridMaterial = new QQuick3DPrincipledMaterial();
-        gridMaterial->setBaseColor(QColor::fromString("#000000"));
+        QQuick3DPrincipledMaterial *gridMaterial;
+        if (gridMaterialRef.size() > 0)
+            gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
+        else
+            gridMaterial = new QQuick3DPrincipledMaterial();
+        QColor gridColor = m_surfaceController->visibleSeries()->wireframeColor();
+        gridMaterial->setBaseColor(gridColor);
         gridMaterial->setLighting(QQuick3DPrincipledMaterial::NoLighting);
-        gridMaterialRef.append(gridMaterial);
+        if (gridMaterialRef.size() > 0)
+            gridMaterialRef.replace(0, gridMaterial);
+        else
+            gridMaterialRef.append(gridMaterial);
     }
 }
 
