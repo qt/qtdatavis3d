@@ -10,6 +10,7 @@
 
 #include <QtQuick3D/private/qquick3drepeater_p.h>
 #include <QtQuick3D/private/qquick3dprincipledmaterial_p.h>
+#include <QtQuick3D/private/qquick3ddefaultmaterial_p.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -809,13 +810,6 @@ void QQuickDataVisSurface::updateGraph()
                                QQuick3DGeometry::Attribute::U32Type);
         m_model->setGeometry(geometry);
 
-        // TODO :: create material regarding height value
-        QQmlListReference materialRef(m_model, "materials");
-        QQuick3DPrincipledMaterial *material;
-        if (materialRef.size() > 0)
-            material = static_cast<QQuick3DPrincipledMaterial *>(materialRef.at(0));
-        else
-            material = new QQuick3DPrincipledMaterial();
         auto axisY = m_surfaceController->axisY();
         maxY = axisY->max();
         minY = axisY->min();
@@ -859,7 +853,15 @@ void QQuickDataVisSurface::updateGraph()
         textureData->setTextureData(imageData);
         QQuick3DTexture *texture = new QQuick3DTexture();
         texture->setTextureData(textureData);
-        material->setBaseColorMap(texture);
+        QQmlListReference materialRef(m_model, "materials");
+        QQuick3DDefaultMaterial *material;
+        if (materialRef.size() > 0)
+            material = static_cast<QQuick3DDefaultMaterial *>(materialRef.at(0));
+        else
+            material = new QQuick3DDefaultMaterial();
+        material->setDiffuseMap(texture);
+        material->setSpecularAmount(7.0f);
+        material->setSpecularRoughness(0.025f);
         if (materialRef.size() > 0)
             materialRef.replace(0, material);
         else

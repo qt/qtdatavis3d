@@ -530,7 +530,7 @@ void QQuickDataVisItem::synchData()
     Q3DThemeDirtyBitField themeDirtyBits = theme->d_ptr->m_dirtyBits;
 
     if (themeDirtyBits.lightStrengthDirty) {
-        light()->setBrightness(theme->lightStrength() * 0.5f + 0.000002f);
+        light()->setBrightness(theme->lightStrength() * 0.1f);
         themeDirtyBits.lightStrengthDirty = false;
     }
 
@@ -1668,12 +1668,18 @@ void QQuickDataVisItem::setUpCamera()
 
 void QQuickDataVisItem::setUpLight()
 {
+    auto bLight = new QQuick3DDirectionalLight(rootNode());
+    QQuick3DObjectPrivate::get(bLight)->refSceneManager(
+                *QQuick3DObjectPrivate::get(rootNode())->sceneManager);
+    bLight->setParent(camera());
+    bLight->setParentItem(camera());
+    bLight->setScope(background());
+    bLight->setBrightness(2.5f);
     auto light = new QQuick3DDirectionalLight(rootNode());
     QQuick3DObjectPrivate::get(light)->refSceneManager(
                 *QQuick3DObjectPrivate::get(rootNode())->sceneManager);
     light->setParent(camera());
     light->setParentItem(camera());
-    light->setEulerRotation(QVector3D(0,0,0));
     m_light = light;
 }
 
