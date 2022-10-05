@@ -83,7 +83,7 @@ void tst_surface::construct()
 void tst_surface::initialProperties()
 {
     QVERIFY(m_graph);
-    QCOMPARE(m_graph->seriesList().length(), 0);
+    QCOMPARE(m_graph->seriesList().size(), 0);
     QVERIFY(!m_graph->selectedSeries());
     QCOMPARE(m_graph->flipHorizontalGrid(), false);
     QCOMPARE(m_graph->axisX()->orientation(), QAbstract3DAxis::AxisOrientationX);
@@ -168,7 +168,7 @@ void tst_surface::addSeries()
 {
     m_graph->addSeries(newSeries());
 
-    QCOMPARE(m_graph->seriesList().length(), 1);
+    QCOMPARE(m_graph->seriesList().size(), 1);
     QVERIFY(!m_graph->selectedSeries());
 }
 
@@ -182,7 +182,7 @@ void tst_surface::addMultipleSeries()
     m_graph->addSeries(series2);
     m_graph->addSeries(series3);
 
-    QCOMPARE(m_graph->seriesList().length(), 3);
+    QCOMPARE(m_graph->seriesList().size(), 3);
 }
 
 void tst_surface::selectSeries()
@@ -192,7 +192,7 @@ void tst_surface::selectSeries()
     m_graph->addSeries(series);
     m_graph->seriesList()[0]->setSelectedPoint(QPoint(0, 0));
 
-    QCOMPARE(m_graph->seriesList().length(), 1);
+    QCOMPARE(m_graph->seriesList().size(), 1);
     QCOMPARE(m_graph->selectedSeries(), series);
 
     m_graph->clearSelection();
@@ -205,7 +205,7 @@ void tst_surface::removeSeries()
 
     m_graph->addSeries(series);
     m_graph->removeSeries(series);
-    QCOMPARE(m_graph->seriesList().length(), 0);
+    QCOMPARE(m_graph->seriesList().size(), 0);
 
     delete series;
 }
@@ -224,14 +224,14 @@ void tst_surface::removeMultipleSeries()
     QCOMPARE(m_graph->selectedSeries(), series);
 
     m_graph->removeSeries(series);
-    QCOMPARE(m_graph->seriesList().length(), 2);
+    QCOMPARE(m_graph->seriesList().size(), 2);
     QVERIFY(!m_graph->selectedSeries());
 
     m_graph->removeSeries(series2);
-    QCOMPARE(m_graph->seriesList().length(), 1);
+    QCOMPARE(m_graph->seriesList().size(), 1);
 
     m_graph->removeSeries(series3);
-    QCOMPARE(m_graph->seriesList().length(), 0);
+    QCOMPARE(m_graph->seriesList().size(), 0);
 
     delete series;
     delete series2;

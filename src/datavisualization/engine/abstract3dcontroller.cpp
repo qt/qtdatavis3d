@@ -996,7 +996,7 @@ int Abstract3DController::addCustomItem(QCustom3DItem *item)
     item->d_ptr->resetDirtyBits();
     m_isCustomDataDirty = true;
     emitNeedRender();
-    return m_customItems.count() - 1;
+    return m_customItems.size() - 1;
 }
 
 void Abstract3DController::deleteCustomItems()
@@ -1523,7 +1523,7 @@ int Abstract3DController::selectedLabelIndex() const
 {
     int index = m_selectedLabelIndex;
     QAbstract3DAxis *axis = selectedAxis();
-    if (axis && axis->labels().count() <= index)
+    if (axis && axis->labels().size() <= index)
         index = -1;
     return index;
 }
@@ -1553,7 +1553,7 @@ QAbstract3DAxis *Abstract3DController::selectedAxis() const
 int Abstract3DController::selectedCustomItemIndex() const
 {
     int index = m_selectedCustomItemIndex;
-    if (m_customItems.count() <= index)
+    if (m_customItems.size() <= index)
         index = -1;
     return index;
 }

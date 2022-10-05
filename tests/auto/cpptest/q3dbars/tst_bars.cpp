@@ -98,7 +98,7 @@ void tst_bars::initialProperties()
     QCOMPARE(m_graph->barSpacing(), QSizeF(1.0f, 1.0f));
     QCOMPARE(m_graph->barSeriesMargin(), QSizeF(0.0f, 0.0f));
     QCOMPARE(m_graph->isBarSpacingRelative(), true);
-    QCOMPARE(m_graph->seriesList().length(), 0);
+    QCOMPARE(m_graph->seriesList().size(), 0);
     QVERIFY(!m_graph->selectedSeries());
     QVERIFY(!m_graph->primarySeries());
     QCOMPARE(m_graph->floorLevel(), 0.0);
@@ -198,7 +198,7 @@ void tst_bars::addSeries()
 
     m_graph->addSeries(series);
 
-    QCOMPARE(m_graph->seriesList().length(), 1);
+    QCOMPARE(m_graph->seriesList().size(), 1);
     QVERIFY(!m_graph->selectedSeries());
     QCOMPARE(m_graph->primarySeries(), series);
 }
@@ -213,7 +213,7 @@ void tst_bars::addMultipleSeries()
     m_graph->addSeries(series2);
     m_graph->addSeries(series3);
 
-    QCOMPARE(m_graph->seriesList().length(), 3);
+    QCOMPARE(m_graph->seriesList().size(), 3);
     QCOMPARE(m_graph->primarySeries(), series);
 
     m_graph->setPrimarySeries(series2);
@@ -228,7 +228,7 @@ void tst_bars::selectSeries()
     m_graph->addSeries(series);
     m_graph->primarySeries()->setSelectedBar(QPoint(0, 0));
 
-    QCOMPARE(m_graph->seriesList().length(), 1);
+    QCOMPARE(m_graph->seriesList().size(), 1);
     QCOMPARE(m_graph->selectedSeries(), series);
 
     m_graph->clearSelection();
@@ -241,7 +241,7 @@ void tst_bars::removeSeries()
 
     m_graph->addSeries(series);
     m_graph->removeSeries(series);
-    QCOMPARE(m_graph->seriesList().length(), 0);
+    QCOMPARE(m_graph->seriesList().size(), 0);
     delete series;
 }
 
@@ -259,16 +259,16 @@ void tst_bars::removeMultipleSeries()
     QCOMPARE(m_graph->selectedSeries(), series);
 
     m_graph->removeSeries(series);
-    QCOMPARE(m_graph->seriesList().length(), 2);
+    QCOMPARE(m_graph->seriesList().size(), 2);
     QCOMPARE(m_graph->primarySeries(), series2);
     QVERIFY(!m_graph->selectedSeries());
 
     m_graph->removeSeries(series2);
-    QCOMPARE(m_graph->seriesList().length(), 1);
+    QCOMPARE(m_graph->seriesList().size(), 1);
     QCOMPARE(m_graph->primarySeries(), series3);
 
     m_graph->removeSeries(series3);
-    QCOMPARE(m_graph->seriesList().length(), 0);
+    QCOMPARE(m_graph->seriesList().size(), 0);
 
     delete series;
     delete series2;
@@ -294,14 +294,14 @@ void tst_bars::addInputHandler()
     m_graph->addInputHandler(handler);
     m_graph->addInputHandler(handler2);
 
-    QCOMPARE(m_graph->inputHandlers().length(), 3); // Default, as it is still active, plus added ones
+    QCOMPARE(m_graph->inputHandlers().size(), 3); // Default, as it is still active, plus added ones
     QCOMPARE(m_graph->activeInputHandler(), initialHandler);
     m_graph->setActiveInputHandler(handler2);
     QCOMPARE(m_graph->activeInputHandler(), handler2);
 
     m_graph->setActiveInputHandler(NULL);
     QVERIFY(!m_graph->activeInputHandler());
-    QCOMPARE(m_graph->inputHandlers().length(), 2);
+    QCOMPARE(m_graph->inputHandlers().size(), 2);
 }
 
 void tst_bars::removeInputHandler()
@@ -313,12 +313,12 @@ void tst_bars::removeInputHandler()
     m_graph->addInputHandler(handler2);
 
     m_graph->setActiveInputHandler(handler2);
-    QCOMPARE(m_graph->inputHandlers().length(), 2); // Default handler removed by previous call
+    QCOMPARE(m_graph->inputHandlers().size(), 2); // Default handler removed by previous call
     QCOMPARE(m_graph->activeInputHandler(), handler2);
     m_graph->releaseInputHandler(handler2);
-    QCOMPARE(m_graph->inputHandlers().length(), 1);
+    QCOMPARE(m_graph->inputHandlers().size(), 1);
     m_graph->releaseInputHandler(handler);
-    QCOMPARE(m_graph->inputHandlers().length(), 0);
+    QCOMPARE(m_graph->inputHandlers().size(), 0);
 
     delete handler2;
     delete handler;
@@ -332,7 +332,7 @@ void tst_bars::addTheme()
     m_graph->addTheme(theme);
     m_graph->addTheme(theme2);
 
-    QCOMPARE(m_graph->themes().length(), 3); // Default, plus added ones
+    QCOMPARE(m_graph->themes().size(), 3); // Default, plus added ones
     QCOMPARE(m_graph->activeTheme(), initialTheme);
     m_graph->setActiveTheme(theme2);
     QCOMPARE(m_graph->activeTheme(), theme2);
@@ -348,9 +348,9 @@ void tst_bars::removeTheme()
     m_graph->setActiveTheme(theme2);
     QCOMPARE(m_graph->activeTheme(), theme2);
     m_graph->releaseTheme(theme2);
-    QCOMPARE(m_graph->themes().length(), 2);
+    QCOMPARE(m_graph->themes().size(), 2);
     m_graph->releaseTheme(theme);
-    QCOMPARE(m_graph->themes().length(), 1); // Default theme remains
+    QCOMPARE(m_graph->themes().size(), 1); // Default theme remains
 
     delete theme2;
     delete theme;
@@ -362,9 +362,9 @@ void tst_bars::addCustomItem()
     QCustom3DItem *item2 = new QCustom3DItem();
 
     m_graph->addCustomItem(item);
-    QCOMPARE(m_graph->customItems().length(), 1);
+    QCOMPARE(m_graph->customItems().size(), 1);
     m_graph->addCustomItem(item2);
-    QCOMPARE(m_graph->customItems().length(), 2);
+    QCOMPARE(m_graph->customItems().size(), 2);
 }
 
 void tst_bars::removeCustomItem()
@@ -379,14 +379,14 @@ void tst_bars::removeCustomItem()
     m_graph->addCustomItem(item3);
 
     m_graph->releaseCustomItem(item);
-    QCOMPARE(m_graph->customItems().length(), 2);
+    QCOMPARE(m_graph->customItems().size(), 2);
     m_graph->removeCustomItem(item2);
-    QCOMPARE(m_graph->customItems().length(), 1);
+    QCOMPARE(m_graph->customItems().size(), 1);
     m_graph->addCustomItem(item);
     m_graph->removeCustomItemAt(QVector3D(1, 1, 1));
-    QCOMPARE(m_graph->customItems().length(), 1);
+    QCOMPARE(m_graph->customItems().size(), 1);
     m_graph->removeCustomItems();
-    QCOMPARE(m_graph->customItems().length(), 0);
+    QCOMPARE(m_graph->customItems().size(), 0);
 }
 
 void tst_bars::renderToImage()
