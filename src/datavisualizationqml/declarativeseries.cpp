@@ -246,7 +246,7 @@ QList<DeclarativeColor *> DeclarativeBar3DSeries::colorList()
 void DeclarativeBar3DSeries::clearColors()
 {
     clearDummyColors();
-    for (const auto color : qAsConst(m_rowColors))
+    for (const auto color : std::as_const(m_rowColors))
         disconnect(color, 0, this, 0);
 
     m_rowColors.clear();
