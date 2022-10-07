@@ -49,6 +49,7 @@ private:
     bool m_rangeGradient = false;
 
     friend class ScatterSeriesVisualizer;
+    friend class QQuickBarSeriesVisualizer;
 };
 
 #endif // DATAVISQUICK3DINSTANCING_H

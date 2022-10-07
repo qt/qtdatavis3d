@@ -16,6 +16,10 @@
 #include <QtCore/QThread>
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtCore/QMutexLocker>
+//#include <QtQuick3D/private/qquick3ddefaultmaterial_p.h>
+//#include <QtQuick3D/private/qquick3dprincipledmaterial_p.h>
+//#include <QtQuick3DUtils/private/qssgutils_p.h>
+//#include "datavisquick3dtexturedata_p.h"
 
 QT_BEGIN_NAMESPACE
 

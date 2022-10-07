@@ -131,6 +131,7 @@ void QBarDataProxy::resetArray()
 {
     resetArray(0, QStringList(), QStringList());
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
 }
 
 /*!
@@ -146,6 +147,7 @@ void QBarDataProxy::resetArray(QBarDataArray *newArray)
     dptr()->resetArray(newArray, 0, 0);
     emit arrayReset();
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
 }
 
 /*!
@@ -163,6 +165,7 @@ void QBarDataProxy::resetArray(QBarDataArray *newArray, const QStringList &rowLa
     dptr()->resetArray(newArray, &rowLabels, &columnLabels);
     emit arrayReset();
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
 }
 
 /*!
@@ -244,6 +247,7 @@ int QBarDataProxy::addRow(QBarDataRow *row)
     int addIndex = dptr()->addRow(row, 0);
     emit rowsAdded(addIndex, 1);
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
     return addIndex;
 }
 
@@ -257,6 +261,7 @@ int QBarDataProxy::addRow(QBarDataRow *row, const QString &label)
     int addIndex = dptr()->addRow(row, &label);
     emit rowsAdded(addIndex, 1);
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
     return addIndex;
 }
 
@@ -271,6 +276,7 @@ int QBarDataProxy::addRows(const QBarDataArray &rows)
     int addIndex = dptr()->addRows(rows, 0);
     emit rowsAdded(addIndex, rows.size());
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
     return addIndex;
 }
 
@@ -284,6 +290,7 @@ int QBarDataProxy::addRows(const QBarDataArray &rows, const QStringList &labels)
     int addIndex = dptr()->addRows(rows, &labels);
     emit rowsAdded(addIndex, rows.size());
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
     return addIndex;
 }
 
@@ -300,6 +307,7 @@ void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row)
     dptr()->insertRow(rowIndex, row, 0);
     emit rowsInserted(rowIndex, 1);
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
 }
 
 /*!
@@ -312,6 +320,7 @@ void QBarDataProxy::insertRow(int rowIndex, QBarDataRow *row, const QString &lab
     dptr()->insertRow(rowIndex, row, &label);
     emit rowsInserted(rowIndex, 1);
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
 }
 
 /*!
@@ -326,6 +335,7 @@ void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows)
     dptr()->insertRows(rowIndex, rows, 0);
     emit rowsInserted(rowIndex, rows.size());
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
 }
 
 /*!
@@ -338,6 +348,7 @@ void QBarDataProxy::insertRows(int rowIndex, const QBarDataArray &rows, const QS
     dptr()->insertRows(rowIndex, rows, &labels);
     emit rowsInserted(rowIndex, rows.size());
     emit rowCountChanged(rowCount());
+    emit colCountChanged(colCount());
 }
 
 /*!
@@ -354,7 +365,20 @@ void QBarDataProxy::removeRows(int rowIndex, int removeCount, bool removeLabels)
         dptr()->removeRows(rowIndex, removeCount, removeLabels);
         emit rowsRemoved(rowIndex, removeCount);
         emit rowCountChanged(rowCount());
+        emit colCountChanged(colCount());
     }
+}
+
+/*!
+ * \property QBarDataProxy::colCount
+ *
+ * \brief The number of columns in the array.
+ */
+int QBarDataProxy::colCount() const
+{
+    if (dptrc()->m_dataArray->size() <= 0)
+        return 0;
+    return dptrc()->m_dataArray->at(0)->size();
 }
 
 /*!

@@ -142,6 +142,7 @@ void Bars3DController::handleArrayReset()
         m_changedSeriesList.append(series);
     // Clear selection unless still valid
     setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
+    series->d_ptr->markItemLabelDirty();
     emitNeedRender();
 }
 

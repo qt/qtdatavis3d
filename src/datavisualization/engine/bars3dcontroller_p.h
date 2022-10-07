@@ -14,13 +14,17 @@
 #ifndef Q3DBARSCONTROLLER_p_H
 #define Q3DBARSCONTROLLER_p_H
 
+#include "axishelper_p.h"
 #include <private/datavisualizationglobal_p.h>
 #include <private/abstract3dcontroller_p.h>
+#include <QtQuick3D/private/qquick3drepeater_p.h>
 
 QT_BEGIN_NAMESPACE
 
 class Bars3DRenderer;
+class QBarDataProxy;
 class QBar3DSeries;
+class QQuick3DModel;
 
 struct Bars3DChangeBitField {
     bool multiSeriesScalingChanged  : 1;
@@ -130,6 +134,9 @@ public:
     void handleAxisRangeChangedBySender(QObject *sender) override;
     void adjustAxisRanges() override;
 
+    QQuick3DModel *selected() const;
+    void setSelected(QQuick3DModel *newSelected);
+
 public Q_SLOTS:
     void handleArrayReset();
     void handleRowsAdded(int startIndex, int count);
@@ -146,12 +153,24 @@ Q_SIGNALS:
     void selectedSeriesChanged(QBar3DSeries *series);
 
 protected:
+    // Testing sketching
+    AxisHelper m_helperAxisX;
+    AxisHelper m_helperAxisY;
+    AxisHelper m_helperAxisZ;
+
     QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation) override;
+    QSizeF m_cachedBarThickness;
+    QSizeF m_cachedBarSpacing;
+
+    void updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative);
 
 private:
     void adjustSelectionPosition(QPoint &pos, const QBar3DSeries *series);
 
     Q_DISABLE_COPY(Bars3DController)
+    friend class QQuickDataVisItem;
+    friend class QQuickDataVisBars;
+    friend class QQuickBarSeriesVisualizer;
 };
 
 QT_END_NAMESPACE

@@ -60,13 +60,12 @@ qt_internal_add_qml_module(DataVisualization
         engine/abstractdeclarativeinterface.cpp engine/abstractdeclarativeinterface_p.h
         engine/abstract3dcontroller.cpp engine/abstract3dcontroller_p.h
         engine/abstract3drenderer.cpp engine/abstract3drenderer_p.h
-        engine/axishelper.cpp engine/axishelper_p.h
         engine/axisrendercache.cpp engine/axisrendercache_p.h
+        engine/axishelper.cpp engine/axishelper_p.h
         engine/bars3dcontroller.cpp engine/bars3dcontroller_p.h
         engine/bars3drenderer.cpp engine/bars3drenderer_p.h
         engine/barseriesrendercache.cpp engine/barseriesrendercache_p.h
         engine/datavisquick3dinstancing.cpp engine/datavisquick3dinstancing_p.h
-        engine/datavisquick3dtexturedata.cpp engine/datavisquick3dtexturedata.cpp
         engine/drawer.cpp engine/drawer_p.h
         engine/q3dbars.cpp engine/q3dbars.h engine/q3dbars_p.h
         engine/q3dcamera.cpp engine/q3dcamera.h engine/q3dcamera_p.h
@@ -78,10 +77,12 @@ qt_internal_add_qml_module(DataVisualization
         engine/qabstract3dgraph.cpp engine/qabstract3dgraph.h engine/qabstract3dgraph_p.h
         engine/scatter3dcontroller.cpp engine/scatter3dcontroller_p.h
         engine/scatter3drenderer.cpp engine/scatter3drenderer_p.h
+
         engine/scatterseriesrendercache.cpp engine/scatterseriesrendercache_p.h
         engine/selectionpointer.cpp engine/selectionpointer_p.h
         engine/seriesrendercache.cpp engine/seriesrendercache_p.h
         engine/surface3dcontroller.cpp engine/surface3dcontroller_p.h
+        engine/datavisquick3dtexturedata.cpp engine/datavisquick3dtexturedata_p.h # Maybe change this location
         engine/surface3drenderer.cpp engine/surface3drenderer_p.h
         engine/surfaceseriesrendercache.cpp engine/surfaceseriesrendercache_p.h
         global/datavisualizationglobal_p.h
@@ -103,6 +104,7 @@ qt_internal_add_qml_module(DataVisualization
         utils/texturehelper.cpp utils/texturehelper_p.h
         utils/utils.cpp utils/utils_p.h
         utils/vertexindexer.cpp utils/vertexindexer_p.h
+        # Qml files
         qml/abstractdeclarative.cpp qml/abstractdeclarative_p.h
         qml/colorgradient.cpp qml/colorgradient_p.h
         qml/declarativebars.cpp qml/declarativebars_p.h
@@ -117,8 +119,10 @@ qt_internal_add_qml_module(DataVisualization
         qml/foreigntypes_p.h
         qml/glstatestore.cpp qml/glstatestore_p.h
         qml/qquickdatavisitem.cpp qml/qquickdatavisitem_p.h
+        qml/qquickdatavisbars.cpp qml/qquickdatavisbars_p.h
         qml/qquickdatavissurface.cpp qml/qquickdatavissurface_p.h
         qml/qquickdatavisscatter.cpp qml/qquickdatavisscatter_p.h
+        qml/qquickbarseriesvisualizer.cpp qml/qquickbarseriesvisualizer_p.h
         qml/scatterseriesvisualizer.cpp qml/scatterseriesvisualizer_p.h
     INCLUDE_DIRECTORIES
         axis
@@ -306,10 +310,10 @@ set_source_files_properties("engine/meshes/background.mesh"
     PROPERTIES QT_RESOURCE_ALIAS "backgroundMesh"
 )
 set_source_files_properties("engine/meshes/barFilledFlat.mesh"
-    PROPERTIES QT_RESOURCE_ALIAS "BevelBarMeshFull"
+    PROPERTIES QT_RESOURCE_ALIAS "bevelBarMeshFull"
 )
 set_source_files_properties("engine/meshes/barFilledSmooth.mesh"
-    PROPERTIES QT_RESOURCE_ALIAS "BevelBarMeshSmoothFull"
+    PROPERTIES QT_RESOURCE_ALIAS "bevelBarMeshSmoothFull"
 )
 set_source_files_properties("engine/meshes/barFlat.mesh"
     PROPERTIES QT_RESOURCE_ALIAS "bevelBarMesh"

@@ -390,6 +390,8 @@ private:
 
     QVector3D m_flipped = QVector3D(false, false, false);
 
+    bool m_flipScales;
+
     QVector3D m_scaleWithBackground = QVector3D(1.0f, 1.0f, 1.0f);
 
     QVector3D m_rot = QVector3D(1.0f, 1.0f, 1.0f);
@@ -413,6 +415,7 @@ private:
 
     friend class Scatter3DController;
     friend class ScatterSeriesVisualizer;
+    friend class QQuickBarSeriesVisualizer;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::OptimizationHints)

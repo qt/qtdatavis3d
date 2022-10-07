@@ -64,6 +64,7 @@ private:
     friend class Surface3DController;
     friend class QValue3DAxisFormatterPrivate;
     friend class QQuickDataVisScatter;
+    friend class QQuickDataVisBars;
 };
 
 QT_END_NAMESPACE
