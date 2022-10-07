@@ -175,54 +175,53 @@ void QQuickDataVisSurface::updateGrid()
     QVector3D scaleY(lineWidthScaleFactor(), scale().y() * lineLengthScaleFactor() * scaleWithBackground().y(), lineWidthScaleFactor());
     QVector3D scaleZ(scale().z() * lineLengthScaleFactor() * scaleWithBackground().z(), lineWidthScaleFactor(), lineWidthScaleFactor());
 
-    QVector3D lineBackRotationX(0, 0, 0);
-    QVector3D lineBackRotationY(0, 0, 0);
-
     auto axisX = static_cast<QValue3DAxis *>(m_surfaceController->axisX());
     auto axisY = static_cast<QValue3DAxis *>(m_surfaceController->axisY());
     auto axisZ = static_cast<QValue3DAxis *>(m_surfaceController->axisZ());
 
-    auto lineFloorRotation = Utils::calculateRotation(QVector3D(0, -90, 0));
+    QQuaternion lineRotation(0, 0, 0, 0);
     float linePosX = scaleX.x() / 2.0f;
     float linePosY = -scaleWithBackground().y() + 0.01f;
     float linePosZ = 0;
 
-    if (!flipped().z()) {
-        linePosZ = -scaleWithBackground().z() + gridOffset();
-    } else {
-        linePosZ = scaleWithBackground().z() - gridOffset();
-        lineBackRotationX = QVector3D(0, 180, 0);
-        lineBackRotationY = QVector3D(0, 180, 0);
-    }
-
     auto scale = this->scale().x() * scaleWithBackground().x() + scaleOffset().x();
 
     // Floor horizontal line
+    if (flipped().z())
+        lineRotation = Utils::calculateRotation(QVector3D(-90, 0, 0));
     for (int i = 0; i < subGridLineCountX; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterX()->objectAt(i));
         linePosZ = axisX->subGridPositionAt(i) * -scale + scaleOffset().x();
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setRotation(lineRotation);
     }
 
     for (int i  = 0; i < gridLineCountX; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterX()->objectAt(i));
         linePosZ = axisX->gridPositionAt(i) * -scale + scaleOffset().x();
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setRotation(lineRotation);
     }
 
-    linePosY = scaleY.y() / 2.0f;
-    linePosZ += 0.01f;
-    scale = this->scale().z() * scaleWithBackground().z() + scaleOffset().z();
     // Side vertical line
+    linePosY = scaleY.y() / 2.0f;
+    if (flipped().z()) {
+        linePosZ *= -1;
+        lineRotation = Utils::calculateRotation(QVector3D(180, 0, 0));
+    }
+    scale = this->scale().z() * scaleWithBackground().z() + scaleOffset().z();
+
     for (int i  = 0; i < subGridLineCountZ; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterZ()->objectAt(i + subGridLineCountZ));
         linePosX = axisZ->subGridPositionAt(i) * scale - scaleOffset().z();
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setRotation(lineRotation);
     }
     for (int i  = 0; i < gridLineCountZ; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterZ()->objectAt(i + gridLineCountZ));
         linePosX = axisZ->gridPositionAt(i) * scale - scaleOffset().z();
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setRotation(lineRotation);
     }
 
     // Side horizontal line
@@ -232,61 +231,77 @@ void QQuickDataVisSurface::updateGrid()
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterY()->objectAt(i));
         linePosY = axisY->gridPositionAt(i) * scale - scaleOffset().y();
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setRotation(lineRotation);
     }
 
     for (int i = 0; i < subGridLineCountY; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterY()->objectAt(i));
         linePosY = axisY->subGridPositionAt(i) * scale - scaleOffset().y();
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setRotation(lineRotation);
     }
 
     // Floor vertical line
     linePosZ = scaleZ.z() / -2.0f;
     linePosY = -scaleWithBackground().y() + 0.01f;
     scale = this->scale().z() * scaleWithBackground().z() + scaleOffset().z();
+    lineRotation = Utils::calculateRotation(QVector3D(0, -90, 0));
+    if (!flipped().x())
+        lineRotation = Utils::calculateRotation(QVector3D(-90, -90, 0));
     for (int i = 0; i < subGridLineCountZ; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterZ()->objectAt(i));
         linePosX = axisZ->subGridPositionAt(i) * scale - scaleOffset().z();
         positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
-        lineNode->setRotation(lineFloorRotation);
+        lineNode->setRotation(lineRotation);
     }
     for (int i  = 0; i < gridLineCountZ; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterZ()->objectAt(i));
         linePosX = axisZ->gridPositionAt(i) * scale - scaleOffset().z();
         positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
-        lineNode->setRotation(lineFloorRotation);
+        lineNode->setRotation(lineRotation);
     }
 
     // Back horizontal line
     scale = this->scale().y() * scaleWithBackground().y() + scaleOffset().y();
     linePosX -= 0.01f;
+    if (!flipped().x()) {
+        linePosX *= -1;
+        lineRotation = Utils::calculateRotation(QVector3D(180, -90, 0));
+    }
     for (int i = 0; i < subGridLineCountY; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterY()->objectAt(i + subGridLineCountY));
         linePosY = axisY->subGridPositionAt(i) * scale - scaleOffset().y();
         positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
-        lineNode->setRotation(lineFloorRotation);
+        lineNode->setRotation(lineRotation);
     }
 
     for (int i  = 0; i < gridLineCountY; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterY()->objectAt(i + gridLineCountY));
         linePosY = axisY->gridPositionAt(i) * scale - scaleOffset().y();
         positionAndScaleLine(lineNode, scaleZ, QVector3D(linePosX, linePosY, linePosZ));
-        lineNode->setRotation(lineFloorRotation);
+        lineNode->setRotation(lineRotation);
     }
 
     // Back vertical line
     linePosY = scaleY.y() / 2.0f;
     scale = this->scale().x() * scaleWithBackground().x() + scaleOffset().x();
+    if (flipped().z()) {
+        lineRotation = Utils::calculateRotation(QVector3D(0, -90, 0));
+        if (!flipped().x())
+            lineRotation = Utils::calculateRotation(QVector3D(0, 90, 0));
+    }
     for (int i  = 0; i < gridLineCountX; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterX()->objectAt(i + gridLineCountX));
         linePosZ = axisX->gridPositionAt(i) * -scale + scaleOffset().x();
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setRotation(lineRotation);
     }
 
     for (int i  = 0; i < subGridLineCountX; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterX()->objectAt(i + subGridLineCountX));
         linePosZ = axisX->subGridPositionAt(i) * -scale + scaleOffset().x();
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
+        lineNode->setRotation(lineRotation);
     }
 }
 
@@ -367,6 +382,7 @@ void QQuickDataVisSurface::updateLabels()
             }
         }
     }
+
     if (!flipped().x()) {
         if (!flipped().y())
             yPos = -scaleWithBackground().y();
@@ -438,16 +454,6 @@ void QQuickDataVisSurface::updateLabels()
         }
     }
 
-    if (flipped().x())
-        xPos = -scaleWithBackground().x() - labelMargin();
-    else
-        xPos = scaleWithBackground().x() + labelMargin();
-
-    if (flipped().z())
-        zPos = scaleWithBackground().z() + labelMargin();
-    else
-        zPos = -scaleWithBackground().z() - labelMargin();
-
     backLabelRotation.setX(-fractionCamY);
     sideLabelRotation.setX(-fractionCamY);
 
@@ -457,7 +463,11 @@ void QQuickDataVisSurface::updateLabels()
     labelsMaxWidth = 0;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_surfaceController->axisY()->labels())));
 
-    for (int i = 0; i < repeaterY()->count()/2; i++) {
+    xPos = labelTrans.x();
+    if (!flipped().x())
+        labelTrans.setX(-xPos);
+
+    for (int i = 0; i < repeaterY()->count() / 2; i++) {
         auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
         labelTrans.setY(axisY->labelPositionAt(i) * scale - scaleOffset().y());
         obj->setPosition(labelTrans);
@@ -585,6 +595,10 @@ void QQuickDataVisSurface::updateLabels()
     scale = this->scale().y() * scaleWithBackground().y() + scaleOffset().y();
     labelsMaxWidth = 0;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisY->labels())));
+
+    zPos = labelTrans.z();
+    if (flipped().z())
+        labelTrans.setZ(-zPos);
 
     for (int i = 0; i < repeaterY()->count() / 2; i++) {
         auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i + (repeaterY()->count() / 2)));

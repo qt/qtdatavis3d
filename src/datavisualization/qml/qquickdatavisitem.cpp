@@ -693,8 +693,9 @@ void QQuickDataVisItem::updateGrid()
     QVector3D lineSideRotationY(0, 90, -90);
     QVector3D lineSideRotationZ(0, 90, 0);
 
-    QVector3D lineFloorRotationX(-90,0,0);
-    QVector3D lineFloorRotationZ(-90,0,0);
+    QVector3D lineFloorRotationX(-90, 0, 0);
+    QVector3D lineFloorRotationZ(-90, 0, 0);
+
     float linePosX = 0;
     float linePosY = 0;
     float linePosZ = 0;
