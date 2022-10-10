@@ -18,8 +18,8 @@ class StaticLibInitializer
 public:
     StaticLibInitializer()
     {
-        Q_INIT_RESOURCE(shaders);
-        Q_INIT_RESOURCE(meshes);
+        Q_INIT_RESOURCE(datavisualizationshaders);
+        Q_INIT_RESOURCE(datavisualizationmeshes);
     }
 };
 StaticLibInitializer staticLibInitializer;
