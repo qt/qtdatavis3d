@@ -104,11 +104,6 @@ void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
 {
     Abstract3DController::handleSeriesVisibilityChangedBySender(sender);
 
-    QSurface3DSeries *series = static_cast<QSurface3DSeries *>(sender);
-
-    if (series->isVisible())
-        m_visibleSeries = series;
-
     // Visibility changes may require disabling slicing,
     // so just reset selection to ensure everything is still valid.
     setSelectedPoint(m_selectedPoint, m_selectedSeries, false);

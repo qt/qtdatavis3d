@@ -82,26 +82,30 @@ Q_SIGNALS:
     Q_REVISION(1, 2) void flipHorizontalGridChanged(bool flip);
 
 private:
-    QVector3D getNormalizedVertex(const QSurfaceDataItem &data, bool polar, bool flipXZ);
-    void createSmoothNormalBodyLine(int &totalIndex, int column);
-    void createSmoothNormalUpperLine(int &totalIndex);
-    void createSmoothIndices(int x, int y, int endX, int endY);
-    void createSmoothGridlineIndices(int x, int y, int endX, int endY);
-
     struct SurfaceVertex {
         QVector3D position;
         QVector3D normal;
         QVector2D uv;
     };
 
-    QQuick3DModel *m_model = nullptr;
-    QQuick3DModel *m_gridModel = nullptr;
-    Surface3DController *m_surfaceController;
+    struct SurfaceModel {
+        QQuick3DModel *model;
+        QQuick3DModel *gridModel;
+        QVector<SurfaceVertex> vertices;
+        QVector<quint32> indices;
+        QVector<quint32> gridIndices;
+        QVector<float> height;
+        QSurface3DSeries *series;
+    };
 
-    QVector<SurfaceVertex> m_vertices;
-    QVector<quint32> m_indices;
-    QVector<quint32> m_gridIndices;
-    QVector<float> m_height;
+    QVector3D getNormalizedVertex(SurfaceModel *model, const QSurfaceDataItem &data, bool polar, bool flipXZ);
+    void createSmoothNormalBodyLine(SurfaceModel *model, int &totalIndex, int column);
+    void createSmoothNormalUpperLine(SurfaceModel *model, int &totalIndex);
+    void createSmoothIndices(SurfaceModel *model, int x, int y, int endX, int endY);
+    void createSmoothGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY);
+
+    QVector<SurfaceModel *> m_model;
+    Surface3DController *m_surfaceController;
 };
 
 QT_END_NAMESPACE

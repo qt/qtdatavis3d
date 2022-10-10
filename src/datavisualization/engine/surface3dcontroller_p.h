@@ -71,7 +71,6 @@ private:
     QList<ChangeRow> m_changedRows;
     bool m_flipHorizontalGrid;
     QList<QSurface3DSeries *> m_changedTextures;
-    QSurface3DSeries* m_visibleSeries;
 
     int m_columnCount;
     int m_rowCount;
@@ -89,7 +88,6 @@ public:
     void clearSelection() override;
 
     inline QSurface3DSeries *selectedSeries() const { return m_selectedSeries; }
-    inline QSurface3DSeries *visibleSeries() const { return m_visibleSeries; }
 
     void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) override;
