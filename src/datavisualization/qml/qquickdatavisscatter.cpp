@@ -158,13 +158,13 @@ void QQuickDataVisScatter::addSeries(QScatter3DSeries *series)
 {
     m_scatterController->addSeries(series);
     auto visualizer = new ScatterSeriesVisualizer();
-    visualizer->m_controller = m_scatterController;
-    visualizer->m_qml = this;
+    visualizer->setController(m_scatterController);
+    visualizer->setQml(this);
     visualizer->setup();
     visualizer->connectSeries(series);
-    visualizer->m_helperAxisX = &m_helperAxisX;
-    visualizer->m_helperAxisY = &m_helperAxisY;
-    visualizer->m_helperAxisZ = &m_helperAxisZ;
+    visualizer->setHelperAxisX(&m_helperAxisX);
+    visualizer->setHelperAxisY(&m_helperAxisY);
+    visualizer->setHelperAxisZ(&m_helperAxisZ);
     setVisualizerForSeries(series, visualizer);
 
     if (series->selectedItem() != invalidSelectionIndex())
@@ -278,16 +278,16 @@ void QQuickDataVisScatter::updatePointScaleSize()
 void QQuickDataVisScatter::updateDataPoints(QScatter3DSeries *series)
 {
     auto visualizer = visualizerForSeries(series);
-    visualizer->m_dotSizedScale = m_pointScale;
+    visualizer->setDotSizedScale(m_pointScale);
     visualizer->updateItemPositions(series->dataProxy());
 }
 
 void QQuickDataVisScatter::updateDataPointVisuals(QScatter3DSeries *series)
 {
     auto visualizer = visualizerForSeries(series);
-    visualizer->m_scaleX = m_scaleX;
-    visualizer->m_scaleY = m_scaleY;
-    visualizer->m_scaleZ = m_scaleZ;
+    visualizer->setScaleX(m_scaleX);
+    visualizer->setScaleY(m_scaleY);
+    visualizer->setScaleZ(m_scaleZ);
     visualizer->updateItemVisuals(series);
 }
 

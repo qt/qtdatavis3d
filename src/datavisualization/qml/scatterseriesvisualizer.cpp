@@ -83,6 +83,56 @@ void ScatterSeriesVisualizer::handleItemCountChanged(int count)
     m_itemCount = count;
 }
 
+void ScatterSeriesVisualizer::setScaleZ(float newScaleZ)
+{
+    m_scaleZ = newScaleZ;
+}
+
+void ScatterSeriesVisualizer::setScaleY(float newScaleY)
+{
+    m_scaleY = newScaleY;
+}
+
+void ScatterSeriesVisualizer::setScaleX(float newScaleX)
+{
+    m_scaleX = newScaleX;
+}
+
+void ScatterSeriesVisualizer::setDotSizedScale(float newDotSizedScale)
+{
+    m_dotSizedScale = newDotSizedScale;
+}
+
+void ScatterSeriesVisualizer::setHelperAxisZ(AxisHelper *newHelperAxisZ)
+{
+    m_helperAxisZ = newHelperAxisZ;
+}
+
+void ScatterSeriesVisualizer::setHelperAxisY(AxisHelper *newHelperAxisY)
+{
+    m_helperAxisY = newHelperAxisY;
+}
+
+void ScatterSeriesVisualizer::setHelperAxisX(AxisHelper *newHelperAxisX)
+{
+    m_helperAxisX = newHelperAxisX;
+}
+
+void ScatterSeriesVisualizer::setQml(QQuickDataVisItem *newQml)
+{
+    m_qml = newQml;
+}
+
+void ScatterSeriesVisualizer::setController(Scatter3DController *newController)
+{
+    m_controller = newController;
+}
+
+void ScatterSeriesVisualizer::createParent()
+{
+    m_visualizerRoot.reset(new QObject());
+}
+
 bool ScatterSeriesVisualizer::pointsGenerated() const
 {
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault)
@@ -99,13 +149,11 @@ void ScatterSeriesVisualizer::setup()
             delete m_instancing;
         if (m_instancingRootItem)
             delete m_instancingRootItem;
-        generatePoints(m_itemCount);
     } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationHint::OptimizationStatic) {
         removeDataItems();
         m_instancing = new DatavisQuick3DInstancing();
         createInstancingRootItem();
         createSelectionIndicator();
-        generatePoints(m_itemCount);
     }
 }
 
@@ -138,6 +186,8 @@ void ScatterSeriesVisualizer::disconnectSeries(QScatter3DSeries *series)
 
 void ScatterSeriesVisualizer::generatePoints(int count)
 {
+    if (!m_visualizerRoot)
+        createParent();
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         if (count > 0)
             m_itemList.resize(count);
@@ -581,7 +631,7 @@ QQuick3DNode *ScatterSeriesVisualizer::createSeriesRoot()
 QQuick3DModel *ScatterSeriesVisualizer::createDataItem()
 {
     auto model = new QQuick3DModel();
-    model->setParent(m_seriesRootItem);
+    model->setParent(m_visualizerRoot.get());
     model->setParentItem(m_seriesRootItem);
     QString fileName;
     switch (m_meshType) {

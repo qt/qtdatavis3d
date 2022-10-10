@@ -35,6 +35,37 @@ public:
     explicit ScatterSeriesVisualizer(QObject *parent = nullptr);
     ~ScatterSeriesVisualizer();
 
+    void setup();
+    void connectSeries(QScatter3DSeries *series);
+    void disconnectSeries(QScatter3DSeries *series);
+    void generatePoints(int count);
+    qsizetype getItemIndex(QQuick3DModel *item);
+    void setSelected(qsizetype index);
+    void clearSelection();
+    void updateItemPositions(QScatterDataProxy *dataProxy);
+    void updateItemVisuals(QScatter3DSeries *series);
+    void createItemLabel();
+    QVector3D selectedItemPosition();
+
+    bool pointsGenerated() const;
+
+    void setController(Scatter3DController *newController);
+    void setQml(QQuickDataVisItem *newQml);
+    void setHelperAxisX(AxisHelper *newHelperAxisX);
+    void setHelperAxisY(AxisHelper *newHelperAxisY);
+    void setHelperAxisZ(AxisHelper *newHelperAxisZ);
+    void setDotSizedScale(float newDotSizedScale);
+    void setScaleX(float newScaleX);
+    void setScaleY(float newScaleY);
+    void setScaleZ(float newScaleZ);
+
+public Q_SLOTS:
+    void handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh);
+    void handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    void handleMeshSmoothChanged(bool enable);
+    void handleItemCountChanged(int count);
+
+private:
     QAbstract3DGraph::OptimizationHint optimizationHint = QAbstract3DGraph::OptimizationHint::OptimizationDefault;
     Scatter3DController *m_controller = nullptr;
     QAbstract3DSeries::Mesh m_meshType = QAbstract3DSeries::MeshSphere;
@@ -69,17 +100,11 @@ public:
     QScatter3DSeries *m_series;
     int m_itemCount = 0;
 
-    void setup();
+    QScopedPointer<QObject> m_visualizerRoot;
+
+    void createParent();
     void handleSeriesConnected();
-    void connectSeries(QScatter3DSeries *series);
-    void disconnectSeries(QScatter3DSeries *series);
-    void generatePoints(int count);
-    qsizetype getItemIndex(QQuick3DModel *item);
-    void setSelected(qsizetype index);
-    void clearSelection();
     void resetSelection();
-    void updateItemPositions(QScatterDataProxy *dataProxy);
-    void updateItemVisuals(QScatter3DSeries *series);
     void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
     void updateItemInstancedMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
     void updateInstancedCustomMaterial(QQuick3DModel *model, bool isHighlight = false);
@@ -96,18 +121,8 @@ public:
     void createSelectionIndicator();
     void removeDataItems();
     void removeDummyDataItems();
-    void createItemLabel();
-    QVector3D selectedItemPosition();
     void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
     QString getMeshFileName();
-
-    bool pointsGenerated() const;
-
-public Q_SLOTS:
-    void handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh);
-    void handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
-    void handleMeshSmoothChanged(bool enable);
-    void handleItemCountChanged(int count);
 };
 
 QT_END_NAMESPACE
