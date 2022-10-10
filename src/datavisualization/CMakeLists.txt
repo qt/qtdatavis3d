@@ -376,7 +376,7 @@ set(shader_resource_files
     "engine/shaders/texture_ES2.frag"
 )
 
-qt_internal_add_resource(DataVisualization "shaders"
+qt_internal_add_resource(DataVisualization "datavisualizationshaders"
     PREFIX
         "/shaders"
     BASE
@@ -385,7 +385,7 @@ qt_internal_add_resource(DataVisualization "shaders"
         ${shader_resource_files}
 )
 
-qt_internal_add_resource(DataVisualization "meshes"
+qt_internal_add_resource(DataVisualization "datavisualizationmeshes"
     PREFIX
         "/defaultMeshes"
     BASE
