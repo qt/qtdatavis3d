@@ -167,6 +167,9 @@ void QQuickDataVisScatter::addSeries(QScatter3DSeries *series)
     visualizer->setHelperAxisZ(&m_helperAxisZ);
     setVisualizerForSeries(series, visualizer);
 
+    if (series->dataProxy()->itemCount() > 0)
+        visualizer->generatePoints(series->dataProxy()->itemCount());
+
     if (series->selectedItem() != invalidSelectionIndex())
         setSelectedItem(series->selectedItem(), series);
 }
@@ -882,9 +885,6 @@ void QQuickDataVisScatter::updateGraph()
     for (auto *scatterSeries : std::as_const(scatterSeriesList)) {
         auto *visualizer = visualizerForSeries(scatterSeries);
         if (visualizer && scatterSeries->isVisible()) {
-            if (!visualizer->pointsGenerated())
-                visualizer->generatePoints(scatterSeries->dataProxy()->itemCount());
-
             if (m_scatterController->m_isDataDirty)
                 updateDataPoints(scatterSeries);
 

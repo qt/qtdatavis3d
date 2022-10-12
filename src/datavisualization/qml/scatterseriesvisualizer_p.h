@@ -103,7 +103,6 @@ private:
     QScopedPointer<QObject> m_visualizerRoot;
 
     void createParent();
-    void handleSeriesConnected();
     void resetSelection();
     void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
     void updateItemInstancedMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);

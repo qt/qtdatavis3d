@@ -81,6 +81,8 @@ void ScatterSeriesVisualizer::handleMeshSmoothChanged(bool enable)
 void ScatterSeriesVisualizer::handleItemCountChanged(int count)
 {
     m_itemCount = count;
+    removeDataItems();
+    generatePoints(count);
 }
 
 void ScatterSeriesVisualizer::setScaleZ(float newScaleZ)
@@ -157,14 +159,6 @@ void ScatterSeriesVisualizer::setup()
     }
 }
 
-void ScatterSeriesVisualizer::handleSeriesConnected()
-{
-    if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
-        createInstancingRootItem();
-        createSelectionIndicator();
-    }
-}
-
 void ScatterSeriesVisualizer::connectSeries(QScatter3DSeries *series)
 {
     m_meshType = series->mesh();
@@ -176,7 +170,6 @@ void ScatterSeriesVisualizer::connectSeries(QScatter3DSeries *series)
     QObject::connect(series, &QScatter3DSeries::meshSmoothChanged, this, &ScatterSeriesVisualizer::handleMeshSmoothChanged);
     QObject::connect(m_controller, &Abstract3DController::optimizationHintsChanged, this, &ScatterSeriesVisualizer::handleOptimizationHintsChanged);
     QObject::connect(series->dataProxy(), &QScatterDataProxy::itemCountChanged, this, &ScatterSeriesVisualizer::handleItemCountChanged);
-    handleSeriesConnected();
 }
 
 void ScatterSeriesVisualizer::disconnectSeries(QScatter3DSeries *series)
@@ -633,41 +626,8 @@ QQuick3DModel *ScatterSeriesVisualizer::createDataItem()
     auto model = new QQuick3DModel();
     model->setParent(m_visualizerRoot.get());
     model->setParentItem(m_seriesRootItem);
-    QString fileName;
-    switch (m_meshType) {
-        case QAbstract3DSeries::MeshSphere:
-        fileName = QStringLiteral("defaultMeshes/sphereMesh");
-        break;
-    case QAbstract3DSeries::MeshBar:
-    case QAbstract3DSeries::MeshCube:
-        fileName = QStringLiteral("defaultMeshes/barMesh");
-        break;
-    case QAbstract3DSeries::MeshPyramid:
-        fileName = QStringLiteral("defaultMeshes/pyramidMesh");
-        break;
-    case QAbstract3DSeries::MeshCone:
-        fileName = QStringLiteral("defaultMeshes/coneMesh");
-        break;
-    case QAbstract3DSeries::MeshCylinder:
-        fileName = QStringLiteral("defaultMeshes/cylinderMesh");
-        break;
-    case QAbstract3DSeries::MeshBevelBar:
-    case QAbstract3DSeries::MeshBevelCube:
-        fileName = QStringLiteral("defaultMeshes/bevelBarMesh");
-        break;
-    case QAbstract3DSeries::MeshMinimal:
-        fileName = QStringLiteral("defaultMeshes/minimalMesh");
-        break;
-    case QAbstract3DSeries::MeshArrow:
-        fileName = QStringLiteral("defaultMeshes/arrowMesh");
-        break;
-    case QAbstract3DSeries::MeshPoint:
-        qWarning("Points not supported yet");
-        break;
-    default:
-        fileName = QStringLiteral("defaultMeshes/sphereMesh");
-    }
-    fixMeshFileName(fileName, m_meshType);
+    QString fileName = getMeshFileName();
+
     model->setSource(QUrl(fileName));
     return model;
 }
