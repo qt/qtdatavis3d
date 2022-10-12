@@ -263,7 +263,7 @@ float QQuickDataVisScatter::calculatePointScaleSize()
 {
     auto series = m_scatterController->scatterSeriesList();
     int totalDataSize = 0;
-    for (const auto &scatterSeries : qAsConst(series)) {
+    for (const auto &scatterSeries : std::as_const(series)) {
         if (scatterSeries->isVisible())
             totalDataSize += scatterSeries->dataProxy()->array()->size();
     }
@@ -681,7 +681,7 @@ int QQuickDataVisScatter::findLabelsMaxWidth(const QStringList &labels)
     int labelWidth = 0;
     QFontMetrics labelFM(m_scatterController->activeTheme()->font());
 
-    for (const auto &label : qAsConst(labels)) {
+    for (const auto &label : std::as_const(labels)) {
         auto width = labelFM.horizontalAdvance(label);
         if (labelWidth < width)
             labelWidth = width;
@@ -879,7 +879,7 @@ void QQuickDataVisScatter::updateGraph()
     //     for each series one visualizer
     auto scatterSeriesList = m_scatterController->scatterSeriesList();
 
-    for (auto *scatterSeries : qAsConst(scatterSeriesList)) {
+    for (auto *scatterSeries : std::as_const(scatterSeriesList)) {
         auto *visualizer = visualizerForSeries(scatterSeries);
         if (visualizer && scatterSeries->isVisible()) {
             if (!visualizer->pointsGenerated())
@@ -901,7 +901,7 @@ void QQuickDataVisScatter::synchData()
 
     float maxItemSize = 0.0f;
 
-    for (const auto &series : qAsConst(seriesList)) {
+    for (const auto &series : std::as_const(seriesList)) {
         if (series->isVisible()) {
             float itemSize = series->itemSize();
             if (itemSize > maxItemSize)
@@ -955,7 +955,7 @@ void QQuickDataVisScatter::setSelectionModeNG(QAbstract3DGraph::SelectionFlags m
     }
 
     if (mode == QAbstract3DGraph::SelectionItem && isReady()) {
-        for (const auto &visualizer : qAsConst(m_seriesVisualizerMap))
+        for (const auto &visualizer : std::as_const(m_seriesVisualizerMap))
             visualizer->createItemLabel();
     }
 }

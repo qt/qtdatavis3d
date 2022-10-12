@@ -723,7 +723,7 @@ void QQuickDataVisBars::updateGraph()
 
     calculateSceneScalingFactors();
 
-    for (auto *barSeries : qAsConst(barSeriesList)) {
+    for (auto *barSeries : std::as_const(barSeriesList)) {
         auto *visualizer = visualizerForSeries(barSeries);
         if (visualizer && barSeries->isVisible()) {
             if (visualizer)

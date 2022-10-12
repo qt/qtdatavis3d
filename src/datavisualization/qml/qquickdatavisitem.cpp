@@ -889,7 +889,7 @@ int QQuickDataVisItem::findLabelsMaxWidth(const QStringList &labels)
     int labelWidth = 0;
     QFontMetrics labelFM(m_controller->activeTheme()->font());
 
-    for (const auto &label : qAsConst(labels)) {
+    for (const auto &label : std::as_const(labels)) {
         auto width = labelFM.horizontalAdvance(label);
         if (labelWidth < width)
             labelWidth = width;

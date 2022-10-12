@@ -663,7 +663,7 @@ void QQuickBarSeriesVisualizer::removeDataItems()
 
 void QQuickBarSeriesVisualizer::removeDummyDataItems()
 {
-    for (const auto &item : qAsConst(m_dummyItemList)) {
+    for (const auto &item : std::as_const(m_dummyItemList)) {
         delete item;
     }
     dummiesCreated = false;

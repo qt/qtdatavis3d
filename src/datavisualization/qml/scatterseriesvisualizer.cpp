@@ -687,7 +687,7 @@ void ScatterSeriesVisualizer::createSelectionIndicator()
 
 void ScatterSeriesVisualizer::removeDataItems()
 {
-    for (const auto &item : qAsConst(m_itemList)) {
+    for (const auto &item : std::as_const(m_itemList)) {
         QQmlListReference materialsRef(item, "materials");
         if (materialsRef.count()) {
             auto material = materialsRef.at(0);
@@ -699,7 +699,7 @@ void ScatterSeriesVisualizer::removeDataItems()
 
 void ScatterSeriesVisualizer::removeDummyDataItems()
 {
-    for (const auto &item : qAsConst(m_dummyItemList))
+    for (const auto &item : std::as_const(m_dummyItemList))
         delete item;
     dummiesCreated = false;
 }
