@@ -186,8 +186,8 @@ void GraphModifier::resetTemperatureData()
 
 void GraphModifier::changeRange(int range)
 {
-    if (range >= m_years.count())
-        m_yearAxis->setRange(0, m_years.count() - 1);
+    if (range >= m_years.size())
+        m_yearAxis->setRange(0, m_years.size() - 1);
     else
         m_yearAxis->setRange(range, range);
 }

@@ -68,8 +68,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->xPosRole(), QString(""));
     QCOMPARE(proxy->yPosRole(), QString("y"));
     QCOMPARE(proxy->zPosRole(), QString(""));
-    QCOMPARE(proxy->rowCategories().length(), 0);
-    QCOMPARE(proxy->columnCategories().length(), 0);
+    QCOMPARE(proxy->rowCategories().size(), 0);
+    QCOMPARE(proxy->columnCategories().size(), 0);
     delete proxy;
 
     proxy = new QItemModelSurfaceDataProxy(table.model(), "row", "column", "y");
@@ -79,8 +79,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->xPosRole(), QString("column"));
     QCOMPARE(proxy->yPosRole(), QString("y"));
     QCOMPARE(proxy->zPosRole(), QString("row"));
-    QCOMPARE(proxy->rowCategories().length(), 0);
-    QCOMPARE(proxy->columnCategories().length(), 0);
+    QCOMPARE(proxy->rowCategories().size(), 0);
+    QCOMPARE(proxy->columnCategories().size(), 0);
     delete proxy;
 
     proxy = new QItemModelSurfaceDataProxy(table.model(), "row", "column", "x", "y", "z");
@@ -90,8 +90,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->xPosRole(), QString("x"));
     QCOMPARE(proxy->yPosRole(), QString("y"));
     QCOMPARE(proxy->zPosRole(), QString("z"));
-    QCOMPARE(proxy->rowCategories().length(), 0);
-    QCOMPARE(proxy->columnCategories().length(), 0);
+    QCOMPARE(proxy->rowCategories().size(), 0);
+    QCOMPARE(proxy->columnCategories().size(), 0);
     delete proxy;
 
     proxy = new QItemModelSurfaceDataProxy(table.model(), "row", "column", "y",
@@ -102,8 +102,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->xPosRole(), QString("column"));
     QCOMPARE(proxy->yPosRole(), QString("y"));
     QCOMPARE(proxy->zPosRole(), QString("row"));
-    QCOMPARE(proxy->rowCategories().length(), 1);
-    QCOMPARE(proxy->columnCategories().length(), 1);
+    QCOMPARE(proxy->rowCategories().size(), 1);
+    QCOMPARE(proxy->columnCategories().size(), 1);
     delete proxy;
 
     proxy = new QItemModelSurfaceDataProxy(table.model(), "row", "column", "x", "y", "z",
@@ -114,8 +114,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->xPosRole(), QString("x"));
     QCOMPARE(proxy->yPosRole(), QString("y"));
     QCOMPARE(proxy->zPosRole(), QString("z"));
-    QCOMPARE(proxy->rowCategories().length(), 1);
-    QCOMPARE(proxy->columnCategories().length(), 1);
+    QCOMPARE(proxy->rowCategories().size(), 1);
+    QCOMPARE(proxy->columnCategories().size(), 1);
     delete proxy;
 }
 
@@ -184,13 +184,13 @@ void tst_proxy::initializeProperties()
 
     QCOMPARE(m_proxy->autoColumnCategories(), false);
     QCOMPARE(m_proxy->autoRowCategories(), false);
-    QCOMPARE(m_proxy->columnCategories().count(), 2);
+    QCOMPARE(m_proxy->columnCategories().size(), 2);
     QCOMPARE(m_proxy->columnRole(), QString("column"));
     QCOMPARE(m_proxy->columnRolePattern(), QRegularExpression("/^.*-(\\d\\d)$/"));
     QCOMPARE(m_proxy->columnRoleReplace(), QString("\\\\1"));
     QVERIFY(m_proxy->itemModel());
     QCOMPARE(m_proxy->multiMatchBehavior(), QItemModelSurfaceDataProxy::MMBAverage);
-    QCOMPARE(m_proxy->rowCategories().count(), 2);
+    QCOMPARE(m_proxy->rowCategories().size(), 2);
     QCOMPARE(m_proxy->rowRole(), QString("row"));
     QCOMPARE(m_proxy->rowRolePattern(), QRegularExpression("/^(\\d\\d\\d\\d).*$/"));
     QCOMPARE(m_proxy->rowRoleReplace(), QString("\\\\1"));

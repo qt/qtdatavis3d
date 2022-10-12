@@ -245,7 +245,7 @@ void ScatterSeriesVisualizer::updateItemPositions(QScatterDataProxy *dataProxy)
         itemSize = m_dotSizedScale;
 
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
-        if (dataProxy->itemCount() != m_itemList.count())
+        if (dataProxy->itemCount() != m_itemList.size())
             qWarning()<<__func__<<"Item count differs from itemList count";
         for (int i = 0; i < dataProxy->itemCount(); ++i) {
             auto item = dataProxy->itemAt(i);
@@ -326,7 +326,7 @@ void ScatterSeriesVisualizer::updateItemVisuals(QScatter3DSeries *series)
     bool rangeGradient = (useGradient && series->d_ptr->m_colorStyle == Q3DTheme::ColorStyleRangeGradient) ? true : false;
 
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
-        if (itemCount != m_itemList.count())
+        if (itemCount != m_itemList.size())
             qWarning()<<__func__<<"Item count differs from itemList count";
 
         if (!rangeGradient) {
@@ -404,7 +404,7 @@ void ScatterSeriesVisualizer::updateItemMaterial(QQuick3DModel *item, bool useGr
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(item, "materials");
     if (!rangeGradient) {
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();
                 auto oldCustomMaterial = materialsRef.at(0);
@@ -416,7 +416,7 @@ void ScatterSeriesVisualizer::updateItemMaterial(QQuick3DModel *item, bool useGr
             materialsRef.append(principledMaterial);
         }
     } else {
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0))) {
                 auto customMaterial = m_qml->createQmlCustomMaterial(QStringLiteral(":/materials/RangeGradientMaterial"));
                 auto oldPrincipledMaterial = materialsRef.at(0);
@@ -435,7 +435,7 @@ void ScatterSeriesVisualizer::updateItemInstancedMaterial(QQuick3DModel *item, b
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(item, "materials");
     if (!rangeGradient) {
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();
                 auto oldCustomMaterial = materialsRef.at(0);
@@ -447,7 +447,7 @@ void ScatterSeriesVisualizer::updateItemInstancedMaterial(QQuick3DModel *item, b
             materialsRef.append(principledMaterial);
         }
     } else {
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0))) {
                 auto customMaterial = m_qml->createQmlCustomMaterial(QStringLiteral(":/materials/RangeGradientMaterialInstancing"));
                 auto oldPrincipledMaterial = materialsRef.at(0);
@@ -466,7 +466,7 @@ void ScatterSeriesVisualizer::updateSelectionIndicatorMaterial(bool useGradient,
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(m_selectionIndicator, "materials");
     if (!rangeGradient) {
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();
                 auto old = qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0));
@@ -479,7 +479,7 @@ void ScatterSeriesVisualizer::updateSelectionIndicatorMaterial(bool useGradient,
         }
     } else {
         // Rangegradient
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0))) {
                 auto old = materialsRef.at(0);
                 auto customMaterial = m_qml->createQmlCustomMaterial(QStringLiteral(":/materials/RangeGradientMaterial"));
@@ -689,7 +689,7 @@ void ScatterSeriesVisualizer::removeDataItems()
 {
     for (const auto &item : std::as_const(m_itemList)) {
         QQmlListReference materialsRef(item, "materials");
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             auto material = materialsRef.at(0);
             delete material;
         }

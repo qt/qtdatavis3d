@@ -89,7 +89,7 @@ void DataSource::update(QSurface3DSeries *series)
     if (series && m_data.size()) {
         // Each iteration uses data from a different cached array
         m_index++;
-        if (m_index > m_data.count() - 1)
+        if (m_index > m_data.size() - 1)
             m_index = 0;
 
         QSurfaceDataArray array = m_data.at(m_index);

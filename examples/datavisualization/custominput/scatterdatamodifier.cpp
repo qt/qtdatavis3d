@@ -119,9 +119,9 @@ void ScatterDataModifier::addData()
 
     // Add data from the QList to datamodel
     QScatterDataArray *dataArray = new QScatterDataArray;
-    dataArray->resize(itemList.count());
+    dataArray->resize(itemList.size());
     QScatterDataItem *ptrToDataArray = &dataArray->first();
-    for (int i = 0; i < itemList.count(); i++) {
+    for (int i = 0; i < itemList.size(); i++) {
         ptrToDataArray->setPosition(itemList.at(i));
         ptrToDataArray++;
     }

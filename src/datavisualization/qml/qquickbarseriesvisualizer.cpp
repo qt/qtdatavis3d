@@ -371,7 +371,7 @@ void QQuickBarSeriesVisualizer::updateItemMaterial(QQuick3DModel *item, bool use
     QQmlListReference materialsRef(item, "materials");
     if (!rangeGradient) {
 
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();
                 auto oldCustomMaterial = materialsRef.at(0);
@@ -383,7 +383,7 @@ void QQuickBarSeriesVisualizer::updateItemMaterial(QQuick3DModel *item, bool use
             materialsRef.append(principledMaterial);
         }
     } else {
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0))) {
                 auto customMaterial = m_qml->createQmlCustomMaterial(QStringLiteral(":/materials/RangeGradientMaterial"));
                 auto oldPrincipledMaterial = materialsRef.at(0);
@@ -403,7 +403,7 @@ void QQuickBarSeriesVisualizer::updateItemInstancedMaterial(QQuick3DModel *item,
     QQmlListReference materialsRef(item, "materials");
     if (!rangeGradient) {
 
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();
                 auto oldCustomMaterial = materialsRef.at(0);
@@ -415,7 +415,7 @@ void QQuickBarSeriesVisualizer::updateItemInstancedMaterial(QQuick3DModel *item,
             materialsRef.append(principledMaterial);
         }
     } else {
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0))) {
                 auto customMaterial = m_qml->createQmlCustomMaterial(QStringLiteral(":/materials/RangeGradientMaterialInstancing"));
                 auto oldPrincipledMaterial = materialsRef.at(0);
@@ -457,7 +457,7 @@ void QQuickBarSeriesVisualizer::updateSelectionIndicatorMaterial(bool useGradien
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(m_selectionIndicator, "materials");
     if (!rangeGradient) {
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();
                 auto old = qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0));
@@ -470,7 +470,7 @@ void QQuickBarSeriesVisualizer::updateSelectionIndicatorMaterial(bool useGradien
         }
     } else {
         // Rangegradient
-        if (materialsRef.count()) {
+        if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0))) {
                 auto old = materialsRef.at(0);
                 auto customMaterial = m_qml->createQmlCustomMaterial(QStringLiteral(":/materials/RangeGradientMaterial"));

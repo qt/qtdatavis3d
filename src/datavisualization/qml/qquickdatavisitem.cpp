@@ -222,7 +222,7 @@ void QQuickDataVisItem::componentComplete()
         int subGridLineCount = 2 * (segmentCount * (subSegmentCount - 1));
         m_segmentLineRepeaterX->setModel(gridLineCount);
         m_subsegmentLineRepeaterX->setModel(subGridLineCount);
-        m_repeaterX->setModel(valueAxis->labels().count());
+        m_repeaterX->setModel(valueAxis->labels().size());
         m_controller->handleAxisLabelsChangedBySender(m_controller->axisX());
     }
     if (m_controller->axisY()->type() & QAbstract3DAxis::AxisTypeValue) {
@@ -233,7 +233,7 @@ void QQuickDataVisItem::componentComplete()
         int subGridLineCount = 2 * (segmentCount * (subSegmentCount - 1));
         m_segmentLineRepeaterY->setModel(gridLineCount);
         m_subsegmentLineRepeaterY->setModel(subGridLineCount);
-        m_repeaterY->setModel(2 * valueAxis->labels().count());
+        m_repeaterY->setModel(2 * valueAxis->labels().size());
         m_controller->handleAxisLabelsChangedBySender(m_controller->axisY());
     }
     if (m_controller->axisZ()->type() & QAbstract3DAxis::AxisTypeValue) {
@@ -244,7 +244,7 @@ void QQuickDataVisItem::componentComplete()
         int subGridLineCount = 2 * (segmentCount * (subSegmentCount - 1));
         m_segmentLineRepeaterZ->setModel(gridLineCount);
         m_subsegmentLineRepeaterZ->setModel(subGridLineCount);
-        m_repeaterZ->setModel(valueAxis->labels().count());
+        m_repeaterZ->setModel(valueAxis->labels().size());
         m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
     }
 }
@@ -616,7 +616,7 @@ void QQuickDataVisItem::synchData()
         auto bg = background();
         QQmlListReference materialsRef(bg, "materials");
         QQuick3DPrincipledMaterial *bgMat;
-        if (!materialsRef.count()) {
+        if (!materialsRef.size()) {
             bgMat = new QQuick3DPrincipledMaterial();
             bgMat->setSpecularAmount(.5f);
             bgMat->setRoughness(.5f);

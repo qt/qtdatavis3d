@@ -163,7 +163,7 @@ void DeclarativeBar3DSeries::appendRowColorsFunc(QQmlListProperty<DeclarativeCol
 
 qsizetype DeclarativeBar3DSeries::countRowColorsFunc(QQmlListProperty<DeclarativeColor> *list)
 {
-    return reinterpret_cast<DeclarativeBar3DSeries *>(list->data)->colorList().count();
+    return reinterpret_cast<DeclarativeBar3DSeries *>(list->data)->colorList().size();
 }
 
 DeclarativeColor *DeclarativeBar3DSeries::atRowColorsFunc(QQmlListProperty<DeclarativeColor> *list,

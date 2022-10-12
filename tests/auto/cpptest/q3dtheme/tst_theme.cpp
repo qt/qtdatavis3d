@@ -54,10 +54,10 @@ void tst_theme::construct()
     QCOMPARE(theme->ambientLightStrength(), 0.5f);
     QCOMPARE(theme->backgroundColor(), QColor(Qt::black));
     QCOMPARE(theme->isBackgroundEnabled(), true);
-    QCOMPARE(theme->baseColors().length(), 5);
+    QCOMPARE(theme->baseColors().size(), 5);
     QCOMPARE(theme->baseColors().at(0), QColor(Qt::white));
     QCOMPARE(theme->baseColors().at(4), QColor(QRgb(0x6b6b6b)));
-    QCOMPARE(theme->baseGradients().length(), 5);
+    QCOMPARE(theme->baseGradients().size(), 5);
     QCOMPARE(theme->baseGradients().at(0).stops().at(1).second, QColor(Qt::white));
     QCOMPARE(theme->baseGradients().at(4).stops().at(1).second, QColor(QRgb(0x6b6b6b)));
     QCOMPARE(theme->colorStyle(), Q3DTheme::ColorStyleUniform);
@@ -87,9 +87,9 @@ void tst_theme::initialProperties()
     QCOMPARE(m_theme->ambientLightStrength(), 0.25f);
     QCOMPARE(m_theme->backgroundColor(), QColor(Qt::black));
     QCOMPARE(m_theme->isBackgroundEnabled(), true);
-    QCOMPARE(m_theme->baseColors().length(), 1);
+    QCOMPARE(m_theme->baseColors().size(), 1);
     QCOMPARE(m_theme->baseColors().at(0), QColor(Qt::black));
-    QCOMPARE(m_theme->baseGradients().length(), 1);
+    QCOMPARE(m_theme->baseGradients().size(), 1);
     QCOMPARE(m_theme->baseGradients().at(0).stops().at(0).second, QColor(Qt::black));
     QCOMPARE(m_theme->baseGradients().at(0).stops().at(1).second, QColor(Qt::white));
     QCOMPARE(m_theme->colorStyle(), Q3DTheme::ColorStyleUniform);
@@ -152,10 +152,10 @@ void tst_theme::initializeProperties()
     QCOMPARE(m_theme->ambientLightStrength(), 0.3f);
     QCOMPARE(m_theme->backgroundColor(), QColor(Qt::red));
     QCOMPARE(m_theme->isBackgroundEnabled(), false);
-    QCOMPARE(m_theme->baseColors().length(), 2);
+    QCOMPARE(m_theme->baseColors().size(), 2);
     QCOMPARE(m_theme->baseColors().at(0), QColor(Qt::red));
     QCOMPARE(m_theme->baseColors().at(1), QColor(Qt::blue));
-    QCOMPARE(m_theme->baseGradients().length(), 2);
+    QCOMPARE(m_theme->baseGradients().size(), 2);
     QCOMPARE(m_theme->baseGradients().at(0), gradient1);
     QCOMPARE(m_theme->baseGradients().at(0), gradient2);
     QCOMPARE(m_theme->colorStyle(), Q3DTheme::ColorStyleRangeGradient);

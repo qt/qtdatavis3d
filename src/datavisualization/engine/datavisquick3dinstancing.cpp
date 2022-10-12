@@ -13,7 +13,7 @@ QByteArray DatavisQuick3DInstancing::getInstanceBuffer(int *instanceCount) {
         m_instanceData.resize(0);
         int instanceNumber = 0;
 
-        for (int i = 0; i < m_dataArray.count(); ++i) {
+        for (int i = 0; i < m_dataArray.size(); ++i) {
             auto item = m_dataArray.at(i);
             float x = item.position.x();
             float y = item.position.y();
