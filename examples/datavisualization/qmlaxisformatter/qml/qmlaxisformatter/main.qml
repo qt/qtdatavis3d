@@ -75,7 +75,7 @@ Item {
         width: parent.width
         height: parent.height - buttonLayout.height
 
-        Scatter3D {
+        Scatter3DNG {
             id: scatterGraph
             width: dataView.width
             height: dataView.height

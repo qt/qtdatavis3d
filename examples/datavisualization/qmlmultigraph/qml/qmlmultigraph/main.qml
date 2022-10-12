@@ -34,7 +34,7 @@ Item {
             border.width: 2
             color: "#00000000"
 
-            Surface3D {
+            Surface3DNG {
                 id: surfaceGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width
@@ -111,7 +111,7 @@ Item {
             border.width: 2
             color: "#00000000"
 
-            Scatter3D {
+            Scatter3DNG {
                 id: scatterGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width
@@ -141,7 +141,7 @@ Item {
             border.width: 2
             color: "#00000000"
 
-            Bars3D {
+            Bars3DNG {
                 id: barGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width

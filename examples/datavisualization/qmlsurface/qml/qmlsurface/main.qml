@@ -33,7 +33,7 @@ Rectangle {
         }
         //! [0]
 
-        Surface3D {
+        Surface3DNG {
             id: surfacePlot
             width: surfaceView.width
             height: surfaceView.height

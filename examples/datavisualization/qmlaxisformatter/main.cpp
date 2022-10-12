@@ -6,6 +6,7 @@
 #include <QtGui/QGuiApplication>
 #include <QtQuick/QQuickView>
 #include <QtQml>
+#include <QtQuick3D/qquick3d.h>
 
 //! [0]
 Q_DECLARE_METATYPE(CustomFormatter *)
@@ -13,8 +14,8 @@ Q_DECLARE_METATYPE(CustomFormatter *)
 
 int main(int argc, char *argv[])
 {
-    qputenv("QSG_RHI_BACKEND", "opengl");
     QGuiApplication app(argc, argv);
+    QSurfaceFormat::setDefaultFormat(QQuick3D::idealSurfaceFormat());
 
     //! [1]
     qmlRegisterType<CustomFormatter>("CustomFormatter", 1, 0, "CustomFormatter");

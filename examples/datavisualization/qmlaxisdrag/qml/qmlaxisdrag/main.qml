@@ -105,7 +105,7 @@ Item {
         height: parent.height
 
         //! [0]
-        Scatter3D {
+        Scatter3DNG {
             id: scatterGraph
             inputHandler: null
             //! [0]

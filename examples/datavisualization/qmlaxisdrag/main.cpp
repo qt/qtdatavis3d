@@ -5,12 +5,12 @@
 #include <QtCore/QDir>
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlEngine>
+#include <QtQuick3D/qquick3d.h>
 
 int main(int argc, char *argv[])
 {
-    qputenv("QSG_RHI_BACKEND", "opengl");
     QGuiApplication app(argc, argv);
-
+    QSurfaceFormat::setDefaultFormat(QQuick3D::idealSurfaceFormat());
     QQuickView viewer;
 
     // The following are needed to make examples run without having to install the module

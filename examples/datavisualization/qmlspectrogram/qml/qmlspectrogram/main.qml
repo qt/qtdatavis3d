@@ -85,7 +85,7 @@ Window {
 
         //! [0]
         //! [7]
-        Surface3D {
+        Surface3DNG {
             //! [7]
             id: surfaceGraph
             width: surfaceView.width

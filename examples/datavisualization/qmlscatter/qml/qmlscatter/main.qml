@@ -46,7 +46,7 @@ Item {
         //! [8]
 
         //! [2]
-        Scatter3D {
+        Scatter3DNG {
             id: scatterGraph
             width: dataView.width
             height: dataView.height

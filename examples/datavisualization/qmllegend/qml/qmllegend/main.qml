@@ -32,7 +32,7 @@ Item {
         id: dataView
         anchors.fill: parent
 
-        Bars3D {
+        Bars3DNG {
             id: barGraph
             anchors.fill: parent
             selectionMode: AbstractGraph3D.SelectionItemAndRow

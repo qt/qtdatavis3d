@@ -9,7 +9,6 @@
 
 int main(int argc, char *argv[])
 {
-    qputenv("QSG_RHI_BACKEND", "opengl");
     QGuiApplication app(argc, argv);
     QSurfaceFormat::setDefaultFormat(QQuick3D::idealSurfaceFormat());
     QQuickView viewer;

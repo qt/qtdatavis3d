@@ -43,7 +43,7 @@ Item {
         }
         //! [0]
 
-        Surface3D {
+        Surface3DNG {
             id: surfaceLayers
             width: surfaceView.width
             height: surfaceView.height
