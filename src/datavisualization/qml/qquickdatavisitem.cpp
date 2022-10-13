@@ -482,6 +482,11 @@ void QQuickDataVisItem::synchData()
         axisFormatterChanged = true;
     }
 
+    if (m_controller->m_changeTracker.shadowQualityChanged) {
+        updateShadowQuality(shadowQuality());
+        m_controller->m_changeTracker.shadowQualityChanged = false;
+    }
+
     QVector3D forward = camera()->forward();
     auto targetRotation = cameraTarget()->rotation();
     bool viewFlipped = false;
@@ -903,6 +908,35 @@ void QQuickDataVisItem::graphPositionAt(const QPoint &point)
 
     emit queriedGraphPositionChanged(m_controller->queriedGraphPosition());
     m_controller->setGraphPositionQueryPending(false);
+}
+
+void QQuickDataVisItem::updateShadowQuality(ShadowQuality quality)
+{
+    if (quality != QQuickDataVisItem::ShadowQualityNone) {
+        light()->setCastsShadow(true);
+
+        QQuick3DAbstractLight::QSSGShadowMapQuality shadowMapQuality;
+        switch (quality) {
+        case QQuickDataVisItem::ShadowQualityLow:
+        case QQuickDataVisItem::ShadowQualitySoftLow:
+            shadowMapQuality = QQuick3DAbstractLight::QSSGShadowMapQuality::ShadowMapQualityLow;
+            break;
+        case QQuickDataVisItem::ShadowQualityMedium:
+        case QQuickDataVisItem::ShadowQualitySoftMedium:
+            shadowMapQuality = QQuick3DAbstractLight::QSSGShadowMapQuality::ShadowMapQualityMedium;
+            break;
+        case QQuickDataVisItem::ShadowQualityHigh:
+        case QQuickDataVisItem::ShadowQualitySoftHigh:
+            shadowMapQuality = QQuick3DAbstractLight::QSSGShadowMapQuality::ShadowMapQualityHigh;
+            break;
+        default:
+            shadowMapQuality = QQuick3DAbstractLight::QSSGShadowMapQuality::ShadowMapQualityMedium;
+            break;
+        }
+        light()->setShadowMapQuality(shadowMapQuality);
+    } else {
+        light()->setCastsShadow(false);
+    }
 }
 
 int QQuickDataVisItem::findLabelsMaxWidth(const QStringList &labels)

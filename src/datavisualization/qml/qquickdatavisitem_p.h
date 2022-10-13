@@ -351,6 +351,8 @@ protected:
 
     virtual void updateGraph() {}
 
+    virtual void updateShadowQuality(QQuickDataVisItem::ShadowQuality quality);
+
     QSharedPointer<QMutex> m_nodeMutex;
 
 private:

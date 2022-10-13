@@ -128,6 +128,7 @@ private:
     void updatePointScaleSize();
     void updateDataPoints(QScatter3DSeries *series);
     void updateDataPointVisuals(QScatter3DSeries *series);
+    void updateShadowQuality(QQuickDataVisItem::ShadowQuality quality) override;
 
     QQuick3DModel *selected() const;
     void setSelected(QQuick3DModel *newSelected);

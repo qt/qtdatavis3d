@@ -294,6 +294,11 @@ void QQuickDataVisScatter::updateDataPointVisuals(QScatter3DSeries *series)
     visualizer->updateItemVisuals(series);
 }
 
+void QQuickDataVisScatter::updateShadowQuality(ShadowQuality quality)
+{
+    QQuickDataVisItem::updateShadowQuality(quality);
+}
+
 QQuick3DModel *QQuickDataVisScatter::selected() const
 {
     return m_selected;
@@ -879,7 +884,7 @@ void QQuickDataVisScatter::updateGrid()
 
 void QQuickDataVisScatter::updateGraph()
 {
-    //     for each series one visualizer
+    //for each series one visualizer
     auto scatterSeriesList = m_scatterController->scatterSeriesList();
 
     for (auto *scatterSeries : std::as_const(scatterSeriesList)) {
@@ -896,7 +901,6 @@ void QQuickDataVisScatter::updateGraph()
 
 void QQuickDataVisScatter::synchData()
 {
-
     QList<QScatter3DSeries *> seriesList = m_scatterController->scatterSeriesList();
 
     float maxItemSize = 0.0f;
@@ -924,7 +928,6 @@ void QQuickDataVisScatter::synchData()
     aZ->formatter()->d_ptr->recalculate();
 
     m_pointScale = calculatePointScaleSize();
-
 
     updateLabels();
 
