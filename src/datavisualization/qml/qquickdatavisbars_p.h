@@ -14,18 +14,15 @@
 #ifndef QQUICKDATAVISBARS_H
 #define QQUICKDATAVISBARS_H
 
-#include "qquickdatavisitem_p.h"
 #include "qbar3dseries.h"
+#include "qquickdatavisitem_p.h"
+#include "bars3dcontroller_p.h"
 
 #include <private/datavisualizationglobal_p.h>
-#include <private/bars3dcontroller_p.h>
 #include <private/qqmldelegatemodel_p.h>
 
 QT_BEGIN_NAMESPACE
 
-class QValue3DAxis;
-class QBar3DSeries;
-class Bars3DController;
 class QQuickBarSeriesVisualizer;
 
 class QQuickDataVisBars : public QQuickDataVisItem
@@ -82,9 +79,12 @@ public:
     Q_INVOKABLE void addSeries(QBar3DSeries *series);
     Q_INVOKABLE void removeSeries(QBar3DSeries *series);
     Q_INVOKABLE void insertSeries(int index, QBar3DSeries *series);
+
     void setPrimarySeries(QBar3DSeries *series);
     QBar3DSeries *primarySeries() const;
     QBar3DSeries *selectedSeries() const;
+    void setSelectedBar(const QPoint &position, QBar3DSeries *series, bool enterSlice);
+    static inline QPoint invalidSelectionPosition(){ return QPoint(-1, -1); }
 
     void setFloorLevel(float level);
     float floorLevel() const;
@@ -119,8 +119,6 @@ protected:
     void updateLabels() override;
     void updateGraph() override;
 
-//    void updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative);
-
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
 
@@ -146,7 +144,19 @@ Q_SIGNALS:
 private:
     QQmlComponent *createRepeaterDelegate(QAbstract3DSeries::Mesh meshType);
 
-    float m_lineLengthScaleFactor = lineLengthScaleFactor();
+    // Interaction
+    QPoint m_selectedBar;     // Points to row & column in data window.
+    QBar3DSeries *m_selectedBarSeries; // Points to the series for which the bar is selected in
+                                       // single series selection cases.
+    QBar3DSeries *m_primarySeries; // Category axis labels are taken from the primary series
+
+    // Testing sketching
+    AxisHelper m_helperAxisX;
+    AxisHelper m_helperAxisY;
+    AxisHelper m_helperAxisZ;
+
+    float m_lineLengthScaleFactor = 0.0102f;
+    float m_lineWidthScaleFactor = 0.00015f;
     float m_gridOffset = gridOffset();
     float m_scaleXWithBackground = scaleWithBackground().x();
     float m_scaleYWithBackground = scaleWithBackground().y();
@@ -167,6 +177,7 @@ private:
     void setVisualizerForSeries(QBar3DSeries *series, QQuickBarSeriesVisualizer *visualizer);
     QQuickBarSeriesVisualizer *visualizerForSeries(QBar3DSeries *series);
 
+    void updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative);
     void updateDataPoints(QBar3DSeries *series);
     void updateDataPointVisuals(QBar3DSeries *series);
 

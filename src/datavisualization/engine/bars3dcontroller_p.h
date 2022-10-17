@@ -153,11 +153,6 @@ Q_SIGNALS:
     void selectedSeriesChanged(QBar3DSeries *series);
 
 protected:
-    // Testing sketching
-    AxisHelper m_helperAxisX;
-    AxisHelper m_helperAxisY;
-    AxisHelper m_helperAxisZ;
-
     QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation) override;
     QSizeF m_cachedBarThickness;
     QSizeF m_cachedBarSpacing;

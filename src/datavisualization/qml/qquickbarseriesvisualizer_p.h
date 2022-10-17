@@ -45,7 +45,6 @@ public:
 
     QAbstract3DGraph::OptimizationHint optimizationHint = QAbstract3DGraph::OptimizationHint::OptimizationDefault;
     QQuickDataVisBars *m_dataVisBars;
-    QQuickDataVisItem *m_dataVisItem;
     Bars3DController *m_controller = nullptr;
     QAbstract3DSeries::Mesh m_meshType = QAbstract3DSeries::MeshSphere;
     bool m_smooth = false;
@@ -76,12 +75,13 @@ public:
     QQuickDataVisItem *m_qml;
     bool dummiesCreated = false;
     QList<QBar3DSeries *> m_seriesList;
+    bool m_barsGenerated;
 
     void setup();
     void handleSeriesConnected();
     void connectSeries(QBar3DSeries *series);
     void disconnectSeries(QBar3DSeries *series);
-    void generateBars(const QList<QBar3DSeries *> &seriesList);
+    void generateBars(const QList<QAbstract3DSeries *> &seriesList);
     QPoint getItemIndex(QQuick3DModel *item);
     void setSelected(QPoint index);
     void clearSelection();
