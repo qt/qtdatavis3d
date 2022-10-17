@@ -156,6 +156,7 @@ void QQuickDataVisSurface::componentComplete()
         model->setParentItem(scene);
         model->setVisible(visible);
         auto geometry = new QQuick3DGeometry();
+        geometry->setStride(sizeof(SurfaceVertex));
         geometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Triangles);
         geometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
                                0,
@@ -187,6 +188,7 @@ void QQuickDataVisSurface::componentComplete()
         gridModel->setVisible(visible);
         gridModel->setDepthBias(1.0f);
         auto gridGeometry = new QQuick3DGeometry();
+        gridGeometry->setStride(sizeof(SurfaceVertex));
         gridGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
         gridGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
                                    0,
@@ -866,7 +868,6 @@ void QQuickDataVisSurface::updateGraph()
             auto geometry = model->model->geometry();
             QByteArray vertexBuffer(reinterpret_cast<char *>(model->vertices.data()), model->vertices.size() * sizeof(SurfaceVertex));
             geometry->setVertexData(vertexBuffer);
-            geometry->setStride(sizeof(SurfaceVertex));
             QByteArray indexBuffer(reinterpret_cast<char *>(model->indices.data()), model->indices.size() * sizeof(quint32));
             geometry->setIndexData(indexBuffer);
             geometry->update();
@@ -918,15 +919,7 @@ void QQuickDataVisSurface::updateGraph()
             createSmoothGridlineIndices(model, 0, 0, colLimit, rowLimit);
 
             auto gridGeometry = model->gridModel->geometry();
-            gridGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
-            gridGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
-                                       0,
-                                       QQuick3DGeometry::Attribute::F32Type);
-            gridGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
-                                       0,
-                                       QQuick3DGeometry::Attribute::U32Type);
             gridGeometry->setVertexData(vertexBuffer);
-            gridGeometry->setStride(sizeof(SurfaceVertex));
             QByteArray gridIndexBuffer(reinterpret_cast<char *>(model->gridIndices.data()), model->gridIndices.size() * sizeof(quint32));
             gridGeometry->setIndexData(gridIndexBuffer);
             gridGeometry->update();
