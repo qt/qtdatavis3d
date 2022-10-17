@@ -618,10 +618,8 @@ void QQuickDataVisItem::synchData()
         QQuick3DPrincipledMaterial *bgMat;
         if (!materialsRef.size()) {
             bgMat = new QQuick3DPrincipledMaterial();
-            bgMat->setSpecularAmount(.5f);
-            bgMat->setRoughness(.5f);
-            bgMat->setBaseColor(Qt::gray);
-            bgMat->setBaseColor(Qt::green);
+            bgMat->setRoughness(.3f);
+            bgMat->setEmissiveFactor(QVector3D(.075f, .075f, .075f));
             materialsRef.append(bgMat);
         } else {
             bgMat = static_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0));
@@ -1669,13 +1667,6 @@ void QQuickDataVisItem::setUpCamera()
 
 void QQuickDataVisItem::setUpLight()
 {
-    auto bLight = new QQuick3DDirectionalLight(rootNode());
-    QQuick3DObjectPrivate::get(bLight)->refSceneManager(
-                *QQuick3DObjectPrivate::get(rootNode())->sceneManager);
-    bLight->setParent(camera());
-    bLight->setParentItem(camera());
-    bLight->setScope(background());
-    bLight->setBrightness(2.5f);
     auto light = new QQuick3DDirectionalLight(rootNode());
     QQuick3DObjectPrivate::get(light)->refSceneManager(
                 *QQuick3DObjectPrivate::get(rootNode())->sceneManager);
