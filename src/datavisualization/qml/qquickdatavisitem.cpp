@@ -129,7 +129,6 @@ void QQuickDataVisItem::handleFpsChanged()
 
 void QQuickDataVisItem::componentComplete()
 {
-    qDebug()<<staticMetaObject.className()<<__func__;
     QQuick3DViewport::componentComplete();
 
     auto url = QUrl(QStringLiteral("defaultMeshes/backgroundMesh"));
@@ -450,6 +449,9 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
 
 void QQuickDataVisItem::synchData()
 {
+    m_controller->m_renderPending = false;
+
+    bool axisFormatterChanged = false;
     if (m_controller->m_changeTracker.axisXFormatterChanged) {
         m_controller->m_changeTracker.axisXFormatterChanged = false;
         QAbstract3DAxis *axisX = m_controller->axisX();
@@ -457,6 +459,7 @@ void QQuickDataVisItem::synchData()
             QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(axisX);
             valueAxisX->recalculate();
         }
+        axisFormatterChanged = true;
     }
 
     if (m_controller->m_changeTracker.axisYFormatterChanged) {
@@ -466,6 +469,7 @@ void QQuickDataVisItem::synchData()
             QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(axisY);
             valueAxisY->recalculate();
         }
+        axisFormatterChanged = true;
     }
 
     if (m_controller->m_changeTracker.axisZFormatterChanged) {
@@ -475,13 +479,29 @@ void QQuickDataVisItem::synchData()
             QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(axisZ);
             valueAxisZ->recalculate();
         }
+        axisFormatterChanged = true;
     }
 
     QVector3D forward = camera()->forward();
     auto targetRotation = cameraTarget()->rotation();
-    m_flipped.setY(targetRotation.x() > 0);
-    m_flipped.setX(forward.x() > 0);
-    m_flipped.setZ(forward.z() >= 0);
+    bool viewFlipped = false;
+    if ((bool)m_flipped.y() != (targetRotation.x() > 0)) {
+        m_flipped.setY(targetRotation.x() > 0);
+        viewFlipped = true;
+    }
+    if ((bool)m_flipped.x() != (forward.x() > 0)) {
+        m_flipped.setX(forward.x() > 0);
+        viewFlipped = true;
+    }
+    if ((bool)m_flipped.z() != (forward.z() >= 0)) {
+        m_flipped.setZ(forward.z() >= 0);
+        viewFlipped = true;
+    }
+
+    if (axisFormatterChanged || viewFlipped) {
+        updateGrid();
+        updateLabels();
+    }
 
     QMatrix4x4 modelMatrix;
     m_backgroundScale->setScale(m_scaleWithBackground);
@@ -513,14 +533,13 @@ void QQuickDataVisItem::synchData()
         m_backgroundRotation->setRotation(rotation);
     }
 
-    updateGrid();
-
     if (m_controller->graphPositionQueryPending())
         graphPositionAt(m_controller->scene()->graphPositionQuery());
 
     updateCamera();
 
     Q3DTheme *theme = m_controller->activeTheme();
+
     if (m_controller->m_changeTracker.themeChanged) {
         environment()->setClearColor(theme->windowColor());
 
@@ -609,8 +628,6 @@ void QQuickDataVisItem::synchData()
         themeDirtyBits.fontDirty = false;
     }
 
-    updateLabels();
-
     // Grid and background adjustments
     if (themeDirtyBits.backgroundColorDirty) {
         auto bg = background();
@@ -663,9 +680,15 @@ void QQuickDataVisItem::synchData()
         themeDirtyBits.windowColorDirty = false;
     }
 
-    m_controller->updateChangedSeriesList();
+    if (m_controller->m_changedSeriesList.size()) {
+        updateGraph();
+        m_controller->m_changedSeriesList.clear();
+    }
 
-    updateGraph();
+    if (m_controller->m_isSeriesVisualsDirty) {
+        updateGraph();
+        m_controller->m_isSeriesVisualsDirty = false;
+    }
 }
 
 void QQuickDataVisItem::updateGrid()

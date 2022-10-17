@@ -155,11 +155,50 @@ void QQuickDataVisSurface::componentComplete()
         model->setParent(scene);
         model->setParentItem(scene);
         model->setVisible(visible);
+        auto geometry = new QQuick3DGeometry();
+        geometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Triangles);
+        geometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
+                               0,
+                               QQuick3DGeometry::Attribute::F32Type);
+        geometry->addAttribute(QQuick3DGeometry::Attribute::TexCoord0Semantic,
+                               sizeof(QVector3D) * 2,
+                               QQuick3DGeometry::Attribute::F32Type);
+        geometry->addAttribute(QQuick3DGeometry::Attribute::NormalSemantic,
+                               sizeof(QVector3D),
+                               QQuick3DGeometry::Attribute::F32Type);
+        geometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
+                               0,
+                               QQuick3DGeometry::Attribute::U32Type);
+        model->setGeometry(geometry);
+        QQmlListReference materialRef(model, "materials");
+        auto material = new QQuick3DDefaultMaterial();
+        QQuick3DTexture *texture = new QQuick3DTexture();
+        QQuick3DTextureData *textureData = new QQuick3DTextureData();
+        texture->setTextureData(textureData);
+        material->setDiffuseMap(texture);
+        material->setSpecularAmount(7.0f);
+        material->setSpecularRoughness(0.025f);
+        material->setCullMode(QQuick3DMaterial::NoCulling);
+        materialRef.append(material);
 
         auto gridModel = new QQuick3DModel();
         gridModel->setParent(scene);
         gridModel->setParentItem(scene);
         gridModel->setVisible(visible);
+        gridModel->setDepthBias(1.0f);
+        auto gridGeometry = new QQuick3DGeometry();
+        gridGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
+        gridGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
+                                   0,
+                                   QQuick3DGeometry::Attribute::F32Type);
+        gridGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
+                                   0,
+                                   QQuick3DGeometry::Attribute::U32Type);
+        gridModel->setGeometry(gridGeometry);
+        QQmlListReference gridMaterialRef(gridModel, "materials");
+        auto gridMaterial = new QQuick3DPrincipledMaterial();
+        gridMaterial->setLighting(QQuick3DPrincipledMaterial::NoLighting);
+        gridMaterialRef.append(gridMaterial);
 
         SurfaceModel *surfaceModel = new SurfaceModel();
         surfaceModel->model = model;
@@ -824,31 +863,20 @@ void QQuickDataVisSurface::updateGraph()
 
             createSmoothIndices(model, 0, 0, colLimit, rowLimit);
 
-            QQuick3DGeometry *geometry = new QQuick3DGeometry();
+            auto geometry = model->model->geometry();
             QByteArray vertexBuffer(reinterpret_cast<char *>(model->vertices.data()), model->vertices.size() * sizeof(SurfaceVertex));
             geometry->setVertexData(vertexBuffer);
             geometry->setStride(sizeof(SurfaceVertex));
             QByteArray indexBuffer(reinterpret_cast<char *>(model->indices.data()), model->indices.size() * sizeof(quint32));
             geometry->setIndexData(indexBuffer);
-            geometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Triangles);
-            geometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
-                                   0,
-                                   QQuick3DGeometry::Attribute::F32Type);
-            geometry->addAttribute(QQuick3DGeometry::Attribute::TexCoord0Semantic,
-                                   sizeof(QVector3D) * 2,
-                                   QQuick3DGeometry::Attribute::F32Type);
-            geometry->addAttribute(QQuick3DGeometry::Attribute::NormalSemantic,
-                                   sizeof(QVector3D),
-                                   QQuick3DGeometry::Attribute::F32Type);
-            geometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
-                                   0,
-                                   QQuick3DGeometry::Attribute::U32Type);
-            model->model->setGeometry(geometry);
+            geometry->update();
 
             auto axisY = m_surfaceController->axisY();
             maxY = axisY->max();
             minY = axisY->min();
-            QQuick3DTextureData *textureData = new QQuick3DTextureData();
+            QQmlListReference materialRef(model->model, "materials");
+            auto material = static_cast<QQuick3DDefaultMaterial *>(materialRef.at(0));
+            auto textureData = material->diffuseMap()->textureData();
             textureData->setSize(QSize(rowCount, columnCount));
             textureData->setFormat(QQuick3DTextureData::RGBA8);
             QByteArray imageData;
@@ -886,29 +914,10 @@ void QQuickDataVisSurface::updateGraph()
                 }
             }
             textureData->setTextureData(imageData);
-            QQuick3DTexture *texture = new QQuick3DTexture();
-            texture->setTextureData(textureData);
-            QQmlListReference materialRef(model->model, "materials");
-            QQuick3DDefaultMaterial *material;
-            if (materialRef.size() > 0)
-                material = static_cast<QQuick3DDefaultMaterial *>(materialRef.at(0));
-            else
-                material = new QQuick3DDefaultMaterial();
-            material->setDiffuseMap(texture);
-            material->setSpecularAmount(7.0f);
-            material->setSpecularRoughness(0.025f);
-            if (materialRef.size() > 0)
-                materialRef.replace(0, material);
-            else
-                materialRef.append(material);
 
             createSmoothGridlineIndices(model, 0, 0, colLimit, rowLimit);
 
-            QQuick3DGeometry *gridGeometry = new QQuick3DGeometry();
-            gridGeometry->setVertexData(vertexBuffer);
-            gridGeometry->setStride(sizeof(SurfaceVertex));
-            QByteArray gridIndexBuffer(reinterpret_cast<char *>(model->gridIndices.data()), model->gridIndices.size() * sizeof(quint32));
-            gridGeometry->setIndexData(gridIndexBuffer);
+            auto gridGeometry = model->gridModel->geometry();
             gridGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
             gridGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
                                        0,
@@ -916,22 +925,16 @@ void QQuickDataVisSurface::updateGraph()
             gridGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
                                        0,
                                        QQuick3DGeometry::Attribute::U32Type);
-            model->gridModel->setDepthBias(1.0f);
-            model->gridModel->setGeometry(gridGeometry);
+            gridGeometry->setVertexData(vertexBuffer);
+            gridGeometry->setStride(sizeof(SurfaceVertex));
+            QByteArray gridIndexBuffer(reinterpret_cast<char *>(model->gridIndices.data()), model->gridIndices.size() * sizeof(quint32));
+            gridGeometry->setIndexData(gridIndexBuffer);
+            gridGeometry->update();
 
             QQmlListReference gridMaterialRef(model->gridModel, "materials");
-            QQuick3DPrincipledMaterial *gridMaterial;
-            if (gridMaterialRef.size() > 0)
-                gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
-            else
-                gridMaterial = new QQuick3DPrincipledMaterial();
+            auto gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
             QColor gridColor = model->series->wireframeColor();
             gridMaterial->setBaseColor(gridColor);
-            gridMaterial->setLighting(QQuick3DPrincipledMaterial::NoLighting);
-            if (gridMaterialRef.size() > 0)
-                gridMaterialRef.replace(0, gridMaterial);
-            else
-                gridMaterialRef.append(gridMaterial);
         }
     }
 }

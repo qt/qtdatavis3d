@@ -347,8 +347,6 @@ public:
     bool graphPositionQueryPending() const { return m_graphPositionQueryPending; }
     void setGraphPositionQueryPending(const bool &pending) { m_graphPositionQueryPending = pending; }
 
-    void updateChangedSeriesList();
-
 public Q_SLOTS:
     void destroyRenderer();
 

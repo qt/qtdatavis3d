@@ -57,7 +57,6 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_selectedCustomItemIndex(-1),
     m_margin(-1.0)
 {
-    qDebug()<<__func__;
     if (!m_scene)
         m_scene = new Q3DScene;
     m_scene->setParent(this);
@@ -1369,12 +1368,6 @@ void Abstract3DController::markSeriesItemLabelsDirty()
 bool Abstract3DController::isOpenGLES() const
 {
     return Utils::isOpenGLES();
-}
-
-void Abstract3DController::updateChangedSeriesList()
-{
-    if (m_changedSeriesList.size())
-        m_changedSeriesList.clear();
 }
 
 void Abstract3DController::setAxisHelper(QAbstract3DAxis::AxisOrientation orientation,
