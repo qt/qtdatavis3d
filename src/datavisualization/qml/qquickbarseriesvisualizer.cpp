@@ -91,26 +91,24 @@ void QQuickBarSeriesVisualizer::handleMeshSmoothChanged(bool enable)
     }
 }
 
-void QQuickBarSeriesVisualizer::handleRowCountChanged(int count)
+void QQuickBarSeriesVisualizer::handleRowCountChanged()
 {
-    Q_UNUSED(count);
-    qDebug() << "---";
     QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_controller->axisZ());
     m_dataVisBars->segmentLineRepeaterZ()->setModel(categoryAxisZ->labels().size());
     m_dataVisBars->repeaterZ()->setModel(categoryAxisZ->labels().size());
     m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
-//    m_rowCount = count;
+    m_dataVisBars->updateGrid();
+    m_dataVisBars->updateLabels();
 }
 
-void QQuickBarSeriesVisualizer::handleColCountChanged(int count)
+void QQuickBarSeriesVisualizer::handleColCountChanged()
 {
-    Q_UNUSED(count);
-    qDebug() << "---";
     QCategory3DAxis *categoryAxisX = static_cast<QCategory3DAxis *>(m_controller->axisX());
     m_dataVisBars->segmentLineRepeaterX()->setModel(categoryAxisX->labels().size());
     m_dataVisBars->repeaterX()->setModel(categoryAxisX->labels().size());
     m_controller->handleAxisLabelsChangedBySender(m_controller->axisX());
-//    m_colCount = count;
+    m_dataVisBars->updateGrid();
+    m_dataVisBars->updateLabels();
 }
 
 void QQuickBarSeriesVisualizer::handleSeriesChanged(QBar3DSeries *series)
@@ -260,7 +258,7 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
 {
 //    qDebug() << __FUNCTION__;
     int colcount = dataProxy->colCount();
-    int rowcount  = dataProxy->rowCount();
+    int rowcount = dataProxy->rowCount();
     Q_UNUSED(colcount);
     Q_UNUSED(rowcount);
     m_seriesScaleX = 1.0f / float(m_visibleSeriesCount);

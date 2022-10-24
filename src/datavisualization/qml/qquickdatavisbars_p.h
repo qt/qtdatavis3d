@@ -155,8 +155,8 @@ private:
     AxisHelper m_helperAxisY;
     AxisHelper m_helperAxisZ;
 
-    float m_lineLengthScaleFactor = 0.0102f;
-    float m_lineWidthScaleFactor = 0.00015f;
+    float m_lineLengthScaleFactor;
+    float m_lineWidthScaleFactor = lineWidthScaleFactor();
     float m_gridOffset = gridOffset();
     float m_scaleXWithBackground = scaleWithBackground().x();
     float m_scaleYWithBackground = scaleWithBackground().y();

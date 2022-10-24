@@ -106,7 +106,7 @@ bool QQuickDataVisBars::isMultiSeriesUniform() const
 void QQuickDataVisBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {
-        m_barsController->setBarSpecs(GLfloat(thicknessRatio), barSpacing(),
+        m_barsController->setBarSpecs(thicknessRatio, barSpacing(),
                                       isBarSpacingRelative());
         emit barThicknessChanged(thicknessRatio);
     }
@@ -120,7 +120,7 @@ float QQuickDataVisBars::barThickness() const
 void QQuickDataVisBars::setBarSpacing(const QSizeF &spacing)
 {
     if (spacing != barSpacing()) {
-        m_barsController->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
+        m_barsController->setBarSpecs(barThickness(), spacing, isBarSpacingRelative());
         emit barSpacingChanged(spacing);
     }
 }
@@ -133,7 +133,7 @@ QSizeF QQuickDataVisBars::barSpacing() const
 void QQuickDataVisBars::setBarSpacingRelative(bool relative)
 {
     if (relative != isBarSpacingRelative()) {
-        m_barsController->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
+        m_barsController->setBarSpecs(barThickness(), barSpacing(), relative);
         emit barSpacingRelativeChanged(relative);
     }
 }
@@ -311,8 +311,8 @@ void QQuickDataVisBars::componentComplete()
         m_cachedRowCount = m_newRows;
 
         // Calculate max scene size
-        GLfloat sceneRatio = qMin(GLfloat(m_newCols) / GLfloat(m_newRows),
-                                  GLfloat(m_newRows) / GLfloat(m_newCols));
+        float sceneRatio = qMin(float(m_newCols) / float(m_newRows),
+                                  float(m_newRows) / float(m_newCols));
         m_maxSceneSize = 2.0f * qSqrt(sceneRatio * m_newCols * m_newRows);
     }
 
@@ -331,9 +331,12 @@ void QQuickDataVisBars::componentComplete()
 //    m_gridModel->setParent(QQuick3DViewport::scene());
 //    m_gridModel->setParentItem(QQuick3DViewport::scene());
 
-    setScaleOffset({3.95f, 1.0f, 3.22f});
+    setScaleOffset({2.0f, 1.0f, 2.0f});
+    setLineLengthScaleFactor(0.01f);
 
-    setLabelMargin(0.05f);
+    m_lineLengthScaleFactor = lineLengthScaleFactor();
+
+    setLabelMargin(0.3f);
 }
 
 void QQuickDataVisBars::synchData()
@@ -395,24 +398,28 @@ void QQuickDataVisBars::updateGrid()
         lineFloorRotationZ = QVector3D(90, 0, 0);
     }
 
-    auto scale = m_zScale * m_scaleZWithBackground * scaleOffset().z();
+    auto z = m_rowWidth - (m_scaleZWithBackground / segmentLineRepeaterZ()->count())
+             + m_gridOffset * segmentLineRepeaterZ()->count();
+    auto scale = (m_scaleXWithBackground * segmentLineRepeaterZ()->count()) / m_scaleZWithBackground
+                  - (m_lineLengthScaleFactor * segmentLineRepeaterZ()->count() * m_scaleZWithBackground);
 
     // Floor lines: rows
     for (int row = 0; row < segmentLineRepeaterZ()->count(); row++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterZ()->objectAt(row));
-        linePosZ = m_columnDepth - (row * m_cachedBarSpacing.height());
-        linePosZ = (linePosZ / scale) + 1.3;
+        linePosZ = (m_rowWidth - (row * m_cachedBarSpacing.height())) / scale + z;
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationZ);
     }
 
     // X = Column
     linePosZ = 0;
-    scale  = m_xScale * m_scaleXWithBackground * scaleOffset().x();
+    auto x = m_columnDepth - (m_scaleXWithBackground / segmentLineRepeaterX()->count());
+    scale = (m_scaleZWithBackground * segmentLineRepeaterX()->count()) / m_scaleXWithBackground
+              - (m_lineLengthScaleFactor * segmentLineRepeaterX()->count() * m_scaleXWithBackground);
 
     for (int col = 0; col < segmentLineRepeaterX()->count(); col++) {
         auto lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterX()->objectAt(col));
-        linePosX = ((m_rowWidth - (col * m_cachedBarSpacing.width())) / scale) + 1.83;
+        linePosX = ((col * m_cachedBarSpacing.width() - m_columnDepth) / scale) - x;
         positionAndScaleLine(lineNode,scaleZ, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationX);
     }
@@ -443,7 +450,7 @@ void QQuickDataVisBars::updateGrid()
 
     for (int i = 0; i < subGridLineCountY; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterY()->objectAt(i));
-        linePosY = valueAxis()->subGridPositionAt(i) - m_yScale;
+        linePosY = valueAxis()->subGridPositionAt(i) * scale - m_yScale;
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineBackRotationY);
     }
@@ -482,348 +489,354 @@ void QQuickDataVisBars::updateGrid()
 void QQuickDataVisBars::updateLabels()
 {
     float labelAutoAngle = 0.0f;
-    float colPosValue = (m_scaleXWithBackground + labelMargin() * 5.0f);
-    float rowPosValue = (m_scaleZWithBackground + labelMargin() * 10.0f);
     float rowPos = 0.0f;
     float colPos = 0.0f;
 
     // X Labels
-    {
-        auto labels = m_barsController->m_axisX->labels();
-        labelAutoAngle = m_barsController->m_axisX->labelAutoRotation();
-        float labelAngleFraction = labelAutoAngle / 90.0f;
-        float fractionCamX = m_barsController->scene()->activeCamera()->xRotation() * labelAngleFraction;
-        float fractionCamY = m_barsController->scene()->activeCamera()->yRotation() * labelAngleFraction;
+    auto labels = m_barsController->m_axisX->labels();
+    labelAutoAngle = m_barsController->m_axisX->labelAutoRotation();
+    float labelAngleFraction = labelAutoAngle / 90.0f;
+    float fractionCamX = m_barsController->scene()->activeCamera()->xRotation() * labelAngleFraction;
+    float fractionCamY = m_barsController->scene()->activeCamera()->yRotation() * labelAngleFraction;
 
-        QVector3D labelRotation;
+    QVector3D labelRotation;
 
-        float yPos = 0.0f;
-        float zPos = 0.0f;
+    float xPos = 0.0f;
+    float yPos = 0.0f;
+    float zPos = 0.0f;
 
-        if (labelAutoAngle == 0.0f) {
-            labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
-            if (m_xFlipped)
-                labelRotation.setY(-90.0f);
-            if (m_yFlipped) {
-                if (m_xFlipped)
-                    labelRotation.setY(-90.0f);
-                else
-                    labelRotation.setY(90.0f);
-                labelRotation.setX(90.0f);
-            }
-        } else {
+    if (labelAutoAngle == 0.0f) {
+        labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
+        if (m_xFlipped)
+            labelRotation.setY(-90.0f);
+        if (m_yFlipped) {
             if (m_xFlipped)
                 labelRotation.setY(-90.0f);
             else
                 labelRotation.setY(90.0f);
-            if (m_yFlipped) {
-                if (m_zFlipped) {
-                    if (m_xFlipped) {
-                        labelRotation.setX(90.0f - (2.0f * labelAutoAngle - fractionCamX)
-                                           * (labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(-labelAutoAngle - fractionCamY);
-                    } else {
-                        labelRotation.setX(90.0f- (2.0f * labelAutoAngle + fractionCamX)
-                                           * (labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(labelAutoAngle + fractionCamY);
-                    }
+            labelRotation.setX(90.0f);
+        }
+    } else {
+        if (m_xFlipped)
+            labelRotation.setY(-90.0f);
+        else
+            labelRotation.setY(90.0f);
+        if (m_yFlipped) {
+            if (m_zFlipped) {
+                if (m_xFlipped) {
+                    labelRotation.setX(90.0f - (2.0f * labelAutoAngle - fractionCamX)
+                                       * (labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(-labelAutoAngle - fractionCamY);
                 } else {
-                    if (m_xFlipped) {
-                        labelRotation.setX(90.0f + fractionCamX
-                                           * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(labelAutoAngle + fractionCamY);
-                    } else {
-                        labelRotation.setX(90.0f - fractionCamX
-                                           * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(-labelAutoAngle - fractionCamY);
-                    }
+                    labelRotation.setX(90.0f - (2.0f * labelAutoAngle + fractionCamX)
+                                       * (labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(labelAutoAngle + fractionCamY);
                 }
             } else {
-                if (m_zFlipped) {
-                    if (m_xFlipped) {
-                        labelRotation.setX(-90.0f + (2.0f * labelAutoAngle - fractionCamX)
-                                           *(labelAutoAngle - fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(labelAutoAngle - fractionCamY);
-                    }
+                if (m_xFlipped) {
+                    labelRotation.setX(90.0f + fractionCamX
+                                       * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(labelAutoAngle + fractionCamY);
                 } else {
-                    if (m_xFlipped) {
-                        labelRotation.setX(-90.0f - fractionCamX
-                                           * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(-labelAutoAngle + fractionCamY);
-                    } else {
-                        labelRotation.setX(-90.0f + fractionCamX
-                                           * -(labelAutoAngle - fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(labelAutoAngle - fractionCamY);
-                    }
+                    labelRotation.setX(90.0f - fractionCamX
+                                       * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(-labelAutoAngle - fractionCamY);
+                }
+            }
+        } else {
+            if (m_zFlipped) {
+                if (m_xFlipped) {
+                    labelRotation.setX(-90.0f + (2.0f * labelAutoAngle - fractionCamX)
+                                       * (labelAutoAngle - fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(labelAutoAngle - fractionCamY);
+                }
+            } else {
+                if (m_xFlipped) {
+                    labelRotation.setX(-90.0f - fractionCamX
+                                       * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(-labelAutoAngle + fractionCamY);
+                } else {
+                    labelRotation.setX(-90.0f + fractionCamX
+                                       * -(labelAutoAngle - fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(labelAutoAngle - fractionCamY);
                 }
             }
         }
+    }
 
-        if (!m_xFlipped) {
-            if (!m_yFlipped)
-                yPos = -m_scaleYWithBackground;
-            else
-                yPos = m_scaleYWithBackground;
-        } else {
-            if (!m_yFlipped)
-                yPos = -m_scaleYWithBackground;
-            else
-                yPos = m_scaleYWithBackground;
-        }
-
-        if (m_zFlipped)
-            zPos = -m_scaleZWithBackground - labelMargin();
+    if (!m_xFlipped) {
+        if (!m_yFlipped)
+            yPos = -m_scaleYWithBackground;
         else
-            zPos = m_scaleZWithBackground + labelMargin();
+            yPos = m_scaleYWithBackground;
+    } else {
+        if (!m_yFlipped)
+            yPos = -m_scaleYWithBackground;
+        else
+            yPos = m_scaleYWithBackground;
+    }
 
-        auto totalRotation = Utils::calculateRotation(labelRotation);
-        auto labelTrans = QVector3D(0.0f, yPos, zPos);
-        float labelsMaxWidth = 0.0f;
-        labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisX->labels())));
+    if (m_zFlipped)
+        zPos = -m_scaleZWithBackground - labelMargin();
+    else
+        zPos = m_scaleZWithBackground + labelMargin();
 
-        for (int i = 0; i < repeaterX()->count(); i++) {
-            colPos = (i + 0.5f) * m_cachedBarSpacing.width();
-            if (m_zFlipped)
-                rowPos = - rowPosValue;
-            else
-                rowPos = rowPosValue;
+    auto totalRotation = Utils::calculateRotation(labelRotation);
+    auto labelTrans = QVector3D(0.0f, yPos, zPos);
+    float labelsMaxWidth = 0.0f;
+    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisX->labels())
+                                                / m_scaleXWithBackground));
 
-            labelTrans.setX((colPos - m_rowWidth) / m_scaleFactor);
-            labelTrans.setZ(rowPos);
+    float rowPosValue = zPos;
+    auto x = m_columnDepth - (m_scaleXWithBackground / segmentLineRepeaterX()->count());
+    auto scale = (m_scaleZWithBackground * segmentLineRepeaterX()->count()) / m_scaleXWithBackground
+                   - (m_lineLengthScaleFactor * segmentLineRepeaterX()->count() * m_scaleXWithBackground);
 
-            auto obj = static_cast<QQuick3DNode *>(repeaterX()->objectAt(i));
-            obj->setPosition(labelTrans);
-            obj->setRotation(totalRotation);
-            obj->setProperty("labelText", labels[i]);
-            obj->setProperty("labelWidth", labelsMaxWidth);
-        }
+    for (int i = 0; i < repeaterX()->count(); i++) {
+        colPos = (i + labelMargin()) * m_cachedBarSpacing.width();
+        if (m_zFlipped)
+            rowPos = -rowPosValue;
+        else
+            rowPos = rowPosValue;
 
-        if (titleLabelX()->visible()) {
-            labelTrans.setX(0.0f);
-            updateXTitle(labelRotation, labelTrans, totalRotation,labelsMaxWidth);
-        }
+        labelTrans.setX(((colPos - m_rowWidth) / scale) - x);
+        labelTrans.setZ(rowPos);
 
+        auto obj = static_cast<QQuick3DNode *>(repeaterX()->objectAt(i));
+        obj->setPosition(labelTrans);
+        obj->setRotation(totalRotation);
+        obj->setProperty("labelText", labels[i]);
+        obj->setProperty("labelWidth", labelsMaxWidth);
+    }
+
+    if (titleLabelX()->visible()) {
+        labelTrans.setX(0.0f);
+        updateXTitle(labelRotation, labelTrans, totalRotation, labelsMaxWidth);
     }
 
     // Y Labels
-    {
-        auto labels = m_barsController->m_axisY->labels();
-        float labelAutoAngle = m_barsController->m_axisY->labelAutoRotation();
-        float labelAngleFraction = labelAutoAngle / 90.0f;
-        float fractionCamX = m_barsController->scene()->activeCamera()->xRotation() * labelAngleFraction;
-        float fractionCamY = m_barsController->scene()->activeCamera()->yRotation() * labelAngleFraction;
+    labels = m_barsController->m_axisY->labels();
+    labelAutoAngle = m_barsController->m_axisY->labelAutoRotation();
+    labelAngleFraction = labelAutoAngle / 90.0f;
+    fractionCamX = m_barsController->scene()->activeCamera()->xRotation() * labelAngleFraction;
+    fractionCamY = m_barsController->scene()->activeCamera()->yRotation() * labelAngleFraction;
 
-        QVector3D sideLabelRotation(0.0f, -90.0f, 0.0f);
-        QVector3D backLabelRotation(0.0f, 0.0f, 0.0f);
+    QVector3D sideLabelRotation(0.0f, -90.0f, 0.0f);
+    QVector3D backLabelRotation(0.0f, 0.0f, 0.0f);
 
-        float xPos = 0.0f;
-        float zPos = 0.0f;
+    xPos = 0.0f;
+    zPos = 0.0f;
 
-        int rightSideCount = repeaterY()->count() / 2;
+    int rightSideCount = repeaterY()->count() / 2;
 
-        if (labelAutoAngle == 0.0f) {
-            if (!m_xFlipped)
-                sideLabelRotation.setY(90.0f);
-            if (m_zFlipped)
-                backLabelRotation.setY(180.f);
-        } else {
-            // Orient side labels somewhat towards the camera
-            if (m_xFlipped) {
-                if (m_zFlipped)
-                    backLabelRotation.setY(180.0f + (2.0f * labelAutoAngle) - fractionCamX);
-                else
-                    backLabelRotation.setY(-fractionCamX);
-                sideLabelRotation.setY(-90.0f + labelAutoAngle - fractionCamX);
-            } else {
-                if (m_zFlipped)
-                    backLabelRotation.setY(180.0f - (2.0f * labelAutoAngle) - fractionCamX);
-                else
-                    backLabelRotation.setY(-fractionCamX);
-                sideLabelRotation.setY(90.0f - labelAutoAngle - fractionCamX);
-            }
-        }
-
+    if (labelAutoAngle == 0.0f) {
         if (m_xFlipped)
-            xPos = -m_scaleXWithBackground - labelMargin();
-        else
-            xPos = m_scaleXWithBackground + labelMargin();
-
+            sideLabelRotation.setY(90.0f);
         if (m_zFlipped)
-            zPos = m_scaleZWithBackground + labelMargin();
-        else
-            zPos = -m_scaleZWithBackground - labelMargin();
-
-        backLabelRotation.setX(-fractionCamY);
-        sideLabelRotation.setX(-fractionCamY);
-
-        auto totalSideLabelRotation = Utils::calculateRotation(sideLabelRotation);
-        auto SideLabelTrans = QVector3D(xPos, 0, zPos);
-
-        float labelsMaxWidth = 0.0f;
-        labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisX->labels())));
-
-        auto scale = m_yScale * m_scaleYWithBackground + m_yScale;
-
-        for (int i = 0; i < rightSideCount; i++) {
-            auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
-            SideLabelTrans.setY(m_helperAxisY.labelPositionAt(i) * scale - m_yScale);
-            obj->setPosition(SideLabelTrans);
-            obj->setRotation(totalSideLabelRotation);
-            obj->setProperty("labelText", labels[i]);
-            obj->setProperty("labelWidth", labelsMaxWidth);
+            backLabelRotation.setY(180.f);
+    } else {
+        // Orient side labels somewhat towards the camera
+        if (m_xFlipped) {
+            if (m_zFlipped)
+                backLabelRotation.setY(180.0f + (2.0f * labelAutoAngle) - fractionCamX);
+            else
+                backLabelRotation.setY(-fractionCamX);
+            sideLabelRotation.setY(-90.0f + labelAutoAngle - fractionCamX);
+        } else {
+            if (m_zFlipped)
+                backLabelRotation.setY(180.0f - (2.0f * labelAutoAngle) - fractionCamX);
+            else
+                backLabelRotation.setY(-fractionCamX);
+            sideLabelRotation.setY(90.0f - labelAutoAngle - fractionCamX);
         }
-
-        int label = 0;
-        // Left side
-        if (!m_xFlipped)
-            xPos = -m_scaleXWithBackground - labelMargin();
-        else
-            xPos = m_scaleXWithBackground + labelMargin();
-
-        if (!m_zFlipped)
-            zPos = m_scaleZWithBackground + labelMargin();
-        else
-            zPos = -m_scaleZWithBackground - labelMargin();
-
-        auto totalBackLabelRotation = Utils::calculateRotation(backLabelRotation);
-        auto backLabelTrans = QVector3D(xPos, 0, zPos);
-
-        for (int i = rightSideCount; i < repeaterY()->count(); i++) {
-            auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
-            backLabelTrans.setY(m_helperAxisY.labelPositionAt(label) * scale - m_yScale);
-            obj->setPosition(backLabelTrans);
-            obj->setRotation(totalBackLabelRotation);
-            obj->setProperty("labelText", labels[label]);
-            obj->setProperty("labelWidth", labelsMaxWidth);
-            label++;
-       }
-       backLabelTrans.setY(0.0f);
-       SideLabelTrans.setY(0.0f);
-
-       if (titleLabelY()->visible()) {
-           updateYTitle(sideLabelRotation, backLabelRotation,
-                            SideLabelTrans, backLabelTrans,
-                            totalSideLabelRotation, totalBackLabelRotation,1);
-       }
     }
 
+    if (m_xFlipped)
+        xPos = -m_scaleXWithBackground - labelMargin();
+    else
+        xPos = m_scaleXWithBackground + labelMargin();
+
+    if (m_zFlipped)
+        zPos = m_scaleZWithBackground + labelMargin();
+    else
+        zPos = -m_scaleZWithBackground - labelMargin();
+
+    backLabelRotation.setX(-fractionCamY);
+    sideLabelRotation.setX(-fractionCamY);
+
+    auto totalSideLabelRotation = Utils::calculateRotation(sideLabelRotation);
+    auto SideLabelTrans = QVector3D(xPos, 0, zPos);
+
+    labelsMaxWidth = 0.0f;
+    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisY->labels())
+                                                / (m_scaleXWithBackground * m_scaleZWithBackground)));
+
+    scale = m_yScale * m_scaleYWithBackground + m_yScale;
+
+    for (int i = 0; i < rightSideCount; i++) {
+        auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
+        SideLabelTrans.setY(m_helperAxisY.labelPositionAt(i) * scale - m_yScale);
+        obj->setPosition(SideLabelTrans);
+        obj->setRotation(totalSideLabelRotation);
+        obj->setProperty("labelText", labels[i]);
+        obj->setProperty("labelWidth", labelsMaxWidth);
+    }
+
+    int label = 0;
+    // Left side
+    if (!m_xFlipped)
+        xPos = -m_scaleXWithBackground - labelMargin();
+    else
+        xPos = m_scaleXWithBackground + labelMargin();
+
+    if (!m_zFlipped)
+        zPos = m_scaleZWithBackground + labelMargin();
+    else
+        zPos = -m_scaleZWithBackground - labelMargin();
+
+    auto totalBackLabelRotation = Utils::calculateRotation(backLabelRotation);
+    auto backLabelTrans = QVector3D(xPos, 0, zPos);
+
+    for (int i = rightSideCount; i < repeaterY()->count(); i++) {
+        auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
+        backLabelTrans.setY(m_helperAxisY.labelPositionAt(label) * scale - m_yScale);
+        obj->setPosition(backLabelTrans);
+        obj->setRotation(totalBackLabelRotation);
+        obj->setProperty("labelText", labels[label]);
+        obj->setProperty("labelWidth", labelsMaxWidth);
+        label++;
+   }
+   backLabelTrans.setY(0.0f);
+   SideLabelTrans.setY(0.0f);
+
+   if (titleLabelY()->visible()) {
+       updateYTitle(sideLabelRotation, backLabelRotation,
+                        SideLabelTrans, backLabelTrans,
+                        totalSideLabelRotation, totalBackLabelRotation, 1);
+   }
+
     // Z labels
-    {
-        auto labels = m_barsController->m_axisZ->labels();
-        float labelAutoAngle = m_barsController->m_axisZ->labelAutoRotation();
-        float labelAngleFraction = labelAutoAngle / 90.0f;
-        float fractionCamX = m_barsController->scene()->activeCamera()->xRotation() * labelAngleFraction;
-        float fractionCamY = m_barsController->scene()->activeCamera()->yRotation() * labelAngleFraction;
+    labels = m_barsController->m_axisZ->labels();
+    labelAutoAngle = m_barsController->m_axisZ->labelAutoRotation();
+    labelAngleFraction = labelAutoAngle / 90.0f;
+    fractionCamX = m_barsController->scene()->activeCamera()->xRotation() * labelAngleFraction;
+    fractionCamY = m_barsController->scene()->activeCamera()->yRotation() * labelAngleFraction;
 
-        float xPos;
-        float yPos;
-        QVector3D labelRotation;
-
-        if (labelAutoAngle == 0.0f) {
+    if (labelAutoAngle == 0.0f) {
+        if (m_zFlipped)
+            labelRotation.setY(180.0f);
+        else
+            labelRotation.setY(0.0f);
+        if (m_yFlipped) {
             if (m_zFlipped)
                 labelRotation.setY(180.0f);
-            if (m_yFlipped) {
-                if (m_zFlipped)
-                    labelRotation.setY(180.0f);
-                else
-                    labelRotation.setY(0.0f);
-                labelRotation.setX(90.0f);
+            else
+                labelRotation.setY(0.0f);
+            labelRotation.setX(90.0f);
+        } else {
+            labelRotation.setX(-90.0f);
+        }
+    } else {
+        if (m_zFlipped)
+            labelRotation.setY(180.0f);
+        else
+            labelRotation.setY(0.0f);
+        if (m_yFlipped) {
+            if (m_zFlipped) {
+                if (m_xFlipped) {
+                    labelRotation.setX(90.0f - (labelAutoAngle - fractionCamX)
+                                       * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(labelAutoAngle + fractionCamY);
+                } else {
+                    labelRotation.setX(90.0f + (labelAutoAngle + fractionCamX)
+                                       * (labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(-labelAutoAngle - fractionCamY);
+                }
             } else {
-                labelRotation.setX(-90.0f);
+                if (m_xFlipped) {
+                    labelRotation.setX(90.0f + (labelAutoAngle - fractionCamX)
+                                       * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(-labelAutoAngle - fractionCamY);
+                } else {
+                    labelRotation.setX(90.0f - (labelAutoAngle + fractionCamX)
+                                       * (labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(labelAutoAngle + fractionCamY);
+                }
             }
         } else {
-            if (m_zFlipped)
-                labelRotation.setY(180.0f);
-            if (m_yFlipped) {
-                if (m_zFlipped) {
-                    if (m_xFlipped) {
-                        labelRotation.setX(90.0f - (labelAutoAngle - fractionCamX)
-                                           * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(labelAutoAngle + fractionCamY);
-                    } else {
-                        labelRotation.setX(90.0f + (labelAutoAngle + fractionCamX)
-                                           * (labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(-labelAutoAngle - fractionCamY);
-                    }
+            if (m_zFlipped) {
+                if (m_xFlipped) {
+                    labelRotation.setX(-90.0f + (labelAutoAngle - fractionCamX)
+                                       * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(-labelAutoAngle + fractionCamY);
                 } else {
-                    if (m_xFlipped) {
-                        labelRotation.setX(90.0f + (labelAutoAngle - fractionCamX)
-                                           * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(-labelAutoAngle - fractionCamY);
-                    } else {
-                        labelRotation.setX(90.0f - (labelAutoAngle + fractionCamX)
-                                           * (labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(labelAutoAngle + fractionCamY);
-                    }
+                    labelRotation.setX(-90.0f - (labelAutoAngle + fractionCamX)
+                                       * (labelAutoAngle - fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(labelAutoAngle - fractionCamY);
                 }
             } else {
-                if (m_zFlipped) {
-                    if (m_xFlipped) {
-                        labelRotation.setX(-90.0f + (labelAutoAngle - fractionCamX)
-                                           * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(-labelAutoAngle + fractionCamY);
-                    } else {
-                        labelRotation.setX(-90.0f - (labelAutoAngle + fractionCamX)
-                                           * (labelAutoAngle - fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(labelAutoAngle - fractionCamY);
-                    }
+                if (m_xFlipped) {
+                    labelRotation.setX(-90.0f - (labelAutoAngle - fractionCamX)
+                                       * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(labelAutoAngle - fractionCamY);
                 } else {
-                    if (m_xFlipped) {
-                        labelRotation.setX(-90.0f - (labelAutoAngle - fractionCamX)
-                                           * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(labelAutoAngle - fractionCamY);
-                    } else {
-                        labelRotation.setX(-90.0f + (labelAutoAngle + fractionCamX)
-                                           * (labelAutoAngle - fractionCamY) / labelAutoAngle);
-                        labelRotation.setZ(-labelAutoAngle + fractionCamY);
-                    }
+                    labelRotation.setX(-90.0f + (labelAutoAngle + fractionCamX)
+                                       * (labelAutoAngle - fractionCamY) / labelAutoAngle);
+                    labelRotation.setZ(-labelAutoAngle + fractionCamY);
                 }
             }
         }
+    }
 
-        if (m_xFlipped)
-            xPos = -m_scaleXWithBackground - labelMargin();
+    if (!m_xFlipped)
+        xPos = -m_scaleXWithBackground - labelMargin();
+    else
+        xPos = m_scaleXWithBackground + labelMargin();
+
+    if (!m_zFlipped) {
+        if (!m_yFlipped)
+            yPos = -m_scaleYWithBackground;
         else
-            xPos = m_scaleXWithBackground + labelMargin();
+            yPos = m_scaleYWithBackground;
+    } else {
+        if (!m_yFlipped)
+            yPos = -m_scaleYWithBackground;
+        else
+            yPos = m_scaleYWithBackground;
+    }
 
-        if (!m_zFlipped) {
-            if (!m_yFlipped)
-                yPos = -m_scaleYWithBackground;
-            else
-                yPos = m_scaleYWithBackground;
-        }
-        else {
-            if (!m_yFlipped)
-                yPos = -m_scaleYWithBackground;
-            else
-                yPos = m_scaleYWithBackground;
-        }
-        auto totalRotation = Utils::calculateRotation(labelRotation);
-        auto labelTrans = QVector3D(xPos, yPos, 0);
-        float labelsMaxWidth = 0.0f;
-        labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisX->labels())));
+    totalRotation = Utils::calculateRotation(labelRotation);
+    labelTrans = QVector3D(xPos, yPos, 0);
+    labelsMaxWidth = 0.0f;
+    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisZ->labels())
+                                                / m_scaleZWithBackground));
 
-        for (int i = 0; i < repeaterZ()->count(); i++) {
-            rowPos = (i + 0.5f) * m_cachedBarSpacing.height();
-            if (m_xFlipped)
-                colPos = -colPosValue;
-            else
-                colPos = colPosValue;
+    float colPosValue = xPos;
+    auto z = m_rowWidth - (m_scaleZWithBackground / segmentLineRepeaterZ()->count())
+             + m_gridOffset * segmentLineRepeaterZ()->count();
+    scale = (m_scaleXWithBackground * segmentLineRepeaterZ()->count()) / m_scaleZWithBackground
+             - (m_lineLengthScaleFactor * segmentLineRepeaterZ()->count() * m_scaleZWithBackground);
 
-            labelTrans.setX(colPos);
-            labelTrans.setZ((m_columnDepth - rowPos) / m_scaleFactor);
+    for (int i = 0; i < repeaterZ()->count(); i++) {
+        rowPos = (i + 0.5f) * m_cachedBarSpacing.height();
+        if (m_xFlipped)
+            colPos = -colPosValue;
+        else
+            colPos = colPosValue;
 
-            auto obj = static_cast<QQuick3DNode *>(repeaterZ()->objectAt(i));
-            obj->setPosition(labelTrans);
-            obj->setRotation(totalRotation);
-            obj->setProperty("labelText", labels[i]);
-            obj->setProperty("labelWidth", labelsMaxWidth);
-        }
+        labelTrans.setX(colPos);
+        labelTrans.setZ(((m_columnDepth - rowPos) / scale) + z);
 
-        if (titleLabelZ()->visible()) {
-            labelTrans.setZ(0.0f);
-            updateZTitle(labelRotation, labelTrans, totalRotation,labelsMaxWidth);
-        }
+        auto obj = static_cast<QQuick3DNode *>(repeaterZ()->objectAt(i));
+        obj->setPosition(labelTrans);
+        obj->setRotation(totalRotation);
+        obj->setProperty("labelText", labels[i]);
+        obj->setProperty("labelWidth", labelsMaxWidth);
+    }
+
+    if (titleLabelZ()->visible()) {
+        labelTrans.setZ(0.0f);
+        updateZTitle(labelRotation, labelTrans, totalRotation, labelsMaxWidth);
     }
 }
 
@@ -883,12 +896,11 @@ void QQuickDataVisBars::calculateSceneScalingFactors()
 
     setScaleWithBackground(QVector3D(m_scaleXWithBackground, m_scaleYWithBackground, m_scaleZWithBackground));
 
-    m_helperAxisX.setScale(4.0f);
-    m_helperAxisY.setScale(m_yScale * 1.0f);
-    m_helperAxisZ.setScale(-3.0);
+    m_helperAxisX.setScale(m_scaleXWithBackground * 2);
+    m_helperAxisY.setScale(m_yScale);
+    m_helperAxisZ.setScale(-m_scaleZWithBackground * 2);
     m_helperAxisX.setTranslate(-m_xScale);
     m_helperAxisY.setTranslate(0.0f);
-    m_helperAxisZ.setTranslate(m_zScale);
 }
 
 void QQuickDataVisBars::calculateHeightAdjustment()

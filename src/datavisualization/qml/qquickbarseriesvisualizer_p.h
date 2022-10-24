@@ -116,8 +116,8 @@ public Q_SLOTS:
     void handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh);
     void handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
     void handleMeshSmoothChanged(bool enable);
-    void handleRowCountChanged(int count);
-    void handleColCountChanged(int count);
+    void handleRowCountChanged();
+    void handleColCountChanged();
     void handleSeriesChanged(QBar3DSeries *series);
 
 private:
