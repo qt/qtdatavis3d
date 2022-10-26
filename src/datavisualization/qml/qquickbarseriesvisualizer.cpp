@@ -69,7 +69,6 @@ void QQuickBarSeriesVisualizer::handleSeriesMeshChanged(QAbstract3DSeries::Mesh 
 void QQuickBarSeriesVisualizer::handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints)
 {
     Q_UNUSED(hints);
-    qDebug()<<__func__<<"scatterseriesVisualizer";
     setup();
 }
 
@@ -111,6 +110,11 @@ void QQuickBarSeriesVisualizer::handleColCountChanged()
     m_dataVisBars->updateLabels();
 }
 
+void QQuickBarSeriesVisualizer::createParent()
+{
+    m_visualizerRoot.reset(new QObject());
+}
+
 void QQuickBarSeriesVisualizer::handleSeriesChanged(QBar3DSeries *series)
 {
     int size = m_seriesList.size();
@@ -125,14 +129,12 @@ void QQuickBarSeriesVisualizer::setup()
             delete m_instancing;
         if (m_instancingRootItem)
             delete m_instancingRootItem;
-//        generateBars(m_seriesList);
     }
     else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationHint::OptimizationStatic) {
         removeDataItems();
         m_instancing = new DatavisQuick3DInstancing();
         createInstancingRootItem();
         createSelectionIndicator();
-//        generateBars(m_seriesList);
     }
 }
 
@@ -169,7 +171,9 @@ void QQuickBarSeriesVisualizer::disconnectSeries(QBar3DSeries *series)
 
 void QQuickBarSeriesVisualizer::generateBars(const QList<QAbstract3DSeries *> &seriesList)
 {
-//    qDebug() << __FUNCTION__ << seriesList.size();
+    if (!m_visualizerRoot)
+        createParent();
+
     int minRow = m_controller->m_axisZ->min();
     int dataRowCount = 0;
     int dataColCount = 0;
@@ -214,7 +218,6 @@ void QQuickBarSeriesVisualizer::generateBars(const QList<QAbstract3DSeries *> &s
 
 QPoint QQuickBarSeriesVisualizer::getItemIndex(QQuick3DModel *item)
 {
-    Q_UNUSED(item);
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault){
         int row = item->position().z();
         int col = item->position().x();
@@ -256,11 +259,6 @@ void QQuickBarSeriesVisualizer::resetSelection()
 
 void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
 {
-//    qDebug() << __FUNCTION__;
-    int colcount = dataProxy->colCount();
-    int rowcount = dataProxy->rowCount();
-    Q_UNUSED(colcount);
-    Q_UNUSED(rowcount);
     m_seriesScaleX = 1.0f / float(m_visibleSeriesCount);
     m_seriesStep = 1.0f / float(m_visibleSeriesCount);
     m_seriesStart = -((float(m_visibleSeriesCount) - 1.0f) / 2.0f)
@@ -275,35 +273,34 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
     m_meshRotation = dataProxy->series()->meshRotation();
 
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
-            int rowCount = dataProxy->rowCount();
-            for (int i = 0; i < rowCount; ++i) {
-                auto *dataRow = dataProxy->rowAt(i);
-                int colCount = dataRow->size();
-                for (int j = 0; j < colCount; ++j) {
-                    QBarDataItem *item = const_cast<QBarDataItem *>(&(dataRow->at(j)));
-                    QQuick3DModel *model = m_modelList.key(item);
-                    float value = item->value();
-                    float heightValue = m_helperAxisY->itemPositionAt(value);
-                    float angle = item->rotation();
+        int rowCount = dataProxy->rowCount();
+        for (int i = 0; i < rowCount; ++i) {
+            auto *dataRow = dataProxy->rowAt(i);
+            int colCount = dataRow->size();
+            for (int j = 0; j < colCount; ++j) {
+                QBarDataItem *item = const_cast<QBarDataItem *>(&(dataRow->at(j)));
+                QQuick3DModel *model = m_modelList.key(item);
+                float value = item->value();
+                float heightValue = m_helperAxisY->itemPositionAt(value);
+                float angle = item->rotation();
 
-                    //float scale = 2;
-                    float rowPos = i * (m_dataVisBars->m_cachedBarSpacing.height());
-                    float colPos = j * (m_dataVisBars->m_cachedBarSpacing.width());
-                    float xPos = (colPos - ((float)m_dataVisBars->m_rowWidth)) / (float)m_dataVisBars->m_rowWidth;
-                    float zPos = (((float)m_dataVisBars->m_columnDepth) - rowPos) / ((float)m_dataVisBars->m_columnDepth);
+                float rowPos = i * (m_dataVisBars->m_cachedBarSpacing.height());
+                float colPos = j * (m_dataVisBars->m_cachedBarSpacing.width());
+                float xPos = (colPos - ((float)m_dataVisBars->m_rowWidth)) / (float)m_dataVisBars->m_rowWidth;
+                float zPos = (((float)m_dataVisBars->m_columnDepth) - rowPos) / ((float)m_dataVisBars->m_columnDepth);
 
-                    if (angle) {
-                        model->setRotation(
-                                    QQuaternion::fromAxisAndAngle(
-                                        upVector, angle));
-                    } else {
-                        model->setRotation(identityQuaternion);
-                    }
-                    model->setPosition(QVector3D((xPos + 0.075) * m_dataVisBars->m_xScaleFactor, heightValue - m_dataVisBars->m_yScale, (zPos - 0.15) * m_dataVisBars->m_zScaleFactor));
-                    model->setScale(QVector3D(m_dataVisBars->m_xScale, heightValue , m_dataVisBars->m_zScale));
+                if (angle) {
+                    model->setRotation(
+                                QQuaternion::fromAxisAndAngle(
+                                    upVector, angle));
+                } else {
+                    model->setRotation(identityQuaternion);
                 }
+                model->setPosition(QVector3D((xPos + 0.075) * m_dataVisBars->m_xScaleFactor, heightValue - m_dataVisBars->m_yScale, (zPos - 0.15) * m_dataVisBars->m_zScaleFactor));
+                model->setScale(QVector3D(m_dataVisBars->m_xScale, heightValue , m_dataVisBars->m_zScale));
             }
-     }
+        }
+    }
 }
 
 void QQuickBarSeriesVisualizer::updateItemVisuals(QBar3DSeries *series)
@@ -606,7 +603,6 @@ QQmlComponent *QQuickBarSeriesVisualizer::createRepeaterDelegate(QAbstract3DSeri
 
 QQuick3DNode *QQuickBarSeriesVisualizer::createSeriesRoot()
 {
-//    qDebug()<<"Bar series visualizer"<<__func__;
     auto model = new QQuick3DNode();
 
     model->setParentItem(m_qml->rootNode());
@@ -616,7 +612,7 @@ QQuick3DNode *QQuickBarSeriesVisualizer::createSeriesRoot()
 QQuick3DModel *QQuickBarSeriesVisualizer::createDataItem()
 {
     auto model = new QQuick3DModel();
-    model->setParent(m_seriesRootItem);
+    model->setParent(m_visualizerRoot.get());
     model->setParentItem(m_seriesRootItem);
     QString fileName;
     switch (m_meshType) {
@@ -687,7 +683,6 @@ void QQuickBarSeriesVisualizer::removeDummyDataItems()
 
 void QQuickBarSeriesVisualizer::createItemLabel()
 {
-//    qDebug()<<staticMetaObject.className()<<"::"<<__func__;
     QQmlComponent component(qmlEngine(m_qml), QStringLiteral(":/axis/ItemLabel"));
     QQuick3DNode *labelNode = qobject_cast<QQuick3DNode *>(component.create());
     labelNode->setParent(m_qml->rootNode());

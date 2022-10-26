@@ -77,6 +77,9 @@ public:
     QList<QBar3DSeries *> m_seriesList;
     bool m_barsGenerated;
 
+    QScopedPointer<QObject> m_visualizerRoot;
+
+    void createParent();
     void setup();
     void handleSeriesConnected();
     void connectSeries(QBar3DSeries *series);
