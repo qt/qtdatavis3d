@@ -51,9 +51,6 @@ public:
 
     void setController(Scatter3DController *newController);
     void setQml(QQuickDataVisScatter *newQml);
-    void setHelperAxisX(AxisHelper *newHelperAxisX);
-    void setHelperAxisY(AxisHelper *newHelperAxisY);
-    void setHelperAxisZ(AxisHelper *newHelperAxisZ);
     void setDotSizedScale(float newDotSizedScale);
     void setScaleX(float newScaleX);
     void setScaleY(float newScaleY);
@@ -81,9 +78,7 @@ private:
     bool m_hasHighLightTexture = false;
 
     QQuick3DNode *m_itemLabel = nullptr;
-    AxisHelper *m_helperAxisX = nullptr;
-    AxisHelper *m_helperAxisY = nullptr;
-    AxisHelper *m_helperAxisZ = nullptr;
+
     float m_scaleX = 1.0f;
     float m_scaleY = 1.0f;
     float m_scaleZ = 1.0f;

@@ -19,8 +19,6 @@
 #include <private/datavisualizationglobal_p.h>
 #include <private/qqmldelegatemodel_p.h>
 
-#include <axishelper_p.h>
-
 QT_BEGIN_NAMESPACE
 
 class ScatterSeriesVisualizer;
@@ -83,11 +81,6 @@ private:
     const float m_itemScaler = 3.0f;
     float m_pointScale = 0;
 
-    // Testing sketching
-    AxisHelper m_helperAxisX;
-    AxisHelper m_helperAxisY;
-    AxisHelper m_helperAxisZ;
-
     // These were in renderer
     float m_scaleX = 1.0f;
     float m_scaleY = 1.0f;
@@ -106,9 +99,6 @@ private:
     float m_graphHorizontalAspectRatio = 0.0f;
     float m_graphAspectRatio = 2.0f;
 
-    bool m_xFlipped = false;
-    bool m_yFlipped = false;
-    bool m_zFlipped = false;
     int m_selectedItem;
     QScatter3DSeries *m_selectedItemSeries; // Points to the series for which the bar is selected
                                             // in single series selection cases.
@@ -116,7 +106,7 @@ private:
     QQuick3DModel *m_previousSelected = nullptr;
     QColor m_selectedSeriesColor;
 
-    float m_labelMargin = 0.15f;
+    float m_labelMargin = 0.25f;
 
     float m_gridOffset = 0.002f;
     float m_lineWidthScaleFactor = 0.0001f;

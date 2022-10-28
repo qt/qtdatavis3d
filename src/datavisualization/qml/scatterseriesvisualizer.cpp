@@ -107,21 +107,6 @@ void ScatterSeriesVisualizer::setDotSizedScale(float newDotSizedScale)
     m_dotSizedScale = newDotSizedScale;
 }
 
-void ScatterSeriesVisualizer::setHelperAxisZ(AxisHelper *newHelperAxisZ)
-{
-    m_helperAxisZ = newHelperAxisZ;
-}
-
-void ScatterSeriesVisualizer::setHelperAxisY(AxisHelper *newHelperAxisY)
-{
-    m_helperAxisY = newHelperAxisY;
-}
-
-void ScatterSeriesVisualizer::setHelperAxisX(AxisHelper *newHelperAxisX)
-{
-    m_helperAxisX = newHelperAxisX;
-}
-
 void ScatterSeriesVisualizer::setQml(QQuickDataVisScatter *newQml)
 {
     m_qml = newQml;
