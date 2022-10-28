@@ -362,6 +362,10 @@ ScatterSeriesVisualizer *QQuickDataVisScatter::visualizerForSeries(QScatter3DSer
 void QQuickDataVisScatter::updateLabels()
 {
     float labelAutoAngle = 0.0f;
+
+    auto xFlipped = isXFlipped();
+    auto yFlipped = isYFlipped();
+    auto zFlipped = isZFlipped();
     // X labels
     {
         auto xLabelPositions = axisX()->formatter()->labelPositions();
@@ -377,23 +381,23 @@ void QQuickDataVisScatter::updateLabels()
 
         if (labelAutoAngle == 0.0f) {
             labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
-            if (m_xFlipped)
+            if (xFlipped)
                 labelRotation.setY(-90.0f);
-            if (m_yFlipped) {
-                if (m_xFlipped)
+            if (yFlipped) {
+                if (xFlipped)
                     labelRotation.setY(-90.0f);
                 else
                     labelRotation.setY(90.0f);
                 labelRotation.setX(90.0f);
             }
         } else {
-            if (m_xFlipped)
+            if (xFlipped)
                 labelRotation.setY(-90.0f);
             else
                 labelRotation.setY(90.0f);
-            if (m_yFlipped) {
-                if (m_zFlipped) {
-                    if (m_xFlipped) {
+            if (yFlipped) {
+                if (zFlipped) {
+                    if (xFlipped) {
                         labelRotation.setX(90.0f - (2.0f * labelAutoAngle - fractionCamX)
                                            * (labelAutoAngle + fractionCamY) / labelAutoAngle);
                         labelRotation.setZ(-labelAutoAngle - fractionCamY);
@@ -403,7 +407,7 @@ void QQuickDataVisScatter::updateLabels()
                         labelRotation.setZ(labelAutoAngle + fractionCamY);
                     }
                 } else {
-                    if (m_xFlipped) {
+                    if (xFlipped) {
                         labelRotation.setX(90.0f + fractionCamX
                                            * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
                         labelRotation.setZ(labelAutoAngle + fractionCamY);
@@ -414,8 +418,8 @@ void QQuickDataVisScatter::updateLabels()
                     }
                 }
             } else {
-                if (m_zFlipped) {
-                    if (m_xFlipped) {
+                if (zFlipped) {
+                    if (xFlipped) {
                         labelRotation.setX(-90.0f + (2.0f * labelAutoAngle - fractionCamX)
                                            * (labelAutoAngle - fractionCamY) / labelAutoAngle);
                         labelRotation.setZ(labelAutoAngle - fractionCamY);
@@ -425,7 +429,7 @@ void QQuickDataVisScatter::updateLabels()
                         labelRotation.setZ(-labelAutoAngle + fractionCamY);
                     }
                 } else {
-                    if (m_xFlipped) {
+                    if (xFlipped) {
                         labelRotation.setX(-90.0f - fractionCamX
                                            * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                         labelRotation.setZ(-labelAutoAngle + fractionCamY);
@@ -437,21 +441,19 @@ void QQuickDataVisScatter::updateLabels()
                 }
             }
         }
-        if (!m_xFlipped) {
-            if (!m_yFlipped) {
+        if (!xFlipped) {
+            if (!yFlipped)
                 yPos = -m_scaleYWithBackground;
-            } else {
+            else
                 yPos = m_scaleYWithBackground;
-            }
         } else {
-            if (!m_yFlipped) {
+            if (!yFlipped)
                 yPos = -m_scaleYWithBackground;
-            } else {
+            else
                 yPos = m_scaleYWithBackground;
-            }
         }
 
-        if (m_zFlipped)
+        if (zFlipped)
             zPos = -m_scaleZWithBackground - m_labelMargin;
         else
             zPos = m_scaleZWithBackground + m_labelMargin;
@@ -493,20 +495,20 @@ void QQuickDataVisScatter::updateLabels()
         int rightSideCount = repeaterY()->count() / 2;
 
         if (labelAutoAngle == 0.0f) {
-            if (!m_xFlipped)
+            if (!xFlipped)
                 sideLabelRotation.setY(90.0f);
-            if (m_zFlipped)
+            if (zFlipped)
                 backLabelRotation.setY(180.f);
         } else {
             // Orient side labels somewhat towards the camera
-            if (m_xFlipped) {
-                if (m_zFlipped)
+            if (xFlipped) {
+                if (zFlipped)
                     backLabelRotation.setY(180.0f + (2.0f * labelAutoAngle) - fractionCamX);
                 else
                     backLabelRotation.setY(-fractionCamX);
                 sideLabelRotation.setY(-90.0f + labelAutoAngle - fractionCamX);
             } else {
-                if (m_zFlipped)
+                if (zFlipped)
                     backLabelRotation.setY(180.0f - (2.0f * labelAutoAngle) - fractionCamX);
                 else
                     backLabelRotation.setY(-fractionCamX);
@@ -514,12 +516,12 @@ void QQuickDataVisScatter::updateLabels()
             }
         }
 
-        if (m_xFlipped)
+        if (xFlipped)
             xPos = -m_scaleXWithBackground - m_labelMargin;
         else
             xPos = m_scaleXWithBackground + m_labelMargin;
 
-        if (m_zFlipped)
+        if (zFlipped)
             zPos = m_scaleZWithBackground + m_labelMargin;
         else
             zPos = -m_scaleZWithBackground - m_labelMargin;
@@ -540,12 +542,12 @@ void QQuickDataVisScatter::updateLabels()
 
         int label = 0;
         //Left side
-        if (!m_xFlipped)
+        if (!xFlipped)
             xPos = -m_scaleXWithBackground - m_labelMargin;
         else
             xPos = m_scaleXWithBackground + m_labelMargin;
 
-        if (!m_zFlipped)
+        if (!zFlipped)
             zPos = m_scaleZWithBackground + m_labelMargin;
         else
             zPos = -m_scaleZWithBackground - m_labelMargin;
@@ -587,10 +589,10 @@ void QQuickDataVisScatter::updateLabels()
         QVector3D labelRotation;
 
         if (labelAutoAngle == 0.0f) {
-            if (m_zFlipped)
+            if (zFlipped)
                 labelRotation.setY(180.0f);
-            if (m_yFlipped) {
-                if (m_zFlipped)
+            if (yFlipped) {
+                if (zFlipped)
                     labelRotation.setY(180.0f);
                 else
                     labelRotation.setY(0.0f);
@@ -599,11 +601,11 @@ void QQuickDataVisScatter::updateLabels()
                 labelRotation.setX(-90.0f);
             }
         } else {
-            if (m_zFlipped)
+            if (zFlipped)
                 labelRotation.setY(180.0f);
-            if (m_yFlipped) {
-                if (m_zFlipped) {
-                    if (m_xFlipped) {
+            if (yFlipped) {
+                if (zFlipped) {
+                    if (xFlipped) {
                         labelRotation.setX(90.0f - (labelAutoAngle - fractionCamX)
                                            * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
                         labelRotation.setZ(labelAutoAngle + fractionCamY);
@@ -613,7 +615,7 @@ void QQuickDataVisScatter::updateLabels()
                         labelRotation.setZ(-labelAutoAngle - fractionCamY);
                     }
                 } else {
-                    if (m_xFlipped) {
+                    if (xFlipped) {
                         labelRotation.setX(90.0f + (labelAutoAngle - fractionCamX)
                                            * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
                         labelRotation.setZ(-labelAutoAngle - fractionCamY);
@@ -624,8 +626,8 @@ void QQuickDataVisScatter::updateLabels()
                     }
                 }
             } else {
-                if (m_zFlipped) {
-                    if (m_xFlipped) {
+                if (zFlipped) {
+                    if (xFlipped) {
                         labelRotation.setX(-90.0f + (labelAutoAngle - fractionCamX)
                                            * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                         labelRotation.setZ(-labelAutoAngle + fractionCamY);
@@ -635,7 +637,7 @@ void QQuickDataVisScatter::updateLabels()
                         labelRotation.setZ(labelAutoAngle - fractionCamY);
                     }
                 } else {
-                    if (m_xFlipped) {
+                    if (xFlipped) {
                         labelRotation.setX(-90.0f - (labelAutoAngle - fractionCamX)
                                            * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                         labelRotation.setZ(labelAutoAngle - fractionCamY);
@@ -648,19 +650,19 @@ void QQuickDataVisScatter::updateLabels()
             }
         }
 
-        if (m_xFlipped)
+        if (xFlipped)
             xPos = -m_scaleXWithBackground - m_labelMargin;
         else
             xPos = m_scaleXWithBackground + m_labelMargin;
 
-        if (!m_zFlipped) {
-            if (!m_yFlipped)
+        if (!zFlipped) {
+            if (!yFlipped)
                 yPos = -m_scaleYWithBackground;
             else
                 yPos = m_scaleYWithBackground;
         }
         else {
-            if (!m_yFlipped)
+            if (!yFlipped)
                 yPos = -m_scaleYWithBackground;
             else
                 yPos = m_scaleYWithBackground;
