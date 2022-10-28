@@ -253,6 +253,8 @@ void QQuickDataVisScatter::calculateSceneScalingFactors()
     m_scaleZWithBackground = m_scaleZ + m_hBackgroundMargin;
 
     setScaleWithBackground(QVector3D(m_scaleXWithBackground, m_scaleYWithBackground, m_scaleZWithBackground));
+    setScale({m_scaleX * 2.0f, m_scaleY * 2.0f, -m_scaleZ * 2.0f});
+    setTranslate({-m_scaleX, -m_scaleY, m_scaleZ});
 
     m_helperAxisX.setScale(m_scaleX * 2.0f);
     m_helperAxisY.setScale(m_scaleY * 2.0f);
@@ -462,7 +464,8 @@ void QQuickDataVisScatter::updateLabels()
         auto labelTrans = QVector3D(0.0f, yPos, zPos);
         for (int i = 0; i < repeaterX()->count(); i++) {
             auto obj = static_cast<QQuick3DNode *>(repeaterX()->objectAt(i));
-            labelTrans.setX(m_helperAxisX.labelPositionAt(i));
+            auto posX = axisX()->labelPositionAt(i) * scale().x() + translate().x();
+            labelTrans.setX(posX);
             obj->setPosition(labelTrans);
             obj->setRotation(totalRotation);
             obj->setProperty("labelText", labels[i]);
@@ -534,7 +537,8 @@ void QQuickDataVisScatter::updateLabels()
 
         for (int i = 0; i < rightSideCount; i++) {
             auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
-            SideLabelTrans.setY(m_helperAxisY.labelPositionAt(i));
+            auto posY = axisY()->labelPositionAt(i) * scale().y() + translate().y();
+            SideLabelTrans.setY(posY);
             obj->setPosition(SideLabelTrans);
             obj->setRotation(totalSideLabelRotation);
             obj->setProperty("labelText", labels[i]);
@@ -557,7 +561,8 @@ void QQuickDataVisScatter::updateLabels()
 
         for (int i = rightSideCount; i < repeaterY()->count(); i++) {
             auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
-            backLabelTrans.setY(m_helperAxisY.labelPositionAt(label));
+            auto posY = axisY()->labelPositionAt(label) * scale().y() + translate().y();
+            backLabelTrans.setY(posY);
             obj->setPosition(backLabelTrans);
             obj->setRotation(totalBackLabelRotation);
             obj->setProperty("labelText", labels[label]);
@@ -672,7 +677,8 @@ void QQuickDataVisScatter::updateLabels()
 
         for (int i = 0; i < repeaterZ()->count(); i++) {
             auto obj = static_cast<QQuick3DNode *>(repeaterZ()->objectAt(i));
-            labelTrans.setZ(m_helperAxisZ.labelPositionAt(i));
+            auto posZ = axisZ()->labelPositionAt(i) * scale().z() + translate().z();
+            labelTrans.setZ(posZ);
             obj->setPosition(labelTrans);
             obj->setRotation(totalRotation);
             obj->setProperty("labelText", labels[i]);
@@ -703,7 +709,6 @@ void QQuickDataVisScatter::updateGrid()
 {
     calculateSceneScalingFactors();
     updatePointScaleSize();
-
     int gridLineCountX = segmentLineRepeaterX()->count() / 2;
     int subGridLineCountX = subsegmentLineRepeaterX()->count() / 2;
     int gridLineCountY = segmentLineRepeaterY()->count() / 2;
@@ -717,10 +722,6 @@ void QQuickDataVisScatter::updateGrid()
     auto scaleXWithBackground = m_scaleXWithBackground;
     auto scaleYWithBackground = m_scaleYWithBackground;
     auto scaleZWithBackground = m_scaleZWithBackground;
-    auto xFlipped = m_xFlipped;
-    auto yFlipped = m_yFlipped;
-    auto zFlipped = m_zFlipped;
-
 
     auto axisX = static_cast<QValue3DAxis *>(m_scatterController->axisX());
     auto axisY = static_cast<QValue3DAxis *>(m_scatterController->axisY());
@@ -750,7 +751,7 @@ void QQuickDataVisScatter::updateGrid()
 
     // X = Column
     linePosY = 0;
-    if (!zFlipped) {
+    if (!isZFlipped()) {
         linePosZ = -scaleZWithBackground + gridOffset;
     } else {
         linePosZ = scaleZWithBackground - gridOffset;
@@ -793,7 +794,7 @@ void QQuickDataVisScatter::updateGrid()
 
     linePosZ = 0;
     int k = 0;
-    if (!xFlipped) {
+    if (!isXFlipped()) {
         linePosX = -scaleXWithBackground + gridOffset;
     } else {
         linePosX = scaleXWithBackground - gridOffset;
@@ -839,7 +840,7 @@ void QQuickDataVisScatter::updateGrid()
     // X = Column
     linePosZ = 0;
     k = 0;
-    if (!yFlipped) {
+    if (!isYFlipped()) {
         linePosY = -scaleYWithBackground + gridOffset;
     } else {
         linePosY = scaleYWithBackground - gridOffset;

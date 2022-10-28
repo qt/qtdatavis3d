@@ -4,6 +4,8 @@
 #include "scatter3dcontroller_p.h"
 #include "scatterseriesvisualizer_p.h"
 #include "qquickdatavisitem_p.h"
+#include "qquickdatavisscatter_p.h"
+#include "qvalue3daxis_p.h"
 #include "axishelper_p.h"
 #include "datavisquick3dtexturedata_p.h"
 #include "q3dtheme.h"
@@ -120,7 +122,7 @@ void ScatterSeriesVisualizer::setHelperAxisX(AxisHelper *newHelperAxisX)
     m_helperAxisX = newHelperAxisX;
 }
 
-void ScatterSeriesVisualizer::setQml(QQuickDataVisItem *newQml)
+void ScatterSeriesVisualizer::setQml(QQuickDataVisScatter *newQml)
 {
     m_qml = newQml;
 }
@@ -246,9 +248,10 @@ void ScatterSeriesVisualizer::updateItemPositions(QScatterDataProxy *dataProxy)
 
             auto dotPos = item->position();
             auto dotRot = item->rotation();
-            auto posX = m_helperAxisX->itemPositionAt(dotPos.x());
-            auto posY = m_helperAxisY->itemPositionAt(dotPos.y());
-            auto posZ = m_helperAxisZ->itemPositionAt(dotPos.z());
+            auto posX = m_qml->axisX()->positionAt(dotPos.x()) * m_qml->scale().x() + m_qml->translate().x();
+            auto posY = m_qml->axisY()->positionAt(dotPos.y()) * m_qml->scale().y() + m_qml->translate().y();
+            auto posZ = m_qml->axisZ()->positionAt(dotPos.z()) * m_qml->scale().z() + m_qml->translate().z();
+
             dataPoint->setPosition(QVector3D(posX, posY, posZ));
 
             dataPoint->setRotation(dotRot * m_meshRotation);
@@ -262,9 +265,10 @@ void ScatterSeriesVisualizer::updateItemPositions(QScatterDataProxy *dataProxy)
         for (int i = 0; i < count; i++) {
             auto item = dataProxy->itemAt(i);
             auto dotPos = item->position();
-            auto posX = m_helperAxisX->itemPositionAt(dotPos.x());
-            auto posY = m_helperAxisY->itemPositionAt(dotPos.y());
-            auto posZ = m_helperAxisZ->itemPositionAt(dotPos.z());
+
+            auto posX = m_qml->axisX()->positionAt(dotPos.x()) * m_qml->scale().x() + m_qml->translate().x();
+            auto posY = m_qml->axisY()->positionAt(dotPos.y()) * m_qml->scale().y() + m_qml->translate().y();
+            auto posZ = m_qml->axisZ()->positionAt(dotPos.z()) * m_qml->scale().z() + m_qml->translate().z();
 
             DataItemHolder dih;
             dih.position = {posX,posY,posZ};

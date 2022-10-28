@@ -26,7 +26,7 @@ class Scatter3DController;
 class AxisHelper;
 class QQuick3DTexture;
 class Q3DTheme;
-class QQuickDataVisItem;
+class QQuickDataVisScatter;
 
 class ScatterSeriesVisualizer : public QObject
 {
@@ -50,7 +50,7 @@ public:
     bool pointsGenerated() const;
 
     void setController(Scatter3DController *newController);
-    void setQml(QQuickDataVisItem *newQml);
+    void setQml(QQuickDataVisScatter *newQml);
     void setHelperAxisX(AxisHelper *newHelperAxisX);
     void setHelperAxisY(AxisHelper *newHelperAxisY);
     void setHelperAxisZ(AxisHelper *newHelperAxisZ);
@@ -95,7 +95,7 @@ private:
     QQuick3DModel *m_selectionIndicator = nullptr;
     bool m_selectionActive = false;
     float m_selectedGradientPos = 0.0f;
-    QQuickDataVisItem *m_qml;
+    QQuickDataVisScatter *m_qml;
     bool dummiesCreated = false;
     QScatter3DSeries *m_series;
     int m_itemCount = 0;
