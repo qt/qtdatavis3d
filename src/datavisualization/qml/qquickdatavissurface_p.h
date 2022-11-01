@@ -103,6 +103,8 @@ private:
     void createSmoothNormalUpperLine(SurfaceModel *model, int &totalIndex);
     void createSmoothIndices(SurfaceModel *model, int x, int y, int endX, int endY);
     void createSmoothGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY);
+    void handleChangedSeries();
+    void updateModel(SurfaceModel *model);
 
     QVector<SurfaceModel *> m_model;
     Surface3DController *m_surfaceController;

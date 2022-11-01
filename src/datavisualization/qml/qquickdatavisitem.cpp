@@ -1192,8 +1192,7 @@ void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
         m_windowSamples = 0;
 
     connect(window, &QQuickWindow::beforeSynchronizing,
-            this, &QQuickDataVisItem::synchData,
-            Qt::DirectConnection);
+            this, &QQuickDataVisItem::synchData);
 
     if (m_renderMode == RenderDirectToBackground_NoClear
             || m_renderMode == RenderDirectToBackground) {

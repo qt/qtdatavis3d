@@ -60,23 +60,6 @@ public:
     };
     Q_DECLARE_FLAGS(DataDimensions, DataDimension)
 
-private:
-    Surface3DChangeBitField m_changeTracker;
-    Surface3DRenderer *m_renderer;
-    QPoint m_selectedPoint;
-    QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
-                                        // single series selection cases.
-    bool m_flatShadingSupported;
-    QList<ChangeItem> m_changedItems;
-    QList<ChangeRow> m_changedRows;
-    bool m_flipHorizontalGrid;
-    QList<QSurface3DSeries *> m_changedTextures;
-
-    int m_columnCount;
-    int m_rowCount;
-    Surface3DController::DataDimensions m_dataDimensions;
-
-public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
     ~Surface3DController();
 
@@ -116,6 +99,11 @@ public:
     void setDataDimensions(DataDimensions dimension) { m_dataDimensions = dimension; }
     DataDimensions dataDimensions() { return m_dataDimensions; }
 
+    bool hasChangedSeriesList() { return !m_changedSeriesList.isEmpty(); }
+    bool isSeriesVisibilityDirty() { return m_isSeriesVisualsDirty; }
+
+    QList<QAbstract3DSeries *> changedSeriesList() { return m_changedSeriesList; }
+
 public Q_SLOTS:
     void handleArrayReset();
     void handleRowsAdded(int startIndex, int count);
@@ -131,6 +119,21 @@ Q_SIGNALS:
     void flipHorizontalGridChanged(bool flip);
 
 private:
+    Surface3DChangeBitField m_changeTracker;
+    Surface3DRenderer *m_renderer;
+    QPoint m_selectedPoint;
+    QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
+                                        // single series selection cases.
+    bool m_flatShadingSupported;
+    QList<ChangeItem> m_changedItems;
+    QList<ChangeRow> m_changedRows;
+    bool m_flipHorizontalGrid;
+    QList<QSurface3DSeries *> m_changedTextures;
+
+    int m_columnCount;
+    int m_rowCount;
+    Surface3DController::DataDimensions m_dataDimensions;
+
     Q_DISABLE_COPY(Surface3DController)
 };
 

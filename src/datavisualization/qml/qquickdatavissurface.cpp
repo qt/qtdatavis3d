@@ -358,6 +358,10 @@ void QQuickDataVisSurface::updateGrid()
         positionAndScaleLine(lineNode, scaleY, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setRotation(lineRotation);
     }
+
+    for (auto model : m_model) {
+        updateModel(model);
+    }
 }
 
 void QQuickDataVisSurface::updateLabels()
@@ -733,202 +737,223 @@ inline static int binarySearchArray(const QSurfaceDataArray &array, int maxIndex
 
 void QQuickDataVisSurface::updateGraph()
 {
-    for (auto model : m_model) {
-        bool visible = model->series->isVisible();
-        if (!visible) {
-            model->model->setVisible(visible);
-            model->gridModel->setVisible(visible);
-            continue;
+    if (m_surfaceController->hasChangedSeriesList())
+        handleChangedSeries();
+
+    if (m_surfaceController->isSeriesVisibilityDirty()) {
+        for (auto model : m_model) {
+            bool visible = model->series->isVisible();
+            if (!visible) {
+                model->model->setVisible(visible);
+                model->gridModel->setVisible(visible);
+                continue;
+            }
+            model->gridModel->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawWireframe));
+            model->model->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawSurface));
         }
-        model->gridModel->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawWireframe));
-        model->model->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawSurface));
+    }
+}
 
-        const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
+void QQuickDataVisSurface::handleChangedSeries()
+{
+    auto changedSeries = m_surfaceController->changedSeriesList();
 
-        // calculateSampleRect
-        QRect sampleSpace;
-        if (array.size() > 0) {
-            if (array.size() >= 2 && array.at(0)->size() >= 2) {
-                const int maxRow = array.size() - 1;
-                const int maxColumn = array.at(0)->size() - 1;
+    for (auto series : changedSeries) {
+        for (auto model : m_model) {
+            if (model->series == series) {
+                updateModel(model);
+            }
+        }
+    }
+}
 
-                const bool ascendingX = array.at(0)->at(0).x() < array.at(0)->at(maxColumn).x();
-                const bool ascendingZ = array.at(0)->at(0).z() < array.at(maxRow)->at(0).z();
+void QQuickDataVisSurface::updateModel(SurfaceModel *model)
+{
+    const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
 
-                int idx = binarySearchArray(array, maxColumn, m_surfaceController->axisX()->min(), true, true, ascendingX);
-                if (idx != -1) {
-                    if (ascendingX)
-                        sampleSpace.setLeft(idx);
-                    else
-                        sampleSpace.setRight(idx);
-                } else {
-                    sampleSpace.setWidth(-1);
-                }
+    // calculateSampleRect
+    QRect sampleSpace;
+    if (array.size() > 0) {
+        if (array.size() >= 2 && array.at(0)->size() >= 2) {
+            const int maxRow = array.size() - 1;
+            const int maxColumn = array.at(0)->size() - 1;
 
-                idx = binarySearchArray(array, maxColumn, m_surfaceController->axisX()->max(), true, false, ascendingX);
-                if (idx != -1) {
-                    if (ascendingX)
-                        sampleSpace.setRight(idx);
-                    else
-                        sampleSpace.setLeft(idx);
-                } else {
-                    sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
-                }
+            const bool ascendingX = array.at(0)->at(0).x() < array.at(0)->at(maxColumn).x();
+            const bool ascendingZ = array.at(0)->at(0).z() < array.at(maxRow)->at(0).z();
 
-                idx = binarySearchArray(array, maxRow, m_surfaceController->axisZ()->min(), false, true, ascendingZ);
-                if (idx != -1) {
-                    if (ascendingZ)
-                        sampleSpace.setTop(idx);
-                    else
-                        sampleSpace.setBottom(idx);
-                } else {
-                    sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
-                }
-
-                idx = binarySearchArray(array, maxRow, m_surfaceController->axisZ()->max(), false, false, ascendingZ);
-                if (idx != -1) {
-                    if (ascendingZ)
-                        sampleSpace.setBottom(idx);
-                    else
-                        sampleSpace.setTop(idx);
-                } else {
-                    sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
-                }
+            int idx = binarySearchArray(array, maxColumn, m_surfaceController->axisX()->min(), true, true, ascendingX);
+            if (idx != -1) {
+                if (ascendingX)
+                    sampleSpace.setLeft(idx);
+                else
+                    sampleSpace.setRight(idx);
+            } else {
+                sampleSpace.setWidth(-1);
             }
 
-            int rowCount = sampleSpace.height();
-            int columnCount = sampleSpace.width();
-            m_surfaceController->setRowCount(rowCount);
-            m_surfaceController->setColumnCount(columnCount);
-
-            int totalSize = rowCount * columnCount * 2;
-            float uvX = 1.0f / float(columnCount - 1);
-            float uvY = 1.0f / float(rowCount - 1);
-
-            // checkDirection
-            int dataDimensions = Surface3DController::BothAscending;
-            if (array.at(0)->at(0).x() > array.at(0)->at(array.at(0)->size() - 1).x())
-                dataDimensions |= Surface3DController::XDescending;
-            if (static_cast<QValue3DAxis *>(m_surfaceController->axisX())->reversed())
-                dataDimensions ^= Surface3DController::XDescending;
-
-            if (array.at(0)->at(0).z() > array.at(array.size() - 1)-> at(0).z())
-                dataDimensions |= Surface3DController::ZDescending;
-            if (static_cast<QValue3DAxis *>(m_surfaceController->axisZ())->reversed())
-                dataDimensions ^= Surface3DController::ZDescending;
-
-            m_surfaceController->setDataDimensions(static_cast<Surface3DController::DataDimensions>(dataDimensions));
-
-            model->vertices.reserve(totalSize);
-
-            float minY = qInf();
-            float maxY = qInf();
-
-            model->vertices.clear();
-            model->height.clear();
-            for (int i = 0 ; i < rowCount ; i++) {
-                const QSurfaceDataRow &row = *array.at(i);
-                for (int j = 0 ; j < columnCount ; j++) {
-                    // getNormalizedVertex
-                    SurfaceVertex vertex;
-                    vertex.position = getNormalizedVertex(model, row.at(j), false, false);
-                    if (qIsInf(maxY))
-                        maxY = model->height.last();
-                    else
-                        maxY = qMax(model->height.last(), maxY);
-                    if (qIsInf(minY))
-                        minY = model->height.last();
-                    else
-                        minY = qMin(model->height.last(), minY);
-                    vertex.normal = QVector3D(0, 0, 0);
-                    vertex.uv = QVector2D(j * uvX, i * uvY);
-                    model->vertices.push_back(vertex);
-                }
+            idx = binarySearchArray(array, maxColumn, m_surfaceController->axisX()->max(), true, false, ascendingX);
+            if (idx != -1) {
+                if (ascendingX)
+                    sampleSpace.setRight(idx);
+                else
+                    sampleSpace.setLeft(idx);
+            } else {
+                sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
             }
 
-            //create normals
-            int rowLimit = rowCount - 1;
-            int colLimit = columnCount - 1;
-
-            int totalIndex = 0;
-
-            if (dataDimensions == Surface3DController::BothAscending || dataDimensions == Surface3DController::XDescending) {
-                for (int row = 0 ; row < rowLimit ; row++)
-                    createSmoothNormalBodyLine(model, totalIndex, row * columnCount);
-                createSmoothNormalUpperLine(model, totalIndex);
-            }
-            else {
-                createSmoothNormalUpperLine(model, totalIndex);
-                for (int row = 1 ; row < rowCount ; row++)
-                    createSmoothNormalBodyLine(model, totalIndex, row * columnCount);
+            idx = binarySearchArray(array, maxRow, m_surfaceController->axisZ()->min(), false, true, ascendingZ);
+            if (idx != -1) {
+                if (ascendingZ)
+                    sampleSpace.setTop(idx);
+                else
+                    sampleSpace.setBottom(idx);
+            } else {
+                sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
             }
 
-            createSmoothIndices(model, 0, 0, colLimit, rowLimit);
+            idx = binarySearchArray(array, maxRow, m_surfaceController->axisZ()->max(), false, false, ascendingZ);
+            if (idx != -1) {
+                if (ascendingZ)
+                    sampleSpace.setBottom(idx);
+                else
+                    sampleSpace.setTop(idx);
+            } else {
+                sampleSpace.setWidth(-1); // to indicate nothing needs to be shown
+            }
+        }
 
-            auto geometry = model->model->geometry();
-            QByteArray vertexBuffer(reinterpret_cast<char *>(model->vertices.data()), model->vertices.size() * sizeof(SurfaceVertex));
-            geometry->setVertexData(vertexBuffer);
-            QByteArray indexBuffer(reinterpret_cast<char *>(model->indices.data()), model->indices.size() * sizeof(quint32));
-            geometry->setIndexData(indexBuffer);
-            geometry->update();
+        int rowCount = sampleSpace.height();
+        int columnCount = sampleSpace.width();
+        m_surfaceController->setRowCount(rowCount);
+        m_surfaceController->setColumnCount(columnCount);
 
-            auto axisY = m_surfaceController->axisY();
-            maxY = axisY->max();
-            minY = axisY->min();
-            QQmlListReference materialRef(model->model, "materials");
-            auto material = static_cast<QQuick3DDefaultMaterial *>(materialRef.at(0));
-            auto textureData = material->diffuseMap()->textureData();
-            textureData->setSize(QSize(rowCount, columnCount));
-            textureData->setFormat(QQuick3DTextureData::RGBA8);
-            QByteArray imageData;
-            imageData.resize(model->height.size() * 4);
-            QLinearGradient gradient = model->series->baseGradient();
-            auto stops = gradient.stops();
-            for (int i = 0; i < model->height.size(); i++) {
-                float height = model->height.at(i);
-                float normalizedHeight = (height - minY) / (maxY - minY);
-                for (int j = 0; j < stops.size(); j++) {
-                    if (normalizedHeight < stops.at(j).first ||
-                            (normalizedHeight >= (float)stops.at(j).first && j == stops.size() - 1)) {
-                        QColor color;
-                        if (j == 0 || normalizedHeight >= (float)stops.at(j).first) {
-                            color = stops.at(j).second;
-                        } else {
-                            float normalLowerBound = stops.at(j - 1).first;
-                            float normalUpperBound = stops.at(j).first;
-                            normalizedHeight = (normalizedHeight - normalLowerBound) / (normalUpperBound - normalLowerBound);
-                            QColor start = stops.at(j - 1).second;
-                            QColor end = stops.at(j).second;
-                            float red = start.redF() + ((end.redF() - start.redF()) * normalizedHeight);
-                            float green = start.greenF() + ((end.greenF() - start.greenF()) * normalizedHeight);
-                            float blue = start.blueF() + ((end.blueF() - start.blueF()) * normalizedHeight);
-                            color.setRedF(red);
-                            color.setGreenF(green);
-                            color.setBlueF(blue);
-                        }
-                        imageData.data()[i * 4 + 0] = char(color.red());
-                        imageData.data()[i * 4 + 1] = char(color.green());
-                        imageData.data()[i * 4 + 2] = char(color.blue());
-                        imageData.data()[i * 4 + 3] = char(color.alpha());
-                        break;
+        int totalSize = rowCount * columnCount * 2;
+        float uvX = 1.0f / float(columnCount - 1);
+        float uvY = 1.0f / float(rowCount - 1);
+
+        // checkDirection
+        int dataDimensions = Surface3DController::BothAscending;
+        if (array.at(0)->at(0).x() > array.at(0)->at(array.at(0)->size() - 1).x())
+            dataDimensions |= Surface3DController::XDescending;
+        if (static_cast<QValue3DAxis *>(m_surfaceController->axisX())->reversed())
+            dataDimensions ^= Surface3DController::XDescending;
+
+        if (array.at(0)->at(0).z() > array.at(array.size() - 1)-> at(0).z())
+            dataDimensions |= Surface3DController::ZDescending;
+        if (static_cast<QValue3DAxis *>(m_surfaceController->axisZ())->reversed())
+            dataDimensions ^= Surface3DController::ZDescending;
+
+        m_surfaceController->setDataDimensions(static_cast<Surface3DController::DataDimensions>(dataDimensions));
+
+        model->vertices.reserve(totalSize);
+
+        float minY = qInf();
+        float maxY = qInf();
+
+        model->vertices.clear();
+        model->height.clear();
+        for (int i = 0 ; i < rowCount ; i++) {
+            const QSurfaceDataRow &row = *array.at(i);
+            for (int j = 0 ; j < columnCount ; j++) {
+                // getNormalizedVertex
+                SurfaceVertex vertex;
+                vertex.position = getNormalizedVertex(model, row.at(j), false, false);
+                if (qIsInf(maxY))
+                    maxY = model->height.last();
+                else
+                    maxY = qMax(model->height.last(), maxY);
+                if (qIsInf(minY))
+                    minY = model->height.last();
+                else
+                    minY = qMin(model->height.last(), minY);
+                vertex.normal = QVector3D(0, 0, 0);
+                vertex.uv = QVector2D(j * uvX, i * uvY);
+                model->vertices.push_back(vertex);
+            }
+        }
+
+        //create normals
+        int rowLimit = rowCount - 1;
+        int colLimit = columnCount - 1;
+
+        int totalIndex = 0;
+
+        if (dataDimensions == Surface3DController::BothAscending || dataDimensions == Surface3DController::XDescending) {
+            for (int row = 0 ; row < rowLimit ; row++)
+                createSmoothNormalBodyLine(model, totalIndex, row * columnCount);
+            createSmoothNormalUpperLine(model, totalIndex);
+        }
+        else {
+            createSmoothNormalUpperLine(model, totalIndex);
+            for (int row = 1 ; row < rowCount ; row++)
+                createSmoothNormalBodyLine(model, totalIndex, row * columnCount);
+        }
+
+        createSmoothIndices(model, 0, 0, colLimit, rowLimit);
+
+        auto geometry = model->model->geometry();
+        QByteArray vertexBuffer(reinterpret_cast<char *>(model->vertices.data()), model->vertices.size() * sizeof(SurfaceVertex));
+        geometry->setVertexData(vertexBuffer);
+        QByteArray indexBuffer(reinterpret_cast<char *>(model->indices.data()), model->indices.size() * sizeof(quint32));
+        geometry->setIndexData(indexBuffer);
+        geometry->update();
+
+        auto axisY = m_surfaceController->axisY();
+        maxY = axisY->max();
+        minY = axisY->min();
+        QQmlListReference materialRef(model->model, "materials");
+        auto material = static_cast<QQuick3DDefaultMaterial *>(materialRef.at(0));
+        auto textureData = material->diffuseMap()->textureData();
+        textureData->setSize(QSize(rowCount, columnCount));
+        textureData->setFormat(QQuick3DTextureData::RGBA8);
+        QByteArray imageData;
+        imageData.resize(model->height.size() * 4);
+        QLinearGradient gradient = model->series->baseGradient();
+        auto stops = gradient.stops();
+        for (int i = 0; i < model->height.size(); i++) {
+            float height = model->height.at(i);
+            float normalizedHeight = (height - minY) / (maxY - minY);
+            for (int j = 0; j < stops.size(); j++) {
+                if (normalizedHeight < stops.at(j).first ||
+                        (normalizedHeight >= (float)stops.at(j).first && j == stops.size() - 1)) {
+                    QColor color;
+                    if (j == 0 || normalizedHeight >= (float)stops.at(j).first) {
+                        color = stops.at(j).second;
+                    } else {
+                        float normalLowerBound = stops.at(j - 1).first;
+                        float normalUpperBound = stops.at(j).first;
+                        normalizedHeight = (normalizedHeight - normalLowerBound) / (normalUpperBound - normalLowerBound);
+                        QColor start = stops.at(j - 1).second;
+                        QColor end = stops.at(j).second;
+                        float red = start.redF() + ((end.redF() - start.redF()) * normalizedHeight);
+                        float green = start.greenF() + ((end.greenF() - start.greenF()) * normalizedHeight);
+                        float blue = start.blueF() + ((end.blueF() - start.blueF()) * normalizedHeight);
+                        color.setRedF(red);
+                        color.setGreenF(green);
+                        color.setBlueF(blue);
                     }
+                    imageData.data()[i * 4 + 0] = char(color.red());
+                    imageData.data()[i * 4 + 1] = char(color.green());
+                    imageData.data()[i * 4 + 2] = char(color.blue());
+                    imageData.data()[i * 4 + 3] = char(color.alpha());
+                    break;
                 }
             }
-            textureData->setTextureData(imageData);
-
-            createSmoothGridlineIndices(model, 0, 0, colLimit, rowLimit);
-
-            auto gridGeometry = model->gridModel->geometry();
-            gridGeometry->setVertexData(vertexBuffer);
-            QByteArray gridIndexBuffer(reinterpret_cast<char *>(model->gridIndices.data()), model->gridIndices.size() * sizeof(quint32));
-            gridGeometry->setIndexData(gridIndexBuffer);
-            gridGeometry->update();
-
-            QQmlListReference gridMaterialRef(model->gridModel, "materials");
-            auto gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
-            QColor gridColor = model->series->wireframeColor();
-            gridMaterial->setBaseColor(gridColor);
         }
+        textureData->setTextureData(imageData);
+
+        createSmoothGridlineIndices(model, 0, 0, colLimit, rowLimit);
+
+        auto gridGeometry = model->gridModel->geometry();
+        gridGeometry->setVertexData(vertexBuffer);
+        QByteArray gridIndexBuffer(reinterpret_cast<char *>(model->gridIndices.data()), model->gridIndices.size() * sizeof(quint32));
+        gridGeometry->setIndexData(gridIndexBuffer);
+        gridGeometry->update();
+
+        QQmlListReference gridMaterialRef(model->gridModel, "materials");
+        auto gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
+        QColor gridColor = model->series->wireframeColor();
+        gridMaterial->setBaseColor(gridColor);
     }
 }
 
