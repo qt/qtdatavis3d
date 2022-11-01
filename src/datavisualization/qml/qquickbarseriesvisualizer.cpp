@@ -284,10 +284,11 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
                 float heightValue = m_helperAxisY->itemPositionAt(value);
                 float angle = item->rotation();
 
-                float rowPos = i * (m_dataVisBars->m_cachedBarSpacing.height());
-                float colPos = j * (m_dataVisBars->m_cachedBarSpacing.width());
-                float xPos = (colPos - ((float)m_dataVisBars->m_rowWidth)) / (float)m_dataVisBars->m_rowWidth;
-                float zPos = (((float)m_dataVisBars->m_columnDepth) - rowPos) / ((float)m_dataVisBars->m_columnDepth);
+                float diffX = m_dataVisBars->m_scaleXWithBackground * 2.0 / colCount;
+                float diffZ = m_dataVisBars->m_scaleZWithBackground * 2.0 / rowCount;
+
+                float xPos = -m_dataVisBars->m_scaleXWithBackground + (j + m_dataVisBars->labelMargin()) * diffX;
+                float zPos = m_dataVisBars->m_scaleZWithBackground - (i + m_dataVisBars->labelMargin()) * diffZ;
 
                 if (angle) {
                     model->setRotation(
@@ -296,8 +297,8 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
                 } else {
                     model->setRotation(identityQuaternion);
                 }
-                model->setPosition(QVector3D((xPos + 0.075) * m_dataVisBars->m_xScaleFactor, heightValue - m_dataVisBars->m_yScale, (zPos - 0.15) * m_dataVisBars->m_zScaleFactor));
-                model->setScale(QVector3D(m_dataVisBars->m_xScale, heightValue , m_dataVisBars->m_zScale));
+                model->setPosition(QVector3D(xPos, heightValue - m_dataVisBars->m_yScale, zPos));
+                model->setScale(QVector3D(m_dataVisBars->m_scaleFactor / colCount, heightValue , m_dataVisBars->m_scaleFactor / rowCount));
             }
         }
     }
@@ -383,7 +384,6 @@ void QQuickBarSeriesVisualizer::updateItemMaterial(QQuick3DModel *item, bool use
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(item, "materials");
     if (!rangeGradient) {
-
         if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();

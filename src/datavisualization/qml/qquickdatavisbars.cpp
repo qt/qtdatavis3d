@@ -336,7 +336,7 @@ void QQuickDataVisBars::componentComplete()
 
     m_lineLengthScaleFactor = lineLengthScaleFactor();
 
-    setLabelMargin(0.3f);
+    setLabelMargin(0.5f);
 }
 
 void QQuickDataVisBars::synchData()
@@ -398,28 +398,24 @@ void QQuickDataVisBars::updateGrid()
         lineFloorRotationZ = QVector3D(90, 0, 0);
     }
 
-    auto z = m_rowWidth - (m_scaleZWithBackground / segmentLineRepeaterZ()->count())
-             + m_gridOffset * segmentLineRepeaterZ()->count();
-    auto scale = (m_scaleXWithBackground * segmentLineRepeaterZ()->count()) / m_scaleZWithBackground
-                  - (m_lineLengthScaleFactor * segmentLineRepeaterZ()->count() * m_scaleZWithBackground);
+    float diffZ = m_scaleZWithBackground * 2.0 / segmentLineRepeaterZ()->count();
 
     // Floor lines: rows
     for (int row = 0; row < segmentLineRepeaterZ()->count(); row++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterZ()->objectAt(row));
-        linePosZ = (m_rowWidth - (row * m_cachedBarSpacing.height())) / scale + z;
+        linePosZ = m_scaleZWithBackground - row * diffZ;
         positionAndScaleLine(lineNode, scaleX, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationZ);
     }
 
     // X = Column
     linePosZ = 0;
-    auto x = m_columnDepth - (m_scaleXWithBackground / segmentLineRepeaterX()->count());
-    scale = (m_scaleZWithBackground * segmentLineRepeaterX()->count()) / m_scaleXWithBackground
-              - (m_lineLengthScaleFactor * segmentLineRepeaterX()->count() * m_scaleXWithBackground);
+
+    float diffX = m_scaleXWithBackground * 2.0 / segmentLineRepeaterX()->count();
 
     for (int col = 0; col < segmentLineRepeaterX()->count(); col++) {
         auto lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterX()->objectAt(col));
-        linePosX = ((col * m_cachedBarSpacing.width() - m_columnDepth) / scale) - x;
+        linePosX = -m_scaleXWithBackground + col * diffX;
         positionAndScaleLine(lineNode,scaleZ, QVector3D(linePosX, linePosY, linePosZ));
         lineNode->setEulerRotation(lineFloorRotationX);
     }
@@ -439,7 +435,7 @@ void QQuickDataVisBars::updateGrid()
     int gridLineCountY = segmentLineRepeaterY()->count() / 2;
     int subGridLineCountY = subsegmentLineRepeaterY()->count() / 2;
 
-    scale = m_yScale * m_scaleYWithBackground + m_yScale;
+    auto scale = m_yScale * m_scaleYWithBackground + m_yScale;
 
     for (int i  = 0; i < gridLineCountY; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(segmentLineRepeaterY()->objectAt(i));
@@ -588,18 +584,17 @@ void QQuickDataVisBars::updateLabels()
                                                 / m_scaleXWithBackground));
 
     float rowPosValue = zPos;
-    auto x = m_columnDepth - (m_scaleXWithBackground / segmentLineRepeaterX()->count());
-    auto scale = (m_scaleZWithBackground * segmentLineRepeaterX()->count()) / m_scaleXWithBackground
-                   - (m_lineLengthScaleFactor * segmentLineRepeaterX()->count() * m_scaleXWithBackground);
+
+    float diffX = m_scaleXWithBackground * 2.0 / repeaterX()->count();
 
     for (int i = 0; i < repeaterX()->count(); i++) {
-        colPos = (i + labelMargin()) * m_cachedBarSpacing.width();
+        colPos = -m_scaleXWithBackground + (i + labelMargin()) * diffX;
         if (m_zFlipped)
             rowPos = -rowPosValue;
         else
             rowPos = rowPosValue;
 
-        labelTrans.setX(((colPos - m_rowWidth) / scale) - x);
+        labelTrans.setX(colPos);
         labelTrans.setZ(rowPos);
 
         auto obj = static_cast<QQuick3DNode *>(repeaterX()->objectAt(i));
@@ -623,9 +618,6 @@ void QQuickDataVisBars::updateLabels()
 
     QVector3D sideLabelRotation(0.0f, -90.0f, 0.0f);
     QVector3D backLabelRotation(0.0f, 0.0f, 0.0f);
-
-    xPos = 0.0f;
-    zPos = 0.0f;
 
     int rightSideCount = repeaterY()->count() / 2;
 
@@ -652,14 +644,14 @@ void QQuickDataVisBars::updateLabels()
     }
 
     if (m_xFlipped)
-        xPos = -m_scaleXWithBackground - labelMargin();
+        xPos = -m_scaleXWithBackground - (labelMargin() / 2.0f);
     else
-        xPos = m_scaleXWithBackground + labelMargin();
+        xPos = m_scaleXWithBackground + (labelMargin() / 2.0f);
 
     if (m_zFlipped)
-        zPos = m_scaleZWithBackground + labelMargin();
+        zPos = m_scaleZWithBackground + (labelMargin() / 2.0f);
     else
-        zPos = -m_scaleZWithBackground - labelMargin();
+        zPos = -m_scaleZWithBackground - (labelMargin() / 2.0f);
 
     backLabelRotation.setX(-fractionCamY);
     sideLabelRotation.setX(-fractionCamY);
@@ -671,7 +663,7 @@ void QQuickDataVisBars::updateLabels()
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisY->labels())
                                                 / (m_scaleXWithBackground * m_scaleZWithBackground)));
 
-    scale = m_yScale * m_scaleYWithBackground + m_yScale;
+    auto scale = m_yScale * m_scaleYWithBackground + m_yScale;
 
     for (int i = 0; i < rightSideCount; i++) {
         auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
@@ -685,14 +677,14 @@ void QQuickDataVisBars::updateLabels()
     int label = 0;
     // Left side
     if (!m_xFlipped)
-        xPos = -m_scaleXWithBackground - labelMargin();
+        xPos = -m_scaleXWithBackground - (labelMargin() / 2.0f);
     else
-        xPos = m_scaleXWithBackground + labelMargin();
+        xPos = m_scaleXWithBackground + (labelMargin() / 2.0f);
 
     if (!m_zFlipped)
-        zPos = m_scaleZWithBackground + labelMargin();
+        zPos = m_scaleZWithBackground + (labelMargin() / 2.0f);
     else
-        zPos = -m_scaleZWithBackground - labelMargin();
+        zPos = -m_scaleZWithBackground - (labelMargin() / 2.0f);
 
     auto totalBackLabelRotation = Utils::calculateRotation(backLabelRotation);
     auto backLabelTrans = QVector3D(xPos, 0, zPos);
@@ -789,9 +781,9 @@ void QQuickDataVisBars::updateLabels()
     }
 
     if (!m_xFlipped)
-        xPos = -m_scaleXWithBackground - labelMargin();
+        xPos = -m_scaleXWithBackground - (labelMargin() / 2.0f);
     else
-        xPos = m_scaleXWithBackground + labelMargin();
+        xPos = m_scaleXWithBackground + (labelMargin() / 2.0f);
 
     if (!m_zFlipped) {
         if (!m_yFlipped)
@@ -812,20 +804,18 @@ void QQuickDataVisBars::updateLabels()
                                                 / m_scaleZWithBackground));
 
     float colPosValue = xPos;
-    auto z = m_rowWidth - (m_scaleZWithBackground / segmentLineRepeaterZ()->count())
-             + m_gridOffset * segmentLineRepeaterZ()->count();
-    scale = (m_scaleXWithBackground * segmentLineRepeaterZ()->count()) / m_scaleZWithBackground
-             - (m_lineLengthScaleFactor * segmentLineRepeaterZ()->count() * m_scaleZWithBackground);
+
+    float diffZ = m_scaleZWithBackground * 2.0 / repeaterZ()->count();
 
     for (int i = 0; i < repeaterZ()->count(); i++) {
-        rowPos = (i + 0.5f) * m_cachedBarSpacing.height();
+        rowPos = m_scaleZWithBackground - (i + labelMargin()) * diffZ;
         if (m_xFlipped)
             colPos = -colPosValue;
         else
             colPos = colPosValue;
 
         labelTrans.setX(colPos);
-        labelTrans.setZ(((m_columnDepth - rowPos) / scale) + z);
+        labelTrans.setZ(rowPos);
 
         auto obj = static_cast<QQuick3DNode *>(repeaterZ()->objectAt(i));
         obj->setPosition(labelTrans);
