@@ -40,7 +40,7 @@
 */
 
 /*!
-    \page qtdatavisualization_data_handling.html
+    \page qtdatavisualization-data-handling.html
     \title Qt Data Visualization Data Handling
 
     \section1 Series
@@ -143,7 +143,7 @@
 */
 
 /*!
-    \page qtdatavisualization_interacting_with_data.html
+    \page qtdatavisualization-interacting-with-data.html
     \title Qt Data Visualization Interacting with Data
 
     \section1 Interacting with Data
@@ -190,7 +190,7 @@
 */
 
 /*!
-    \page qtdatavisualization_known_issues.html
+    \page qtdatavisualization-known-issues.html
     \title Qt Data Visualization Known Issues
 
     \list
