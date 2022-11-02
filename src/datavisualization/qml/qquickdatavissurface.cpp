@@ -241,8 +241,11 @@ void QQuickDataVisSurface::updateGrid()
 
     auto scale = this->scale().x() * scaleWithBackground().x() + scaleOffset().x();
 
+    const bool xFlipped = isXFlipped();
+    const bool zFlipped = isZFlipped();
+
     // Floor horizontal line
-    if (flipped().z())
+    if (zFlipped)
         lineRotation = Utils::calculateRotation(QVector3D(-90, 0, 0));
     for (int i = 0; i < subGridLineCountX; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterX()->objectAt(i));
@@ -260,7 +263,7 @@ void QQuickDataVisSurface::updateGrid()
 
     // Side vertical line
     linePosY = scaleY.y() / 2.0f;
-    if (flipped().z()) {
+    if (zFlipped) {
         linePosZ *= -1;
         lineRotation = Utils::calculateRotation(QVector3D(180, 0, 0));
     }
@@ -301,7 +304,7 @@ void QQuickDataVisSurface::updateGrid()
     linePosY = -scaleWithBackground().y() + 0.01f;
     scale = this->scale().z() * scaleWithBackground().z() + scaleOffset().z();
     lineRotation = Utils::calculateRotation(QVector3D(0, -90, 0));
-    if (!flipped().x())
+    if (!xFlipped)
         lineRotation = Utils::calculateRotation(QVector3D(-90, -90, 0));
     for (int i = 0; i < subGridLineCountZ; i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(subsegmentLineRepeaterZ()->objectAt(i));
@@ -319,7 +322,7 @@ void QQuickDataVisSurface::updateGrid()
     // Back horizontal line
     scale = this->scale().y() * scaleWithBackground().y() + scaleOffset().y();
     linePosX -= 0.01f;
-    if (!flipped().x()) {
+    if (!xFlipped) {
         linePosX *= -1;
         lineRotation = Utils::calculateRotation(QVector3D(180, -90, 0));
     }
@@ -340,9 +343,9 @@ void QQuickDataVisSurface::updateGrid()
     // Back vertical line
     linePosY = scaleY.y() / 2.0f;
     scale = this->scale().x() * scaleWithBackground().x() + scaleOffset().x();
-    if (flipped().z()) {
+    if (zFlipped) {
         lineRotation = Utils::calculateRotation(QVector3D(0, -90, 0));
-        if (!flipped().x())
+        if (!xFlipped)
             lineRotation = Utils::calculateRotation(QVector3D(0, 90, 0));
     }
     for (int i  = 0; i < gridLineCountX; i++) {
@@ -379,25 +382,29 @@ void QQuickDataVisSurface::updateLabels()
     float yPos;
     float zPos;
 
+    const bool xFlipped = isXFlipped();
+    const bool yFlipped = isYFlipped();
+    const bool zFlipped = isZFlipped();
+
     if (labelAutoAngle == 0.0f) {
         labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
-        if (flipped().x())
+        if (xFlipped)
             labelRotation.setY(-90.0f);
-        if (flipped().y()) {
-            if (flipped().x())
+        if (yFlipped) {
+            if (xFlipped)
                 labelRotation.setY(-90.0f);
             else
                 labelRotation.setY(90.0f);
             labelRotation.setX(90.0f);
         }
     } else {
-        if (flipped().x())
+        if (xFlipped)
             labelRotation.setY(-90.0f);
         else
             labelRotation.setY(90.0f);
-        if (flipped().y()) {
-            if (flipped().z()) {
-                if (flipped().x()) {
+        if (yFlipped) {
+            if (zFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(90.0f - (2.0f * labelAutoAngle - fractionCamX)
                                        * (labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(-labelAutoAngle - fractionCamY);
@@ -407,7 +414,7 @@ void QQuickDataVisSurface::updateLabels()
                     labelRotation.setZ(labelAutoAngle + fractionCamY);
                 }
             } else {
-                if (flipped().x()) {
+                if (xFlipped) {
                     labelRotation.setX(90.0f + fractionCamX
                                        * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(labelAutoAngle + fractionCamY);
@@ -418,8 +425,8 @@ void QQuickDataVisSurface::updateLabels()
                 }
             }
         } else {
-            if (flipped().z()) {
-                if (flipped().x()) {
+            if (zFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(-90.0f + (2.0f * labelAutoAngle - fractionCamX)
                                        * (labelAutoAngle - fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(labelAutoAngle - fractionCamY);
@@ -429,7 +436,7 @@ void QQuickDataVisSurface::updateLabels()
                     labelRotation.setZ(-labelAutoAngle + fractionCamY);
                 }
             } else {
-                if (flipped().x()) {
+                if (xFlipped) {
                     labelRotation.setX(-90.0f - fractionCamX
                                        * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(-labelAutoAngle + fractionCamY);
@@ -442,19 +449,19 @@ void QQuickDataVisSurface::updateLabels()
         }
     }
 
-    if (!flipped().x()) {
-        if (!flipped().y())
+    if (!xFlipped) {
+        if (!yFlipped)
             yPos = -scaleWithBackground().y();
         else
             yPos = scaleWithBackground().y();
     } else {
-        if (!flipped().y())
+        if (!yFlipped)
             yPos = -scaleWithBackground().y();
         else
             yPos = scaleWithBackground().y();
     }
 
-    if (flipped().z())
+    if (zFlipped)
         zPos = -scaleWithBackground().z() - labelMargin();
     else
         zPos = scaleWithBackground().z() + labelMargin();
@@ -492,20 +499,20 @@ void QQuickDataVisSurface::updateLabels()
     QVector3D backLabelRotation(0.0f, 0.0f, 0.0f);
 
     if (labelAutoAngle == 0.0f) {
-        if (!flipped().x())
+        if (!xFlipped)
             sideLabelRotation.setY(90.0f);
-        if (flipped().z())
+        if (zFlipped)
             backLabelRotation.setY(180.f);
     } else {
         // Orient side labels somewhat towards the camera
-        if (flipped().x()) {
-            if (flipped().z())
+        if (xFlipped) {
+            if (zFlipped)
                 backLabelRotation.setY(180.0f + (2.0f * labelAutoAngle) - fractionCamX);
             else
                 backLabelRotation.setY(-fractionCamX);
             sideLabelRotation.setY(-90.0f + labelAutoAngle - fractionCamX);
         } else {
-            if (flipped().z())
+            if (zFlipped)
                 backLabelRotation.setY(180.0f - (2.0f * labelAutoAngle) - fractionCamX);
             else
                 backLabelRotation.setY(-fractionCamX);
@@ -523,7 +530,7 @@ void QQuickDataVisSurface::updateLabels()
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_surfaceController->axisY()->labels())));
 
     xPos = labelTrans.x();
-    if (!flipped().x())
+    if (!xFlipped)
         labelTrans.setX(-xPos);
 
     for (int i = 0; i < repeaterY()->count() / 2; i++) {
@@ -548,10 +555,10 @@ void QQuickDataVisSurface::updateLabels()
 
     if (labelAutoAngle == 0.0f) {
         labelRotation = QVector3D(90.0f, 0.0f, 0.0f);
-        if (flipped().z())
+        if (zFlipped)
             labelRotation.setY(180.0f);
-        if (flipped().y()) {
-            if (flipped().z())
+        if (yFlipped) {
+            if (zFlipped)
                 labelRotation.setY(180.0f);
             else
                 labelRotation.setY(0.0f);
@@ -560,11 +567,11 @@ void QQuickDataVisSurface::updateLabels()
             labelRotation.setX(-90.0f);
         }
     } else {
-        if (flipped().z())
+        if (zFlipped)
             labelRotation.setY(180.0f);
-        if (flipped().y()) {
-            if (flipped().z()) {
-                if (flipped().x()) {
+        if (yFlipped) {
+            if (zFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(90.0f - (labelAutoAngle - fractionCamX)
                                        * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(labelAutoAngle + fractionCamY);
@@ -574,7 +581,7 @@ void QQuickDataVisSurface::updateLabels()
                     labelRotation.setZ(-labelAutoAngle - fractionCamY);
                 }
             } else {
-                if (flipped().x()) {
+                if (xFlipped) {
                     labelRotation.setX(90.0f + (labelAutoAngle - fractionCamX)
                                        * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(-labelAutoAngle - fractionCamY);
@@ -585,8 +592,8 @@ void QQuickDataVisSurface::updateLabels()
                 }
             }
         } else {
-            if (flipped().z()) {
-                if (flipped().x()) {
+            if (zFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(-90.0f + (labelAutoAngle - fractionCamX)
                                        * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(-labelAutoAngle + fractionCamY);
@@ -596,7 +603,7 @@ void QQuickDataVisSurface::updateLabels()
                     labelRotation.setZ(labelAutoAngle - fractionCamY);
                 }
             } else {
-                if (flipped().x()) {
+                if (xFlipped) {
                     labelRotation.setX(-90.0f - (labelAutoAngle - fractionCamX)
                                        * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(labelAutoAngle - fractionCamY);
@@ -609,19 +616,19 @@ void QQuickDataVisSurface::updateLabels()
         }
     }
 
-    if (flipped().x())
+    if (xFlipped)
         xPos = -scaleWithBackground().x() - labelMargin();
     else
         xPos = scaleWithBackground().x() + labelMargin();
 
-    if (!flipped().z()) {
-        if (!flipped().y())
+    if (!zFlipped) {
+        if (!yFlipped)
             yPos = -scaleWithBackground().y();
         else
             yPos = scaleWithBackground().y();
     }
     else {
-        if (!flipped().y())
+        if (!yFlipped)
             yPos = -scaleWithBackground().y();
         else
             yPos = scaleWithBackground().y();
@@ -656,7 +663,7 @@ void QQuickDataVisSurface::updateLabels()
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisY->labels())));
 
     zPos = labelTrans.z();
-    if (flipped().z())
+    if (zFlipped)
         labelTrans.setZ(-zPos);
 
     for (int i = 0; i < repeaterY()->count() / 2; i++) {

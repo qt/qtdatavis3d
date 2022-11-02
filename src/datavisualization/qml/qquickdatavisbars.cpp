@@ -3,7 +3,6 @@
 
 #include "qquickbarseriesvisualizer_p.h"
 #include "qquickdatavisbars_p.h"
-#include "qbardataproxy_p.h"
 #include "declarativescene_p.h"
 #include "qbar3dseries_p.h"
 #include "q3dcamera_p.h"
@@ -316,20 +315,12 @@ void QQuickDataVisBars::componentComplete()
         m_maxSceneSize = 2.0f * qSqrt(sceneRatio * m_newCols * m_newRows);
     }
 
-    m_xFlipped = true;
+    setXFlipped(true);
 
     QQuickDataVisItem::componentComplete();
 
     QValue3DAxis *axisY = static_cast<QValue3DAxis *>(m_barsController->axisY());
     m_helperAxisY.setFormatter(axisY->formatter());
-
-//    m_model = new QQuick3DModel();
-//    m_model->setParent(QQuick3DViewport::scene());
-//    m_model->setParentItem(QQuick3DViewport::scene());
-
-//    m_gridModel = new QQuick3DModel();
-//    m_gridModel->setParent(QQuick3DViewport::scene());
-//    m_gridModel->setParentItem(QQuick3DViewport::scene());
 
     setScaleOffset({2.0f, 1.0f, 2.0f});
     setLineLengthScaleFactor(0.01f);
@@ -390,7 +381,11 @@ void QQuickDataVisBars::updateGrid()
     QVector3D lineFloorRotationX(-90,0,0);
     QVector3D lineFloorRotationZ(-90,0,0);
 
-    if (!m_yFlipped) {
+    const bool xFlipped = isXFlipped();
+    const bool yFlipped = isYFlipped();
+    const bool zFlipped = isZFlipped();
+
+    if (!yFlipped) {
         linePosY = -m_scaleYWithBackground + m_gridOffset;
     } else {
         linePosY = m_scaleYWithBackground - m_gridOffset;
@@ -423,7 +418,7 @@ void QQuickDataVisBars::updateGrid()
     // Wall lines: back wall
     // X = Column
     linePosY = 0;
-    if (!m_zFlipped) {
+    if (!zFlipped) {
         linePosZ = -m_scaleZWithBackground + m_gridOffset;
     } else {
         linePosZ = m_scaleZWithBackground - m_gridOffset;
@@ -456,7 +451,7 @@ void QQuickDataVisBars::updateGrid()
 
     linePosZ = 0;
     int k = 0;
-    if (!m_xFlipped) {
+    if (!xFlipped) {
         linePosX = -m_scaleXWithBackground + m_gridOffset;
     } else {
         linePosX = m_scaleXWithBackground - m_gridOffset;
@@ -501,25 +496,29 @@ void QQuickDataVisBars::updateLabels()
     float yPos = 0.0f;
     float zPos = 0.0f;
 
+    const bool xFlipped = isXFlipped();
+    const bool yFlipped = isYFlipped();
+    const bool zFlipped = isZFlipped();
+
     if (labelAutoAngle == 0.0f) {
         labelRotation = QVector3D(-90.0f, 90.0f, 0.0f);
-        if (m_xFlipped)
+        if (xFlipped)
             labelRotation.setY(-90.0f);
-        if (m_yFlipped) {
-            if (m_xFlipped)
+        if (yFlipped) {
+            if (xFlipped)
                 labelRotation.setY(-90.0f);
             else
                 labelRotation.setY(90.0f);
             labelRotation.setX(90.0f);
         }
     } else {
-        if (m_xFlipped)
+        if (xFlipped)
             labelRotation.setY(-90.0f);
         else
             labelRotation.setY(90.0f);
-        if (m_yFlipped) {
-            if (m_zFlipped) {
-                if (m_xFlipped) {
+        if (yFlipped) {
+            if (zFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(90.0f - (2.0f * labelAutoAngle - fractionCamX)
                                        * (labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(-labelAutoAngle - fractionCamY);
@@ -529,7 +528,7 @@ void QQuickDataVisBars::updateLabels()
                     labelRotation.setZ(labelAutoAngle + fractionCamY);
                 }
             } else {
-                if (m_xFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(90.0f + fractionCamX
                                        * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(labelAutoAngle + fractionCamY);
@@ -540,14 +539,14 @@ void QQuickDataVisBars::updateLabels()
                 }
             }
         } else {
-            if (m_zFlipped) {
-                if (m_xFlipped) {
+            if (zFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(-90.0f + (2.0f * labelAutoAngle - fractionCamX)
                                        * (labelAutoAngle - fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(labelAutoAngle - fractionCamY);
                 }
             } else {
-                if (m_xFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(-90.0f - fractionCamX
                                        * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(-labelAutoAngle + fractionCamY);
@@ -560,19 +559,19 @@ void QQuickDataVisBars::updateLabels()
         }
     }
 
-    if (!m_xFlipped) {
-        if (!m_yFlipped)
+    if (!xFlipped) {
+        if (!yFlipped)
             yPos = -m_scaleYWithBackground;
         else
             yPos = m_scaleYWithBackground;
     } else {
-        if (!m_yFlipped)
+        if (!yFlipped)
             yPos = -m_scaleYWithBackground;
         else
             yPos = m_scaleYWithBackground;
     }
 
-    if (m_zFlipped)
+    if (zFlipped)
         zPos = -m_scaleZWithBackground - labelMargin();
     else
         zPos = m_scaleZWithBackground + labelMargin();
@@ -589,7 +588,8 @@ void QQuickDataVisBars::updateLabels()
 
     for (int i = 0; i < repeaterX()->count(); i++) {
         colPos = -m_scaleXWithBackground + (i + labelMargin()) * diffX;
-        if (m_zFlipped)
+
+        if (zFlipped)
             rowPos = -rowPosValue;
         else
             rowPos = rowPosValue;
@@ -622,20 +622,20 @@ void QQuickDataVisBars::updateLabels()
     int rightSideCount = repeaterY()->count() / 2;
 
     if (labelAutoAngle == 0.0f) {
-        if (m_xFlipped)
+        if (xFlipped)
             sideLabelRotation.setY(90.0f);
-        if (m_zFlipped)
+        if (zFlipped)
             backLabelRotation.setY(180.f);
     } else {
         // Orient side labels somewhat towards the camera
-        if (m_xFlipped) {
-            if (m_zFlipped)
+        if (xFlipped) {
+            if (zFlipped)
                 backLabelRotation.setY(180.0f + (2.0f * labelAutoAngle) - fractionCamX);
             else
                 backLabelRotation.setY(-fractionCamX);
             sideLabelRotation.setY(-90.0f + labelAutoAngle - fractionCamX);
         } else {
-            if (m_zFlipped)
+            if (zFlipped)
                 backLabelRotation.setY(180.0f - (2.0f * labelAutoAngle) - fractionCamX);
             else
                 backLabelRotation.setY(-fractionCamX);
@@ -643,12 +643,12 @@ void QQuickDataVisBars::updateLabels()
         }
     }
 
-    if (m_xFlipped)
+    if (xFlipped)
         xPos = -m_scaleXWithBackground - (labelMargin() / 2.0f);
     else
         xPos = m_scaleXWithBackground + (labelMargin() / 2.0f);
 
-    if (m_zFlipped)
+    if (zFlipped)
         zPos = m_scaleZWithBackground + (labelMargin() / 2.0f);
     else
         zPos = -m_scaleZWithBackground - (labelMargin() / 2.0f);
@@ -676,12 +676,12 @@ void QQuickDataVisBars::updateLabels()
 
     int label = 0;
     // Left side
-    if (!m_xFlipped)
+    if (!xFlipped)
         xPos = -m_scaleXWithBackground - (labelMargin() / 2.0f);
     else
         xPos = m_scaleXWithBackground + (labelMargin() / 2.0f);
 
-    if (!m_zFlipped)
+    if (!zFlipped)
         zPos = m_scaleZWithBackground + (labelMargin() / 2.0f);
     else
         zPos = -m_scaleZWithBackground - (labelMargin() / 2.0f);
@@ -715,12 +715,12 @@ void QQuickDataVisBars::updateLabels()
     fractionCamY = m_barsController->scene()->activeCamera()->yRotation() * labelAngleFraction;
 
     if (labelAutoAngle == 0.0f) {
-        if (m_zFlipped)
+        if (zFlipped)
             labelRotation.setY(180.0f);
         else
             labelRotation.setY(0.0f);
-        if (m_yFlipped) {
-            if (m_zFlipped)
+        if (yFlipped) {
+            if (zFlipped)
                 labelRotation.setY(180.0f);
             else
                 labelRotation.setY(0.0f);
@@ -729,13 +729,13 @@ void QQuickDataVisBars::updateLabels()
             labelRotation.setX(-90.0f);
         }
     } else {
-        if (m_zFlipped)
+        if (zFlipped)
             labelRotation.setY(180.0f);
         else
             labelRotation.setY(0.0f);
-        if (m_yFlipped) {
-            if (m_zFlipped) {
-                if (m_xFlipped) {
+        if (yFlipped) {
+            if (zFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(90.0f - (labelAutoAngle - fractionCamX)
                                        * (-labelAutoAngle - fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(labelAutoAngle + fractionCamY);
@@ -745,7 +745,7 @@ void QQuickDataVisBars::updateLabels()
                     labelRotation.setZ(-labelAutoAngle - fractionCamY);
                 }
             } else {
-                if (m_xFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(90.0f + (labelAutoAngle - fractionCamX)
                                        * -(labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(-labelAutoAngle - fractionCamY);
@@ -756,8 +756,8 @@ void QQuickDataVisBars::updateLabels()
                 }
             }
         } else {
-            if (m_zFlipped) {
-                if (m_xFlipped) {
+            if (zFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(-90.0f + (labelAutoAngle - fractionCamX)
                                        * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(-labelAutoAngle + fractionCamY);
@@ -767,7 +767,7 @@ void QQuickDataVisBars::updateLabels()
                     labelRotation.setZ(labelAutoAngle - fractionCamY);
                 }
             } else {
-                if (m_xFlipped) {
+                if (xFlipped) {
                     labelRotation.setX(-90.0f - (labelAutoAngle - fractionCamX)
                                        * (-labelAutoAngle + fractionCamY) / labelAutoAngle);
                     labelRotation.setZ(labelAutoAngle - fractionCamY);
@@ -780,18 +780,18 @@ void QQuickDataVisBars::updateLabels()
         }
     }
 
-    if (!m_xFlipped)
+    if (!xFlipped)
         xPos = -m_scaleXWithBackground - (labelMargin() / 2.0f);
     else
         xPos = m_scaleXWithBackground + (labelMargin() / 2.0f);
 
-    if (!m_zFlipped) {
-        if (!m_yFlipped)
+    if (!zFlipped) {
+        if (!yFlipped)
             yPos = -m_scaleYWithBackground;
         else
             yPos = m_scaleYWithBackground;
     } else {
-        if (!m_yFlipped)
+        if (!yFlipped)
             yPos = -m_scaleYWithBackground;
         else
             yPos = m_scaleYWithBackground;
@@ -809,7 +809,7 @@ void QQuickDataVisBars::updateLabels()
 
     for (int i = 0; i < repeaterZ()->count(); i++) {
         rowPos = m_scaleZWithBackground - (i + labelMargin()) * diffZ;
-        if (m_xFlipped)
+        if (xFlipped)
             colPos = -colPosValue;
         else
             colPos = colPosValue;

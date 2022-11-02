@@ -161,9 +161,6 @@ private:
     float m_scaleXWithBackground = scaleWithBackground().x();
     float m_scaleYWithBackground = scaleWithBackground().y();
     float m_scaleZWithBackground = scaleWithBackground().z();
-    float m_xFlipped = flipped().x();
-    float m_yFlipped = flipped().y();
-    float m_zFlipped = flipped().z();
     float m_xScale = scale().x();
     float m_yScale = scale().y();
     float m_zScale = scale().z();

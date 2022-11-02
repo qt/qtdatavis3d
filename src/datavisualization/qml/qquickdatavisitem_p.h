@@ -244,8 +244,12 @@ public:
     QQuick3DRepeater *subsegmentLineRepeaterY() const { return m_subsegmentLineRepeaterY; }
     QQuick3DRepeater *subsegmentLineRepeaterZ() const { return m_subsegmentLineRepeaterZ; }
 
-    QVector3D flipped() const { return m_flipped; }
-    void setFlipped(const QVector3D &flipped) { m_flipped = flipped; }
+    bool isXFlipped() const { return m_xFlipped; }
+    void setXFlipped(bool xFlipped) { m_xFlipped = xFlipped; }
+    bool isYFlipped() const { return m_yFlipped; }
+    void setYFlipped(bool yFlipped) { m_yFlipped = yFlipped; }
+    bool isZFlipped() const { return m_zFlipped; }
+    void setZFlipped(bool zFlipped) { m_zFlipped = zFlipped; }
     QVector3D scaleWithBackground() const { return m_scaleWithBackground; }
     void setScaleWithBackground(const QVector3D &scale) { m_scaleWithBackground = scale; }
     QVector3D rotation() const { return m_rot; }
@@ -390,7 +394,9 @@ private:
     bool m_runningInDesigner;
     QMutex m_mutex;
 
-    QVector3D m_flipped = QVector3D(false, false, false);
+    bool m_xFlipped = false;
+    bool m_yFlipped = false;
+    bool m_zFlipped = false;
 
     bool m_flipScales;
 

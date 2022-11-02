@@ -490,16 +490,16 @@ void QQuickDataVisItem::synchData()
     QVector3D forward = camera()->forward();
     auto targetRotation = cameraTarget()->rotation();
     bool viewFlipped = false;
-    if ((bool)m_flipped.y() != (targetRotation.x() > 0)) {
-        m_flipped.setY(targetRotation.x() > 0);
+    if (m_yFlipped != (targetRotation.x() > 0)) {
+        m_yFlipped = (targetRotation.x() > 0);
         viewFlipped = true;
     }
-    if ((bool)m_flipped.x() != (forward.x() > 0)) {
-        m_flipped.setX(forward.x() > 0);
+    if (m_xFlipped != (forward.x() > 0)) {
+        m_xFlipped = (forward.x() > 0);
         viewFlipped = true;
     }
-    if ((bool)m_flipped.z() != (forward.z() >= 0)) {
-        m_flipped.setZ(forward.z() >= 0);
+    if (m_zFlipped != (forward.z() >= 0)) {
+        m_zFlipped = (forward.z() >= 0);
         viewFlipped = true;
     }
 
@@ -512,26 +512,26 @@ void QQuickDataVisItem::synchData()
     m_backgroundScale->setScale(m_scaleWithBackground);
 
     QVector3D rotVec;
-    if (!m_flipped.y()) {
+    if (!m_yFlipped) {
         rotVec = QVector3D(0, 270, 0);
-        if (m_flipped.x() && m_flipped.z())
+        if (m_xFlipped && m_zFlipped)
             rotVec.setY(90);
-        else if (!m_flipped.x() && m_flipped.z())
+        else if (!m_xFlipped && m_zFlipped)
             rotVec.setY(0);
-        else if (m_flipped.x() && !m_flipped.z())
+        else if (m_xFlipped && !m_zFlipped)
             rotVec.setY(180);
     } else {
         rotVec = QVector3D(0, 180, 180);
-        if (m_flipped.x() && m_flipped.z())
+        if (m_xFlipped && m_zFlipped)
             rotVec.setY(0);
-        else if (!m_flipped.x() && m_flipped.z())
+        else if (!m_xFlipped && m_zFlipped)
             rotVec.setY(270);
-        else if (m_flipped.x() && !m_flipped.z())
+        else if (m_xFlipped && !m_zFlipped)
             rotVec.setY(90);
     }
 
     auto rotation = Utils::calculateRotation(rotVec);
-    if (m_flipped.y()) {
+    if (m_yFlipped) {
         m_backgroundRotation->setRotation(rotation);
     } else {
         modelMatrix.rotate(rotation);
@@ -731,7 +731,7 @@ void QQuickDataVisItem::updateGrid()
 
     // X = Column
     linePosY = 0;
-    if (!m_flipped.z()) {
+    if (!m_zFlipped) {
         linePosZ = -m_scaleWithBackground.z() + m_gridOffset;
     } else {
         linePosZ = m_scaleWithBackground.z() - m_gridOffset;
@@ -773,7 +773,7 @@ void QQuickDataVisItem::updateGrid()
     // Y = Row
     linePosZ = 0;
     int k = 0;
-    if (!m_flipped.x()) {
+    if (!m_xFlipped) {
         linePosX = -m_scaleWithBackground.x() + m_gridOffset;
     } else {
         linePosX = m_scaleWithBackground.x() - m_gridOffset;
@@ -819,7 +819,7 @@ void QQuickDataVisItem::updateGrid()
     // X = Column
     linePosZ = 0;
     k = 0;
-    if (!m_flipped.y()) {
+    if (!m_yFlipped) {
         linePosY = -m_scaleWithBackground.y() + m_gridOffset;
     } else {
         linePosY = m_scaleWithBackground.y() - m_gridOffset;
@@ -970,11 +970,11 @@ void QQuickDataVisItem::updateXTitle(const QVector3D &labelRotation, const QVect
     float xRotation = -90.0f + labelRotation.z();
     float offsetRotation = labelRotation.z();
     float extraRotation = -90.0f;
-    if (m_flipped.y()) {
+    if (m_yFlipped) {
         zRotation = 180.0f;
-        if (m_flipped.z()) {
+        if (m_zFlipped) {
             titleOffset = -titleOffset;
-            if (m_flipped.x()) {
+            if (m_xFlipped) {
                 offsetRotation = -offsetRotation;
                 extraRotation = -extraRotation;
             } else {
@@ -982,7 +982,7 @@ void QQuickDataVisItem::updateXTitle(const QVector3D &labelRotation, const QVect
             }
         } else {
             yRotation = 180.0f;
-            if (m_flipped.x()) {
+            if (m_xFlipped) {
                 offsetRotation = -offsetRotation;
                 xRotation = -90.0f - labelRotation.z();
             } else {
@@ -990,9 +990,9 @@ void QQuickDataVisItem::updateXTitle(const QVector3D &labelRotation, const QVect
             }
         }
     } else {
-        if (m_flipped.z()) {
+        if (m_zFlipped) {
             titleOffset = -titleOffset;
-            if (m_flipped.x()) {
+            if (m_xFlipped) {
                 yRotation = 180.0f;
                 offsetRotation = -offsetRotation;
             } else {
@@ -1000,23 +1000,23 @@ void QQuickDataVisItem::updateXTitle(const QVector3D &labelRotation, const QVect
                 xRotation = -90.0f - labelRotation.z();
                 extraRotation = -extraRotation;
             }
-            if (m_flipped.y()) {
+            if (m_yFlipped) {
                 extraRotation = -extraRotation;
-                if (m_flipped.x())
+                if (m_xFlipped)
                     xRotation = 90.0f + labelRotation.z();
                 else
                     xRotation = 90.0f - labelRotation.z();
             }
         } else {
-            if (m_flipped.x()) {
+            if (m_xFlipped) {
                 offsetRotation = -offsetRotation;
                 xRotation = -90.0f - labelRotation.z();
                 extraRotation = -extraRotation;
             }
-            if (m_flipped.y()) {
+            if (m_yFlipped) {
                 xRotation = 90.0f + labelRotation.z();
                 extraRotation = -extraRotation;
-                if (m_flipped.x())
+                if (m_xFlipped)
                     xRotation = 90.0f - labelRotation.z();
             }
         }
@@ -1056,7 +1056,7 @@ void QQuickDataVisItem::updateYTitle(const QVector3D &sideLabelRotation, const Q
     float yRotation;
     QVector3D titleTrans;
     QQuaternion totalRotation;
-    if (m_flipped.x() == m_flipped.z()) {
+    if (m_xFlipped == m_zFlipped) {
         yRotation = backLabelRotation.y();
         titleTrans = backLabelTrans;
         totalRotation = totalBackRotation;
@@ -1093,11 +1093,11 @@ void QQuickDataVisItem::updateZTitle(const QVector3D &labelRotation, const QVect
     float xRotation = -90.0f;
     float extraRotation = 90.0f;
 
-    if (m_flipped.y()) {
+    if (m_yFlipped) {
 
         xRotation = -xRotation;
-        if (m_flipped.z()) {
-            if (m_flipped.x()) {
+        if (m_zFlipped) {
+            if (m_xFlipped) {
                 titleOffset = -titleOffset;
                 zRotation = -zRotation;
                 extraRotation = -extraRotation;
@@ -1106,7 +1106,7 @@ void QQuickDataVisItem::updateZTitle(const QVector3D &labelRotation, const QVect
                 yRotation = -yRotation;
             }
         } else {
-            if (m_flipped.x()) {
+            if (m_xFlipped) {
                 titleOffset = -titleOffset;
             } else {
                 extraRotation = -extraRotation;
@@ -1114,23 +1114,23 @@ void QQuickDataVisItem::updateZTitle(const QVector3D &labelRotation, const QVect
             }
         }
     } else {
-        if (m_flipped.z()) {
+        if (m_zFlipped) {
             zRotation = -zRotation;
-            if (m_flipped.x()) {
+            if (m_xFlipped) {
                 titleOffset = -titleOffset;
             } else {
                 extraRotation = -extraRotation;
                 yRotation = -yRotation;
             }
         } else {
-            if (m_flipped.x()) {
+            if (m_xFlipped) {
                 titleOffset = -titleOffset;
                 extraRotation = -extraRotation;
             } else {
                 yRotation = -yRotation;
             }
         }
-        if (m_flipped.y()) {
+        if (m_yFlipped) {
             xRotation = -xRotation;
             extraRotation = -extraRotation;
         }
