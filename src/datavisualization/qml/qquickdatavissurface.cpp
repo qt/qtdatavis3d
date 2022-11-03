@@ -67,6 +67,17 @@ void QQuickDataVisSurface::setAxisZ(QValue3DAxis *axis)
     m_surfaceController->setAxisZ(axis);
 }
 
+void QQuickDataVisSurface::handleFlatShadingEnabledChanged()
+{
+    auto series = static_cast<QSurface3DSeries *>(sender());
+    for (auto model : m_model) {
+        if (model->series == series) {
+            updateModel(model);
+            break;
+        }
+    }
+}
+
 QSurface3DSeries *QQuickDataVisSurface::selectedSeries() const
 {
     return m_surfaceController->selectedSeries();
@@ -208,6 +219,8 @@ void QQuickDataVisSurface::componentComplete()
         surfaceModel->series = series;
 
         m_model.push_back(surfaceModel);
+
+        connect(series, &QSurface3DSeries::flatShadingEnabledChanged, this, &QQuickDataVisSurface::handleFlatShadingEnabledChanged);
     }
 
     setScaleWithBackground({2.1f, 1.1f, 2.1f});
@@ -857,6 +870,8 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
         float minY = qInf();
         float maxY = qInf();
 
+        bool isFlatShadingEnabled = model->series->isFlatShadingEnabled();
+
         model->vertices.clear();
         model->height.clear();
         for (int i = 0 ; i < rowCount ; i++) {
@@ -885,21 +900,33 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
 
         int totalIndex = 0;
 
-        if (dataDimensions == Surface3DController::BothAscending || dataDimensions == Surface3DController::XDescending) {
-            for (int row = 0 ; row < rowLimit ; row++)
-                createSmoothNormalBodyLine(model, totalIndex, row * columnCount);
-            createSmoothNormalUpperLine(model, totalIndex);
-        }
-        else {
-            createSmoothNormalUpperLine(model, totalIndex);
-            for (int row = 1 ; row < rowCount ; row++)
-                createSmoothNormalBodyLine(model, totalIndex, row * columnCount);
-        }
+        model->indices.clear();
 
-        createSmoothIndices(model, 0, 0, colLimit, rowLimit);
+        if (isFlatShadingEnabled) {
+            model->coarceVertices.clear();
+
+            createCoarseVertices(model, 0, 0, colLimit, rowLimit);
+        } else {
+            if (dataDimensions == Surface3DController::BothAscending || dataDimensions == Surface3DController::XDescending) {
+                for (int row = 0 ; row < rowLimit ; row++)
+                    createSmoothNormalBodyLine(model, totalIndex, row * columnCount);
+                createSmoothNormalUpperLine(model, totalIndex);
+            }
+            else {
+                createSmoothNormalUpperLine(model, totalIndex);
+                for (int row = 1 ; row < rowCount ; row++)
+                    createSmoothNormalBodyLine(model, totalIndex, row * columnCount);
+            }
+
+            createSmoothIndices(model, 0, 0, colLimit, rowLimit);
+        }
 
         auto geometry = model->model->geometry();
-        QByteArray vertexBuffer(reinterpret_cast<char *>(model->vertices.data()), model->vertices.size() * sizeof(SurfaceVertex));
+        QByteArray vertexBuffer;
+        if (isFlatShadingEnabled)
+            vertexBuffer.setRawData(reinterpret_cast<char *>(model->coarceVertices.data()), model->coarceVertices.size() * sizeof(SurfaceVertex));
+        else
+            vertexBuffer.setRawData(reinterpret_cast<char *>(model->vertices.data()), model->vertices.size() * sizeof(SurfaceVertex));
         geometry->setVertexData(vertexBuffer);
         QByteArray indexBuffer(reinterpret_cast<char *>(model->indices.data()), model->indices.size() * sizeof(quint32));
         geometry->setIndexData(indexBuffer);
@@ -949,9 +976,12 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
         }
         textureData->setTextureData(imageData);
 
-        createSmoothGridlineIndices(model, 0, 0, colLimit, rowLimit);
+        createGridlineIndices(model, 0, 0, colLimit, rowLimit);
 
         auto gridGeometry = model->gridModel->geometry();
+
+        if (isFlatShadingEnabled)
+            vertexBuffer.setRawData(reinterpret_cast<char *>(model->vertices.data()), model->vertices.size() * sizeof(SurfaceVertex));
         gridGeometry->setVertexData(vertexBuffer);
         QByteArray gridIndexBuffer(reinterpret_cast<char *>(model->gridIndices.data()), model->gridIndices.size() * sizeof(quint32));
         gridGeometry->setIndexData(gridIndexBuffer);
@@ -1143,8 +1173,8 @@ void QQuickDataVisSurface::createSmoothIndices(SurfaceModel *model, int x, int y
         y = endY - 1;
 
     int indexCount = 6 * (endX - x) * (endY - y);
-    model->indices.resize(indexCount);
     model->indices.clear();
+    model->indices.resize(indexCount);
 
     int rowEnd = endY * columnCount;
     for (int row = y * columnCount ; row < rowEnd ; row += columnCount) {
@@ -1179,7 +1209,131 @@ void QQuickDataVisSurface::createSmoothIndices(SurfaceModel *model, int x, int y
     }
 }
 
-void QQuickDataVisSurface::createSmoothGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY)
+void QQuickDataVisSurface::createCoarseVertices(SurfaceModel *model, int x, int y, int endX, int endY)
+{
+    int columnCount = m_surfaceController->columnCount();
+    int rowCount = m_surfaceController->rowCount();
+    Surface3DController::DataDimensions dataDimensions = m_surfaceController->dataDimensions();
+
+    if (endX >= columnCount)
+        endX = columnCount - 1;
+    if (endY >= rowCount)
+        endY = rowCount - 1;
+    if (x > endX)
+        x = endX - 1;
+    if (y > endY)
+        y = endY - 1;
+
+    int indexCount = 6 * (endX - x) * (endY - y);
+    model->indices.clear();
+    model->indices.resize(indexCount);
+
+    int index = 0;
+    int rowEnd = endY * columnCount;
+
+    int i1, i2, i3;
+    SurfaceVertex v1, v2, v3;
+    QVector3D normalVector;
+
+    for (int row = y * columnCount; row < rowEnd; row += columnCount) {
+        for (int j = x; j < endX; j++) {
+            if (dataDimensions == Surface3DController::BothAscending
+                    || dataDimensions == Surface3DController::BothDescending) {
+                i1 = row + j + 1, i2 = row + columnCount + j, i3 = row + j;
+                v1 = model->vertices.at(i1);
+                v2 = model->vertices.at(i2);
+                v3 = model->vertices.at(i3);
+                normalVector = normal(v1.position, v2.position, v3.position);
+                v1.normal = normalVector;
+                v2.normal = normalVector;
+                v3.normal = normalVector;
+                model->coarceVertices.push_back(v1);
+                model->coarceVertices.push_back(v2);
+                model->coarceVertices.push_back(v3);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+
+                i1 = row + columnCount + j + 1, i2 = row + columnCount + j, i3 = row + j + 1;
+                v1 = model->vertices.at(i1);
+                v2 = model->vertices.at(i2);
+                v3 = model->vertices.at(i3);
+                normalVector = normal(v1.position, v2.position, v3.position);
+                v1.normal = normalVector;
+                v2.normal = normalVector;
+                v3.normal = normalVector;
+                model->coarceVertices.push_back(v1);
+                model->coarceVertices.push_back(v2);
+                model->coarceVertices.push_back(v3);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+            } else if (dataDimensions == Surface3DController::XDescending) {
+                i1 = row + columnCount + j, i2 = row + columnCount + j + 1, i3 = row + j;
+                v1 = model->vertices.at(i1);
+                v2 = model->vertices.at(i2);
+                v3 = model->vertices.at(i3);
+                normalVector = normal(v1.position, v2.position, v3.position);
+                v1.normal = normalVector;
+                v2.normal = normalVector;
+                v3.normal = normalVector;
+                model->coarceVertices.push_back(v1);
+                model->coarceVertices.push_back(v2);
+                model->coarceVertices.push_back(v3);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+
+                i1 = row + j, i2 = row + columnCount + j + 1, i3 = row + j + 1;
+                v1 = model->vertices.at(i1);
+                v2 = model->vertices.at(i2);
+                v3 = model->vertices.at(i3);
+                normalVector = normal(v1.position, v2.position, v3.position);
+                v1.normal = normalVector;
+                v2.normal = normalVector;
+                v3.normal = normalVector;
+                model->coarceVertices.push_back(v1);
+                model->coarceVertices.push_back(v2);
+                model->coarceVertices.push_back(v3);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+            } else {
+                i1 = row + columnCount + j, i2 = row + columnCount + j + 1, i3 = row + j + 1;
+                v1 = model->vertices.at(i1);
+                v2 = model->vertices.at(i2);
+                v3 = model->vertices.at(i3);
+                normalVector = normal(v1.position, v2.position, v3.position);
+                v1.normal = normalVector;
+                v2.normal = normalVector;
+                v3.normal = normalVector;
+                model->coarceVertices.push_back(v1);
+                model->coarceVertices.push_back(v2);
+                model->coarceVertices.push_back(v3);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+
+                i1 = row + j, i2 = row + columnCount + j + 1, i3 = row + j + 1;
+                v1 = model->vertices.at(i1);
+                v2 = model->vertices.at(i2);
+                v3 = model->vertices.at(i3);
+                normalVector = normal(v1.position, v2.position, v3.position);
+                v1.normal = normalVector;
+                v2.normal = normalVector;
+                v3.normal = normalVector;
+                model->coarceVertices.push_back(v1);
+                model->coarceVertices.push_back(v2);
+                model->coarceVertices.push_back(v3);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+                model->indices.push_back(index++);
+            }
+        }
+    }
+}
+
+void QQuickDataVisSurface::createGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY)
 {
     int columnCount = m_surfaceController->columnCount();
     int rowCount = m_surfaceController->rowCount();
@@ -1196,8 +1350,8 @@ void QQuickDataVisSurface::createSmoothGridlineIndices(SurfaceModel *model, int 
     int nColumns = endX - x + 1;
     int nRows = endY - y + 1;
 
-    int m_gridIndexCount = 2 * nColumns * (nRows - 1) + 2 * nRows * (nColumns - 1);
-    model->gridIndices.resize(m_gridIndexCount);
+    int gridIndexCount = 2 * nColumns * (nRows - 1) + 2 * nRows * (nColumns - 1);
+    model->gridIndices.resize(gridIndexCount);
     model->gridIndices.clear();
 
     for (int i = y, row = columnCount * y ; i <= endY ; i++, row += columnCount) {

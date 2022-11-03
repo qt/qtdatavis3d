@@ -74,6 +74,8 @@ public Q_SLOTS:
     void handleAxisYChanged(QAbstract3DAxis *axis) override;
     void handleAxisZChanged(QAbstract3DAxis *axis) override;
 
+    void handleFlatShadingEnabledChanged();
+
 Q_SIGNALS:
     void axisXChanged(QValue3DAxis *axis);
     void axisYChanged(QValue3DAxis *axis);
@@ -92,6 +94,7 @@ private:
         QQuick3DModel *model;
         QQuick3DModel *gridModel;
         QVector<SurfaceVertex> vertices;
+        QVector<SurfaceVertex> coarceVertices;
         QVector<quint32> indices;
         QVector<quint32> gridIndices;
         QVector<float> height;
@@ -102,7 +105,8 @@ private:
     void createSmoothNormalBodyLine(SurfaceModel *model, int &totalIndex, int column);
     void createSmoothNormalUpperLine(SurfaceModel *model, int &totalIndex);
     void createSmoothIndices(SurfaceModel *model, int x, int y, int endX, int endY);
-    void createSmoothGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY);
+    void createCoarseVertices(SurfaceModel *model, int x, int y, int endX, int endY);
+    void createGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY);
     void handleChangedSeries();
     void updateModel(SurfaceModel *model);
 
