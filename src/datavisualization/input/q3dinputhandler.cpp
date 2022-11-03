@@ -384,9 +384,9 @@ void Q3DInputHandlerPrivate::handleQueriedGraphPositionChange()
 
         // If zooming in/out outside the graph, or zooming out after certain point,
         // move towards the center.
-        if ((qAbs(newTarget.x()) > 1.0f
-             || qAbs(newTarget.y()) > 1.0f
-             || qAbs(newTarget.z()) > 1.0f)
+        if ((qAbs(newTarget.x()) > 2.0f
+             || qAbs(newTarget.y()) > 2.0f
+             || qAbs(newTarget.z()) > 2.0f)
                 || (previousZoom > currentZoom && currentZoom <= driftTowardCenterLevel)) {
             newTarget = zeroVector;
             // Add some extra correction so that we actually reach the center eventually

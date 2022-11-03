@@ -896,7 +896,6 @@ void QQuickDataVisItem::graphPositionAt(const QPoint &point)
 {
     bool isHitted = false;
     auto results = pickAll(point.x(), point.y());
-
     for (auto &result : results) {
         if (auto hit = result.objectHit()) {
             isHitted = true;
@@ -905,10 +904,7 @@ void QQuickDataVisItem::graphPositionAt(const QPoint &point)
                         result.scenePosition().y(),
                         result.scenePosition().z()
                         ));
-            if (backgroundBB() == hit) {
-                m_controller->queriedGraphPosition().setZ(backgroundBB()->bounds().minimum().z());
-            }
-            else {
+            if (backgroundBB() != hit) {
                 m_controller->setQueriedGraphPosition(hit->position());
                 break;
             }
@@ -919,7 +915,9 @@ void QQuickDataVisItem::graphPositionAt(const QPoint &point)
         m_controller->setQueriedGraphPosition(QVector3D(0,0,0));
 
     emit queriedGraphPositionChanged(m_controller->queriedGraphPosition());
+    emit m_controller->queriedGraphPositionChanged(m_controller->queriedGraphPosition());
     m_controller->setGraphPositionQueryPending(false);
+    scene()->setGraphPositionQuery(Q3DScene::invalidSelectionPoint());
 }
 
 void QQuickDataVisItem::updateShadowQuality(ShadowQuality quality)

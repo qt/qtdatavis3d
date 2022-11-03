@@ -917,8 +917,6 @@ void QQuickDataVisScatter::synchData()
 
     m_pointScale = calculatePointScaleSize();
 
-    updateLabels();
-
     // Notify changes to renderer
     if (m_scatterController->m_changeTracker.itemChanged) {
         m_scatterController->m_changeTracker.itemChanged = false;
