@@ -115,6 +115,7 @@ protected:
 
     void componentComplete() override;
     void synchData() override;
+    void updateParameters();
     void updateGrid() override;
     void updateLabels() override;
     void updateGraph() override;

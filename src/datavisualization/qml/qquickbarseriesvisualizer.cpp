@@ -14,7 +14,6 @@
 #include <QtQuick3D/private/qquick3dcustommaterial_p.h>
 #include <QtQuick3D/private/qquick3dshaderutils_p.h>
 
-
 QQuickBarSeriesVisualizer::QQuickBarSeriesVisualizer(QObject *parent)
     : QObject(parent),
       //m_sliceCache(0),
@@ -96,6 +95,7 @@ void QQuickBarSeriesVisualizer::handleRowCountChanged()
     m_dataVisBars->segmentLineRepeaterZ()->setModel(categoryAxisZ->labels().size());
     m_dataVisBars->repeaterZ()->setModel(categoryAxisZ->labels().size());
     m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
+    m_dataVisBars->updateParameters();
     m_dataVisBars->updateGrid();
     m_dataVisBars->updateLabels();
 }
@@ -106,6 +106,7 @@ void QQuickBarSeriesVisualizer::handleColCountChanged()
     m_dataVisBars->segmentLineRepeaterX()->setModel(categoryAxisX->labels().size());
     m_dataVisBars->repeaterX()->setModel(categoryAxisX->labels().size());
     m_controller->handleAxisLabelsChangedBySender(m_controller->axisX());
+    m_dataVisBars->updateParameters();
     m_dataVisBars->updateGrid();
     m_dataVisBars->updateLabels();
 }
@@ -209,9 +210,10 @@ void QQuickBarSeriesVisualizer::generateBars(const QList<QAbstract3DSeries *> &s
 
                     m_barsGenerated = true;
                 }
-                 m_visibleSeriesCount++;
                 ++dataRowIndex;
             }
+            if (series->isVisible())
+                m_visibleSeriesCount++;
         }
     }
 }
@@ -269,7 +271,6 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
     else
         m_seriesScaleZ = 1.0f;
 
-    m_dataVisBars->calculateSceneScalingFactors();
     m_meshRotation = dataProxy->series()->meshRotation();
 
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
@@ -284,11 +285,10 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
                 float heightValue = m_helperAxisY->itemPositionAt(value);
                 float angle = item->rotation();
 
-                float diffX = m_dataVisBars->m_scaleXWithBackground * 2.0 / colCount;
-                float diffZ = m_dataVisBars->m_scaleZWithBackground * 2.0 / rowCount;
-
-                float xPos = -m_dataVisBars->m_scaleXWithBackground + (j + m_dataVisBars->labelMargin()) * diffX;
-                float zPos = m_dataVisBars->m_scaleZWithBackground - (i + m_dataVisBars->labelMargin()) * diffZ;
+                float colPos = (j + 0.5f) * m_dataVisBars->m_cachedBarSpacing.width();
+                float xPos = (colPos - m_dataVisBars->m_rowWidth) / m_dataVisBars->m_scaleFactor;
+                float rowPos = (i + 0.5f) * (m_dataVisBars->m_cachedBarSpacing.height());
+                float zPos = (m_dataVisBars->m_columnDepth - rowPos) / m_dataVisBars->m_scaleFactor;
 
                 if (angle) {
                     model->setRotation(
@@ -298,7 +298,7 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
                     model->setRotation(identityQuaternion);
                 }
                 model->setPosition(QVector3D(xPos, heightValue - m_dataVisBars->m_yScale, zPos));
-                model->setScale(QVector3D(m_dataVisBars->m_scaleFactor / colCount, heightValue , m_dataVisBars->m_scaleFactor / rowCount));
+                model->setScale(QVector3D(m_dataVisBars->m_xScale, heightValue , m_dataVisBars->m_zScale));
             }
         }
     }
