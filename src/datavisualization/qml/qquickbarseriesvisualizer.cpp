@@ -298,7 +298,7 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
                     model->setRotation(identityQuaternion);
                 }
                 model->setPosition(QVector3D(xPos, heightValue - m_dataVisBars->m_yScale, zPos));
-                model->setScale(QVector3D(m_dataVisBars->m_xScale, heightValue , m_dataVisBars->m_zScale));
+                model->setScale(QVector3D(m_dataVisBars->m_xScale * m_seriesScaleX, heightValue , m_dataVisBars->m_zScale * m_seriesScaleZ));
             }
         }
     }

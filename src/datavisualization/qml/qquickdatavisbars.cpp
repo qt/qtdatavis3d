@@ -311,13 +311,7 @@ void QQuickDataVisBars::componentComplete()
 
 void QQuickDataVisBars::synchData()
 {
-    QList<QBar3DSeries *> seriesList = m_barsController->barSeriesList();
-
-    calculateSceneScalingFactors();
-
-    QQuickDataVisItem::synchData();
-
-    if (m_barsController->m_changeTracker.barSpecsChanged) {
+    if (m_barsController->m_changeTracker.barSpecsChanged || !m_cachedBarThickness.isValid()) {
         updateBarSpecs(m_barsController->m_barThicknessRatio, m_barsController->m_barSpacing, m_barsController->m_isBarSpecRelative);
         m_barsController->m_changeTracker.barSpecsChanged = false;
     }
@@ -338,6 +332,8 @@ void QQuickDataVisBars::synchData()
         // m_renderer->updateSelectedBar(m_selectedBar, m_selectedBarSeries);
         m_barsController->m_changeTracker.selectedBarChanged = false;
     }
+
+    QQuickDataVisItem::synchData();
 }
 
 void QQuickDataVisBars::updateParameters() {
@@ -360,8 +356,10 @@ void QQuickDataVisBars::updateParameters() {
         float sceneRatio = qMin(float(m_newCols) / float(m_newRows),
                                   float(m_newRows) / float(m_newCols));
         m_maxSceneSize = 2.0f * qSqrt(sceneRatio * m_newCols * m_newRows);
+
+        if (m_cachedBarThickness.isValid())
+            calculateSceneScalingFactors();
     }
-    calculateSceneScalingFactors();
 }
 
 void QQuickDataVisBars::updateGrid()
