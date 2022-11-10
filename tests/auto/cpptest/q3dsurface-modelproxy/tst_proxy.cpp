@@ -274,8 +274,9 @@ void tst_proxy::multiMatch()
     QSurface3DSeries *series = new QSurface3DSeries(m_proxy);
 
     graph.addSeries(series);
+    QSignalSpy spy(graph.axisY(), SIGNAL(maxChanged(float)));
+    spy.wait(1000);
 
-    QCoreApplication::processEvents();
     QCOMPARE(graph.axisY()->max(), 10.5f);
     m_proxy->setMultiMatchBehavior(QItemModelSurfaceDataProxy::MMBFirst);
     QCoreApplication::processEvents();
