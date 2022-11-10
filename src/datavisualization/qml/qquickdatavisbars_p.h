@@ -116,9 +116,12 @@ protected:
     void componentComplete() override;
     void synchData() override;
     void updateParameters();
+    void updateFloorLevel(float level);
     void updateGrid() override;
     void updateLabels() override;
     void updateGraph() override;
+    void updateAxisRange(float min, float max) override;
+    void updateAxisReversed(bool enable) override;
 
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
@@ -169,6 +172,20 @@ private:
     float m_requestedMargin = -1.0f;
     float m_vBackgroundMargin = 0.1f;
     float m_hBackgroundMargin = 0.1f;
+
+    bool m_hasNegativeValues;
+    bool m_noZeroInRange;
+    float m_actualFloorLevel;
+    float m_heightNormalizer;
+    float m_gradientFraction;
+    float m_backgroundAdjustment;
+
+    float m_minHeight;
+    float m_maxHeight;
+
+    QQuick3DModel *m_floorBackground = nullptr;
+    QQuick3DNode *m_floorBackgroundScale = nullptr;
+    QQuick3DNode *m_floorBackgroundRotation = nullptr;
 
     //Visualization
     QHash<QBar3DSeries *, QQuickBarSeriesVisualizer *> m_seriesVisualizerMap;

@@ -56,6 +56,13 @@ public:
         return m_formatter->subGridPositions().at(gridLine) * m_scale + m_translate;
     }
 
+    inline void setMin(float min) { m_min = min; }
+    inline float min() const { return m_min; }
+    inline void setMax(float max) { m_max = max; }
+    inline float max() const { return m_max; }
+
+    inline void setReversed(bool enable) { m_reversed = enable; }
+    inline bool isReversed() const { return m_reversed; }
 
 private:
     QList<float> m_adjustedGridPositions;
@@ -64,6 +71,11 @@ private:
     float m_scale;
     float m_translate;
     QValue3DAxisFormatter *m_formatter;
+
+    float m_min;
+    float m_max;
+
+    bool m_reversed;
 };
 
 QT_END_NAMESPACE

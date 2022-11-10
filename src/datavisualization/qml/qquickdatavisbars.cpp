@@ -34,7 +34,12 @@ QQuickDataVisBars::QQuickDataVisBars(QQuickItem *parent)
       m_scaleFactor(0),
       m_xScaleFactor(1.0f),
       m_zScaleFactor(1.0f),
-      m_cachedBarSeriesMargin(0.0f, 0.0f)
+      m_cachedBarSeriesMargin(0.0f, 0.0f),
+      m_hasNegativeValues(false),
+      m_noZeroInRange(false),
+      m_actualFloorLevel(0.0f),
+      m_heightNormalizer(1.0f),
+      m_backgroundAdjustment(0.0f)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlags(ItemHasContents);
@@ -294,9 +299,29 @@ float QQuickDataVisBars::floorLevel() const
 
 void QQuickDataVisBars::componentComplete()
 {
-    setXFlipped(true);
-
     QQuickDataVisItem::componentComplete();
+
+    auto wallBackground = background();
+    QUrl wallUrl = QUrl(QStringLiteral("defaultMeshes/backgroundNoFloorMesh"));
+    wallBackground->setSource(wallUrl);
+    setBackground(wallBackground);
+
+    QUrl floorUrl = QUrl(QStringLiteral(":/defaultMeshes/planeMesh"));
+    m_floorBackground = new QQuick3DModel();
+    m_floorBackgroundScale = new QQuick3DNode();
+    m_floorBackgroundRotation = new QQuick3DNode();
+
+    m_floorBackgroundScale->setParent(rootNode());
+    m_floorBackgroundScale->setParentItem(rootNode());
+
+    m_floorBackgroundRotation->setParent(m_floorBackgroundScale);
+    m_floorBackgroundRotation->setParentItem(m_floorBackgroundScale);
+
+    m_floorBackground->setObjectName("Floor Background");
+    m_floorBackground->setParent(m_floorBackgroundRotation);
+    m_floorBackground->setParentItem(m_floorBackgroundRotation);
+
+    m_floorBackground->setSource(floorUrl);
 
     QValue3DAxis *axisY = static_cast<QValue3DAxis *>(m_barsController->axisY());
     m_helperAxisY.setFormatter(axisY->formatter());
@@ -311,6 +336,19 @@ void QQuickDataVisBars::componentComplete()
 
 void QQuickDataVisBars::synchData()
 {
+    if (!m_noZeroInRange) {
+        m_barsController->m_scene->activeCamera()->d_ptr->setMinYRotation(-90.0f);
+        m_barsController->m_scene->activeCamera()->d_ptr->setMaxYRotation(90.0f);
+    } else {
+        if ((m_hasNegativeValues && !m_helperAxisY.isReversed())
+                || (!m_hasNegativeValues && m_helperAxisY.isReversed())) {
+            m_barsController->m_scene->activeCamera()->d_ptr->setMinYRotation(-90.0f);
+            m_barsController->m_scene->activeCamera()->d_ptr->setMaxYRotation(0.0f);
+        } else {
+            m_barsController->m_scene->activeCamera()->d_ptr->setMinYRotation(0.0f);
+            m_barsController->m_scene->activeCamera()->d_ptr->setMaxYRotation(90.0f);
+        }
+    }
     if (m_barsController->m_changeTracker.barSpecsChanged || !m_cachedBarThickness.isValid()) {
         updateBarSpecs(m_barsController->m_barThicknessRatio, m_barsController->m_barSpacing, m_barsController->m_isBarSpecRelative);
         m_barsController->m_changeTracker.barSpecsChanged = false;
@@ -318,7 +356,7 @@ void QQuickDataVisBars::synchData()
 
     // Floor level update requires data update, so do before abstract sync
     if (m_barsController->m_changeTracker.floorLevelChanged) {
-//        updateFloorLevel(m_floorLevel);
+        updateFloorLevel(m_barsController->m_floorLevel);
         m_barsController->m_changeTracker.floorLevelChanged = false;
     }
 
@@ -333,7 +371,44 @@ void QQuickDataVisBars::synchData()
         m_barsController->m_changeTracker.selectedBarChanged = false;
     }
 
+    auto axisY = static_cast<QValue3DAxis *>(m_barsController->axisY());
+    axisY->formatter()->d_ptr->recalculate();
+    m_helperAxisY.setFormatter(axisY->formatter());
+
     QQuickDataVisItem::synchData();
+
+    QMatrix4x4 modelMatrix;
+
+    // Draw floor
+    m_floorBackgroundScale->setScale(scaleWithBackground());
+    modelMatrix.scale(scaleWithBackground());
+    m_floorBackgroundScale->setPosition(QVector3D(0.0f, -m_backgroundAdjustment, 0.0f));
+
+    QQuaternion m_xRightAngleRotation(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, 90.0f));
+    QQuaternion m_xRightAngleRotationNeg(QQuaternion::fromAxisAndAngle(1.0f, 0.0f, 0.0f, -90.0f));
+
+    if (isYFlipped()) {
+        m_floorBackgroundRotation->setRotation(m_xRightAngleRotation);
+        modelMatrix.rotate(m_xRightAngleRotation);
+    } else {
+        m_floorBackgroundRotation->setRotation(m_xRightAngleRotationNeg);
+        modelMatrix.rotate(m_xRightAngleRotationNeg);
+    }
+
+    auto bgFloor = m_floorBackground;
+    QQmlListReference materialsRefF(bgFloor, "materials");
+    QQuick3DPrincipledMaterial * bgMatFloor;
+
+    if (!materialsRefF.size()) {
+        bgMatFloor = new QQuick3DPrincipledMaterial();
+        bgMatFloor->setRoughness(.3f);
+        bgMatFloor->setEmissiveFactor(QVector3D(.075f, .075f, .075f));
+        materialsRefF.append(bgMatFloor);
+    } else {
+        bgMatFloor = static_cast<QQuick3DPrincipledMaterial *>(materialsRefF.at(0));
+    }
+    Q3DTheme *theme = m_barsController->activeTheme();
+    bgMatFloor->setBaseColor(theme->backgroundColor());
 }
 
 void QQuickDataVisBars::updateParameters() {
@@ -362,6 +437,12 @@ void QQuickDataVisBars::updateParameters() {
     }
 }
 
+void QQuickDataVisBars::updateFloorLevel(float level)
+{
+    setFloorLevel(level);
+    calculateHeightAdjustment();
+}
+
 void QQuickDataVisBars::updateGrid()
 {
     QVector3D scaleX(m_helperAxisX.scale() * m_lineLengthScaleFactor, m_lineWidthScaleFactor, m_lineWidthScaleFactor);
@@ -372,7 +453,7 @@ void QQuickDataVisBars::updateGrid()
     QVector3D lineBackRotationY(0, 0, 0);
 
     float linePosX = 0;
-    float linePosY = -m_scaleYWithBackground + m_gridOffset;
+    float linePosY = -m_backgroundAdjustment;
     float linePosZ = 0;
 
     QVector3D lineSideRotationY(0, 90, -90);
@@ -549,14 +630,14 @@ void QQuickDataVisBars::updateLabels()
 
     if (!xFlipped) {
         if (!yFlipped)
-            yPos = -m_scaleYWithBackground;
+            yPos = -m_backgroundAdjustment;
         else
-            yPos = m_scaleYWithBackground;
+            yPos = m_backgroundAdjustment;
     } else {
         if (!yFlipped)
-            yPos = -m_scaleYWithBackground;
+            yPos = -m_backgroundAdjustment;
         else
-            yPos = m_scaleYWithBackground;
+            yPos = m_backgroundAdjustment;
     }
     auto totalRotation = Utils::calculateRotation(labelRotation);
     auto labelTrans = QVector3D(0.0f, yPos, zPos);
@@ -669,8 +750,8 @@ void QQuickDataVisBars::updateLabels()
         obj->setProperty("labelWidth", labelsMaxWidth);
         label++;
    }
-   backLabelTrans.setY(0.0f);
-   SideLabelTrans.setY(0.0f);
+   backLabelTrans.setY(m_backgroundAdjustment);
+   SideLabelTrans.setY(m_backgroundAdjustment);
 
    if (titleLabelY()->visible()) {
        updateYTitle(sideLabelRotation, backLabelRotation,
@@ -753,14 +834,14 @@ void QQuickDataVisBars::updateLabels()
 
     if (!zFlipped) {
         if (!yFlipped)
-            yPos = -m_scaleYWithBackground;
+            yPos = -m_backgroundAdjustment;
         else
-            yPos = m_scaleYWithBackground;
+            yPos = m_backgroundAdjustment;
     } else {
         if (!yFlipped)
-            yPos = -m_scaleYWithBackground;
+            yPos = -m_backgroundAdjustment;
         else
-            yPos = m_scaleYWithBackground;
+            yPos = m_backgroundAdjustment;
     }
 
     totalRotation = Utils::calculateRotation(labelRotation);
@@ -807,12 +888,24 @@ void QQuickDataVisBars::updateGraph()
                 updateDataPoints(barSeries);
             if (visualizer->m_barsGenerated && m_barsController->m_isSeriesVisualsDirty)
                 updateDataPointVisuals(barSeries);
-//            if (visualizer->m_barsGenerated) {
-//                updateGrid();
-//                updateLabels();
-//            }
         }
     }
+}
+
+void QQuickDataVisBars::updateAxisRange(float min, float max)
+{
+    QQuickDataVisItem::updateAxisRange(min, max);
+
+    m_helperAxisY.setMin(min);
+    m_helperAxisY.setMax(max);
+
+    calculateHeightAdjustment();
+}
+
+void QQuickDataVisBars::updateAxisReversed(bool enable)
+{
+    m_helperAxisY.setReversed(enable);
+    calculateHeightAdjustment();
 }
 
 void QQuickDataVisBars::calculateSceneScalingFactors()
@@ -858,6 +951,43 @@ void QQuickDataVisBars::calculateSceneScalingFactors()
 
 void QQuickDataVisBars::calculateHeightAdjustment()
 {
+    m_minHeight = m_helperAxisY.min();
+    m_maxHeight = m_helperAxisY.max();
+    float newAdjustment = 1.0f;
+    m_actualFloorLevel = qBound(m_minHeight, floorLevel(), m_maxHeight);
+    float maxAbs = qFabs(m_maxHeight - m_actualFloorLevel);
+
+    // Check if we have negative values
+    if (m_minHeight < m_actualFloorLevel)
+        m_hasNegativeValues = true;
+    else if (m_minHeight >= m_actualFloorLevel)
+        m_hasNegativeValues = false;
+
+    if (m_maxHeight < m_actualFloorLevel) {
+        m_heightNormalizer = float(qFabs(m_minHeight) - qFabs(m_maxHeight));
+        maxAbs = qFabs(m_maxHeight) - qFabs(m_minHeight);
+    } else {
+        m_heightNormalizer = float(m_maxHeight - m_minHeight);
+    }
+
+    // Height fractions are used in gradient calculations and are therefore doubled
+    // Note that if max or min is exactly zero, we still consider it outside the range
+    if (m_maxHeight <= m_actualFloorLevel || m_minHeight >= m_actualFloorLevel) {
+        m_noZeroInRange = true;
+        m_gradientFraction = 2.0f;
+    } else {
+        m_noZeroInRange = false;
+        float minAbs = qFabs(m_minHeight - m_actualFloorLevel);
+        m_gradientFraction = qMax(minAbs, maxAbs) / m_heightNormalizer * 2.0f;
+    }
+
+    // Calculate translation adjustment for background floor
+    newAdjustment = (qBound(0.0f, (maxAbs / m_heightNormalizer), 1.0f) - 0.5f) * 2.0f;
+    if (m_helperAxisY.isReversed())
+        newAdjustment = -newAdjustment;
+
+    if (newAdjustment != m_backgroundAdjustment)
+        m_backgroundAdjustment = newAdjustment;
 }
 
 void QQuickDataVisBars::handleAxisXChanged(QAbstract3DAxis *axis)
@@ -932,8 +1062,6 @@ void QQuickDataVisBars::updateDataPoints(QBar3DSeries *series)
 
 void QQuickDataVisBars::updateDataPointVisuals(QBar3DSeries *series)
 {
-    Q_UNUSED(series);
     auto visualizer = visualizerForSeries(series);
     visualizer->updateItemVisuals(series);
 }
-

@@ -139,11 +139,11 @@ void QQuickDataVisItem::componentComplete()
     m_backgroundScale->setParent(rootNode());
     m_backgroundScale->setParentItem(rootNode());
 
-    m_backgroundRotation->setParent    (m_backgroundScale);
+    m_backgroundRotation->setParent(m_backgroundScale);
     m_backgroundRotation->setParentItem(m_backgroundScale);
 
     background->setObjectName("Background");
-    background->setParent    (m_backgroundRotation);
+    background->setParent(m_backgroundRotation);
     background->setParentItem(m_backgroundRotation);
 
     background->setSource(url);
@@ -159,6 +159,7 @@ void QQuickDataVisItem::componentComplete()
 
     setBackground(background);
     setBackgroundBB(backgroundBB);
+
     setUpCamera();
     setUpLight();
 
@@ -486,6 +487,19 @@ void QQuickDataVisItem::synchData()
         m_controller->m_changeTracker.shadowQualityChanged = false;
     }
 
+    if (m_controller->m_changeTracker.axisYRangeChanged) {
+        updateAxisRange(m_controller->m_axisY->min(), m_controller->m_axisY->max());
+        m_controller->m_changeTracker.axisYRangeChanged = false;
+    }
+
+    if (m_controller->m_changeTracker.axisYReversedChanged) {
+        m_controller->m_changeTracker.axisYReversedChanged = false;
+        if (m_controller->m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_controller->m_axisY);
+            updateAxisReversed(valueAxisY->reversed());
+        }
+    }
+
     QVector3D forward = camera()->forward();
     auto targetRotation = cameraTarget()->rotation();
     bool viewFlipped = false;
@@ -646,7 +660,6 @@ void QQuickDataVisItem::synchData()
             bgMat = static_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0));
         }
         bgMat->setBaseColor(theme->backgroundColor());
-
         themeDirtyBits.backgroundColorDirty = false;
     }
 
@@ -936,6 +949,17 @@ void QQuickDataVisItem::updateShadowQuality(ShadowQuality quality)
     } else {
         light()->setCastsShadow(false);
     }
+}
+
+void QQuickDataVisItem::updateAxisRange(float min, float max)
+{
+    Q_UNUSED(min);
+    Q_UNUSED(max);
+}
+
+void QQuickDataVisItem::updateAxisReversed(bool enable)
+{
+    Q_UNUSED(enable);
 }
 
 int QQuickDataVisItem::findLabelsMaxWidth(const QStringList &labels)

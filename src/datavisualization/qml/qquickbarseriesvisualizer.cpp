@@ -273,6 +273,8 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
 
     m_meshRotation = dataProxy->series()->meshRotation();
 
+    m_zeroPosition = m_helperAxisY->itemPositionAt(m_dataVisBars->m_actualFloorLevel);
+
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         int rowCount = dataProxy->rowCount();
         for (int i = 0; i < rowCount; ++i) {
@@ -283,6 +285,23 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
                 QQuick3DModel *model = m_modelList.key(item);
                 float value = item->value();
                 float heightValue = m_helperAxisY->itemPositionAt(value);
+
+                if (m_dataVisBars->m_noZeroInRange) {
+                    if (m_dataVisBars->m_hasNegativeValues) {
+                        heightValue = -1.0f + heightValue;
+                        if (heightValue > 0.0f)
+                            heightValue = 0.0f;
+                    } else {
+                        if (heightValue < 0.0f)
+                            heightValue = 0.0f;
+                    }
+                } else {
+                    heightValue -= m_zeroPosition;
+                }
+
+                if (m_helperAxisY->isReversed())
+                    heightValue = -heightValue;
+
                 float angle = item->rotation();
 
                 float colPos = (j + 0.5f) * m_dataVisBars->m_cachedBarSpacing.width();
@@ -297,7 +316,7 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
                 } else {
                     model->setRotation(identityQuaternion);
                 }
-                model->setPosition(QVector3D(xPos, heightValue - m_dataVisBars->m_yScale, zPos));
+                model->setPosition(QVector3D(xPos, heightValue - m_dataVisBars->m_backgroundAdjustment, zPos));
                 model->setScale(QVector3D(m_dataVisBars->m_xScale * m_seriesScaleX, heightValue , m_dataVisBars->m_zScale * m_seriesScaleZ));
             }
         }

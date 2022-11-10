@@ -384,7 +384,9 @@ set_source_files_properties("engine/meshes/sphere.mesh"
 set_source_files_properties("engine/meshes/sphereSmooth.mesh"
     PROPERTIES QT_RESOURCE_ALIAS "sphereMeshSmooth"
 )
-
+set_source_files_properties("engine/meshes/backgroundNoFloor.mesh"
+    PROPERTIES QT_RESOURCE_ALIAS "backgroundNoFloorMesh"
+)
 set(mesh_resource_files
     # .mesh files
     "engine/meshes/background.mesh"
@@ -415,6 +417,7 @@ set(mesh_resource_files
     "engine/meshes/pyramidSmooth.mesh"
     "engine/meshes/sphere.mesh"
     "engine/meshes/sphereSmooth.mesh"
+    "engine/meshes/backgroundNoFloor.mesh"
 )
 
 set(obj_resource_files

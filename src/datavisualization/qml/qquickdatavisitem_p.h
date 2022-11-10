@@ -357,6 +357,10 @@ protected:
 
     virtual void updateShadowQuality(QQuickDataVisItem::ShadowQuality quality);
 
+    virtual void updateAxisRange(float min, float max);
+
+    virtual void updateAxisReversed(bool enable);
+
     QSharedPointer<QMutex> m_nodeMutex;
 
 private:
