@@ -52,10 +52,10 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
     const QList<QVector3D> indexed_vertices = dotObj->indexedvertices();
     const QList<QVector2D> indexed_uvs = dotObj->indexedUVs();
     const QList<QVector3D> indexed_normals = dotObj->indexedNormals();
-    const int indicesCount = indices.count();
-    const int verticeCount = indexed_vertices.count();
-    const int uvsCount = indexed_uvs.count();
-    const int normalsCount = indexed_normals.count();
+    const int indicesCount = indices.size();
+    const int verticeCount = indexed_vertices.size();
+    const int uvsCount = indexed_uvs.size();
+    const int normalsCount = indexed_normals.size();
 
     float itemSize = cache->itemSize() / itemScaler;
     if (itemSize == 0.0f)
@@ -172,7 +172,7 @@ void ScatterObjectBufferHelper::fullLoad(ScatterSeriesRenderCache *cache, qreal 
 void ScatterObjectBufferHelper::updateUVs(ScatterSeriesRenderCache *cache)
 {
     ObjectHelper *dotObj = cache->object();
-    const int uvsCount = dotObj->indexedUVs().count();
+    const int uvsCount = dotObj->indexedUVs().size();
     const ScatterRenderItemArray &renderArray = cache->renderArray();
     const bool updateAll = (cache->updateIndices().size() == 0);
     const int updateSize = updateAll ? renderArray.size() : cache->updateIndices().size();
@@ -213,7 +213,7 @@ uint ScatterObjectBufferHelper::createRangeGradientUVs(ScatterSeriesRenderCache 
                                                        QList<QVector2D> &buffered_uvs)
 {
     ObjectHelper *dotObj = cache->object();
-    const int uvsCount = dotObj->indexedUVs().count();
+    const int uvsCount = dotObj->indexedUVs().size();
     const ScatterRenderItemArray &renderArray = cache->renderArray();
     const bool updateAll = (cache->updateIndices().size() == 0);
     const int updateSize = updateAll ? renderArray.size() : cache->updateIndices().size();
@@ -256,7 +256,7 @@ uint ScatterObjectBufferHelper::createObjectGradientUVs(ScatterSeriesRenderCache
                                                         const QList<QVector3D> &indexed_vertices)
 {
     ObjectHelper *dotObj = cache->object();
-    const int uvsCount = dotObj->indexedUVs().count();
+    const int uvsCount = dotObj->indexedUVs().size();
     const ScatterRenderItemArray &renderArray = cache->renderArray();
     const uint renderArraySize = renderArray.size();
 
@@ -293,7 +293,7 @@ void ScatterObjectBufferHelper::update(ScatterSeriesRenderCache *cache, qreal do
 
     // Index vertices
     const QList<QVector3D> indexed_vertices = dotObj->indexedvertices();
-    int verticeCount = indexed_vertices.count();
+    int verticeCount = indexed_vertices.size();
 
     float itemSize = cache->itemSize() / itemScaler;
     if (itemSize == 0.0f)

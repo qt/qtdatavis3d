@@ -55,7 +55,7 @@ bool MeshLoader::loadOBJ(const QString &path, QList<QVector3D> &out_vertices,
             QStringList set1 = lineContents.at(1).split(slashTag);
             QStringList set2 = lineContents.at(2).split(slashTag);
             QStringList set3 = lineContents.at(3).split(slashTag);
-            if (set1.length() < 3 || set2.length() < 3 || set3.length() < 3) {
+            if (set1.size() < 3 || set2.size() < 3 || set3.size() < 3) {
                 qWarning("The file being loaded is missing UVs and/or normals");
                 return false;
             }

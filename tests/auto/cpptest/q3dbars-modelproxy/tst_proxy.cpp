@@ -66,8 +66,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->columnRole(), QString(""));
     QCOMPARE(proxy->valueRole(), QString("val"));
     QCOMPARE(proxy->rotationRole(), QString(""));
-    QCOMPARE(proxy->rowCategories().length(), 0);
-    QCOMPARE(proxy->columnCategories().length(), 0);
+    QCOMPARE(proxy->rowCategories().size(), 0);
+    QCOMPARE(proxy->columnCategories().size(), 0);
     delete proxy;
 
     proxy = new QItemModelBarDataProxy(table->model(), "row", "col", "val");
@@ -76,8 +76,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->columnRole(), QString("col"));
     QCOMPARE(proxy->valueRole(), QString("val"));
     QCOMPARE(proxy->rotationRole(), QString(""));
-    QCOMPARE(proxy->rowCategories().length(), 0);
-    QCOMPARE(proxy->columnCategories().length(), 0);
+    QCOMPARE(proxy->rowCategories().size(), 0);
+    QCOMPARE(proxy->columnCategories().size(), 0);
     delete proxy;
 
     proxy = new QItemModelBarDataProxy(table->model(), "row", "col", "val", "rot");
@@ -86,8 +86,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->columnRole(), QString("col"));
     QCOMPARE(proxy->valueRole(), QString("val"));
     QCOMPARE(proxy->rotationRole(), QString("rot"));
-    QCOMPARE(proxy->rowCategories().length(), 0);
-    QCOMPARE(proxy->columnCategories().length(), 0);
+    QCOMPARE(proxy->rowCategories().size(), 0);
+    QCOMPARE(proxy->columnCategories().size(), 0);
     delete proxy;
 
     proxy = new QItemModelBarDataProxy(table->model(), "row", "col", "val",
@@ -97,8 +97,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->columnRole(), QString("col"));
     QCOMPARE(proxy->valueRole(), QString("val"));
     QCOMPARE(proxy->rotationRole(), QString(""));
-    QCOMPARE(proxy->rowCategories().length(), 1);
-    QCOMPARE(proxy->columnCategories().length(), 1);
+    QCOMPARE(proxy->rowCategories().size(), 1);
+    QCOMPARE(proxy->columnCategories().size(), 1);
     delete proxy;
 
     proxy = new QItemModelBarDataProxy(table->model(), "row", "col", "val", "rot",
@@ -108,8 +108,8 @@ void tst_proxy::construct()
     QCOMPARE(proxy->columnRole(), QString("col"));
     QCOMPARE(proxy->valueRole(), QString("val"));
     QCOMPARE(proxy->rotationRole(), QString("rot"));
-    QCOMPARE(proxy->rowCategories().length(), 1);
-    QCOMPARE(proxy->columnCategories().length(), 1);
+    QCOMPARE(proxy->rowCategories().size(), 1);
+    QCOMPARE(proxy->columnCategories().size(), 1);
     delete proxy;
 }
 
@@ -137,9 +137,9 @@ void tst_proxy::initialProperties()
     QCOMPARE(m_proxy->valueRolePattern(), QRegularExpression());
     QCOMPARE(m_proxy->valueRoleReplace(), QString());
 
-    QCOMPARE(m_proxy->columnLabels().count(), 0);
+    QCOMPARE(m_proxy->columnLabels().size(), 0);
     QCOMPARE(m_proxy->rowCount(), 0);
-    QCOMPARE(m_proxy->rowLabels().count(), 0);
+    QCOMPARE(m_proxy->rowLabels().size(), 0);
     QVERIFY(!m_proxy->series());
 
     QCOMPARE(m_proxy->type(), QAbstractDataProxy::DataTypeBar);
@@ -173,7 +173,7 @@ void tst_proxy::initializeProperties()
 
     QCOMPARE(m_proxy->autoColumnCategories(), false);
     QCOMPARE(m_proxy->autoRowCategories(), false);
-    QCOMPARE(m_proxy->columnCategories().count(), 2);
+    QCOMPARE(m_proxy->columnCategories().size(), 2);
     QCOMPARE(m_proxy->columnRole(), QString("column"));
     QCOMPARE(m_proxy->columnRolePattern(), QRegularExpression("/^.*-(\\d\\d)$/"));
     QCOMPARE(m_proxy->columnRoleReplace(), QString("\\\\1"));
@@ -182,7 +182,7 @@ void tst_proxy::initializeProperties()
     QCOMPARE(m_proxy->rotationRole(), QString("rotation"));
     QCOMPARE(m_proxy->rotationRolePattern(), QRegularExpression("/-/"));
     QCOMPARE(m_proxy->rotationRoleReplace(), QString("\\\\1"));
-    QCOMPARE(m_proxy->rowCategories().count(), 2);
+    QCOMPARE(m_proxy->rowCategories().size(), 2);
     QCOMPARE(m_proxy->rowRole(), QString("row"));
     QCOMPARE(m_proxy->rowRolePattern(), QRegularExpression("/^(\\d\\d\\d\\d).*$/"));
     QCOMPARE(m_proxy->rowRoleReplace(), QString("\\\\1"));
@@ -246,9 +246,9 @@ void tst_proxy::multiMatch()
     QCoreApplication::processEvents();
     QCOMPARE(graph.valueAxis()->max(), 15.0f);
 
-    QCOMPARE(m_proxy->columnLabels().count(), 1);
+    QCOMPARE(m_proxy->columnLabels().size(), 1);
     QCOMPARE(m_proxy->rowCount(), 1);
-    QCOMPARE(m_proxy->rowLabels().count(), 1);
+    QCOMPARE(m_proxy->rowLabels().size(), 1);
     QVERIFY(m_proxy->series());
 
     m_proxy = 0; // Proxy gets deleted as graph gets deleted

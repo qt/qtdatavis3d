@@ -62,7 +62,7 @@ void tst_axis::initialProperties()
     // Common (from QAbstract3DAxis)
     QCOMPARE(m_axis->isAutoAdjustRange(), true);
     QCOMPARE(m_axis->labelAutoRotation(), 0.0f);
-    QCOMPARE(m_axis->labels().length(), 6);
+    QCOMPARE(m_axis->labels().size(), 6);
     QCOMPARE(m_axis->labels().at(0), QString("0.00"));
     QCOMPARE(m_axis->labels().at(1), QString("2.00"));
     QCOMPARE(m_axis->labels().at(2), QString("4.00"));
@@ -103,7 +103,7 @@ void tst_axis::initializeProperties()
 
     QCOMPARE(m_axis->isAutoAdjustRange(), false);
     QCOMPARE(m_axis->labelAutoRotation(), 15.0f);
-    QCOMPARE(m_axis->labels().length(), 3);
+    QCOMPARE(m_axis->labels().size(), 3);
     QCOMPARE(m_axis->labels().at(0), QString("5m"));
     QCOMPARE(m_axis->labels().at(1), QString("15m"));
     QCOMPARE(m_axis->labels().at(2), QString("25m"));

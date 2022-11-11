@@ -70,7 +70,7 @@ void tst_custom::construct()
     QCOMPARE(custom->sliceIndexY(), -1);
     QCOMPARE(custom->sliceIndexZ(), -1);
     QCOMPARE(custom->useHighDefShader(), true);
-    QCOMPARE(custom->textureData()->length(), 1000);
+    QCOMPARE(custom->textureData()->size(), 1000);
     QCOMPARE(custom->textureDataWidth(), 40);
     QCOMPARE(custom->textureFormat(), QImage::Format_ARGB32);
     QCOMPARE(custom->textureHeight(), 10);

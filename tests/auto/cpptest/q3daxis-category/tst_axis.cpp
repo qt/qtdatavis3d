@@ -54,7 +54,7 @@ void tst_axis::initialProperties()
 {
     QVERIFY(m_axis);
 
-    QCOMPARE(m_axis->labels().length(), 0);
+    QCOMPARE(m_axis->labels().size(), 0);
 
     // Common (from QAbstract3DAxis)
     QCOMPARE(m_axis->isAutoAdjustRange(), true);
@@ -74,7 +74,7 @@ void tst_axis::initializeProperties()
 
     m_axis->setLabels(QStringList() << "first" << "second");
 
-    QCOMPARE(m_axis->labels().length(), 2);
+    QCOMPARE(m_axis->labels().size(), 2);
     QCOMPARE(m_axis->labels().at(1), QString("second"));
 
     // Common (from QAbstract3DAxis)

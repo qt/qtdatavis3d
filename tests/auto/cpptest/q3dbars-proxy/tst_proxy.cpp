@@ -53,9 +53,9 @@ void tst_proxy::initialProperties()
 {
     QVERIFY(m_proxy);
 
-    QCOMPARE(m_proxy->columnLabels().count(), 0);
+    QCOMPARE(m_proxy->columnLabels().size(), 0);
     QCOMPARE(m_proxy->rowCount(), 0);
-    QCOMPARE(m_proxy->rowLabels().count(), 0);
+    QCOMPARE(m_proxy->rowLabels().size(), 0);
     QVERIFY(!m_proxy->series());
 
     QCOMPARE(m_proxy->type(), QAbstractDataProxy::DataTypeBar);
@@ -71,9 +71,9 @@ void tst_proxy::initializeProperties()
     m_proxy->addRow(data);
     m_proxy->setRowLabels(QStringList() << "1");
 
-    QCOMPARE(m_proxy->columnLabels().count(), 3);
+    QCOMPARE(m_proxy->columnLabels().size(), 3);
     QCOMPARE(m_proxy->rowCount(), 1);
-    QCOMPARE(m_proxy->rowLabels().count(), 1);
+    QCOMPARE(m_proxy->rowLabels().size(), 1);
 }
 
 QTEST_MAIN(tst_proxy)
