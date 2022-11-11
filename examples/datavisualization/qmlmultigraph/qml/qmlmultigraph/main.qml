@@ -16,6 +16,8 @@ Item {
         id: data
     }
 
+    property var currentData: data.sharedPrimaryData
+
     //! [0]
     GridLayout {
         id: gridLayout
@@ -47,7 +49,7 @@ Item {
                 Surface3DSeries {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     ItemModelSurfaceDataProxy {
-                        itemModel: data.sharedData
+                        itemModel: currentData
                         // The surface data points are not neatly lined up in rows and columns,
                         // so we define explicit row and column roles.
                         rowRole: "row"
@@ -84,8 +86,8 @@ Item {
                     Layout.minimumWidth: parent.width / 2
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: "Quit"
-                    onClicked: Qt.quit();
+                    text: "Toggle Data"
+                    onClicked: toggleData() // call a helper function to toggle the data set in use
                 }
 
                 Button {
@@ -124,7 +126,7 @@ Item {
                 Scatter3DSeries {
                     itemLabelFormat: "Pop density at (@xLabel N, @zLabel E): @yLabel"
                     ItemModelScatterDataProxy {
-                        itemModel: data.sharedData
+                        itemModel: currentData
                         // Mapping model roles to scatter series item coordinates.
                         xPosRole: "latitude"
                         zPosRole: "longitude"
@@ -157,7 +159,7 @@ Item {
                     name: "Population density"
 
                     ItemModelBarDataProxy {
-                        itemModel: data.sharedData
+                        itemModel: currentData
                         // Mapping model roles to bar series rows, columns, and values.
                         rowRole: "row"
                         columnRole: "col"
@@ -195,5 +197,12 @@ Item {
             surfaceGraph.seriesList[0].flatShadingEnabled = false
             scatterGraph.seriesList[0].meshSmooth = true
         }
+    }
+
+    function toggleData() {
+        if (currentData === data.sharedPrimaryData)
+            currentData = data.sharedSecondaryData
+        else
+            currentData = data.sharedPrimaryData
     }
 }
