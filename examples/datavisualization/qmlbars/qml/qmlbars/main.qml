@@ -89,35 +89,35 @@ Item {
             valueAxis: graphAxes.value
 
             //! [4]
-//            Bar3DSeries {
-//                id: secondarySeries
-//                visible: false
-//                itemLabelFormat: "Expenses, @colLabel, @rowLabel: -@valueLabel"
-//                baseGradient: secondaryGradient
+            Bar3DSeries {
+                id: secondarySeries
+                visible: false
+                itemLabelFormat: "Expenses, @colLabel, @rowLabel: -@valueLabel"
+                baseGradient: secondaryGradient
 
-//                ItemModelBarDataProxy {
-//                    id: secondaryProxy
-//                    itemModel: graphData.model
-//                    rowRole: "timestamp"
-//                    columnRole: "timestamp"
-//                    valueRole: "expenses"
-//                    rowRolePattern: /^(\d\d\d\d).*$/
-//                    columnRolePattern: /^.*-(\d\d)$/
-//                    valueRolePattern: /-/
-//                    rowRoleReplace: "\\1"
-//                    columnRoleReplace: "\\1"
-//                    multiMatchBehavior: ItemModelBarDataProxy.MMBCumulative
-//                }
-//                //! [4]
+                ItemModelBarDataProxy {
+                    id: secondaryProxy
+                    itemModel: graphData.model
+                    rowRole: "timestamp"
+                    columnRole: "timestamp"
+                    valueRole: "expenses"
+                    rowRolePattern: /^(\d\d\d\d).*$/
+                    columnRolePattern: /^.*-(\d\d)$/
+                    valueRolePattern: /-/
+                    rowRoleReplace: "\\1"
+                    columnRoleReplace: "\\1"
+                    multiMatchBehavior: ItemModelBarDataProxy.MMBCumulative
+                }
+                //! [4]
 
-//                ColorGradient {
-//                    id: secondaryGradient
-//                    ColorGradientStop { position: 1.0; color: "#FF0000" }
-//                    ColorGradientStop { position: 0.0; color: "#600000" }
-//                }
+                ColorGradient {
+                    id: secondaryGradient
+                    ColorGradientStop { position: 1.0; color: "#FF0000" }
+                    ColorGradientStop { position: 0.0; color: "#600000" }
+                }
 
-//                onSelectedBarChanged: (position)=> handleSelectionChange(secondarySeries, position)
-//            }
+                onSelectedBarChanged: (position)=> handleSelectionChange(secondarySeries, position)
+            }
 
             //! [3]
             Bar3DSeries {
