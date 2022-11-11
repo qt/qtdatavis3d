@@ -1445,7 +1445,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
     bool volumeDetected = false;
     int loopCount = 0;
     while (loopCount < 2) {
-        for (QCustom3DItem *customItem : qAsConst(m_customItemDrawOrder)) {
+        for (QCustom3DItem *customItem : std::as_const(m_customItemDrawOrder)) {
             CustomRenderItem *item = m_customRenderCache.value(customItem);
             // Check that the render item is visible, and skip drawing if not
             // Also check if reflected item is on the "wrong" side, and skip drawing if it is
