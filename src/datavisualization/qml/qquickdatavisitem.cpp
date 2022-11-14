@@ -554,7 +554,7 @@ void QQuickDataVisItem::synchData()
     Q3DThemeDirtyBitField themeDirtyBits = theme->d_ptr->m_dirtyBits;
 
     if (themeDirtyBits.lightStrengthDirty) {
-        light()->setBrightness(theme->lightStrength() * 0.1f);
+        light()->setBrightness(theme->lightStrength() * .2f);
         themeDirtyBits.lightStrengthDirty = false;
     }
 
