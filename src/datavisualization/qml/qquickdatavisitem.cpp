@@ -1160,7 +1160,7 @@ void QQuickDataVisItem::updateZTitle(const QVector3D &labelRotation, const QVect
 
 void QQuickDataVisItem::updateCamera()
 {
-    float zoom = 500.0f / m_controller->scene()->activeCamera()->zoomLevel();
+    float zoom = 720.f / m_controller->scene()->activeCamera()->zoomLevel();
     camera()->setZ(zoom);
     cameraTarget()->setPosition(m_controller->scene()->activeCamera()->target());
     cameraTarget()->setEulerRotation(QVector3D(
@@ -1697,6 +1697,7 @@ void QQuickDataVisItem::setUpCamera()
     if (!useOrtho) {
         auto persCamera = new QQuick3DPerspectiveCamera(rootNode());
         persCamera->setClipNear(0.001f);
+        persCamera->setFieldOfView(45.0f);
         camera = persCamera;
     }
     else {
@@ -1716,7 +1717,7 @@ void QQuickDataVisItem::setUpCamera()
     camera->setParent(cameraTarget);
     camera->setParentItem(cameraTarget);
 
-    camera->setPosition(QVector3D(0,0,5));
+    camera->setPosition(QVector3D(0, 0, 5));
     camera->lookAt(cameraTarget);
     setCamera(camera);
 }
