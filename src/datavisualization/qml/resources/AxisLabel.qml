@@ -15,7 +15,7 @@ Component {
         property real labelWidth: -1
         property real labelHeight: 10
 
-        scale: Qt.vector3d(0.01, 0.01, 0.01)
+        scale: Qt.vector3d(0.01, 0.01, 0.0)
 
         Item {
             anchors.centerIn: parent
