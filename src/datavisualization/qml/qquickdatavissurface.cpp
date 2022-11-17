@@ -159,13 +159,20 @@ void QQuickDataVisSurface::componentComplete()
     QQuickDataVisItem::componentComplete();
 
     auto scene = QQuick3DViewport::scene();
+
     for (auto series : m_surfaceController->surfaceSeriesList()) {
         bool visible = series->isVisible();
 
         auto model = new QQuick3DModel();
         model->setParent(scene);
         model->setParentItem(scene);
+        model->setObjectName(QStringLiteral("SurfaceModel"));
         model->setVisible(visible);
+        if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionNone))
+            model->setPickable(false);
+        else
+            model->setPickable(true);
+
         auto geometry = new QQuick3DGeometry();
         geometry->setStride(sizeof(SurfaceVertex));
         geometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Triangles);
@@ -182,6 +189,7 @@ void QQuickDataVisSurface::componentComplete()
                                0,
                                QQuick3DGeometry::Attribute::U32Type);
         model->setGeometry(geometry);
+
         QQmlListReference materialRef(model, "materials");
         auto material = new QQuick3DDefaultMaterial();
         QQuick3DTexture *texture = new QQuick3DTexture();
@@ -228,6 +236,16 @@ void QQuickDataVisSurface::componentComplete()
     setLineLengthScaleFactor(0.02f);
 
     setLabelMargin(0.3f);
+}
+
+void QQuickDataVisSurface::synchData()
+{
+    QQuickDataVisItem::synchData();
+
+    if (m_surfaceController->isSelectedPointChanged()) {
+        updateSelectedPoint();
+        m_surfaceController->setSelectedPointChanged(false);
+    }
 }
 
 void QQuickDataVisSurface::updateGrid()
@@ -770,6 +788,22 @@ void QQuickDataVisSurface::updateGraph()
             }
             model->gridModel->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawWireframe));
             model->model->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawSurface));
+
+            SurfaceVertex selectedVertex = model->selectedVertex;
+            visible = visible && !selectedVertex.position.isNull();
+            if (visible) {
+                selectionPointer()->setPosition(selectedVertex.position);
+                const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
+                const QSurfaceDataRow &rowArray = *array.at(selectedVertex.coord.y());
+                QVector3D value = rowArray.at(selectedVertex.coord.x()).position();
+                QString label = QString::number(value.x()) + QStringLiteral(", ") +
+                        QString::number(value.y()) + QStringLiteral(", ") +
+                        QString::number(value.z());
+                itemLabel()->setPosition(selectedVertex.position);
+                itemLabel()->setProperty("labelText", label);
+            }
+            selectionPointer()->setVisible(visible);
+            itemLabel()->setVisible(visible);
         }
     }
 }
@@ -844,8 +878,8 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
 
         int rowCount = sampleSpace.height();
         int columnCount = sampleSpace.width();
-        m_surfaceController->setRowCount(rowCount);
-        m_surfaceController->setColumnCount(columnCount);
+        model->rowCount = rowCount;
+        model->columnCount = columnCount;
 
         int totalSize = rowCount * columnCount * 2;
         float uvX = 1.0f / float(columnCount - 1);
@@ -867,10 +901,10 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
 
         model->vertices.reserve(totalSize);
 
-        float minY = qInf();
-        float maxY = qInf();
-
         bool isFlatShadingEnabled = model->series->isFlatShadingEnabled();
+
+        QVector3D boundsMin(0.0f, 0.0f, 0.0f);
+        QVector3D boundsMax(0.0f, 0.0f, 0.0f);
 
         model->vertices.clear();
         model->height.clear();
@@ -879,18 +913,20 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
             for (int j = 0 ; j < columnCount ; j++) {
                 // getNormalizedVertex
                 SurfaceVertex vertex;
-                vertex.position = getNormalizedVertex(model, row.at(j), false, false);
-                if (qIsInf(maxY))
-                    maxY = model->height.last();
-                else
-                    maxY = qMax(model->height.last(), maxY);
-                if (qIsInf(minY))
-                    minY = model->height.last();
-                else
-                    minY = qMin(model->height.last(), minY);
+                QVector3D pos = getNormalizedVertex(model, row.at(j), false, false);
+                vertex.position = pos;
                 vertex.normal = QVector3D(0, 0, 0);
                 vertex.uv = QVector2D(j * uvX, i * uvY);
+                vertex.coord = QPoint(i, j);
                 model->vertices.push_back(vertex);
+                if (boundsMin.isNull())
+                    boundsMin = pos;
+                else
+                    boundsMin = QVector3D(qMin(boundsMin.x(), pos.x()), qMin(boundsMin.y(), pos.y()), qMin(boundsMin.z(), pos.z()));
+                if (boundsMax.isNull())
+                    boundsMax = pos;
+                else
+                    boundsMax = QVector3D(qMax(boundsMax.x(), pos.x()), qMax(boundsMax.y(), pos.y()), qMax(boundsMax.z(), pos.z()));
             }
         }
 
@@ -930,11 +966,12 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
         geometry->setVertexData(vertexBuffer);
         QByteArray indexBuffer(reinterpret_cast<char *>(model->indices.data()), model->indices.size() * sizeof(quint32));
         geometry->setIndexData(indexBuffer);
+        geometry->setBounds(boundsMin, boundsMax);
         geometry->update();
 
         auto axisY = m_surfaceController->axisY();
-        maxY = axisY->max();
-        minY = axisY->min();
+        float maxY = axisY->max();
+        float minY = axisY->min();
         QQmlListReference materialRef(model->model, "materials");
         auto material = static_cast<QQuick3DDefaultMaterial *>(materialRef.at(0));
         auto textureData = material->diffuseMap()->textureData();
@@ -985,6 +1022,7 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
         gridGeometry->setVertexData(vertexBuffer);
         QByteArray gridIndexBuffer(reinterpret_cast<char *>(model->gridIndices.data()), model->gridIndices.size() * sizeof(quint32));
         gridGeometry->setIndexData(gridIndexBuffer);
+        gridGeometry->setBounds(boundsMin, boundsMax);
         gridGeometry->update();
 
         QQmlListReference gridMaterialRef(model->gridModel, "materials");
@@ -1030,7 +1068,7 @@ inline static QVector3D normal(const QVector3D &a, const QVector3D &b, const QVe
 
 void QQuickDataVisSurface::createSmoothNormalBodyLine(SurfaceModel *model, int &totalIndex, int column)
 {
-    int columnCount = m_surfaceController->columnCount();
+    int columnCount = model->columnCount;
     int colLimit = columnCount - 1;
     Surface3DController::DataDimensions dataDimensions = m_surfaceController->dataDimensions();
     if (dataDimensions == Surface3DController::BothAscending) {
@@ -1094,8 +1132,8 @@ void QQuickDataVisSurface::createSmoothNormalBodyLine(SurfaceModel *model, int &
 
 void QQuickDataVisSurface::createSmoothNormalUpperLine(SurfaceModel *model, int &totalIndex)
 {
-    int columnCount = m_surfaceController->columnCount();
-    int rowCount = m_surfaceController->rowCount();
+    int columnCount = model->columnCount;
+    int rowCount = model->rowCount;
     Surface3DController::DataDimensions dataDimensions = m_surfaceController->dataDimensions();
 
     if (dataDimensions == Surface3DController::BothAscending) {
@@ -1159,8 +1197,8 @@ void QQuickDataVisSurface::createSmoothNormalUpperLine(SurfaceModel *model, int 
 
 void QQuickDataVisSurface::createSmoothIndices(SurfaceModel *model, int x, int y, int endX, int endY)
 {
-    int columnCount = m_surfaceController->columnCount();
-    int rowCount = m_surfaceController->rowCount();
+    int columnCount = model->columnCount;
+    int rowCount = model->rowCount;
     Surface3DController::DataDimensions dataDimensions = m_surfaceController->dataDimensions();
 
     if (endX >= columnCount)
@@ -1211,8 +1249,8 @@ void QQuickDataVisSurface::createSmoothIndices(SurfaceModel *model, int x, int y
 
 void QQuickDataVisSurface::createCoarseVertices(SurfaceModel *model, int x, int y, int endX, int endY)
 {
-    int columnCount = m_surfaceController->columnCount();
-    int rowCount = m_surfaceController->rowCount();
+    int columnCount = model->columnCount;
+    int rowCount = model->rowCount;
     Surface3DController::DataDimensions dataDimensions = m_surfaceController->dataDimensions();
 
     if (endX >= columnCount)
@@ -1335,8 +1373,8 @@ void QQuickDataVisSurface::createCoarseVertices(SurfaceModel *model, int x, int 
 
 void QQuickDataVisSurface::createGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY)
 {
-    int columnCount = m_surfaceController->columnCount();
-    int rowCount = m_surfaceController->rowCount();
+    int columnCount = model->columnCount;
+    int rowCount = model->rowCount;
 
     if (endX >= columnCount)
         endX = columnCount - 1;
@@ -1368,4 +1406,72 @@ void QQuickDataVisSurface::createGridlineIndices(SurfaceModel *model, int x, int
     }
 }
 
+void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
+{
+    if (Qt::LeftButton == event->button()) {
+        auto mousePos = event->pos();
+        auto pickResult = pickAll(mousePos.x(), mousePos.y());
+        QVector3D pickedPos(0.0f, 0.0f, 0.0f);
+
+        auto selectionMode = m_surfaceController->selectionMode();
+        if (!selectionMode.testFlag(QAbstract3DGraph::SelectionNone)) {
+            for (auto picked : pickResult) {
+                if (picked.objectHit()->objectName().contains(QStringLiteral("SurfaceModel"))) {
+                    pickedPos = picked.position();
+                    break;
+                }
+            }
+
+            if (!pickedPos.isNull()) {
+                float min = -1.0f;
+                for (auto model : m_model) {
+                    if (!model->series->isVisible())
+                        continue;
+
+                    SurfaceVertex selectedVertex;
+                    for (auto vertex : model->vertices) {
+                        QVector3D pos = vertex.position;
+                        float dist = pickedPos.distanceToPoint(pos);
+                        if (selectedVertex.position.isNull() || dist < min) {
+                            min = dist;
+                            selectedVertex = vertex;
+                        }
+                    }
+
+                    if (selectionMode == QAbstract3DGraph::SelectionItem) {
+                        model->selectedVertex = selectedVertex;
+
+                        if (!selectedVertex.position.isNull())
+                            model->series->setSelectedPoint(selectedVertex.coord);
+                        else
+                            model->series->setSelectedPoint(m_surfaceController->invalidSelectionPosition());
+                    }
+                }
+            }
+        }
+    }
+}
+
+void QQuickDataVisSurface::updateSelectedPoint()
+{
+    for (auto model : m_model) {
+        SurfaceVertex selectedVertex = model->selectedVertex;
+        if (model->series->isVisible() &&
+                !selectedVertex.position.isNull()) {
+            selectionPointer()->setPosition(selectedVertex.position);
+            const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
+            const QSurfaceDataRow &rowArray = *array.at(selectedVertex.coord.y());
+            QVector3D value = rowArray.at(selectedVertex.coord.x()).position();
+            QString label = QString::number(value.x()) + QStringLiteral(", ") +
+                    QString::number(value.y()) + QStringLiteral(", ") +
+                    QString::number(value.z());
+            itemLabel()->setPosition(selectedVertex.position);
+            itemLabel()->setProperty("labelText", label);
+            itemLabel()->setEulerRotation(QVector3D(
+                                              -m_surfaceController->scene()->activeCamera()->yRotation(),
+                                              -m_surfaceController->scene()->activeCamera()->xRotation(),
+                                              0));
+        }
+    }
+}
 QT_END_NAMESPACE

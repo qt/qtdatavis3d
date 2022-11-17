@@ -216,17 +216,17 @@ public:
     QQuick3DNode *cameraTarget() { return m_cameraTarget; }
     void setCameraTarget(QQuick3DNode *target) { m_cameraTarget = target; }
 
-    QQuick3DModel *background() const;
-    void setBackground(QQuick3DModel *newBackground);
+    QQuick3DModel *background() const { return m_background; }
+    void setBackground(QQuick3DModel *newBackground) { m_background = newBackground; }
 
     QQuick3DDirectionalLight *light() const;
     QQuick3DCustomMaterial *createQmlCustomMaterial(const QString &fileName);
     QQuick3DPrincipledMaterial *createPrincipledMaterial();
 
-    QQuick3DModel *m_targetVisualizer;
+    QQuick3DModel *selectionPointer() { return m_selectionPointer; }
+    QQuick3DNode *itemLabel() { return m_itemLabel; }
 
-    QQuick3DModel *backgroundBB() const;
-    void setBackgroundBB(QQuick3DModel *newBackgroundBB);
+    QQuick3DModel *m_targetVisualizer;
 
     QQuick3DRepeater *repeaterX() const { return m_repeaterX; }
     QQuick3DRepeater *repeaterY() const { return m_repeaterY; }
@@ -328,6 +328,7 @@ protected:
     virtual void handleSelectedElementChange(QAbstract3DGraph::ElementType type);
     virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
     virtual void keyPressEvent(QKeyEvent *ev) override;
+    virtual void handleMousePressedEvent(QMouseEvent *event);
 
     void componentComplete() override;
 
@@ -386,6 +387,8 @@ private:
     QQuick3DRepeater *m_subsegmentLineRepeaterY = nullptr;
     QQuick3DRepeater *m_segmentLineRepeaterZ = nullptr;
     QQuick3DRepeater *m_subsegmentLineRepeaterZ = nullptr;
+
+    QQuick3DModel *m_selectionPointer = nullptr;
 
     QPointer<Abstract3DController> m_controller;
     QQuick3DNode *m_cameraTarget = nullptr;

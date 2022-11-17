@@ -111,14 +111,9 @@ void QQuickDataVisItem::keyPressEvent(QKeyEvent *ev)
     update();
 }
 
-QQuick3DModel *QQuickDataVisItem::backgroundBB() const
+void QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
 {
-    return m_backgroundBB;
-}
-
-void QQuickDataVisItem::setBackgroundBB(QQuick3DModel *newBackgroundBB)
-{
-    m_backgroundBB = newBackgroundBB;
+    Q_UNUSED(event);
 }
 
 void QQuickDataVisItem::handleFpsChanged()
@@ -132,7 +127,7 @@ void QQuickDataVisItem::componentComplete()
     QQuick3DViewport::componentComplete();
 
     auto url = QUrl(QStringLiteral("defaultMeshes/backgroundMesh"));
-    auto background = new QQuick3DModel();
+    m_background = new QQuick3DModel();
     m_backgroundScale = new QQuick3DNode();
     m_backgroundRotation = new QQuick3DNode();
 
@@ -142,23 +137,18 @@ void QQuickDataVisItem::componentComplete()
     m_backgroundRotation->setParent(m_backgroundScale);
     m_backgroundRotation->setParentItem(m_backgroundScale);
 
-    background->setObjectName("Background");
-    background->setParent(m_backgroundRotation);
-    background->setParentItem(m_backgroundRotation);
+    m_background->setObjectName("Background");
+    m_background->setParent(m_backgroundRotation);
+    m_background->setParentItem(m_backgroundRotation);
 
-    background->setSource(url);
-//    background->setPickable(true);
+    m_background->setSource(url);
 
-    auto backgroundBB = new QQuick3DModel();
-    backgroundBB->setObjectName("BackgroundBB");
-    backgroundBB->setParent    (background);
-    backgroundBB->setParentItem(background);
-//    backgroundBB->setScale(QVector3D(0.1f,0.1f,0.1f));
-    backgroundBB->setSource(QUrl(QStringLiteral("defaultMeshes/barMeshFull")));
-    backgroundBB->setPickable(true);
-
-    setBackground(background);
-    setBackgroundBB(backgroundBB);
+    m_backgroundBB = new QQuick3DModel();
+    m_backgroundBB->setObjectName("BackgroundBB");
+    m_backgroundBB->setParent(m_background);
+    m_backgroundBB->setParentItem(m_background);
+    m_backgroundBB->setSource(QUrl(QStringLiteral("defaultMeshes/barMeshFull")));
+    m_backgroundBB->setPickable(true);
 
     setUpCamera();
     setUpLight();
@@ -247,6 +237,17 @@ void QQuickDataVisItem::componentComplete()
         m_repeaterZ->setModel(valueAxis->labels().size());
         m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
     }
+
+    m_selectionPointer = new QQuick3DModel();
+    m_selectionPointer->setParent(QQuick3DViewport::scene());
+    m_selectionPointer->setParentItem(QQuick3DViewport::scene());
+    m_selectionPointer->setSource(QUrl(QStringLiteral("#Sphere")));
+    m_selectionPointer->setScale(QVector3D(0.001f, 0.001f, 0.001f));
+    auto pointerMaterial = new QQuick3DPrincipledMaterial();
+    pointerMaterial->setBaseColor(m_controller->activeTheme()->singleHighlightColor());
+    QQmlListReference materialRef(m_selectionPointer, "materials");
+    materialRef.append(pointerMaterial);
+    m_selectionPointer->setVisible(false);
 }
 
 QQuick3DDirectionalLight *QQuickDataVisItem::light() const
@@ -648,8 +649,7 @@ void QQuickDataVisItem::synchData()
 
     // Grid and background adjustments
     if (themeDirtyBits.backgroundColorDirty) {
-        auto bg = background();
-        QQmlListReference materialsRef(bg, "materials");
+        QQmlListReference materialsRef(m_background, "materials");
         QQuick3DPrincipledMaterial *bgMat;
         if (!materialsRef.size()) {
             bgMat = new QQuick3DPrincipledMaterial();
@@ -664,7 +664,7 @@ void QQuickDataVisItem::synchData()
     }
 
     if (themeDirtyBits.backgroundEnabledDirty) {
-        background()->setVisible(theme->isBackgroundEnabled());
+        m_background->setVisible(theme->isBackgroundEnabled());
         themeDirtyBits.backgroundEnabledDirty = false;
     }
 
@@ -689,6 +689,13 @@ void QQuickDataVisItem::synchData()
         changeGridLineColor(m_segmentLineRepeaterZ, gridLineColor);
         changeGridLineColor(m_subsegmentLineRepeaterZ, gridLineColor);
         themeDirtyBits.gridLineColorDirty = false;
+    }
+
+    if (themeDirtyBits.singleHighlightColorDirty) {
+        QQmlListReference materialRef(m_selectionPointer, "materials");
+        auto material = static_cast<QQuick3DPrincipledMaterial *>(materialRef.at(0));
+        material->setBaseColor(theme->singleHighlightColor());
+        themeDirtyBits.singleHighlightColorDirty = false;
     }
 
     // Other adjustments
@@ -904,7 +911,7 @@ void QQuickDataVisItem::graphPositionAt(const QPoint &point)
                         result.scenePosition().y(),
                         result.scenePosition().z()
                         ));
-            if (backgroundBB() != hit) {
+            if (m_backgroundBB != hit) {
                 m_controller->setQueriedGraphPosition(hit->position());
                 break;
             }
@@ -1184,10 +1191,14 @@ void QQuickDataVisItem::updateCamera()
     float zoom = 720.f / m_controller->scene()->activeCamera()->zoomLevel();
     camera()->setZ(zoom);
     cameraTarget()->setPosition(m_controller->scene()->activeCamera()->target());
-    cameraTarget()->setEulerRotation(QVector3D(
-                                         -m_controller->scene()->activeCamera()->yRotation(),
-                                         -m_controller->scene()->activeCamera()->xRotation(),
-                                         0));
+    auto rotation = QVector3D(
+                -m_controller->scene()->activeCamera()->yRotation(),
+                -m_controller->scene()->activeCamera()->xRotation(),
+                0);
+    cameraTarget()->setEulerRotation(rotation);
+
+    if (m_itemLabel->visible())
+        m_itemLabel->setEulerRotation(rotation);
 }
 
 int QQuickDataVisItem::msaaSamples() const
@@ -1396,6 +1407,7 @@ void QQuickDataVisItem::touchEvent(QTouchEvent *event)
 void QQuickDataVisItem::mousePressEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
+    handleMousePressedEvent(event);
     m_controller->mousePressEvent(event, mousePos);
 }
 
@@ -1584,16 +1596,6 @@ qreal QQuickDataVisItem::margin() const
 QQuick3DNode *QQuickDataVisItem::rootNode() const
 {
     return QQuick3DViewport::scene();
-}
-
-QQuick3DModel *QQuickDataVisItem::background() const
-{
-    return m_background;
-}
-
-void QQuickDataVisItem::setBackground(QQuick3DModel *newBackground)
-{
-    m_background = newBackground;
 }
 
 void QQuickDataVisItem::changeLabelBackgroundColor(QQuick3DRepeater *repeater, const QColor &color)

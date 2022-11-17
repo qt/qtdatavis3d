@@ -91,11 +91,6 @@ public:
 
     void updateSurfaceTexture(QSurface3DSeries *series);
 
-    void setRowCount(int count) { m_rowCount = count; }
-    int rowCount() { return m_rowCount; }
-    void setColumnCount(int count) { m_columnCount = count; }
-    int columnCount() { return m_columnCount; }
-
     void setDataDimensions(DataDimensions dimension) { m_dataDimensions = dimension; }
     DataDimensions dataDimensions() { return m_dataDimensions; }
 
@@ -103,6 +98,9 @@ public:
     bool isSeriesVisibilityDirty() { return m_isSeriesVisualsDirty; }
 
     QList<QAbstract3DSeries *> changedSeriesList() { return m_changedSeriesList; }
+
+    bool isSelectedPointChanged() const { return m_changeTracker.selectedPointChanged; }
+    void setSelectedPointChanged(bool changed) { m_changeTracker.selectedPointChanged = changed; }
 
 public Q_SLOTS:
     void handleArrayReset();
@@ -130,8 +128,6 @@ private:
     bool m_flipHorizontalGrid;
     QList<QSurface3DSeries *> m_changedTextures;
 
-    int m_columnCount;
-    int m_rowCount;
     Surface3DController::DataDimensions m_dataDimensions;
 
     Q_DISABLE_COPY(Surface3DController)

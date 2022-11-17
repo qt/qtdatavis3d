@@ -65,9 +65,11 @@ public:
 
 protected:
     void componentComplete() override;
+    void synchData() override;
     void updateGrid() override;
     void updateLabels() override;
     void updateGraph() override;
+    void handleMousePressedEvent(QMouseEvent *event) override;
 
 public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
@@ -88,6 +90,7 @@ private:
         QVector3D position;
         QVector3D normal;
         QVector2D uv;
+        QPoint coord;
     };
 
     struct SurfaceModel {
@@ -99,6 +102,9 @@ private:
         QVector<quint32> gridIndices;
         QVector<float> height;
         QSurface3DSeries *series;
+        int columnCount;
+        int rowCount;
+        SurfaceVertex selectedVertex;
     };
 
     QVector3D getNormalizedVertex(SurfaceModel *model, const QSurfaceDataItem &data, bool polar, bool flipXZ);
@@ -109,6 +115,7 @@ private:
     void createGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY);
     void handleChangedSeries();
     void updateModel(SurfaceModel *model);
+    void updateSelectedPoint();
 
     QVector<SurfaceModel *> m_model;
     Surface3DController *m_surfaceController;
