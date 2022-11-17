@@ -390,8 +390,7 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
 //    m_controller->m_qml = this;
 
     if (!m_controller->isOpenGLES())
-        m_samples = 4;
-    setAntialiasing(m_samples > 0);
+        setMsaaSamples(4);
 
     // Reset default theme, as the default C++ theme is Q3DTheme, not DeclarativeTheme3D.
     DeclarativeTheme3D *defaultTheme = new DeclarativeTheme3D;
@@ -1188,6 +1187,9 @@ void QQuickDataVisItem::setMsaaSamples(int samples)
         } else if (m_samples != samples) {
             m_samples = samples;
             setAntialiasing(m_samples > 0);
+            environment()->setAntialiasingMode(m_samples > 0
+                        ? QQuick3DSceneEnvironment::QQuick3DEnvironmentAAModeValues::MSAA
+                        : QQuick3DSceneEnvironment::QQuick3DEnvironmentAAModeValues::NoAA);
             emit msaaSamplesChanged(samples);
             update();
         }
