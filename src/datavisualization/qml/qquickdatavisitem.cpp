@@ -1187,10 +1187,34 @@ void QQuickDataVisItem::setMsaaSamples(int samples)
         } else if (m_samples != samples) {
             m_samples = samples;
             setAntialiasing(m_samples > 0);
-            environment()->setAntialiasingMode(m_samples > 0
-                        ? QQuick3DSceneEnvironment::QQuick3DEnvironmentAAModeValues::MSAA
-                        : QQuick3DSceneEnvironment::QQuick3DEnvironmentAAModeValues::NoAA);
-            emit msaaSamplesChanged(samples);
+            auto sceneEnv = environment();
+            sceneEnv->setAntialiasingMode(m_samples > 0
+                                          ? QQuick3DSceneEnvironment::QQuick3DEnvironmentAAModeValues::MSAA
+                                          : QQuick3DSceneEnvironment::QQuick3DEnvironmentAAModeValues::NoAA);
+            switch (m_samples) {
+            case 0:
+                // no-op
+                break;
+            case 2:
+                sceneEnv->setAntialiasingQuality(
+                            QQuick3DSceneEnvironment::QQuick3DEnvironmentAAQualityValues::Medium);
+                break;
+            case 4:
+                sceneEnv->setAntialiasingQuality(
+                            QQuick3DSceneEnvironment::QQuick3DEnvironmentAAQualityValues::High);
+                break;
+            case 8:
+                sceneEnv->setAntialiasingQuality(
+                            QQuick3DSceneEnvironment::QQuick3DEnvironmentAAQualityValues::VeryHigh);
+                break;
+            default:
+                qWarning("Invalid multisampling sample number, using 4x instead");
+                sceneEnv->setAntialiasingQuality(
+                            QQuick3DSceneEnvironment::QQuick3DEnvironmentAAQualityValues::High);
+                m_samples = 4;
+                break;
+            }
+            emit msaaSamplesChanged(m_samples);
             update();
         }
     }
