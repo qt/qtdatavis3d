@@ -316,8 +316,13 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
                 } else {
                     model->setRotation(identityQuaternion);
                 }
+
+                if (heightValue < 0.f) {
+                    const QVector3D rot = model->eulerRotation();
+                    model->setEulerRotation(QVector3D(-180.f, rot.y(), rot.z()));
+                }
                 model->setPosition(QVector3D(xPos, heightValue - m_dataVisBars->m_backgroundAdjustment, zPos));
-                model->setScale(QVector3D(m_dataVisBars->m_xScale * m_seriesScaleX, heightValue , m_dataVisBars->m_zScale * m_seriesScaleZ));
+                model->setScale(QVector3D(m_dataVisBars->m_xScale * m_seriesScaleX, qAbs(heightValue), m_dataVisBars->m_zScale * m_seriesScaleZ));
             }
         }
     }
@@ -633,41 +638,7 @@ QQuick3DModel *QQuickBarSeriesVisualizer::createDataItem()
     auto model = new QQuick3DModel();
     model->setParent(m_visualizerRoot.get());
     model->setParentItem(m_seriesRootItem);
-    QString fileName;
-    switch (m_meshType) {
-        case QAbstract3DSeries::MeshSphere:
-        fileName = QStringLiteral("defaultMeshes/sphereMesh");
-        break;
-    case QAbstract3DSeries::MeshBar:
-    case QAbstract3DSeries::MeshCube:
-        fileName = QStringLiteral("defaultMeshes/barMesh");
-        break;
-    case QAbstract3DSeries::MeshPyramid:
-        fileName = QStringLiteral("defaultMeshes/pyramidMesh");
-        break;
-    case QAbstract3DSeries::MeshCone:
-        fileName = QStringLiteral("defaultMeshes/coneMesh");
-        break;
-    case QAbstract3DSeries::MeshCylinder:
-        fileName = QStringLiteral("defaultMeshes/cylinderMesh");
-        break;
-    case QAbstract3DSeries::MeshBevelBar:
-    case QAbstract3DSeries::MeshBevelCube:
-        fileName = QStringLiteral("defaultMeshes/bevelBarMesh");
-        break;
-    case QAbstract3DSeries::MeshMinimal:
-        fileName = QStringLiteral("defaultMeshes/minimalMesh");
-        break;
-    case QAbstract3DSeries::MeshArrow:
-        fileName = QStringLiteral("defaultMeshes/arrowMesh");
-        break;
-    case QAbstract3DSeries::MeshPoint:
-        qWarning("Points not supported yet");
-        break;
-    default:
-        fileName = QStringLiteral("defaultMeshes/sphereMesh");
-    }
-    fixMeshFileName(fileName, m_meshType);
+    QString fileName = getMeshFileName();
     model->setSource(QUrl(fileName));
     return model;
 }
@@ -731,8 +702,7 @@ QVector3D QQuickBarSeriesVisualizer::selectedItemPosition()
 
 void QQuickBarSeriesVisualizer::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType)
 {
-    if (meshType != QAbstract3DSeries::MeshSphere && meshType != QAbstract3DSeries::MeshArrow
-            && meshType != QAbstract3DSeries::MeshMinimal && meshType != QAbstract3DSeries::MeshPoint)
+    if (!m_controller->activeTheme()->isBackgroundEnabled() && meshType != QAbstract3DSeries::MeshSphere)
         fileName.append(QStringLiteral("Full"));
 }
 
@@ -760,15 +730,6 @@ QString QQuickBarSeriesVisualizer::getMeshFileName()
     case QAbstract3DSeries::MeshBevelBar:
     case QAbstract3DSeries::MeshBevelCube:
         fileName = QStringLiteral("defaultMeshes/bevelBarMesh");
-        break;
-    case QAbstract3DSeries::MeshMinimal:
-        fileName = QStringLiteral("defaultMeshes/minimalMesh");
-        break;
-    case QAbstract3DSeries::MeshArrow:
-        fileName = QStringLiteral("defaultMeshes/arrowMesh");
-        break;
-    case QAbstract3DSeries::MeshPoint:
-        qWarning("Points not supported yet");
         break;
     default:
         fileName = QStringLiteral("defaultMeshes/sphereMesh");
