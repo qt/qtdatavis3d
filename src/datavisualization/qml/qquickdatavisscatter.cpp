@@ -679,19 +679,6 @@ void QQuickDataVisScatter::updateLabels()
     }
 }
 
-int QQuickDataVisScatter::findLabelsMaxWidth(const QStringList &labels)
-{
-    int labelWidth = 0;
-    QFontMetrics labelFM(m_scatterController->activeTheme()->font());
-
-    for (const auto &label : std::as_const(labels)) {
-        auto width = labelFM.horizontalAdvance(label);
-        if (labelWidth < width)
-            labelWidth = width;
-    }
-    return labelWidth;
-}
-
 void QQuickDataVisScatter::updateGrid()
 {
     calculateSceneScalingFactors();

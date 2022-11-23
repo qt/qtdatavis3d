@@ -127,7 +127,7 @@ private:
 
     void setVisualizerForSeries(QScatter3DSeries *series, ScatterSeriesVisualizer * visualizer);
     ScatterSeriesVisualizer *visualizerForSeries(QScatter3DSeries * series);
-    int findLabelsMaxWidth(const QStringList &labels);
+
     void updateLabels() override;
     void updateGrid() override;
     void updateGraph() override;

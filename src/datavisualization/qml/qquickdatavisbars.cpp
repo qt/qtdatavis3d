@@ -642,8 +642,7 @@ void QQuickDataVisBars::updateLabels()
     auto totalRotation = Utils::calculateRotation(labelRotation);
     auto labelTrans = QVector3D(0.0f, yPos, zPos);
     float labelsMaxWidth = 0.0f;
-    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisX->labels())
-                                                / (m_scaleXWithBackground * m_scaleZWithBackground)));
+    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisX->labels())));
     float rowPosValue = m_scaleZWithBackground + labelMargin();
 
     for (int i = 0; i < repeaterX()->count(); i++) {

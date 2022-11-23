@@ -13,14 +13,13 @@ Component {
         property bool borderEnabled : false
         property font labelFont
         property real labelWidth: -1
-        property real labelHeight: 10
 
         scale: Qt.vector3d(0.01, 0.01, 0.0)
 
         Item {
             anchors.centerIn: parent
-            width: labelWidth > 0 ? labelWidth : text0.width
-            height: text0.height
+            width: Math.max(labelWidth / 2, text0.implicitWidth)
+            height: text0.implicitHeight
 
             Rectangle {
                 id: labelBackground
@@ -29,15 +28,16 @@ Component {
                 visible: backgroundEnabled
                 border.color: labelTextColor
                 border.width: borderEnabled ? 1 : 0
+                radius: 3
             }
 
             Text {
                 id: text0
-                anchors.verticalCenter: parent.verticalCenter
-                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.centerIn: parent
                 color: labelTextColor
                 text: labelText
                 font: labelFont
+                padding: 4
             }
         }
     }
