@@ -252,12 +252,11 @@ public:
     void setZFlipped(bool zFlipped) { m_zFlipped = zFlipped; }
     QVector3D scaleWithBackground() const { return m_scaleWithBackground; }
     void setScaleWithBackground(const QVector3D &scale) { m_scaleWithBackground = scale; }
+    void setBackgroundScaleMargin(const QVector3D &margin) { m_backgroundScaleMargin = margin; }
     QVector3D rotation() const { return m_rot; }
     void setRotation(const QVector3D &rotation) { m_rot = rotation; }
     QVector3D scale() const { return m_scale; }
     void setScale(const QVector3D &scale) { m_scale = scale; }
-    QVector3D scaleOffset() const { return m_scaleOffset; }
-    void setScaleOffset(const QVector3D &scaleOffset) { m_scaleOffset = scaleOffset; }
     QVector3D translate() const { return m_translate; }
     void setTranslate(const QVector3D &translate) { m_translate = translate;}
 
@@ -347,12 +346,14 @@ protected:
 
     void positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position);
     int findLabelsMaxWidth(const QStringList &labels);
+    virtual QVector3D calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition, int index);
+    virtual float calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index);
+    void setFloorGridInRange(bool inRange) { m_isFloorGridInRange = inRange; }
+    void setVerticalSegmentLine(bool hasVerticalLine) { m_hasVerticalSegmentLine = hasVerticalLine; }
+    void updateGrid();
+    void updateLabels();
 
     virtual void synchData();
-
-    virtual void updateGrid();
-
-    virtual void updateLabels() {}
 
     virtual void updateGraph() {}
 
@@ -407,19 +408,21 @@ private:
 
     bool m_flipScales;
 
+    bool m_isFloorGridInRange = false;
+    bool m_hasVerticalSegmentLine = true;
+
     QVector3D m_scaleWithBackground = QVector3D(1.0f, 1.0f, 1.0f);
+    QVector3D m_backgroundScaleMargin = QVector3D(0.0f, 0.0f, 0.0f);
 
     QVector3D m_rot = QVector3D(1.0f, 1.0f, 1.0f);
 
     QVector3D m_scale = QVector3D(1.0f, 1.0f, 1.0f);
 
-    QVector3D m_scaleOffset = QVector3D(1.0f, 1.0f, 1.0f);
-
     QVector3D m_translate = QVector3D(1.0f, 1.0f, 1.0f);
 
     float m_gridOffset = 0.002f;
     float m_lineWidthScaleFactor = 0.0001f;
-    float m_lineLengthScaleFactor = 0.011f;
+    float m_lineLengthScaleFactor = 0.02f;
 
     float m_labelMargin = 0.0f;
 
@@ -427,6 +430,7 @@ private:
     void setUpLight();
     void graphPositionAt(const QPoint& point);
     void updateCamera();
+    QVector3D calculateLabelRotation(float labelAutoAngle);
 
     friend class Scatter3DController;
     friend class ScatterSeriesVisualizer;

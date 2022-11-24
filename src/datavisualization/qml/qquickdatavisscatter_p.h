@@ -128,8 +128,6 @@ private:
     void setVisualizerForSeries(QScatter3DSeries *series, ScatterSeriesVisualizer * visualizer);
     ScatterSeriesVisualizer *visualizerForSeries(QScatter3DSeries * series);
 
-    void updateLabels() override;
-    void updateGrid() override;
     void updateGraph() override;
     void synchData() override;
 

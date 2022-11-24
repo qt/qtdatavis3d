@@ -66,8 +66,6 @@ public:
 protected:
     void componentComplete() override;
     void synchData() override;
-    void updateGrid() override;
-    void updateLabels() override;
     void updateGraph() override;
     void handleMousePressedEvent(QMouseEvent *event) override;
 

@@ -97,6 +97,8 @@ public:
     bool hasChangedSeriesList() { return !m_changedSeriesList.isEmpty(); }
     bool isSeriesVisibilityDirty() { return m_isSeriesVisualsDirty; }
 
+    bool isDataDirty() { return m_isDataDirty; }
+
     QList<QAbstract3DSeries *> changedSeriesList() { return m_changedSeriesList; }
 
     bool isSelectedPointChanged() const { return m_changeTracker.selectedPointChanged; }

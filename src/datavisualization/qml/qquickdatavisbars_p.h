@@ -117,11 +117,11 @@ protected:
     void synchData() override;
     void updateParameters();
     void updateFloorLevel(float level);
-    void updateGrid() override;
-    void updateLabels() override;
     void updateGraph() override;
     void updateAxisRange(float min, float max) override;
     void updateAxisReversed(bool enable) override;
+    QVector3D calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition, int index) override;
+    float calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index) override;
 
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
