@@ -142,14 +142,14 @@ int main(int argc, char **argv)
                      backgroundCheckBox, &QCheckBox::setChecked);
     QObject::connect(modifier, &ScatterDataModifier::gridEnabledChanged,
                      gridCheckBox, &QCheckBox::setChecked);
-    QObject::connect(itemStyleList, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeStyle(int)));
+    QObject::connect(itemStyleList, &QComboBox::currentIndexChanged, modifier,
+                     qOverload<int>(&ScatterDataModifier::changeStyle));
 
-    QObject::connect(themeList, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeTheme(int)));
+    QObject::connect(themeList, &QComboBox::currentIndexChanged, modifier,
+                     qOverload<int>(&ScatterDataModifier::changeTheme));
 
-    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeShadowQuality(int)));
+    QObject::connect(shadowQuality, &QComboBox::currentIndexChanged, modifier,
+                     qOverload<int>(&ScatterDataModifier::changeShadowQuality));
 
     QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);

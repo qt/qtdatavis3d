@@ -268,20 +268,20 @@ int main(int argc, char **argv)
     QObject::connect(modifier, &GraphModifier::gridEnabledChanged,
                      gridCheckBox, &QCheckBox::setChecked);
 
-    QObject::connect(rangeList, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeRange(int)));
+    QObject::connect(rangeList, &QComboBox::currentIndexChanged, modifier,
+                     &GraphModifier::changeRange);
 
-    QObject::connect(barStyleList, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeStyle(int)));
+    QObject::connect(barStyleList, &QComboBox::currentIndexChanged, modifier,
+                     &GraphModifier::changeStyle);
 
-    QObject::connect(selectionModeList, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeSelectionMode(int)));
+    QObject::connect(selectionModeList, &QComboBox::currentIndexChanged, modifier,
+                     &GraphModifier::changeSelectionMode);
 
-    QObject::connect(themeList, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeTheme(int)));
+    QObject::connect(themeList, &QComboBox::currentIndexChanged, modifier,
+                     &GraphModifier::changeTheme);
 
-    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeShadowQuality(int)));
+    QObject::connect(shadowQuality, &QComboBox::currentIndexChanged, modifier,
+                     &GraphModifier::changeShadowQuality);
 
     QObject::connect(modifier, &GraphModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);

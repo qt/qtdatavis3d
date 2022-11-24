@@ -65,8 +65,8 @@ int main(int argc, char **argv)
     QObject::connect(cameraButton, &QPushButton::clicked, modifier,
                      &ScatterDataModifier::toggleCameraAnimation);
 
-    QObject::connect(shadowQuality, SIGNAL(currentIndexChanged(int)), modifier,
-                     SLOT(changeShadowQuality(int)));
+    QObject::connect(shadowQuality, &QComboBox::currentIndexChanged, modifier,
+                     &ScatterDataModifier::changeShadowQuality);
 
     QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);

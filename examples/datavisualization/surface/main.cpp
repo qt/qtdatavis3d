@@ -185,8 +185,8 @@ int main(int argc, char **argv)
                      modifier, &SurfaceGraph::adjustZMin);
     QObject::connect(axisMaxSliderZ, &QSlider::valueChanged,
                      modifier, &SurfaceGraph::adjustZMax);
-    QObject::connect(themeList, SIGNAL(currentIndexChanged(int)),
-                     modifier, SLOT(changeTheme(int)));
+    QObject::connect(themeList, &QComboBox::currentIndexChanged,
+                     modifier, &SurfaceGraph::changeTheme);
     QObject::connect(gradientBtoYPB, &QPushButton::pressed,
                      modifier, &SurfaceGraph::setBlackToYellowGradient);
     QObject::connect(gradientGtoRPB, &QPushButton::pressed,
