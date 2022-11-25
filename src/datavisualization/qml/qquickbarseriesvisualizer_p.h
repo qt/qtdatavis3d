@@ -25,7 +25,6 @@
 
 QT_BEGIN_NAMESPACE
 class LabelItem;
-//class AbstractDeclarative;
 class QQuickDataVisItem;
 class Abstract3DController;
 class QBar3DSeries;
@@ -84,7 +83,7 @@ public:
     void handleSeriesConnected();
     void connectSeries(QBar3DSeries *series);
     void disconnectSeries(QBar3DSeries *series);
-    void generateBars(const QList<QAbstract3DSeries *> &seriesList);
+    void generateBars(QBar3DSeries *series);
     QPoint getItemIndex(QQuick3DModel *item);
     void setSelected(QPoint index);
     void clearSelection();
@@ -114,6 +113,7 @@ public:
     QVector3D selectedItemPosition();
     void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
     QString getMeshFileName();
+    void setVisualIndex(int index) {m_visualIndex = index;}
 
 public Q_SLOTS:
     void handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh);
@@ -121,7 +121,6 @@ public Q_SLOTS:
     void handleMeshSmoothChanged(bool enable);
     void handleRowCountChanged();
     void handleColCountChanged();
-    void handleSeriesChanged(QBar3DSeries *series);
 
 private:
     //AxisRenderCache *m_sliceCache; // not owned
@@ -135,6 +134,7 @@ private:
     bool m_keepSeriesUniform;
     bool m_haveUniformColorSeries;
     bool m_haveGradientSeries;
+    int m_visualIndex;
 };
 
 QT_END_NAMESPACE

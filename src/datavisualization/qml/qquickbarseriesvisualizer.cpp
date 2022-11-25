@@ -53,7 +53,7 @@ void QQuickBarSeriesVisualizer::handleSeriesMeshChanged(QAbstract3DSeries::Mesh 
     m_meshType = mesh;
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         removeDataItems();
-//        generateBars(m_seriesList);
+        //generateBars(m_seriesList);
     } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
         removeDummyDataItems();
         resetSelection();
@@ -61,7 +61,7 @@ void QQuickBarSeriesVisualizer::handleSeriesMeshChanged(QAbstract3DSeries::Mesh 
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
         m_controller->markDataDirty();
         m_controller->markSeriesVisualsDirty();
-//        generateBars(m_seriesList);
+        //generateBars(m_seriesList);
     }
 }
 
@@ -77,7 +77,7 @@ void QQuickBarSeriesVisualizer::handleMeshSmoothChanged(bool enable)
 
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         removeDataItems();
-//        generateBars(m_seriesList);
+        //generateBars(m_seriesList);
     } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
         removeDummyDataItems();
         resetSelection();
@@ -85,7 +85,7 @@ void QQuickBarSeriesVisualizer::handleMeshSmoothChanged(bool enable)
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
         m_controller->markDataDirty();
         m_controller->markSeriesVisualsDirty();
-//        generateBars(m_seriesList);
+        //generateBars(m_seriesList);
     }
 }
 
@@ -96,8 +96,6 @@ void QQuickBarSeriesVisualizer::handleRowCountChanged()
     m_dataVisBars->repeaterZ()->setModel(categoryAxisZ->labels().size());
     m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
     m_dataVisBars->updateParameters();
-    m_dataVisBars->updateGrid();
-    m_dataVisBars->updateLabels();
 }
 
 void QQuickBarSeriesVisualizer::handleColCountChanged()
@@ -107,19 +105,11 @@ void QQuickBarSeriesVisualizer::handleColCountChanged()
     m_dataVisBars->repeaterX()->setModel(categoryAxisX->labels().size());
     m_controller->handleAxisLabelsChangedBySender(m_controller->axisX());
     m_dataVisBars->updateParameters();
-    m_dataVisBars->updateGrid();
-    m_dataVisBars->updateLabels();
 }
 
 void QQuickBarSeriesVisualizer::createParent()
 {
     m_visualizerRoot.reset(new QObject());
-}
-
-void QQuickBarSeriesVisualizer::handleSeriesChanged(QBar3DSeries *series)
-{
-    int size = m_seriesList.size();
-    m_seriesList.insert(size, series);
 }
 
 void QQuickBarSeriesVisualizer::setup()
@@ -156,7 +146,6 @@ void QQuickBarSeriesVisualizer::connectSeries(QBar3DSeries *series)
 
     m_seriesRootItem = createSeriesRoot();
     m_seriesRootItem->setParent(series);
-    handleSeriesChanged(series);
     QObject::connect(series, &QBar3DSeries::meshChanged, this, &QQuickBarSeriesVisualizer::handleSeriesMeshChanged);
     QObject::connect(series, &QBar3DSeries::meshSmoothChanged, this, &QQuickBarSeriesVisualizer::handleMeshSmoothChanged);
     QObject::connect(m_controller, &Abstract3DController::optimizationHintsChanged, this, &QQuickBarSeriesVisualizer::handleOptimizationHintsChanged);
@@ -170,8 +159,9 @@ void QQuickBarSeriesVisualizer::disconnectSeries(QBar3DSeries *series)
     QObject::disconnect(series, 0, this, 0);
 }
 
-void QQuickBarSeriesVisualizer::generateBars(const QList<QAbstract3DSeries *> &seriesList)
+void QQuickBarSeriesVisualizer::generateBars(QBar3DSeries *series)
 {
+    m_seriesList.append(series);
     if (!m_visualizerRoot)
         createParent();
 
@@ -181,39 +171,30 @@ void QQuickBarSeriesVisualizer::generateBars(const QList<QAbstract3DSeries *> &s
 
     m_visibleSeriesCount = 0;
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
-        int seriesCount = seriesList.size();
-        for (int i = 0; i < seriesCount; i++) {
-            QAbstract3DSeries *series = seriesList.at(i);
-            QBar3DSeries *currentSeries = static_cast<QBar3DSeries *>(series);
-            const QBarDataArray *array = currentSeries->dataProxy()->array();
-            QBarDataProxy *dataProxy = currentSeries->dataProxy();
-            dataRowCount = dataProxy->rowCount();
-            if (dataRowCount == 0)
-                continue;
-            dataColCount = dataProxy->colCount();
-            int dataRowIndex = minRow;
+        const QBarDataArray *array = series->dataProxy()->array();
+        QBarDataProxy *dataProxy = series->dataProxy();
+        dataRowCount = dataProxy->rowCount();
+        dataColCount = dataProxy->colCount();
+        int dataRowIndex = minRow;
 
-            while (dataRowIndex < dataRowCount) {
-                const QBarDataRow *dataRow = array->at(dataRowIndex);
-                Q_ASSERT(dataRow->size() == dataColCount);
-                for (int i = 0; i < dataColCount; i++) {
-                    QBarDataItem *dataItem = const_cast <QBarDataItem *> (&(dataRow->at(i)));
-                    QQuick3DModel *model = m_modelList.key(dataItem);
-                    if (!model) {
-                        model = createDataItem();
-                        model->setPickable(true);
-                        model->setParentItem(m_seriesRootItem);
-                    }
-                    m_modelList.insert(model,dataItem);
-                    m_controller->markDataDirty();
-                    m_controller->markSeriesVisualsDirty();
-
-                    m_barsGenerated = true;
+        while (dataRowIndex < dataRowCount) {
+            const QBarDataRow *dataRow = array->at(dataRowIndex);
+            Q_ASSERT(dataRow->size() == dataColCount);
+            for (int i = 0; i < dataColCount; i++) {
+                QBarDataItem *dataItem = const_cast <QBarDataItem *> (&(dataRow->at(i)));
+                QQuick3DModel *model = m_modelList.key(dataItem);
+                if (!model) {
+                    model = createDataItem();
+                    model->setPickable(true);
+                    model->setParentItem(m_seriesRootItem);
                 }
-                ++dataRowIndex;
+                m_modelList.insert(model,dataItem);
+                m_controller->markDataDirty();
+                m_controller->markSeriesVisualsDirty();
+
+                m_barsGenerated = true;
             }
-            if (series->isVisible())
-                m_visibleSeriesCount++;
+            ++dataRowIndex;
         }
     }
 }
@@ -261,6 +242,11 @@ void QQuickBarSeriesVisualizer::resetSelection()
 
 void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
 {
+    for (auto series : m_controller->barSeriesList()) {
+        if (series->isVisible())
+            m_visibleSeriesCount++;
+    }
+
     m_seriesScaleX = 1.0f / float(m_visibleSeriesCount);
     m_seriesStep = 1.0f / float(m_visibleSeriesCount);
     m_seriesStart = -((float(m_visibleSeriesCount) - 1.0f) / 2.0f)
@@ -272,8 +258,11 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
         m_seriesScaleZ = 1.0f;
 
     m_meshRotation = dataProxy->series()->meshRotation();
-
     m_zeroPosition = m_helperAxisY->itemPositionAt(m_dataVisBars->m_actualFloorLevel);
+
+    float seriesPos = m_seriesStart + m_seriesStep
+            * (m_visualIndex - (m_visualIndex
+                                * m_dataVisBars->m_cachedBarSeriesMargin.width())) + 0.5f;
 
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         int rowCount = dataProxy->rowCount();
@@ -304,7 +293,7 @@ void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
 
                 float angle = item->rotation();
 
-                float colPos = (j + 0.5f) * m_dataVisBars->m_cachedBarSpacing.width();
+                float colPos = (j + seriesPos) * m_dataVisBars->m_cachedBarSpacing.width();
                 float xPos = (colPos - m_dataVisBars->m_rowWidth) / m_dataVisBars->m_scaleFactor;
                 float rowPos = (i + 0.5f) * (m_dataVisBars->m_cachedBarSpacing.height());
                 float zPos = (m_dataVisBars->m_columnDepth - rowPos) / m_dataVisBars->m_scaleFactor;
@@ -692,7 +681,7 @@ QVector3D QQuickBarSeriesVisualizer::selectedItemPosition()
 
     QVector3D position;
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
-//        position = m_itemList[m_selectedRowIndex][m_selectedColIndex]->position();
+        //position = m_itemList[m_selectedRowIndex][m_selectedColIndex]->position();
     } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
         position = m_selectionIndicator->position();
     }
@@ -711,7 +700,7 @@ QString QQuickBarSeriesVisualizer::getMeshFileName()
     QString fileName;
     QString smoothString = QStringLiteral("Smooth");
     switch (m_meshType) {
-        case QAbstract3DSeries::MeshSphere:
+    case QAbstract3DSeries::MeshSphere:
         fileName = QStringLiteral("defaultMeshes/sphereMesh");
         break;
     case QAbstract3DSeries::MeshBar:

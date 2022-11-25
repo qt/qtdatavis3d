@@ -432,6 +432,9 @@ void QQuickDataVisBars::updateParameters() {
                                   float(m_newRows) / float(m_newCols));
         m_maxSceneSize = 2.0f * qSqrt(sceneRatio * m_newCols * m_newRows);
 
+        updateGrid();
+        updateLabels();
+
         if (m_cachedBarThickness.isValid())
             calculateSceneScalingFactors();
     }
@@ -878,11 +881,16 @@ void QQuickDataVisBars::updateGraph()
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     calculateSceneScalingFactors();
 
+    int visualIndex = 0;
     for (auto *barSeries : std::as_const(barSeriesList)) {
         auto *visualizer = visualizerForSeries(barSeries);
+        if (barSeries->isVisible())
+            visualizer->setVisualIndex(visualIndex++);
+        else if (!barSeries->isVisible())
+            visualizer->setVisualIndex(-1);
         if (visualizer && barSeries->isVisible()) {
             if (visualizer)
-                visualizer->generateBars(m_barsController->m_seriesList);
+                visualizer->generateBars(barSeries);
             if (visualizer->m_barsGenerated && m_barsController->m_isDataDirty)
                 updateDataPoints(barSeries);
             if (visualizer->m_barsGenerated && m_barsController->m_isSeriesVisualsDirty)
