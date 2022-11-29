@@ -42,16 +42,13 @@ public:
     explicit QQuickBarSeriesVisualizer (QObject *parent = nullptr);
     ~QQuickBarSeriesVisualizer ();
 
-    QAbstract3DGraph::OptimizationHint optimizationHint = QAbstract3DGraph::OptimizationHint::OptimizationDefault;
     QQuickDataVisBars *m_dataVisBars;
     Bars3DController *m_controller = nullptr;
     QAbstract3DSeries::Mesh m_meshType = QAbstract3DSeries::MeshSphere;
     bool m_smooth = false;
     DatavisQuick3DInstancing *m_instancing = nullptr;
     QQuick3DModel *m_instancingRootItem = nullptr;
-    QQuick3DRepeater *m_repeater = nullptr;
     QQuick3DNode *m_seriesRootItem = nullptr;
-    QQuick3DMaterial *m_seriesMaterial = nullptr;
     QQuick3DTexture *m_texture = nullptr;
     QQuick3DTexture *m_highlightTexture = nullptr;
     bool m_hasTexture = false;
@@ -61,11 +58,9 @@ public:
     AxisHelper *m_helperAxisX = nullptr;
     AxisHelper *m_helperAxisY = nullptr;
     AxisHelper *m_helperAxisZ = nullptr;
-    float m_dotSizedScale = 1.0f;
     QQuaternion m_meshRotation;
 
     QHash<QQuick3DModel *, QBarDataItem *> m_modelList;
-    QList<QQuick3DModel*> m_dummyItemList;
     qsizetype m_selectedRowIndex = -1;
     qsizetype m_selectedColIndex = -1;
     QQuick3DModel *m_selectionIndicator = nullptr;
@@ -73,14 +68,12 @@ public:
     float m_selectedGradientPos = 0.0f;
     QQuickDataVisItem *m_qml;
     bool dummiesCreated = false;
-    QList<QBar3DSeries *> m_seriesList;
     bool m_barsGenerated;
 
     QScopedPointer<QObject> m_visualizerRoot;
 
     void createParent();
     void setup();
-    void handleSeriesConnected();
     void connectSeries(QBar3DSeries *series);
     void disconnectSeries(QBar3DSeries *series);
     void generateBars(QBar3DSeries *series);
@@ -89,7 +82,7 @@ public:
     void clearSelection();
     void resetSelection();
 
-    void updateData(QBarDataProxy *dataProxy);
+    void updateData(QBar3DSeries *series);
     void updateItemVisuals(QBar3DSeries *series);
     void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
     void updateItemInstancedMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
@@ -98,7 +91,6 @@ public:
     void updateCustomMaterial(QQuick3DModel *item, bool isHighlight = false);
     void updatePrincipledMaterial(QQuick3DModel *model, const QColor &color, bool useGradient, bool isHighlight = false);
 
-    void createDummyDataItems(int count);
     QQuick3DTexture *createTexture();
     QQuick3DModel *createDataItemModel(QAbstract3DSeries::Mesh meshType);
     QQmlComponent *createRepeaterDelegate(QAbstract3DSeries::Mesh meshType);
@@ -107,9 +99,7 @@ public:
     void createInstancingRootItem();
     void createSelectionIndicator();
     void removeDataItems();
-    void removeDummyDataItems();
     void createItemLabel();
-    void updateItemLabelVisuals(const Q3DTheme *activeTheme);
     QVector3D selectedItemPosition();
     void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
     QString getMeshFileName();

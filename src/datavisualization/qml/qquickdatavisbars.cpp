@@ -200,7 +200,6 @@ void QQuickDataVisBars::addSeries(QBar3DSeries *series)
     visualizer->m_controller = m_barsController;
     visualizer->m_qml = this;
     visualizer->m_dataVisBars = this;
-    visualizer->setup();
     visualizer->connectSeries(series);
     visualizer->m_helperAxisX = &m_helperAxisX;
     visualizer->m_helperAxisY = &m_helperAxisY;
@@ -331,7 +330,7 @@ void QQuickDataVisBars::componentComplete()
 
     m_lineLengthScaleFactor = lineLengthScaleFactor();
 
-    setLabelMargin(0.4f);
+    setLabelMargin(0.5f);
 }
 
 void QQuickDataVisBars::synchData()
@@ -432,11 +431,15 @@ void QQuickDataVisBars::updateParameters() {
                                   float(m_newRows) / float(m_newCols));
         m_maxSceneSize = 2.0f * qSqrt(sceneRatio * m_newCols * m_newRows);
 
-        updateGrid();
-        updateLabels();
-
         if (m_cachedBarThickness.isValid())
             calculateSceneScalingFactors();
+    }
+
+    if (!m_barsController->m_changedSeriesList.isEmpty()) {
+        updateGraph();
+        updateGrid();
+        updateLabels();
+        m_barsController->m_changedSeriesList.clear();
     }
 }
 
@@ -648,21 +651,23 @@ void QQuickDataVisBars::updateLabels()
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisX->labels())));
     float rowPosValue = m_scaleZWithBackground + labelMargin();
 
-    for (int i = 0; i < repeaterX()->count(); i++) {
-        colPos = (i + 0.5f) * m_cachedBarSpacing.width();
-        if (zFlipped)
-            rowPos = -rowPosValue;
-        else
-            rowPos = rowPosValue;
+    if (labels.size() == repeaterX()->count()) {
+        for (int i = 0; i < repeaterX()->count(); i++) {
+            colPos = (i + 0.5f) * m_cachedBarSpacing.width();
+            if (zFlipped)
+                rowPos = -rowPosValue;
+            else
+                rowPos = rowPosValue;
 
-        labelTrans.setX((colPos - m_rowWidth) / m_scaleFactor);
-        labelTrans.setZ(rowPos);
+            labelTrans.setX((colPos - m_rowWidth) / m_scaleFactor);
+            labelTrans.setZ(rowPos);
 
-        auto obj = static_cast<QQuick3DNode *>(repeaterX()->objectAt(i));
-        obj->setPosition(labelTrans);
-        obj->setRotation(totalRotation);
-        obj->setProperty("labelText", labels[i]);
-        obj->setProperty("labelWidth", labelsMaxWidth);
+            auto obj = static_cast<QQuick3DNode *>(repeaterX()->objectAt(i));
+            obj->setPosition(labelTrans);
+            obj->setRotation(totalRotation);
+            obj->setProperty("labelText", labels[i]);
+            obj->setProperty("labelWidth", labelsMaxWidth);
+        }
     }
 
     if (titleLabelX()->visible()) {
@@ -725,8 +730,7 @@ void QQuickDataVisBars::updateLabels()
                                          0.0f, -labelZTrans - labelMarginZTrans);
 
     labelsMaxWidth = 0.0f;
-    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisY->labels())
-                                                / (m_scaleXWithBackground * m_scaleZWithBackground)));
+    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisY->labels())));
     auto scale = m_yScale * m_scaleYWithBackground + m_yScale;
 
     for (int i = 0; i < rightSideCount; i++) {
@@ -849,25 +853,26 @@ void QQuickDataVisBars::updateLabels()
     totalRotation = Utils::calculateRotation(labelRotation);
     labelTrans = QVector3D(xPos, yPos, 0);
     labelsMaxWidth = 0.0f;
-    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisZ->labels())
-                                                / (m_scaleXWithBackground * m_scaleZWithBackground)));
+    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_barsController->m_axisZ->labels())));
     float colPosValue = m_scaleXWithBackground + (labelMargin() / 2.0f);
 
-    for (int i = 0; i < repeaterZ()->count(); i++) {
-        rowPos = (i + 0.5f) * m_cachedBarSpacing.height();
-        if (xFlipped)
-            colPos = -colPosValue;
-        else
-            colPos = colPosValue;
+    if (labels.size() == repeaterZ()->count()) {
+        for (int i = 0; i < repeaterZ()->count(); i++) {
+            rowPos = (i + 0.5f) * m_cachedBarSpacing.height();
+            if (xFlipped)
+                colPos = -colPosValue;
+            else
+                colPos = colPosValue;
 
-        labelTrans.setX(colPos);
-        labelTrans.setZ((m_columnDepth - rowPos) / m_scaleFactor);
+            labelTrans.setX(colPos);
+            labelTrans.setZ((m_columnDepth - rowPos) / m_scaleFactor);
 
-        auto obj = static_cast<QQuick3DNode *>(repeaterZ()->objectAt(i));
-        obj->setPosition(labelTrans);
-        obj->setRotation(totalRotation);
-        obj->setProperty("labelText", labels[i]);
-        obj->setProperty("labelWidth", labelsMaxWidth);
+            auto obj = static_cast<QQuick3DNode *>(repeaterZ()->objectAt(i));
+            obj->setPosition(labelTrans);
+            obj->setRotation(totalRotation);
+            obj->setProperty("labelText", labels[i]);
+            obj->setProperty("labelWidth", labelsMaxWidth);
+        }
     }
 
     if (titleLabelZ()->visible()) {
@@ -884,17 +889,17 @@ void QQuickDataVisBars::updateGraph()
     int visualIndex = 0;
     for (auto *barSeries : std::as_const(barSeriesList)) {
         auto *visualizer = visualizerForSeries(barSeries);
+        visualizer->removeDataItems();
         if (barSeries->isVisible())
             visualizer->setVisualIndex(visualIndex++);
         else if (!barSeries->isVisible())
             visualizer->setVisualIndex(-1);
-        if (visualizer && barSeries->isVisible()) {
-            if (visualizer)
-                visualizer->generateBars(barSeries);
+        if (visualizer) {
+            visualizer->generateBars(barSeries);
             if (visualizer->m_barsGenerated && m_barsController->m_isDataDirty)
-                updateDataPoints(barSeries);
+                visualizer->updateData(barSeries);
             if (visualizer->m_barsGenerated && m_barsController->m_isSeriesVisualsDirty)
-                updateDataPointVisuals(barSeries);
+                visualizer->updateItemVisuals(barSeries);
         }
     }
 }
@@ -1059,16 +1064,4 @@ void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spaci
 
     // Calculate here and at setting sample space
     calculateSceneScalingFactors();
-}
-
-void QQuickDataVisBars::updateDataPoints(QBar3DSeries *series)
-{
-    auto visualizer = visualizerForSeries(series);
-    visualizer->updateData(series->dataProxy());
-}
-
-void QQuickDataVisBars::updateDataPointVisuals(QBar3DSeries *series)
-{
-    auto visualizer = visualizerForSeries(series);
-    visualizer->updateItemVisuals(series);
 }

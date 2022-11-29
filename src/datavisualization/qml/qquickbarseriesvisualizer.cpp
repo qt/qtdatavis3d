@@ -37,11 +37,6 @@ QQuickBarSeriesVisualizer::~QQuickBarSeriesVisualizer()
     if (m_texture)
         m_texture->deleteLater();
 
-    removeDataItems();
-
-    removeDummyDataItems();
-    m_dummyItemList.clear();
-
     if (m_instancing)
         delete m_instancing;
     if (m_seriesRootItem)
@@ -55,7 +50,6 @@ void QQuickBarSeriesVisualizer::handleSeriesMeshChanged(QAbstract3DSeries::Mesh 
         removeDataItems();
         //generateBars(m_seriesList);
     } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
-        removeDummyDataItems();
         resetSelection();
         m_instancingRootItem->setSource(QUrl(getMeshFileName()));
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
@@ -79,7 +73,6 @@ void QQuickBarSeriesVisualizer::handleMeshSmoothChanged(bool enable)
         removeDataItems();
         //generateBars(m_seriesList);
     } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
-        removeDummyDataItems();
         resetSelection();
         m_instancingRootItem->setSource(QUrl(getMeshFileName()));
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
@@ -115,25 +108,13 @@ void QQuickBarSeriesVisualizer::createParent()
 void QQuickBarSeriesVisualizer::setup()
 {
     if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationHint::OptimizationDefault) {
-        removeDummyDataItems();
         if (m_instancing)
             delete m_instancing;
         if (m_instancingRootItem)
             delete m_instancingRootItem;
-    }
-    else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationHint::OptimizationStatic) {
+    } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationHint::OptimizationStatic) {
         removeDataItems();
         m_instancing = new DatavisQuick3DInstancing();
-        createInstancingRootItem();
-        createSelectionIndicator();
-    }
-}
-
-void QQuickBarSeriesVisualizer::handleSeriesConnected()
-{
-    if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
-
-    } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
         createInstancingRootItem();
         createSelectionIndicator();
     }
@@ -151,7 +132,6 @@ void QQuickBarSeriesVisualizer::connectSeries(QBar3DSeries *series)
     QObject::connect(m_controller, &Abstract3DController::optimizationHintsChanged, this, &QQuickBarSeriesVisualizer::handleOptimizationHintsChanged);
     QObject::connect(series->dataProxy(), &QBarDataProxy::rowCountChanged, this, &QQuickBarSeriesVisualizer::handleRowCountChanged);
     QObject::connect(series->dataProxy(), &QBarDataProxy::colCountChanged, this, &QQuickBarSeriesVisualizer::handleColCountChanged);
-    handleSeriesConnected();
 }
 
 void QQuickBarSeriesVisualizer::disconnectSeries(QBar3DSeries *series)
@@ -161,7 +141,6 @@ void QQuickBarSeriesVisualizer::disconnectSeries(QBar3DSeries *series)
 
 void QQuickBarSeriesVisualizer::generateBars(QBar3DSeries *series)
 {
-    m_seriesList.append(series);
     if (!m_visualizerRoot)
         createParent();
 
@@ -189,13 +168,14 @@ void QQuickBarSeriesVisualizer::generateBars(QBar3DSeries *series)
                     model->setParentItem(m_seriesRootItem);
                 }
                 m_modelList.insert(model,dataItem);
-                m_controller->markDataDirty();
-                m_controller->markSeriesVisualsDirty();
 
+                bool visible = series->isVisible();
+                model->setVisible(visible);
                 m_barsGenerated = true;
             }
             ++dataRowIndex;
         }
+        m_controller->markDataDirty();
     }
 }
 
@@ -240,8 +220,9 @@ void QQuickBarSeriesVisualizer::resetSelection()
     }
 }
 
-void QQuickBarSeriesVisualizer::updateData(QBarDataProxy *dataProxy)
+void QQuickBarSeriesVisualizer::updateData(QBar3DSeries *series)
 {
+    QBarDataProxy *dataProxy = series->dataProxy();
     for (auto series : m_controller->barSeriesList()) {
         if (series->isVisible())
             m_visibleSeriesCount++;
@@ -543,27 +524,6 @@ void QQuickBarSeriesVisualizer::updatePrincipledMaterial(QQuick3DModel *model, c
     }
 }
 
-void QQuickBarSeriesVisualizer::createDummyDataItems(int count)
-{
-    if (!dummiesCreated && count > 0) {
-        if (!m_instancingRootItem)
-            qWarning("No instancing root item");
-        m_dummyItemList.resize(count);
-
-        for (int i = 0; i < count; i++) {
-            auto dummyItem = new QQuick3DModel();
-            dummyItem->setParent(m_seriesRootItem);
-            dummyItem->setParentItem(m_seriesRootItem);
-            dummyItem->setSource(m_instancingRootItem->source());
-            dummyItem->setScale(m_instancingRootItem->scale()*1.05f);
-            dummyItem->setPickable(true);
-
-            m_dummyItemList[i] = dummyItem;
-        }
-        dummiesCreated = true;
-    }
-}
-
 QQuick3DTexture *QQuickBarSeriesVisualizer::createTexture()
 {
     QQuick3DTexture *texture = new QQuick3DTexture();
@@ -648,16 +608,13 @@ void QQuickBarSeriesVisualizer::createSelectionIndicator()
 void QQuickBarSeriesVisualizer::removeDataItems()
 {
     for (auto it = m_modelList.begin(); it != m_modelList.end(); it++) {
-        m_modelList.erase(it);
+        QQmlListReference materialsRef(it.key(), "materials");
+        if (materialsRef.size()) {
+            auto material = materialsRef.at(0);
+            delete material;
+            m_modelList.erase(it);
+        }
     }
-}
-
-void QQuickBarSeriesVisualizer::removeDummyDataItems()
-{
-    for (const auto &item : std::as_const(m_dummyItemList)) {
-        delete item;
-    }
-    dummiesCreated = false;
 }
 
 void QQuickBarSeriesVisualizer::createItemLabel()
@@ -667,11 +624,6 @@ void QQuickBarSeriesVisualizer::createItemLabel()
     labelNode->setParent(m_qml->rootNode());
     labelNode->setParentItem(m_qml->rootNode());
     m_itemLabel = labelNode;
-}
-
-void QQuickBarSeriesVisualizer::updateItemLabelVisuals(const Q3DTheme *activeTheme)
-{
-    Q_UNUSED(activeTheme);
 }
 
 QVector3D QQuickBarSeriesVisualizer::selectedItemPosition()

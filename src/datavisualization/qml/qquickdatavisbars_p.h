@@ -193,8 +193,6 @@ private:
     QQuickBarSeriesVisualizer *visualizerForSeries(QBar3DSeries *series);
 
     void updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative);
-    void updateDataPoints(QBar3DSeries *series);
-    void updateDataPointVisuals(QBar3DSeries *series);
 
     friend class Bars3DController;
     friend class QQuickBarSeriesVisualizer;
