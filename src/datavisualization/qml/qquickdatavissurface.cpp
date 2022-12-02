@@ -35,6 +35,8 @@ QQuickDataVisSurface::~QQuickDataVisSurface()
     QMutexLocker locker(m_nodeMutex.data());
     const QMutexLocker locker2(mutex());
     delete m_surfaceController;
+    for (auto model : m_model)
+        delete model;
 }
 
 QValue3DAxis *QQuickDataVisSurface::axisX() const
@@ -174,6 +176,7 @@ void QQuickDataVisSurface::componentComplete()
             model->setPickable(true);
 
         auto geometry = new QQuick3DGeometry();
+        geometry->setParent(this);
         geometry->setStride(sizeof(SurfaceVertex));
         geometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Triangles);
         geometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
@@ -192,8 +195,11 @@ void QQuickDataVisSurface::componentComplete()
 
         QQmlListReference materialRef(model, "materials");
         auto material = new QQuick3DDefaultMaterial();
+        material->setParent(this);
         QQuick3DTexture *texture = new QQuick3DTexture();
+        texture->setParent(this);
         QQuick3DTextureData *textureData = new QQuick3DTextureData();
+        textureData->setParent(this);
         texture->setTextureData(textureData);
         material->setDiffuseMap(texture);
         material->setSpecularAmount(7.0f);
@@ -207,6 +213,7 @@ void QQuickDataVisSurface::componentComplete()
         gridModel->setVisible(visible);
         gridModel->setDepthBias(1.0f);
         auto gridGeometry = new QQuick3DGeometry();
+        gridGeometry->setParent(this);
         gridGeometry->setStride(sizeof(SurfaceVertex));
         gridGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
         gridGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
@@ -218,7 +225,9 @@ void QQuickDataVisSurface::componentComplete()
         gridModel->setGeometry(gridGeometry);
         QQmlListReference gridMaterialRef(gridModel, "materials");
         auto gridMaterial = new QQuick3DPrincipledMaterial();
+        gridMaterial->setParent(this);
         gridMaterial->setLighting(QQuick3DPrincipledMaterial::NoLighting);
+        gridMaterial->setParent(this);
         gridMaterialRef.append(gridMaterial);
 
         SurfaceModel *surfaceModel = new SurfaceModel();

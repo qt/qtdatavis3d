@@ -259,6 +259,7 @@ void QQuickDataVisItem::componentComplete()
     m_selectionPointer->setSource(QUrl(QStringLiteral("#Sphere")));
     m_selectionPointer->setScale(QVector3D(0.001f, 0.001f, 0.001f));
     auto pointerMaterial = new QQuick3DPrincipledMaterial();
+    pointerMaterial->setParent(this);
     pointerMaterial->setBaseColor(m_controller->activeTheme()->singleHighlightColor());
     QQmlListReference materialRef(m_selectionPointer, "materials");
     materialRef.append(pointerMaterial);
@@ -668,6 +669,7 @@ void QQuickDataVisItem::synchData()
         QQuick3DPrincipledMaterial *bgMat;
         if (!materialsRef.size()) {
             bgMat = new QQuick3DPrincipledMaterial();
+            bgMat->setParent(this);
             bgMat->setRoughness(.3f);
             bgMat->setEmissiveFactor(QVector3D(.075f, .075f, .075f));
             materialsRef.append(bgMat);
