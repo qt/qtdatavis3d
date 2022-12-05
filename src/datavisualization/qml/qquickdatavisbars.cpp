@@ -197,6 +197,7 @@ void QQuickDataVisBars::addSeries(QBar3DSeries *series)
 {
     m_barsController->addSeries(series);
     auto visualizer = new QQuickBarSeriesVisualizer();
+    visualizer->setParent(this);
     visualizer->m_controller = m_barsController;
     visualizer->m_qml = this;
     visualizer->m_dataVisBars = this;
@@ -400,6 +401,7 @@ void QQuickDataVisBars::synchData()
 
     if (!materialsRefF.size()) {
         bgMatFloor = new QQuick3DPrincipledMaterial();
+        bgMatFloor->setParent(this);
         bgMatFloor->setRoughness(.3f);
         bgMatFloor->setEmissiveFactor(QVector3D(.075f, .075f, .075f));
         materialsRefF.append(bgMatFloor);

@@ -75,7 +75,7 @@ private:
     float m_min;
     float m_max;
 
-    bool m_reversed;
+    bool m_reversed = false;
 };
 
 QT_END_NAMESPACE

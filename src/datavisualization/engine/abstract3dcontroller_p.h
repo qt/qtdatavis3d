@@ -165,7 +165,7 @@ private:
     qreal m_reflectivity;
     QLocale m_locale;
     QVector3D m_queriedGraphPosition;
-    bool m_graphPositionQueryPending;
+    bool m_graphPositionQueryPending = false;
 
 protected:
     Q3DScene *m_scene;

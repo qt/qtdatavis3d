@@ -39,8 +39,6 @@ QQuickBarSeriesVisualizer::~QQuickBarSeriesVisualizer()
 
     if (m_instancing)
         delete m_instancing;
-    if (m_seriesRootItem)
-        delete m_seriesRootItem;
 }
 
 void QQuickBarSeriesVisualizer::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
@@ -381,12 +379,14 @@ void QQuickBarSeriesVisualizer::updateItemMaterial(QQuick3DModel *item, bool use
         if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();
+                principledMaterial->setParent(this);
                 auto oldCustomMaterial = materialsRef.at(0);
                 materialsRef.replace(0, principledMaterial);
                 delete oldCustomMaterial;
             }
         } else {
             auto principledMaterial = new QQuick3DPrincipledMaterial();
+            principledMaterial->setParent(this);
             materialsRef.append(principledMaterial);
         }
     } else {
@@ -527,6 +527,7 @@ void QQuickBarSeriesVisualizer::updatePrincipledMaterial(QQuick3DModel *model, c
 QQuick3DTexture *QQuickBarSeriesVisualizer::createTexture()
 {
     QQuick3DTexture *texture = new QQuick3DTexture();
+    texture->setParent(this);
     texture->setRotationUV(-90.0f);
     texture->setHorizontalTiling(QQuick3DTexture::ClampToEdge);
     texture->setVerticalTiling(QQuick3DTexture::ClampToEdge);
