@@ -35,8 +35,6 @@ ScatterSeriesVisualizer::~ScatterSeriesVisualizer()
 
     if (m_instancing)
         delete m_instancing;
-    if (m_seriesRootItem)
-        delete m_seriesRootItem;
 }
 
 void ScatterSeriesVisualizer::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
@@ -555,6 +553,7 @@ void ScatterSeriesVisualizer::createDummyDataItems(int count)
 QQuick3DTexture *ScatterSeriesVisualizer::createTexture()
 {
     QQuick3DTexture *texture = new QQuick3DTexture();
+    texture->setParent(this);
     texture->setRotationUV(-90.0f);
     texture->setHorizontalTiling(QQuick3DTexture::ClampToEdge);
     texture->setVerticalTiling(QQuick3DTexture::ClampToEdge);

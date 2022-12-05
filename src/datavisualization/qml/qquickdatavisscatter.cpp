@@ -158,6 +158,7 @@ void QQuickDataVisScatter::addSeries(QScatter3DSeries *series)
 {
     m_scatterController->addSeries(series);
     auto visualizer = new ScatterSeriesVisualizer();
+    visualizer->setParent(this);
     visualizer->setController(m_scatterController);
     visualizer->setQml(this);
     visualizer->setup();
