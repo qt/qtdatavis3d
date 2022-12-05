@@ -647,7 +647,7 @@ void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spaci
     m_cachedBarThickness.setHeight(1.0f / thicknessRatio);
 
     if (relative) {
-        m_cachedBarSpacing.setWidth((m_cachedBarThickness.width()*2)
+        m_cachedBarSpacing.setWidth((m_cachedBarThickness.width() * 2)
                                     * (spacing.width() + 1.0f));
         m_cachedBarSpacing.setHeight((m_cachedBarThickness.height() * 2)
                                      * (spacing.height() + 1.0f));

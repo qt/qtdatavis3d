@@ -420,6 +420,8 @@ private:
 
     QVector3D m_translate = QVector3D(1.0f, 1.0f, 1.0f);
 
+    QVector3D m_labelScale = QVector3D(0.01f, 0.01f, 0.0f);
+
     float m_gridOffset = 0.002f;
     float m_lineWidthScaleFactor = 0.0001f;
     float m_lineLengthScaleFactor = 0.02f;

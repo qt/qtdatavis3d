@@ -773,8 +773,9 @@ void QQuickDataVisItem::updateGrid()
     float linePosX = 0.0f;
     float linePosY = backgroundScale.y();
     float linePosZ = 0.0f;
-    float scale, translate;
-    scale = translate = m_scaleWithBackground.z();
+    float scale = m_scaleWithBackground.z();
+    float translate = m_scaleWithBackground.z();
+
     if (!yFlipped) {
         linePosY *= -1.0f;
         rotation.setZ(180.0f);
@@ -1031,49 +1032,41 @@ void QQuickDataVisItem::updateLabels()
         }
     }
 
-    if (!xFlipped) {
-        if (!yFlipped)
-            yPos = -backgroundScale.y();
-        else
-            yPos = backgroundScale.y();
-    } else {
-        if (!yFlipped)
-            yPos = -backgroundScale.y();
-        else
-            yPos = backgroundScale.y();
-    }
+    float scale = backgroundScale.x() - m_backgroundScaleMargin.x();;
+    float translate = backgroundScale.x() - m_backgroundScaleMargin.x();
 
-    if (zFlipped)
-        zPos = -backgroundScale.z() - labelMargin();
-    else
-        zPos = backgroundScale.z() + labelMargin();
-
-    float scale, translate;
-    scale = translate = backgroundScale.x();
     auto totalRotation = Utils::calculateRotation(labelRotation);
-    auto labelTrans = QVector3D(0.0f, yPos, zPos);
     float labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisX->labels())));
+    auto adjustment = labelsMaxWidth * m_labelScale.x() / 4.0f;
+    zPos = backgroundScale.z() + adjustment;
+    adjustment *= qAbs(qSin(qDegreesToRadians(labelRotation.z())));
+    yPos = backgroundScale.y() + adjustment;
+
+    if (!yFlipped)
+        yPos *= -1.0f;
+
+    if (zFlipped)
+        zPos *= -1.0f;
+
+    auto labelTrans = QVector3D(0.0f, yPos, zPos);
 
     if (axisX->type() == QAbstract3DAxis::AxisTypeValue) {
         auto valueAxisX = static_cast<QValue3DAxis *>(axisX);
         for (int i = 0; i < repeaterX()->count(); i++) {
             auto obj = static_cast<QQuick3DNode *>(repeaterX()->objectAt(i));
             labelTrans.setX(valueAxisX->labelPositionAt(i) * scale * 2.0f - translate);
+            obj->setScale(m_labelScale);
             obj->setPosition(labelTrans);
             obj->setRotation(totalRotation);
             obj->setProperty("labelText", labels[i]);
             obj->setProperty("labelWidth", labelsMaxWidth);
         }
     } else if (axisX->type() == QAbstract3DAxis::AxisTypeCategory) {
-        float rowPos = backgroundScale.z() + labelMargin();
-        if (zFlipped)
-            rowPos *= -1.0f;
-        labelTrans.setZ(rowPos);
         for (int i = 0; i < repeaterX()->count(); i++) {
             labelTrans = calculateCategoryLabelPosition(axisX, labelTrans, i);
-
             auto obj = static_cast<QQuick3DNode *>(repeaterX()->objectAt(i));
+            obj->setScale(m_labelScale);
             obj->setPosition(labelTrans);
             obj->setRotation(totalRotation);
             obj->setProperty("labelText", labels[i]);
@@ -1088,7 +1081,7 @@ void QQuickDataVisItem::updateLabels()
         labelTrans.setX(x);
     }
 
-    auto axisY = static_cast<QValue3DAxis *>(m_controller->axisY());
+    auto axisY = m_controller->axisY();
     labels = axisY->labels();
     labelAutoAngle = axisY->labelAutoRotation();
     labelAngleFraction = labelAutoAngle / 90.0f;
@@ -1124,18 +1117,24 @@ void QQuickDataVisItem::updateLabels()
     sideLabelRotation.setX(-fractionCamY);
 
     totalRotation = Utils::calculateRotation(sideLabelRotation);
-    scale = translate = backgroundScale.y();
+    scale = translate = backgroundScale.y() - m_backgroundScaleMargin.y();
 
     labelsMaxWidth = 0.0f;
-    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(m_controller->axisY()->labels())));
-
-    xPos = labelTrans.x();
+    labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisY->labels())));
+    adjustment = labelsMaxWidth * m_labelScale.x() / 4.0f;
+    xPos = backgroundScale.x();
     if (!xFlipped)
-        labelTrans.setX(-xPos);
+        xPos *= -1.0f;
+    labelTrans.setX(xPos);
+    zPos = backgroundScale.z() + adjustment;
+    if (zFlipped)
+        zPos *= -1.0f;
+    labelTrans.setZ(zPos);
 
     for (int i = 0; i < repeaterY()->count() / 2; i++) {
         auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i));
-        labelTrans.setY(axisY->labelPositionAt(i) * scale * 2.0f - translate);
+        labelTrans.setY(static_cast<QValue3DAxis *>(axisY)->labelPositionAt(i) * scale * 2.0f - translate);
+        obj->setScale(m_labelScale);
         obj->setPosition(labelTrans);
         obj->setRotation(totalRotation);
         obj->setProperty("labelText", labels[i]);
@@ -1217,49 +1216,40 @@ void QQuickDataVisItem::updateLabels()
         }
     }
 
-    if (xFlipped)
-        xPos = -backgroundScale.x() - labelMargin();
-    else
-        xPos = backgroundScale.x() + labelMargin();
-
-    if (!zFlipped) {
-        if (!yFlipped)
-            yPos = -backgroundScale.y();
-        else
-            yPos = backgroundScale.y();
-    }
-    else {
-        if (!yFlipped)
-            yPos = -backgroundScale.y();
-        else
-            yPos = backgroundScale.y();
-    }
     totalRotation = Utils::calculateRotation(labelRotation);
-    labelTrans = QVector3D(xPos, yPos, 0.0f);
 
-    scale = translate = backgroundScale.z();
+    scale = translate = backgroundScale.z() - m_backgroundScaleMargin.z();
     labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisZ->labels())));
+    adjustment = labelsMaxWidth * m_labelScale.x() / 4.0f;
+
+    xPos = backgroundScale.x() + adjustment;
+    if (xFlipped)
+        xPos *= -1.0f;
+
+    adjustment *= qAbs(qSin(qDegreesToRadians(labelRotation.z())));
+    yPos = backgroundScale.y() + adjustment;
+    if (!yFlipped)
+        yPos *= -1.0f;
+
+    labelTrans = QVector3D(xPos, yPos, 0.0f);
 
     if (axisZ->type() == QAbstract3DAxis::AxisTypeValue) {
-        auto valueAxisZ = static_cast<QValue3DAxis *>(axisX);
+        auto valueAxisZ = static_cast<QValue3DAxis *>(axisZ);
         for (int i = 0; i < repeaterZ()->count(); i++) {
             auto obj = static_cast<QQuick3DNode *>(repeaterZ()->objectAt(i));
             labelTrans.setZ(valueAxisZ->labelPositionAt(i) * scale * -2.0f + translate);
+            obj->setScale(m_labelScale);
             obj->setPosition(labelTrans);
             obj->setRotation(totalRotation);
             obj->setProperty("labelText", labels[i]);
             obj->setProperty("labelWidth", labelsMaxWidth);
         }
     } else if (axisZ->type() == QAbstract3DAxis::AxisTypeCategory) {
-        float colPos = backgroundScale.x() + (labelMargin() / 2.0f);
-        if (xFlipped)
-            colPos *= -1.0f;
-        labelTrans.setX(colPos);
         for (int i = 0; i < repeaterZ()->count(); i++) {
             labelTrans = calculateCategoryLabelPosition(axisZ, labelTrans, i);
-
             auto obj = static_cast<QQuick3DNode *>(repeaterZ()->objectAt(i));
+            obj->setScale(m_labelScale);
             obj->setPosition(labelTrans);
             obj->setRotation(totalRotation);
             obj->setProperty("labelText", labels[i]);
@@ -1276,17 +1266,25 @@ void QQuickDataVisItem::updateLabels()
 
     labels = axisY->labels();
     totalRotation = Utils::calculateRotation(backLabelRotation);
-    scale = translate = backgroundScale.y();
+    scale = translate = backgroundScale.y() - m_backgroundScaleMargin.y();
     labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisY->labels())));
+    adjustment = labelsMaxWidth * m_labelScale.x() / 4.0f;
 
-    zPos = labelTrans.z();
+    xPos = backgroundScale.x() + adjustment;
+    if (xFlipped)
+        xPos *= -1.0f;
+    labelTrans.setX(xPos);
+
+    zPos = -backgroundScale.z();
     if (zFlipped)
-        labelTrans.setZ(-zPos);
+        zPos *= -1.0f;
+    labelTrans.setZ(zPos);
 
     for (int i = 0; i < repeaterY()->count() / 2; i++) {
         auto obj = static_cast<QQuick3DNode *>(repeaterY()->objectAt(i + (repeaterY()->count() / 2)));
-        labelTrans.setY(axisY->labelPositionAt(i) * scale * 2.0f - translate);
+        labelTrans.setY(static_cast<QValue3DAxis *>(axisY)->labelPositionAt(i) * scale * 2.0f - translate);
+        obj->setScale(m_labelScale);
         obj->setPosition(labelTrans);
         obj->setRotation(totalRotation);
         obj->setProperty("labelText", labels[i]);
@@ -1501,6 +1499,7 @@ void QQuickDataVisItem::updateXTitle(const QVector3D &labelRotation, const QVect
                 * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, extraRotation);
     }
 
+    m_titleLabelX->setScale(m_labelScale);
     m_titleLabelX->setPosition(labelTrans + titleOffsetVector);
     m_titleLabelX->setRotation(titleRotation);
 }
@@ -1540,6 +1539,7 @@ void QQuickDataVisItem::updateYTitle(const QVector3D &sideLabelRotation, const Q
         titleRotation = totalRotation * zRightAngleRotation;
     }
 
+    m_titleLabelY->setScale(m_labelScale);
     m_titleLabelY->setPosition(titleTrans + titleOffsetVector);
     m_titleLabelY->setRotation(titleRotation);
 }
@@ -1616,6 +1616,7 @@ void QQuickDataVisItem::updateZTitle(const QVector3D &labelRotation, const QVect
                 * QQuaternion::fromAxisAndAngle(0.0f, 0.0f, 1.0f, extraRotation);
     }
 
+    m_titleLabelZ->setScale(m_labelScale);
     m_titleLabelZ->setPosition(labelTrans + titleOffsetVector);
     m_titleLabelZ->setRotation(titleRotation);
 }
@@ -2152,6 +2153,7 @@ QQuick3DNode *QQuickDataVisItem::createTitleLabel()
     titleLabel->setParent(rootNode());
     titleLabel->setParentItem(rootNode());
     titleLabel->setVisible(false);
+    titleLabel->setScale(m_labelScale);
     return titleLabel;
 }
 

@@ -14,8 +14,6 @@ Component {
         property font labelFont
         property real labelWidth: -1
 
-        scale: Qt.vector3d(0.01, 0.01, 0.0)
-
         Item {
             anchors.centerIn: parent
             width: Math.max(labelWidth / 2, text0.implicitWidth)
