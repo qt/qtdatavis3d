@@ -183,6 +183,8 @@ private:
     float m_minHeight;
     float m_maxHeight;
 
+    bool axisRangeChanged;
+
     QQuick3DModel *m_floorBackground = nullptr;
     QQuick3DNode *m_floorBackgroundScale = nullptr;
     QQuick3DNode *m_floorBackgroundRotation = nullptr;

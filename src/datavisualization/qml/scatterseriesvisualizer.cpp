@@ -24,9 +24,6 @@ ScatterSeriesVisualizer::ScatterSeriesVisualizer(QObject *parent)
 
 ScatterSeriesVisualizer::~ScatterSeriesVisualizer()
 {
-    if (m_texture)
-        m_texture->deleteLater();
-
     removeDataItems();
     m_itemList.clear();
     removeDummyDataItems();
@@ -279,6 +276,7 @@ void ScatterSeriesVisualizer::updateItemVisuals(QScatter3DSeries *series)
     if (useGradient) {
         if (!m_hasTexture) {
             m_texture = createTexture();
+            m_texture->setParent(this);
             m_hasTexture = true;
         }
         auto gradient = series->baseGradient();
@@ -287,6 +285,7 @@ void ScatterSeriesVisualizer::updateItemVisuals(QScatter3DSeries *series)
 
         if (!m_hasHighLightTexture) {
             m_highlightTexture = createTexture();
+            m_highlightTexture->setParent(this);
             m_hasHighLightTexture = true;
         }
         auto highlightGradient = series->singleHighlightGradient();

@@ -82,8 +82,8 @@ public:
     void clearSelection();
     void resetSelection();
 
-    void updateData(QBar3DSeries *series);
-    void updateItemVisuals(QBar3DSeries *series);
+    void updateBarPositions(QBar3DSeries *series);
+    void updateBarVisuals(QBar3DSeries *series);
     void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
     void updateItemInstancedMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
     void updateInstancedCustomMaterial(QQuick3DModel *model, bool isHighlight = false);
@@ -125,6 +125,8 @@ private:
     bool m_haveUniformColorSeries;
     bool m_haveGradientSeries;
     int m_visualIndex;
+
+    QList<QHash<QQuick3DModel *, QBarDataItem *> *> m_list;
 };
 
 QT_END_NAMESPACE

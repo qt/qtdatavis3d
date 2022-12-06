@@ -410,6 +410,12 @@ void QQuickDataVisBars::synchData()
     }
     Q3DTheme *theme = m_barsController->activeTheme();
     bgMatFloor->setBaseColor(theme->backgroundColor());
+
+    if (axisRangeChanged) {
+        updateGrid();
+        updateLabels();
+        axisRangeChanged = false;
+    }
 }
 
 void QQuickDataVisBars::updateParameters() {
@@ -437,12 +443,8 @@ void QQuickDataVisBars::updateParameters() {
             calculateSceneScalingFactors();
     }
 
-    if (!m_barsController->m_changedSeriesList.isEmpty()) {
-        updateGraph();
-        updateGrid();
-        updateLabels();
-        m_barsController->m_changedSeriesList.clear();
-    }
+    axisRangeChanged = true;
+    update();
 }
 
 void QQuickDataVisBars::updateFloorLevel(float level)
@@ -462,16 +464,18 @@ void QQuickDataVisBars::updateGraph()
         visualizer->removeDataItems();
         if (barSeries->isVisible())
             visualizer->setVisualIndex(visualIndex++);
-        else if (!barSeries->isVisible())
+        else
             visualizer->setVisualIndex(-1);
-        if (visualizer) {
+        if (visualizer && barSeries->isVisible()) {
             visualizer->generateBars(barSeries);
             if (visualizer->m_barsGenerated && m_barsController->m_isDataDirty)
-                visualizer->updateData(barSeries);
+                visualizer->updateBarPositions(barSeries);
             if (visualizer->m_barsGenerated && m_barsController->m_isSeriesVisualsDirty)
-                visualizer->updateItemVisuals(barSeries);
+                visualizer->updateBarVisuals(barSeries);
         }
     }
+    m_barsController->m_isDataDirty = false;
+    m_barsController->m_isSeriesVisualsDirty = false;
 }
 
 void QQuickDataVisBars::updateAxisRange(float min, float max)
@@ -586,6 +590,7 @@ QVector3D QQuickDataVisBars::calculateCategoryLabelPosition(QAbstract3DAxis *axi
         float zPos = (index + 0.5f) * m_cachedBarSpacing.height();
         ret.setZ((m_columnDepth - zPos) / m_scaleFactor);
     }
+    ret.setY(-m_backgroundAdjustment);
     return ret;
 }
 
@@ -600,6 +605,8 @@ float QQuickDataVisBars::calculateCategoryGridLinePosition(QAbstract3DAxis *axis
         float rowPos = index * (m_cachedBarSpacing.width() / m_scaleFactor);
         ret = rowPos - scale().x();
     }
+    if (axis->orientation() == QAbstract3DAxis::AxisOrientationY)
+        ret = -m_backgroundAdjustment;
     return ret;
 }
 

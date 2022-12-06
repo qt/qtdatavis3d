@@ -34,11 +34,10 @@ QQuickBarSeriesVisualizer::QQuickBarSeriesVisualizer(QObject *parent)
 
 QQuickBarSeriesVisualizer::~QQuickBarSeriesVisualizer()
 {
-    if (m_texture)
-        m_texture->deleteLater();
-
     if (m_instancing)
         delete m_instancing;
+    m_modelList.clear();
+    m_list.clear();
 }
 
 void QQuickBarSeriesVisualizer::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
@@ -85,7 +84,8 @@ void QQuickBarSeriesVisualizer::handleRowCountChanged()
     QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_controller->axisZ());
     m_dataVisBars->segmentLineRepeaterZ()->setModel(categoryAxisZ->labels().size());
     m_dataVisBars->repeaterZ()->setModel(categoryAxisZ->labels().size());
-    m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
+//    m_controller->m_isDataDirty = true;
+//    m_controller->m_isSeriesVisualsDirty = true;
     m_dataVisBars->updateParameters();
 }
 
@@ -94,7 +94,8 @@ void QQuickBarSeriesVisualizer::handleColCountChanged()
     QCategory3DAxis *categoryAxisX = static_cast<QCategory3DAxis *>(m_controller->axisX());
     m_dataVisBars->segmentLineRepeaterX()->setModel(categoryAxisX->labels().size());
     m_dataVisBars->repeaterX()->setModel(categoryAxisX->labels().size());
-    m_controller->handleAxisLabelsChangedBySender(m_controller->axisX());
+//    m_controller->m_isDataDirty = true;
+//    m_controller->m_isSeriesVisualsDirty = true;
     m_dataVisBars->updateParameters();
 }
 
@@ -139,6 +140,7 @@ void QQuickBarSeriesVisualizer::disconnectSeries(QBar3DSeries *series)
 
 void QQuickBarSeriesVisualizer::generateBars(QBar3DSeries *series)
 {
+    bool visible = series->isVisible();
     if (!m_visualizerRoot)
         createParent();
 
@@ -160,20 +162,15 @@ void QQuickBarSeriesVisualizer::generateBars(QBar3DSeries *series)
             for (int i = 0; i < dataColCount; i++) {
                 QBarDataItem *dataItem = const_cast <QBarDataItem *> (&(dataRow->at(i)));
                 QQuick3DModel *model = m_modelList.key(dataItem);
-                if (!model) {
+                if (!model)
                     model = createDataItem();
-                    model->setPickable(true);
-                    model->setParentItem(m_seriesRootItem);
-                }
-                m_modelList.insert(model,dataItem);
-
-                bool visible = series->isVisible();
                 model->setVisible(visible);
+                m_modelList.insert(model, dataItem);
                 m_barsGenerated = true;
             }
             ++dataRowIndex;
         }
-        m_controller->markDataDirty();
+        m_list.append(&m_modelList);
     }
 }
 
@@ -218,7 +215,7 @@ void QQuickBarSeriesVisualizer::resetSelection()
     }
 }
 
-void QQuickBarSeriesVisualizer::updateData(QBar3DSeries *series)
+void QQuickBarSeriesVisualizer::updateBarPositions(QBar3DSeries *series)
 {
     QBarDataProxy *dataProxy = series->dataProxy();
     for (auto series : m_controller->barSeriesList()) {
@@ -296,7 +293,7 @@ void QQuickBarSeriesVisualizer::updateData(QBar3DSeries *series)
     }
 }
 
-void QQuickBarSeriesVisualizer::updateItemVisuals(QBar3DSeries *series)
+void QQuickBarSeriesVisualizer::updateBarVisuals(QBar3DSeries *series)
 {
     bool useGradient = series->d_ptr->isUsingGradient();
     QBarDataProxy *dataProxy = series->dataProxy();
@@ -311,6 +308,7 @@ void QQuickBarSeriesVisualizer::updateItemVisuals(QBar3DSeries *series)
     if (useGradient) {
         if (!m_hasTexture) {
             m_texture = createTexture();
+            m_texture->setParent(this);
             m_hasTexture = true;
         }
         auto gradient = series->baseGradient();
@@ -319,6 +317,7 @@ void QQuickBarSeriesVisualizer::updateItemVisuals(QBar3DSeries *series)
 
         if (!m_hasHighlightTexture) {
             m_highlightTexture = createTexture();
+            m_highlightTexture->setParent(this);
             m_hasHighlightTexture = true;
         }
         auto highlightGradient = series->singleHighlightGradient();
@@ -379,14 +378,14 @@ void QQuickBarSeriesVisualizer::updateItemMaterial(QQuick3DModel *item, bool use
         if (materialsRef.size()) {
             if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
                 auto principledMaterial = new QQuick3DPrincipledMaterial();
-                principledMaterial->setParent(this);
+                principledMaterial->setParent(m_seriesRootItem);
                 auto oldCustomMaterial = materialsRef.at(0);
                 materialsRef.replace(0, principledMaterial);
                 delete oldCustomMaterial;
             }
         } else {
             auto principledMaterial = new QQuick3DPrincipledMaterial();
-            principledMaterial->setParent(this);
+            principledMaterial->setParent(m_seriesRootItem);
             materialsRef.append(principledMaterial);
         }
     } else {
@@ -512,6 +511,7 @@ void QQuickBarSeriesVisualizer::updatePrincipledMaterial(QQuick3DModel *model, c
 {
     QQmlListReference materialsRef(model, "materials");
     auto principledMaterial = static_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0));
+    principledMaterial->setParent(m_seriesRootItem);
 
     if (useGradient) {
         principledMaterial->setBaseColor(QColor(Qt::white));
@@ -588,6 +588,7 @@ QQuick3DModel *QQuickBarSeriesVisualizer::createDataItem()
     auto model = new QQuick3DModel();
     model->setParent(m_visualizerRoot.get());
     model->setParentItem(m_seriesRootItem);
+    model->setPickable(true);
     QString fileName = getMeshFileName();
     model->setSource(QUrl(fileName));
     return model;
@@ -613,9 +614,10 @@ void QQuickBarSeriesVisualizer::removeDataItems()
         if (materialsRef.size()) {
             auto material = materialsRef.at(0);
             delete material;
-            m_modelList.erase(it);
         }
     }
+    m_modelList.clear();
+    m_list.clear();
 }
 
 void QQuickBarSeriesVisualizer::createItemLabel()
