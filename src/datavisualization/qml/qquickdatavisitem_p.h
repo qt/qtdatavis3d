@@ -336,13 +336,13 @@ protected:
 
     QQuick3DNode *createTitleLabel();
     void updateXTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
-                      const QQuaternion &totalRotation, float labelsMaxWidth);
+                      const QQuaternion &totalRotation, float labelsMaxWidth, float labelHeight, const QVector3D &scale);
     void updateYTitle(const QVector3D &sideLabelRotation, const QVector3D &backLabelRotation,
                       const QVector3D &sideLabelTrans, const QVector3D &backLabelTrans,
                       const QQuaternion &totalSideRotation, const QQuaternion &totalBackRotation,
-                      float labelsMaxWidth);
+                      float labelsMaxWidth, float labelHeight, const QVector3D &scale);
     void updateZTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
-                      const QQuaternion &totalRotation, float labelsMaxWidth);
+                      const QQuaternion &totalRotation, float labelsMaxWidth, float labelHeight, const QVector3D &scale);
 
     void positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position);
     int findLabelsMaxWidth(const QStringList &labels);
@@ -426,7 +426,7 @@ private:
     float m_lineWidthScaleFactor = 0.0001f;
     float m_lineLengthScaleFactor = 0.02f;
 
-    float m_labelMargin = 0.0f;
+    float m_labelMargin = 0.1f;
 
     void setUpCamera();
     void setUpLight();

@@ -330,8 +330,6 @@ void QQuickDataVisBars::componentComplete()
     setVerticalSegmentLine(false);
 
     m_lineLengthScaleFactor = lineLengthScaleFactor();
-
-    setLabelMargin(0.5f);
 }
 
 void QQuickDataVisBars::synchData()
@@ -590,7 +588,6 @@ QVector3D QQuickDataVisBars::calculateCategoryLabelPosition(QAbstract3DAxis *axi
         float zPos = (index + 0.5f) * m_cachedBarSpacing.height();
         ret.setZ((m_columnDepth - zPos) / m_scaleFactor);
     }
-    ret.setY(-m_backgroundAdjustment);
     return ret;
 }
 

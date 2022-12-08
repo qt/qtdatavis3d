@@ -13,11 +13,12 @@ Component {
         property bool borderEnabled : false
         property font labelFont
         property real labelWidth: -1
+        property real labelHeight: -1
 
         Item {
             anchors.centerIn: parent
-            width: Math.max(labelWidth / 2, text0.implicitWidth)
-            height: text0.implicitHeight
+            width: labelWidth
+            height: labelHeight
 
             Rectangle {
                 id: labelBackground
@@ -26,7 +27,7 @@ Component {
                 visible: backgroundEnabled
                 border.color: labelTextColor
                 border.width: borderEnabled ? 1 : 0
-                radius: 3
+                radius: 4
             }
 
             Text {
@@ -35,7 +36,6 @@ Component {
                 color: labelTextColor
                 text: labelText
                 font: labelFont
-                padding: 4
             }
         }
     }

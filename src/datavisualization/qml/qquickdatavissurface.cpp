@@ -243,8 +243,6 @@ void QQuickDataVisSurface::componentComplete()
     setScaleWithBackground({2.0f, 1.0f, 2.0f});
     setBackgroundScaleMargin({0.1f, 0.1f, 0.1f});
     setScale({2.0f, 1.0f, 2.0f});
-
-    setLabelMargin(0.3f);
 }
 
 void QQuickDataVisSurface::synchData()
