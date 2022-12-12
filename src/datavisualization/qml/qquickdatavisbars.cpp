@@ -1,20 +1,20 @@
 // Copyright (C) 2022 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "qquickbarseriesvisualizer_p.h"
 #include "qquickdatavisbars_p.h"
+#include "bars3dcontroller_p.h"
 #include "declarativescene_p.h"
 #include "qbar3dseries_p.h"
+
 #include "q3dcamera_p.h"
 #include <QtCore/QMutexLocker>
-#include "bars3dcontroller_p.h"
 #include "utils_p.h"
 #include <QColor>
+
 #include <QtQuick3D/private/qquick3drepeater_p.h>
 #include <QtQuick3D/private/qquick3dprincipledmaterial_p.h>
-#include <QtQuick3D/private/qquick3dperspectivecamera_p.h>
-#include <private/qquick3ddirectionallight_p.h>
-#include <private/qquick3dpointlight_p.h>
+#include "datavisquick3dtexturedata_p.h"
+#include <QtQuick3D/private/qquick3dcustommaterial_p.h>
 
 QQuickDataVisBars::QQuickDataVisBars(QQuickItem *parent)
     : QQuickDataVisItem(parent),
@@ -39,7 +39,14 @@ QQuickDataVisBars::QQuickDataVisBars(QQuickItem *parent)
       m_noZeroInRange(false),
       m_actualFloorLevel(0.0f),
       m_heightNormalizer(1.0f),
-      m_backgroundAdjustment(0.0f)
+      m_backgroundAdjustment(0.0f),
+      m_keepSeriesUniform(false),
+      m_seriesScaleX(0.0f),
+      m_seriesScaleZ(0.0f),
+      m_seriesStep(0.0f),
+      m_seriesStart(0.0f),
+      m_zeroPosition(0.0f),
+      m_visibleSeriesCount(0)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
     setFlags(ItemHasContents);
@@ -55,6 +62,8 @@ QQuickDataVisBars::QQuickDataVisBars(QQuickItem *parent)
                      this, &QQuickDataVisBars::primarySeriesChanged);
     QObject::connect(m_barsController, &Bars3DController::selectedSeriesChanged,
                      this, &QQuickDataVisBars::selectedSeriesChanged);
+    QObject::connect(m_barsController, &Abstract3DController::optimizationHintsChanged,
+                     this, &QQuickDataVisBars::handleOptimizationHintsChanged);
 }
 
 QQuickDataVisBars::~QQuickDataVisBars()
@@ -62,6 +71,7 @@ QQuickDataVisBars::~QQuickDataVisBars()
     QMutexLocker locker(m_nodeMutex.data());
     const QMutexLocker locker2(mutex());
     delete m_barsController;
+    m_barModelsMap.clear();
 }
 
 QCategory3DAxis *QQuickDataVisBars::rowAxis() const
@@ -196,17 +206,7 @@ void QQuickDataVisBars::clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
 void QQuickDataVisBars::addSeries(QBar3DSeries *series)
 {
     m_barsController->addSeries(series);
-    auto visualizer = new QQuickBarSeriesVisualizer();
-    visualizer->setParent(this);
-    visualizer->m_controller = m_barsController;
-    visualizer->m_qml = this;
-    visualizer->m_dataVisBars = this;
-    visualizer->connectSeries(series);
-    visualizer->m_helperAxisX = &m_helperAxisX;
-    visualizer->m_helperAxisY = &m_helperAxisY;
-    visualizer->m_helperAxisZ = &m_helperAxisZ;
-    setVisualizerForSeries(series, visualizer);
-
+    connectSeries(series);
     if (series->selectedBar() != invalidSelectionPosition())
         setSelectedBar(series->selectedBar(), series, false);
 }
@@ -248,17 +248,17 @@ void QQuickDataVisBars::setSelectedBar(const QPoint &position, QBar3DSeries *ser
 
     m_barsController->adjustSelectionPosition(pos, series);
 
-//    if (m_barsController->selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
-//        // If the selected bar is outside data window, or there is no visible selected bar,
-//        // disable slicing.
-        if (pos.x() < m_barsController->m_axisZ->min() || pos.x() > m_barsController->m_axisZ->max()
-                || pos.y() < m_barsController->m_axisX->min() || pos.y() > m_barsController->m_axisX->max()
-                || !series->isVisible()) {
-            scene()->setSlicingActive(false);
-        } else if (enterSlice) {
-            scene()->setSlicingActive(true);
-        }
-//    }
+    //    if (m_barsController->selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
+    //        // If the selected bar is outside data window, or there is no visible selected bar,
+    //        // disable slicing.
+    if (pos.x() < m_barsController->m_axisZ->min() || pos.x() > m_barsController->m_axisZ->max()
+            || pos.y() < m_barsController->m_axisX->min() || pos.y() > m_barsController->m_axisX->max()
+            || !series->isVisible()) {
+        scene()->setSlicingActive(false);
+    } else if (enterSlice) {
+        scene()->setSlicingActive(true);
+    }
+    //    }
 
     if (pos != m_selectedBar || series != m_selectedBarSeries) {
         bool seriesChanged = (series != m_selectedBarSeries);
@@ -270,8 +270,6 @@ void QQuickDataVisBars::setSelectedBar(const QPoint &position, QBar3DSeries *ser
         foreach (QAbstract3DSeries *otherSeries, m_barsController->m_seriesList) {
             QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(otherSeries);
             if (barSeries != m_selectedBarSeries) {
-                auto visualizer = visualizerForSeries(barSeries);
-                visualizer->clearSelection();
                 barSeries->dptr()->setSelectedBar(invalidSelectionPosition());
             }
         }
@@ -434,7 +432,7 @@ void QQuickDataVisBars::updateParameters() {
 
         // Calculate max scene size
         float sceneRatio = qMin(float(m_newCols) / float(m_newRows),
-                                  float(m_newRows) / float(m_newCols));
+                                float(m_newRows) / float(m_newCols));
         m_maxSceneSize = 2.0f * qSqrt(sceneRatio * m_newCols * m_newRows);
 
         if (m_cachedBarThickness.isValid())
@@ -456,24 +454,27 @@ void QQuickDataVisBars::updateGraph()
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     calculateSceneScalingFactors();
 
+    if (axisRangeChanged && m_barsController->m_changedSeriesList.size()) {
+        for (auto series : m_barsController->barSeriesList()) {
+            if (m_barModelsMap.contains(series))
+                removeDataItems(series);
+        }
+
+    }
+    generateBars(barSeriesList);
     int visualIndex = 0;
-    for (auto *barSeries : std::as_const(barSeriesList)) {
-        auto *visualizer = visualizerForSeries(barSeries);
-        visualizer->removeDataItems();
-        if (barSeries->isVisible())
-            visualizer->setVisualIndex(visualIndex++);
-        else
-            visualizer->setVisualIndex(-1);
-        if (visualizer && barSeries->isVisible()) {
-            visualizer->generateBars(barSeries);
-            if (visualizer->m_barsGenerated && m_barsController->m_isDataDirty)
-                visualizer->updateBarPositions(barSeries);
-            if (visualizer->m_barsGenerated && m_barsController->m_isSeriesVisualsDirty)
-                visualizer->updateBarVisuals(barSeries);
+    if (m_barsGenerated) {
+        for (auto barSeries : m_barsController->barSeriesList()) {
+            if (barSeries->isVisible()) {
+                updateBarVisuality(barSeries, visualIndex);
+                updateBarPositions(barSeries);
+                updateBarVisuals(barSeries);
+                ++visualIndex;
+            }
+            else
+                updateBarVisuality(barSeries, -1);
         }
     }
-    m_barsController->m_isDataDirty = false;
-    m_barsController->m_isSeriesVisualsDirty = false;
 }
 
 void QQuickDataVisBars::updateAxisRange(float min, float max)
@@ -622,6 +623,69 @@ void QQuickDataVisBars::handleAxisZChanged(QAbstract3DAxis *axis)
     emit rowAxisChanged(static_cast<QCategory3DAxis *>(axis));
 }
 
+void QQuickDataVisBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
+{
+    QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
+    m_meshType = mesh;
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+        for (auto series : m_barsController->barSeriesList()) {
+            if (m_barModelsMap.contains(series))
+                removeDataItems(series);
+        }
+        generateBars(barSeriesList);
+    } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+        resetSelection();
+//        m_instancingRootItem->setSource(QUrl(getMeshFileName()));
+        m_selectionIndicator->setSource(QUrl(getMeshFileName()));
+        m_barsController->markDataDirty();
+        m_barsController->markSeriesVisualsDirty();
+        generateBars(barSeriesList);
+    }
+}
+
+void QQuickDataVisBars::handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints)
+{
+    Q_UNUSED(hints);
+    //    setup();
+}
+
+void QQuickDataVisBars::handleMeshSmoothChanged(bool enable)
+{
+    QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
+    m_smooth = enable;
+
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+        for (auto series : m_barsController->barSeriesList()) {
+            if (m_barModelsMap.contains(series))
+                removeDataItems(series);
+        }
+        generateBars(barSeriesList);
+    } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+        resetSelection();
+//        m_instancingRootItem->setSource(QUrl(getMeshFileName()));
+        m_selectionIndicator->setSource(QUrl(getMeshFileName()));
+        m_barsController->markDataDirty();
+        m_barsController->markSeriesVisualsDirty();
+        generateBars(barSeriesList);
+    }
+}
+
+void QQuickDataVisBars::handleRowCountChanged()
+{
+    QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_barsController->axisZ());
+    segmentLineRepeaterZ()->setModel(categoryAxisZ->labels().size());
+    repeaterZ()->setModel(categoryAxisZ->labels().size());
+    updateParameters();
+}
+
+void QQuickDataVisBars::handleColCountChanged()
+{
+    QCategory3DAxis *categoryAxisX = static_cast<QCategory3DAxis *>(m_barsController->axisX());
+    segmentLineRepeaterX()->setModel(categoryAxisX->labels().size());
+    repeaterX()->setModel(categoryAxisX->labels().size());
+    updateParameters();
+}
+
 QQmlComponent *QQuickDataVisBars::createRepeaterDelegate(QAbstract3DSeries::Mesh meshType)
 {
     switch (meshType) {
@@ -634,14 +698,431 @@ QQmlComponent *QQuickDataVisBars::createRepeaterDelegate(QAbstract3DSeries::Mesh
     }
 }
 
-void QQuickDataVisBars::setVisualizerForSeries(QBar3DSeries *series, QQuickBarSeriesVisualizer *visualizer)
+void QQuickDataVisBars::connectSeries(QBar3DSeries *series)
 {
-    m_seriesVisualizerMap.insert(series, visualizer);
+    m_meshType = series->mesh();
+    m_smooth = series->isMeshSmooth();
+
+    QObject::connect(series, &QBar3DSeries::meshChanged, this, &QQuickDataVisBars::handleSeriesMeshChanged);
+    QObject::connect(series, &QBar3DSeries::meshSmoothChanged, this, &QQuickDataVisBars::handleMeshSmoothChanged);
+    QObject::connect(series->dataProxy(), &QBarDataProxy::rowCountChanged, this, &QQuickDataVisBars::handleRowCountChanged);
+    QObject::connect(series->dataProxy(), &QBarDataProxy::colCountChanged, this, &QQuickDataVisBars::handleColCountChanged);
 }
 
-QQuickBarSeriesVisualizer *QQuickDataVisBars::visualizerForSeries(QBar3DSeries *series)
+void QQuickDataVisBars::disconnectSeries(QBar3DSeries *series)
 {
-    return m_seriesVisualizerMap.value(series, nullptr);
+    QObject::disconnect(series, 0, this, 0);
+}
+
+void QQuickDataVisBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
+{
+    int seriesCount = barSeriesList.size();
+    m_visibleSeriesCount = 0;
+    for (int i = 0; i < seriesCount; i++) {
+        QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(barSeriesList[i]);
+        QVector<BarModel *> *barList = m_barModelsMap.value(barSeries);
+        if (!barList) {
+            barList = new QVector<BarModel *>;
+            m_barModelsMap[barSeries] = barList;
+        }
+        if (barList->isEmpty()) {
+            bool visible = barSeries->isVisible();
+            int minRow = m_barsController->m_axisZ->min();
+            int dataRowCount = 0;
+            int dataColCount = 0;
+
+            const QBarDataArray *array = barSeries->dataProxy()->array();
+            QBarDataProxy *dataProxy = barSeries->dataProxy();
+            dataRowCount = dataProxy->rowCount();
+            dataColCount = dataProxy->colCount();
+            int dataRowIndex = minRow;
+
+            while (dataRowIndex < dataRowCount) {
+                const QBarDataRow *dataRow = array->at(dataRowIndex);
+                Q_ASSERT(dataRow->size() == dataColCount);
+                for (int i = 0; i < dataColCount; i++) {
+                    QBarDataItem *dataItem = const_cast <QBarDataItem *> (&(dataRow->at(i)));
+                    QQuick3DModel *model = createDataItem();
+                    model->setVisible(visible);
+
+                    BarModel *barModel = new BarModel();
+                    barModel->model = model;
+                    barModel->barItem = dataItem;
+
+                    if (!barList->contains(barModel))
+                        barList->append(barModel);
+                }
+                ++dataRowIndex;
+            }
+            m_barsGenerated = true;
+        }
+        if (barSeries->isVisible())
+            m_visibleSeriesCount++;
+    }
+}
+
+QQuick3DModel *QQuickDataVisBars::createDataItem()
+{
+    auto scene = QQuick3DViewport::scene();
+    auto model = new QQuick3DModel();
+    model->setParent(scene);
+    model->setParentItem(scene);
+    model->setPickable(true);
+    QString fileName = getMeshFileName();
+    model->setSource(QUrl(fileName));
+    return model;
+}
+
+QString QQuickDataVisBars::getMeshFileName()
+{
+    QString fileName;
+    QString smoothString = QStringLiteral("Smooth");
+    switch (m_meshType) {
+    case QAbstract3DSeries::MeshSphere:
+        fileName = QStringLiteral("defaultMeshes/sphereMesh");
+        break;
+    case QAbstract3DSeries::MeshBar:
+    case QAbstract3DSeries::MeshCube:
+        fileName = QStringLiteral("defaultMeshes/barMesh");
+        break;
+    case QAbstract3DSeries::MeshPyramid:
+        fileName = QStringLiteral("defaultMeshes/pyramidMesh");
+        break;
+    case QAbstract3DSeries::MeshCone:
+        fileName = QStringLiteral("defaultMeshes/coneMesh");
+        break;
+    case QAbstract3DSeries::MeshCylinder:
+        fileName = QStringLiteral("defaultMeshes/cylinderMesh");
+        break;
+    case QAbstract3DSeries::MeshBevelBar:
+    case QAbstract3DSeries::MeshBevelCube:
+        fileName = QStringLiteral("defaultMeshes/bevelBarMesh");
+        break;
+    default:
+        fileName = QStringLiteral("defaultMeshes/sphereMesh");
+    }
+    if (m_smooth && m_meshType != QAbstract3DSeries::MeshPoint)
+        fileName += smoothString;
+
+    fixMeshFileName(fileName, m_meshType);
+
+    return fileName;
+}
+
+void QQuickDataVisBars::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType)
+{
+    if (!m_barsController->activeTheme()->isBackgroundEnabled() && meshType != QAbstract3DSeries::MeshSphere)
+        fileName.append(QStringLiteral("Full"));
+}
+
+void QQuickDataVisBars::updateBarVisuality(QBar3DSeries *series, int visualIndex)
+{
+    QVector<BarModel *> barList = *m_barModelsMap.value(series);
+    for (int i = 0; i < barList.count(); i++) {
+        barList.at(i)->visualIndex = visualIndex;
+        barList.at(i)->model->setVisible(series->isVisible());
+    }
+}
+
+void QQuickDataVisBars::updateBarPositions(QBar3DSeries *series)
+{
+    QBarDataProxy *dataProxy = series->dataProxy();
+    int dataRowCount = 0;
+    int dataColCount = 0;
+
+
+    m_seriesScaleX = 1.0f / float(m_visibleSeriesCount);
+    m_seriesStep = 1.0f / float(m_visibleSeriesCount);
+    m_seriesStart = -((float(m_visibleSeriesCount) - 1.0f) / 2.0f)
+            * (m_seriesStep - (m_seriesStep * m_cachedBarSeriesMargin.width()));
+
+    if (m_keepSeriesUniform)
+        m_seriesScaleZ = m_seriesScaleX;
+    else
+        m_seriesScaleZ = 1.0f;
+
+    m_meshRotation = dataProxy->series()->meshRotation();
+    m_zeroPosition = m_helperAxisY.itemPositionAt(m_actualFloorLevel);
+
+    QVector<BarModel *> barList = *m_barModelsMap.value(series);
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+        for (int i = 0; i < barList.count(); i++) {
+            QBarDataItem *item = const_cast<QBarDataItem *>((barList.at(i)->barItem));
+            QQuick3DModel *model = barList.at(i)->model;
+            float value = item->value();
+            float heightValue = m_helperAxisY.itemPositionAt(value);
+
+            if (m_noZeroInRange) {
+                if (m_hasNegativeValues) {
+                    heightValue = -1.0f + heightValue;
+                    if (heightValue > 0.0f)
+                        heightValue = 0.0f;
+                } else {
+                    if (heightValue < 0.0f)
+                        heightValue = 0.0f;
+                }
+            } else {
+                heightValue -= m_zeroPosition;
+            }
+
+            if (m_helperAxisY.isReversed())
+                heightValue = -heightValue;
+
+            float angle = item->rotation();
+
+            if (angle) {
+                model->setRotation(
+                            QQuaternion::fromAxisAndAngle(
+                                upVector, angle));
+            } else {
+                model->setRotation(identityQuaternion);
+            }
+
+            if (heightValue < 0.f) {
+                const QVector3D rot = model->eulerRotation();
+                model->setEulerRotation(QVector3D(-180.f, rot.y(), rot.z()));
+            }
+
+            float seriesPos = m_seriesStart + m_seriesStep
+                    * (barList.at(i)->visualIndex - (barList.at(i)->visualIndex
+                                                     * m_cachedBarSeriesMargin.width())) + 0.5f;
+
+
+            float colPos = (dataColCount + seriesPos) * m_cachedBarSpacing.width();
+            float xPos = (colPos - m_rowWidth) / m_scaleFactor;
+            float rowPos = (dataRowCount + 0.5f) * (m_cachedBarSpacing.height());
+            float zPos = (m_columnDepth - rowPos) / m_scaleFactor;
+
+            model->setPosition(QVector3D(xPos, heightValue - m_backgroundAdjustment, zPos));
+            model->setScale(QVector3D(m_xScale * m_seriesScaleX, qAbs(heightValue), m_zScale * m_seriesScaleZ));
+
+            if (dataColCount < dataProxy->colCount() - 1) {
+                ++dataColCount;
+            } else {
+                dataColCount = 0;
+                if (dataRowCount < dataProxy->rowCount() - 1)
+                    ++dataRowCount;
+                else
+                    dataRowCount = 0;
+            }
+        }
+    }
+}
+
+void QQuickDataVisBars::updateBarVisuals(QBar3DSeries *series)
+{
+    QVector<BarModel *> barList = *m_barModelsMap.value(series);
+    bool useGradient = series->d_ptr->isUsingGradient();
+
+    if (useGradient) {
+        m_texture = createTexture();
+        m_texture->setParent(this);
+        auto gradient = series->baseGradient();
+        auto textureData = static_cast<DatavisQuick3DTextureData *>(m_texture->textureData());
+        textureData->createGradient(gradient);
+
+        if (!m_hasHighlightTexture) {
+            m_highlightTexture = createTexture();
+            m_highlightTexture->setParent(this);
+            m_hasHighlightTexture = true;
+        }
+        auto highlightGradient = series->singleHighlightGradient();
+        auto highlightTextureData = static_cast<DatavisQuick3DTextureData *>(m_highlightTexture->textureData());
+        highlightTextureData->createGradient(highlightGradient);
+    } else {
+        if (m_texture)
+            m_texture->deleteLater();
+
+        if (m_hasHighlightTexture) {
+            m_highlightTexture->deleteLater();
+            m_hasHighlightTexture = false;
+        }
+    }
+
+    bool rangeGradient = (useGradient && series->d_ptr->m_colorStyle == Q3DTheme::ColorStyleRangeGradient)
+                        ? true : false;
+
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+        if (!rangeGradient) {
+            for (int i = 0; i < barList.count(); i++) {
+                QQuick3DModel *model = barList.at(i)->model;
+                updateItemMaterial(model, useGradient, rangeGradient);
+                updatePrincipledMaterial(model, series->baseColor(), useGradient, false);
+            }
+            if (m_selectedIndex != -1) {
+                QQuick3DModel *selectedItem = barList.at(m_selectedIndex)->model;
+                updatePrincipledMaterial(selectedItem, series->singleHighlightColor(), useGradient, true);
+            }
+        } else {
+            for (int i = 0; i < barList.count(); i++) {
+                QQuick3DModel *model = barList.at(i)->model;
+                updateItemMaterial(model, useGradient, rangeGradient);
+                updateCustomMaterial(model);
+            }
+            if (m_selectedIndex != -1) {
+                QQuick3DModel *selectedItem = barList.at(m_selectedIndex)->model;
+                auto itemLabel = series->itemLabel();
+                updateCustomMaterial(selectedItem, true);
+            }
+        }
+    }
+}
+
+void QQuickDataVisBars::updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient)
+{
+    Q_UNUSED(useGradient);
+    QQmlListReference materialsRef(item, "materials");
+    if (!rangeGradient) {
+        if (materialsRef.size()) {
+            if (!qobject_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0))) {
+                auto principledMaterial = new QQuick3DPrincipledMaterial();
+                principledMaterial->setParent(this);
+                auto oldCustomMaterial = materialsRef.at(0);
+                materialsRef.replace(0, principledMaterial);
+                delete oldCustomMaterial;
+            }
+        } else {
+            auto principledMaterial = new QQuick3DPrincipledMaterial();
+            principledMaterial->setParent(this);
+            materialsRef.append(principledMaterial);
+        }
+    } else {
+        if (materialsRef.size()) {
+            if (!qobject_cast<QQuick3DCustomMaterial *>(materialsRef.at(0))) {
+                auto customMaterial = createQmlCustomMaterial(QStringLiteral(":/materials/RangeGradientMaterial"));
+                auto oldPrincipledMaterial = materialsRef.at(0);
+                materialsRef.replace(0, customMaterial);
+                delete oldPrincipledMaterial;
+            }
+        } else {
+            auto customMaterial = createQmlCustomMaterial(QStringLiteral(":/materials/RangeGradientMaterial"));
+            materialsRef.append(customMaterial);
+        }
+    }
+}
+
+void QQuickDataVisBars::updateCustomMaterial(QQuick3DModel *item, bool isHighlight)
+{
+    QQmlListReference materialsRef(item, "materials");
+    auto customMaterial = static_cast<QQuick3DCustomMaterial *>(materialsRef.at(0));
+    QVariant textureInputAsVariant = customMaterial->property("custex");
+    QQuick3DShaderUtilsTextureInput *textureInput = textureInputAsVariant.value<QQuick3DShaderUtilsTextureInput *>();
+
+    if (!isHighlight)
+        textureInput->setTexture(m_texture);
+    else
+        textureInput->setTexture(m_highlightTexture);
+
+    float rangeGradientYScaler = 0.5f / m_yScale;
+    float value = (item->y() + m_yScale) * rangeGradientYScaler;
+    customMaterial->setProperty("gradientPos", value);
+}
+
+void QQuickDataVisBars::updatePrincipledMaterial(QQuick3DModel *model, const QColor &color, bool useGradient, bool isHighlight)
+{
+    QQmlListReference materialsRef(model, "materials");
+    auto principledMaterial = static_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0));
+    principledMaterial->setParent(this);
+
+    if (useGradient) {
+        principledMaterial->setBaseColor(QColor(Qt::white));
+        if (!isHighlight)
+            principledMaterial->setBaseColorMap(m_texture);
+        else
+            principledMaterial->setBaseColorMap(m_highlightTexture);
+    } else {
+        principledMaterial->setBaseColor(color);
+    }
+}
+
+void QQuickDataVisBars::removeDataItems(QBar3DSeries *series)
+{
+    if (m_barModelsMap.value(series)->isEmpty())
+        return;
+    QVector<BarModel *> barList = *m_barModelsMap.value(series);
+    for (int i = 0; i < barList.count(); i++) {
+        QQmlListReference materialsRef(barList.at(i)->model, "materials");
+        if (materialsRef.size()) {
+            auto material = materialsRef.at(0);
+            delete material;
+        }
+    }
+    m_barModelsMap.remove(series);
+}
+
+QQuick3DTexture *QQuickDataVisBars::createTexture()
+{
+    QQuick3DTexture *texture = new QQuick3DTexture();
+    texture->setParent(this);
+    texture->setRotationUV(-90.0f);
+    texture->setHorizontalTiling(QQuick3DTexture::ClampToEdge);
+    texture->setVerticalTiling(QQuick3DTexture::ClampToEdge);
+    DatavisQuick3DTextureData *textureData = new DatavisQuick3DTextureData();
+    textureData->setParent(texture);
+    textureData->setParentItem(texture);
+    texture->setTextureData(textureData);
+
+    return texture;
+}
+
+qsizetype QQuickDataVisBars::getItemIndex(QQuick3DModel *item)
+{
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+        for (auto series : m_barsController->barSeriesList()) {
+            QVector<BarModel *> barList = *m_barModelsMap.value(series);
+            for (int i = 0; i < barList.count(); i++) {
+                if (barList.at(i)->model == item)
+                    return i;
+            }
+        }
+    }
+
+    return -1;
+}
+
+void QQuickDataVisBars::setSelected(qsizetype index)
+{
+    m_selectedIndex = index;
+}
+
+void QQuickDataVisBars::clearSelectedBar()
+{
+    resetSelection();
+    m_selectedIndex = -1;
+}
+
+void QQuickDataVisBars::resetSelection()
+{
+    if (m_selectedIndex != -1) {
+        if (m_barsController->optimizationHints()==QAbstract3DGraph::OptimizationStatic) {
+            m_selectionActive = false;
+            m_selectionIndicator->setVisible(false);
+        }
+    }
+}
+
+void QQuickDataVisBars::createItemLabel()
+{
+    QQmlComponent component(qmlEngine(this), QStringLiteral(":/axis/ItemLabel"));
+    QQuick3DNode *labelNode = qobject_cast<QQuick3DNode *>(component.create());
+    labelNode->setParent(this);
+    m_itemLabel = labelNode;
+}
+
+QVector3D QQuickDataVisBars::selectedItemPosition(QBar3DSeries *series)
+{
+    if (m_selectedIndex == -1)
+        return QVector3D();
+
+    QVector3D position;
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+        QVector<BarModel *> barList = *m_barModelsMap.value(series);
+        position = barList.at(m_selectedIndex)->model->position();
+    } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+        position = m_selectionIndicator->position();
+    }
+
+    return position;
 }
 
 void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative)

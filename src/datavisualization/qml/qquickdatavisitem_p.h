@@ -436,7 +436,6 @@ private:
 
     friend class Scatter3DController;
     friend class ScatterSeriesVisualizer;
-    friend class QQuickBarSeriesVisualizer;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::OptimizationHints)

@@ -165,7 +165,6 @@ private:
     Q_DISABLE_COPY(Bars3DController)
     friend class QQuickDataVisItem;
     friend class QQuickDataVisBars;
-    friend class QQuickBarSeriesVisualizer;
 };
 
 QT_END_NAMESPACE

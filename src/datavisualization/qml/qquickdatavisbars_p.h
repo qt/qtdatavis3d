@@ -18,12 +18,9 @@
 #include "qquickdatavisitem_p.h"
 #include "bars3dcontroller_p.h"
 
-#include <private/datavisualizationglobal_p.h>
-#include <private/qqmldelegatemodel_p.h>
+#include <QtQuick3D/private/qquick3dmaterial_p.h>
 
 QT_BEGIN_NAMESPACE
-
-class QQuickBarSeriesVisualizer;
 
 class QQuickDataVisBars : public QQuickDataVisItem
 {
@@ -130,6 +127,11 @@ public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
     void handleAxisYChanged(QAbstract3DAxis *axis) override;
     void handleAxisZChanged(QAbstract3DAxis *axis) override;
+    void handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh);
+    void handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    void handleMeshSmoothChanged(bool enable);
+    void handleRowCountChanged();
+    void handleColCountChanged();
 
 Q_SIGNALS:
     void rowAxisChanged(QCategory3DAxis *axis);
@@ -151,7 +153,7 @@ private:
     // Interaction
     QPoint m_selectedBar;     // Points to row & column in data window.
     QBar3DSeries *m_selectedBarSeries; // Points to the series for which the bar is selected in
-                                       // single series selection cases.
+    // single series selection cases.
     QBar3DSeries *m_primarySeries; // Category axis labels are taken from the primary series
 
     // Testing sketching
@@ -189,15 +191,58 @@ private:
     QQuick3DNode *m_floorBackgroundScale = nullptr;
     QQuick3DNode *m_floorBackgroundRotation = nullptr;
 
-    //Visualization
-    QHash<QBar3DSeries *, QQuickBarSeriesVisualizer *> m_seriesVisualizerMap;
-    void setVisualizerForSeries(QBar3DSeries *series, QQuickBarSeriesVisualizer *visualizer);
-    QQuickBarSeriesVisualizer *visualizerForSeries(QBar3DSeries *series);
+    //Generate bars
+    struct BarModel
+    {
+        QQuick3DModel *model;
+        QBarDataItem *barItem;
+        int visualIndex;
+    };
+    QHash<QBar3DSeries *, QVector<BarModel *> *> m_barModelsMap;
+    QAbstract3DSeries::Mesh m_meshType = QAbstract3DSeries::MeshSphere;
+    bool m_smooth = false;
+    bool m_keepSeriesUniform;
+    bool m_hasHighlightTexture = false;
+    bool m_selectionActive = false;
+    bool m_barsGenerated = false;
+    float m_seriesScaleX;
+    float m_seriesScaleZ;
+    float m_seriesStep;
+    float m_seriesStart;
+    float m_zeroPosition;
+    qsizetype m_selectedIndex = -1;
+    int m_visibleSeriesCount;
+    QQuaternion m_meshRotation;
+    QQuick3DTexture *m_texture = nullptr;
+    QQuick3DTexture *m_highlightTexture = nullptr;
+    QQuick3DModel *m_selectionIndicator = nullptr;
+    QQuick3DNode *m_itemLabel = nullptr;
+
+
+    void connectSeries(QBar3DSeries *series);
+    void disconnectSeries(QBar3DSeries *series);
+    void generateBars(QList<QBar3DSeries *> &barSeriesList);
+    QQuick3DModel *createDataItem();
+    QString getMeshFileName();
+    void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
+    void updateBarVisuality(QBar3DSeries *series, int visualIndex);
+    void updateBarPositions(QBar3DSeries *series);
+    void updateBarVisuals(QBar3DSeries *series);
+    void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
+    void updateCustomMaterial(QQuick3DModel *item, bool isHighlight = false);
+    void updatePrincipledMaterial(QQuick3DModel *model, const QColor &color, bool useGradient, bool isHighlight);
+    void removeDataItems(QBar3DSeries *series);
+    QQuick3DTexture *createTexture();
+    qsizetype getItemIndex(QQuick3DModel *item);
+    void setSelected(qsizetype index);
+    void clearSelectedBar();
+    void resetSelection();
+    void createItemLabel();
+    QVector3D selectedItemPosition(QBar3DSeries *series);
 
     void updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative);
 
     friend class Bars3DController;
-    friend class QQuickBarSeriesVisualizer;
 };
 
 QT_END_NAMESPACE

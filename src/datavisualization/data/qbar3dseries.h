@@ -53,7 +53,6 @@ private:
 
     friend class Bars3DController;
     friend class QQuickDataVisBars;
-    friend class QQuickBarSeriesVisualizer;
 };
 
 QT_END_NAMESPACE
