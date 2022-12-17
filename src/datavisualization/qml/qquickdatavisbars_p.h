@@ -87,29 +87,6 @@ public:
     float floorLevel() const;
 
 protected:
-    Bars3DController *m_barsController;
-
-    int m_cachedRowCount;
-    int m_cachedColumnCount;
-    int m_minRow;
-    int m_maxRow;
-    int m_minCol;
-    int m_maxCol;
-    int m_newRows;
-    int m_newCols;
-
-    float m_maxSceneSize;
-    float m_rowWidth;
-    float m_columnDepth;
-    float m_maxDimension;
-    float m_scaleFactor;
-    float m_xScaleFactor;
-    float m_zScaleFactor;
-
-    QSizeF m_cachedBarSeriesMargin;
-    QSizeF m_cachedBarThickness;
-    QSizeF m_cachedBarSpacing;
-
     void componentComplete() override;
     void synchData() override;
     void updateParameters();
@@ -119,9 +96,6 @@ protected:
     void updateAxisReversed(bool enable) override;
     QVector3D calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition, int index) override;
     float calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index) override;
-
-    void calculateSceneScalingFactors();
-    void calculateHeightAdjustment();
 
 public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
@@ -148,12 +122,32 @@ Q_SIGNALS:
     Q_REVISION(1, 2) void floorLevelChanged(float level);
 
 private:
-    QQmlComponent *createRepeaterDelegate(QAbstract3DSeries::Mesh meshType);
+    Bars3DController *m_barsController;
+
+    int m_cachedRowCount;
+    int m_cachedColumnCount;
+    int m_minRow;
+    int m_maxRow;
+    int m_minCol;
+    int m_maxCol;
+    int m_newRows;
+    int m_newCols;
+
+    float m_maxSceneSize;
+    float m_rowWidth;
+    float m_columnDepth;
+    float m_maxDimension;
+    float m_scaleFactor;
+    float m_xScaleFactor;
+    float m_zScaleFactor;
+
+    QSizeF m_cachedBarSeriesMargin;
+    QSizeF m_cachedBarThickness;
+    QSizeF m_cachedBarSpacing;
 
     // Interaction
     QPoint m_selectedBar;     // Points to row & column in data window.
-    QBar3DSeries *m_selectedBarSeries; // Points to the series for which the bar is selected in
-    // single series selection cases.
+    QBar3DSeries *m_selectedBarSeries; // Points to the series for which the bar is selected
     QBar3DSeries *m_primarySeries; // Category axis labels are taken from the primary series
 
     // Testing sketching
@@ -161,9 +155,6 @@ private:
     AxisHelper m_helperAxisY;
     AxisHelper m_helperAxisZ;
 
-    float m_lineLengthScaleFactor;
-    float m_lineWidthScaleFactor = lineWidthScaleFactor();
-    float m_gridOffset = gridOffset();
     float m_scaleXWithBackground = scaleWithBackground().x();
     float m_scaleYWithBackground = scaleWithBackground().y();
     float m_scaleZWithBackground = scaleWithBackground().z();
@@ -185,7 +176,7 @@ private:
     float m_minHeight;
     float m_maxHeight;
 
-    bool axisRangeChanged;
+    bool m_axisRangeChanged = false;
 
     QQuick3DModel *m_floorBackground = nullptr;
     QQuick3DNode *m_floorBackgroundScale = nullptr;
@@ -204,7 +195,6 @@ private:
     bool m_keepSeriesUniform;
     bool m_hasHighlightTexture = false;
     bool m_selectionActive = false;
-    bool m_barsGenerated = false;
     float m_seriesScaleX;
     float m_seriesScaleZ;
     float m_seriesStep;
@@ -218,7 +208,9 @@ private:
     QQuick3DModel *m_selectionIndicator = nullptr;
     QQuick3DNode *m_itemLabel = nullptr;
 
-
+    void calculateSceneScalingFactors();
+    void calculateHeightAdjustment();
+    void calculateSeriesStartPosition();
     void connectSeries(QBar3DSeries *series);
     void disconnectSeries(QBar3DSeries *series);
     void generateBars(QList<QBar3DSeries *> &barSeriesList);
@@ -241,6 +233,7 @@ private:
     QVector3D selectedItemPosition(QBar3DSeries *series);
 
     void updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative);
+    void updateBarSeriesMargin(const QSizeF &margin);
 
     friend class Bars3DController;
 };

@@ -326,8 +326,6 @@ void QQuickDataVisBars::componentComplete()
 
     setFloorGridInRange(true);
     setVerticalSegmentLine(false);
-
-    m_lineLengthScaleFactor = lineLengthScaleFactor();
 }
 
 void QQuickDataVisBars::synchData()
@@ -357,7 +355,7 @@ void QQuickDataVisBars::synchData()
     }
 
     if (m_barsController->m_changeTracker.barSeriesMarginChanged) {
-        // m_renderer->updateBarSeriesMargin(m_barSeriesMargin);
+        updateBarSeriesMargin(barSeriesMargin());
         m_barsController->m_changeTracker.barSeriesMarginChanged = false;
     }
 
@@ -407,10 +405,10 @@ void QQuickDataVisBars::synchData()
     Q3DTheme *theme = m_barsController->activeTheme();
     bgMatFloor->setBaseColor(theme->backgroundColor());
 
-    if (axisRangeChanged) {
+    if (m_axisRangeChanged) {
         updateGrid();
         updateLabels();
-        axisRangeChanged = false;
+        m_axisRangeChanged = false;
     }
 }
 
@@ -439,7 +437,7 @@ void QQuickDataVisBars::updateParameters() {
             calculateSceneScalingFactors();
     }
 
-    axisRangeChanged = true;
+    m_axisRangeChanged = true;
     update();
 }
 
@@ -454,26 +452,23 @@ void QQuickDataVisBars::updateGraph()
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     calculateSceneScalingFactors();
 
-    if (axisRangeChanged && m_barsController->m_changedSeriesList.size()) {
+    if (m_barsController->m_changedSeriesList.size()) {
         for (auto series : m_barsController->barSeriesList()) {
             if (m_barModelsMap.contains(series))
                 removeDataItems(series);
         }
-
     }
     generateBars(barSeriesList);
     int visualIndex = 0;
-    if (m_barsGenerated) {
-        for (auto barSeries : m_barsController->barSeriesList()) {
-            if (barSeries->isVisible()) {
-                updateBarVisuality(barSeries, visualIndex);
-                updateBarPositions(barSeries);
-                updateBarVisuals(barSeries);
-                ++visualIndex;
-            }
-            else
-                updateBarVisuality(barSeries, -1);
+    for (auto barSeries : m_barsController->barSeriesList()) {
+        if (barSeries->isVisible()) {
+            updateBarVisuality(barSeries, visualIndex);
+            updateBarPositions(barSeries);
+            updateBarVisuals(barSeries);
+            ++visualIndex;
         }
+        else
+            updateBarVisuality(barSeries, -1);
     }
 }
 
@@ -495,8 +490,8 @@ void QQuickDataVisBars::updateAxisReversed(bool enable)
 
 void QQuickDataVisBars::calculateSceneScalingFactors()
 {
-    m_rowWidth = (m_cachedColumnCount * m_cachedBarSpacing.width()) / 2.0f;
-    m_columnDepth = (m_cachedRowCount * m_cachedBarSpacing.height()) / 2.0f;
+    m_rowWidth = (m_cachedColumnCount * m_cachedBarSpacing.width()) * 0.5f;
+    m_columnDepth = (m_cachedRowCount * m_cachedBarSpacing.height()) * 0.5f;
     m_maxDimension = qMax(m_rowWidth, m_columnDepth);
     m_scaleFactor = qMin((m_cachedColumnCount *(m_maxDimension / m_maxSceneSize)),
                          (m_cachedRowCount * (m_maxDimension / m_maxSceneSize)));
@@ -576,6 +571,12 @@ void QQuickDataVisBars::calculateHeightAdjustment()
 
     if (newAdjustment != m_backgroundAdjustment)
         m_backgroundAdjustment = newAdjustment;
+}
+
+void QQuickDataVisBars::calculateSeriesStartPosition()
+{
+    m_seriesStart = -((float(m_visibleSeriesCount) - 1.0f) * 0.5f)
+            * (m_seriesStep - (m_seriesStep * m_cachedBarSeriesMargin.width()));
 }
 
 QVector3D QQuickDataVisBars::calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition, int index)
@@ -686,18 +687,6 @@ void QQuickDataVisBars::handleColCountChanged()
     updateParameters();
 }
 
-QQmlComponent *QQuickDataVisBars::createRepeaterDelegate(QAbstract3DSeries::Mesh meshType)
-{
-    switch (meshType) {
-    case QAbstract3DSeries::MeshSphere:
-        return createRepeaterDelegateComponent(QStringLiteral(":/datapointModels/DatapointSphere"));
-    case QAbstract3DSeries::MeshCube:
-        return createRepeaterDelegateComponent(QStringLiteral(":/datapointModels/DatapointCube"));
-    default:
-        return createRepeaterDelegateComponent(QStringLiteral(":/datapointModels/DatapointSphere"));
-    }
-}
-
 void QQuickDataVisBars::connectSeries(QBar3DSeries *series)
 {
     m_meshType = series->mesh();
@@ -754,7 +743,6 @@ void QQuickDataVisBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
                 }
                 ++dataRowIndex;
             }
-            m_barsGenerated = true;
         }
         if (barSeries->isVisible())
             m_visibleSeriesCount++;
@@ -833,7 +821,7 @@ void QQuickDataVisBars::updateBarPositions(QBar3DSeries *series)
 
     m_seriesScaleX = 1.0f / float(m_visibleSeriesCount);
     m_seriesStep = 1.0f / float(m_visibleSeriesCount);
-    m_seriesStart = -((float(m_visibleSeriesCount) - 1.0f) / 2.0f)
+    m_seriesStart = -((float(m_visibleSeriesCount) - 1.0f) * 0.5f)
             * (m_seriesStep - (m_seriesStep * m_cachedBarSeriesMargin.width()));
 
     if (m_keepSeriesUniform)
@@ -1140,6 +1128,7 @@ void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spaci
         m_cachedBarSpacing = m_cachedBarThickness * 2 + spacing * 2;
     }
 
+    m_axisRangeChanged = true;
     /* Will I need those?
      *
     // Slice mode doesn't update correctly without this
@@ -1147,7 +1136,14 @@ void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spaci
         m_selectionDirty = true;
      *
     */
-
     // Calculate here and at setting sample space
     calculateSceneScalingFactors();
+}
+
+void QQuickDataVisBars::updateBarSeriesMargin(const QSizeF &margin)
+{
+    m_cachedBarSeriesMargin = margin;
+    calculateSeriesStartPosition();
+    calculateSceneScalingFactors();
+    m_barsController->m_isSeriesVisualsDirty = true;
 }
