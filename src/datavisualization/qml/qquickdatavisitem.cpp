@@ -252,18 +252,6 @@ void QQuickDataVisItem::componentComplete()
     m_subsegmentLineRepeaterZ->setModel(subGridLineCount);
     m_repeaterZ->setModel(axis->labels().size());
     m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
-
-    m_selectionPointer = new QQuick3DModel();
-    m_selectionPointer->setParent(QQuick3DViewport::scene());
-    m_selectionPointer->setParentItem(QQuick3DViewport::scene());
-    m_selectionPointer->setSource(QUrl(QStringLiteral("#Sphere")));
-    m_selectionPointer->setScale(QVector3D(0.001f, 0.001f, 0.001f));
-    auto pointerMaterial = new QQuick3DPrincipledMaterial();
-    pointerMaterial->setParent(this);
-    pointerMaterial->setBaseColor(m_controller->activeTheme()->singleHighlightColor());
-    QQmlListReference materialRef(m_selectionPointer, "materials");
-    materialRef.append(pointerMaterial);
-    m_selectionPointer->setVisible(false);
 }
 
 QQuick3DDirectionalLight *QQuickDataVisItem::light() const
@@ -708,9 +696,7 @@ void QQuickDataVisItem::synchData()
     }
 
     if (themeDirtyBits.singleHighlightColorDirty) {
-        QQmlListReference materialRef(m_selectionPointer, "materials");
-        auto material = static_cast<QQuick3DPrincipledMaterial *>(materialRef.at(0));
-        material->setBaseColor(theme->singleHighlightColor());
+        updateSingleHighlightColor();
         themeDirtyBits.singleHighlightColorDirty = false;
     }
 
@@ -1056,12 +1042,14 @@ void QQuickDataVisItem::updateLabels()
     auto scaleFactor = m_labelScale.x() * 4.0f / pointSize + m_labelScale.x() * 0.3f;
     QVector3D fontScaled = QVector3D(scaleFactor, scaleFactor, 0.0f);
 
+    m_itemLabel->setScale(fontScaled);
+
     float labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisX->labels()))) + textPadding;
     QFontMetrics fm(m_controller->activeTheme()->font());
     float labelHeight = fm.height() + textPadding;
 
-    auto adjustment = labelsMaxWidth * scaleFactor / 2.0f;
+    auto adjustment = labelsMaxWidth * scaleFactor * .5f;
     zPos = backgroundScale.z() + adjustment + m_labelMargin;
     adjustment *= qAbs(qSin(qDegreesToRadians(labelRotation.z())));
     yPos = backgroundScale.y() + adjustment;
@@ -1147,7 +1135,7 @@ void QQuickDataVisItem::updateLabels()
     labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisY->labels()))) + textPadding;
 
-    adjustment = labelsMaxWidth * scaleFactor / 2.0f + m_labelMargin;
+    adjustment = labelsMaxWidth * scaleFactor * .5f + m_labelMargin;
     xPos = backgroundScale.x();
     if (!xFlipped)
         xPos *= -1.0f;
@@ -1248,7 +1236,7 @@ void QQuickDataVisItem::updateLabels()
     scale = translate = backgroundScale.z() - m_backgroundScaleMargin.z();
     labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisZ->labels()))) + textPadding ;
-    adjustment = labelsMaxWidth * scaleFactor / 2.0f;
+    adjustment = labelsMaxWidth * scaleFactor * .5f;
 
     xPos = backgroundScale.x() + adjustment + m_labelMargin;
     if (xFlipped)
@@ -1298,7 +1286,7 @@ void QQuickDataVisItem::updateLabels()
     scale = translate = backgroundScale.y() - m_backgroundScaleMargin.y();
     labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisY->labels()))) + textPadding;
-    adjustment = labelsMaxWidth * scaleFactor / 2.0f + m_labelMargin;
+    adjustment = labelsMaxWidth * scaleFactor * .5f + m_labelMargin;
 
     xPos = backgroundScale.x() + adjustment;
     if (xFlipped)

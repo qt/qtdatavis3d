@@ -6,6 +6,7 @@
 
 #include "declarativescene_p.h"
 #include "surface3dcontroller_p.h"
+#include "surfaceselectioninstancing_p.h"
 #include "utils_p.h"
 
 #include <QtQuick3D/private/qquick3drepeater_p.h>
@@ -240,6 +241,19 @@ void QQuickDataVisSurface::componentComplete()
         connect(series, &QSurface3DSeries::flatShadingEnabledChanged, this, &QQuickDataVisSurface::handleFlatShadingEnabledChanged);
     }
 
+    m_selectionPointer = new QQuick3DModel();
+    m_selectionPointer->setParent(QQuick3DViewport::scene());
+    m_selectionPointer->setParentItem(QQuick3DViewport::scene());
+    m_selectionPointer->setSource(QUrl(QStringLiteral("#Sphere")));
+    auto pointerMaterial = new QQuick3DPrincipledMaterial();
+    pointerMaterial->setParent(this);
+    pointerMaterial->setBaseColor(m_surfaceController->activeTheme()->singleHighlightColor());
+    QQmlListReference materialRef(m_selectionPointer, "materials");
+    materialRef.append(pointerMaterial);
+    m_instancing = new SurfaceSelectionInstancing();
+    m_instancing->setScale(QVector3D(0.001f, 0.001f, 0.001f));
+    m_selectionPointer->setInstancing(m_instancing);
+
     setScaleWithBackground({2.0f, 1.0f, 2.0f});
     setBackgroundScaleMargin({0.1f, 0.1f, 0.1f});
     setScale({2.0f, 1.0f, 2.0f});
@@ -327,23 +341,9 @@ void QQuickDataVisSurface::updateGraph()
             }
             model->gridModel->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawWireframe));
             model->model->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawSurface));
-
-            SurfaceVertex selectedVertex = model->selectedVertex;
-            visible = visible && !selectedVertex.position.isNull();
-            if (visible) {
-                selectionPointer()->setPosition(selectedVertex.position);
-                const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
-                const QSurfaceDataRow &rowArray = *array.at(selectedVertex.coord.y());
-                QVector3D value = rowArray.at(selectedVertex.coord.x()).position();
-                QString label = QString::number(value.x()) + QStringLiteral(", ") +
-                        QString::number(value.y()) + QStringLiteral(", ") +
-                        QString::number(value.z());
-                itemLabel()->setPosition(selectedVertex.position);
-                itemLabel()->setProperty("labelText", label);
-            }
-            selectionPointer()->setVisible(visible);
-            itemLabel()->setVisible(visible);
         }
+
+        updateSelectedPoint();
     }
 
     if (m_surfaceController->isDataDirty()) {
@@ -957,39 +957,66 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
         auto mousePos = event->pos();
         auto pickResult = pickAll(mousePos.x(), mousePos.y());
         QVector3D pickedPos(0.0f, 0.0f, 0.0f);
+        QQuick3DModel *pickedModel = nullptr;
 
         auto selectionMode = m_surfaceController->selectionMode();
         if (!selectionMode.testFlag(QAbstract3DGraph::SelectionNone)) {
             for (auto picked : pickResult) {
                 if (picked.objectHit()->objectName().contains(QStringLiteral("SurfaceModel"))) {
                     pickedPos = picked.position();
+                    pickedModel = picked.objectHit();
                     break;
                 }
             }
 
             if (!pickedPos.isNull()) {
                 float min = -1.0f;
+                SurfaceVertex selectedVertex;
+
                 for (auto model : m_model) {
                     if (!model->series->isVisible())
                         continue;
 
-                    SurfaceVertex selectedVertex;
-                    for (auto vertex : model->vertices) {
-                        QVector3D pos = vertex.position;
-                        float dist = pickedPos.distanceToPoint(pos);
-                        if (selectedVertex.position.isNull() || dist < min) {
-                            min = dist;
-                            selectedVertex = vertex;
+                    if (model->model == pickedModel) {
+                        model->picked = true;
+                        for (auto vertex : model->vertices) {
+                            QVector3D pos = vertex.position;
+                            float dist = pickedPos.distanceToPoint(pos);
+                            if (selectedVertex.position.isNull() || dist < min) {
+                                min = dist;
+                                selectedVertex = vertex;
+                            }
                         }
+                    } else {
+                        model->picked = false;
                     }
+                }
 
-                    if (selectionMode == QAbstract3DGraph::SelectionItem) {
-                        model->selectedVertex = selectedVertex;
+                for (auto model : m_model) {
+                    if (!model->series->isVisible())
+                        continue;
 
-                        if (!selectedVertex.position.isNull())
+                    if (selectionMode.testFlag(QAbstract3DGraph::SelectionItem)) {
+                        if (selectionMode == QAbstract3DGraph::SelectionItem) {
+                            if (model->picked)
+                                model->selectedVertex = selectedVertex;
+                            else
+                                model->selectedVertex = SurfaceVertex();
+                        }
+                        else if (selectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)) {
+                            if (model->picked) {
+                                model->selectedVertex = selectedVertex;
+                            } else {
+                                QPoint coord = selectedVertex.coord;
+                                int index = coord.x() * model->rowCount + coord.y();
+                                auto vertex = model->vertices.at(index);
+                                model->selectedVertex = vertex;
+                            }
+                        }
+
+                        if (!selectedVertex.position.isNull() &&
+                                model->picked)
                             model->series->setSelectedPoint(selectedVertex.coord);
-                        else
-                            model->series->setSelectedPoint(m_surfaceController->invalidSelectionPosition());
                     }
                 }
             }
@@ -999,24 +1026,39 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
 
 void QQuickDataVisSurface::updateSelectedPoint()
 {
+    bool labelVisible = false;
+    m_instancing->resetPositions();
     for (auto model : m_model) {
         SurfaceVertex selectedVertex = model->selectedVertex;
         if (model->series->isVisible() &&
                 !selectedVertex.position.isNull()) {
-            selectionPointer()->setPosition(selectedVertex.position);
-            const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
-            const QSurfaceDataRow &rowArray = *array.at(selectedVertex.coord.y());
-            QVector3D value = rowArray.at(selectedVertex.coord.x()).position();
-            QString label = QString::number(value.x()) + QStringLiteral(", ") +
-                    QString::number(value.y()) + QStringLiteral(", ") +
-                    QString::number(value.z());
-            itemLabel()->setPosition(selectedVertex.position);
-            itemLabel()->setProperty("labelText", label);
-            itemLabel()->setEulerRotation(QVector3D(
-                                              -m_surfaceController->scene()->activeCamera()->yRotation(),
-                                              -m_surfaceController->scene()->activeCamera()->xRotation(),
-                                              0));
+            m_instancing->addPosition(selectedVertex.position);
+            if (model->picked) {
+                const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
+                const QSurfaceDataRow &rowArray = *array.at(selectedVertex.coord.y());
+                QVector3D value = rowArray.at(selectedVertex.coord.x()).position();
+                QVector3D labelPosition = selectedVertex.position;
+                QString x = static_cast<QValue3DAxis *>(m_surfaceController->axisX())->stringForValue(value.x());
+                QString y = static_cast<QValue3DAxis *>(m_surfaceController->axisY())->stringForValue(value.y());
+                QString z = static_cast<QValue3DAxis *>(m_surfaceController->axisZ())->stringForValue(value.z());
+                QString label = x + QStringLiteral(", ") +
+                            y + QStringLiteral(", ") +
+                            z;
+                itemLabel()->setPosition(labelPosition);
+                itemLabel()->setProperty("labelText", label);
+                itemLabel()->setEulerRotation(QVector3D(
+                                                  -m_surfaceController->scene()->activeCamera()->yRotation(),
+                                                  -m_surfaceController->scene()->activeCamera()->xRotation(),
+                                                  0));
+                labelVisible = true;
+            }
         }
     }
+    itemLabel()->setVisible(labelVisible);
+}
+
+void QQuickDataVisSurface::updateSingleHighlightColor()
+{
+    m_instancing->setColor(m_surfaceController->activeTheme()->singleHighlightColor());
 }
 QT_END_NAMESPACE

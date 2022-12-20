@@ -14,7 +14,7 @@
 #define SCATTERSERIESVISUALIZER_H
 #include "qscatter3dseries_p.h"
 #include "qabstract3dgraph.h"
-#include "datavisquick3dinstancing_p.h"
+#include "scatterinstancing_p.h"
 
 #include <QtQuick3D/private/qquick3dmodel_p.h>
 #include <QtQuick3D/private/qquick3drepeater_p.h>
@@ -67,7 +67,7 @@ private:
     Scatter3DController *m_controller = nullptr;
     QAbstract3DSeries::Mesh m_meshType = QAbstract3DSeries::MeshSphere;
     bool m_smooth = false;
-    DatavisQuick3DInstancing *m_instancing = nullptr;
+    ScatterInstancing *m_instancing = nullptr;
     QQuick3DModel *m_instancingRootItem = nullptr;
     QQuick3DRepeater *m_repeater = nullptr;
     QQuick3DNode *m_seriesRootItem = nullptr;

@@ -135,7 +135,7 @@ void ScatterSeriesVisualizer::setup()
             delete m_instancingRootItem;
     } else if (m_controller->optimizationHints() == QAbstract3DGraph::OptimizationHint::OptimizationStatic) {
         removeDataItems();
-        m_instancing = new DatavisQuick3DInstancing();
+        m_instancing = new ScatterInstancing();
         createInstancingRootItem();
         createSelectionIndicator();
     }

@@ -11,8 +11,8 @@
 //
 // We mean it.
 
-#ifndef DATAVISQUICK3DINSTANCING_H
-#define DATAVISQUICK3DINSTANCING_H
+#ifndef SCATTERINSTANCING_H
+#define SCATTERINSTANCING_H
 #include <QtQuick3D/private/qquick3dinstancing_p.h>
 struct DataItemHolder {
     QVector3D position;
@@ -20,11 +20,11 @@ struct DataItemHolder {
     QVector3D scale;
 };
 
-class DatavisQuick3DInstancing : public QQuick3DInstancing
+class ScatterInstancing : public QQuick3DInstancing
 {
     Q_OBJECT
 public:
-    DatavisQuick3DInstancing();
+    ScatterInstancing();
 
     const QList<DataItemHolder> &dataArray() const;
     void setDataArray(const QList<DataItemHolder> &newDataArray);
@@ -51,4 +51,4 @@ private:
     friend class ScatterSeriesVisualizer;
 };
 
-#endif // DATAVISQUICK3DINSTANCING_H
+#endif // SCATTERINSTANCING_H

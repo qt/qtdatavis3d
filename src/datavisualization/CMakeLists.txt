@@ -65,7 +65,7 @@ qt_internal_add_qml_module(DataVisualization
         engine/bars3dcontroller.cpp engine/bars3dcontroller_p.h
         engine/bars3drenderer.cpp engine/bars3drenderer_p.h
         engine/barseriesrendercache.cpp engine/barseriesrendercache_p.h
-        engine/datavisquick3dinstancing.cpp engine/datavisquick3dinstancing_p.h
+        engine/scatterinstancing.cpp engine/scatterinstancing_p.h
         engine/drawer.cpp engine/drawer_p.h
         engine/q3dbars.cpp engine/q3dbars.h engine/q3dbars_p.h
         engine/q3dcamera.cpp engine/q3dcamera.h engine/q3dcamera_p.h
@@ -85,6 +85,7 @@ qt_internal_add_qml_module(DataVisualization
         engine/datavisquick3dtexturedata.cpp engine/datavisquick3dtexturedata_p.h # Maybe change this location
         engine/surface3drenderer.cpp engine/surface3drenderer_p.h
         engine/surfaceseriesrendercache.cpp engine/surfaceseriesrendercache_p.h
+        engine/surfaceselectioninstancing.cpp engine/surfaceselectioninstancing_p.h
         global/datavisualizationglobal_p.h
         global/qdatavisualizationglobal.h
         input/q3dinputhandler.cpp input/q3dinputhandler.h input/q3dinputhandler_p.h

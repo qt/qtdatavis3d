@@ -25,6 +25,7 @@ QT_BEGIN_NAMESPACE
 class QValue3DAxis;
 class QSurface3DSeries;
 class Surface3DController;
+class SurfaceSelectionInstancing;
 
 class QQuickDataVisSurface : public QQuickDataVisItem
 {
@@ -68,6 +69,7 @@ protected:
     void synchData() override;
     void updateGraph() override;
     void handleMousePressedEvent(QMouseEvent *event) override;
+    void updateSingleHighlightColor() override;
 
 public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
@@ -103,6 +105,7 @@ private:
         int columnCount;
         int rowCount;
         SurfaceVertex selectedVertex;
+        bool picked = false;
     };
 
     QVector3D getNormalizedVertex(SurfaceModel *model, const QSurfaceDataItem &data, bool polar, bool flipXZ);
@@ -117,6 +120,8 @@ private:
 
     QVector<SurfaceModel *> m_model;
     Surface3DController *m_surfaceController;
+    QQuick3DModel *m_selectionPointer = nullptr;
+    SurfaceSelectionInstancing *m_instancing = nullptr;
 };
 
 QT_END_NAMESPACE

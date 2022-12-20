@@ -275,6 +275,11 @@ float QValue3DAxis::positionAt(float x)
     return formatter()->positionAt(x);
 }
 
+QString QValue3DAxis::stringForValue(float x)
+{
+    return formatter()->stringForValue(x, labelFormat());
+}
+
 /*!
  * \internal
  */

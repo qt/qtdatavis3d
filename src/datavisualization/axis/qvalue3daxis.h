@@ -44,6 +44,7 @@ public:
     float subGridPositionAt(int gridLine);
     float labelPositionAt(int index);
     float positionAt(float x);
+    QString stringForValue(float x);
 
 Q_SIGNALS:
     void segmentCountChanged(int count);

@@ -223,7 +223,6 @@ public:
     QQuick3DCustomMaterial *createQmlCustomMaterial(const QString &fileName);
     QQuick3DPrincipledMaterial *createPrincipledMaterial();
 
-    QQuick3DModel *selectionPointer() { return m_selectionPointer; }
     QQuick3DNode *itemLabel() { return m_itemLabel; }
 
     QQuick3DModel *m_targetVisualizer;
@@ -363,6 +362,8 @@ protected:
 
     virtual void updateAxisReversed(bool enable);
 
+    virtual void updateSingleHighlightColor() {}
+
     QSharedPointer<QMutex> m_nodeMutex;
 
 private:
@@ -388,8 +389,6 @@ private:
     QQuick3DRepeater *m_subsegmentLineRepeaterY = nullptr;
     QQuick3DRepeater *m_segmentLineRepeaterZ = nullptr;
     QQuick3DRepeater *m_subsegmentLineRepeaterZ = nullptr;
-
-    QQuick3DModel *m_selectionPointer = nullptr;
 
     QPointer<Abstract3DController> m_controller;
     QQuick3DNode *m_cameraTarget = nullptr;

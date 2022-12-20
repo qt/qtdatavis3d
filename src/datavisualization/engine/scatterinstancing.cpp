@@ -1,14 +1,14 @@
 // Copyright (C) 2022 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "datavisquick3dinstancing_p.h"
+#include "scatterinstancing_p.h"
 
-DatavisQuick3DInstancing::DatavisQuick3DInstancing()
+ScatterInstancing::ScatterInstancing()
 {
 
 }
 
-QByteArray DatavisQuick3DInstancing::getInstanceBuffer(int *instanceCount) {
+QByteArray ScatterInstancing::getInstanceBuffer(int *instanceCount) {
     if (m_dirty) {
         m_instanceData.resize(0);
         int instanceNumber = 0;
@@ -35,39 +35,39 @@ QByteArray DatavisQuick3DInstancing::getInstanceBuffer(int *instanceCount) {
     return m_instanceData;
 }
 
-bool DatavisQuick3DInstancing::rangeGradient() const
+bool ScatterInstancing::rangeGradient() const
 {
     return m_rangeGradient;
 }
 
-void DatavisQuick3DInstancing::setRangeGradient(bool newRangeGradient)
+void ScatterInstancing::setRangeGradient(bool newRangeGradient)
 {
     m_rangeGradient = newRangeGradient;
 }
 
-QList<float> &DatavisQuick3DInstancing::customData()
+QList<float> &ScatterInstancing::customData()
 {
     return m_customData;
 }
 
-void DatavisQuick3DInstancing::setCustomData(const QList<float> &newCustomData)
+void ScatterInstancing::setCustomData(const QList<float> &newCustomData)
 {
     m_customData = newCustomData;
     markDataDirty();
 }
 
-void DatavisQuick3DInstancing::markDataDirty()
+void ScatterInstancing::markDataDirty()
 {
     m_dirty = true;
     markDirty();
 }
 
-const QList<DataItemHolder> &DatavisQuick3DInstancing::dataArray() const
+const QList<DataItemHolder> &ScatterInstancing::dataArray() const
 {
     return m_dataArray;
 }
 
-void DatavisQuick3DInstancing::setDataArray(const QList<DataItemHolder> &newDataArray)
+void ScatterInstancing::setDataArray(const QList<DataItemHolder> &newDataArray)
 {
     m_dataArray = newDataArray;
     markDataDirty();
