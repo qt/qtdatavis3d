@@ -40,6 +40,9 @@ QQuickDataVisBars::QQuickDataVisBars(QQuickItem *parent)
       m_actualFloorLevel(0.0f),
       m_heightNormalizer(1.0f),
       m_backgroundAdjustment(0.0f),
+      m_selectedBarSeries(0),
+      m_selectedBarCoord(Bars3DController::invalidSelectionPosition()),
+      m_selectedBarPos(0.0f, 0.0f, 0.0f),
       m_keepSeriesUniform(false),
       m_seriesScaleX(0.0f),
       m_seriesScaleZ(0.0f),
@@ -208,7 +211,7 @@ void QQuickDataVisBars::addSeries(QBar3DSeries *series)
     m_barsController->addSeries(series);
     connectSeries(series);
     if (series->selectedBar() != invalidSelectionPosition())
-        setSelectedBar(series->selectedBar(), series, false);
+        updateSelectedBar();
 }
 
 void QQuickDataVisBars::removeSeries(QBar3DSeries *series)
@@ -236,51 +239,6 @@ QBar3DSeries *QQuickDataVisBars::selectedSeries() const
 {
     return m_barsController->selectedSeries();
 }
-
-void QQuickDataVisBars::setSelectedBar(const QPoint &position, QBar3DSeries *series, bool enterSlice)
-{
-    // If the selection targets non-existent bar, clear selection instead.
-    QPoint pos = position;
-
-    // Series may already have been removed, so check it before setting the selection.
-    if (!m_barsController->m_seriesList.contains(series))
-        series = 0;
-
-    m_barsController->adjustSelectionPosition(pos, series);
-
-    //    if (m_barsController->selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
-    //        // If the selected bar is outside data window, or there is no visible selected bar,
-    //        // disable slicing.
-    if (pos.x() < m_barsController->m_axisZ->min() || pos.x() > m_barsController->m_axisZ->max()
-            || pos.y() < m_barsController->m_axisX->min() || pos.y() > m_barsController->m_axisX->max()
-            || !series->isVisible()) {
-        scene()->setSlicingActive(false);
-    } else if (enterSlice) {
-        scene()->setSlicingActive(true);
-    }
-    //    }
-
-    if (pos != m_selectedBar || series != m_selectedBarSeries) {
-        bool seriesChanged = (series != m_selectedBarSeries);
-        m_selectedBar = pos;
-        m_selectedBarSeries = series;
-        m_barsController->m_changeTracker.selectedBarChanged = true;
-
-        // Clear selection from other series and finally set new selection to the specified series
-        foreach (QAbstract3DSeries *otherSeries, m_barsController->m_seriesList) {
-            QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(otherSeries);
-            if (barSeries != m_selectedBarSeries) {
-                barSeries->dptr()->setSelectedBar(invalidSelectionPosition());
-            }
-        }
-        if (m_selectedBarSeries)
-            m_selectedBarSeries->dptr()->setSelectedBar(m_selectedBar);
-
-        if (seriesChanged)
-            emit selectedSeriesChanged(m_selectedBarSeries);
-    }
-}
-
 
 void QQuickDataVisBars::setFloorLevel(float level)
 {
@@ -359,17 +317,18 @@ void QQuickDataVisBars::synchData()
         m_barsController->m_changeTracker.barSeriesMarginChanged = false;
     }
 
-    // Needs to be done after data is set, as it needs to know the visual array.
-    if (m_barsController->m_changeTracker.selectedBarChanged) {
-        // m_renderer->updateSelectedBar(m_selectedBar, m_selectedBarSeries);
-        m_barsController->m_changeTracker.selectedBarChanged = false;
-    }
-
     auto axisY = static_cast<QValue3DAxis *>(m_barsController->axisY());
     axisY->formatter()->d_ptr->recalculate();
     m_helperAxisY.setFormatter(axisY->formatter());
 
     QQuickDataVisItem::synchData();
+
+    // Needs to be done after data is set, as it needs to know the visual array.
+    if (m_barsController->m_changeTracker.selectedBarChanged) {
+        updateSelectedBar();
+        m_barsController->m_changeTracker.selectedBarChanged = false;
+        m_barSelectionFound = false;
+    }
 
     QMatrix4x4 modelMatrix;
 
@@ -609,6 +568,61 @@ float QQuickDataVisBars::calculateCategoryGridLinePosition(QAbstract3DAxis *axis
     return ret;
 }
 
+void QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
+{
+    if (Qt::LeftButton == event->button()) {
+        auto mousePos = event->pos();
+        auto pickResult = pickAll(mousePos.x(), mousePos.y());
+        QVector3D pickedPos(0.0f, 0.0f, 0.0f);
+
+        auto selectionMode = m_barsController->selectionMode();
+        if (!selectionMode.testFlag(QAbstract3DGraph::SelectionNone)) {
+            for (auto picked : pickResult) {
+                if (picked.objectHit()->objectName().contains(QStringLiteral("BarModel"))) {
+                    pickedPos = picked.scenePosition();
+                    break;
+                }
+            }
+
+            if (!pickedPos.isNull()) {
+                float min = pickResult.at(0).distance();
+                for (auto it = m_barModelsMap.begin(); it != m_barModelsMap.end(); it++) {
+                    if (!it.key()->isVisible())
+                        continue;
+
+                    for (int i = 0; i < it.value()->count(); i++) {
+                        QVector3D pos = it.value()->at(i)->model->position();
+                        float dist = pickedPos.distanceToPoint(pos);
+                        if (m_selectedBarPos.isNull() || dist < min) {
+                            min = dist;
+                            m_selectedBarSeries = it.key();
+                            m_selectedBarCoord = it.value()->at(i)->coord;
+                            m_selectedBarPos = pos;
+                            m_selectedIndex = i;
+                        }
+                    }
+
+                    if (selectionMode == QAbstract3DGraph::SelectionItem) {
+                        if (!m_selectedBarPos.isNull())
+                            m_selectedBarSeries->setSelectedBar(m_selectedBarCoord);
+                        else
+                            m_selectedBarSeries->setSelectedBar(m_barsController->invalidSelectionPosition());
+
+                        m_barSelectionFound = true;
+                        m_barsController->m_changeTracker.selectedBarChanged = true;
+                    }
+                }
+            } else {
+                if (m_selectedBarSeries) {
+                    QQuick3DModel *model = m_barModelsMap.value(m_selectedBarSeries)->at(m_selectedIndex)->model;
+                    updatePrincipledMaterial(model, m_selectedBarSeries->baseColor(), m_selectedBarSeries->d_ptr->isUsingGradient(), false);
+                    resetClickedStatus();
+                }
+            }
+        }
+    }
+}
+
 void QQuickDataVisBars::handleAxisXChanged(QAbstract3DAxis *axis)
 {
     emit columnAxisChanged(static_cast<QCategory3DAxis *>(axis));
@@ -635,7 +649,7 @@ void QQuickDataVisBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
         }
         generateBars(barSeriesList);
     } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
-        resetSelection();
+        resetClickedStatus();
 //        m_instancingRootItem->setSource(QUrl(getMeshFileName()));
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
         m_barsController->markDataDirty();
@@ -662,7 +676,7 @@ void QQuickDataVisBars::handleMeshSmoothChanged(bool enable)
         }
         generateBars(barSeriesList);
     } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
-        resetSelection();
+        resetClickedStatus();
 //        m_instancingRootItem->setSource(QUrl(getMeshFileName()));
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
         m_barsController->markDataDirty();
@@ -737,6 +751,7 @@ void QQuickDataVisBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
                     BarModel *barModel = new BarModel();
                     barModel->model = model;
                     barModel->barItem = dataItem;
+                    barModel->coord = QPoint(dataRowIndex, i);
 
                     if (!barList->contains(barModel))
                         barList->append(barModel);
@@ -755,7 +770,7 @@ QQuick3DModel *QQuickDataVisBars::createDataItem()
     auto model = new QQuick3DModel();
     model->setParent(scene);
     model->setParentItem(scene);
-    model->setPickable(true);
+    model->setObjectName(QStringLiteral("BarModel"));
     QString fileName = getMeshFileName();
     model->setSource(QUrl(fileName));
     return model;
@@ -810,6 +825,8 @@ void QQuickDataVisBars::updateBarVisuality(QBar3DSeries *series, int visualIndex
         barList.at(i)->visualIndex = visualIndex;
         barList.at(i)->model->setVisible(series->isVisible());
     }
+    if (!m_barSelectionFound)
+        resetClickedStatus();
 }
 
 void QQuickDataVisBars::updateBarPositions(QBar3DSeries *series)
@@ -937,20 +954,11 @@ void QQuickDataVisBars::updateBarVisuals(QBar3DSeries *series)
                 updateItemMaterial(model, useGradient, rangeGradient);
                 updatePrincipledMaterial(model, series->baseColor(), useGradient, false);
             }
-            if (m_selectedIndex != -1) {
-                QQuick3DModel *selectedItem = barList.at(m_selectedIndex)->model;
-                updatePrincipledMaterial(selectedItem, series->singleHighlightColor(), useGradient, true);
-            }
         } else {
             for (int i = 0; i < barList.count(); i++) {
                 QQuick3DModel *model = barList.at(i)->model;
                 updateItemMaterial(model, useGradient, rangeGradient);
                 updateCustomMaterial(model);
-            }
-            if (m_selectedIndex != -1) {
-                QQuick3DModel *selectedItem = barList.at(m_selectedIndex)->model;
-                auto itemLabel = series->itemLabel();
-                updateCustomMaterial(selectedItem, true);
             }
         }
     }
@@ -1021,6 +1029,10 @@ void QQuickDataVisBars::updatePrincipledMaterial(QQuick3DModel *model, const QCo
     } else {
         principledMaterial->setBaseColor(color);
     }
+    if (m_barsController->selectionMode().testFlag(QAbstract3DGraph::SelectionNone))
+        model->setPickable(false);
+    else
+        model->setPickable(true);
 }
 
 void QQuickDataVisBars::removeDataItems(QBar3DSeries *series)
@@ -1053,64 +1065,40 @@ QQuick3DTexture *QQuickDataVisBars::createTexture()
     return texture;
 }
 
-qsizetype QQuickDataVisBars::getItemIndex(QQuick3DModel *item)
+void QQuickDataVisBars::updateSelectedBar()
 {
-    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
-        for (auto series : m_barsController->barSeriesList()) {
-            QVector<BarModel *> barList = *m_barModelsMap.value(series);
+    if (m_barSelectionFound) {
+        for (auto it = m_barModelsMap.begin(); it != m_barModelsMap.end(); it++) {
+            QVector<BarModel *> barList = *it.value();
             for (int i = 0; i < barList.count(); i++) {
-                if (barList.at(i)->model == item)
-                    return i;
+                if (barList.at(i)->model->position() == m_selectedBarPos && it.key() == m_selectedBarSeries && barList.at(i)->coord == m_selectedBarCoord) {
+                    QBarDataItem *item = const_cast<QBarDataItem *>((barList.at(i)->barItem));
+                    float value = item->value();
+                    float heightValue = m_helperAxisY.itemPositionAt(value);
+                    bool visible = it.key()->isVisible() && !m_selectedBarPos.isNull();
+                    QString label = (m_selectedBarSeries->dptr()->itemLabel());
+                    m_selectedBarPos.setY(m_selectedBarPos.y() + heightValue);
+                    itemLabel()->setPosition(m_selectedBarPos);
+                    itemLabel()->setProperty("labelText", label);
+                    itemLabel()->setEulerRotation(QVector3D(
+                                                      -m_barsController->scene()->activeCamera()->yRotation(),
+                                                      -m_barsController->scene()->activeCamera()->xRotation(),
+                                                      0));
+                    itemLabel()->setVisible(visible);
+                    updatePrincipledMaterial(barList.at(i)->model, m_selectedBarSeries->singleHighlightColor(), m_selectedBarSeries->d_ptr->isUsingGradient(), true);
+                }
             }
         }
     }
-
-    return -1;
 }
 
-void QQuickDataVisBars::setSelected(qsizetype index)
+void QQuickDataVisBars::resetClickedStatus()
 {
-    m_selectedIndex = index;
-}
-
-void QQuickDataVisBars::clearSelectedBar()
-{
-    resetSelection();
+    m_selectedBarPos = QVector3D(0.0f, 0.0f, 0.0f);
+    m_selectedBarCoord = Bars3DController::invalidSelectionPosition();
+    m_selectedBarSeries = 0;
     m_selectedIndex = -1;
-}
-
-void QQuickDataVisBars::resetSelection()
-{
-    if (m_selectedIndex != -1) {
-        if (m_barsController->optimizationHints()==QAbstract3DGraph::OptimizationStatic) {
-            m_selectionActive = false;
-            m_selectionIndicator->setVisible(false);
-        }
-    }
-}
-
-void QQuickDataVisBars::createItemLabel()
-{
-    QQmlComponent component(qmlEngine(this), QStringLiteral(":/axis/ItemLabel"));
-    QQuick3DNode *labelNode = qobject_cast<QQuick3DNode *>(component.create());
-    labelNode->setParent(this);
-    m_itemLabel = labelNode;
-}
-
-QVector3D QQuickDataVisBars::selectedItemPosition(QBar3DSeries *series)
-{
-    if (m_selectedIndex == -1)
-        return QVector3D();
-
-    QVector3D position;
-    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
-        QVector<BarModel *> barList = *m_barModelsMap.value(series);
-        position = barList.at(m_selectedIndex)->model->position();
-    } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
-        position = m_selectionIndicator->position();
-    }
-
-    return position;
+    itemLabel()->setVisible(false);
 }
 
 void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative)
