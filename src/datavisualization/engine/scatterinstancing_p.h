@@ -47,8 +47,6 @@ private:
     int m_instanceCount = 0;
     bool m_dirty = true;
     bool m_rangeGradient = false;
-
-    friend class ScatterSeriesVisualizer;
 };
 
 #endif // SCATTERINSTANCING_H

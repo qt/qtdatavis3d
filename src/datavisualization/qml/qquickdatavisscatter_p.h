@@ -15,13 +15,12 @@
 #include "qscatter3dseries.h"
 #include "qquickdatavisitem_p.h"
 #include "scatter3dcontroller_p.h"
+#include "scatterinstancing_p.h"
 
 #include <private/datavisualizationglobal_p.h>
 #include <private/qqmldelegatemodel_p.h>
 
 QT_BEGIN_NAMESPACE
-
-class ScatterSeriesVisualizer;
 
 class QQuickDataVisScatter : public QQuickDataVisItem
 {
@@ -75,7 +74,6 @@ private:
     float m_maxItemSize = 0.0f;
 
     // For Quick3D renderer integration
-    QHash<QScatter3DSeries *, ScatterSeriesVisualizer *> m_seriesVisualizerMap;
     const float m_defaultMinSize = 0.01f;
     const float m_defaultMaxSize = 0.1f;
     const float m_itemScaler = 3.0f;
@@ -104,6 +102,67 @@ private:
                                             // in single series selection cases.
     QQuick3DModel *m_selected = nullptr;
     QQuick3DModel *m_previousSelected = nullptr;
+
+    QHash<QScatter3DSeries *, QList<QQuick3DModel *>> m_seriesModelMap;
+
+    // From seriesvisualizer
+    void setup(QScatter3DSeries *series);
+    void connectSeries(QScatter3DSeries *series);
+    void disconnectSeries(QScatter3DSeries *series);
+    void generatePointsForSeries(QScatter3DSeries *series);
+    qsizetype getItemIndex(QQuick3DModel *item);
+    void setSelected(qsizetype index);
+//    void clearSelection();
+    void updateItemPositions(QScatter3DSeries *series);
+    void updateItemVisuals(QScatter3DSeries *series);
+    void createItemLabel();
+    QVector3D selectedItemPosition();
+
+    bool pointsGenerated() const;
+
+    ScatterInstancing *m_instancing = nullptr;
+    QQuick3DModel *m_instancingRootItem = nullptr;
+    QQuick3DNode *m_seriesRootItem = nullptr;
+    QQuick3DMaterial *m_seriesMaterial = nullptr;
+    QQuick3DTexture *m_texture = nullptr;
+    QQuick3DTexture *m_highlightTexture = nullptr;
+    bool m_hasTexture = false;
+    bool m_hasHighLightTexture = false;
+    bool m_smooth = false;
+
+    float m_dotSizedScale = 1.0f;
+    QQuaternion m_meshRotation;
+    QList<QQuick3DModel *> m_itemList;
+    qsizetype m_selectedIndex = -1;
+    QQuick3DModel *m_selectionIndicator = nullptr;
+    bool m_selectionActive = false;
+    float m_selectedGradientPos = 0.0f;
+    QQuickDataVisScatter *m_qml;
+    QScatter3DSeries *m_series;
+    int m_itemCount = 0;
+
+    void resetSelection();
+    void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
+    void updateItemInstancedMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
+    void updateInstancedCustomMaterial(QQuick3DModel *model, bool isHighlight = false);
+    void updateSelectionIndicatorMaterial(bool useGradient, bool rangeGradient);
+    void updateCustomMaterial(QQuick3DModel *item, bool isHighlight = false);
+    void updatePrincipledMaterial(QQuick3DModel *model, const QColor &color, bool useGradient, bool isHighlight = false);
+
+    QQuick3DTexture *createTexture();
+    QQuick3DModel *createDataItemModel(QAbstract3DSeries::Mesh meshType);
+    QQuick3DNode *createSeriesRoot();
+    QQuick3DModel *createDataItem(const QAbstract3DSeries::Mesh meshType);
+    void createInstancingRootItem(QAbstract3DSeries::Mesh meshType);
+    void createSelectionIndicator(QAbstract3DSeries::Mesh meshType);
+    void removeDataItems(QList<QQuick3DModel *> &items);
+    void removeDummyDataItems();
+    void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
+    QString getMeshFileName(QAbstract3DSeries::Mesh meshType);
+    // ----------------------------------------
+
+    QQuick3DNode *m_itemLabel = nullptr;
+
     QColor m_selectedSeriesColor;
 
     float m_labelMargin = 0.25f;
@@ -124,9 +183,6 @@ private:
     void setSelected(QQuick3DModel *newSelected);
     void setSelected(QQuick3DModel *root, qsizetype index);
     void clearSelectionModel();
-
-    void setVisualizerForSeries(QScatter3DSeries *series, ScatterSeriesVisualizer * visualizer);
-    ScatterSeriesVisualizer *visualizerForSeries(QScatter3DSeries * series);
 
     void updateGraph() override;
     void synchData() override;

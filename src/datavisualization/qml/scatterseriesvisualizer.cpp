@@ -371,7 +371,7 @@ void ScatterSeriesVisualizer::updateItemVisuals(QScatter3DSeries *series)
             m_selectionIndicator->setRotation(dih.rotation);
             m_selectionIndicator->setScale(dih.scale*1.1f);
             m_selectionIndicator->setVisible(true);
-            m_qml->m_itemLabel->setPosition(m_selectionIndicator->position());
+//            m_qml->m_itemLabel->setPosition(m_selectionIndicator->position());
             m_selectionActive = true;
             m_instancing->markDataDirty();
         }

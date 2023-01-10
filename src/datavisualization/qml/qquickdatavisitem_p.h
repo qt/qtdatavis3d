@@ -434,7 +434,6 @@ private:
     QVector3D calculateLabelRotation(float labelAutoAngle);
 
     friend class Scatter3DController;
-    friend class ScatterSeriesVisualizer;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::OptimizationHints)

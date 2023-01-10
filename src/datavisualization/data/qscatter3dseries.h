@@ -48,7 +48,6 @@ private:
 
     friend class Scatter3DController;
     friend class QQuickDataVisScatter;
-    friend class ScatterSeriesVisualizer;
 };
 
 QT_END_NAMESPACE

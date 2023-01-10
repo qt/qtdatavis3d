@@ -123,7 +123,6 @@ qt_internal_add_qml_module(DataVisualization
         qml/qquickdatavisbars.cpp qml/qquickdatavisbars_p.h
         qml/qquickdatavissurface.cpp qml/qquickdatavissurface_p.h
         qml/qquickdatavisscatter.cpp qml/qquickdatavisscatter_p.h
-        qml/scatterseriesvisualizer.cpp qml/scatterseriesvisualizer_p.h
     INCLUDE_DIRECTORIES
         axis
         data
