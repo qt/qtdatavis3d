@@ -63,7 +63,7 @@ Item {
         // Set tableView current row to selected bar
         var rowRole = series.dataProxy.rowLabels[position.x];
         var colRole
-        if (barGraph.columnAxis === graphAxes.total)
+        if (barGraph.columnAxis == graphAxes.total)
             colRole = "01";
         else
             colRole = series.dataProxy.columnLabels[position.y];
@@ -83,13 +83,12 @@ Item {
 
     Item {
         id: dataView
-        anchors.right: mainview.right;
+        anchors.right: mainview.right
         anchors.bottom: mainview.bottom
 
         Bars3D {
             id: barGraph
-            width: dataView.width
-            height: dataView.height
+            anchors.fill: parent
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionItem
             theme: Theme3D {
@@ -176,11 +175,8 @@ Item {
         }
     }
 
-
-
     ColumnLayout {
         id: tableViewLayout
-
 
         anchors.top: parent.top
         anchors.left: parent.left
@@ -195,7 +191,6 @@ Item {
                 padding: 3
                 text: header.columnNames[index]
             }
-
         }
 
         TableView {
@@ -214,7 +209,6 @@ Item {
 
                 rows: graphData.modelAsJsArray
             }
-
 
             delegate: Rectangle {
                 implicitHeight: 30
@@ -245,7 +239,6 @@ Item {
                             return display
                         }
                     }
-
                 }
             }
         }
@@ -258,7 +251,7 @@ Item {
         var matches = pattern.exec(timestamp)
         var rowIndex = modelProxy.rowCategoryIndex(matches[1])
         var colIndex
-        if (barGraph.columnAxis === graphAxes.total)
+        if (barGraph.columnAxis == graphAxes.total)
             colIndex = 0 // Just one column when showing yearly totals
         else
             colIndex = modelProxy.columnCategoryIndex(matches[2])
@@ -388,7 +381,7 @@ Item {
             name: "portrait"
             PropertyChanges {
                 target: dataView
-                width: mainview.height / 4 * 3
+                width: mainview.width
                 height: mainview.width
             }
             PropertyChanges  {
