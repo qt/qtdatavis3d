@@ -3,9 +3,8 @@
 
 //! [0]
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
-import QtDataVisualization 1.2
+import QtDataVisualization
 import "."
 //! [0]
 
@@ -15,6 +14,8 @@ Item {
     //! [1]
     width: 500
     height: 500
+
+    property bool portraitMode: width < height
 
     //! [4]
     Data {
@@ -42,7 +43,8 @@ Item {
         anchors.bottom: parent.bottom
         //! [9]
         width: parent.width
-        height: parent.height - buttonLayout.height
+        height: parent.height - (portraitMode ? shadowToggle.implicitHeight * 3 + 25
+                                              : shadowToggle.implicitHeight + 10)
         //! [8]
 
         //! [2]
@@ -115,103 +117,108 @@ Item {
         }
     }
 
-    RowLayout {
-        id: buttonLayout
-        Layout.minimumHeight: cameraToggle.height
-        width: parent.width
+    //! [7]
+    Button {
+        id: shadowToggle
+        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
         anchors.left: parent.left
-        spacing: 0
-        //! [7]
-        Button {
-            id: shadowToggle
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            text: scatterGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
-            enabled: scatterGraph.shadowsSupported
-            onClicked: {
-                if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;
-                    text = "Hide Shadows";
-                } else {
-                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
-                    text = "Show Shadows";
-                }
+        anchors.top: parent.top
+        anchors.margins: 5
+        text: scatterGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
+        enabled: scatterGraph.shadowsSupported
+        onClicked: {
+            if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;
+                text = "Hide Shadows";
+            } else {
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                text = "Show Shadows";
             }
         }
-        //! [7]
+    }
+    //! [7]
 
-        Button {
-            id: smoothToggle
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            text: "Use Smooth for Series One"
-            onClicked: {
-                if (scatterSeries.meshSmooth === false) {
-                    text = "Use Flat for Series One";
-                    scatterSeries.meshSmooth = true;
-                } else {
-                    text = "Use Smooth for Series One"
-                    scatterSeries.meshSmooth = false;
-                }
+    Button {
+        id: smoothToggle
+        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        anchors.left: shadowToggle.right
+        anchors.top: parent.top
+        anchors.margins: 5
+        text: "Use Smooth for Series One"
+        onClicked: {
+            if (scatterSeries.meshSmooth === false) {
+                text = "Use Flat for Series One";
+                scatterSeries.meshSmooth = true;
+            } else {
+                text = "Use Smooth for Series One"
+                scatterSeries.meshSmooth = false;
             }
         }
+    }
 
-        Button {
-            id: cameraToggle
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            text: "Change Camera Placement"
-            onClicked: {
-                if (scatterGraph.scene.activeCamera.cameraPreset === Camera3D.CameraPresetFront) {
-                    scatterGraph.scene.activeCamera.cameraPreset =
-                            Camera3D.CameraPresetIsometricRightHigh;
-                } else {
-                    scatterGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetFront;
-                }
+    Button {
+        id: cameraToggle
+        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        anchors.left: portraitMode ? parent.left : smoothToggle.right
+        anchors.top: portraitMode ? smoothToggle.bottom : parent.top
+        anchors.margins: 5
+        text: "Change Camera Placement"
+        onClicked: {
+            if (scatterGraph.scene.activeCamera.cameraPreset === Camera3D.CameraPresetFront) {
+                scatterGraph.scene.activeCamera.cameraPreset =
+                        Camera3D.CameraPresetIsometricRightHigh;
+            } else {
+                scatterGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetFront;
             }
         }
+    }
 
-        Button {
-            id: themeToggle
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            text: "Change Theme"
-            onClicked: {
-                if (scatterGraph.theme.type === Theme3D.ThemeArmyBlue) {
-                    scatterGraph.theme = themeIsabelle
-                } else {
-                    scatterGraph.theme = themeArmyBlue
-                }
-                if (scatterGraph.theme.backgroundEnabled === true) {
-                    backgroundToggle.text = "Hide Background";
-                } else {
-                    backgroundToggle.text = "Show Background";
-                }
+    Button {
+        id: themeToggle
+        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        anchors.left: cameraToggle.right
+        anchors.top: portraitMode ? smoothToggle.bottom : parent.top
+        anchors.margins: 5
+        text: "Change Theme"
+        onClicked: {
+            if (scatterGraph.theme.type === Theme3D.ThemeArmyBlue) {
+                scatterGraph.theme = themeIsabelle
+            } else {
+                scatterGraph.theme = themeArmyBlue
+            }
+            if (scatterGraph.theme.backgroundEnabled === true) {
+                backgroundToggle.text = "Hide Background";
+            } else {
+                backgroundToggle.text = "Show Background";
             }
         }
+    }
 
-        Button {
-            id: backgroundToggle
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            text: "Hide Background"
-            onClicked: {
-                if (scatterGraph.theme.backgroundEnabled === true) {
-                    scatterGraph.theme.backgroundEnabled = false;
-                    text = "Show Background";
-                } else {
-                    scatterGraph.theme.backgroundEnabled = true;
-                    text = "Hide Background";
-                }
+    Button {
+        id: backgroundToggle
+        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        anchors.left: portraitMode ? parent.left : themeToggle.right
+        anchors.top: portraitMode ? themeToggle.bottom : parent.top
+        anchors.margins: 5
+        text: "Hide Background"
+        onClicked: {
+            if (scatterGraph.theme.backgroundEnabled === true) {
+                scatterGraph.theme.backgroundEnabled = false;
+                text = "Show Background";
+            } else {
+                scatterGraph.theme.backgroundEnabled = true;
+                text = "Hide Background";
             }
         }
+    }
 
-        Button {
-            id: exitButton
-            Layout.fillHeight: true
-            Layout.fillWidth: true
-            text: "Quit"
-            onClicked: Qt.quit();
-        }
+    Button {
+        id: exitButton
+        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        anchors.left: backgroundToggle.right
+        anchors.top: portraitMode ? themeToggle.bottom : parent.top
+        anchors.margins: 5
+        text: "Quit"
+        onClicked: Qt.quit();
     }
 }
