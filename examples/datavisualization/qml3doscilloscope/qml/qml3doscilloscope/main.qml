@@ -28,9 +28,8 @@
 ****************************************************************************/
 
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
-import QtDataVisualization 1.2
+import QtDataVisualization
 import "."
 
 Item {
@@ -42,6 +41,8 @@ Item {
     property int sampleRows: sampleColumns / 2
     property int sampleCache: 24
 
+    property bool portraitMode: width < height
+
     onSampleRowsChanged: {
         surfaceSeries.selectedPoint = surfaceSeries.invalidSelectionPosition
         generateData()
@@ -51,7 +52,7 @@ Item {
         id: dataView
         anchors.bottom: parent.bottom
         width: parent.width
-        height: parent.height - buttonLayout.height
+        height: parent.height - controlArea.height
 
         Surface3D {
             id: surfaceGraph
@@ -118,206 +119,175 @@ Item {
     //! [3]
 
     Rectangle {
-        width: parent.width
-        height: flatShadingToggle.implicitHeight * 2
+        id: controlArea
+        height: portraitMode ? flatShadingToggle.implicitHeight * 7
+                             : flatShadingToggle.implicitHeight * 2
         anchors.left: parent.left
         anchors.top: parent.top
+        anchors.right: parent.right
         color: surfaceGraph.theme.backgroundColor
 
-        ColumnLayout {
-            anchors.fill: parent
-            RowLayout {
-                id: sliderLayout
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                Layout.minimumHeight: flatShadingToggle.implicitHeight
-                spacing: 0
+        // Samples
+        Rectangle {
+            id: samples
+            width: portraitMode ? mainView.width : mainView.width / 4
+            height: flatShadingToggle.implicitHeight
+            anchors.left: parent.left
+            anchors.top: parent.top
 
-                Rectangle {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: samplesText.implicitWidth + 120
-                    Layout.maximumWidth: samplesText.implicitWidth + 120
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
+            border.color: "gray"
+            border.width: 1
+            radius: 4
 
-                    border.color: "gray"
-                    border.width: 1
-                    radius: 4
+            Row {
+                anchors.centerIn: parent
+                spacing: 10
+                padding: 5
 
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: parent.border.width + 1
-
-                        Slider {
-                            id: sampleSlider
-                            Layout.fillHeight: true
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                            Layout.minimumWidth: 80
-                            from: mainView.sampleCache * 2
-                            to: from * 10
-                            stepSize: mainView.sampleCache
-                            Component.onCompleted: value = from * 2
-                        }
-
-                        Rectangle {
-                            Layout.fillHeight: true
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: samplesText.implicitWidth + 10
-                            Layout.maximumWidth: samplesText.implicitWidth + 10
-                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                            Text {
-                                id: samplesText
-                                text: "Samples: " + (mainView.sampleRows * mainView.sampleColumns)
-                                anchors.fill: parent
-                                verticalAlignment: Text.AlignVCenter
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-                        }
-                    }
+                Slider {
+                    id: sampleSlider
+                    from: mainView.sampleCache * 2
+                    to: from * 10
+                    stepSize: mainView.sampleCache
+                    Component.onCompleted: value = from * 2
                 }
 
-                Rectangle {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: frequencyText.implicitWidth + 120
-                    Layout.maximumWidth: frequencyText.implicitWidth + 120
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                    border.color: "gray"
-                    border.width: 1
-                    radius: 4
-
-                    RowLayout {
-                        anchors.fill: parent
-                        anchors.margins: parent.border.width + 1
-
-                        Slider {
-                            id: frequencySlider
-                            Layout.fillHeight: true
-                            Layout.fillWidth: true
-                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-                            Layout.minimumWidth: 80
-                            from: 2
-                            to: 60
-                            stepSize: 2
-                            value: 30
-                        }
-
-                        Rectangle {
-                            Layout.fillHeight: true
-                            Layout.fillWidth: true
-                            Layout.minimumWidth: frequencyText.implicitWidth + 10
-                            Layout.maximumWidth: frequencyText.implicitWidth + 10
-                            Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                            Text {
-                                id: frequencyText
-                                text: "Freq: " + frequencySlider.value + " Hz"
-                                anchors.fill: parent
-                                verticalAlignment: Text.AlignVCenter
-                                horizontalAlignment: Text.AlignHCenter
-                            }
-                        }
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: fpsText.implicitWidth + 10
-                    Layout.maximumWidth: fpsText.implicitWidth + 10
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                    border.color: "gray"
-                    border.width: 1
-                    radius: 4
-
-                    Text {
-                        id: fpsText
-                        anchors.fill: parent
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter
-                    }
-                }
-
-                Rectangle {
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-                    Layout.minimumWidth: selectionText.implicitWidth + 10
-                    Layout.alignment: Qt.AlignHCenter | Qt.AlignVCenter
-
-                    border.color: "gray"
-                    border.width: 1
-                    radius: 4
-
-                    Text {
-                        id: selectionText
-                        anchors.fill: parent
-                        verticalAlignment: Text.AlignVCenter
-                        horizontalAlignment: Text.AlignHCenter
-                        text: "No selection"
-                    }
-                }
-            }
-
-            RowLayout {
-                id: buttonLayout
-                Layout.fillHeight: true
-                Layout.fillWidth: true
-                Layout.minimumHeight: flatShadingToggle.implicitHeight
-                spacing: 0
-
-                Button {
-                    id: flatShadingToggle
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-
-                    text: surfaceSeries.flatShadingSupported ? "Show Flat" : "Flat not supported"
-                    enabled: surfaceSeries.flatShadingSupported
-
-                    onClicked: {
-                        if (surfaceSeries.flatShadingEnabled === true) {
-                            surfaceSeries.flatShadingEnabled = false;
-                            text = "Show Flat"
-                        } else {
-                            surfaceSeries.flatShadingEnabled = true;
-                            text = "Show Smooth"
-                        }
-                    }
-                }
-
-                Button {
-                    id: surfaceGridToggle
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-
-                    text: "Show Surface Grid"
-
-                    onClicked: {
-                        if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
-                            surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
-                            text = "Show Surface Grid"
-                        } else {
-                            surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
-                            text = "Hide Surface Grid"
-                        }
-                    }
-                }
-
-                Button {
-                    id: exitButton
-                    Layout.fillHeight: true
-                    Layout.fillWidth: true
-
-                    text: "Quit"
-
-                    onClicked: Qt.quit();
+                Text {
+                    id: samplesText
+                    text: "Samples: " + (mainView.sampleRows * mainView.sampleColumns)
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
                 }
             }
         }
 
+        // Frequency
+        Rectangle {
+            id: frequency
+            width: portraitMode ? mainView.width : mainView.width / 4
+            height: flatShadingToggle.implicitHeight
+            anchors.left: portraitMode ? parent.left : samples.right
+            anchors.top: portraitMode ? samples.bottom : parent.top
+
+            border.color: "gray"
+            border.width: 1
+            radius: 4
+
+            Row {
+                anchors.centerIn: parent
+                spacing: 10
+                padding: 5
+
+                Slider {
+                    id: frequencySlider
+                    from: 2
+                    to: 60
+                    stepSize: 2
+                    value: 30
+                }
+
+                Text {
+                    id: frequencyText
+                    text: "Freq: " + frequencySlider.value + " Hz"
+                    verticalAlignment: Text.AlignVCenter
+                    horizontalAlignment: Text.AlignHCenter
+                }
+            }
+        }
+
+        // FPS
+        Rectangle {
+            id: fpsindicator
+            width: portraitMode ? mainView.width : mainView.width / 4
+            height: flatShadingToggle.implicitHeight
+            anchors.left: portraitMode ? parent.left : frequency.right
+            anchors.top: portraitMode ? frequency.bottom : parent.top
+
+            border.color: "gray"
+            border.width: 1
+            radius: 4
+
+            Text {
+                id: fpsText
+                anchors.fill: parent
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+            }
+        }
+
+        // Selection
+        Rectangle {
+            id: selection
+            width: portraitMode ? mainView.width : mainView.width / 4
+            height: flatShadingToggle.implicitHeight
+            anchors.left: portraitMode ? parent.left : fpsindicator.right
+            anchors.top: portraitMode ? fpsindicator.bottom : parent.top
+
+            border.color: "gray"
+            border.width: 1
+            radius: 4
+
+            Text {
+                id: selectionText
+                anchors.fill: parent
+                verticalAlignment: Text.AlignVCenter
+                horizontalAlignment: Text.AlignHCenter
+                text: "No selection"
+            }
+        }
+
+        // Flat shading
+        Button {
+            id: flatShadingToggle
+            width: portraitMode ? mainView.width : mainView.width / 3
+            anchors.left: parent.left
+            anchors.top: selection.bottom
+
+            text: surfaceSeries.flatShadingSupported ? "Show Flat" : "Flat not supported"
+            enabled: surfaceSeries.flatShadingSupported
+
+            onClicked: {
+                if (surfaceSeries.flatShadingEnabled === true) {
+                    surfaceSeries.flatShadingEnabled = false;
+                    text = "Show Flat"
+                } else {
+                    surfaceSeries.flatShadingEnabled = true;
+                    text = "Show Smooth"
+                }
+            }
+        }
+
+        // Surface grid
+        Button {
+            id: surfaceGridToggle
+            width: portraitMode ? mainView.width : mainView.width / 3
+            anchors.left: portraitMode ? parent.left : flatShadingToggle.right
+            anchors.top: portraitMode ? flatShadingToggle.bottom : selection.bottom
+
+            text: "Show Surface Grid"
+
+            onClicked: {
+                if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
+                    surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
+                    text = "Show Surface Grid"
+                } else {
+                    surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
+                    text = "Hide Surface Grid"
+                }
+            }
+        }
+
+        // Exit
+        Button {
+            id: exitButton
+            width: portraitMode ? mainView.width : mainView.width / 3
+            anchors.left: portraitMode ? parent.left : surfaceGridToggle.right
+            anchors.top: portraitMode ? surfaceGridToggle.bottom : selection.bottom
+
+            text: "Quit"
+
+            onClicked: Qt.quit();
+        }
     }
 
     //! [4]
