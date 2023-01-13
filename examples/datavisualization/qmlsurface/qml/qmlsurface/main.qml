@@ -2,9 +2,8 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
-import QtDataVisualization 1.2
+import QtDataVisualization
 import "."
 
 Rectangle {
@@ -13,16 +12,18 @@ Rectangle {
     height: 768
     color: surfacePlot.theme.windowColor
 
+    property bool portraitMode: width < height
+
     Data {
         id: surfaceData
     }
 
     Item {
         id: surfaceView
-        width: mainview.width
-        height: mainview.height
-        anchors.top: mainview.top
+        anchors.top: buttons.bottom
+        anchors.bottom: mainview.bottom
         anchors.left: mainview.left
+        anchors.right: mainview.right
 
         //! [0]
         ColorGradient {
@@ -49,6 +50,7 @@ Rectangle {
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
+            scene.activeCamera.zoomLevel: 75
             axisY.min: 0.0
             axisY.max: 500.0
             axisX.segmentCount: 10
@@ -103,18 +105,23 @@ Rectangle {
         }
     }
 
-    RowLayout {
-        id: buttonLayout
+    Item {
+        id: buttons
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.margins: 10
+        height: portraitMode ? surfaceGridToggle.implicitHeight * 4 + 15
+                             : surfaceGridToggle.implicitHeight * 3 + 10
         opacity: 0.5
 
         Button {
             id: surfaceGridToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Show Surface Grid"
+            anchors.margins: 5
+            anchors.left: parent.left
+            anchors.top: parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Show Surface\nGrid"
             //! [1]
             onClicked: {
                 if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
@@ -130,29 +137,33 @@ Rectangle {
 
         Button {
             id: surfaceGridColor
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Red surface grid color"
+            anchors.margins: 5
+            anchors.left: surfaceGridToggle.right
+            anchors.top: parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Red surface\ngrid color"
             onClicked: {
                 if (Qt.colorEqual(surfaceSeries.wireframeColor, "#000000")
                         && Qt.colorEqual(heightSeries.wireframeColor, "#000000")) {
                     surfaceSeries.wireframeColor = "red"
                     heightSeries.wireframeColor = "red"
-                    text = "Black surface grid color"
+                    text = "Black surface\ngrid color"
                 }
                 else {
                     surfaceSeries.wireframeColor = "black"
                     heightSeries.wireframeColor = "black"
-                    text = "Red surface grid color"
+                    text = "Red surface\ngrid color"
                 }
             }
         }
 
         Button {
             id: surfaceToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Hide Surface"
+            anchors.margins: 5
+            anchors.left: portraitMode ? parent.left : surfaceGridColor.right
+            anchors.top: portraitMode ? surfaceGridColor.bottom : parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Hide\nSurface"
             //! [8]
             onClicked: {
                 if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface) {
@@ -168,20 +179,22 @@ Rectangle {
 
         Button {
             id: flatShadingToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: surfaceSeries.flatShadingSupported ? "Show Flat" : "Flat not supported"
+            anchors.margins: 5
+            anchors.left: portraitMode ? surfaceToggle.right : parent.left
+            anchors.top: portraitMode ? surfaceGridColor.bottom : surfaceToggle.bottom
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: surfaceSeries.flatShadingSupported ? "Show\nFlat" : "Flat not\nsupported"
             enabled: surfaceSeries.flatShadingSupported
             //! [2]
             onClicked: {
                 if (surfaceSeries.flatShadingEnabled === true) {
                     surfaceSeries.flatShadingEnabled = false;
                     heightSeries.flatShadingEnabled = false;
-                    text = "Show Flat"
+                    text = "Show\nFlat"
                 } else {
                     surfaceSeries.flatShadingEnabled = true;
                     heightSeries.flatShadingEnabled = true;
-                    text = "Show Smooth"
+                    text = "Show\nSmooth"
                 }
             }
             //! [2]
@@ -189,40 +202,46 @@ Rectangle {
 
         Button {
             id: backgroundToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Hide Background"
+            anchors.margins: 5
+            anchors.left: portraitMode ? parent.left : flatShadingToggle.right
+            anchors.top: portraitMode ? flatShadingToggle.bottom : surfaceToggle.bottom
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Hide\nBackground"
             onClicked: {
                 if (surfacePlot.theme.backgroundEnabled === true) {
                     surfacePlot.theme.backgroundEnabled = false;
-                    text = "Show Background"
+                    text = "Show\nBackground"
                 } else {
                     surfacePlot.theme.backgroundEnabled = true;
-                    text = "Hide Background"
+                    text = "Hide\nBackground"
                 }
             }
         }
 
         Button {
             id: gridToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Hide Grid"
+            anchors.margins: 5
+            anchors.left: backgroundToggle.right
+            anchors.top: portraitMode ? flatShadingToggle.bottom : surfaceToggle.bottom
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Hide\nGrid"
             onClicked: {
                 if (surfacePlot.theme.gridEnabled === true) {
                     surfacePlot.theme.gridEnabled = false;
-                    text = "Show Grid"
+                    text = "Show\nGrid"
                 } else {
                     surfacePlot.theme.gridEnabled = true;
-                    text = "Hide Grid"
+                    text = "Hide\nGrid"
                 }
             }
         }
 
         Button {
             id: seriesToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
+            anchors.margins: 5
+            anchors.left: parent.left
+            anchors.top: gridToggle.bottom
+            width: mainview.width - 30
             text: "Switch to Height Map Series"
             //! [3]
             onClicked: {
@@ -246,13 +265,13 @@ Rectangle {
 
     function checkState() {
         if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface)
-            surfaceToggle.text = "Hide Surface"
+            surfaceToggle.text = "Hide\nSurface"
         else
-            surfaceToggle.text = "Show Surface"
+            surfaceToggle.text = "Show\nSurface"
 
         if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe)
-            surfaceGridToggle.text = "Hide Surface Grid"
+            surfaceGridToggle.text = "Hide Surface\nGrid"
         else
-            surfaceGridToggle.text = "Show Surface Grid"
+            surfaceGridToggle.text = "Show Surface\nGrid"
     }
 }
