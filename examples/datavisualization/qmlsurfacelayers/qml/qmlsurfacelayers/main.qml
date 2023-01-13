@@ -39,10 +39,11 @@ Item {
     height: 720
 
     property real fontSize: 12
+    property bool portraitMode: width < height
 
     Item {
         id: surfaceView
-        width: mainview.width - buttonLayout.width
+        width: mainview.width - settings.width
         height: mainview.height
         anchors.right: mainview.right;
 
@@ -134,175 +135,185 @@ Item {
         }
     }
 
-    ColumnLayout {
-        id: buttonLayout
-        anchors.top: parent.top
-        anchors.left: parent.left
-        spacing: 0
+    Flickable {
+        id: settings
+        width: buttonLayout.width
+        contentHeight: buttonLayout.height
+        height: mainview.height
 
-        //! [3]
-        GroupBox {
-            Layout.fillWidth: true
-            Column {
-                spacing: 10
+        ColumnLayout {
+            id: buttonLayout
+            anchors.top: parent.top
+            anchors.left: parent.left
+            spacing: 0
 
-                Label {
-                    font.pointSize: fontSize
-                    font.bold: true
-                    text: "Layer Selection"
-                }
+            //! [3]
+            GroupBox {
+                Layout.fillWidth: true
+                Column {
+                    spacing: 10
 
-                CheckBox {
-                    id: layerOneToggle
-                    checked: true
-                    text: "Show Ground Layer"
-                }
-
-                CheckBox {
-                    id: layerTwoToggle
-                    checked: true
-                    text: "Show Sea Layer"
-                }
-
-                CheckBox {
-                    id: layerThreeToggle
-                    checked: true
-                    text: "Show Tectonic Layer"
-                }
-            }
-        }
-        //! [3]
-
-        //! [5]
-        GroupBox {
-            Layout.fillWidth: true
-            Column {
-                spacing: 10
-
-                Label {
-                    font.pointSize: fontSize
-                    font.bold: true
-                    text: "Layer Style"
-                }
-
-                CheckBox {
-                    id: layerOneGrid
-                    text: "Show Ground as Grid"
-                    onCheckedChanged: {
-                        if (checked)
-                            layerOneSeries.drawMode = Surface3DSeries.DrawWireframe
-                        else
-                            layerOneSeries.drawMode = Surface3DSeries.DrawSurface
+                    Label {
+                        font.pointSize: fontSize
+                        font.bold: true
+                        text: portraitMode ? "Layer\nSelection" : "Layer Selection"
                     }
-                }
 
-                CheckBox {
-                    id: layerTwoGrid
-                    text: "Show Sea as Grid"
-
-                    onCheckedChanged: {
-                        if (checked)
-                            layerTwoSeries.drawMode = Surface3DSeries.DrawWireframe
-                        else
-                            layerTwoSeries.drawMode = Surface3DSeries.DrawSurface
+                    CheckBox {
+                        id: layerOneToggle
+                        checked: true
+                        text: portraitMode ? "Show\nGround\nLayer" : "Show Ground Layer"
                     }
-                }
 
-                CheckBox {
-                    id: layerThreeGrid
-                    text: "Show Tectonic as Grid"
-                    onCheckedChanged: {
-                        if (checked)
-                            layerThreeSeries.drawMode = Surface3DSeries.DrawWireframe
-                        else
-                            layerThreeSeries.drawMode = Surface3DSeries.DrawSurface
+                    CheckBox {
+                        id: layerTwoToggle
+                        checked: true
+                        text: portraitMode ? "Show\nSea\nLayer" : "Show Sea Layer"
+                    }
+
+                    CheckBox {
+                        id: layerThreeToggle
+                        checked: true
+                        text: portraitMode ? "Show\nTectonic\nLayer" : "Show Tectonic Layer"
                     }
                 }
             }
-        }
-        //! [5]
+            //! [3]
 
-        //! [6]
-        Button {
-            id: sliceButton
-            text: "Slice All Layers"
-            Layout.fillWidth: true
-            Layout.minimumHeight: 40
-            onClicked: {
-                if (surfaceLayers.selectionMode & AbstractGraph3D.SelectionMultiSeries) {
-                    surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
-                            | AbstractGraph3D.SelectionSlice
-                    text = "Slice All Layers"
-                } else {
-                    surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
-                            | AbstractGraph3D.SelectionSlice
-                            | AbstractGraph3D.SelectionMultiSeries
-                    text = "Slice One Layer"
+            //! [5]
+            GroupBox {
+                Layout.fillWidth: true
+                Column {
+                    spacing: 10
+
+                    Label {
+                        font.pointSize: fontSize
+                        font.bold: true
+                        text: portraitMode ? "Layer\nStyle" : "Layer Style"
+                    }
+
+                    CheckBox {
+                        id: layerOneGrid
+                        text: portraitMode ? "Show\nGround\nas Grid" : "Show Ground as Grid"
+                        onCheckedChanged: {
+                            if (checked)
+                                layerOneSeries.drawMode = Surface3DSeries.DrawWireframe
+                            else
+                                layerOneSeries.drawMode = Surface3DSeries.DrawSurface
+                        }
+                    }
+
+                    CheckBox {
+                        id: layerTwoGrid
+                        text: portraitMode ? "Show\nSea\nas Grid" : "Show Sea as Grid"
+
+                        onCheckedChanged: {
+                            if (checked)
+                                layerTwoSeries.drawMode = Surface3DSeries.DrawWireframe
+                            else
+                                layerTwoSeries.drawMode = Surface3DSeries.DrawSurface
+                        }
+                    }
+
+                    CheckBox {
+                        id: layerThreeGrid
+                        text: portraitMode ? "Show\nTectonic\nas Grid" : "Show Tectonic as Grid"
+                        onCheckedChanged: {
+                            if (checked)
+                                layerThreeSeries.drawMode = Surface3DSeries.DrawWireframe
+                            else
+                                layerThreeSeries.drawMode = Surface3DSeries.DrawSurface
+                        }
+                    }
                 }
             }
-        }
-        //! [6]
+            //! [5]
 
-        Button {
-            id: shadowButton
-            Layout.fillWidth: true
-            Layout.minimumHeight: 40
-            text: surfaceLayers.shadowsSupported ? "Show Shadows" : "Shadows not supported"
-            enabled: surfaceLayers.shadowsSupported
-            onClicked: {
-                if (surfaceLayers.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                    surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityLow
-                    text = "Hide Shadows"
-                } else {
-                    surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityNone
-                    text = "Show Shadows"
+            //! [6]
+            Button {
+                id: sliceButton
+                text: portraitMode ? "Slice\nAll\nLayers" : "Slice All Layers"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 40
+                onClicked: {
+                    if (surfaceLayers.selectionMode & AbstractGraph3D.SelectionMultiSeries) {
+                        surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
+                                | AbstractGraph3D.SelectionSlice
+                        text = portraitMode ? "Slice\nAll\nLayers" : "Slice All Layers"
+                    } else {
+                        surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
+                                | AbstractGraph3D.SelectionSlice
+                                | AbstractGraph3D.SelectionMultiSeries
+                        text = portraitMode ? "Slice\nOne\nLayer" : "Slice One Layer"
+                    }
                 }
             }
-        }
+            //! [6]
 
-        Button {
-            id: renderModeButton
-            text: "Switch Render Mode"
-            Layout.fillWidth: true
-            Layout.minimumHeight: 40
-            onClicked: {
-                var modeText = "Indirect "
-                var aaText
-                if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
-                        surfaceLayers.msaaSamples === 0) {
-                    surfaceLayers.renderingMode = AbstractGraph3D.RenderDirectToBackground
-                    modeText = "BackGround "
-                } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
-                           surfaceLayers.msaaSamples === 4) {
-                    surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
-                    surfaceLayers.msaaSamples = 0
-                } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
-                           surfaceLayers.msaaSamples === 8) {
-                    surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
-                    surfaceLayers.msaaSamples = 4
-                } else {
-                    surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
-                    surfaceLayers.msaaSamples = 8
+            Button {
+                id: shadowButton
+                Layout.fillWidth: true
+                Layout.minimumHeight: 40
+                text: surfaceLayers.shadowsSupported ? (portraitMode ? "Show\nShadows" : "Show Shadows")
+                                                     : (portraitMode ? "Shadows\nnot\nsupported" : "Shadows not supported")
+                enabled: surfaceLayers.shadowsSupported
+                onClicked: {
+                    if (surfaceLayers.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                        surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityLow
+                        text = portraitMode ? "Hide\nShadows" : "Hide Shadows"
+                    } else {
+                        surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityNone
+                        text = portraitMode ? "Show\nShadows" : "Show Shadows"
+                    }
                 }
-
-                if (surfaceLayers.msaaSamples <= 0) {
-                    aaText = "No AA"
-                } else {
-                    aaText = surfaceLayers.msaaSamples + "xMSAA"
-                }
-
-                renderLabel.text = modeText + aaText
             }
-        }
 
-        TextField {
-            id: renderLabel
-            font.pointSize: fontSize
-            Layout.fillWidth: true
-            Layout.minimumHeight: 40
-            enabled: false
-            horizontalAlignment: TextInput.AlignHCenter
-            text: "Indirect, " + surfaceLayers.msaaSamples + "xMSAA"
+            Button {
+                id: renderModeButton
+                text: portraitMode ? "Switch\nRender\nMode" : "Switch Render Mode"
+                Layout.fillWidth: true
+                Layout.minimumHeight: 40
+                onClicked: {
+                    var modeText = "Indirect, "
+                    var aaText
+                    if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
+                            surfaceLayers.msaaSamples === 0) {
+                        surfaceLayers.renderingMode = AbstractGraph3D.RenderDirectToBackground
+                        modeText = "BackGround, "
+                    } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
+                               surfaceLayers.msaaSamples === 4) {
+                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
+                        surfaceLayers.msaaSamples = 0
+                    } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
+                               surfaceLayers.msaaSamples === 8) {
+                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
+                        surfaceLayers.msaaSamples = 4
+                    } else {
+                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
+                        surfaceLayers.msaaSamples = 8
+                    }
+
+                    if (surfaceLayers.msaaSamples <= 0) {
+                        aaText = "No AA"
+                    } else {
+                        aaText = surfaceLayers.msaaSamples + "xMSAA"
+                    }
+
+                    renderLabel.text = modeText + aaText
+                }
+            }
+
+            TextField {
+                id: renderLabel
+                font.pointSize: fontSize
+                Layout.fillWidth: true
+                Layout.minimumHeight: 40
+                color: "gray"
+                enabled: false
+                horizontalAlignment: TextInput.AlignHCenter
+                wrapMode: TextField.WrapAtWordBoundaryOrAnywhere
+                text: "Indirect, " + surfaceLayers.msaaSamples + "xMSAA"
+            }
         }
     }
 }
