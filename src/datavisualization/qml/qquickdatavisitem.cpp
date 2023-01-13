@@ -569,27 +569,25 @@ void QQuickDataVisItem::synchData()
         m_controller->m_changeTracker.themeChanged = false;
     }
 
-    Q3DThemeDirtyBitField themeDirtyBits = theme->d_ptr->m_dirtyBits;
-
-    if (themeDirtyBits.lightStrengthDirty) {
+    if (theme->d_ptr->m_dirtyBits.lightStrengthDirty) {
         light()->setBrightness(theme->lightStrength() * .2f);
-        themeDirtyBits.lightStrengthDirty = false;
+        theme->d_ptr->m_dirtyBits.lightStrengthDirty = false;
     }
 
-    if (themeDirtyBits.ambientLightStrengthDirty) {
+    if (theme->d_ptr->m_dirtyBits.ambientLightStrengthDirty) {
         float ambientStrength = theme->ambientLightStrength();
         QColor ambientColor = QColor::fromRgbF(ambientStrength, ambientStrength, ambientStrength);
         light()->setAmbientColor(ambientColor);
-        themeDirtyBits.ambientLightStrengthDirty = false;
+        theme->d_ptr->m_dirtyBits.ambientLightStrengthDirty = false;
     }
 
-    if (themeDirtyBits.lightColorDirty) {
+    if (theme->d_ptr->m_dirtyBits.lightColorDirty) {
         light()->setColor(theme->lightColor());
-        themeDirtyBits.lightColorDirty = false;
+        theme->d_ptr->m_dirtyBits.lightColorDirty = false;
     }
 
     // label Adjustments
-    if (themeDirtyBits.labelBackgroundColorDirty) {
+    if (theme->d_ptr->m_dirtyBits.labelBackgroundColorDirty) {
         QColor labelBackgroundColor = theme->labelBackgroundColor();
         changeLabelBackgroundColor(m_repeaterX, labelBackgroundColor);
         changeLabelBackgroundColor(m_repeaterY, labelBackgroundColor);
@@ -598,10 +596,10 @@ void QQuickDataVisItem::synchData()
         m_titleLabelY->setProperty("backgroundColor", labelBackgroundColor);
         m_titleLabelZ->setProperty("backgroundColor", labelBackgroundColor);
         m_itemLabel->setProperty("backgroundColor", labelBackgroundColor);
-        themeDirtyBits.labelBackgroundColorDirty = false;
+        theme->d_ptr->m_dirtyBits.labelBackgroundColorDirty = false;
     }
 
-    if (themeDirtyBits.labelBackgroundEnabledDirty) {
+    if (theme->d_ptr->m_dirtyBits.labelBackgroundEnabledDirty) {
         bool enabled = theme->isLabelBackgroundEnabled();
         changeLabelBackgroundEnabled(m_repeaterX, enabled);
         changeLabelBackgroundEnabled(m_repeaterY, enabled);
@@ -610,10 +608,10 @@ void QQuickDataVisItem::synchData()
         m_titleLabelY->setProperty("backgroundEnabled", enabled);
         m_titleLabelZ->setProperty("backgroundEnabled", enabled);
         m_itemLabel->setProperty("backgroundEnabled", enabled);
-        themeDirtyBits.labelBackgroundEnabledDirty = false;
+        theme->d_ptr->m_dirtyBits.labelBackgroundEnabledDirty = false;
     }
 
-    if (themeDirtyBits.labelBorderEnabledDirty) {
+    if (theme->d_ptr->m_dirtyBits.labelBorderEnabledDirty) {
         bool enabled = theme->isLabelBorderEnabled();
         changeLabelBorderEnabled(m_repeaterX, enabled);
         changeLabelBorderEnabled(m_repeaterY, enabled);
@@ -622,10 +620,10 @@ void QQuickDataVisItem::synchData()
         m_titleLabelY->setProperty("borderEnabled", enabled);
         m_titleLabelZ->setProperty("borderEnabled", enabled);
         m_itemLabel->setProperty("borderEnabled", enabled);
-        themeDirtyBits.labelBorderEnabledDirty = false;
+        theme->d_ptr->m_dirtyBits.labelBorderEnabledDirty = false;
     }
 
-    if (themeDirtyBits.labelTextColorDirty) {
+    if (theme->d_ptr->m_dirtyBits.labelTextColorDirty) {
         QColor labelTextColor = theme->labelTextColor();
         changeLabelTextColor(m_repeaterX, labelTextColor);
         changeLabelTextColor(m_repeaterY, labelTextColor);
@@ -634,10 +632,10 @@ void QQuickDataVisItem::synchData()
         m_titleLabelY->setProperty("labelTextColor", labelTextColor);
         m_titleLabelZ->setProperty("labelTextColor", labelTextColor);
         m_itemLabel->setProperty("labelTextColor", labelTextColor);
-        themeDirtyBits.labelTextColorDirty = false;
+        theme->d_ptr->m_dirtyBits.labelTextColorDirty = false;
     }
 
-    if (themeDirtyBits.fontDirty) {
+    if (theme->d_ptr->m_dirtyBits.fontDirty) {
         auto font = theme->font();
         changeLabelFont(m_repeaterX, font);
         changeLabelFont(m_repeaterY, font);
@@ -647,11 +645,11 @@ void QQuickDataVisItem::synchData()
         m_titleLabelZ->setProperty("labelFont", font);
         m_itemLabel->setProperty("labelFont", font);
         updateLabels();
-        themeDirtyBits.fontDirty = false;
+        theme->d_ptr->m_dirtyBits.fontDirty = false;
     }
 
     // Grid and background adjustments
-    if (themeDirtyBits.backgroundColorDirty) {
+    if (theme->d_ptr->m_dirtyBits.backgroundColorDirty) {
         QQmlListReference materialsRef(m_background, "materials");
         QQuick3DPrincipledMaterial *bgMat;
         if (!materialsRef.size()) {
@@ -664,15 +662,15 @@ void QQuickDataVisItem::synchData()
             bgMat = static_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0));
         }
         bgMat->setBaseColor(theme->backgroundColor());
-        themeDirtyBits.backgroundColorDirty = false;
+        theme->d_ptr->m_dirtyBits.backgroundColorDirty = false;
     }
 
-    if (themeDirtyBits.backgroundEnabledDirty) {
+    if (theme->d_ptr->m_dirtyBits.backgroundEnabledDirty) {
         m_background->setVisible(theme->isBackgroundEnabled());
-        themeDirtyBits.backgroundEnabledDirty = false;
+        theme->d_ptr->m_dirtyBits.backgroundEnabledDirty = false;
     }
 
-    if (themeDirtyBits.gridEnabledDirty) {
+    if (theme->d_ptr->m_dirtyBits.gridEnabledDirty) {
         bool enabled = theme->isGridEnabled();
         m_segmentLineRepeaterX->setVisible(enabled);
         m_segmentLineRepeaterY->setVisible(enabled);
@@ -681,10 +679,10 @@ void QQuickDataVisItem::synchData()
         m_subsegmentLineRepeaterX->setVisible(enabled);
         m_subsegmentLineRepeaterY->setVisible(enabled);
         m_subsegmentLineRepeaterZ->setVisible(enabled);
-        themeDirtyBits.gridEnabledDirty = false;
+        theme->d_ptr->m_dirtyBits.gridEnabledDirty = false;
     }
 
-    if (themeDirtyBits.gridLineColorDirty) {
+    if (theme->d_ptr->m_dirtyBits.gridLineColorDirty) {
         QColor gridLineColor = theme->gridLineColor();
         changeGridLineColor(m_segmentLineRepeaterX, gridLineColor);
         changeGridLineColor(m_subsegmentLineRepeaterX, gridLineColor);
@@ -692,18 +690,18 @@ void QQuickDataVisItem::synchData()
         changeGridLineColor(m_subsegmentLineRepeaterY, gridLineColor);
         changeGridLineColor(m_segmentLineRepeaterZ, gridLineColor);
         changeGridLineColor(m_subsegmentLineRepeaterZ, gridLineColor);
-        themeDirtyBits.gridLineColorDirty = false;
+        theme->d_ptr->m_dirtyBits.gridLineColorDirty = false;
     }
 
-    if (themeDirtyBits.singleHighlightColorDirty) {
+    if (theme->d_ptr->m_dirtyBits.singleHighlightColorDirty) {
         updateSingleHighlightColor();
-        themeDirtyBits.singleHighlightColorDirty = false;
+        theme->d_ptr->m_dirtyBits.singleHighlightColorDirty = false;
     }
 
     // Other adjustments
-    if (themeDirtyBits.windowColorDirty) {
+    if (theme->d_ptr->m_dirtyBits.windowColorDirty) {
         environment()->setClearColor(theme->windowColor());
-        themeDirtyBits.windowColorDirty = false;
+        theme->d_ptr->m_dirtyBits.windowColorDirty = false;
     }
 
     if (m_controller->m_changedSeriesList.size()) {
