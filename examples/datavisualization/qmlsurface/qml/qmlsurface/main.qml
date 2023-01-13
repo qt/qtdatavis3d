@@ -28,9 +28,8 @@
 ****************************************************************************/
 
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
-import QtDataVisualization 1.2
+import QtDataVisualization
 import "."
 
 Rectangle {
@@ -39,16 +38,18 @@ Rectangle {
     height: 768
     color: surfacePlot.theme.windowColor
 
+    property bool portraitMode: width < height
+
     Data {
         id: surfaceData
     }
 
     Item {
         id: surfaceView
-        width: mainview.width
-        height: mainview.height
-        anchors.top: mainview.top
+        anchors.top: buttons.bottom
+        anchors.bottom: mainview.bottom
         anchors.left: mainview.left
+        anchors.right: mainview.right
 
         //! [0]
         ColorGradient {
@@ -75,6 +76,7 @@ Rectangle {
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
+            scene.activeCamera.zoomLevel: 75
             axisY.min: 0.0
             axisY.max: 500.0
             axisX.segmentCount: 10
@@ -129,18 +131,23 @@ Rectangle {
         }
     }
 
-    RowLayout {
-        id: buttonLayout
+    Item {
+        id: buttons
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
+        anchors.margins: 10
+        height: portraitMode ? surfaceGridToggle.implicitHeight * 3 + 20
+                             : surfaceGridToggle.implicitHeight * 2 + 15
         opacity: 0.5
 
         Button {
             id: surfaceGridToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Show Surface Grid"
+            anchors.margins: 5
+            anchors.left: parent.left
+            anchors.top: parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Show Surface\nGrid"
             //! [1]
             onClicked: {
                 if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
@@ -156,9 +163,11 @@ Rectangle {
 
         Button {
             id: surfaceToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Hide Surface"
+            anchors.margins: 5
+            anchors.left: surfaceGridToggle.right
+            anchors.top: parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Hide\nSurface"
             //! [8]
             onClicked: {
                 if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface) {
@@ -174,20 +183,22 @@ Rectangle {
 
         Button {
             id: flatShadingToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: surfaceSeries.flatShadingSupported ? "Show Flat" : "Flat not supported"
+            anchors.margins: 5
+            anchors.left: portraitMode ? parent.left : surfaceToggle.right
+            anchors.top: portraitMode ? surfaceToggle.bottom : parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: surfaceSeries.flatShadingSupported ? "Show\nFlat" : "Flat not\nsupported"
             enabled: surfaceSeries.flatShadingSupported
             //! [2]
             onClicked: {
                 if (surfaceSeries.flatShadingEnabled === true) {
                     surfaceSeries.flatShadingEnabled = false;
                     heightSeries.flatShadingEnabled = false;
-                    text = "Show Flat"
+                    text = "Show\nFlat"
                 } else {
                     surfaceSeries.flatShadingEnabled = true;
                     heightSeries.flatShadingEnabled = true;
-                    text = "Show Smooth"
+                    text = "Show\nSmooth"
                 }
             }
             //! [2]
@@ -195,41 +206,47 @@ Rectangle {
 
         Button {
             id: backgroundToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Hide Background"
+            anchors.margins: 5
+            anchors.left: portraitMode ? flatShadingToggle.right : parent.left
+            anchors.top: portraitMode ? surfaceToggle.bottom : flatShadingToggle.bottom
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Hide\nBackground"
             onClicked: {
                 if (surfacePlot.theme.backgroundEnabled === true) {
                     surfacePlot.theme.backgroundEnabled = false;
-                    text = "Show Background"
+                    text = "Show\nBackground"
                 } else {
                     surfacePlot.theme.backgroundEnabled = true;
-                    text = "Hide Background"
+                    text = "Hide\nBackground"
                 }
             }
         }
 
         Button {
             id: gridToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Hide Grid"
+            anchors.margins: 5
+            anchors.left: portraitMode ? parent.left : backgroundToggle.right
+            anchors.top: portraitMode ? backgroundToggle.bottom : surfaceToggle.bottom
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Hide\nGrid"
             onClicked: {
                 if (surfacePlot.theme.gridEnabled === true) {
                     surfacePlot.theme.gridEnabled = false;
-                    text = "Show Grid"
+                    text = "Show\nGrid"
                 } else {
                     surfacePlot.theme.gridEnabled = true;
-                    text = "Hide Grid"
+                    text = "Hide\nGrid"
                 }
             }
         }
 
         Button {
             id: seriesToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Switch to Height Map Series"
+            anchors.margins: 5
+            anchors.left: gridToggle.right
+            anchors.top: portraitMode ? backgroundToggle.bottom : surfaceToggle.bottom
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            text: "Switch to\nHeight Map Series"
             //! [3]
             onClicked: {
                 if (surfaceSeries.visible === false) {
@@ -237,13 +254,13 @@ Rectangle {
                     surfaceSeries.visible = true
                     heightSeries.visible = false
                     middleGradient.position = 0.25
-                    text = "Switch to Height Map Series"
+                    text = "Switch to\nHeight Map Series"
                 } else {
                     surfacePlot.axisY.max = 250.0
                     surfaceSeries.visible = false
                     heightSeries.visible = true
                     middleGradient.position = 0.50
-                    text = "Switch to Item Model Series"
+                    text = "Switch to\nItem Model Series"
                 }
             }
             //! [3]
@@ -252,13 +269,13 @@ Rectangle {
 
     function checkState() {
         if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface)
-            surfaceToggle.text = "Hide Surface"
+            surfaceToggle.text = "Hide\nSurface"
         else
-            surfaceToggle.text = "Show Surface"
+            surfaceToggle.text = "Show\nSurface"
 
         if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe)
-            surfaceGridToggle.text = "Hide Surface Grid"
+            surfaceGridToggle.text = "Hide Surface\nGrid"
         else
-            surfaceGridToggle.text = "Show Surface Grid"
+            surfaceGridToggle.text = "Show Surface\nGrid"
     }
 }
