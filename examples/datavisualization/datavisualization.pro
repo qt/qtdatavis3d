@@ -3,8 +3,6 @@ qtHaveModule(quick) {
     SUBDIRS += qmlbars \
                qmlscatter \
                qmlsurface \
-               qmlcustominput \
-               qmllegend \
                qmlmultigraph \
                qml3doscilloscope \
                qmlsurfacelayers \
@@ -15,12 +13,10 @@ qtHaveModule(quick) {
 
 !android:!ios:!winrt {
     SUBDIRS += bars \
-               custominput \
                customproxy \
                itemmodel \
                scatter \
                surface \
-               rotations \
                draggableaxes \
                customitems \
                texturesurface \
