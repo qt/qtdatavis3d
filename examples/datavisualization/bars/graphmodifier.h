@@ -18,7 +18,7 @@ class GraphModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphModifier(Q3DBars *bargraph);
+    explicit GraphModifier(Q3DBarsNG *bargraph);
     ~GraphModifier();
 
     void resetTemperatureData();
@@ -55,7 +55,7 @@ Q_SIGNALS:
     void fontSizeChanged(int size);
 
 private:
-    Q3DBars *m_graph;
+    Q3DBarsNG *m_graph;
     float m_xRotation;
     float m_yRotation;
     int m_fontSize;

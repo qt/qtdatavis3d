@@ -134,12 +134,23 @@ void QQuickDataVisSurface::clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *l
 void QQuickDataVisSurface::addSeries(QSurface3DSeries *series)
 {
     m_surfaceController->addSeries(series);
+    if (isReady())
+        addModel(series);
 }
 
 void QQuickDataVisSurface::removeSeries(QSurface3DSeries *series)
 {
     m_surfaceController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
+    for (int i = 0; i < m_model.size();) {
+        if (m_model[i]->series == series) {
+            m_model[i]->model->deleteLater();
+            m_model[i]->gridModel->deleteLater();
+            m_model.removeAt(i);
+        } else {
+            ++i;
+        }
+    }
 }
 
 void QQuickDataVisSurface::handleAxisXChanged(QAbstract3DAxis *axis)
@@ -161,85 +172,8 @@ void QQuickDataVisSurface::componentComplete()
 {
     QQuickDataVisItem::componentComplete();
 
-    auto scene = QQuick3DViewport::scene();
-
-    for (auto series : m_surfaceController->surfaceSeriesList()) {
-        bool visible = series->isVisible();
-
-        auto model = new QQuick3DModel();
-        model->setParent(scene);
-        model->setParentItem(scene);
-        model->setObjectName(QStringLiteral("SurfaceModel"));
-        model->setVisible(visible);
-        if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionNone))
-            model->setPickable(false);
-        else
-            model->setPickable(true);
-
-        auto geometry = new QQuick3DGeometry();
-        geometry->setParent(this);
-        geometry->setStride(sizeof(SurfaceVertex));
-        geometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Triangles);
-        geometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
-                               0,
-                               QQuick3DGeometry::Attribute::F32Type);
-        geometry->addAttribute(QQuick3DGeometry::Attribute::TexCoord0Semantic,
-                               sizeof(QVector3D) * 2,
-                               QQuick3DGeometry::Attribute::F32Type);
-        geometry->addAttribute(QQuick3DGeometry::Attribute::NormalSemantic,
-                               sizeof(QVector3D),
-                               QQuick3DGeometry::Attribute::F32Type);
-        geometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
-                               0,
-                               QQuick3DGeometry::Attribute::U32Type);
-        model->setGeometry(geometry);
-
-        QQmlListReference materialRef(model, "materials");
-        auto material = new QQuick3DDefaultMaterial();
-        material->setParent(this);
-        QQuick3DTexture *texture = new QQuick3DTexture();
-        texture->setParent(this);
-        QQuick3DTextureData *textureData = new QQuick3DTextureData();
-        textureData->setParent(this);
-        texture->setTextureData(textureData);
-        material->setDiffuseMap(texture);
-        material->setSpecularAmount(7.0f);
-        material->setSpecularRoughness(0.025f);
-        material->setCullMode(QQuick3DMaterial::NoCulling);
-        materialRef.append(material);
-
-        auto gridModel = new QQuick3DModel();
-        gridModel->setParent(scene);
-        gridModel->setParentItem(scene);
-        gridModel->setVisible(visible);
-        gridModel->setDepthBias(1.0f);
-        auto gridGeometry = new QQuick3DGeometry();
-        gridGeometry->setParent(this);
-        gridGeometry->setStride(sizeof(SurfaceVertex));
-        gridGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
-        gridGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
-                                   0,
-                                   QQuick3DGeometry::Attribute::F32Type);
-        gridGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
-                                   0,
-                                   QQuick3DGeometry::Attribute::U32Type);
-        gridModel->setGeometry(gridGeometry);
-        QQmlListReference gridMaterialRef(gridModel, "materials");
-        auto gridMaterial = new QQuick3DPrincipledMaterial();
-        gridMaterial->setParent(this);
-        gridMaterial->setLighting(QQuick3DPrincipledMaterial::NoLighting);
-        gridMaterial->setParent(this);
-        gridMaterialRef.append(gridMaterial);
-
-        SurfaceModel *surfaceModel = new SurfaceModel();
-        surfaceModel->model = model;
-        surfaceModel->gridModel = gridModel;
-        surfaceModel->series = series;
-
-        m_model.push_back(surfaceModel);
-
-        connect(series, &QSurface3DSeries::flatShadingEnabledChanged, this, &QQuickDataVisSurface::handleFlatShadingEnabledChanged);
-    }
+    for (auto series : m_surfaceController->surfaceSeriesList())
+        addModel(series);
 
     m_selectionPointer = new QQuick3DModel();
     m_selectionPointer->setParent(QQuick3DViewport::scene());
@@ -1055,6 +989,86 @@ void QQuickDataVisSurface::updateSelectedPoint()
         }
     }
     itemLabel()->setVisible(labelVisible);
+}
+
+void QQuickDataVisSurface::addModel(QSurface3DSeries *series)
+{
+    auto scene = QQuick3DViewport::scene();
+    bool visible = series->isVisible();
+
+    auto model = new QQuick3DModel();
+    model->setParent(scene);
+    model->setParentItem(scene);
+    model->setObjectName(QStringLiteral("SurfaceModel"));
+    model->setVisible(visible);
+    if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionNone))
+        model->setPickable(false);
+    else
+        model->setPickable(true);
+
+    auto geometry = new QQuick3DGeometry();
+    geometry->setParent(this);
+    geometry->setStride(sizeof(SurfaceVertex));
+    geometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Triangles);
+    geometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
+                           0,
+                           QQuick3DGeometry::Attribute::F32Type);
+    geometry->addAttribute(QQuick3DGeometry::Attribute::TexCoord0Semantic,
+                           sizeof(QVector3D) * 2,
+                           QQuick3DGeometry::Attribute::F32Type);
+    geometry->addAttribute(QQuick3DGeometry::Attribute::NormalSemantic,
+                           sizeof(QVector3D),
+                           QQuick3DGeometry::Attribute::F32Type);
+    geometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
+                           0,
+                           QQuick3DGeometry::Attribute::U32Type);
+    model->setGeometry(geometry);
+
+    QQmlListReference materialRef(model, "materials");
+    auto material = new QQuick3DDefaultMaterial();
+    material->setParent(this);
+    QQuick3DTexture *texture = new QQuick3DTexture();
+    texture->setParent(this);
+    QQuick3DTextureData *textureData = new QQuick3DTextureData();
+    textureData->setParent(this);
+    texture->setTextureData(textureData);
+    material->setDiffuseMap(texture);
+    material->setSpecularAmount(7.0f);
+    material->setSpecularRoughness(0.025f);
+    material->setCullMode(QQuick3DMaterial::NoCulling);
+    materialRef.append(material);
+
+    auto gridModel = new QQuick3DModel();
+    gridModel->setParent(scene);
+    gridModel->setParentItem(scene);
+    gridModel->setVisible(visible);
+    gridModel->setDepthBias(1.0f);
+    auto gridGeometry = new QQuick3DGeometry();
+    gridGeometry->setParent(this);
+    gridGeometry->setStride(sizeof(SurfaceVertex));
+    gridGeometry->setPrimitiveType(QQuick3DGeometry::PrimitiveType::Lines);
+    gridGeometry->addAttribute(QQuick3DGeometry::Attribute::PositionSemantic,
+                               0,
+                               QQuick3DGeometry::Attribute::F32Type);
+    gridGeometry->addAttribute(QQuick3DGeometry::Attribute::IndexSemantic,
+                               0,
+                               QQuick3DGeometry::Attribute::U32Type);
+    gridModel->setGeometry(gridGeometry);
+    QQmlListReference gridMaterialRef(gridModel, "materials");
+    auto gridMaterial = new QQuick3DPrincipledMaterial();
+    gridMaterial->setParent(this);
+    gridMaterial->setLighting(QQuick3DPrincipledMaterial::NoLighting);
+    gridMaterial->setParent(this);
+    gridMaterialRef.append(gridMaterial);
+
+    SurfaceModel *surfaceModel = new SurfaceModel();
+    surfaceModel->model = model;
+    surfaceModel->gridModel = gridModel;
+    surfaceModel->series = series;
+
+    m_model.push_back(surfaceModel);
+
+    connect(series, &QSurface3DSeries::flatShadingEnabledChanged, this, &QQuickDataVisSurface::handleFlatShadingEnabledChanged);
 }
 
 void QQuickDataVisSurface::updateSingleHighlightColor()

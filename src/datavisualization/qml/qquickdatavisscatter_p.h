@@ -22,6 +22,8 @@
 
 QT_BEGIN_NAMESPACE
 
+class Q3DScatterNG;
+
 class QQuickDataVisScatter : public QQuickDataVisItem
 {
     Q_OBJECT
@@ -183,6 +185,8 @@ private:
 
     // Change selection mode
     void setSelectionModeNG(QAbstract3DGraph::SelectionFlags mode);
+
+    friend class Q3DScatterNG;
 };
 
 QT_END_NAMESPACE

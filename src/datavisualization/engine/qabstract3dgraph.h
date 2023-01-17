@@ -11,6 +11,8 @@
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
 #include <QtCore/QLocale>
+#include <QtQuick/QQuickWindow>
+#include <QtQuickWidgets/QQuickWidget>
 
 QT_BEGIN_NAMESPACE
 
@@ -18,6 +20,8 @@ class QAbstract3DGraphPrivate;
 class QCustom3DItem;
 class QAbstract3DAxis;
 class QAbstract3DSeries;
+
+class QQuickDataVisItem;
 
 class Q_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
@@ -217,6 +221,41 @@ private:
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::OptimizationHints)
+
+class Q_DATAVISUALIZATION_EXPORT QAbstract3DGraphNG : public QQuickWidget
+{
+    Q_OBJECT
+    Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
+    Q_PROPERTY(QAbstract3DGraph::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
+    Q_PROPERTY(QAbstract3DGraph::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(Q3DScene* scene READ scene)
+
+public:
+    Q3DScene *scene() const;
+    QAbstract3DGraph::ShadowQuality shadowQuality() const;
+    void setShadowQuality(const QAbstract3DGraph::ShadowQuality &shadowQuality);
+    Q3DTheme *activeTheme() const;
+    void setActiveTheme(Q3DTheme *activeTheme);
+    QAbstract3DGraph::SelectionFlags selectionMode() const;
+    void setSelectionMode(const QAbstract3DGraph::SelectionFlags &selectionMode);
+    virtual ~QAbstract3DGraphNG();
+
+protected:
+    QAbstract3DGraphNG();
+
+Q_SIGNALS:
+    void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
+    void activeThemeChanged(Q3DTheme *activeTheme);
+    void selectionModeChanged(const QAbstract3DGraph::SelectionFlags selectionMode);
+
+private:
+    Q_DISABLE_COPY(QAbstract3DGraphNG)
+    QScopedPointer<QQuickDataVisItem> d_ptr;
+
+    friend class Q3DBarsNG;
+    friend class Q3DScatterNG;
+    friend class Q3DSurfaceNG;
+};
 
 QT_END_NAMESPACE
 

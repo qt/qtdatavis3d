@@ -16,7 +16,7 @@
 const QString celsiusString = QString(QChar(0xB0)) + "C";
 
 //! [0]
-GraphModifier::GraphModifier(Q3DBars *bargraph)
+GraphModifier::GraphModifier(Q3DBarsNG *bargraph)
     : m_graph(bargraph),
       m_xRotation(0.0f),
       m_yRotation(0.0f),

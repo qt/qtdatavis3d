@@ -21,28 +21,21 @@ int main(int argc, char **argv)
     qputenv("QSG_RHI_BACKEND", "opengl");
     //! [0]
     QApplication app(argc, argv);
-    Q3DScatter *graph = new Q3DScatter();
-    QWidget *container = QWidget::createWindowContainer(graph);
+    Q3DScatterNG *graph = new Q3DScatterNG();
     //! [0]
 
-    if (!graph->hasContext()) {
-        QMessageBox msgBox;
-        msgBox.setText("Couldn't initialize the OpenGL context.");
-        msgBox.exec();
-        return -1;
-    }
-
     QSize screenSize = graph->screen()->size();
-    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
-    container->setMaximumSize(screenSize);
-    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    container->setFocusPolicy(Qt::StrongFocus);
+    graph->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
+    graph->setMaximumSize(screenSize);
+    graph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    graph->setFocusPolicy(Qt::StrongFocus);
+    graph->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     //! [1]
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
-    hLayout->addWidget(container, 1);
+    hLayout->addWidget(graph, 1);
     hLayout->addLayout(vLayout);
     //! [1]
 
@@ -153,7 +146,7 @@ int main(int argc, char **argv)
 
     QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
-    QObject::connect(graph, &Q3DScatter::shadowQualityChanged, modifier,
+    QObject::connect(graph, &Q3DScatterNG::shadowQualityChanged, modifier,
                      &ScatterDataModifier::shadowQualityUpdatedByVisual);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,

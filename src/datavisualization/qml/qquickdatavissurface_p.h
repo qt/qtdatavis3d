@@ -26,6 +26,7 @@ class QValue3DAxis;
 class QSurface3DSeries;
 class Surface3DController;
 class SurfaceSelectionInstancing;
+class Q3DSurfaceNG;
 
 class QQuickDataVisSurface : public QQuickDataVisItem
 {
@@ -117,11 +118,14 @@ private:
     void handleChangedSeries();
     void updateModel(SurfaceModel *model);
     void updateSelectedPoint();
+    void addModel(QSurface3DSeries *series);
 
     QVector<SurfaceModel *> m_model;
     Surface3DController *m_surfaceController;
     QQuick3DModel *m_selectionPointer = nullptr;
     SurfaceSelectionInstancing *m_instancing = nullptr;
+
+    friend class Q3DSurfaceNG;
 };
 
 QT_END_NAMESPACE

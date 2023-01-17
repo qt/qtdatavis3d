@@ -22,6 +22,8 @@
 
 QT_BEGIN_NAMESPACE
 
+class Q3DBarsNG;
+
 class QQuickDataVisBars : public QQuickDataVisItem
 {
     Q_OBJECT
@@ -234,6 +236,7 @@ private:
     void updateBarSeriesMargin(const QSizeF &margin);
 
     friend class Bars3DController;
+    friend class Q3DBarsNG;
 };
 
 QT_END_NAMESPACE

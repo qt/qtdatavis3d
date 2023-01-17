@@ -138,6 +138,7 @@ qt_internal_add_qml_module(DataVisualization
         Qt::OpenGL
         Qt::Qml
         Qt::Quick
+        Qt::QuickWidgets
         Qt::Quick3D
         Qt::Quick3DPrivate
         Qt::Quick3DRuntimeRenderPrivate

@@ -13,7 +13,7 @@ project(QtDataVisualization
 
 find_package(Qt6 ${PROJECT_VERSION} CONFIG REQUIRED COMPONENTS BuildInternals)
 find_package(Qt6 ${PROJECT_VERSION} CONFIG OPTIONAL_COMPONENTS
-    Core OpenGL Quick Qml Gui Widgets QuickTest Test Quick3D)
+    Core OpenGL Quick Qml Gui Widgets QuickTest QuickWidgets Test Quick3D)
 
 macro(assertTargets)
     foreach(qtTarget IN ITEMS ${ARGN})
@@ -24,6 +24,6 @@ macro(assertTargets)
     endforeach()
 endmacro()
 
-assertTargets(Gui Widgets OpenGL Quick Qml QuickTest Test Quick3D)
+assertTargets(Gui Widgets OpenGL Quick Qml QuickTest QuickWidgets Test Quick3D)
 
 qt_build_repo()

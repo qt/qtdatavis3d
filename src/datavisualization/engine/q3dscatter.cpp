@@ -3,6 +3,7 @@
 
 #include "q3dscatter.h"
 #include "q3dscatter_p.h"
+#include "qquickdatavisscatter_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -284,6 +285,98 @@ void Q3DScatterPrivate::handleAxisZChanged(QAbstract3DAxis *axis)
 Q3DScatter *Q3DScatterPrivate::qptr()
 {
     return static_cast<Q3DScatter *>(q_ptr);
+}
+
+Q3DScatterNG::Q3DScatterNG() : QAbstract3DGraphNG()
+{
+    QQmlComponent *component = new QQmlComponent(engine(), this);
+    component->setData("import QtQuick; import QtDataVisualization; Scatter3DNG { anchors.fill: parent; }", QUrl());
+    d_ptr.reset(qobject_cast<QQuickDataVisScatter *>(component->create()));
+    setContent(component->url(), component, d_ptr.data());
+}
+
+Q3DScatterNG::~Q3DScatterNG()
+{
+}
+
+void Q3DScatterNG::addSeries(QScatter3DSeries *series)
+{
+    dptr()->addSeries(series);
+}
+
+void Q3DScatterNG::removeSeries(QScatter3DSeries *series)
+{
+    dptr()->removeSeries(series);
+}
+
+QList<QScatter3DSeries *> Q3DScatterNG::seriesList() const
+{
+    return dptrc()->m_scatterController->scatterSeriesList();
+}
+
+QQuickDataVisScatter *Q3DScatterNG::dptr()
+{
+    return static_cast<QQuickDataVisScatter *>(d_ptr.data());
+}
+
+const QQuickDataVisScatter *Q3DScatterNG::dptrc() const
+{
+    return static_cast<const QQuickDataVisScatter *>(d_ptr.data());
+}
+
+void Q3DScatterNG::setAxisX(QValue3DAxis *axis)
+{
+    dptr()->setAxisX(axis);
+}
+
+QValue3DAxis *Q3DScatterNG::axisX() const
+{
+    return static_cast<QValue3DAxis *>(dptrc()->axisX());
+}
+
+void Q3DScatterNG::setAxisY(QValue3DAxis *axis)
+{
+    dptr()->setAxisY(axis);
+}
+
+QValue3DAxis *Q3DScatterNG::axisY() const
+{
+    return static_cast<QValue3DAxis *>(dptrc()->axisY());
+}
+
+void Q3DScatterNG::setAxisZ(QValue3DAxis *axis)
+{
+    dptr()->setAxisZ(axis);
+}
+
+QValue3DAxis *Q3DScatterNG::axisZ() const
+{
+    return static_cast<QValue3DAxis *>(dptrc()->axisZ());
+}
+
+QScatter3DSeries *Q3DScatterNG::selectedSeries() const
+{
+    return dptrc()->selectedSeries();
+}
+
+void Q3DScatterNG::addAxis(QValue3DAxis *axis)
+{
+    dptr()->m_scatterController->addAxis(axis);
+}
+
+void Q3DScatterNG::releaseAxis(QValue3DAxis *axis)
+{
+    dptr()->m_scatterController->releaseAxis(axis);
+}
+
+QList<QValue3DAxis *> Q3DScatterNG::axes() const
+{
+    QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_scatterController->axes();
+    QList<QValue3DAxis *> retList;
+    for (QAbstract3DAxis *axis : abstractAxes)
+        retList.append(static_cast<QValue3DAxis *>(axis));
+
+    return retList;
 }
 
 QT_END_NAMESPACE

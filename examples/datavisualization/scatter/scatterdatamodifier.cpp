@@ -19,7 +19,7 @@ const float curveDivider = 3.0f;
 const int lowerNumberOfItems = 900;
 const float lowerCurveDivider = 0.75f;
 
-ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
+ScatterDataModifier::ScatterDataModifier(Q3DScatterNG *scatter)
     : m_graph(scatter),
       m_fontSize(40.0f),
       m_style(QAbstract3DSeries::MeshSphere),

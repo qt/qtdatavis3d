@@ -22,28 +22,21 @@ int main(int argc, char **argv)
     qputenv("QSG_RHI_BACKEND", "opengl");
     //! [0]
     QApplication app(argc, argv);
-    Q3DSurface *graph = new Q3DSurface();
-    QWidget *container = QWidget::createWindowContainer(graph);
+    Q3DSurfaceNG *graph = new Q3DSurfaceNG();
     //! [0]
 
-    if (!graph->hasContext()) {
-        QMessageBox msgBox;
-        msgBox.setText("Couldn't initialize the OpenGL context.");
-        msgBox.exec();
-        return -1;
-    }
-
     QSize screenSize = graph->screen()->size();
-    container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.6));
-    container->setMaximumSize(screenSize);
-    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    container->setFocusPolicy(Qt::StrongFocus);
+    graph->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.6));
+    graph->setMaximumSize(screenSize);
+    graph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    graph->setFocusPolicy(Qt::StrongFocus);
+    graph->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     //! [1]
     QWidget *widget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
-    hLayout->addWidget(container, 1);
+    hLayout->addWidget(graph, 1);
     hLayout->addLayout(vLayout);
     vLayout->setAlignment(Qt::AlignTop);
     //! [1]

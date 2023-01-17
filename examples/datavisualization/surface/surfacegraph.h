@@ -14,7 +14,7 @@ class SurfaceGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit SurfaceGraph(Q3DSurface *surface);
+    explicit SurfaceGraph(Q3DSurfaceNG *surface);
     ~SurfaceGraph();
 
     void enableHeightMapModel(bool enable);
@@ -46,7 +46,7 @@ public Q_SLOTS:
     void changeTheme(int theme);
 
 private:
-    Q3DSurface *m_graph;
+    Q3DSurfaceNG *m_graph;
     QHeightMapSurfaceDataProxy *m_heightMapProxy;
     QSurfaceDataProxy *m_sqrtSinProxy;
     QSurface3DSeries *m_heightMapSeries;

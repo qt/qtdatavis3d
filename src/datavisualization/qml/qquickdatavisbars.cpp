@@ -95,6 +95,24 @@ QValue3DAxis *QQuickDataVisBars::valueAxis() const
 void QQuickDataVisBars::setValueAxis(QValue3DAxis *axis)
 {
     m_barsController->setAxisY(axis);
+    if (segmentLineRepeaterY()) {
+        int segmentCount = 0;
+        int subSegmentCount = 0;
+        int gridLineCount = 0;
+        int subGridLineCount = 0;
+        if (axis->type() & QAbstract3DAxis::AxisTypeValue) {
+            QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(axis);
+            segmentCount = valueAxis->segmentCount();
+            subSegmentCount = valueAxis->subSegmentCount();
+            gridLineCount = 2 * (segmentCount + 1);
+            subGridLineCount = 2 * (segmentCount * (subSegmentCount - 1));
+        } else if (axis->type() & QAbstract3DAxis::AxisTypeCategory) {
+            gridLineCount = axis->labels().size();
+        }
+        segmentLineRepeaterY()->setModel(gridLineCount);
+        subsegmentLineRepeaterY()->setModel(subGridLineCount);
+        repeaterY()->setModel(2 * axis->labels().size());
+    }
 }
 
 QCategory3DAxis *QQuickDataVisBars::columnAxis() const

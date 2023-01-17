@@ -12,7 +12,7 @@ class ScatterDataModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit ScatterDataModifier(Q3DScatter *scatter);
+    explicit ScatterDataModifier(Q3DScatterNG *scatter);
     ~ScatterDataModifier();
 
     void addData();
@@ -41,7 +41,7 @@ Q_SIGNALS:
 
 private:
     QVector3D randVector();
-    Q3DScatter *m_graph;
+    Q3DScatterNG *m_graph;
     int m_fontSize;
     QAbstract3DSeries::Mesh m_style;
     bool m_smooth;

@@ -3,6 +3,7 @@
 
 #include "q3dsurface.h"
 #include "q3dsurface_p.h"
+#include "qquickdatavissurface_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -335,5 +336,108 @@ Q3DSurface *Q3DSurfacePrivate::qptr()
 {
     return static_cast<Q3DSurface *>(q_ptr);
 }
+
+Q3DSurfaceNG::Q3DSurfaceNG() : QAbstract3DGraphNG()
+{
+    QQmlComponent *component = new QQmlComponent(engine(), this);
+    component->setData("import QtQuick; import QtDataVisualization; Surface3DNG { anchors.fill: parent; }", QUrl());
+    d_ptr.reset(qobject_cast<QQuickDataVisSurface *>(component->create()));
+    setContent(component->url(), component, d_ptr.data());
+}
+
+Q3DSurfaceNG::~Q3DSurfaceNG()
+{
+}
+
+void Q3DSurfaceNG::addSeries(QSurface3DSeries *series)
+{
+    dptr()->addSeries(series);
+}
+
+void Q3DSurfaceNG::removeSeries(QSurface3DSeries *series)
+{
+    dptr()->removeSeries(series);
+}
+
+QList<QSurface3DSeries *> Q3DSurfaceNG::seriesList() const
+{
+    return dptrc()->m_surfaceController->surfaceSeriesList();
+}
+
+void Q3DSurfaceNG::setAxisX(QValue3DAxis *axis)
+{
+    dptr()->setAxisX(axis);
+}
+
+QValue3DAxis *Q3DSurfaceNG::axisX() const
+{
+    return static_cast<QValue3DAxis *>(dptrc()->axisX());
+}
+
+void Q3DSurfaceNG::setAxisY(QValue3DAxis *axis)
+{
+    dptr()->setAxisY(axis);
+}
+
+QValue3DAxis *Q3DSurfaceNG::axisY() const
+{
+    return static_cast<QValue3DAxis *>(dptrc()->axisY());
+}
+
+void Q3DSurfaceNG::setAxisZ(QValue3DAxis *axis)
+{
+    dptr()->setAxisZ(axis);
+}
+
+QValue3DAxis *Q3DSurfaceNG::axisZ() const
+{
+    return static_cast<QValue3DAxis *>(dptrc()->axisZ());
+}
+
+QSurface3DSeries *Q3DSurfaceNG::selectedSeries() const
+{
+    return dptrc()->selectedSeries();
+}
+
+void Q3DSurfaceNG::setFlipHorizontalGrid(bool flip)
+{
+    dptr()->setFlipHorizontalGrid(flip);
+}
+
+bool Q3DSurfaceNG::flipHorizontalGrid() const
+{
+    return dptrc()->flipHorizontalGrid();
+}
+
+void Q3DSurfaceNG::addAxis(QValue3DAxis *axis)
+{
+    return dptrc()->m_surfaceController->addAxis(axis);
+}
+
+void Q3DSurfaceNG::releaseAxis(QValue3DAxis *axis)
+{
+    return dptrc()->m_surfaceController->releaseAxis(axis);
+}
+
+QList<QValue3DAxis *> Q3DSurfaceNG::axes() const
+{
+    QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_surfaceController->axes();
+    QList<QValue3DAxis *> retList;
+    for (QAbstract3DAxis *axis : abstractAxes)
+        retList.append(static_cast<QValue3DAxis *>(axis));
+
+    return retList;
+}
+
+QQuickDataVisSurface *Q3DSurfaceNG::dptr()
+{
+    return static_cast<QQuickDataVisSurface *>(d_ptr.data());
+}
+
+const QQuickDataVisSurface *Q3DSurfaceNG::dptrc() const
+{
+    return static_cast<const QQuickDataVisSurface *>(d_ptr.data());
+}
+
 
 QT_END_NAMESPACE

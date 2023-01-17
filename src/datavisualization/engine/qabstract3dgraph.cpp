@@ -8,6 +8,7 @@
 #include "q3dscene_p.h"
 #include "qutils.h"
 #include "utils_p.h"
+#include "qquickdatavisitem_p.h"
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOpenGLContext>
@@ -1177,6 +1178,54 @@ QImage QAbstract3DGraphPrivate::renderToImage(int msaaSamples, const QSize &imag
     m_context->makeCurrent(q_ptr);
 
     return image;
+}
+
+QAbstract3DGraphNG::QAbstract3DGraphNG()
+{
+}
+
+QAbstract3DGraphNG::~QAbstract3DGraphNG()
+{
+}
+
+Q3DScene *QAbstract3DGraphNG::scene() const
+{
+    return (Q3DScene *)d_ptr->scene();
+}
+
+QAbstract3DGraph::ShadowQuality QAbstract3DGraphNG::shadowQuality() const
+{
+    return QAbstract3DGraph::ShadowQuality(d_ptr->shadowQuality());
+}
+
+void QAbstract3DGraphNG::setShadowQuality(const QAbstract3DGraph::ShadowQuality &shadowQuality)
+{
+    d_ptr->setShadowQuality(QQuickDataVisItem::ShadowQuality(shadowQuality));
+    emit shadowQualityChanged(shadowQuality);
+}
+
+Q3DTheme *QAbstract3DGraphNG::activeTheme() const
+{
+    return d_ptr->theme();
+}
+
+void QAbstract3DGraphNG::setActiveTheme(Q3DTheme *activeTheme)
+{
+    d_ptr->setTheme(activeTheme);
+    emit activeThemeChanged(activeTheme);
+}
+
+QAbstract3DGraph::SelectionFlags QAbstract3DGraphNG::selectionMode() const
+{
+    int intmode = int(d_ptr->selectionMode());
+    return QAbstract3DGraph::SelectionFlags(intmode);
+}
+
+void QAbstract3DGraphNG::setSelectionMode(const QAbstract3DGraph::SelectionFlags &selectionMode)
+{
+    int intmode = int(selectionMode);
+    d_ptr->setSelectionMode(QQuickDataVisItem::SelectionFlags(intmode));
+    emit selectionModeChanged(selectionMode);
 }
 
 QT_END_NAMESPACE

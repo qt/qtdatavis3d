@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dbars_p.h"
+#include "qquickdatavisbars_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -470,6 +471,189 @@ void Q3DBarsPrivate::handleAxisZChanged(QAbstract3DAxis *axis)
 Q3DBars *Q3DBarsPrivate::qptr()
 {
     return static_cast<Q3DBars *>(q_ptr);
+}
+
+Q3DBarsNG::Q3DBarsNG() : QAbstract3DGraphNG()
+{
+    QQmlComponent *component = new QQmlComponent(engine(), this);
+    component->setData("import QtQuick; import QtDataVisualization; Bars3DNG { anchors.fill: parent; }", QUrl());
+    d_ptr.reset(qobject_cast<QQuickDataVisBars *>(component->create()));
+    setContent(component->url(), component, d_ptr.data());
+}
+
+Q3DBarsNG::~Q3DBarsNG()
+{
+}
+
+void Q3DBarsNG::setPrimarySeries(QBar3DSeries *series)
+{
+    dptr()->setPrimarySeries(series);
+    emit primarySeriesChanged(series);
+}
+
+QBar3DSeries *Q3DBarsNG::primarySeries() const
+{
+    return dptrc()->primarySeries();
+}
+
+void Q3DBarsNG::addSeries(QBar3DSeries *series)
+{
+    dptr()->addSeries(series);
+}
+
+void Q3DBarsNG::removeSeries(QBar3DSeries *series)
+{
+    dptr()->removeSeries(series);
+}
+
+void Q3DBarsNG::insertSeries(int index, QBar3DSeries *series)
+{
+    dptr()->insertSeries(index, series);
+}
+
+QList<QBar3DSeries *> Q3DBarsNG::seriesList() const
+{
+    return dptrc()->m_barsController->barSeriesList();
+}
+
+void Q3DBarsNG::setMultiSeriesUniform(bool uniform)
+{
+    dptr()->setMultiSeriesUniform(uniform);
+    emit multiSeriesUniformChanged(uniform);
+}
+
+bool Q3DBarsNG::isMultiSeriesUniform() const
+{
+    return dptrc()->isMultiSeriesUniform();
+}
+
+void Q3DBarsNG::setBarThickness(float thicknessRatio)
+{
+    dptr()->setBarThickness(thicknessRatio);
+    emit barThicknessChanged(thicknessRatio);
+}
+
+float Q3DBarsNG::barThickness() const
+{
+    return dptrc()->barThickness();
+}
+
+void Q3DBarsNG::setBarSpacing(const QSizeF &spacing)
+{
+    dptr()->setBarSpacing(spacing);
+    emit barSpacingChanged(spacing);
+}
+
+QSizeF Q3DBarsNG::barSpacing() const
+{
+    return dptrc()->barSpacing();
+}
+
+void Q3DBarsNG::setBarSpacingRelative(bool relative)
+{
+    dptr()->setBarSpacingRelative(relative);
+    emit barSpacingRelativeChanged(relative);
+}
+
+bool Q3DBarsNG::isBarSpacingRelative() const
+{
+    return dptrc()->isBarSpacingRelative();
+}
+
+void Q3DBarsNG::setBarSeriesMargin(const QSizeF &margin)
+{
+    dptr()->setBarSeriesMargin(margin);
+    emit barSeriesMarginChanged(margin);
+}
+
+QSizeF Q3DBarsNG::barSeriesMargin() const
+{
+    return dptrc()->barSeriesMargin();
+}
+
+void Q3DBarsNG::setRowAxis(QCategory3DAxis *axis)
+{
+    dptr()->setRowAxis(axis);
+    emit rowAxisChanged(axis);
+}
+
+QCategory3DAxis *Q3DBarsNG::rowAxis() const
+{
+    return dptrc()->rowAxis();
+}
+
+void Q3DBarsNG::setColumnAxis(QCategory3DAxis *axis)
+{
+    dptr()->setColumnAxis(axis);
+    emit columnAxisChanged(axis);
+}
+
+QCategory3DAxis *Q3DBarsNG::columnAxis() const
+{
+    return dptrc()->columnAxis();
+}
+
+void Q3DBarsNG::setValueAxis(QValue3DAxis *axis)
+{
+    dptr()->setValueAxis(axis);
+    emit valueAxisChanged(axis);
+}
+
+QValue3DAxis *Q3DBarsNG::valueAxis() const
+{
+    return dptrc()->valueAxis();
+}
+
+QBar3DSeries *Q3DBarsNG::selectedSeries() const
+{
+    return dptrc()->selectedSeries();
+}
+
+void Q3DBarsNG::setFloorLevel(float level)
+{
+    dptr()->setFloorLevel(level);
+    emit floorLevelChanged(level);
+}
+
+float Q3DBarsNG::floorLevel() const
+{
+    return dptrc()->floorLevel();
+}
+
+void Q3DBarsNG::addAxis(QAbstract3DAxis *axis)
+{
+    dptr()->m_barsController->addAxis(axis);
+}
+
+void Q3DBarsNG::releaseAxis(QAbstract3DAxis *axis)
+{
+    dptr()->m_barsController->releaseAxis(axis);
+}
+
+QList<QAbstract3DAxis *> Q3DBarsNG::axes() const
+{
+    return dptrc()->m_barsController->axes();
+}
+
+bool Q3DBarsNG::isReflection() const
+{
+    return dptrc()->isReflection();
+}
+
+void Q3DBarsNG::setReflection(bool reflection)
+{
+    dptr()->setReflection(reflection);
+    emit reflectionChanged(reflection);
+}
+
+QQuickDataVisBars *Q3DBarsNG::dptr()
+{
+    return static_cast<QQuickDataVisBars *>(d_ptr.data());
+}
+
+const QQuickDataVisBars *Q3DBarsNG::dptrc() const
+{
+    return static_cast<const QQuickDataVisBars *>(d_ptr.data());
 }
 
 QT_END_NAMESPACE
