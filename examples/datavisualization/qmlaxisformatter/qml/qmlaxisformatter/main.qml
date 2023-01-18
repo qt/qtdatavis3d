@@ -4,9 +4,8 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtDataVisualization 1.2
+import QtDataVisualization
 import CustomFormatter
-import "."
 
 Item {
     id: mainView
@@ -28,7 +27,7 @@ Item {
     ValueAxis3D {
         id: dateAxis
         formatter: CustomFormatter {
-            originDate:  "2014-01-01"
+            originDate: "2014-01-01"
             selectionFormat: "yyyy-MM-dd HH:mm:ss"
         }
         subSegmentCount: 2
@@ -148,7 +147,7 @@ Item {
             Layout.fillWidth: true
             text: "Toggle Y-axis"
             onClicked: {
-                if (scatterGraph.axisY === linearAxis) {
+                if (scatterGraph.axisY == linearAxis) {
                     scatterGraph.axisY = logAxis
                     yAxisBaseChange.state = "enabled"
                 } else {

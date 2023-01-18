@@ -6,12 +6,14 @@
 
 #include <QtDataVisualization/QValue3DAxisFormatter>
 #include <QtCore/QDateTime>
+#include <QtQml/qqmlregistration.h>
 
 //! [2]
 class CustomFormatter : public QValue3DAxisFormatter
 {
     //! [2]
     Q_OBJECT
+    QML_ELEMENT
 
     //! [1]
     Q_PROPERTY(QDate originDate READ originDate WRITE setOriginDate NOTIFY originDateChanged)

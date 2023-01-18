@@ -72,11 +72,8 @@
 
     \snippet qmlaxisformatter/customformatter.cpp 3
 
-    To expose our new custom formatter to the QML, we must declare and register it:
-
-    \snippet qmlaxisformatter/main.cpp 0
-    \dots 0
-    \snippet qmlaxisformatter/main.cpp 1
+    To expose our new custom formatter to the QML, we must declare it and make it a QML module.
+    Doing this was introduced in the \l{Qt Quick 2 Oscilloscope Example} so we will skip it here.
 
     \section1 QML
 
