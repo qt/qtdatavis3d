@@ -27,7 +27,7 @@
     To overcome this limitation, we implement a simple \c DataSource class in C++ to populate the
     data proxy of the series.
 
-    The \c DataSource class provides three methods that can be called from QML:
+    The \c DataSource class provides two methods that can be called from QML:
 
     \snippet qml3doscilloscope/datasource.h 0
 
@@ -47,9 +47,23 @@
     the graph to render the data.
 
     To be able to access the \c DataSource methods from QML, we need to expose it. We do this by
-    defining a context property in application main:
+    making the DataSource a QML_ELEMENT:
 
-    \snippet qml3doscilloscope/main.cpp 0
+    \snippet qml3doscilloscope/datasource.h 1
+
+    In addition to that, it needs to be declared as a QML module in the CMakeLists.txt:
+
+    \badcode
+    qt6_add_qml_module(qml3doscilloscope
+        URI DataSource
+        VERSION 1.0
+        NO_RESOURCE_TARGET_PATH
+        SOURCES
+            datasource.cpp datasource.h
+        QML_FILES
+            qml/qml3doscilloscope/main.qml
+    )
+    \endcode
 
     To make it possible to use QSurface3DSeries pointers as parameters on the
     \c DataSource class methods on all environments and builds, we need to make sure the meta
@@ -61,7 +75,14 @@
 
     \section1 QML
 
-    In the QML codes, we define a Surface3D graph normally and give it a Surface3DSeries:
+    To be able to use the \c{DataSource}, we need to import the QML module, and create an
+    instance of it to be used:
+
+    \snippet qml3doscilloscope/qml/qml3doscilloscope/main.qml 0
+    \dots 0
+    \snippet qml3doscilloscope/qml/qml3doscilloscope/main.qml 5
+
+    We define a Surface3D graph normally and give it a Surface3DSeries:
 
     \snippet qml3doscilloscope/qml/qml3doscilloscope/main.qml 0
 

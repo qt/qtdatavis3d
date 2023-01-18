@@ -23,7 +23,6 @@ find_package(Qt6 COMPONENTS Quick)
 find_package(Qt6 COMPONENTS DataVisualization)
 
 qt_add_executable(qml3doscilloscope
-    datasource.cpp datasource.h
     main.cpp
 )
 set_target_properties(qml3doscilloscope PROPERTIES
@@ -38,15 +37,14 @@ target_link_libraries(qml3doscilloscope PUBLIC
     Qt::DataVisualization
 )
 
-set(qml3doscilloscope_resource_files
-    "qml/qml3doscilloscope/main.qml"
-)
-
-qt6_add_resources(qml3doscilloscope "qml3doscilloscope"
-    PREFIX
-        "/"
-    FILES
-        ${qml3doscilloscope_resource_files}
+qt6_add_qml_module(qml3doscilloscope
+    URI DataSource
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    SOURCES
+        datasource.cpp datasource.h
+    QML_FILES
+        qml/qml3doscilloscope/main.qml
 )
 
 install(TARGETS qml3doscilloscope
