@@ -5,7 +5,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtDataVisualization
-import "."
 //! [0]
 
 //! [1]
@@ -43,8 +42,8 @@ Item {
         anchors.bottom: parent.bottom
         //! [9]
         width: parent.width
-        height: parent.height - (portraitMode ? shadowToggle.implicitHeight * 3 + 25
-                                              : shadowToggle.implicitHeight + 10)
+        height: parent.height - (mainView.portraitMode ? shadowToggle.implicitHeight * 3 + 25
+                                                       : shadowToggle.implicitHeight + 10)
         //! [8]
 
         //! [2]
@@ -120,7 +119,7 @@ Item {
     //! [7]
     Button {
         id: shadowToggle
-        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        width: mainView.portraitMode ? implicitWidth : (mainView.width / 6 - 6)
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.margins: 5
@@ -140,7 +139,7 @@ Item {
 
     Button {
         id: smoothToggle
-        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        width: mainView.portraitMode ? implicitWidth : (mainView.width / 6 - 6)
         anchors.left: shadowToggle.right
         anchors.top: parent.top
         anchors.margins: 5
@@ -158,9 +157,9 @@ Item {
 
     Button {
         id: cameraToggle
-        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
-        anchors.left: portraitMode ? parent.left : smoothToggle.right
-        anchors.top: portraitMode ? smoothToggle.bottom : parent.top
+        width: mainView.portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        anchors.left: mainView.portraitMode ? parent.left : smoothToggle.right
+        anchors.top: mainView.portraitMode ? smoothToggle.bottom : parent.top
         anchors.margins: 5
         text: "Change Camera Placement"
         onClicked: {
@@ -175,9 +174,9 @@ Item {
 
     Button {
         id: themeToggle
-        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        width: mainView.portraitMode ? implicitWidth : (mainView.width / 6 - 6)
         anchors.left: cameraToggle.right
-        anchors.top: portraitMode ? smoothToggle.bottom : parent.top
+        anchors.top: mainView.portraitMode ? smoothToggle.bottom : parent.top
         anchors.margins: 5
         text: "Change Theme"
         onClicked: {
@@ -196,9 +195,9 @@ Item {
 
     Button {
         id: backgroundToggle
-        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
-        anchors.left: portraitMode ? parent.left : themeToggle.right
-        anchors.top: portraitMode ? themeToggle.bottom : parent.top
+        width: mainView.portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        anchors.left: mainView.portraitMode ? parent.left : themeToggle.right
+        anchors.top: mainView.portraitMode ? themeToggle.bottom : parent.top
         anchors.margins: 5
         text: "Hide Background"
         onClicked: {
@@ -214,9 +213,9 @@ Item {
 
     Button {
         id: exitButton
-        width: portraitMode ? implicitWidth : (mainView.width / 6 - 6)
+        width: mainView.portraitMode ? implicitWidth : (mainView.width / 6 - 6)
         anchors.left: backgroundToggle.right
-        anchors.top: portraitMode ? themeToggle.bottom : parent.top
+        anchors.top: mainView.portraitMode ? themeToggle.bottom : parent.top
         anchors.margins: 5
         text: "Quit"
         onClicked: Qt.quit();
