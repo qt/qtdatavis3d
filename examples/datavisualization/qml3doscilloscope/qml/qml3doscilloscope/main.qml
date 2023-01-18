@@ -4,7 +4,9 @@
 import QtQuick
 import QtQuick.Controls
 import QtDataVisualization
-import "."
+//! [1]
+import DataSource
+//! [1]
 
 Item {
     id: mainView
@@ -21,6 +23,12 @@ Item {
         surfaceSeries.selectedPoint = surfaceSeries.invalidSelectionPosition
         generateData()
     }
+
+    //![5]
+    DataSource {
+        id: dataSource
+    }
+    //![5]
 
     Item {
         id: dataView
@@ -61,14 +69,14 @@ Item {
             //! [0]
             Surface3DSeries {
                 id: surfaceSeries
-                drawMode: Surface3DSeries.DrawSurface;
-                flatShadingEnabled: false;
+                drawMode: Surface3DSeries.DrawSurfaceAndWireframe
+                flatShadingEnabled: false
                 meshSmooth: true
                 itemLabelFormat: "@xLabel, @zLabel: @yLabel"
                 itemLabelVisible: false
 
                 onItemLabelChanged: {
-                    if (surfaceSeries.selectedPoint === surfaceSeries.invalidSelectionPosition)
+                    if (surfaceSeries.selectedPoint == surfaceSeries.invalidSelectionPosition)
                         selectionText.text = "No selection"
                     else
                         selectionText.text = surfaceSeries.itemLabel
@@ -94,8 +102,8 @@ Item {
 
     Rectangle {
         id: controlArea
-        height: portraitMode ? flatShadingToggle.implicitHeight * 7
-                             : flatShadingToggle.implicitHeight * 2
+        height: mainView.portraitMode ? flatShadingToggle.implicitHeight * 7
+                                      : flatShadingToggle.implicitHeight * 2
         anchors.left: parent.left
         anchors.top: parent.top
         anchors.right: parent.right
@@ -104,7 +112,7 @@ Item {
         // Samples
         Rectangle {
             id: samples
-            width: portraitMode ? mainView.width : mainView.width / 4
+            width: mainView.portraitMode ? mainView.width : mainView.width / 4
             height: flatShadingToggle.implicitHeight
             anchors.left: parent.left
             anchors.top: parent.top
@@ -138,10 +146,10 @@ Item {
         // Frequency
         Rectangle {
             id: frequency
-            width: portraitMode ? mainView.width : mainView.width / 4
+            width: mainView.portraitMode ? mainView.width : mainView.width / 4
             height: flatShadingToggle.implicitHeight
-            anchors.left: portraitMode ? parent.left : samples.right
-            anchors.top: portraitMode ? samples.bottom : parent.top
+            anchors.left: mainView.portraitMode ? parent.left : samples.right
+            anchors.top: mainView.portraitMode ? samples.bottom : parent.top
 
             border.color: "gray"
             border.width: 1
@@ -172,10 +180,10 @@ Item {
         // FPS
         Rectangle {
             id: fpsindicator
-            width: portraitMode ? mainView.width : mainView.width / 4
+            width: mainView.portraitMode ? mainView.width : mainView.width / 4
             height: flatShadingToggle.implicitHeight
-            anchors.left: portraitMode ? parent.left : frequency.right
-            anchors.top: portraitMode ? frequency.bottom : parent.top
+            anchors.left: mainView.portraitMode ? parent.left : frequency.right
+            anchors.top: mainView.portraitMode ? frequency.bottom : parent.top
 
             border.color: "gray"
             border.width: 1
@@ -192,10 +200,10 @@ Item {
         // Selection
         Rectangle {
             id: selection
-            width: portraitMode ? mainView.width : mainView.width / 4
+            width: mainView.portraitMode ? mainView.width : mainView.width / 4
             height: flatShadingToggle.implicitHeight
-            anchors.left: portraitMode ? parent.left : fpsindicator.right
-            anchors.top: portraitMode ? fpsindicator.bottom : parent.top
+            anchors.left: mainView.portraitMode ? parent.left : fpsindicator.right
+            anchors.top: mainView.portraitMode ? fpsindicator.bottom : parent.top
 
             border.color: "gray"
             border.width: 1
@@ -213,7 +221,7 @@ Item {
         // Flat shading
         Button {
             id: flatShadingToggle
-            width: portraitMode ? mainView.width : mainView.width / 3
+            width: mainView.portraitMode ? mainView.width : mainView.width / 3
             anchors.left: parent.left
             anchors.top: selection.bottom
 
@@ -234,11 +242,11 @@ Item {
         // Surface grid
         Button {
             id: surfaceGridToggle
-            width: portraitMode ? mainView.width : mainView.width / 3
-            anchors.left: portraitMode ? parent.left : flatShadingToggle.right
-            anchors.top: portraitMode ? flatShadingToggle.bottom : selection.bottom
+            width: mainView.portraitMode ? mainView.width : mainView.width / 3
+            anchors.left: mainView.portraitMode ? parent.left : flatShadingToggle.right
+            anchors.top: mainView.portraitMode ? flatShadingToggle.bottom : selection.bottom
 
-            text: "Show Surface Grid"
+            text: "Hide Surface Grid"
 
             onClicked: {
                 if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
@@ -254,9 +262,9 @@ Item {
         // Exit
         Button {
             id: exitButton
-            width: portraitMode ? mainView.width : mainView.width / 3
-            anchors.left: portraitMode ? parent.left : surfaceGridToggle.right
-            anchors.top: portraitMode ? surfaceGridToggle.bottom : selection.bottom
+            width: mainView.portraitMode ? mainView.width : mainView.width / 3
+            anchors.left: mainView.portraitMode ? parent.left : surfaceGridToggle.right
+            anchors.top: mainView.portraitMode ? surfaceGridToggle.bottom : selection.bottom
 
             text: "Quit"
 
