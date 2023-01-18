@@ -5,7 +5,6 @@ import QtQuick
 import QtQuick.Controls
 import QtQuick.Window
 import QtDataVisualization
-import "."
 
 Window {
     id: mainview
@@ -143,7 +142,7 @@ Window {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: portraitMode ? (polarToggle.height + 10) * 3 : polarToggle.height + 30
+        height: mainview.portraitMode ? (polarToggle.height + 10) * 3 : polarToggle.height + 30
         anchors.margins: 10
 
         //! [3]
@@ -152,7 +151,7 @@ Window {
             anchors.margins: 5
             anchors.left: parent.left
             anchors.top: parent.top
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
             text: "Switch to\npolar"
             onClicked: {
                 if (surfaceGraph.polar === false) {
@@ -171,7 +170,7 @@ Window {
             anchors.margins: 5
             anchors.left: polarToggle.right
             anchors.top: parent.top
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
             text: "Switch to\nperspective"
             onClicked: {
                 if (surfaceGraph.orthoProjection === true) {
@@ -197,9 +196,9 @@ Window {
         Button {
             id: flipGridToggle
             anchors.margins: 5
-            anchors.left: portraitMode ? parent.left : orthoToggle.right
-            anchors.top: portraitMode ? orthoToggle.bottom : parent.top
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            anchors.left: mainview.portraitMode ? parent.left : orthoToggle.right
+            anchors.top: mainview.portraitMode ? orthoToggle.bottom : parent.top
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
             text: "Toggle axis\ngrid on top"
             onClicked: {
                 if (surfaceGraph.flipHorizontalGrid === true) {
@@ -214,8 +213,8 @@ Window {
             id: labelOffsetToggle
             anchors.margins: 5
             anchors.left: flipGridToggle.right
-            anchors.top: portraitMode ? orthoToggle.bottom : parent.top
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            anchors.top: mainview.portraitMode ? orthoToggle.bottom : parent.top
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
             text: "Toggle radial\nlabel position"
             visible: surfaceGraph.polar
             onClicked: {
@@ -230,14 +229,14 @@ Window {
         Button {
             id: surfaceGridToggle
             anchors.margins: 5
-            anchors.left: portraitMode ? (labelOffsetToggle.visible ? parent.left
-                                                                    : flipGridToggle.right)
-                                       : (labelOffsetToggle.visible ? labelOffsetToggle.right
-                                                                    : flipGridToggle.right)
-            anchors.top: portraitMode ? (labelOffsetToggle.visible ? labelOffsetToggle.bottom
-                                                                   : orthoToggle.bottom)
-                                      : parent.top
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            anchors.left: mainview.portraitMode ? (labelOffsetToggle.visible ? parent.left
+                                                                             : flipGridToggle.right)
+                                                : (labelOffsetToggle.visible ? labelOffsetToggle.right
+                                                                             : flipGridToggle.right)
+            anchors.top: mainview.portraitMode ? (labelOffsetToggle.visible ? labelOffsetToggle.bottom
+                                                                            : orthoToggle.bottom)
+                                               : parent.top
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
             text: "Toggle\nsurface grid"
             visible: !surfaceGraph.orthoProjection
             onClicked: {
@@ -255,7 +254,7 @@ Window {
         anchors.bottom: parent.bottom
         anchors.top: buttons.bottom
         anchors.right: parent.right
-        width: portraitMode ? 100 : 125
+        width: mainview.portraitMode ? 100 : 125
 
         Rectangle {
             id: gradient
@@ -265,7 +264,7 @@ Window {
             anchors.right: legend.right
             border.color: "black"
             border.width: 1
-            width: portraitMode ? 25 : 50
+            width: mainview.portraitMode ? 25 : 50
             rotation: 180
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "black" }
