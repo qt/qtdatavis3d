@@ -4,7 +4,6 @@
 import QtQuick
 import QtQuick.Controls
 import QtDataVisualization
-import "."
 
 Rectangle {
     id: mainview
@@ -81,7 +80,7 @@ Rectangle {
                     yPosRole: "height"
                 }
                 //! [6]
-                onDrawModeChanged: checkState()
+                onDrawModeChanged: mainview.checkState()
             }
             //! [4]
             Surface3DSeries {
@@ -99,7 +98,7 @@ Rectangle {
                     maxXValue: 97
                 }
 
-                onDrawModeChanged: checkState()
+                onDrawModeChanged: mainview.checkState()
             }
             //! [4]
         }
@@ -111,8 +110,8 @@ Rectangle {
         anchors.left: parent.left
         anchors.right: parent.right
         anchors.margins: 10
-        height: portraitMode ? surfaceGridToggle.implicitHeight * 4 + 15
-                             : surfaceGridToggle.implicitHeight * 3 + 10
+        height: mainview.portraitMode ? surfaceGridToggle.implicitHeight * 4 + 15
+                                      : surfaceGridToggle.implicitHeight * 3 + 10
         opacity: 0.5
 
         Button {
@@ -120,7 +119,7 @@ Rectangle {
             anchors.margins: 5
             anchors.left: parent.left
             anchors.top: parent.top
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
             text: "Show Surface\nGrid"
             //! [1]
             onClicked: {
@@ -140,7 +139,7 @@ Rectangle {
             anchors.margins: 5
             anchors.left: surfaceGridToggle.right
             anchors.top: parent.top
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
             text: "Red surface\ngrid color"
             onClicked: {
                 if (Qt.colorEqual(surfaceSeries.wireframeColor, "#000000")
@@ -160,9 +159,9 @@ Rectangle {
         Button {
             id: surfaceToggle
             anchors.margins: 5
-            anchors.left: portraitMode ? parent.left : surfaceGridColor.right
-            anchors.top: portraitMode ? surfaceGridColor.bottom : parent.top
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            anchors.left: mainview.portraitMode ? parent.left : surfaceGridColor.right
+            anchors.top: mainview.portraitMode ? surfaceGridColor.bottom : parent.top
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
             text: "Hide\nSurface"
             //! [8]
             onClicked: {
@@ -180,9 +179,9 @@ Rectangle {
         Button {
             id: flatShadingToggle
             anchors.margins: 5
-            anchors.left: portraitMode ? surfaceToggle.right : parent.left
-            anchors.top: portraitMode ? surfaceGridColor.bottom : surfaceToggle.bottom
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            anchors.left: mainview.portraitMode ? surfaceToggle.right : parent.left
+            anchors.top: mainview.portraitMode ? surfaceGridColor.bottom : surfaceToggle.bottom
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
             text: surfaceSeries.flatShadingSupported ? "Show\nFlat" : "Flat not\nsupported"
             enabled: surfaceSeries.flatShadingSupported
             //! [2]
@@ -203,9 +202,9 @@ Rectangle {
         Button {
             id: backgroundToggle
             anchors.margins: 5
-            anchors.left: portraitMode ? parent.left : flatShadingToggle.right
-            anchors.top: portraitMode ? flatShadingToggle.bottom : surfaceToggle.bottom
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            anchors.left: mainview.portraitMode ? parent.left : flatShadingToggle.right
+            anchors.top: mainview.portraitMode ? flatShadingToggle.bottom : surfaceToggle.bottom
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
             text: "Hide\nBackground"
             onClicked: {
                 if (surfacePlot.theme.backgroundEnabled === true) {
@@ -222,8 +221,8 @@ Rectangle {
             id: gridToggle
             anchors.margins: 5
             anchors.left: backgroundToggle.right
-            anchors.top: portraitMode ? flatShadingToggle.bottom : surfaceToggle.bottom
-            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
+            anchors.top: mainview.portraitMode ? flatShadingToggle.bottom : surfaceToggle.bottom
+            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 40) / 3
             text: "Hide\nGrid"
             onClicked: {
                 if (surfacePlot.theme.gridEnabled === true) {
