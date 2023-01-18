@@ -4,7 +4,6 @@
 import QtQuick
 import QtDataVisualization
 import QtQuick.Controls
-import "."
 
 Item {
     id: mainView
@@ -250,7 +249,7 @@ Item {
     Button {
         id: rangeToggle
         // We're adding 3 buttons and want to divide them equally, if not in portrait mode
-        width: portraitMode ? parent.width : parent.width / 3
+        width: mainView.portraitMode ? parent.width : parent.width / 3
         text: "Use Preset Range"
         anchors.left: parent.left
         anchors.top: parent.top
@@ -280,10 +279,10 @@ Item {
     //! [8]
     Button {
         id: orthoToggle
-        width: portraitMode ? parent.width : parent.width / 3
+        width: mainView.portraitMode ? parent.width : parent.width / 3
         text: "Display Orthographic"
-        anchors.left: portraitMode ? parent.left : rangeToggle.right
-        anchors.top: portraitMode ? rangeToggle.bottom : parent.top
+        anchors.left: mainView.portraitMode ? parent.left : rangeToggle.right
+        anchors.top: mainView.portraitMode ? rangeToggle.bottom : parent.top
         onClicked: {
             if (scatterGraph.orthoProjection) {
                 text = "Display Orthographic";
@@ -300,10 +299,10 @@ Item {
 
     Button {
         id: exitButton
-        width: portraitMode ? parent.width : parent.width / 3
+        width: mainView.portraitMode ? parent.width : parent.width / 3
         text: "Quit"
-        anchors.left: portraitMode ? parent.left : orthoToggle.right
-        anchors.top: portraitMode ? orthoToggle.bottom : parent.top
+        anchors.left: mainView.portraitMode ? parent.left : orthoToggle.right
+        anchors.top: mainView.portraitMode ? orthoToggle.bottom : parent.top
         onClicked: Qt.quit();
     }
 }
