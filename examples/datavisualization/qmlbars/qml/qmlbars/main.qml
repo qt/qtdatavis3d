@@ -4,17 +4,15 @@
 import QtQuick
 import QtQuick.Controls
 import QtQuick.Layouts
-import QtDataVisualization 1.2
-import QtQuick.Window
+import QtDataVisualization
 import Qt.labs.qmlmodels
-import "."
 
 Item {
     id: mainview
     width: 1280
     height: 1024
 
-    property int buttonLayoutHeight: 180;
+    property int buttonLayoutHeight: 180
     property int currentRow
     state: Screen.width < Screen.height ? "portrait" : "landscape"
 
@@ -30,9 +28,8 @@ Item {
     selectedSeries: barSeries
 
     function handleSelectionChange(series, position) {
-        if (position !== series.invalidSelectionPosition) {
+        if (position !== series.invalidSelectionPosition)
             selectedSeries = series
-        }
 
         // Set tableView current row to selected bar
         var rowRole = series.dataProxy.rowLabels[position.x];
@@ -115,7 +112,8 @@ Item {
                     ColorGradientStop { position: 0.0; color: "#600000" }
                 }
 
-                onSelectedBarChanged: (position)=> handleSelectionChange(secondarySeries, position)
+                onSelectedBarChanged: (position) => mainview.handleSelectionChange(secondarySeries,
+                                                                                   position)
             }
 
             //! [3]
@@ -144,7 +142,8 @@ Item {
                     ColorGradientStop { position: 0.0; color: "#006000" }
                 }
 
-                onSelectedBarChanged: (position)=> handleSelectionChange(barSeries, position)
+                onSelectedBarChanged: (position) => mainview.handleSelectionChange(barSeries,
+                                                                                  position)
             }
         }
     }
@@ -156,14 +155,15 @@ Item {
         anchors.left: parent.left
 
         HorizontalHeaderView {
-            id: header
-            property var columnNames: ["Month", "Expenses", "Income"]
+            id: headerView
+            readonly property var columnNames: ["Month", "Expenses", "Income"]
 
             syncView: tableView
             Layout.fillWidth: true
             delegate: Text {
+                required property int index
                 padding: 3
-                text: header.columnNames[index]
+                text: headerView.columnNames[index]
             }
         }
 
@@ -185,12 +185,16 @@ Item {
             }
 
             delegate: Rectangle {
+                id: delegateRoot
+                required property int row
+                required property int column
+                required property string display
                 implicitHeight: 30
                 implicitWidth: tableView.width / 3
-                color: row===currentRow ? "#e0e0e0" : "#ffffff"
+                color: row === mainview.currentRow ? "#e0e0e0" : "#ffffff"
                 MouseArea {
                     anchors.fill: parent
-                    onClicked: currentRow = row
+                    onClicked: mainview.currentRow = delegateRoot.row
                 }
 
                 Text {
@@ -202,15 +206,15 @@ Item {
                     anchors.right: parent.right
                     text: formattedText
                     property string formattedText: {
-                        if (column === 0) {
-                            if (display !== "") {
+                        if (delegateRoot.column === 0) {
+                            if (delegateRoot.display !== "") {
                                 var pattern = /(\d\d\d\d)-(\d\d)/
-                                var matches = pattern.exec(display)
+                                var matches = pattern.exec(delegateRoot.display)
                                 var colIndex = parseInt(matches[2], 10) - 1
                                 return matches[1] + " - " + graphAxes.column.labels[colIndex]
                             }
                         } else {
-                            return display
+                            return delegateRoot.display
                         }
                     }
                 }
@@ -220,7 +224,7 @@ Item {
 
     //! [2]
     onCurrentRowChanged: {
-        var timestamp = graphData.model.get(currentRow).timestamp
+        var timestamp = graphData.model.get(mainview.currentRow).timestamp
         var pattern = /(\d\d\d\d)-(\d\d)/
         var matches = pattern.exec(timestamp)
         var rowIndex = modelProxy.rowCategoryIndex(matches[1])
