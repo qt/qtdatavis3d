@@ -4,8 +4,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtDataVisualization 1.2
-import "."
+import QtDataVisualization
 
 Item {
     id: mainview
@@ -128,27 +127,27 @@ Item {
                     spacing: 10
 
                     Label {
-                        font.pointSize: fontSize
+                        font.pointSize: mainview.fontSize
                         font.bold: true
-                        text: portraitMode ? "Layer\nSelection" : "Layer Selection"
+                        text: mainview.portraitMode ? "Layer\nSelection" : "Layer Selection"
                     }
 
                     CheckBox {
                         id: layerOneToggle
                         checked: true
-                        text: portraitMode ? "Show\nGround\nLayer" : "Show Ground Layer"
+                        text: mainview.portraitMode ? "Show\nGround\nLayer" : "Show Ground Layer"
                     }
 
                     CheckBox {
                         id: layerTwoToggle
                         checked: true
-                        text: portraitMode ? "Show\nSea\nLayer" : "Show Sea Layer"
+                        text: mainview.portraitMode ? "Show\nSea\nLayer" : "Show Sea Layer"
                     }
 
                     CheckBox {
                         id: layerThreeToggle
                         checked: true
-                        text: portraitMode ? "Show\nTectonic\nLayer" : "Show Tectonic Layer"
+                        text: mainview.portraitMode ? "Show\nTectonic\nLayer" : "Show Tectonic Layer"
                     }
                 }
             }
@@ -161,14 +160,14 @@ Item {
                     spacing: 10
 
                     Label {
-                        font.pointSize: fontSize
+                        font.pointSize: mainview.fontSize
                         font.bold: true
-                        text: portraitMode ? "Layer\nStyle" : "Layer Style"
+                        text: mainview.portraitMode ? "Layer\nStyle" : "Layer Style"
                     }
 
                     CheckBox {
                         id: layerOneGrid
-                        text: portraitMode ? "Show\nGround\nas Grid" : "Show Ground as Grid"
+                        text: mainview.portraitMode ? "Show\nGround\nas Grid" : "Show Ground as Grid"
                         onCheckedChanged: {
                             if (checked)
                                 layerOneSeries.drawMode = Surface3DSeries.DrawWireframe
@@ -179,7 +178,7 @@ Item {
 
                     CheckBox {
                         id: layerTwoGrid
-                        text: portraitMode ? "Show\nSea\nas Grid" : "Show Sea as Grid"
+                        text: mainview.portraitMode ? "Show\nSea\nas Grid" : "Show Sea as Grid"
 
                         onCheckedChanged: {
                             if (checked)
@@ -191,7 +190,8 @@ Item {
 
                     CheckBox {
                         id: layerThreeGrid
-                        text: portraitMode ? "Show\nTectonic\nas Grid" : "Show Tectonic as Grid"
+                        text: mainview.portraitMode ? "Show\nTectonic\nas Grid"
+                                                    : "Show Tectonic as Grid"
                         onCheckedChanged: {
                             if (checked)
                                 layerThreeSeries.drawMode = Surface3DSeries.DrawWireframe
@@ -206,19 +206,19 @@ Item {
             //! [6]
             Button {
                 id: sliceButton
-                text: portraitMode ? "Slice\nAll\nLayers" : "Slice All Layers"
+                text: mainview.portraitMode ? "Slice\nAll\nLayers" : "Slice All Layers"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 40
                 onClicked: {
                     if (surfaceLayers.selectionMode & AbstractGraph3D.SelectionMultiSeries) {
                         surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
                                 | AbstractGraph3D.SelectionSlice
-                        text = portraitMode ? "Slice\nAll\nLayers" : "Slice All Layers"
+                        text = mainview.portraitMode ? "Slice\nAll\nLayers" : "Slice All Layers"
                     } else {
                         surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
                                 | AbstractGraph3D.SelectionSlice
                                 | AbstractGraph3D.SelectionMultiSeries
-                        text = portraitMode ? "Slice\nOne\nLayer" : "Slice One Layer"
+                        text = mainview.portraitMode ? "Slice\nOne\nLayer" : "Slice One Layer"
                     }
                 }
             }
@@ -228,23 +228,23 @@ Item {
                 id: shadowButton
                 Layout.fillWidth: true
                 Layout.minimumHeight: 40
-                text: surfaceLayers.shadowsSupported ? (portraitMode ? "Show\nShadows" : "Show Shadows")
-                                                     : (portraitMode ? "Shadows\nnot\nsupported" : "Shadows not supported")
+                text: surfaceLayers.shadowsSupported ? (mainview.portraitMode ? "Show\nShadows" : "Show Shadows")
+                                                     : (mainview.portraitMode ? "Shadows\nnot\nsupported" : "Shadows not supported")
                 enabled: surfaceLayers.shadowsSupported
                 onClicked: {
                     if (surfaceLayers.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
                         surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityLow
-                        text = portraitMode ? "Hide\nShadows" : "Hide Shadows"
+                        text = mainview.portraitMode ? "Hide\nShadows" : "Hide Shadows"
                     } else {
                         surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityNone
-                        text = portraitMode ? "Show\nShadows" : "Show Shadows"
+                        text = mainview.portraitMode ? "Show\nShadows" : "Show Shadows"
                     }
                 }
             }
 
             Button {
                 id: renderModeButton
-                text: portraitMode ? "Switch\nRender\nMode" : "Switch Render Mode"
+                text: mainview.portraitMode ? "Switch\nRender\nMode" : "Switch Render Mode"
                 Layout.fillWidth: true
                 Layout.minimumHeight: 40
                 onClicked: {
@@ -279,7 +279,7 @@ Item {
 
             TextField {
                 id: renderLabel
-                font.pointSize: fontSize
+                font.pointSize: mainview.fontSize
                 Layout.fillWidth: true
                 Layout.minimumHeight: 40
                 color: "gray"
