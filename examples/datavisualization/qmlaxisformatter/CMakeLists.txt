@@ -23,7 +23,6 @@ find_package(Qt6 COMPONENTS Quick)
 find_package(Qt6 COMPONENTS DataVisualization)
 
 qt_add_executable(qmlaxisformatter
-    customformatter.cpp customformatter.h
     main.cpp
 )
 set_target_properties(qmlaxisformatter PROPERTIES
@@ -38,16 +37,15 @@ target_link_libraries(qmlaxisformatter PUBLIC
     Qt::DataVisualization
 )
 
-set(qmlaxisformatter_resource_files
-    "qml/qmlaxisformatter/Data.qml"
-    "qml/qmlaxisformatter/main.qml"
-)
-
-qt6_add_resources(qmlaxisformatter "qmlaxisformatter"
-    PREFIX
-        "/"
-    FILES
-        ${qmlaxisformatter_resource_files}
+qt6_add_qml_module(qmlaxisformatter
+    URI CustomFormatter
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    SOURCES
+        customformatter.cpp customformatter.h
+    QML_FILES
+        qml/qmlaxisformatter/Data.qml
+        qml/qmlaxisformatter/main.qml
 )
 
 install(TARGETS qmlaxisformatter

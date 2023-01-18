@@ -1,24 +1,14 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "customformatter.h"
-
 #include <QtGui/QGuiApplication>
 #include <QtQuick/QQuickView>
 #include <QtQml>
-
-//! [0]
-Q_DECLARE_METATYPE(CustomFormatter *)
-//! [0]
 
 int main(int argc, char *argv[])
 {
     qputenv("QSG_RHI_BACKEND", "opengl");
     QGuiApplication app(argc, argv);
-
-    //! [1]
-    qmlRegisterType<CustomFormatter>("CustomFormatter", 1, 0, "CustomFormatter");
-    //! [1]
 
     QQuickView viewer;
 
