@@ -78,8 +78,8 @@ Item {
                     Layout.minimumWidth: parent.width / 2
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: portraitMode ? "Clear\nSelections" : "Clear Selections"
-                    onClicked: clearSelections() // call a helper function to keep button itself simpler
+                    text: mainView.portraitMode ? "Clear\nSelections" : "Clear Selections"
+                    onClicked: mainView.clearSelections() // call a helper function to keep button itself simpler
                 }
 
                 Button {
@@ -93,15 +93,15 @@ Item {
                 Button {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: portraitMode ? "Reset\nCameras" : "Reset Cameras"
-                    onClicked: resetCameras() // call a helper function to keep button itself simpler
+                    text: mainView.portraitMode ? "Reset\nCameras" : "Reset Cameras"
+                    onClicked: mainView.resetCameras() // call a helper function to keep button itself simpler
                 }
 
                 Button {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: portraitMode ? "Toggle\nMesh\nStyles" : "Toggle Mesh Styles"
-                    onClicked: toggleMeshStyle() // call a helper function to keep button itself simpler
+                    text: mainView.portraitMode ? "Toggle\nMesh\nStyles" : "Toggle Mesh Styles"
+                    onClicked: mainView.toggleMeshStyle() // call a helper function to keep button itself simpler
                 }
             }
         }
