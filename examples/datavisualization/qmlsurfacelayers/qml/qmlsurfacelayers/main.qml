@@ -18,7 +18,7 @@ Item {
         id: surfaceView
         width: mainview.width - settings.width
         height: mainview.height
-        anchors.right: mainview.right;
+        anchors.right: mainview.right
 
         //! [0]
         ColorGradient {
@@ -74,7 +74,7 @@ Item {
                 baseGradient: layerOneGradient
                 //! [2]
                 HeightMapSurfaceDataProxy {
-                    heightMapFile: ":/heightmaps/layer_1.png"
+                    heightMapFile: ":/layer_1.png"
                 }
                 flatShadingEnabled: false
                 drawMode: Surface3DSeries.DrawSurface
@@ -87,7 +87,7 @@ Item {
                 id: layerTwoSeries
                 baseGradient: layerTwoGradient
                 HeightMapSurfaceDataProxy {
-                    heightMapFile: ":/heightmaps/layer_2.png"
+                    heightMapFile: ":/layer_2.png"
                 }
                 flatShadingEnabled: false
                 drawMode: Surface3DSeries.DrawSurface
@@ -98,7 +98,7 @@ Item {
                 id: layerThreeSeries
                 baseGradient: layerThreeGradient
                 HeightMapSurfaceDataProxy {
-                    heightMapFile: ":/heightmaps/layer_3.png"
+                    heightMapFile: ":/layer_3.png"
                 }
                 flatShadingEnabled: false
                 drawMode: Surface3DSeries.DrawSurface
@@ -170,9 +170,9 @@ Item {
                         text: mainview.portraitMode ? "Show\nGround\nas Grid" : "Show Ground as Grid"
                         onCheckedChanged: {
                             if (checked)
-                                layerOneSeries.drawMode = Surface3DSeries.DrawWireframe
+                                layerOneSeries.drawMode = Surface3DSeries.DrawWireframe;
                             else
-                                layerOneSeries.drawMode = Surface3DSeries.DrawSurface
+                                layerOneSeries.drawMode = Surface3DSeries.DrawSurface;
                         }
                     }
 
@@ -182,9 +182,9 @@ Item {
 
                         onCheckedChanged: {
                             if (checked)
-                                layerTwoSeries.drawMode = Surface3DSeries.DrawWireframe
+                                layerTwoSeries.drawMode = Surface3DSeries.DrawWireframe;
                             else
-                                layerTwoSeries.drawMode = Surface3DSeries.DrawSurface
+                                layerTwoSeries.drawMode = Surface3DSeries.DrawSurface;
                         }
                     }
 
@@ -194,9 +194,9 @@ Item {
                                                     : "Show Tectonic as Grid"
                         onCheckedChanged: {
                             if (checked)
-                                layerThreeSeries.drawMode = Surface3DSeries.DrawWireframe
+                                layerThreeSeries.drawMode = Surface3DSeries.DrawWireframe;
                             else
-                                layerThreeSeries.drawMode = Surface3DSeries.DrawSurface
+                                layerThreeSeries.drawMode = Surface3DSeries.DrawSurface;
                         }
                     }
                 }
@@ -213,12 +213,12 @@ Item {
                     if (surfaceLayers.selectionMode & AbstractGraph3D.SelectionMultiSeries) {
                         surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
                                 | AbstractGraph3D.SelectionSlice
-                        text = mainview.portraitMode ? "Slice\nAll\nLayers" : "Slice All Layers"
+                        text = mainview.portraitMode ? "Slice\nAll\nLayers" : "Slice All Layers";
                     } else {
                         surfaceLayers.selectionMode = AbstractGraph3D.SelectionRow
                                 | AbstractGraph3D.SelectionSlice
                                 | AbstractGraph3D.SelectionMultiSeries
-                        text = mainview.portraitMode ? "Slice\nOne\nLayer" : "Slice One Layer"
+                        text = mainview.portraitMode ? "Slice\nOne\nLayer" : "Slice One Layer";
                     }
                 }
             }
@@ -233,11 +233,11 @@ Item {
                 enabled: surfaceLayers.shadowsSupported
                 onClicked: {
                     if (surfaceLayers.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                        surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityLow
-                        text = mainview.portraitMode ? "Hide\nShadows" : "Hide Shadows"
+                        surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityLow;
+                        text = mainview.portraitMode ? "Hide\nShadows" : "Hide Shadows";
                     } else {
-                        surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityNone
-                        text = mainview.portraitMode ? "Show\nShadows" : "Show Shadows"
+                        surfaceLayers.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                        text = mainview.portraitMode ? "Show\nShadows" : "Show Shadows";
                     }
                 }
             }
@@ -248,32 +248,32 @@ Item {
                 Layout.fillWidth: true
                 Layout.minimumHeight: 40
                 onClicked: {
-                    var modeText = "Indirect, "
-                    var aaText
+                    var modeText = "Indirect, ";
+                    var aaText;
                     if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
                             surfaceLayers.msaaSamples === 0) {
-                        surfaceLayers.renderingMode = AbstractGraph3D.RenderDirectToBackground
-                        modeText = "BackGround, "
+                        surfaceLayers.renderingMode = AbstractGraph3D.RenderDirectToBackground;
+                        modeText = "BackGround, ";
                     } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
                                surfaceLayers.msaaSamples === 4) {
-                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
-                        surfaceLayers.msaaSamples = 0
+                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect;
+                        surfaceLayers.msaaSamples = 0;
                     } else if (surfaceLayers.renderingMode === AbstractGraph3D.RenderIndirect &&
                                surfaceLayers.msaaSamples === 8) {
-                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
-                        surfaceLayers.msaaSamples = 4
+                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect;
+                        surfaceLayers.msaaSamples = 4;
                     } else {
-                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect
-                        surfaceLayers.msaaSamples = 8
+                        surfaceLayers.renderingMode = AbstractGraph3D.RenderIndirect;
+                        surfaceLayers.msaaSamples = 8;
                     }
 
                     if (surfaceLayers.msaaSamples <= 0) {
-                        aaText = "No AA"
+                        aaText = "No AA";
                     } else {
-                        aaText = surfaceLayers.msaaSamples + "xMSAA"
+                        aaText = surfaceLayers.msaaSamples + "xMSAA";
                     }
 
-                    renderLabel.text = modeText + aaText
+                    renderLabel.text = modeText + aaText;
                 }
             }
 

@@ -90,7 +90,7 @@ Rectangle {
                 visible: false
 
                 HeightMapSurfaceDataProxy {
-                    heightMapFile: ":/heightmaps/image"
+                    heightMapFile: ":/heightmap.png"
                     // We don't want the default data values set by heightmap proxy.
                     minZValue: 30
                     maxZValue: 60
@@ -144,14 +144,14 @@ Rectangle {
             onClicked: {
                 if (Qt.colorEqual(surfaceSeries.wireframeColor, "#000000")
                         && Qt.colorEqual(heightSeries.wireframeColor, "#000000")) {
-                    surfaceSeries.wireframeColor = "red"
-                    heightSeries.wireframeColor = "red"
-                    text = "Black surface\ngrid color"
+                    surfaceSeries.wireframeColor = "red";
+                    heightSeries.wireframeColor = "red";
+                    text = "Black surface\ngrid color";
                 }
                 else {
-                    surfaceSeries.wireframeColor = "black"
-                    heightSeries.wireframeColor = "black"
-                    text = "Red surface\ngrid color"
+                    surfaceSeries.wireframeColor = "black";
+                    heightSeries.wireframeColor = "black";
+                    text = "Red surface\ngrid color";
                 }
             }
         }
@@ -209,10 +209,10 @@ Rectangle {
             onClicked: {
                 if (surfacePlot.theme.backgroundEnabled === true) {
                     surfacePlot.theme.backgroundEnabled = false;
-                    text = "Show\nBackground"
+                    text = "Show\nBackground";
                 } else {
                     surfacePlot.theme.backgroundEnabled = true;
-                    text = "Hide\nBackground"
+                    text = "Hide\nBackground";
                 }
             }
         }
@@ -227,10 +227,10 @@ Rectangle {
             onClicked: {
                 if (surfacePlot.theme.gridEnabled === true) {
                     surfacePlot.theme.gridEnabled = false;
-                    text = "Show\nGrid"
+                    text = "Show\nGrid";
                 } else {
                     surfacePlot.theme.gridEnabled = true;
-                    text = "Hide\nGrid"
+                    text = "Hide\nGrid";
                 }
             }
         }
@@ -245,17 +245,17 @@ Rectangle {
             //! [3]
             onClicked: {
                 if (surfaceSeries.visible === false) {
-                    surfacePlot.axisY.max = 500.0
-                    surfaceSeries.visible = true
-                    heightSeries.visible = false
-                    middleGradient.position = 0.25
-                    text = "Switch to Height Map Series"
+                    surfacePlot.axisY.max = 500.0;
+                    surfaceSeries.visible = true;
+                    heightSeries.visible = false;
+                    middleGradient.position = 0.25;
+                    text = "Switch to Height Map Series";
                 } else {
-                    surfacePlot.axisY.max = 250.0
-                    surfaceSeries.visible = false
-                    heightSeries.visible = true
-                    middleGradient.position = 0.50
-                    text = "Switch to Item Model Series"
+                    surfacePlot.axisY.max = 250.0;
+                    surfaceSeries.visible = false;
+                    heightSeries.visible = true;
+                    middleGradient.position = 0.50;
+                    text = "Switch to Item Model Series";
                 }
             }
             //! [3]
@@ -264,13 +264,13 @@ Rectangle {
 
     function checkState() {
         if (surfaceSeries.drawMode & Surface3DSeries.DrawSurface)
-            surfaceToggle.text = "Hide\nSurface"
+            surfaceToggle.text = "Hide\nSurface";
         else
-            surfaceToggle.text = "Show\nSurface"
+            surfaceToggle.text = "Show\nSurface";
 
         if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe)
-            surfaceGridToggle.text = "Hide Surface\nGrid"
+            surfaceGridToggle.text = "Hide Surface\nGrid";
         else
-            surfaceGridToggle.text = "Show Surface\nGrid"
+            surfaceGridToggle.text = "Show Surface\nGrid";
     }
 }

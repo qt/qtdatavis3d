@@ -37,16 +37,13 @@ target_link_libraries(qmlspectrogram PUBLIC
     Qt::DataVisualization
 )
 
-set(qmlspectrogram_resource_files
-    "qml/qmlspectrogram/Data.qml"
-    "qml/qmlspectrogram/main.qml"
-)
-
-qt6_add_resources(qmlspectrogram "qmlspectrogram"
-    PREFIX
-        "/qml"
-    FILES
-        ${qmlspectrogram_resource_files}
+qt6_add_qml_module(qmlspectrogram
+    URI Spectrogram
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    QML_FILES
+        qml/qmlspectrogram/Data.qml
+        qml/qmlspectrogram/main.qml
 )
 
 install(TARGETS qmlspectrogram

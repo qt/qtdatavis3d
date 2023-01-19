@@ -41,17 +41,14 @@ target_link_libraries(qmlbars PUBLIC
     Qt::DataVisualization
 )
 
-set(qmlbars_resource_files
-    "qml/qmlbars/Axes.qml"
-    "qml/qmlbars/Data.qml"
-    "qml/qmlbars/main.qml"
-)
-
-qt6_add_resources(qmlbars "qmlbars"
-    PREFIX
-        "/"
-    FILES
-        ${qmlbars_resource_files}
+qt6_add_qml_module(qmlbars
+    URI Bars
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    QML_FILES
+        qml/qmlbars/Axes.qml
+        qml/qmlbars/Data.qml
+        qml/qmlbars/main.qml
 )
 
 install(TARGETS qmlbars

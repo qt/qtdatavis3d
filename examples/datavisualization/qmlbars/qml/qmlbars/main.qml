@@ -7,6 +7,8 @@ import QtQuick.Layouts
 import QtDataVisualization
 import Qt.labs.qmlmodels
 
+pragma ComponentBehavior: Bound
+
 Item {
     id: mainview
     width: 1280

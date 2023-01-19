@@ -149,7 +149,7 @@ Item {
                 text = "Use Flat for Series One";
                 scatterSeries.meshSmooth = true;
             } else {
-                text = "Use Smooth for Series One"
+                text = "Use Smooth for Series One";
                 scatterSeries.meshSmooth = false;
             }
         }
@@ -180,16 +180,14 @@ Item {
         anchors.margins: 5
         text: "Change Theme"
         onClicked: {
-            if (scatterGraph.theme.type === Theme3D.ThemeArmyBlue) {
-                scatterGraph.theme = themeIsabelle
-            } else {
-                scatterGraph.theme = themeArmyBlue
-            }
-            if (scatterGraph.theme.backgroundEnabled === true) {
+            if (scatterGraph.theme.type === Theme3D.ThemeArmyBlue)
+                scatterGraph.theme = themeIsabelle;
+            else
+                scatterGraph.theme = themeArmyBlue;
+            if (scatterGraph.theme.backgroundEnabled === true)
                 backgroundToggle.text = "Hide Background";
-            } else {
+            else
                 backgroundToggle.text = "Show Background";
-            }
         }
     }
 

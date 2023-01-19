@@ -37,16 +37,13 @@ target_link_libraries(qmlscatter PUBLIC
     Qt::DataVisualization
 )
 
-set(qmlscatter_resource_files
-    "qml/qmlscatter/Data.qml"
-    "qml/qmlscatter/main.qml"
-)
-
-qt6_add_resources(qmlscatter "qmlscatter"
-    PREFIX
-        "/"
-    FILES
-        ${qmlscatter_resource_files}
+qt6_add_qml_module(qmlscatter
+    URI Scatter
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    QML_FILES
+        qml/qmlscatter/Data.qml
+        qml/qmlscatter/main.qml
 )
 
 install(TARGETS qmlscatter

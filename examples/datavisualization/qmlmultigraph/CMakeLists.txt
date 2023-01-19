@@ -37,16 +37,13 @@ target_link_libraries(qmlmultigraph PUBLIC
     Qt::DataVisualization
 )
 
-set(qmlmultigraph_resource_files
-    "qml/qmlmultigraph/Data.qml"
-    "qml/qmlmultigraph/main.qml"
-)
-
-qt6_add_resources(qmlmultigraph "qmlmultigraph"
-    PREFIX
-        "/"
-    FILES
-        ${qmlmultigraph_resource_files}
+qt6_add_qml_module(qmlmultigraph
+    URI MultiGraph
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    QML_FILES
+        qml/qmlmultigraph/Data.qml
+        qml/qmlmultigraph/main.qml
 )
 
 install(TARGETS qmlmultigraph

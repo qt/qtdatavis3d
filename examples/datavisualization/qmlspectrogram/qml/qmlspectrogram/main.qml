@@ -154,12 +154,12 @@ Window {
             width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
             text: "Switch to\npolar"
             onClicked: {
-                if (surfaceGraph.polar === false) {
-                    surfaceGraph.polar = true
-                    text = "Switch to\ncartesian"
+                if (!surfaceGraph.polar) {
+                    surfaceGraph.polar = true;
+                    text = "Switch to\ncartesian";
                 } else {
-                    surfaceGraph.polar = false
-                    text = "Switch to\npolar"
+                    surfaceGraph.polar = false;
+                    text = "Switch to\npolar";
                 }
             }
         }
@@ -173,22 +173,23 @@ Window {
             width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
             text: "Switch to\nperspective"
             onClicked: {
-                if (surfaceGraph.orthoProjection === true) {
+                if (surfaceGraph.orthoProjection) {
                     surfaceGraph.orthoProjection = false;
-                    xAxis.labelAutoRotation = 30
-                    yAxis.labelAutoRotation = 30
-                    zAxis.labelAutoRotation = 30
-                    customInputHandler.rotationEnabled = true
-                    text = "Switch to\northographic"
+                    xAxis.labelAutoRotation = 30;
+                    yAxis.labelAutoRotation = 30;
+                    zAxis.labelAutoRotation = 30;
+                    customInputHandler.rotationEnabled = true;
+                    text = "Switch to\northographic";
                 } else {
                     surfaceGraph.orthoProjection = true;
-                    surfaceGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetDirectlyAbove
+                    surfaceGraph.scene.activeCamera.cameraPreset
+                        = Camera3D.CameraPresetDirectlyAbove;
                     surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
-                    xAxis.labelAutoRotation = 0
-                    yAxis.labelAutoRotation = 0
-                    zAxis.labelAutoRotation = 0
-                    customInputHandler.rotationEnabled = false
-                    text = "Switch to\nperspective"
+                    xAxis.labelAutoRotation = 0;
+                    yAxis.labelAutoRotation = 0;
+                    zAxis.labelAutoRotation = 0;
+                    customInputHandler.rotationEnabled = false;
+                    text = "Switch to\nperspective";
                 }
             }
         }
@@ -201,11 +202,10 @@ Window {
             width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
             text: "Toggle axis\ngrid on top"
             onClicked: {
-                if (surfaceGraph.flipHorizontalGrid === true) {
+                if (surfaceGraph.flipHorizontalGrid)
                     surfaceGraph.flipHorizontalGrid = false;
-                } else {
+                else
                     surfaceGraph.flipHorizontalGrid = true;
-                }
             }
         }
 
@@ -218,11 +218,10 @@ Window {
             text: "Toggle radial\nlabel position"
             visible: surfaceGraph.polar
             onClicked: {
-                if (surfaceGraph.radialLabelOffset >= 1.0) {
-                    surfaceGraph.radialLabelOffset = 0.01
-                } else {
-                    surfaceGraph.radialLabelOffset = 1.0
-                }
+                if (surfaceGraph.radialLabelOffset >= 1.0)
+                    surfaceGraph.radialLabelOffset = 0.01;
+                else
+                    surfaceGraph.radialLabelOffset = 1.0;
             }
         }
 
@@ -240,11 +239,10 @@ Window {
             text: "Toggle\nsurface grid"
             visible: !surfaceGraph.orthoProjection
             onClicked: {
-                if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
+                if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe)
                     surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
-                } else {
+                else
                     surfaceSeries.drawMode |= Surface3DSeries.DrawWireframe;
-                }
             }
         }
     }
