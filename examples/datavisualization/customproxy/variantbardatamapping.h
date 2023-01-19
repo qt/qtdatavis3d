@@ -11,11 +11,11 @@ class VariantBarDataMapping : public QObject
 {
     Q_OBJECT
     //! [0]
-    Q_PROPERTY(int rowIndex READ rowIndex WRITE setRowIndex)
-    Q_PROPERTY(int columnIndex READ columnIndex WRITE setColumnIndex)
-    Q_PROPERTY(int valueIndex READ valueIndex WRITE setValueIndex)
-    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories)
-    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories)
+    Q_PROPERTY(int rowIndex READ rowIndex WRITE setRowIndex NOTIFY rowIndexChanged)
+    Q_PROPERTY(int columnIndex READ columnIndex WRITE setColumnIndex NOTIFY columnIndexChanged)
+    Q_PROPERTY(int valueIndex READ valueIndex WRITE setValueIndex NOTIFY valueIndexChanged)
+    Q_PROPERTY(QStringList rowCategories READ rowCategories WRITE setRowCategories NOTIFY rowCategoriesChanged)
+    Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories NOTIFY columnCategoriesChanged)
     //! [0]
 public:
     explicit VariantBarDataMapping();
@@ -47,6 +47,11 @@ public:
                const QStringList &columnCategories);
     //! [2]
 Q_SIGNALS:
+    void rowIndexChanged();
+    void columnIndexChanged();
+    void valueIndexChanged();
+    void rowCategoriesChanged();
+    void columnCategoriesChanged();
     //! [3]
     void mappingChanged();
     //! [3]

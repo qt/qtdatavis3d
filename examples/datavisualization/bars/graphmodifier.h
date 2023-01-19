@@ -80,6 +80,7 @@ private:
     float m_defaultAngleY;
     float m_defaultZoom;
     QVector3D m_defaultTarget;
+    const QString m_celsiusString = QString(QChar(0xB0)) + QLatin1String("C");
 };
 
 #endif

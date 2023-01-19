@@ -13,8 +13,6 @@
 #include <QtWidgets/QComboBox>
 #include <QtCore/qmath.h>
 
-const QString celsiusString = QString(QChar(0xB0)) + "C";
-
 //! [0]
 GraphModifier::GraphModifier(Q3DBars *bargraph)
     : m_graph(bargraph),
@@ -51,7 +49,7 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_temperatureAxis->setSegmentCount(m_segments);
     m_temperatureAxis->setSubSegmentCount(m_subSegments);
     m_temperatureAxis->setRange(m_minval, m_maxval);
-    m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%.1f ") + celsiusString));
+    m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%.1f ") + m_celsiusString));
     m_temperatureAxis->setLabelAutoRotation(30.0f);
     m_temperatureAxis->setTitleVisible(true);
 

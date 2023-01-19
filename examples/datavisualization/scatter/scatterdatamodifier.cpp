@@ -77,11 +77,11 @@ void ScatterDataModifier::addData()
 #else
     //! [6]
     float limit = qSqrt(m_itemCount) / 2.0f;
-    for (float i = -limit; i < limit; i++) {
-        for (float j = -limit; j < limit; j++) {
-            ptrToDataArray->setPosition(QVector3D(i + 0.5f,
-                                                  qCos(qDegreesToRadians((i * j) / m_curveDivider)),
-                                                  j + 0.5f));
+    for (int i = -limit; i < limit; i++) {
+        for (int j = -limit; j < limit; j++) {
+            ptrToDataArray->setPosition(QVector3D(float(i) + 0.5f,
+                                                  qCos(qDegreesToRadians(float(i * j) / m_curveDivider)),
+                                                  float(j) + 0.5f));
             ptrToDataArray++;
         }
     }
