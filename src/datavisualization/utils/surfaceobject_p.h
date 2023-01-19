@@ -14,7 +14,6 @@
 #ifndef SURFACEOBJECT_P_H
 #define SURFACEOBJECT_P_H
 
-#include "datavisualizationglobal_p.h"
 #include "abstractobjecthelper_p.h"
 #include "qsurfacedataproxy.h"
 

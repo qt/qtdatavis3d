@@ -30,6 +30,7 @@ public:
         DrawSurface = 2,
         DrawSurfaceAndWireframe = DrawWireframe | DrawSurface
     };
+    Q_ENUM(DrawFlag)
     Q_DECLARE_FLAGS(DrawFlags, DrawFlag)
 
     explicit QSurface3DSeries(QObject *parent = nullptr);
@@ -79,6 +80,8 @@ private:
 
     friend class Surface3DController;
 };
+
+Q_DECLARE_OPERATORS_FOR_FLAGS(QSurface3DSeries::DrawFlags)
 
 QT_END_NAMESPACE
 
