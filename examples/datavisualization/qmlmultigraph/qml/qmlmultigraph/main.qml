@@ -4,8 +4,7 @@
 import QtQuick
 import QtQuick.Layouts
 import QtQuick.Controls
-import QtDataVisualization 1.2
-import "."
+import QtDataVisualization
 
 Item {
     id: mainView

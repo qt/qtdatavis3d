@@ -22,7 +22,7 @@ int main(int argc, char *argv[])
 #endif
     engine.addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
                                       QString::fromLatin1("qml")));
-    engine.load(QUrl(QStringLiteral("qrc:/qml/qml/qmlspectrogram/main.qml")));
+    engine.load(QUrl(QStringLiteral("qrc:/qml/qmlspectrogram/main.qml")));
 
     return app.exec();
 }

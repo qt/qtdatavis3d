@@ -37,27 +37,16 @@ target_link_libraries(qmlsurfacelayers PUBLIC
     Qt::DataVisualization
 )
 
-set(qmlsurfacelayers_resource_files
-    "qml/qmlsurfacelayers/main.qml"
-)
-
-qt6_add_resources(qmlsurfacelayers "qmlsurfacelayers"
-    PREFIX
-        "/"
-    FILES
-        ${qmlsurfacelayers_resource_files}
-)
-set(qmlsurfacelayers1_resource_files
-    "layer_1.png"
-    "layer_2.png"
-    "layer_3.png"
-)
-
-qt6_add_resources(qmlsurfacelayers "qmlsurfacelayers1"
-    PREFIX
-        "/heightmaps"
-    FILES
-        ${qmlsurfacelayers1_resource_files}
+qt6_add_qml_module(qmlsurfacelayers
+    URI SurfaceLayers
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    QML_FILES
+        qml/qmlsurfacelayers/main.qml
+    RESOURCES
+        layer_1.png
+        layer_2.png
+        layer_3.png
 )
 
 install(TARGETS qmlsurfacelayers

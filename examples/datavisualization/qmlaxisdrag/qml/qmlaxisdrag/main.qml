@@ -50,9 +50,9 @@ Item {
         //! [10]
         onTriggered: {
             rotationAngle = rotationAngle + 1
-            qtCube.setRotationAxisAndAngle(Qt.vector3d(1,0,1), rotationAngle)
+            qtCube.setRotationAxisAndAngle(Qt.vector3d(1, 0, 1), rotationAngle)
             //! [10]
-            scatterSeries.setMeshAxisAndAngle(Qt.vector3d(1,1,1), rotationAngle)
+            scatterSeries.setMeshAxisAndAngle(Qt.vector3d(1, 1, 1), rotationAngle)
             if (isIncreasing) {
                 for (var i = 0; i < 10; i++)
                     appendRow()
@@ -135,10 +135,10 @@ Item {
             customItemList: [
                 Custom3DItem {
                     id: qtCube
-                    meshFile: ":/mesh/cube"
-                    textureFile: ":/texture/texture"
-                    position: Qt.vector3d(0.65,0.35,0.65)
-                    scaling: Qt.vector3d(0.3,0.3,0.3)
+                    meshFile: ":/qml/qmlaxisdrag/cube.obj"
+                    textureFile: ":/qml/qmlaxisdrag/cubetexture.png"
+                    position: Qt.vector3d(0.65, 0.35, 0.65)
+                    scaling: Qt.vector3d(0.3, 0.3, 0.3)
                 }
             ]
             //! [9]

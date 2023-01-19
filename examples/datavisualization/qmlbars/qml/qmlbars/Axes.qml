@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 import QtQuick
-import QtDataVisualization 1.2
+import QtDataVisualization
 
 Item {
     property alias column: columnAxis

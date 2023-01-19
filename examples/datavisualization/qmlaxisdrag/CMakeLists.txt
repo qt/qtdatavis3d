@@ -37,41 +37,15 @@ target_link_libraries(qmlaxisdrag PUBLIC
     Qt::DataVisualization
 )
 
-set(qmlaxisdrag_resource_files
-    "qml/qmlaxisdrag/main.qml"
-)
-
-qt6_add_resources(qmlaxisdrag "qmlaxisdrag"
-    PREFIX
-        "/"
-    FILES
-        ${qmlaxisdrag_resource_files}
-)
-set_source_files_properties("qml/qmlaxisdrag/cube.obj"
-    PROPERTIES QT_RESOURCE_ALIAS "cube"
-)
-set(qmlaxisdrag1_resource_files
-    "qml/qmlaxisdrag/cube.obj"
-)
-
-qt6_add_resources(qmlaxisdrag "qmlaxisdrag1"
-    PREFIX
-        "/mesh"
-    FILES
-        ${qmlaxisdrag1_resource_files}
-)
-set_source_files_properties("qml/qmlaxisdrag/cubetexture.png"
-    PROPERTIES QT_RESOURCE_ALIAS "texture"
-)
-set(qmlaxisdrag2_resource_files
-    "qml/qmlaxisdrag/cubetexture.png"
-)
-
-qt6_add_resources(qmlaxisdrag "qmlaxisdrag2"
-    PREFIX
-        "/texture"
-    FILES
-        ${qmlaxisdrag2_resource_files}
+qt6_add_qml_module(qmlaxisdrag
+    URI AxisDrag
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    QML_FILES
+        qml/qmlaxisdrag/main.qml
+    RESOURCES
+        qml/qmlaxisdrag/cube.obj
+        qml/qmlaxisdrag/cubetexture.png
 )
 
 install(TARGETS qmlaxisdrag
