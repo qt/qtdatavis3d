@@ -634,7 +634,7 @@ void VolumetricModifier::excavateMineBlock(int textureSize, int dataIndex, int s
                                            QList<uchar> *textureData)
 {
     for (int k = 0; k < size; k++) {
-        int curIndex = dataIndex + (k * textureSize * textureSize / 2);
+        int curIndex = 0;
         for (int l = 0; l < size; l++) {
             curIndex = dataIndex + (k * textureSize * textureSize / 2)
                     + (l * textureSize);
