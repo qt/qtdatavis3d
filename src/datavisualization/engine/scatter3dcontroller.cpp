@@ -107,6 +107,11 @@ QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
     return scatterSeriesList;
 }
 
+void Scatter3DController::clearChangedItems()
+{
+    m_changedItems.clear();
+}
+
 void Scatter3DController::handleArrayReset()
 {
     QScatter3DSeries *series;

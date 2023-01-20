@@ -98,11 +98,22 @@ public:
     void removeSeries(QAbstract3DSeries *series) override;
     virtual QList<QScatter3DSeries *> scatterSeriesList();
 
+    inline bool hasSelectedItemChanged() const { return m_changeTracker.selectedItemChanged; }
+    inline void setSelectedItemChanged(bool changed) { m_changeTracker.selectedItemChanged = changed; }
+    inline bool hasItemChanged() const { return m_changeTracker.itemChanged; }
+    inline void setItemChanged(bool changed) { m_changeTracker.itemChanged = changed; }
+
+    void clearChangedItems();
+
     void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) override;
     void handleAxisRangeChangedBySender(QObject *sender) override;
     void handlePendingClick() override;
     void adjustAxisRanges() override;
+    inline bool hasChangedSeriesList() const { return !m_changedSeriesList.empty(); }
+    inline bool isSeriesVisualsDirty() const { return m_isSeriesVisualsDirty; }
+    inline void setSeriesVisualsDirty() { m_isSeriesVisualsDirty = true; }
+    inline bool isDataDirty() const { return m_isDataDirty; }
 
 public Q_SLOTS:
     void handleArrayReset();

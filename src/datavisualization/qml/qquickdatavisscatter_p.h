@@ -70,6 +70,14 @@ Q_SIGNALS:
     void selectedSeriesChanged(QScatter3DSeries *series);
 
 private:
+
+    struct ScatterModel {
+        QList <QQuick3DModel *> dataItems;
+        QQuick3DTexture *seriesTexture;
+        QQuick3DTexture *highlightTexture;
+        QScatter3DSeries *series;
+    };
+
     Scatter3DController *m_scatterController;
     float m_maxItemSize = 0.0f;
 
@@ -78,6 +86,9 @@ private:
     const float m_defaultMaxSize = 0.1f;
     const float m_itemScaler = 3.0f;
     float m_pointScale = 0;
+
+    const float m_indicatorScaleAdjustment = 1.1f;
+    const float m_rangeGradientYHelper = 0.5f;
 
     // These were in renderer
     float m_scaleX = 1.0f;
@@ -88,14 +99,7 @@ private:
     float m_vBackgroundMargin = 0.1f;
     float m_hBackgroundMargin = 0.1f;
 
-    float m_scaleXWithBackground = 0.0f;
-    float m_scaleYWithBackground = 0.0f;
-    float m_scaleZWithBackground = 0.0f;
-
     bool m_polarGraph = false;
-
-    float m_graphHorizontalAspectRatio = 0.0f;
-    float m_graphAspectRatio = 2.0f;
 
     int m_selectedItem;
     QScatter3DSeries *m_selectedItemSeries; // Points to the series for which the bar is selected
@@ -103,51 +107,40 @@ private:
     QQuick3DModel *m_selected = nullptr;
     QQuick3DModel *m_previousSelected = nullptr;
 
-    QHash<QScatter3DSeries *, QList<QQuick3DModel *>> m_seriesModelMap;
+    QList<ScatterModel *> m_scatterGraphs;
 
     // From seriesvisualizer
-    void setup(QScatter3DSeries *series);
     void connectSeries(QScatter3DSeries *series);
     void disconnectSeries(QScatter3DSeries *series);
-    void generatePointsForSeries(QScatter3DSeries *series);
     qsizetype getItemIndex(QQuick3DModel *item);
     void setSelected(qsizetype index);
 //    void clearSelection();
-    void updateItemPositions(QScatter3DSeries *series);
-    void updateItemVisuals(QScatter3DSeries *series);
     void createItemLabel();
     QVector3D selectedItemPosition();
-
-    bool pointsGenerated() const;
 
     ScatterInstancing *m_instancing = nullptr;
     QQuick3DModel *m_instancingRootItem = nullptr;
     QQuick3DNode *m_seriesRootItem = nullptr;
-    QQuick3DMaterial *m_seriesMaterial = nullptr;
-    QQuick3DTexture *m_texture = nullptr;
-    QQuick3DTexture *m_highlightTexture = nullptr;
-    bool m_hasTexture = false;
-    bool m_hasHighLightTexture = false;
+
     bool m_smooth = false;
 
     float m_dotSizedScale = 1.0f;
-    QQuaternion m_meshRotation;
-    QList<QQuick3DModel *> m_itemList;
     qsizetype m_selectedIndex = -1;
     QQuick3DModel *m_selectionIndicator = nullptr;
     bool m_selectionActive = false;
     float m_selectedGradientPos = 0.0f;
-    QQuickDataVisScatter *m_qml;
-    QScatter3DSeries *m_series;
-    int m_itemCount = 0;
 
     void resetSelection();
-    void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
     void updateItemInstancedMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
-    void updateInstancedCustomMaterial(QQuick3DModel *model, bool isHighlight = false);
+    void updateInstancedCustomMaterial(QQuick3DModel *model, bool isHighlight = false,
+                                       QQuick3DTexture *seriesTexture = nullptr,
+                                       QQuick3DTexture *highlightTexture = nullptr);
     void updateSelectionIndicatorMaterial(bool useGradient, bool rangeGradient);
-    void updateCustomMaterial(QQuick3DModel *item, bool isHighlight = false);
-    void updatePrincipledMaterial(QQuick3DModel *model, const QColor &color, bool useGradient, bool isHighlight = false);
+
+    void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
+    void updateCustomMaterial(QQuick3DModel *item, QQuick3DTexture *texture);
+    void updatePrincipledMaterial(QQuick3DModel *model, const QColor &color,
+                                  bool useGradient, QQuick3DTexture *texture = nullptr);
 
     QQuick3DTexture *createTexture();
     QQuick3DModel *createDataItemModel(QAbstract3DSeries::Mesh meshType);
@@ -156,28 +149,29 @@ private:
     void createInstancingRootItem(QAbstract3DSeries::Mesh meshType);
     void createSelectionIndicator(QAbstract3DSeries::Mesh meshType);
     void removeDataItems(QList<QQuick3DModel *> &items);
-    void removeDummyDataItems();
     void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
     QString getMeshFileName(QAbstract3DSeries::Mesh meshType);
     // ----------------------------------------
+
+    void removeDataItems(QList<QQuick3DModel *> &items, qsizetype count);
+    void addPointsToScatterModel(ScatterModel *graphModel, qsizetype count);
+    int sizeDifference(qsizetype size1, qsizetype size2);
+    void handleSeriesChanged(QList<QAbstract3DSeries *> changedSeries);
 
     QQuick3DNode *m_itemLabel = nullptr;
 
     QColor m_selectedSeriesColor;
 
-    float m_labelMargin = 0.25f;
-
-    float m_gridOffset = 0.002f;
-    float m_lineWidthScaleFactor = 0.0001f;
-    float m_lineLengthScaleFactor = 0.011f;
-
     QQmlComponent *createRepeaterDelegate(QAbstract3DSeries::Mesh MeshType);
     void calculateSceneScalingFactors();
     float calculatePointScaleSize();
     void updatePointScaleSize();
-    void updateDataPoints(QScatter3DSeries *series);
-    void updateDataPointVisuals(QScatter3DSeries *series);
+
     void updateShadowQuality(QQuickDataVisItem::ShadowQuality quality) override;
+
+    void generatePointsForScatterModel(ScatterModel *series);
+    void updateScatterGraphItemPositions(ScatterModel *graphModel);
+    void updateScatterGraphItemVisuals(ScatterModel *graphModel);
 
     QQuick3DModel *selected() const;
     void setSelected(QQuick3DModel *newSelected);
@@ -189,8 +183,6 @@ private:
 
     // Change selection mode
     void setSelectionModeNG(QAbstract3DGraph::SelectionFlags mode);
-
-    friend class Scatter3DController;
 };
 
 QT_END_NAMESPACE
