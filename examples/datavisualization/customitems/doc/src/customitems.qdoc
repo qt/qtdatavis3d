@@ -3,7 +3,9 @@
 
 /*!
     \example customitems
-    \title Custom Items Example
+    \meta tags {DataVisualization, Q3DSurface, QCustom3DItem, Surface Graph}
+    \meta category {Graphics}
+    \title Custom Items in Graph
     \ingroup qtdatavisualization_examples
     \brief Adding custom items to a surface graph.
     \since QtDataVisualization 1.1

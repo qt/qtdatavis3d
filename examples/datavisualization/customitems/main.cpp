@@ -90,7 +90,7 @@ int main(int argc, char **argv)
     label4->setFont(font);
     vLayoutRight->addWidget(label4);
 
-    widget->setWindowTitle(QStringLiteral("Custom Items Example"));
+    widget->setWindowTitle(QStringLiteral("Custom Items in Graph"));
 
     widget->show();
 

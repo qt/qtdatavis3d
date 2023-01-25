@@ -37,6 +37,8 @@
     \section1 Examples
 
     \annotatedlist qtdatavisualization_examples
+    The following examples show how to use Qt Quick to visualize data:
+    \annotatedlist qtdatavisualization_qmlexamples
 */
 
 /*!
@@ -111,7 +113,7 @@
     QHeightMapSurfaceDataProxy is a specialized proxy for generating a surface graph from a
     heightmap image. See the QHeightMapSurfaceDataProxy documentation for more information.
 
-    The \l{Custom Proxy Example}{Custom Proxy} example shows how a custom proxy can be created. It
+    The \l{Data from Custom Proxy}{Custom Proxy} example shows how a custom proxy can be created. It
     defines a custom data set based on variant lists and an extension of the basic proxy to resolve
     that data with an associated mapper.
 
@@ -161,9 +163,8 @@
     the default touch controls, see QTouch3DInputHandler. The default handlers
     must be disabled when using customized input handlers.
 
-    The \l{Custom Input Example} illustrates how to use a custom input handler
-    to select items upon mouseover instead of mouse click. The information
-    below the mouse cursor is displayed as a popup.
+    The \l{Input Handling for Axes} illustrates how to use a custom input handler
+    to drag an axis label to move the visible part of the data.
 
     In addition to perspective projection, orthographic projection can be used
     to create 2D graphs by replacing the default input handler with one that
@@ -200,7 +201,7 @@
             application main. It can be defined by adding \c {qputenv("QSG_RHI_BACKEND", "opengl");}
             in the beginning of your main function.
         \li Some platforms like Android and WinRT cannot handle multiple native windows properly,
-            so only the Qt Quick 2 graphs are available in practice for those platforms.
+            so only the Qt Quick graphs are available in practice for those platforms.
         \li Surfaces with non-straight rows and columns do not always render properly.
         \li Q3DLight class (and Light3D QML item) are currently not usable for anything.
         \li Changing most of Q3DScene properties affecting subviewports currently has no effect.

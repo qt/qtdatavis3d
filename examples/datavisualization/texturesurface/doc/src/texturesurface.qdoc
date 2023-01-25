@@ -3,13 +3,15 @@
 
 /*!
     \example texturesurface
-    \title Textured Surface Example
+    \meta tags {DataVisualization, Q3DSurface, Textured Surface}
+    \meta category {Graphics}
+    \title Textured Surface Graph
     \ingroup qtdatavisualization_examples
     \brief Using texture with Q3DSurface.
     \since QtDataVisualization 1.2
 
-    The textured surface example shows how to add an image as a texture for a surface. The example
-    shows also how to:
+    The textured surface graph example shows how to add an image as a texture for a surface. The
+    example shows also how to:
 
     \list
         \li Create a surface series from an image
@@ -54,7 +56,7 @@
 
     \section1 Use Custom Input Handler to Enable Zooming and Panning
 
-    For the panning the implementation is similar to the \l{Axis Range Dragging With Labels Example}.
+    For the panning the implementation is similar to the \l{Input Handling for Axes}.
     The difference is that in this example we follow only dragging of X and Z axis and we don't
     allow dragging the surface outside the graph. The control for this is very simple and done as
     on the following example for the X axis.

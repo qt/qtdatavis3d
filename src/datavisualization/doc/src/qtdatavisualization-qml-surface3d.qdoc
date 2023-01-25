@@ -9,7 +9,7 @@
   \ingroup datavisualization_qml
   \brief Describes the usage of the 3D surface graph.
 
-  This type enables developers to render surface plots in 3D with Qt Quick 2.
+  This type enables developers to render surface plots in 3D with Qt Quick.
 
   You will need to import the data visualization module to use this type:
 
@@ -19,7 +19,7 @@
 
   \snippet doc_src_qmldatavisualization.cpp 3
 
-  See \l{Qt Quick 2 Surface Example} for more thorough usage example.
+  See \l{Surface Graph from Height Data} for more thorough usage example.
 
   \sa Surface3DSeries, ItemModelSurfaceDataProxy, Bars3D, Scatter3D, {Qt Data Visualization C++ Classes}
  */

@@ -3,7 +3,9 @@
 
 /*!
     \example surface
-    \title Surface Example
+    \meta tags {DataVisualization, Q3DSurface}
+    \meta category {Graphics}
+    \title Surface Graph
     \ingroup qtdatavisualization_examples
     \brief Using Q3DSurface in a widget application.
 

@@ -3,18 +3,20 @@
 
 /*!
     \example qmlbars
-    \title Qt Quick 2 Bars Example
-    \ingroup qtdatavisualization_examples
+    \meta tags {DataVisualization, Barsr3D, Multiple Series}
+    \meta category {Graphics}
+    \title Simple Bar Graph
+    \ingroup qtdatavisualization_qmlexamples
     \brief Using Bars3D in a QML application.
 
-    The Qt Quick 2 bars example shows how to make a simple 3D bar graph using Bars3D and Qt
+    The bars example shows how to make a simple 3D bar graph using Bars3D and Qt
     Quick 2.
 
     \image qmlbars-example.png
 
     The interesting thing about this example is switching series and displaying more than one series
     at once. We'll concentrate on those and skip explaining the basic Bars3D functionality - for
-    more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
+    more detailed QML example documentation, see \l{Simple Scatter Graph}.
 
     \include examples-run.qdocinc
 

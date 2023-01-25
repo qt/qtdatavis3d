@@ -3,18 +3,20 @@
 
 /*!
     \example qmlsurface
-    \title Qt Quick 2 Surface Example
-    \ingroup qtdatavisualization_examples
+    \meta tags {DataVisualization, Surface3D, Height Map}
+    \meta category {Graphics}
+    \title Surface Graph from Height Data
+    \ingroup qtdatavisualization_qmlexamples
     \brief Using Surface3D in a QML application.
 
-    The Qt Quick 2 surface example shows how to make a simple 3D surface plot using Surface3D with
-    Qt Quick 2.
+    The surface graph example shows how to make a simple 3D surface plot using Surface3D
+    with QML.
 
     \image qmlsurface-example.png
 
     The focus in this example is on generating a surface graph from height data, so in this section
     we skip explaining the application creation. For more detailed QML example documentation,
-    see \l{Qt Quick 2 Scatter Example}.
+    see \l{Simple Scatter Graph}.
 
     \include examples-run.qdocinc
 

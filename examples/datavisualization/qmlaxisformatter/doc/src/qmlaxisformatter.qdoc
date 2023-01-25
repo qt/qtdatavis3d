@@ -3,19 +3,21 @@
 
 /*!
     \example qmlaxisformatter
-    \title Qt Quick 2 Axis Formatter Example
-    \ingroup qtdatavisualization_examples
+    \meta tags {DataVisualization, Scatter3D, Custom Axis Formatter, Scatter Graph}
+    \meta category {Graphics}
+    \title Axis Formatters
+    \ingroup qtdatavisualization_qmlexamples
     \brief Example of a hybrid C++ and QML application demonstrating different axis formatters.
     \since QtDataVisualization 1.1
 
-    The Qt Quick axis formatter example shows how to use predefined axis formatters and how to
+    The Qt Quick axis formatters example shows how to use predefined axis formatters and how to
     create a custom one.
 
     \image qmlaxisformatter-example.png
 
     The interesting thing about this example is axis formatters, so we'll concentrate on
     that and skip explaining the basic functionality - for
-    more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
+    more detailed QML example documentation, see \l{Simple Scatter Graph}.
 
     \include examples-run.qdocinc
 
@@ -73,7 +75,7 @@
     \snippet qmlaxisformatter/customformatter.cpp 3
 
     To expose our new custom formatter to the QML, we must declare it and make it a QML module.
-    Doing this was introduced in the \l{Qt Quick 2 Oscilloscope Example} so we will skip it here.
+    Doing this was introduced in the \l{Surface Oscilloscope} so we will skip it here.
 
     \section1 QML
 

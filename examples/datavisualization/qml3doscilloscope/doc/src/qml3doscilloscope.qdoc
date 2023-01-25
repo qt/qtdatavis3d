@@ -3,18 +3,20 @@
 
 /*!
     \example qml3doscilloscope
-    \title Qt Quick 2 Oscilloscope Example
-    \ingroup qtdatavisualization_examples
+    \meta tags {DataVisualization, Surface3D, Dynamic Data, Surface Graph}
+    \meta category {Graphics}
+    \title Surface Oscilloscope
+    \ingroup qtdatavisualization_qmlexamples
     \brief Example of a hybrid C++ and QML application.
 
-    The Qt Quick 2 oscilloscope example shows how to combine C++ and QML in an application,
+    The oscilloscope example shows how to combine C++ and QML in an application,
     as well as showing data that changes realtime.
 
     \image qml3doscilloscope-example.png
 
     The interesting thing about this example is combining C++ and QML, so we'll concentrate on
-    that and skip explaining the basic functionality - for
-    more detailed QML example documentation, see \l{Qt Quick 2 Scatter Example}.
+    that and skip explaining the basic functionality - for more detailed QML example documentation,
+    see \l{Simple Scatter Graph}.
 
     \include examples-run.qdocinc
 

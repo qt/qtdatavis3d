@@ -56,7 +56,7 @@
     \image q3dbars-minimal.png
 
     For more information, see \l{How to construct a minimal Q3DBars graph},
-    \l {Bars Example}, and \l {Qt Quick 2 Bars Example}.
+    \l {Bar Graph}, and \l {Simple Bar Graph} examples.
 
     \section2 3D Scatter Graphs
 
@@ -69,7 +69,7 @@
     \image q3dscatter-minimal.png
 
     For more information, see \l{How to construct a minimal Q3DScatter graph},
-    \l{Scatter Example}, and \l{Qt Quick 2 Scatter Example}.
+    \l{Scatter Graph}, and \l{Simple Scatter Graph} examples.
 
     \section2 3D Surface Graphs
 
@@ -82,8 +82,7 @@
     \image q3dsurface-minimal.png
 
     For more information, see \l{How to construct a minimal Q3DSurface graph},
-    \l{Surface Example}, \l{Textured Surface Example}, \l{Qt Quick 2 Surface
-    Example}, and \l{Qt Quick 2 Surface Multiseries Example}.
+    \l{Surface Graph}, \l{Textured Surface Graph}, and \l{Surface Graph from Height Data} examples.
 
     \section1 Using OpenGL for Rendering Data
 
@@ -114,7 +113,7 @@
     be partially transparent. Therefore, changing the rendering mode is a
     question of performance versus quality.
 
-    Qt Quick 2 uses a dedicated scenegraph for data rendering, and is therefore
+    Qt Quick uses a dedicated scenegraph for data rendering, and is therefore
     the best choice for data visualization.
 
     \section1 3D Axes
@@ -187,7 +186,7 @@
     If a graph displays the data from several data series, some settings can be
     specified separately for each series. For example, different gradients can
     be specified for different layers of the graph to make it look more
-    realistic. For an example, see \l{Qt Quick 2 Surface Multiseries Example}.
+    realistic. For an example, see \l{Custom Items in Graph}.
 
     \section1 Customizing 3D Scenes
 
@@ -199,7 +198,7 @@
     position follows the camera automatically.
 
     The camera can be customized by specifying its preset position, rotation,
-    and zoom level. For an example, see \l{Qt Quick 2  Scatter Example}.
+    and zoom level. For an example, see \l{Simple Scatter Graph}.
 
     \section1 Customizing Items
 

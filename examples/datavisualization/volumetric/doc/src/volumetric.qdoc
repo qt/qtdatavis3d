@@ -3,7 +3,9 @@
 
 /*!
     \example volumetric
-    \title Volumetric rendering Example
+    \meta tags {DataVisualization, QCustom3DVolume, Custom Item}
+    \meta category {Graphics}
+    \title Volumetric Rendering
     \ingroup qtdatavisualization_examples
     \brief Rendering volumetric objects.
     \since QtDataVisualization 1.2

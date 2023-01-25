@@ -9,7 +9,7 @@
   \ingroup datavisualization_qml
   \brief 3D scatter graph.
 
-  This type enables developers to render scatter graphs in 3D with Qt Quick 2.
+  This type enables developers to render scatter graphs in 3D with Qt Quick.
 
   You will need to import data visualization module to use this type:
 
@@ -19,7 +19,7 @@
 
   \snippet doc_src_qmldatavisualization.cpp 2
 
-  See \l{Qt Quick 2 Scatter Example} for more thorough usage example.
+  See \l{Simple Scatter Graph} for more thorough usage example.
 
   \sa Scatter3DSeries, ScatterDataProxy, Bars3D, Surface3D, {Qt Data Visualization C++ Classes}
  */
