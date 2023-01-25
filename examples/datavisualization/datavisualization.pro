@@ -3,9 +3,7 @@ qtHaveModule(quick) {
     SUBDIRS += qmlbars \
                qmlscatter \
                qmlsurface \
-               qmlmultigraph \
                qml3doscilloscope \
-               qmlsurfacelayers \
                qmlaxisformatter \
                qmlaxisdrag \
                qmlspectrogram
@@ -14,7 +12,6 @@ qtHaveModule(quick) {
 !android:!ios:!winrt {
     SUBDIRS += bars \
                customproxy \
-               itemmodel \
                scatter \
                surface \
                draggableaxes \

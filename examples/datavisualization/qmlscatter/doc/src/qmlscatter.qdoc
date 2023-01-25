@@ -3,16 +3,18 @@
 
 /*!
     \example qmlscatter
-    \title Qt Quick 2 Scatter Example
-    \ingroup qtdatavisualization_examples
+    \meta tags {DataVisualization, Scatter3D, Multiple Series}
+    \meta category {Graphics}
+    \title Simple Scatter Graph
+    \ingroup qtdatavisualization_qmlexamples
     \brief Using Scatter3D in a QML application.
 
-    The Qt Quick 2 scatter example shows how to make a simple scatter graph visualization using
-    Scatter3D and Qt Quick 2.
+    The scatter graph example shows how to make a simple scatter graph visualization using
+    Scatter3D and QML.
 
     For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
 
-    For instructions how to create a new Qt Quick 2 application of your own, see Qt Creator help.
+    For instructions how to create a new Qt Quick application of your own, see Qt Creator help.
 
     \image qmlscatter-example.png
 

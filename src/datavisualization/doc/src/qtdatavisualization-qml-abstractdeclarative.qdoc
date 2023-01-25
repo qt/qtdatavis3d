@@ -284,7 +284,7 @@
  * \c selectedElementChanged signal is emitted.
  *
  * The signal can be used for example for implementing customized input
- * handling, as demonstrated by the \l {Qt Quick 2 Axis Dragging Example}.
+ * handling, as demonstrated by the \l {Axis Dragging} example.
  *
  * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
  * Bars3D::selectedSeries, Scatter3D::selectedSeries, Scene3D::selectionQueryPosition,

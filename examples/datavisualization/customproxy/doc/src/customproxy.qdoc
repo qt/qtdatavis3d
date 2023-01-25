@@ -3,7 +3,9 @@
 
 /*!
     \example customproxy
-    \title Custom Proxy Example
+    \meta tags {DataVisualization, Q3DBars, Bar Graph}
+    \meta category {Graphics}
+    \title Data from Custom Proxy
     \ingroup qtdatavisualization_examples
     \brief Using Q3DBars with a custom proxy.
 
@@ -11,9 +13,8 @@
 
     \image customproxy-example.png
 
-    The interesting thing about custom proxy example is the custom dataset and the corresponding
-    proxy usage, so we concentrate on that and skip explaining the basic Q3DBars functionality
-    - for that see \l{Bars Example}.
+    This example describes how to use a custom dataset and the corresponding proxy. For more
+    information about basic Q3DBars functionality, see the \l{Bar Graph} example.
 
     This example defines a simple flexible data set \c VariantDataSet where each data item is a
     a variant list. Each item can have multiple different values, identified by their index in

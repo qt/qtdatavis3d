@@ -3,7 +3,9 @@
 
 /*!
     \example bars
-    \title Bars Example
+    \meta tags {DataVisualization, Q3DBars}
+    \meta category {Graphics}
+    \title Bar Graph
     \ingroup qtdatavisualization_examples
     \brief Using Q3DBars in a widget application.
 

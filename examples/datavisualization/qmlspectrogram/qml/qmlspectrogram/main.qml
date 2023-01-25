@@ -8,7 +8,7 @@ import QtDataVisualization
 
 Window {
     id: mainview
-    title: "Qt Quick 2 Spectrogram Example"
+    title: "Qt Quick 2 Surface Spectrogram"
     visible: true
     width: 1024
     height: 768

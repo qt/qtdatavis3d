@@ -3,12 +3,14 @@
 
 /*!
     \example qmlaxisdrag
-    \title Qt Quick 2 Axis Dragging Example
-    \ingroup qtdatavisualization_examples
-    \brief Implementing axis dragging in QML.
+    \meta tags {DataVisualization, Scatter3D, Custom Input Handler, Dynamic Data, Scatter Graph}
+    \meta category {Graphics}
+    \title Axis Dragging
+    \ingroup qtdatavisualization_qmlexamples
+    \brief Implementing axis dragging with a custom input handler in QML.
     \since QtDataVisualization 1.1
 
-    The Qt Quick 2 axis dragging example concentrates on showing how to implement axis range
+    The axis dragging example concentrates on showing how to implement axis range
     changing by dragging axis labels in QML. It also gives a quick peek to two other new features
     in Qt Data Visualization 1.1: orthographic projection and dynamic custom item handling.
 
@@ -71,7 +73,7 @@
     \snippet qmlaxisdrag/qml/qmlaxisdrag/main.qml 7
 
     For a more sophisticated conversion from mouse movement to axis range update, see
-    \l{Axis Range Dragging With Labels Example}{this example}.
+    \l{Input Handling for Axes}.
 
     \section1 Other Features
 

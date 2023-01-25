@@ -62,7 +62,7 @@ QT_BEGIN_NAMESPACE
  *
  * The scene can be rotated, zoomed into, and a bar can be selected to view its value,
  * but no other interaction is included in this minimal code example. You can learn more by
- * familiarizing yourself with the examples provided, like the \l{Bars Example}.
+ * familiarizing yourself with the examples provided, like the \l{Bar Graph}.
  *
  * \sa Q3DScatter, Q3DSurface, {Qt Data Visualization C++ Classes}
  */

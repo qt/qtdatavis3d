@@ -3,12 +3,14 @@
 
 /*!
     \example draggableaxes
-    \title Axis Range Dragging With Labels Example
+    \meta tags {DataVisualization, Q3DScatter, Custom Input Handler, Scatter Graph}
+    \meta category {Graphics}
+    \title Input Handling for Axes
     \ingroup qtdatavisualization_examples
     \brief Implementing a custom input handler to support axis dragging.
     \since QtDataVisualization 1.1
 
-    The Axis Range Dragging example shows how to customize the 3D graph controls in a widget
+    The Input Handling for Axes example shows how to customize the 3D graph controls in a widget
     application to allow changing axis ranges by clicking on an axis label and dragging. This is
     done by implementing a custom input handler to react to selection signals emitted from the
     graph.

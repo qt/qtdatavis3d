@@ -51,6 +51,7 @@ int main(int argc, char **argv)
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
     themeList->addItem(QStringLiteral("Primary Colors"));
+    themeList->addItem(QStringLiteral("Digia"));
     themeList->addItem(QStringLiteral("Stone Moss"));
     themeList->addItem(QStringLiteral("Army Blue"));
     themeList->addItem(QStringLiteral("Retro"));

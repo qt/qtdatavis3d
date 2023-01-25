@@ -55,7 +55,7 @@ QT_BEGIN_NAMESPACE
  * item models where doing search and replace is not necessary to get the desired values.
  *
  * For example about using the search patterns in conjunction with the roles, see
- * \l{Qt Quick 2 Bars Example}.
+ * \l{Simple Bar Graph} example.
  *
  * \sa {Qt Data Visualization Data Handling}
  */

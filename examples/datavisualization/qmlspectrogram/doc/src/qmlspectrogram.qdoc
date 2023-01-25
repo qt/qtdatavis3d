@@ -3,12 +3,14 @@
 
 /*!
     \example qmlspectrogram
-    \title Qt Quick 2 Spectrogram Example
-    \ingroup qtdatavisualization_examples
+    \meta tags {DataVisualization, Surface3D, Polar Graph, Surface Graph}
+    \meta category {Graphics}
+    \title Surface Spectrogram
+    \ingroup qtdatavisualization_qmlexamples
     \brief Showing spectrogram graph in a QML application.
 
-    The Qt Quick 2 Spectrogram example demonstrates how to show a polar and cartesian spectrograms
-    and how to utilize orthographic projection to show them in 2D.
+    The Surface Spectrogram example demonstrates how to show a polar and cartesian
+    spectrograms and how to utilize orthographic projection to show them in 2D.
 
     \image qmlspectrogram-example.png
 
@@ -19,7 +21,7 @@
 
     The focus in this example is on showing how to display spectrograms, so the basic
     functionality is not explained. For more detailed QML example documentation,
-    see \l{Qt Quick 2 Scatter Example}.
+    see \l{Simple Scatter Graph}.
 
     \include examples-run.qdocinc
 
