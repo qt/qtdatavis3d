@@ -46,12 +46,11 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
     //! [1]
 
-    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu and Helsinki, Finland (2006-2013)"));
+    widget->setWindowTitle(QStringLiteral("Average temperatures in Oulu and Helsinki, Finland (2015-2022)"));
 
     QComboBox *themeList = new QComboBox(widget);
     themeList->addItem(QStringLiteral("Qt"));
     themeList->addItem(QStringLiteral("Primary Colors"));
-    themeList->addItem(QStringLiteral("Digia"));
     themeList->addItem(QStringLiteral("Stone Moss"));
     themeList->addItem(QStringLiteral("Army Blue"));
     themeList->addItem(QStringLiteral("Retro"));
@@ -174,14 +173,14 @@ int main(int argc, char **argv)
     shadowQuality->setCurrentIndex(5);
 
     QComboBox *rangeList = new QComboBox(widget);
-    rangeList->addItem(QStringLiteral("2006"));
-    rangeList->addItem(QStringLiteral("2007"));
-    rangeList->addItem(QStringLiteral("2008"));
-    rangeList->addItem(QStringLiteral("2009"));
-    rangeList->addItem(QStringLiteral("2010"));
-    rangeList->addItem(QStringLiteral("2011"));
-    rangeList->addItem(QStringLiteral("2012"));
-    rangeList->addItem(QStringLiteral("2013"));
+    rangeList->addItem(QStringLiteral("2015"));
+    rangeList->addItem(QStringLiteral("2016"));
+    rangeList->addItem(QStringLiteral("2017"));
+    rangeList->addItem(QStringLiteral("2018"));
+    rangeList->addItem(QStringLiteral("2019"));
+    rangeList->addItem(QStringLiteral("2020"));
+    rangeList->addItem(QStringLiteral("2021"));
+    rangeList->addItem(QStringLiteral("2022"));
     rangeList->addItem(QStringLiteral("All"));
     rangeList->setCurrentIndex(8);
 
