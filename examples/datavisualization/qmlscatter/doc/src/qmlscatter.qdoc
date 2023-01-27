@@ -32,7 +32,7 @@
     To make deployment little simpler, we gather all of the application's \c .qml files to a resource
     file (\c qmlscatter.qrc):
 
-    \code
+    \badcode
     <RCC>
         <qresource prefix="/">
             <file>qml/qmlscatter/Data.qml</file>
@@ -45,6 +45,20 @@
 
     \snippet qmlscatter/main.cpp 3
 
+    When using cmake instead of qmake, the \c .qml files are added into a QML module in the
+    \c {CMakeLists.txt} instead:
+
+    \badcode
+    qt6_add_qml_module(qmlscatter
+        URI Scatter
+        VERSION 1.0
+        NO_RESOURCE_TARGET_PATH
+        QML_FILES
+            qml/qmlscatter/Data.qml
+            qml/qmlscatter/main.qml
+    )
+    \endcode
+
     Lastly, we want the application to run in a maximized window:
 
     \snippet qmlscatter/main.cpp 2
@@ -54,9 +68,6 @@
     First we'll import all the QML modules we need:
 
     \snippet qmlscatter/qml/qmlscatter/main.qml 0
-
-    The last \c import just imports all the qml files in the same directory as our \c {main.qml},
-    because that's where \c Data.qml is.
 
     Then we create our main \c Item and call it \c mainView:
 
@@ -79,10 +90,11 @@
 
     \snippet qmlscatter/qml/qmlscatter/main.qml 3
 
-    We added a customized theme and changed the shadow quality.
+    We added a customized theme, changed the shadow quality, and adjusted the camera position.
     We're happy with the other visual properties, so we won't change them.
 
-    The custom theme is based on a predefined theme, but we change the font in it:
+    The custom theme is based on a predefined theme \c {Theme3D.ThemeQt}, but we change the font
+    in it:
 
     \snippet qmlscatter/qml/qmlscatter/main.qml 13
 
