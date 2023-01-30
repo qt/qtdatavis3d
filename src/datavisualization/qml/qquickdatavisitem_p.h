@@ -276,6 +276,11 @@ public:
     void changeGridLineColor(QQuick3DRepeater *repeater, const QColor &color);
     void updateTitleLabels();
 
+    bool isSliceEnabled() const { return m_sliceEnabled; }
+    void setSliceEnabled(bool enabled) { m_sliceEnabled = enabled; }
+    void setSliceActivatedChanged(bool changed) { m_sliceActivatedChanged = changed; }
+    void updateSliceView();
+
     QQuick3DNode *itemSelectionLabel() const;
     void setItemSelectionLabel(QQuick3DNode *newItemSelectionLabel);
 
@@ -331,10 +336,15 @@ protected:
 
     void componentComplete() override;
 
+    void createSliceView();
+
+    QQuick3DNode *graphNode() { return m_graphNode; }
+    QQuick3DViewport *sliceView() { return m_sliceView; }
+
     QQmlComponent *createRepeaterDelegateComponent(const QString &fileName);
     QQuick3DRepeater *createRepeater();
-
     QQuick3DNode *createTitleLabel();
+
     void updateXTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
                       const QQuaternion &totalRotation, float labelsMaxWidth, float labelHeight, const QVector3D &scale);
     void updateYTitle(const QVector3D &sideLabelRotation, const QVector3D &backLabelRotation,
@@ -354,20 +364,17 @@ protected:
     void updateLabels();
 
     virtual void synchData();
-
     virtual void updateGraph() {}
 
     virtual void updateShadowQuality(QQuickDataVisItem::ShadowQuality quality);
-
     virtual void updateAxisRange(float min, float max);
-
     virtual void updateAxisReversed(bool enable);
-
     virtual void updateSingleHighlightColor() {}
 
     QSharedPointer<QMutex> m_nodeMutex;
 
 private:
+    QQuick3DNode *m_graphNode = nullptr;
     QQuick3DModel *m_background = nullptr;
     QQuick3DModel *m_backgroundBB = nullptr;
     QQuick3DNode *m_backgroundScale = nullptr;
@@ -390,6 +397,8 @@ private:
     QQuick3DRepeater *m_subsegmentLineRepeaterY = nullptr;
     QQuick3DRepeater *m_segmentLineRepeaterZ = nullptr;
     QQuick3DRepeater *m_subsegmentLineRepeaterZ = nullptr;
+
+    QQuick3DViewport *m_sliceView = nullptr;
 
     QPointer<Abstract3DController> m_controller;
     QQuick3DNode *m_cameraTarget = nullptr;
@@ -427,6 +436,9 @@ private:
     float m_lineLengthScaleFactor = 0.02f;
 
     float m_labelMargin = 0.1f;
+
+    bool m_sliceEnabled = false;
+    bool m_sliceActivatedChanged = false;
 
     void setUpCamera();
     void setUpLight();

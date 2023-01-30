@@ -41,7 +41,6 @@ QQuickDataVisItem::QQuickDataVisItem(QQuickItem *parent) :
 
     auto sceneManager = QQuick3DObjectPrivate::get(rootNode())->sceneManager;
     connect(sceneManager.data(), &QQuick3DSceneManager::windowChanged, this, &QQuickDataVisItem::handleWindowChanged);
-    environment()->setAntialiasingMode(QQuick3DSceneEnvironment::QQuick3DEnvironmentAAModeValues::NoAA);
     // Set contents to false in case we are in qml designer to make component look nice
     m_runningInDesigner = QGuiApplication::applicationDisplayName() == QLatin1String("Qml2Puppet");
     setFlag(ItemHasContents/*, !m_runningInDesigner*/); // Is this relevant anymore?
@@ -113,7 +112,19 @@ void QQuickDataVisItem::keyPressEvent(QKeyEvent *ev)
 
 void QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
 {
-    Q_UNUSED(event);
+    if (Qt::LeftButton == event->button()) {
+        if (m_sliceEnabled && m_controller->isSlicingActive()) {
+            m_sliceEnabled = false;
+            m_sliceActivatedChanged = true;
+            return;
+        }
+        auto selectionMode = m_controller->selectionMode();
+        if (selectionMode.testFlag(QAbstract3DGraph::SelectionSlice)
+                && (selectionMode.testFlag(QAbstract3DGraph::SelectionColumn)
+                    != selectionMode.testFlag(QAbstract3DGraph::SelectionRow))) {
+            m_sliceEnabled = true;
+        }
+    }
 }
 
 void QQuickDataVisItem::handleFpsChanged()
@@ -719,6 +730,11 @@ void QQuickDataVisItem::synchData()
     if (m_controller->m_isDataDirty) {
         updateGraph();
         m_controller->m_isDataDirty = false;
+    }
+
+    if (m_sliceActivatedChanged) {
+        updateSliceView();
+        m_sliceActivatedChanged = false;
     }
 }
 
@@ -2150,6 +2166,20 @@ void QQuickDataVisItem::updateTitleLabels()
     }
 }
 
+void QQuickDataVisItem::updateSliceView()
+{
+    if (!m_sliceEnabled) {
+        m_controller->setSlicingActive(false);
+        setWidth(width() * 5.f);
+        setHeight(height() * 5.f);
+        m_sliceView->setVisible(false);
+    } else {
+        setWidth(width() * .2f);
+        setHeight(height() * .2f);
+        m_sliceView->setVisible(true);
+    }
+}
+
 void QQuickDataVisItem::windowDestroyed(QObject *obj)
 {
     // Remove destroyed window from window lists
@@ -2205,6 +2235,26 @@ QQuick3DPrincipledMaterial *QQuickDataVisItem::createPrincipledMaterial()
 bool QQuickDataVisItem::event(QEvent *event)
 {
     return QQuickItem::event(event);
+}
+
+void QQuickDataVisItem::createSliceView()
+{
+    m_sliceView = new QQuick3DViewport();
+    m_sliceView->setParent(parent());
+    m_sliceView->setParentItem(parentItem());
+    m_sliceView->setVisible(false);
+    m_sliceView->setWidth(width());
+    m_sliceView->setHeight(height());
+
+    auto scene = m_sliceView->scene();
+
+    auto camera = new QQuick3DOrthographicCamera(scene);
+    camera->setPosition(QVector3D(0, 0, 5));
+    m_sliceView->setCamera(camera);
+
+    auto light = new QQuick3DDirectionalLight(scene);
+    light->setParent(camera);
+    light->setParentItem(camera);
 }
 
 void QQuickDataVisItem::setUpCamera()
