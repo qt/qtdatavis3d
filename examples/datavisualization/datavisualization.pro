@@ -4,8 +4,7 @@ qtHaveModule(quick) {
                qmlscatter \
                qmlsurface \
                qml3doscilloscope \
-               qmlaxisformatter \
-               qmlaxisdrag \
+               qmlaxishandling \
                qmlspectrogram
 }
 

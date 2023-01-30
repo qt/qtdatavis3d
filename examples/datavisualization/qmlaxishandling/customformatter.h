@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef CUSTOMFORMATTER_H
 #define CUSTOMFORMATTER_H
 
-#include <QtDataVisualization/QValue3DAxisFormatter>
-#include <QtCore/QDateTime>
+#include <QtDataVisualization/qvalue3daxisformatter.h>
+#include <QtCore/qdatetime.h>
 #include <QtQml/qqmlregistration.h>
 
 //! [2]
