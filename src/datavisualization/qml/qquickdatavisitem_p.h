@@ -276,11 +276,6 @@ public:
     void changeGridLineColor(QQuick3DRepeater *repeater, const QColor &color);
     void updateTitleLabels();
 
-    bool isSliceEnabled() const { return m_sliceEnabled; }
-    void setSliceEnabled(bool enabled) { m_sliceEnabled = enabled; }
-    void setSliceActivatedChanged(bool changed) { m_sliceActivatedChanged = changed; }
-    void updateSliceView();
-
     QQuick3DNode *itemSelectionLabel() const;
     void setItemSelectionLabel(QQuick3DNode *newItemSelectionLabel);
 
@@ -362,9 +357,16 @@ protected:
     void setVerticalSegmentLine(bool hasVerticalLine) { m_hasVerticalSegmentLine = hasVerticalLine; }
     void updateGrid();
     void updateLabels();
+    void updateSliceGrid();
+    void updateSliceLabels();
 
     virtual void synchData();
     virtual void updateGraph() {}
+
+    bool isSliceEnabled() const { return m_sliceEnabled; }
+    void setSliceEnabled(bool enabled) { m_sliceEnabled = enabled; }
+    void setSliceActivatedChanged(bool changed) { m_sliceActivatedChanged = changed; }
+    virtual void updateSliceGraph();
 
     virtual void updateShadowQuality(QQuickDataVisItem::ShadowQuality quality);
     virtual void updateAxisRange(float min, float max);
@@ -399,6 +401,13 @@ private:
     QQuick3DRepeater *m_subsegmentLineRepeaterZ = nullptr;
 
     QQuick3DViewport *m_sliceView = nullptr;
+    QQuick3DRepeater *m_sliceHorizontalGridRepeater = nullptr;
+    QQuick3DRepeater *m_sliceVerticalGridRepeater = nullptr;
+    QQuick3DRepeater *m_sliceHorizontalLabelRepeater = nullptr;
+    QQuick3DRepeater *m_sliceVerticalLabelRepeater = nullptr;
+
+    QQuick3DNode *m_sliceHorizontalTitleLabel = nullptr;
+    QQuick3DNode *m_sliceVerticalTitleLabel = nullptr;
 
     QPointer<Abstract3DController> m_controller;
     QQuick3DNode *m_cameraTarget = nullptr;
@@ -434,6 +443,9 @@ private:
     float m_gridOffset = 0.002f;
     float m_lineWidthScaleFactor = 0.0001f;
     float m_lineLengthScaleFactor = 0.02f;
+
+    float m_labelFontScaleFactor = 4.0f;
+    float m_fontScaleFactor = .3f;
 
     float m_labelMargin = 0.1f;
 

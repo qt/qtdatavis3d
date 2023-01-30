@@ -255,6 +255,16 @@ void QValue3DAxis::recalculate()
     formatter()->d_ptr->recalculate();
 }
 
+int QValue3DAxis::gridSize()
+{
+    return formatter()->gridPositions().size();
+}
+
+int QValue3DAxis::subGridSize()
+{
+    return formatter()->subGridPositions().size();
+}
+
 float QValue3DAxis::gridPositionAt(int gridLine)
 {
     return formatter()->gridPositions().at(gridLine);
