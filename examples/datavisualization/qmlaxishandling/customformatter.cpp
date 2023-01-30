@@ -1,10 +1,9 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "customformatter.h"
-#include <QtDataVisualization/QValue3DAxis>
-#include <QtQml/QQmlExtensionPlugin>
-#include <QtCore/QDebug>
+#include <QtDataVisualization/qvalue3daxis.h>
+#include <QtQml/qqmlextensionplugin.h>
 
 Q_DECLARE_METATYPE(QValue3DAxisFormatter *)
 
