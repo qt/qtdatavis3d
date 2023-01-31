@@ -95,7 +95,8 @@ protected:
     void updateGraph() override;
     void updateAxisRange(float min, float max) override;
     void updateAxisReversed(bool enable) override;
-    QVector3D calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition, int index) override;
+    QVector3D calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition,
+                                             int index) override;
     float calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index) override;
     void handleMousePressedEvent(QMouseEvent *event) override;
 
@@ -183,8 +184,6 @@ private:
     QBar3DSeries *m_selectedBarSeries;
     QPoint m_selectedBarCoord;
     QVector3D m_selectedBarPos;
-    bool m_barSelectionFound = false;
-    qsizetype m_selectedIndex = -1;
 
     //Generate bars
     struct BarModel
@@ -193,6 +192,8 @@ private:
         QBarDataItem *barItem;
         QPoint coord;
         int visualIndex;
+        float heightValue;
+        QQuick3DTexture *texture;
     };
     QHash<QBar3DSeries *, QVector<BarModel *> *> m_barModelsMap;
     QAbstract3DSeries::Mesh m_meshType = QAbstract3DSeries::MeshSphere;
@@ -207,7 +208,6 @@ private:
     float m_zeroPosition;
     int m_visibleSeriesCount;
     QQuaternion m_meshRotation;
-    QQuick3DTexture *m_texture = nullptr;
     QQuick3DTexture *m_highlightTexture = nullptr;
     QQuick3DModel *m_selectionIndicator = nullptr;
     QQuick3DNode *m_itemLabel = nullptr;
@@ -225,11 +225,15 @@ private:
     void updateBarPositions(QBar3DSeries *series);
     void updateBarVisuals(QBar3DSeries *series);
     void updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient);
-    void updateCustomMaterial(QQuick3DModel *item, bool isHighlight = false);
-    void updatePrincipledMaterial(QQuick3DModel *model, const QColor &color, bool useGradient, bool isHighlight);
+    void updateCustomMaterial(QQuick3DModel *item, bool isHighlight = false,
+                              QQuick3DTexture *texture = nullptr);
+    void updatePrincipledMaterial(QQuick3DModel *model, const QColor &color, bool useGradient,
+                                  bool isHighlight, QQuick3DTexture *texture);
     void removeDataItems(QBar3DSeries *series);
     QQuick3DTexture *createTexture();
+    void setSelectedBar(QBar3DSeries *series, const QPoint &coord);
     void updateSelectedBar();
+    Abstract3DController::SelectionType isSelected(int row, int bar, QBar3DSeries *series);
     void resetClickedStatus();
 
     void updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative);

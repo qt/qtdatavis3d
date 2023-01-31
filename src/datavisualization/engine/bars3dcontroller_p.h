@@ -134,9 +134,6 @@ public:
     void handleAxisRangeChangedBySender(QObject *sender) override;
     void adjustAxisRanges() override;
 
-    QQuick3DModel *selected() const;
-    void setSelected(QQuick3DModel *newSelected);
-
 public Q_SLOTS:
     void handleArrayReset();
     void handleRowsAdded(int startIndex, int count);
