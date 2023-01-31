@@ -69,6 +69,9 @@ Q_SIGNALS:
     void axisZChanged(QValue3DAxis *axis);
     void selectedSeriesChanged(QScatter3DSeries *series);
 
+protected:
+    void handleMousePressedEvent(QMouseEvent *event) override;
+
 private:
 
     struct ScatterModel {
@@ -115,7 +118,6 @@ private:
     qsizetype getItemIndex(QQuick3DModel *item);
     void setSelected(qsizetype index);
 //    void clearSelection();
-    void createItemLabel();
     QVector3D selectedItemPosition();
 
     ScatterInstancing *m_instancing = nullptr;
@@ -157,8 +159,6 @@ private:
     void addPointsToScatterModel(ScatterModel *graphModel, qsizetype count);
     int sizeDifference(qsizetype size1, qsizetype size2);
     void handleSeriesChanged(QList<QAbstract3DSeries *> changedSeries);
-
-    QQuick3DNode *m_itemLabel = nullptr;
 
     QColor m_selectedSeriesColor;
 

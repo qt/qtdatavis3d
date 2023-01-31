@@ -118,11 +118,6 @@ qsizetype QQuickDataVisScatter::getItemIndex(QQuick3DModel *item)
     return -1;
 }
 
-void QQuickDataVisScatter::setSelected(qsizetype index)
-{
-    m_selectedIndex = index;
-}
-
 void QQuickDataVisScatter::resetSelection()
 {
     if (m_selectedIndex != -1) {
@@ -241,8 +236,9 @@ void QQuickDataVisScatter::updateScatterGraphItemVisuals(ScatterModel *graphMode
                 updatePrincipledMaterial(obj, graphModel->series->baseColor(),
                                          useGradient, graphModel->seriesTexture);
             }
-            if (m_selectedIndex != -1) {
-                QQuick3DModel *selectedItem = itemList.at(m_selectedIndex);
+            if (m_scatterController->m_selectedItem != invalidSelectionIndex()
+                    && graphModel->series == m_scatterController->m_selectedItemSeries) {
+                QQuick3DModel *selectedItem = itemList.at(m_scatterController->m_selectedItem);
                 updatePrincipledMaterial(selectedItem, graphModel->series->singleHighlightColor(),
                                          useGradient, graphModel->highlightTexture);
             }
@@ -297,7 +293,7 @@ void QQuickDataVisScatter::updateScatterGraphItemVisuals(ScatterModel *graphMode
             m_selectionIndicator->setRotation(dih.rotation);
             m_selectionIndicator->setScale(dih.scale * m_indicatorScaleAdjustment);
             m_selectionIndicator->setVisible(true);
-            m_itemLabel->setPosition(m_selectionIndicator->position());
+            itemLabel()->setPosition(m_selectionIndicator->position());
             m_selectionActive = true;
             m_instancing->markDataDirty();
         }
@@ -525,20 +521,12 @@ void QQuickDataVisScatter::addPointsToScatterModel(ScatterModel *graphModel, qsi
         item->setParent(graphModel->series);
         graphModel->dataItems.push_back(item);
     }
+    m_scatterController->setSeriesVisualsDirty();
 }
 
 int QQuickDataVisScatter::sizeDifference(qsizetype size1, qsizetype size2)
 {
     return size2 - size1;
-}
-
-void QQuickDataVisScatter::createItemLabel()
-{
-    QQmlComponent component(qmlEngine(this), QStringLiteral(":/axis/ItemLabel"));
-    QQuick3DNode *labelNode = qobject_cast<QQuick3DNode *>(component.create());
-    labelNode->setParent(QQuick3DViewport::scene());
-    labelNode->setParentItem(QQuick3DViewport::scene());
-    m_itemLabel = labelNode;
 }
 
 QVector3D QQuickDataVisScatter::selectedItemPosition()
@@ -622,41 +610,10 @@ QScatter3DSeries *QQuickDataVisScatter::selectedSeries() const
 
 void QQuickDataVisScatter::setSelectedItem(int index, QScatter3DSeries *series)
 {
-    const QScatterDataProxy *proxy = 0;
+    m_scatterController->setSelectedItem(index, series);
 
-    // Series may already have been removed, so check it before setting the selection.
-    if (!m_scatterController->m_seriesList.contains(series))
-        series = 0;
-
-    if (series)
-        proxy = series->dataProxy();
-
-    if (!proxy || index < 0 || index >= proxy->itemCount())
-        index = invalidSelectionIndex();
-
-    if (index != m_selectedItem || series != m_selectedItemSeries) {
-        bool seriesChanged = (series != m_selectedItemSeries);
-        m_selectedItem = index;
-        m_selectedItemSeries = series;
-        m_scatterController->setSelectedItemChanged(true);
-
-        // Clear selection from other series and finally set new selection to the specified series
-        foreach (QAbstract3DSeries *otherSeries, m_scatterController->m_seriesList) {
-            QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(otherSeries);
-            if (scatterSeries != m_selectedItemSeries) {
-
-                scatterSeries->dptr()->setSelectedItem(invalidSelectionIndex());
-            }
-        }
-        if (m_selectedItemSeries)
-            m_selectedItemSeries->dptr()->setSelectedItem(m_selectedItem);
-
-        if (seriesChanged)
-            emit selectedSeriesChanged(m_selectedItemSeries);
-
-    }
     if (index != invalidSelectionIndex())
-        itemSelectionLabel()->setVisible(true);
+        itemLabel()->setVisible(true);
 }
 
 QQmlListProperty<QScatter3DSeries> QQuickDataVisScatter::seriesList()
@@ -744,6 +701,35 @@ void QQuickDataVisScatter::handleAxisZChanged(QAbstract3DAxis *axis)
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
+void QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
+{
+    if (Qt::LeftButton == event->button()) {
+        if (selectionMode() == QAbstract3DGraph::SelectionItem) {
+            const auto clickPosition = event->pos();
+            QList<QQuick3DPickResult> results = pickAll(clickPosition.x(), clickPosition.y());
+            if (!results.empty()) {
+                for (const auto &result : std::as_const(results)) {
+                    if (const auto &hit = result.objectHit()) {
+                        if (hit == backgroundBB() || hit == background()) {
+                            clearSelectionModel();
+                            continue;
+                        }
+                        if (optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+                            setSelected(hit);
+                            break;
+                        } else if (optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+                            setSelected(hit, result.instanceIndex());
+                            break;
+                        }
+                    }
+                }
+            } else {
+                clearSelectionModel();
+            }
+        }
+    }
+}
+
 void QQuickDataVisScatter::calculateSceneScalingFactors()
 {
     if (m_requestedMargin < 0.0f) {
@@ -826,6 +812,21 @@ void QQuickDataVisScatter::setSelected(QQuick3DModel *newSelected)
         m_previousSelected = m_selected;
         m_selected = newSelected;
 
+        auto series = static_cast<QScatter3DSeries *>(m_selected->parent());
+
+        // Find scattermodel
+        ScatterModel *graphModel = nullptr;
+
+        for (const auto &model : std::as_const(m_scatterGraphs)) {
+            if (model->series == series) {
+                graphModel = model;
+                break;
+            }
+        }
+
+        qsizetype index = graphModel->dataItems.indexOf(m_selected);
+        setSelectedItem(index, series);
+
         m_scatterController->setSeriesVisualsDirty();
         m_scatterController->setSelectedItemChanged(true);
     }
@@ -833,7 +834,7 @@ void QQuickDataVisScatter::setSelected(QQuick3DModel *newSelected)
 
 void QQuickDataVisScatter::setSelected(QQuick3DModel *root, qsizetype index)
 {
-    if (index != m_selectedItem) {
+    if (index != m_scatterController->m_selectedItem) {
         QQuick3DObject *seriesRoot = root->parentItem();
         auto series = static_cast<QScatter3DSeries *>(seriesRoot->parent());
 
@@ -843,13 +844,16 @@ void QQuickDataVisScatter::setSelected(QQuick3DModel *root, qsizetype index)
     }
 }
 
+void QQuickDataVisScatter::setSelected(qsizetype index)
+{
+    m_selectedIndex = index;
+}
+
 void QQuickDataVisScatter::clearSelectionModel()
 {
-    setSelectedItem(invalidSelectionIndex(), 0);
-    if (m_selectedItemSeries)  {
+    setSelectedItem(invalidSelectionIndex(), nullptr);
 
-    }
-    itemSelectionLabel()->setVisible(false);
+    itemLabel()->setVisible(false);
     m_scatterController->setSeriesVisualsDirty();
     m_selected = nullptr;
     m_previousSelected = nullptr;
@@ -875,6 +879,18 @@ void QQuickDataVisScatter::updateGraph()
 
         if (m_scatterController->isSeriesVisualsDirty())
             updateScatterGraphItemVisuals(graphModel);
+
+        if (m_scatterController->m_selectedItemSeries == graphModel->series
+                && m_scatterController->m_selectedItem != invalidSelectionIndex()) {
+            QQuick3DModel *selectedModel = graphModel->dataItems.at(m_scatterController->m_selectedItem);
+            itemLabel()->setPosition(selectedModel->position());
+            QString label = m_scatterController->m_selectedItemSeries->itemLabel();
+            itemLabel()->setProperty("labelText", label);
+        }
+    }
+
+    if (m_scatterController->m_selectedItem == invalidSelectionIndex()) {
+        itemLabel()->setVisible(false);
     }
 }
 
@@ -918,7 +934,7 @@ void QQuickDataVisScatter::synchData()
     if (m_scatterController->hasSelectedItemChanged()) {
         if (m_scatterController->m_selectedItem != m_scatterController->invalidSelectionIndex()) {
             QString itemLabelText = m_scatterController->m_selectedItemSeries->itemLabel();
-            itemSelectionLabel()->setProperty("labelText", itemLabelText);
+            itemLabel()->setProperty("labelText", itemLabelText);
         }
         m_scatterController->setSelectedItemChanged(false);
     }

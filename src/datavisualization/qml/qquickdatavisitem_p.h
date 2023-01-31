@@ -218,6 +218,7 @@ public:
 
     QQuick3DModel *background() const { return m_background; }
     void setBackground(QQuick3DModel *newBackground) { m_background = newBackground; }
+    inline QQuick3DModel *backgroundBB() const { return m_backgroundBB; }
 
     QQuick3DDirectionalLight *light() const;
     QQuick3DCustomMaterial *createQmlCustomMaterial(const QString &fileName);
