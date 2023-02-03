@@ -2,12 +2,10 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 if(TARGET Qt::Quick)
+    qt_internal_add_example(qmlaxishandling)
     qt_internal_add_example(qmlbars)
     qt_internal_add_example(qmlscatter)
-    qt_internal_add_example(qmlsurface)
-    qt_internal_add_example(qml3doscilloscope)
-    qt_internal_add_example(qmlaxishandling)
-    qt_internal_add_example(qmlspectrogram)
+    qt_internal_add_example(qmlsurfacegallery)
 endif()
 if(NOT ANDROID AND NOT IOS AND NOT WINRT)
     qt_internal_add_example(bars)

@@ -1,5 +1,0 @@
-<RCC>
-    <qresource prefix="/">
-        <file>qml/qml3doscilloscope/main.qml</file>
-    </qresource>
-</RCC>

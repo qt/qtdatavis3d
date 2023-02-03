@@ -1,8 +1,8 @@
-# Copyright (C) 2022 The Qt Company Ltd.
+# Copyright (C) 2023 The Qt Company Ltd.
 # SPDX-License-Identifier: BSD-3-Clause
 
 cmake_minimum_required(VERSION 3.16)
-project(qml3doscilloscope LANGUAGES CXX)
+project(qmlsurfacegallery LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -22,14 +22,14 @@ find_package(Qt6 COMPONENTS Qml)
 find_package(Qt6 COMPONENTS Quick)
 find_package(Qt6 COMPONENTS DataVisualization)
 
-qt_add_executable(qml3doscilloscope
+qt_add_executable(qmlsurfacegallery
     main.cpp
 )
-set_target_properties(qml3doscilloscope PROPERTIES
+set_target_properties(qmlsurfacegallery PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
 )
-target_link_libraries(qml3doscilloscope PUBLIC
+target_link_libraries(qmlsurfacegallery PUBLIC
     Qt::Core
     Qt::Gui
     Qt::Qml
@@ -37,17 +37,23 @@ target_link_libraries(qml3doscilloscope PUBLIC
     Qt::DataVisualization
 )
 
-qt6_add_qml_module(qml3doscilloscope
-    URI DataSource
+qt6_add_qml_module(qmlsurfacegallery
+    URI SurfaceGallery
     VERSION 1.0
     NO_RESOURCE_TARGET_PATH
     SOURCES
         datasource.cpp datasource.h
     QML_FILES
-        qml/qml3doscilloscope/main.qml
+        qml/qmlsurfacegallery/main.qml
+        qml/qmlsurfacegallery/SpectrogramData.qml
+        qml/qmlsurfacegallery/SurfaceHeightMap.qml
+        qml/qmlsurfacegallery/SurfaceOscilloscope.qml
+        qml/qmlsurfacegallery/SurfaceSpectrogram.qml
+    RESOURCES
+        qml/qmlsurfacegallery/heightmap.png
 )
 
-install(TARGETS qml3doscilloscope
+install(TARGETS qmlsurfacegallery
     RUNTIME DESTINATION "${INSTALL_EXAMPLEDIR}"
     BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
     LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"

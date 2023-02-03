@@ -1,22 +1,18 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "datasource.h"
 #include <QtCore/qmath.h>
 #include <QtCore/qrandom.h>
 
-//! [3]
-Q_DECLARE_METATYPE(QSurface3DSeries *)
-//! [3]
-
 DataSource::DataSource(QObject *parent) :
     QObject(parent),
     m_index(-1),
     m_resetArray(nullptr)
 {
-    //! [4]
+    //! [3]
     qRegisterMetaType<QSurface3DSeries *>();
-    //! [4]
+    //! [3]
 }
 
 DataSource::~DataSource()
@@ -24,21 +20,22 @@ DataSource::~DataSource()
     clearData();
 }
 
-//! [0]
 void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
-                              float xMin, float xMax, float yMin, float yMax,
+                              float xMin, float xMax,
+                              float yMin, float yMax,
                               float zMin, float zMax)
 {
     if (!cacheCount || !rowCount || !columnCount)
         return;
 
     clearData();
+
     // Re-create the cache array
     m_data.resize(cacheCount);
-    for (int i(0); i < cacheCount; i++) {
+    for (int i = 0; i < cacheCount; i++) {
         QSurfaceDataArray &array = m_data[i];
         array.reserve(rowCount);
-        for (int j(0); j < rowCount; j++)
+        for (int j = 0; j < rowCount; j++)
             array.append(new QSurfaceDataRow(columnCount));
     }
 
@@ -48,12 +45,13 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
     int cacheIndexStep = columnCount / cacheCount;
     float cacheStep = float(cacheIndexStep) * xRange / float(columnCount);
 
+    //! [0]
     // Populate caches
-    for (int i(0); i < cacheCount; i++) {
+    for (int i = 0; i < cacheCount; i++) {
         QSurfaceDataArray &cache = m_data[i];
         float cacheXAdjustment = cacheStep * i;
         float cacheIndexAdjustment = cacheIndexStep * i;
-        for (int j(0); j < rowCount; j++) {
+        for (int j = 0; j < rowCount; j++) {
             QSurfaceDataRow &row = *(cache[j]);
             float rowMod = (float(j)) / float(rowCount);
             float yRangeMod = yRange * rowMod;
@@ -61,7 +59,7 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
             float z = zRangeMod + zMin;
             qreal rowColWaveAngleMul = M_PI * M_PI * rowMod;
             float rowColWaveMul = yRangeMod * 0.2f;
-            for (int k(0); k < columnCount; k++) {
+            for (int k = 0; k < columnCount; k++) {
                 float colMod = (float(k)) / float(columnCount);
                 float xRangeMod = xRange * colMod;
                 float x = xRangeMod + xMin + cacheXAdjustment;
@@ -80,13 +78,13 @@ void DataSource::generateData(int cacheCount, int rowCount, int columnCount,
             }
         }
     }
+    //! [0]
 }
-//! [0]
 
-//! [1]
 void DataSource::update(QSurface3DSeries *series)
 {
     if (series && m_data.size()) {
+        //! [1]
         // Each iteration uses data from a different cached array
         m_index++;
         if (m_index > m_data.count() - 1)
@@ -102,29 +100,29 @@ void DataSource::update(QSurface3DSeries *series)
                 || series->dataProxy()->columnCount() != newColumnCount) {
             m_resetArray = new QSurfaceDataArray();
             m_resetArray->reserve(newRowCount);
-            for (int i(0); i < newRowCount; i++)
+            for (int i = 0; i < newRowCount; i++)
                 m_resetArray->append(new QSurfaceDataRow(newColumnCount));
         }
 
         // Copy items from our cache to the reset array
-        for (int i(0); i < newRowCount; i++) {
+        for (int i = 0; i < newRowCount; i++) {
             const QSurfaceDataRow &sourceRow = *(array.at(i));
             QSurfaceDataRow &row = *(*m_resetArray)[i];
-            for (int j(0); j < newColumnCount; j++)
+            for (int j = 0; j < newColumnCount; j++)
                 row[j].setPosition(sourceRow.at(j).position());
         }
 
         // Notify the proxy that data has changed
         series->dataProxy()->resetArray(m_resetArray);
+        //! [1]
     }
 }
-//! [1]
 
 void DataSource::clearData()
 {
-    for (int i(0); i < m_data.size(); i++) {
+    for (int i = 0; i < m_data.size(); i++) {
         QSurfaceDataArray &array = m_data[i];
-        for (int j(0); j < array.size(); j++)
+        for (int j = 0; j < array.size(); j++)
             delete array[j];
         array.clear();
     }
