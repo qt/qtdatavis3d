@@ -225,6 +225,7 @@ public:
     QQuick3DPrincipledMaterial *createPrincipledMaterial();
 
     QQuick3DNode *itemLabel() { return m_itemLabel; }
+    QQuick3DNode *sliceItemLabel() { return m_sliceItemLabel; }
 
     QQuick3DModel *m_targetVisualizer;
 
@@ -275,9 +276,6 @@ public:
     void changeLabelFont(QQuick3DRepeater *repeater, const QFont &font);
     void changeGridLineColor(QQuick3DRepeater *repeater, const QColor &color);
     void updateTitleLabels();
-
-    QQuick3DNode *itemSelectionLabel() const;
-    void setItemSelectionLabel(QQuick3DNode *newItemSelectionLabel);
 
 public Q_SLOTS:
     virtual void handleAxisXChanged(QAbstract3DAxis *axis) = 0;
@@ -391,7 +389,7 @@ private:
     QQuick3DNode *m_titleLabelZ = nullptr;
 
     QQuick3DNode *m_itemLabel = nullptr;
-    QQuick3DNode *m_itemSelectionLabel = nullptr;
+    QQuick3DNode *m_sliceItemLabel = nullptr;
 
     QQuick3DRepeater *m_segmentLineRepeaterX = nullptr;
     QQuick3DRepeater *m_subsegmentLineRepeaterX = nullptr;

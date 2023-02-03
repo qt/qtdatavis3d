@@ -69,6 +69,7 @@ protected:
     void componentComplete() override;
     void synchData() override;
     void updateGraph() override;
+    void updateSliceGraph() override;
     void handleMousePressedEvent(QMouseEvent *event) override;
     void updateSingleHighlightColor() override;
 
@@ -97,6 +98,8 @@ private:
     struct SurfaceModel {
         QQuick3DModel *model;
         QQuick3DModel *gridModel;
+        QQuick3DModel *sliceModel;
+        QQuick3DModel *sliceGridModel;
         QVector<SurfaceVertex> vertices;
         QVector<SurfaceVertex> coarceVertices;
         QVector<quint32> indices;
@@ -124,6 +127,9 @@ private:
     Surface3DController *m_surfaceController;
     QQuick3DModel *m_selectionPointer = nullptr;
     SurfaceSelectionInstancing *m_instancing = nullptr;
+    QQuick3DModel *m_sliceSelectionPointer = nullptr;
+    SurfaceSelectionInstancing *m_sliceInstancing = nullptr;
+
 
     friend class Q3DSurfaceNG;
 };

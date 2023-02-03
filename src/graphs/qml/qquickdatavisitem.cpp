@@ -694,6 +694,11 @@ void QQuickDataVisItem::synchData()
             m_subsegmentLineRepeaterX->setVisible(enabled);
             m_subsegmentLineRepeaterY->setVisible(enabled);
             m_subsegmentLineRepeaterZ->setVisible(enabled);
+
+            if (m_sliceEnabled) {
+                m_sliceHorizontalGridRepeater->setVisible(enabled);
+                m_sliceVerticalGridRepeater->setVisible(enabled);
+            }
             theme->d_ptr->m_dirtyBits.gridEnabledDirty = false;
         }
 
@@ -1063,6 +1068,8 @@ void QQuickDataVisItem::updateLabels()
     QVector3D fontScaled = QVector3D(scaleFactor, scaleFactor, 0.0f);
 
     m_itemLabel->setScale(fontScaled);
+    if (m_sliceEnabled)
+        m_sliceItemLabel->setScale(fontScaled);
 
     float labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisX->labels()))) + textPadding;
@@ -1337,16 +1344,6 @@ void QQuickDataVisItem::updateLabels()
                      totalSideLabelRotation, totalBackLabelRotation, labelsMaxWidth, labelHeight, fontScaled);
     }
 
-}
-
-QQuick3DNode *QQuickDataVisItem::itemSelectionLabel() const
-{
-    return m_itemSelectionLabel;
-}
-
-void QQuickDataVisItem::setItemSelectionLabel(QQuick3DNode *newItemSelectionLabel)
-{
-    m_itemSelectionLabel = newItemSelectionLabel;
 }
 
 void QQuickDataVisItem::positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position)
@@ -1782,6 +1779,14 @@ void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
 
     connect(m_controller.data(), &Abstract3DController::needRender, window, &QQuickWindow::update);
     updateWindowParameters();
+
+    if (sliceView()) {
+        float pixelRatio = window->devicePixelRatio();
+        float magnification = 100.0f * pixelRatio + 50.0f;
+        QQuick3DOrthographicCamera *camera = static_cast<QQuick3DOrthographicCamera *>(sliceView()->camera());
+        camera->setHorizontalMagnification(magnification);
+        camera->setVerticalMagnification(magnification);
+    }
 
 #if defined(Q_OS_IOS)
     // Scenegraph render cycle in iOS sometimes misses update after beforeSynchronizing signal.
@@ -2266,7 +2271,7 @@ void QQuickDataVisItem::createSliceView()
     auto scene = m_sliceView->scene();
 
     auto camera = new QQuick3DOrthographicCamera(scene);
-    camera->setPosition(QVector3D(.0f, .0f, 10.0f));
+    camera->setPosition(QVector3D(.0f, .0f, 20.0f));
     m_sliceView->setCamera(camera);
 
     auto light = new QQuick3DDirectionalLight(scene);
@@ -2304,6 +2309,11 @@ void QQuickDataVisItem::createSliceView()
     m_sliceVerticalTitleLabel->setParent(scene);
     m_sliceVerticalTitleLabel->setParentItem(scene);
     m_sliceVerticalTitleLabel->setVisible(true);
+
+    m_sliceItemLabel = createTitleLabel();
+    m_sliceItemLabel->setParent(scene);
+    m_sliceItemLabel->setParentItem(scene);
+    m_sliceItemLabel->setVisible(false);
 }
 
 void QQuickDataVisItem::updateSliceGrid()
@@ -2404,22 +2414,18 @@ void QQuickDataVisItem::updateSliceLabels()
     auto pointSize = m_controller->activeTheme()->font().pointSizeF();
     auto selectionMode = m_controller->selectionMode();
 
-    if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow)) {
+    if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow))
         horizontalAxis = m_controller->axisX();
-        scale = backgroundScale.x() - m_backgroundScaleMargin.x();
-        translate = backgroundScale.x() - m_backgroundScaleMargin.x();
-        scaleFactor = m_labelScale.x() * m_labelFontScaleFactor / pointSize
-                + m_labelScale.x() * m_fontScaleFactor;
-    } else if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn)) {
+    else if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn))
         horizontalAxis = m_controller->axisZ();
-        scale = m_scaleWithBackground.z() - m_backgroundScaleMargin.z();
-        translate = m_scaleWithBackground.z() - m_backgroundScaleMargin.z();
-        scaleFactor = m_labelScale.z() * m_labelFontScaleFactor / pointSize
-                + m_labelScale.z() * m_fontScaleFactor;
-    }
+
+    scale = backgroundScale.x() - m_backgroundScaleMargin.x();
+    translate = backgroundScale.x() - m_backgroundScaleMargin.x();
+    scaleFactor = m_labelScale.x() * m_labelFontScaleFactor / pointSize
+            + m_labelScale.x() * m_fontScaleFactor;
 
     if (horizontalAxis == nullptr) {
-        qWarning("Invalid axis type");
+        qWarning("Invalid selection mode");
         return;
     }
 
