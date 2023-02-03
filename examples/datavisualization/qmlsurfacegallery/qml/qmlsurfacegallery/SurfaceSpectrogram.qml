@@ -1,22 +1,20 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 import QtQuick
 import QtQuick.Controls
-import QtQuick.Window
 import QtDataVisualization
 
-Window {
-    id: mainview
-    title: "Qt Quick 2 Surface Spectrogram"
-    visible: true
-    width: 1024
-    height: 768
+Rectangle {
+    id: spectrogramView
     color: surfaceGraph.theme.windowColor
 
-    property bool portraitMode: width < height
+    required property bool portraitMode
 
-    Data {
+    property real buttonWidth: spectrogramView.portraitMode ? (spectrogramView.width - 35) / 2
+                                                            : (spectrogramView.width - 50) / 5
+
+    SpectrogramData {
         id: surfaceData
     }
 
@@ -75,48 +73,10 @@ Window {
             windowColor: "#EEEEEE"
         }
 
-
-        //! [5]
-        TouchInputHandler3D {
-            id: customInputHandler
-            rotationEnabled: false
-        }
-        //! [5]
-
         //! [0]
-        //! [7]
         Surface3D {
-            //! [7]
             id: surfaceGraph
             anchors.fill: parent
-
-            shadowQuality: AbstractGraph3D.ShadowQualityNone
-            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndColumn
-            axisX: xAxis
-            axisY: yAxis
-            axisZ: zAxis
-
-            theme: customTheme
-            //! [6]
-            inputHandler: customInputHandler
-            //! [6]
-
-            // Remove the perspective and view the graph from top down to achieve 2D effect
-            //! [1]
-            orthoProjection: true
-            scene.activeCamera.cameraPreset: Camera3D.CameraPresetDirectlyAbove
-            //! [1]
-
-            //! [2]
-            flipHorizontalGrid: true
-            //! [2]
-
-            //! [4]
-            radialLabelOffset: 0.01
-            //! [4]
-
-            horizontalAspectRatio: 1
-            scene.activeCamera.zoomLevel: 85
 
             Surface3DSeries {
                 id: surfaceSeries
@@ -133,8 +93,39 @@ Window {
                     yPosRole: "value"
                 }
             }
+            //! [0]
+
+            //! [1]
+            // Remove the perspective and view the graph from top down to achieve 2D effect
+            orthoProjection: true
+            scene.activeCamera.cameraPreset: Camera3D.CameraPresetDirectlyAbove
+            //! [1]
+
+            //! [2]
+            flipHorizontalGrid: true
+            //! [2]
+
+            //! [4]
+            radialLabelOffset: 0.01
+            //! [4]
+
+            //! [5]
+            inputHandler: TouchInputHandler3D {
+                rotationEnabled: !surfaceGraph.orthoProjection
+            }
+            //! [5]
+
+            theme: customTheme
+            shadowQuality: AbstractGraph3D.ShadowQualityNone
+            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndColumn
+            axisX: xAxis
+            axisY: yAxis
+            axisZ: zAxis
+
+            aspectRatio: 1.0
+            horizontalAspectRatio: 1.0
+            scene.activeCamera.zoomLevel: 140
         }
-        //! [0]
     }
 
     Item {
@@ -142,7 +133,8 @@ Window {
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        height: mainview.portraitMode ? (polarToggle.height + 10) * 3 : polarToggle.height + 30
+        height: spectrogramView.portraitMode ? (polarToggle.height + 10) * 3
+                                             : polarToggle.height + 30
         anchors.margins: 10
 
         //! [3]
@@ -151,17 +143,9 @@ Window {
             anchors.margins: 5
             anchors.left: parent.left
             anchors.top: parent.top
-            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
-            text: "Switch to\npolar"
-            onClicked: {
-                if (!surfaceGraph.polar) {
-                    surfaceGraph.polar = true;
-                    text = "Switch to\ncartesian";
-                } else {
-                    surfaceGraph.polar = false;
-                    text = "Switch to\npolar";
-                }
-            }
+            width: spectrogramView.buttonWidth // Calculated elsewhere based on screen orientation
+            text: "Switch to\n" + (surfaceGraph.polar ? "cartesian" : "polar")
+            onClicked: surfaceGraph.polar = !surfaceGraph.polar;
         }
         //! [3]
 
@@ -170,26 +154,22 @@ Window {
             anchors.margins: 5
             anchors.left: polarToggle.right
             anchors.top: parent.top
-            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
-            text: "Switch to\nperspective"
+            width: spectrogramView.buttonWidth
+            text: "Switch to\n" + (surfaceGraph.orthoProjection ? "perspective" : "orthographic")
             onClicked: {
                 if (surfaceGraph.orthoProjection) {
                     surfaceGraph.orthoProjection = false;
                     xAxis.labelAutoRotation = 30;
                     yAxis.labelAutoRotation = 30;
                     zAxis.labelAutoRotation = 30;
-                    customInputHandler.rotationEnabled = true;
-                    text = "Switch to\northographic";
                 } else {
                     surfaceGraph.orthoProjection = true;
                     surfaceGraph.scene.activeCamera.cameraPreset
-                        = Camera3D.CameraPresetDirectlyAbove;
+                            = Camera3D.CameraPresetDirectlyAbove;
                     surfaceSeries.drawMode &= ~Surface3DSeries.DrawWireframe;
                     xAxis.labelAutoRotation = 0;
                     yAxis.labelAutoRotation = 0;
                     zAxis.labelAutoRotation = 0;
-                    customInputHandler.rotationEnabled = false;
-                    text = "Switch to\nperspective";
                 }
             }
         }
@@ -197,24 +177,19 @@ Window {
         Button {
             id: flipGridToggle
             anchors.margins: 5
-            anchors.left: mainview.portraitMode ? parent.left : orthoToggle.right
-            anchors.top: mainview.portraitMode ? orthoToggle.bottom : parent.top
-            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            anchors.left: spectrogramView.portraitMode ? parent.left : orthoToggle.right
+            anchors.top: spectrogramView.portraitMode ? orthoToggle.bottom : parent.top
+            width: spectrogramView.buttonWidth
             text: "Toggle axis\ngrid on top"
-            onClicked: {
-                if (surfaceGraph.flipHorizontalGrid)
-                    surfaceGraph.flipHorizontalGrid = false;
-                else
-                    surfaceGraph.flipHorizontalGrid = true;
-            }
+            onClicked: surfaceGraph.flipHorizontalGrid = !surfaceGraph.flipHorizontalGrid;
         }
 
         Button {
             id: labelOffsetToggle
             anchors.margins: 5
             anchors.left: flipGridToggle.right
-            anchors.top: mainview.portraitMode ? orthoToggle.bottom : parent.top
-            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            anchors.top: spectrogramView.portraitMode ? orthoToggle.bottom : parent.top
+            width: spectrogramView.buttonWidth
             text: "Toggle radial\nlabel position"
             visible: surfaceGraph.polar
             onClicked: {
@@ -228,14 +203,14 @@ Window {
         Button {
             id: surfaceGridToggle
             anchors.margins: 5
-            anchors.left: mainview.portraitMode ? (labelOffsetToggle.visible ? parent.left
-                                                                             : flipGridToggle.right)
-                                                : (labelOffsetToggle.visible ? labelOffsetToggle.right
-                                                                             : flipGridToggle.right)
-            anchors.top: mainview.portraitMode ? (labelOffsetToggle.visible ? labelOffsetToggle.bottom
-                                                                            : orthoToggle.bottom)
-                                               : parent.top
-            width: mainview.portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            anchors.left: spectrogramView.portraitMode ? (labelOffsetToggle.visible ? parent.left
+                                                                                    : flipGridToggle.right)
+                                                       : (labelOffsetToggle.visible ? labelOffsetToggle.right
+                                                                                    : flipGridToggle.right)
+            anchors.top: spectrogramView.portraitMode ? (labelOffsetToggle.visible ? labelOffsetToggle.bottom
+                                                                                   : orthoToggle.bottom)
+                                                      : parent.top
+            width: spectrogramView.buttonWidth
             text: "Toggle\nsurface grid"
             visible: !surfaceGraph.orthoProjection
             onClicked: {
@@ -252,7 +227,7 @@ Window {
         anchors.bottom: parent.bottom
         anchors.top: buttons.bottom
         anchors.right: parent.right
-        width: mainview.portraitMode ? 100 : 125
+        width: spectrogramView.portraitMode ? 100 : 125
 
         Rectangle {
             id: gradient
@@ -262,7 +237,7 @@ Window {
             anchors.right: legend.right
             border.color: "black"
             border.width: 1
-            width: mainview.portraitMode ? 25 : 50
+            width: spectrogramView.portraitMode ? 25 : 50
             rotation: 180
             gradient: Gradient {
                 GradientStop { position: 0.0; color: "black" }

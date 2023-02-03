@@ -1,25 +1,31 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-//! [2]
+//! [0]
 #include <QtDataVisualization/qutils.h>
-//! [2]
+//! [0]
 
-#include <QtGui/QGuiApplication>
-#include <QtCore/QDir>
-#include <QtQml/QQmlContext>
-#include <QtQuick/QQuickView>
-#include <QtQml/QQmlEngine>
+#include <QtGui/qguiapplication.h>
+#include <QtQuick/qquickview.h>
+#include <QtQml/qqmlengine.h>
+
+#ifdef QMAKE_BUILD
+#include "datasource.h"
+#endif
 
 int main(int argc, char *argv[])
 {
     qputenv("QSG_RHI_BACKEND", "opengl");
     QGuiApplication app(argc, argv);
 
+#ifdef QMAKE_BUILD
+    qmlRegisterType<DataSource>("SurfaceGallery", 1, 0, "DataSource");
+#endif
+
     QQuickView viewer;
 
-    // Enable antialiasing in direct rendering mode
     //! [1]
+    // Enable antialiasing in direct rendering mode
     viewer.setFormat(qDefaultSurfaceFormat(true));
     //! [1]
 
@@ -31,12 +37,12 @@ int main(int argc, char *argv[])
     QString extraImportPath(QStringLiteral("%1/../../../%2"));
 #endif
     viewer.engine()->addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
-                                      QString::fromLatin1("qml")));
+                                                       QString::fromLatin1("qml")));
     QObject::connect(viewer.engine(), &QQmlEngine::quit, &viewer, &QWindow::close);
 
-    viewer.setTitle(QStringLiteral("Oscilloscope example"));
+    viewer.setTitle(QStringLiteral("Surface Graph Gallery"));
 
-    viewer.setSource(QUrl("qrc:/qml/qml3doscilloscope/main.qml"));
+    viewer.setSource(QUrl("qrc:/qml/qmlsurfacegallery/main.qml"));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
 

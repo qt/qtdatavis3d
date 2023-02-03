@@ -55,8 +55,8 @@
 
     \image q3dbars-minimal.png
 
-    For more information, see \l{How to construct a minimal Q3DBars graph},
-    \l {Bar Graph}, and \l {Simple Bar Graph} examples.
+    For more information, see \l{How to construct a minimal Q3DBars graph}, and
+    \l {Simple Bar Graph} examples.
 
     \section2 3D Scatter Graphs
 
@@ -68,8 +68,8 @@
 
     \image q3dscatter-minimal.png
 
-    For more information, see \l{How to construct a minimal Q3DScatter graph},
-    \l{Scatter Graph}, and \l{Simple Scatter Graph} examples.
+    For more information, see \l{How to construct a minimal Q3DScatter graph}, and
+    \l{Simple Scatter Graph} examples.
 
     \section2 3D Surface Graphs
 
@@ -81,8 +81,8 @@
 
     \image q3dsurface-minimal.png
 
-    For more information, see \l{How to construct a minimal Q3DSurface graph},
-    \l{Surface Graph}, \l{Textured Surface Graph}, and \l{Surface Graph from Height Data} examples.
+    For more information, see \l{How to construct a minimal Q3DSurface graph}, \l{Graph Gallery},
+    and \l{Surface Graph Gallery} examples.
 
     \section1 Using OpenGL for Rendering Data
 
@@ -186,7 +186,7 @@
     If a graph displays the data from several data series, some settings can be
     specified separately for each series. For example, different gradients can
     be specified for different layers of the graph to make it look more
-    realistic. For an example, see \l{Custom Items in Graph}.
+    realistic. For an example, see \l{Surface Graph Gallery}.
 
     \section1 Customizing 3D Scenes
 

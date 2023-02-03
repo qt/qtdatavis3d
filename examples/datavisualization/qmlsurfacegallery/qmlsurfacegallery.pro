@@ -2,15 +2,16 @@
     error( "Couldn't find the examples.pri file!" )
 }
 
+DEFINES += QMAKE_BUILD
+
 QT += datavisualization
 
-# The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \
            datasource.cpp
 HEADERS += datasource.h
 
-RESOURCES += qml3doscilloscope.qrc
+RESOURCES += qmlsurfacegallery.qrc
 
 OTHER_FILES += doc/src/* \
                doc/images/* \
-               qml/qml3doscilloscope/*
+               qml/qmlsurfacegallery/*

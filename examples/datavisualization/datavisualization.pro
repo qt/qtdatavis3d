@@ -2,10 +2,8 @@ TEMPLATE = subdirs
 qtHaveModule(quick) {
     SUBDIRS += qmlbars \
                qmlscatter \
-               qmlsurface \
-               qml3doscilloscope \
                qmlaxishandling \
-               qmlspectrogram
+               qmlsurfacegallery
 }
 
 !android:!ios:!winrt {

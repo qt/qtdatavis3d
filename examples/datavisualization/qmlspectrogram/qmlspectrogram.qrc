@@ -1,6 +1,0 @@
-<RCC>
-    <qresource prefix="/qml">
-        <file>qml/qmlspectrogram/Data.qml</file>
-        <file>qml/qmlspectrogram/main.qml</file>
-    </qresource>
-</RCC>
