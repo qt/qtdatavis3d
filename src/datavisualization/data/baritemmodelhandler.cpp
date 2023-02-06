@@ -5,8 +5,6 @@
 
 QT_BEGIN_NAMESPACE
 
-static const int noRoleIndex = -1;
-
 BarItemModelHandler::BarItemModelHandler(QItemModelBarDataProxy *proxy, QObject *parent)
     : AbstractItemModelHandler(parent),
       m_proxy(proxy),

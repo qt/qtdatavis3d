@@ -10,7 +10,7 @@
 
 QT_BEGIN_NAMESPACE
 
-const GLfloat sliceUnits = 2.5;
+const GLfloat spSliceUnits = 2.5;
 
 SelectionPointer::SelectionPointer(Drawer *drawer)
     : QObject(0),
@@ -68,7 +68,7 @@ void SelectionPointer::renderSelectionPointer(GLuint defaultFboHandle, bool useO
     QMatrix4x4 projectionMatrix;
     GLfloat viewPortRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
     if (m_cachedIsSlicingActivated) {
-        GLfloat sliceUnitsScaled = sliceUnits / m_autoScaleAdjustment;
+        GLfloat sliceUnitsScaled = spSliceUnits / m_autoScaleAdjustment;
         viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
         projectionMatrix.ortho(-sliceUnitsScaled * viewPortRatio, sliceUnitsScaled * viewPortRatio,
                                -sliceUnitsScaled, sliceUnitsScaled,
@@ -138,7 +138,7 @@ void SelectionPointer::renderSelectionLabel(GLuint defaultFboHandle, bool useOrt
     QMatrix4x4 projectionMatrix;
     GLfloat viewPortRatio = (GLfloat)m_mainViewPort.width() / (GLfloat)m_mainViewPort.height();
     if (m_cachedIsSlicingActivated) {
-        GLfloat sliceUnitsScaled = sliceUnits / m_autoScaleAdjustment;
+        GLfloat sliceUnitsScaled = spSliceUnits / m_autoScaleAdjustment;
         viewMatrix.lookAt(QVector3D(0.0f, 0.0f, 1.0f), zeroVector, upVector);
         projectionMatrix.ortho(-sliceUnitsScaled * viewPortRatio, sliceUnitsScaled * viewPortRatio,
                                -sliceUnitsScaled, sliceUnitsScaled,
