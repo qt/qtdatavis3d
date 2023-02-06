@@ -65,6 +65,8 @@ private:
     Q_DISABLE_COPY(AbstractItemModelHandler)
 };
 
+static constexpr int noRoleIndex = -1;
+
 QT_END_NAMESPACE
 
 #endif

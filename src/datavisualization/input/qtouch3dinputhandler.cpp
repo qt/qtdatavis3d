@@ -15,7 +15,7 @@ static const int maxSelectionJitter = 10;
 static const int maxSelectionJitter = 5;
 #endif
 static const int tapAndHoldTime = 250;
-static const float rotationSpeed = 200.0f;
+static const float t3ihRotationSpeed = 200.0f;
 static const float touchZoomDrift = 0.02f;
 
 /*!
@@ -239,9 +239,9 @@ void QTouch3DInputHandlerPrivate::handleRotation(const QPointF &position)
         float yRotation = camera->yRotation();
         QPointF inputPos = q_ptr->inputPosition();
         float mouseMoveX = float(inputPos.x() - position.x())
-                / (scene->viewport().width() / rotationSpeed);
+                / (scene->viewport().width() / t3ihRotationSpeed);
         float mouseMoveY = float(inputPos.y() - position.y())
-                / (scene->viewport().height() / rotationSpeed);
+                / (scene->viewport().height() / t3ihRotationSpeed);
         xRotation -= mouseMoveX;
         yRotation -= mouseMoveY;
         camera->setXRotation(xRotation);
