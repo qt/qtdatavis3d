@@ -158,7 +158,7 @@ Item {
                                //! [3]
                                //! [6]
                                if (pressed && selectedAxisLabel != -1)
-                                   axisGradView.dragAxis();
+                                   axisDragView.dragAxis();
                                //! [6]
                                //! [4]
                                previousMouseX = currentMouseX;
