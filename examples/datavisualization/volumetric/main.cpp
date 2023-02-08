@@ -3,17 +3,16 @@
 
 #include "volumetric.h"
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QRadioButton>
-#include <QtWidgets/QSlider>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QMessageBox>
-#include <QtGui/QScreen>
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qwidget.h>
+#include <QtWidgets/qboxlayout.h>
+#include <QtWidgets/qradiobutton.h>
+#include <QtWidgets/qslider.h>
+#include <QtWidgets/qcheckbox.h>
+#include <QtWidgets/qlabel.h>
+#include <QtWidgets/qgroupbox.h>
+#include <QtWidgets/qmessagebox.h>
+#include <QtGui/qscreen.h>
 
 int main(int argc, char **argv)
 {
@@ -30,7 +29,7 @@ int main(int argc, char **argv)
     }
 
     QSize screenSize = graph->screen()->size();
-    container->setMinimumSize(QSize(screenSize.width() / 3, screenSize.height() / 3));
+    container->setMinimumSize(QSize(screenSize.width() / 3, screenSize.height() / 2));
     container->setMaximumSize(screenSize);
     container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     container->setFocusPolicy(Qt::StrongFocus);
@@ -43,7 +42,7 @@ int main(int argc, char **argv)
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
 
-    widget->setWindowTitle(QStringLiteral("Volumetric object example - 3D terrain"));
+    widget->setWindowTitle(QStringLiteral("Volumetric Rendering - 3D Terrain"));
 
     QCheckBox *sliceXCheckBox = new QCheckBox(widget);
     sliceXCheckBox->setText(QStringLiteral("Slice volume on X axis"));
@@ -79,7 +78,7 @@ int main(int argc, char **argv)
     QGroupBox *textureDetailGroupBox = new QGroupBox(QStringLiteral("Texture detail"));
 
     QRadioButton *lowDetailRB = new QRadioButton(widget);
-    lowDetailRB->setText(QStringLiteral("Low (128x64x128)"));
+    lowDetailRB->setText(QStringLiteral("Low (256x128x256)"));
     lowDetailRB->setChecked(true);
 
     QRadioButton *mediumDetailRB = new QRadioButton(widget);

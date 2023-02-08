@@ -6,11 +6,11 @@
 
 #include <QtDataVisualization/q3dscatter.h>
 #include <QtDataVisualization/qcustom3dvolume.h>
-#include <QtCore/QTimer>
-#include <QtGui/QRgb>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QSlider>
-#include <QtWidgets/QRadioButton>
+#include <QtCore/qtimer.h>
+#include <QtGui/qrgb.h>
+#include <QtWidgets/qlabel.h>
+#include <QtWidgets/qslider.h>
+#include <QtWidgets/qradiobutton.h>
 
 class VolumetricModifier : public QObject
 {
@@ -57,39 +57,39 @@ private:
     void excavateMineBlock(int textureSize, int dataIndex, int size, QList<uchar> *textureData);
     void handleSlicingChanges();
 
-    Q3DScatter *m_graph;
-    QCustom3DVolume *m_volumeItem;
-    int m_sliceIndexX;
-    int m_sliceIndexY;
-    int m_sliceIndexZ;
-    bool m_slicingX;
-    bool m_slicingY;
-    bool m_slicingZ;
-    QLabel *m_fpsLabel;
-    QRadioButton *m_mediumDetailRB;
-    QRadioButton *m_highDetailRB;
-    QList<uchar> *m_lowDetailData;
-    QList<uchar> *m_mediumDetailData;
-    QList<uchar> *m_highDetailData;
+    Q3DScatter *m_graph = nullptr;
+    QCustom3DVolume *m_volumeItem = nullptr;
+    int m_sliceIndexX = 0;
+    int m_sliceIndexY = 0;
+    int m_sliceIndexZ = 0;
+    bool m_slicingX = false;
+    bool m_slicingY = false;
+    bool m_slicingZ = false;
+    QLabel *m_fpsLabel = nullptr;
+    QRadioButton *m_mediumDetailRB = nullptr;
+    QRadioButton *m_highDetailRB = nullptr;
+    QList<uchar> *m_lowDetailData = nullptr;
+    QList<uchar> *m_mediumDetailData = nullptr;
+    QList<uchar> *m_highDetailData = nullptr;
+    int m_mediumDetailIndex = 0;
+    int m_highDetailIndex = 0;
+    int m_mediumDetailShaftIndex = 0;
+    int m_highDetailShaftIndex = 0;
+    QSlider *m_sliceSliderX = nullptr;
+    QSlider *m_sliceSliderY = nullptr;
+    QSlider *m_sliceSliderZ = nullptr;
+    QList<QRgb> m_colorTable1 = {};
+    QList<QRgb> m_colorTable2 = {};
+    bool m_usingPrimaryTable = true;
+    QLabel *m_sliceLabelX = nullptr;
+    QLabel *m_sliceLabelY = nullptr;
+    QLabel *m_sliceLabelZ = nullptr;
+    QLabel *m_alphaMultiplierLabel = nullptr;
+    QList<uchar> m_magmaLayer = {};
+    QList<uchar> m_waterLayer = {};
+    QList<uchar> m_groundLayer = {};
+    QList<QPair<QVector3D, QVector3D>> m_mineShaftArray = {};
     QTimer m_timer;
-    int m_mediumDetailIndex;
-    int m_highDetailIndex;
-    int m_mediumDetailShaftIndex;
-    int m_highDetailShaftIndex;
-    QSlider *m_sliceSliderX;
-    QSlider *m_sliceSliderY;
-    QSlider *m_sliceSliderZ;
-    QList<QRgb> m_colorTable1;
-    QList<QRgb> m_colorTable2;
-    bool m_usingPrimaryTable;
-    QLabel *m_sliceLabelX;
-    QLabel *m_sliceLabelY;
-    QLabel *m_sliceLabelZ;
-    QLabel *m_alphaMultiplierLabel;
-    QList<uchar> m_magmaLayer;
-    QList<uchar> m_waterLayer;
-    QList<uchar> m_groundLayer;
-    QList<QPair<QVector3D, QVector3D>> m_mineShaftArray;
 };
 
 #endif
