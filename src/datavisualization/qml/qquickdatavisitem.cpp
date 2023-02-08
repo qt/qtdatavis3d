@@ -1780,11 +1780,13 @@ void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
     connect(m_controller.data(), &Abstract3DController::needRender, window, &QQuickWindow::update);
     updateWindowParameters();
 
-    float pixelRatio = window->devicePixelRatio();
-    float magnification = 100.0f * pixelRatio + 50.0f;
-    QQuick3DOrthographicCamera *camera = static_cast<QQuick3DOrthographicCamera *>(sliceView()->camera());
-    camera->setHorizontalMagnification(magnification);
-    camera->setVerticalMagnification(magnification);
+    if (sliceView()) {
+        float pixelRatio = window->devicePixelRatio();
+        float magnification = 100.0f * pixelRatio + 50.0f;
+        QQuick3DOrthographicCamera *camera = static_cast<QQuick3DOrthographicCamera *>(sliceView()->camera());
+        camera->setHorizontalMagnification(magnification);
+        camera->setVerticalMagnification(magnification);
+    }
 
 #if defined(Q_OS_IOS)
     // Scenegraph render cycle in iOS sometimes misses update after beforeSynchronizing signal.
