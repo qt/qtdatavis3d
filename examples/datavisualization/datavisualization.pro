@@ -7,9 +7,7 @@ qtHaveModule(quick) {
 }
 
 !android:!ios:!winrt {
-    SUBDIRS += bars \
-               customproxy \
-               scatter \
+    SUBDIRS += scatter \
                surface \
                draggableaxes \
                customitems \

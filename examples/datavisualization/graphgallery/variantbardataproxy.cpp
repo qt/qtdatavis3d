@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "variantbardataproxy.h"
@@ -44,15 +44,17 @@ VariantDataSet *VariantBarDataProxy::dataSet()
 
 void VariantBarDataProxy::setMapping(VariantBarDataMapping *mapping)
 {
-    if (!m_mapping.isNull())
+    if (!m_mapping.isNull()) {
         QObject::disconnect(m_mapping.data(), &VariantBarDataMapping::mappingChanged, this,
                             &VariantBarDataProxy::handleMappingChanged);
+    }
 
     m_mapping = mapping;
 
-    if (!m_mapping.isNull())
+    if (!m_mapping.isNull()) {
         QObject::connect(m_mapping.data(), &VariantBarDataMapping::mappingChanged, this,
                          &VariantBarDataProxy::handleMappingChanged);
+    }
 
     resolveDataSet();
 }
@@ -103,14 +105,14 @@ void VariantBarDataProxy::resolveDataSet()
     // Sort values into rows and columns
     typedef QHash<QString, float> ColumnValueMap;
     QHash <QString, ColumnValueMap> itemValueMap;
-    foreach (const VariantDataItem *item, itemList) {
+    for (const VariantDataItem *item : itemList) {
         itemValueMap[item->at(rowIndex).toString()][item->at(columnIndex).toString()]
                 = item->at(valueIndex).toReal();
     }
 
     // Create a new data array in format the parent class understands
     QBarDataArray *newProxyArray = new QBarDataArray;
-    foreach (QString rowKey, rowList) {
+    for (const QString &rowKey : rowList) {
         QBarDataRow *newProxyRow = new QBarDataRow(columnList.size());
         for (int i = 0; i < columnList.size(); i++)
             (*newProxyRow)[i].setValue(itemValueMap[rowKey][columnList.at(i)]);

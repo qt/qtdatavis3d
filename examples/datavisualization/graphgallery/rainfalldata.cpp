@@ -1,21 +1,15 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "rainfallgraph.h"
-#include <QtDataVisualization/qcategory3daxis.h>
-#include <QtDataVisualization/qvalue3daxis.h>
+#include "rainfalldata.h"
 #include <QtDataVisualization/q3dscene.h>
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
-#include <QtGui/QGuiApplication>
-#include <QtGui/QFont>
-#include <QtCore/QDebug>
-#include <QtCore/QTextStream>
-#include <QtCore/QFile>
+#include <QtCore/qtextstream.h>
+#include <QtCore/qfile.h>
 
-RainfallGraph::RainfallGraph(Q3DBars *rainfall)
-    : m_graph(rainfall)
+RainfallData::RainfallData()
 {
     // In data file the months are in numeric format, so create custom list
     for (int i = 1; i <= 12; i++)
@@ -23,79 +17,59 @@ RainfallGraph::RainfallGraph(Q3DBars *rainfall)
 
     m_columnCount = m_numericMonths.size();
 
+    updateYearsList(2010, 2022);
+
+    // Create proxy and series
+    //! [0]
     m_proxy = new VariantBarDataProxy;
-    QBar3DSeries *series = new QBar3DSeries(m_proxy);
-    m_graph->addSeries(series);
+    m_series = new QBar3DSeries(m_proxy);
+    //! [0]
 
-    updateYearsList(2000, 2012);
+    m_series->setItemLabelFormat(QString(QStringLiteral("%.1f mm")));
 
-    // Set up bar specifications; make the bars as wide as they are deep,
-    // and add a small space between the bars
-    m_graph->setBarThickness(1.0f);
-    m_graph->setBarSpacing(QSizeF(1.1, 1.1));
+    // Create the axes
+    m_rowAxis = new QCategory3DAxis(this);
+    m_colAxis = new QCategory3DAxis(this);
+    m_valueAxis = new QValue3DAxis(this);
+    m_rowAxis->setAutoAdjustRange(true);
+    m_colAxis->setAutoAdjustRange(true);
+    m_valueAxis->setAutoAdjustRange(true);
 
     // Set axis labels and titles
     QStringList months;
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-    m_graph->rowAxis()->setTitle("Year");
-    m_graph->columnAxis()->setTitle("Month");
-    m_graph->valueAxis()->setTitle("rainfall");
-    m_graph->valueAxis()->setLabelFormat("%d mm");
-    m_graph->valueAxis()->setSegmentCount(5);
-    m_graph->rowAxis()->setLabels(m_years);
-    m_graph->columnAxis()->setLabels(months);
+    m_rowAxis->setTitle("Year");
+    m_colAxis->setTitle("Month");
+    m_valueAxis->setTitle("rainfall");
+    m_valueAxis->setSegmentCount(5);
+    m_rowAxis->setLabels(m_years);
+    m_colAxis->setLabels(months);
+    m_rowAxis->setTitleVisible(true);
+    m_colAxis->setTitleVisible(true);
+    m_valueAxis->setTitleVisible(true);
 
-    // Set bar type to cylinder
-    series->setMesh(QAbstract3DSeries::MeshCylinder);
-
-    // Set shadows to medium
-    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
-
-    // Set selection mode to bar and column
-    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndColumn | QAbstract3DGraph::SelectionSlice);
-
-    // Set theme
-    m_graph->activeTheme()->setType(Q3DTheme::ThemeArmyBlue);
-
-    // Override font in theme
-    m_graph->activeTheme()->setFont(QFont("Century Gothic", 30));
-
-    // Override label background for theme
-    m_graph->activeTheme()->setLabelBackgroundEnabled(false);
-
-    // Set camera position and zoom
-    m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetIsometricRightHigh);
-
-    // Set window title
-    m_graph->setTitle(QStringLiteral("Monthly rainfall in Northern Finland"));
-
-    // Set reflections on
-    m_graph->setReflection(true);
-}
-
-RainfallGraph::~RainfallGraph()
-{
-    delete m_mapping;
-    delete m_dataSet;
-    delete m_graph;
-}
-
-void RainfallGraph::start()
-{
     addDataSet();
 }
 
-void RainfallGraph::updateYearsList(int start, int end)
+RainfallData::~RainfallData()
+{
+    delete m_mapping;
+    delete m_dataSet;
+    delete m_proxy;
+}
+
+void RainfallData::updateYearsList(int start, int end)
 {
     m_years.clear();
+
     for (int i = start; i <= end; i++)
         m_years << QString::number(i);
 
     m_rowCount = m_years.size();
 }
 
-//! [0]
-void RainfallGraph::addDataSet()
+//! [1]
+void RainfallData::addDataSet()
 {
     // Create a new variant data set and data item list
     m_dataSet =  new VariantDataSet;
@@ -127,15 +101,15 @@ void RainfallGraph::addDataSet()
     } else {
         qWarning() << "Unable to open data file:" << dataFile.fileName();
     }
-
     //! [1]
+
+    //! [2]
     // Add items to the data set and set it to the proxy
     m_dataSet->addItems(itemList);
     m_proxy->setDataSet(m_dataSet);
 
     // Create new mapping for the data and set it to the proxy
-    m_mapping =  new VariantBarDataMapping(0, 1, 2, m_years, m_numericMonths);
+    m_mapping = new VariantBarDataMapping(0, 1, 2, m_years, m_numericMonths);
     m_proxy->setMapping(m_mapping);
-    //! [1]
+    //! [2]
 }
-//! [0]

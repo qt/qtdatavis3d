@@ -1,16 +1,15 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef VARIANTDATASET_H
 #define VARIANTDATASET_H
 
-#include <QtCore/QScopedPointer>
-#include <QtCore/QVariantList>
+#include <QtCore/qvariantlist.h>
 
-//! [1]
+//! [0]
 typedef QVariantList VariantDataItem;
 typedef QList<VariantDataItem *> VariantDataItemList;
-//! [1]
+//! [0]
 
 class VariantDataSet : public QObject
 {
@@ -20,7 +19,7 @@ public:
     explicit VariantDataSet();
     ~VariantDataSet();
 
-    //! [0]
+    //! [1]
     void clear();
 
     int addItem(VariantDataItem *item);
@@ -31,7 +30,7 @@ public:
 Q_SIGNALS:
     void itemsAdded(int index, int count);
     void dataCleared();
-    //! [0]
+    //! [1]
 
 private:
     VariantDataItemList m_variantData;

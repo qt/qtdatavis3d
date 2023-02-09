@@ -1,7 +1,9 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "graphmodifier.h"
+#include "rainfalldata.h"
+
 #include <QtDataVisualization/qcategory3daxis.h>
 #include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/qbardataproxy.h>
@@ -9,29 +11,22 @@
 #include <QtDataVisualization/q3dcamera.h>
 #include <QtDataVisualization/qbar3dseries.h>
 #include <QtDataVisualization/q3dtheme.h>
-#include <QtCore/QTime>
-#include <QtWidgets/QComboBox>
 #include <QtCore/qmath.h>
+#include <QtWidgets/qcombobox.h>
+
+// TODO: Many of the values do not affect custom proxy series now - should be fixed
 
 //! [0]
 GraphModifier::GraphModifier(Q3DBars *bargraph)
     : m_graph(bargraph),
-      m_xRotation(0.0f),
-      m_yRotation(0.0f),
-      m_fontSize(30),
-      m_segments(4),
-      m_subSegments(3),
-      m_minval(-20.0f),
-      m_maxval(20.0f),
+      //! [0]
       //! [1]
       m_temperatureAxis(new QValue3DAxis),
       m_yearAxis(new QCategory3DAxis),
       m_monthAxis(new QCategory3DAxis),
       m_primarySeries(new QBar3DSeries),
-      m_secondarySeries(new QBar3DSeries),
-      //! [1]
-      m_barMesh(QAbstract3DSeries::MeshBevelBar),
-      m_smooth(false)
+      m_secondarySeries(new QBar3DSeries)
+    //! [1]
 {
     //! [2]
     m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftMedium);
@@ -65,7 +60,7 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_graph->setColumnAxis(m_monthAxis);
     //! [3]
 
-    //! [8]
+    //! [4]
     m_primarySeries->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
     m_primarySeries->setMesh(QAbstract3DSeries::MeshBevelBar);
     m_primarySeries->setMeshSmooth(false);
@@ -74,23 +69,23 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_secondarySeries->setMesh(QAbstract3DSeries::MeshBevelBar);
     m_secondarySeries->setMeshSmooth(false);
     m_secondarySeries->setVisible(false);
-    //! [8]
-
     //! [4]
+
+    //! [5]
     m_graph->addSeries(m_primarySeries);
     m_graph->addSeries(m_secondarySeries);
-    //! [4]
+    //! [5]
 
     //! [6]
     changePresetCamera();
     //! [6]
 
-    //! [9]
+    //! [8]
     resetTemperatureData();
-    //! [9]
+    //! [8]
 
     // Set up property animations for zooming to the selected bar
-    //! [12]
+    //! [11]
     Q3DCamera *camera = m_graph->scene()->activeCamera();
     m_defaultAngleX = camera->xRotation();
     m_defaultAngleY = camera->yRotation();
@@ -120,22 +115,25 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_animationCameraZoom.setKeyValueAt(zoomOutFraction, QVariant::fromValue(50.0f));
     m_animationCameraTarget.setKeyValueAt(zoomOutFraction,
                                           QVariant::fromValue(QVector3D(0.0f, 0.0f, 0.0f)));
-    //! [12]
+    //! [11]
+
+    m_customData = new RainfallData();
 }
-//! [0]
 
 GraphModifier::~GraphModifier()
 {
+    delete m_customData;
     delete m_graph;
 }
 
 void GraphModifier::resetTemperatureData()
 {
-    //! [5]
+    //! [9a]
     // Set up data
     static const float tempOulu[8][12] = {
         {-7.4f, -2.4f, 0.0f, 3.0f, 8.2f, 11.6f, 14.7f, 15.4f, 11.4f, 4.2f, 2.1f, -2.3f},       // 2015
         {-13.4f, -3.9f, -1.8f, 3.1f, 10.6f, 13.7f, 17.8f, 13.6f, 10.7f, 3.5f, -3.1f, -4.2f},   // 2016
+        //! [9a]
         {-5.7f, -6.7f, -3.0f, -0.1f, 4.7f, 12.4f, 16.1f, 14.1f, 9.4f, 3.0f, -0.3f, -3.2f},     // 2017
         {-6.4f, -11.9f, -7.4f, 1.9f, 11.4f, 12.4f, 21.5f, 16.1f, 11.0f, 4.4f, 2.1f, -4.1f},    // 2018
         {-11.7f, -6.1f, -2.4f, 3.9f, 7.2f, 14.5f, 15.6f, 14.4f, 8.5f, 2.0f, -3.0f, -1.5f},     // 2019
@@ -156,10 +154,11 @@ void GraphModifier::resetTemperatureData()
     };
 
     // Create data arrays
+    //! [9b]
     QBarDataArray *dataSet = new QBarDataArray;
     QBarDataArray *dataSet2 = new QBarDataArray;
-    QBarDataRow *dataRow;
-    QBarDataRow *dataRow2;
+    QBarDataRow *dataRow = nullptr;
+    QBarDataRow *dataRow2= nullptr;
 
     dataSet->reserve(m_years.size());
     for (int year = 0; year < m_years.size(); year++) {
@@ -179,7 +178,7 @@ void GraphModifier::resetTemperatureData()
     // Add data to the data proxy (the data proxy assumes ownership of it)
     m_primarySeries->dataProxy()->resetArray(dataSet, m_years, m_months);
     m_secondarySeries->dataProxy()->resetArray(dataSet2, m_years, m_months);
-    //! [5]
+    //! [9b]
 }
 
 void GraphModifier::changeRange(int range)
@@ -197,6 +196,7 @@ void GraphModifier::changeStyle(int style)
         m_barMesh = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
         m_primarySeries->setMesh(m_barMesh);
         m_secondarySeries->setMesh(m_barMesh);
+        m_customData->customSeries()->setMesh(m_barMesh);
     }
 }
 
@@ -210,14 +210,14 @@ void GraphModifier::changePresetCamera()
     // Restore camera target in case animation has changed it
     m_graph->scene()->activeCamera()->setTarget(QVector3D(0.0f, 0.0f, 0.0f));
 
-    //! [10]
+    //! [7]
     static int preset = Q3DCamera::CameraPresetFront;
 
     m_graph->scene()->activeCamera()->setCameraPreset((Q3DCamera::CameraPreset)preset);
 
     if (++preset > Q3DCamera::CameraPresetDirectlyBelow)
         preset = Q3DCamera::CameraPresetFrontLow;
-    //! [10]
+    //! [7]
 }
 
 void GraphModifier::changeTheme(int theme)
@@ -286,7 +286,6 @@ void GraphModifier::setAxisTitleFixed(bool enabled)
     m_yearAxis->setTitleFixed(enabled);
 }
 
-//! [11]
 void GraphModifier::zoomToSelectedBar()
 {
     m_animationCameraX.stop();
@@ -311,7 +310,7 @@ void GraphModifier::zoomToSelectedBar()
 
     if (selectedBar != QBar3DSeries::invalidSelectionPosition()) {
         // Normalize selected bar position within axis range to determine target coordinates
-        //! [13]
+        //! [12]
         QVector3D endTarget;
         float xMin = m_graph->columnAxis()->min();
         float xRange = m_graph->columnAxis()->max() - xMin;
@@ -319,10 +318,10 @@ void GraphModifier::zoomToSelectedBar()
         float zRange = m_graph->rowAxis()->max() - zMin;
         endTarget.setX((selectedBar.y() - xMin) / xRange * 2.0f - 1.0f);
         endTarget.setZ((selectedBar.x() - zMin) / zRange * 2.0f - 1.0f);
-        //! [13]
+        //! [12]
 
         // Rotate the camera so that it always points approximately to the graph center
-        //! [15]
+        //! [14]
         qreal endAngleX = 90.0 - qRadiansToDegrees(qAtan(qreal(endTarget.z() / endTarget.x())));
         if (endTarget.x() > 0.0f)
             endAngleX -= 180.0f;
@@ -331,14 +330,14 @@ void GraphModifier::zoomToSelectedBar()
         float endAngleY = barValue >= 0.0f ? 30.0f : -30.0f;
         if (m_graph->valueAxis()->reversed())
             endAngleY *= -1.0f;
-        //! [15]
+        //! [14]
 
         m_animationCameraX.setEndValue(QVariant::fromValue(float(endAngleX)));
         m_animationCameraY.setEndValue(QVariant::fromValue(endAngleY));
         m_animationCameraZoom.setEndValue(QVariant::fromValue(250));
-        //! [14]
+        //! [13]
         m_animationCameraTarget.setEndValue(QVariant::fromValue(endTarget));
-        //! [14]
+        //! [13]
     } else {
         // No selected bar, so return to the default view
         m_animationCameraX.setEndValue(QVariant::fromValue(m_defaultAngleX));
@@ -352,7 +351,18 @@ void GraphModifier::zoomToSelectedBar()
     m_animationCameraZoom.start();
     m_animationCameraTarget.start();
 }
-//! [11]
+
+void GraphModifier::setDataModeToWeather(bool enabled)
+{
+    if (enabled)
+        changeDataMode(false);
+}
+
+void GraphModifier::setDataModeToCustom(bool enabled)
+{
+    if (enabled)
+        changeDataMode(true);
+}
 
 void GraphModifier::changeShadowQuality(int quality)
 {
@@ -361,19 +371,19 @@ void GraphModifier::changeShadowQuality(int quality)
     emit shadowQualityChanged(quality);
 }
 
-//! [7]
+//! [10]
 void GraphModifier::rotateX(int rotation)
 {
     m_xRotation = rotation;
     m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
 }
+//! [10]
 
 void GraphModifier::rotateY(int rotation)
 {
     m_yRotation = rotation;
     m_graph->scene()->activeCamera()->setCameraPosition(m_xRotation, m_yRotation);
 }
-//! [7]
 
 void GraphModifier::setBackgroundEnabled(int enabled)
 {
@@ -390,6 +400,7 @@ void GraphModifier::setSmoothBars(int smooth)
     m_smooth = bool(smooth);
     m_primarySeries->setMeshSmooth(m_smooth);
     m_secondarySeries->setMeshSmooth(m_smooth);
+    m_customData->customSeries()->setMeshSmooth(m_smooth);
 }
 
 void GraphModifier::setSeriesVisibility(int enabled)
@@ -405,4 +416,24 @@ void GraphModifier::setReverseValueAxis(int enabled)
 void GraphModifier::setReflection(bool enabled)
 {
     m_graph->setReflection(enabled);
+}
+
+void GraphModifier::changeDataMode(bool customData)
+{
+    // Change between weather data and data from custom proxy
+    if (customData) {
+        m_graph->removeSeries(m_primarySeries);
+        m_graph->removeSeries(m_secondarySeries);
+        m_graph->addSeries(m_customData->customSeries());
+        m_graph->setValueAxis(m_customData->valueAxis());
+        m_graph->setRowAxis(m_customData->rowAxis());
+        m_graph->setColumnAxis(m_customData->colAxis());
+    } else {
+        m_graph->removeSeries(m_customData->customSeries());
+        m_graph->addSeries(m_primarySeries);
+        m_graph->addSeries(m_secondarySeries);
+        m_graph->setValueAxis(m_temperatureAxis);
+        m_graph->setRowAxis(m_yearAxis);
+        m_graph->setColumnAxis(m_monthAxis);
+    }
 }

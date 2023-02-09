@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef GRAPHMODIFIER_H
@@ -7,12 +7,9 @@
 #include <QtDataVisualization/q3dbars.h>
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtDataVisualization/qabstract3dseries.h>
+#include <QtCore/qpropertyanimation.h>
 
-#include <QtGui/QFont>
-#include <QtCore/QDebug>
-#include <QtCore/QStringList>
-#include <QtCore/QPointer>
-#include <QtCore/QPropertyAnimation>
+class RainfallData;
 
 class GraphModifier : public QObject
 {
@@ -34,6 +31,7 @@ public:
     void setSeriesVisibility(int enabled);
     void setReverseValueAxis(int enabled);
     void setReflection(bool enabled);
+    void changeDataMode(bool customData);
 
 public Q_SLOTS:
     void changeRange(int range);
@@ -46,6 +44,8 @@ public Q_SLOTS:
     void setAxisTitleVisibility(bool enabled);
     void setAxisTitleFixed(bool enabled);
     void zoomToSelectedBar();
+    void setDataModeToWeather(bool enabled);
+    void setDataModeToCustom(bool enabled);
 
 Q_SIGNALS:
     void shadowQualityChanged(int quality);
@@ -55,32 +55,33 @@ Q_SIGNALS:
     void fontSizeChanged(int size);
 
 private:
-    Q3DBars *m_graph;
-    float m_xRotation;
-    float m_yRotation;
-    int m_fontSize;
-    int m_segments;
-    int m_subSegments;
-    float m_minval;
-    float m_maxval;
-    QStringList m_months;
-    QStringList m_years;
-    QValue3DAxis *m_temperatureAxis;
-    QCategory3DAxis *m_yearAxis;
-    QCategory3DAxis *m_monthAxis;
-    QBar3DSeries *m_primarySeries;
-    QBar3DSeries *m_secondarySeries;
-    QAbstract3DSeries::Mesh m_barMesh;
-    bool m_smooth;
-    QPropertyAnimation m_animationCameraX;
-    QPropertyAnimation m_animationCameraY;
-    QPropertyAnimation m_animationCameraZoom;
-    QPropertyAnimation m_animationCameraTarget;
-    float m_defaultAngleX;
-    float m_defaultAngleY;
-    float m_defaultZoom;
-    QVector3D m_defaultTarget;
+    Q3DBars *m_graph = nullptr;
+    float m_xRotation = 0.f;
+    float m_yRotation = 0.f;
+    int m_fontSize = 30;
+    int m_segments = 4;
+    int m_subSegments = 3;
+    float m_minval = -20.f;
+    float m_maxval = 20.f;
+    QStringList m_months = {};
+    QStringList m_years = {};
+    QValue3DAxis *m_temperatureAxis = nullptr;
+    QCategory3DAxis *m_yearAxis = nullptr;
+    QCategory3DAxis *m_monthAxis = nullptr;
+    QBar3DSeries *m_primarySeries = nullptr;
+    QBar3DSeries *m_secondarySeries = nullptr;
+    QAbstract3DSeries::Mesh m_barMesh = QAbstract3DSeries::MeshBevelBar;
+    bool m_smooth = false;
+    QPropertyAnimation m_animationCameraX = {};
+    QPropertyAnimation m_animationCameraY = {};
+    QPropertyAnimation m_animationCameraZoom = {};
+    QPropertyAnimation m_animationCameraTarget = {};
+    float m_defaultAngleX = 0.f;
+    float m_defaultAngleY = 0.f;
+    float m_defaultZoom = 0.f;
+    QVector3D m_defaultTarget = {};
     const QString m_celsiusString = QString(QChar(0xB0)) + QLatin1String("C");
+    RainfallData *m_customData = nullptr;
 };
 
 #endif

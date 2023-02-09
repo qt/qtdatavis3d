@@ -1,21 +1,15 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "variantbardatamapping.h"
 
 VariantBarDataMapping::VariantBarDataMapping()
-    : QObject(0),
-      m_rowIndex(0),
-      m_columnIndex(1),
-      m_valueIndex(2)
+    : QObject(0)
 {
 }
 
 VariantBarDataMapping::VariantBarDataMapping(const VariantBarDataMapping &other)
-    : QObject(0),
-      m_rowIndex(0),
-      m_columnIndex(1),
-      m_valueIndex(2)
+    : QObject(0)
 {
     operator=(other);
 }
@@ -23,10 +17,7 @@ VariantBarDataMapping::VariantBarDataMapping(const VariantBarDataMapping &other)
 VariantBarDataMapping::VariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
                                              const QStringList &rowCategories,
                                              const QStringList &columnCategories)
-    : QObject(0),
-      m_rowIndex(0),
-      m_columnIndex(1),
-      m_valueIndex(2)
+    : QObject(0)
 {
     m_rowIndex = rowIndex;
     m_columnIndex = columnIndex;

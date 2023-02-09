@@ -1,8 +1,8 @@
-# Copyright (C) 2022 The Qt Company Ltd.
+# Copyright (C) 2023 The Qt Company Ltd.
 # SPDX-License-Identifier: BSD-3-Clause
 
 cmake_minimum_required(VERSION 3.16)
-project(bars LANGUAGES CXX)
+project(graphgallery LANGUAGES CXX)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
@@ -17,27 +17,42 @@ endif()
 set(INSTALL_EXAMPLEDIR "${INSTALL_EXAMPLESDIR}")
 
 find_package(Qt6 COMPONENTS Core)
-find_package(Qt6 COMPONENTS Quick)
 find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Widgets)
 find_package(Qt6 COMPONENTS DataVisualization)
 
-qt_add_executable(bars
-    graphmodifier.cpp graphmodifier.h
+qt_add_executable(graphgallery
     main.cpp
+    bargraph.cpp bargraph.h
+    graphmodifier.cpp graphmodifier.h
+    rainfalldata.cpp rainfalldata.h
+    variantbardatamapping.cpp variantbardatamapping.h
+    variantbardataproxy.cpp variantbardataproxy.h
+    variantdataset.cpp variantdataset.h
 )
-set_target_properties(bars PROPERTIES
+set_target_properties(graphgallery PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
 )
-target_link_libraries(bars PUBLIC
+target_link_libraries(graphgallery PUBLIC
     Qt::Core
     Qt::Gui
     Qt::Widgets
     Qt::DataVisualization
 )
 
-install(TARGETS bars
+set(graphgallery_resource_files
+    "data/raindata.txt"
+)
+
+qt6_add_resources(graphgallery "graphgallery"
+    PREFIX
+        "/"
+    FILES
+        ${graphgallery_resource_files}
+)
+
+install(TARGETS graphgallery
     RUNTIME DESTINATION "${INSTALL_EXAMPLEDIR}"
     BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
     LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"
