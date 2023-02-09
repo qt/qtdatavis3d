@@ -6,19 +6,25 @@ android|ios|winrt {
     error( "Couldn't find the examples.pri file!" )
 }
 
+QT += widgets
+requires(qtConfig(fontcombobox))
+requires(qtConfig(combobox))
+
 SOURCES += main.cpp \
-    rainfallgraph.cpp \
+    graphmodifier.cpp \
+    rainfalldata.cpp \
     variantdataset.cpp \
     variantbardataproxy.cpp \
     variantbardatamapping.cpp \
 
 HEADERS += \
-    rainfallgraph.h \
+    graphmodifier.h \
+    rainfalldata.h \
     variantdataset.h \
     variantbardataproxy.h \
     variantbardatamapping.h
 
-RESOURCES += customproxy.qrc
+RESOURCES += graphgallery.qrc
 
 OTHER_FILES += doc/src/* \
                doc/images/* \

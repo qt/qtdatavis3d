@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef VARIANTBARDATAMAPPING_H
 #define VARIANTBARDATAMAPPING_H
 
-#include <QtCore/QObject>
-#include <QtCore/QStringList>
+#include <QtCore/qobject.h>
+#include <QtCore/qstringlist.h>
 
 class VariantBarDataMapping : public QObject
 {
@@ -22,8 +22,8 @@ public:
     VariantBarDataMapping(const VariantBarDataMapping &other);
     //! [1]
     VariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
-                           const QStringList &rowCategories,
-                           const QStringList &columnCategories);
+                          const QStringList &rowCategories,
+                          const QStringList &columnCategories);
     //! [1]
     virtual ~VariantBarDataMapping();
 
@@ -58,13 +58,13 @@ Q_SIGNALS:
 
 private:
     // Indexes of the mapped items in the VariantDataItem
-    int m_rowIndex;
-    int m_columnIndex;
-    int m_valueIndex;
+    int m_rowIndex = 0;
+    int m_columnIndex = 1;
+    int m_valueIndex = 2;
 
     // For row/column items, sort items into these categories. Other categories are ignored.
-    QStringList m_rowCategories;
-    QStringList m_columnCategories;
+    QStringList m_rowCategories = {};
+    QStringList m_columnCategories = {};
 };
 
 #endif

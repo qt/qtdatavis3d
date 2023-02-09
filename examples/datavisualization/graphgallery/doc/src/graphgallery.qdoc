@@ -1,0 +1,282 @@
+// Copyright (C) 2016 The Qt Company Ltd.
+// SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
+
+/*!
+    \example graphgallery
+    \meta tags {DataVisualization, Q3DBars, Bar Graph, Custom Proxy}
+    \meta category {Graphics}
+    \title Graph Gallery
+    \ingroup qtdatavisualization_examples
+    \brief Gallery of Bar, Scatter, and Surface graphs.
+
+    \e {Graph Gallery} demonstrates all three graph types and some of their special features.
+    The graphs have their own tabs in the application.
+
+    \image qmlgraphgallery-example.png
+
+    \include examples-run.qdocinc
+
+    \section1 Bar Graph
+
+    In the \uicontrol {Bar Graph} tab, create a 3D bar graph using Q3DBars and combine the use of
+    widgets to adjust various bar graph qualities. The example shows how to:
+
+    \list
+        \li Create an application with Q3DBars and some widgets
+        \li Use QBar3DSeries and QBarDataProxy to set data to the graph
+        \li Adjust some graph and series properties using widget controls
+        \li Select a row or a column by clicking an axis label
+        \li Create a custom proxy to use with Q3DBars
+    \endlist
+
+    For information about interacting with the graph, see
+    \l{Qt Data Visualization Interacting with Data}{this page}.
+
+    \section2 Creating the Application
+
+    First, in \c{bargraph.cpp}, instantiate Q3DBars and a window container for it:
+
+    \snippet graphgallery/bargraph.cpp 0
+
+    The call to QWidget::createWindowContainer is required, as all data visualization graph classes
+    (Q3DBars, Q3DScatter, Q3DSurface) inherit QWindow. This is the only way to use a class that
+    inherits QWindow as a widget.
+
+    Then, create horizontal and vertical layouts. Add the graph and the vertical layout to the
+    horizontal one:
+
+    \snippet graphgallery/bargraph.cpp 1
+
+    Next, create another class to handle the data addition and other interaction with the
+    graph:
+
+    \snippet graphgallery/bargraph.cpp 2
+
+    \section2 Setting up the Graph
+
+    Set up the graph in the constructor of the \c GraphModifier class:
+
+    \snippet graphgallery/graphmodifier.cpp 0
+
+    First, create the axes and the series into member variables to support changing them easily:
+
+    \snippet graphgallery/graphmodifier.cpp 1
+
+    Then, set some visual qualities for the graph:
+
+    \snippet graphgallery/graphmodifier.cpp 2
+
+    Set up the axes and make them the active axes of the graph:
+
+    \snippet graphgallery/graphmodifier.cpp 3
+
+    Give axis labels a small autorotation angle with setLabelAutoRotation() to make them orient
+    slightly toward the camera. This improves axis label readability at extreme camera angles.
+
+    Next, initialize the visual properties of the series. Note that the second series is initially
+    not visible:
+
+    \snippet graphgallery/graphmodifier.cpp 4
+
+    Add the series to the graph:
+
+    \snippet graphgallery/graphmodifier.cpp 5
+
+    Finally, set the camera angle by calling the same method the camera angle change button
+    in the UI uses to cycle through various camera angles:
+
+    \snippet graphgallery/graphmodifier.cpp 6
+
+    The camera is controlled via the scene object of the graph:
+
+    \snippet graphgallery/graphmodifier.cpp 7
+
+    For more information about using scene and cameras, see Q3DScene and Q3DCamera.
+
+    \section2 Adding Data to the Graph
+
+    At the end of the constructor, call a method that sets up the data:
+
+    \snippet graphgallery/graphmodifier.cpp 8
+
+    This method adds data to the proxies of the two series:
+
+    \snippet graphgallery/graphmodifier.cpp 9a
+    \dots 0
+    \snippet graphgallery/graphmodifier.cpp 9b
+
+    \section2 Using Widgets to Control the Graph
+
+    Continue by adding some widgets in \c{bargraph.cpp}. Add a slider:
+
+    \snippet graphgallery/bargraph.cpp 3
+
+    Use the slider to rotate the graph instead of just using a mouse or touch. Add it to the
+    vertical layout:
+
+    \snippet graphgallery/bargraph.cpp 4
+
+    Then, connect it to a method in \c GraphModifier:
+
+    \snippet graphgallery/bargraph.cpp 5
+
+    Create a slot in \c GraphModifier for the signal connection. The camera is controlled via the
+    scene object. This time, specify the actual camera position along the orbit around the center
+    point, instead of specifying a preset camera angle:
+
+    \snippet graphgallery/graphmodifier.cpp 10
+
+    You can now use the slider to rotate the graph.
+
+    Add more widgets to the vertical layout to control:
+
+    \list
+        \li Graph rotation
+        \li Label style
+        \li Camera preset
+        \li Background visibility
+        \li Grid visibility
+        \li Bar shading smoothness
+        \li Visibility of the second bar series
+        \li Value axis direction
+        \li Axis title visibility and rotation
+        \li Data range to be shown
+        \li Bar style
+        \li Selection mode
+        \li Theme
+        \li Shadow quality
+        \li Font
+        \li Font size
+        \li Axis label rotation
+        \li Data mode
+    \endlist
+
+    Some widget controls are intentionally disabled when in the \uicontrol {Custom Proxy Data}
+    data mode.
+
+    \section2 Selecting a Row or Column by Clicking an Axis Label
+
+    Selection by axis label is default functionality for bar graphs. As an example, you can select
+    rows by clicking an axis label in the following way:
+
+    \list 1
+        \li Change selection mode to \c SelectionRow
+        \li Click a year label
+        \li The row with the clicked year is selected
+    \endlist
+
+    The same method works with \c SelectionSlice and \c SelectionItem flags, as long as
+    either \c SelectionRow or \c SelectionColumn is set as well.
+
+    \section2 Zooming to Selection
+
+    As an example of adjusting the camera target, implement an animation of zooming to
+    selection via a button press. Animation initializations are done in the constructor:
+
+    \snippet graphgallery/graphmodifier.cpp 11
+
+    Function \c{GraphModifier::zoomToSelectedBar()} contains the zooming functionality.
+    QPropertyAnimation \c m_animationCameraTarget targets Q3DCamera::target property,
+    which takes a value normalized to the range (-1, 1).
+
+    Figure out where the selected bar is relative to axes, and use that as the end value for
+    \c{m_animationCameraTarget}:
+
+    \snippet graphgallery/graphmodifier.cpp 12
+    \dots 0
+    \snippet graphgallery/graphmodifier.cpp 13
+
+    Then, rotate the camera so that it always points approximately to the center of
+    the graph at the end of the animation:
+
+    \snippet graphgallery/graphmodifier.cpp 14
+
+    \section2 Custom Proxy for Data
+
+    By toggling \uicontrol {Custom Proxy Data} data mode on, a custom dataset and the corresponding
+    proxy are taken into use.
+
+    Define a simple flexible data set, \c{VariantDataSet}, where each data item is
+    a variant list. Each item can have multiple values, identified by their index in
+    the list. In this case, the data set is storing monthly rainfall data, where the value in
+    index zero is the year, the value in index one is the month, and the value in index two is
+    the amount of rainfall in that month.
+
+    The custom proxy is similar to itemmodel-based proxies provided by Qt Data Visualization, and
+    it requires mapping to interpret the data.
+
+    \section3 VariantDataSet
+
+    Define the data items as QVariantList objects. Add functionality for clearing the data set and
+    querying for a reference to the data contained in the set. Also, add signals to be emitted when
+    data is added or the set is cleared:
+
+    \snippet graphgallery/variantdataset.h 0
+    \dots 0
+    \codeline
+    \snippet graphgallery/variantdataset.h 1
+
+    \section3 VariantBarDataProxy
+
+    Subclass \c VariantBarDataProxy from QBarDataProxy and provide a simple API of getters and
+    setters for the data set and the mapping:
+
+    \snippet graphgallery/variantbardataproxy.h 0
+    \dots 0
+    \codeline
+    \snippet graphgallery/variantbardataproxy.h 1
+
+    The proxy listens for the changes in the data set and the mapping, and resolves the data set
+    if any changes are detected. This is not a particularly efficient implementation, as any change
+    will cause re-resolving of the entire data set, but that is not an issue for this example.
+
+    In \c resolveDataSet() method, sort the variant data values into rows and columns based on the
+    mapping. This is very similar to how QItemModelBarDataProxy handles mapping, except you use
+    list indexes instead of item model roles here. Once the values are sorted, generate
+    \c QBarDataArray out of them, and call the \c resetArray() method in the parent class:
+
+    \snippet graphgallery/variantbardataproxy.cpp 0
+
+    \section3 VariantBarDataMapping
+
+    Store the mapping information between \c VariantDataSet data item indexes and rows, columns,
+    and values of \c QBarDataArray in \c VariantBarDataMapping. It contains the lists of rows and
+    columns to be included in the resolved data:
+
+    \snippet graphgallery/variantbardatamapping.h 0
+    \dots 0
+    \codeline
+    \snippet graphgallery/variantbardatamapping.h 1
+    \dots 0
+    \codeline
+    \snippet graphgallery/variantbardatamapping.h 2
+    \dots 0
+    \codeline
+    \snippet graphgallery/variantbardatamapping.h 3
+
+    The primary way to use a \c VariantBarDataMapping object is to give the mappings in the
+    constructor, though you can use the \c remap() method to set them later, either individually or
+    all together. Emit a signal if mapping changes. The outcome is a simplified version of the
+    mapping functionality of QItemModelBarDataProxy, adapted to work with variant lists instead of
+    item models.
+
+    \section3 RainfallData
+
+    Handle the setup of QBar3DSeries with the custom proxy in the \c RainfallData class:
+
+    \snippet graphgallery/rainfalldata.cpp 0
+
+    Populate the variant data set in the \c addDataSet() method:
+
+    \snippet graphgallery/rainfalldata.cpp 1
+    \dots
+
+    Add the data set to the custom proxy and set the mapping:
+
+    \snippet graphgallery/rainfalldata.cpp 2
+
+    Finally, add a function for getting the created series for displaying:
+
+    \snippet graphgallery/rainfalldata.h 0
+
+*/

@@ -1,15 +1,15 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef VARIANTBARDATAPROXY_H
 #define VARIANTBARDATAPROXY_H
 
-#include <QtDataVisualization/qbardataproxy.h>
 #include "variantdataset.h"
 #include "variantbardatamapping.h"
-#include <QtCore/QStringList>
-#include <QtCore/QMap>
-#include <QtCore/QPointer>
+#include <QtDataVisualization/qbardataproxy.h>
+#include <QtCore/qstringlist.h>
+#include <QtCore/qmap.h>
+#include <QtCore/qpointer.h>
 
 //! [0]
 class VariantBarDataProxy : public QBarDataProxy
