@@ -5,8 +5,6 @@
 #include <QtDataVisualization/qvalue3daxis.h>
 #include <QtQml/qqmlextensionplugin.h>
 
-Q_DECLARE_METATYPE(QValue3DAxisFormatter *)
-
 static const qreal oneDayMs = 60.0 * 60.0 * 24.0 * 1000.0;
 
 CustomFormatter::CustomFormatter(QObject *parent) :
