@@ -1,17 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "axesinputhandler.h"
 #include <QtCore/qmath.h>
 
 AxesInputHandler::AxesInputHandler(QAbstract3DGraph *graph, QObject *parent) :
-    Q3DInputHandler(parent),
-    m_mousePressed(false),
-    m_state(StateNormal),
-    m_axisX(0),
-    m_axisZ(0),
-    m_axisY(0),
-    m_speedModifier(15.0f)
+    Q3DInputHandler(parent)
 {
     //! [3]
     // Connect to the item selection signal from graph

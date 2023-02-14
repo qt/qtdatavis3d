@@ -29,6 +29,9 @@ qt_add_executable(graphgallery
     variantbardatamapping.cpp variantbardatamapping.h
     variantbardataproxy.cpp variantbardataproxy.h
     variantdataset.cpp variantdataset.h
+    scattergraph.cpp scattergraph.h
+    scatterdatamodifier.cpp scatterdatamodifier.h
+    axesinputhandler.cpp axesinputhandler.h
 )
 set_target_properties(graphgallery PROPERTIES
     WIN32_EXECUTABLE TRUE

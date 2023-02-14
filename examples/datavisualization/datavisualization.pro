@@ -7,9 +7,8 @@ qtHaveModule(quick) {
 }
 
 !android:!ios:!winrt {
-    SUBDIRS += scatter \
+    SUBDIRS += graphgallery \
                surface \
-               draggableaxes \
                customitems \
                texturesurface \
                volumetric

@@ -11,18 +11,25 @@ requires(qtConfig(fontcombobox))
 requires(qtConfig(combobox))
 
 SOURCES += main.cpp \
+    bargraph.cpp \
     graphmodifier.cpp \
     rainfalldata.cpp \
     variantdataset.cpp \
     variantbardataproxy.cpp \
     variantbardatamapping.cpp \
+    scattergraph.cpp \
+    scatterdatamodifier.cpp \
+    axesinputhandler.cpp
 
-HEADERS += \
+HEADERS += bargraph.h \
     graphmodifier.h \
     rainfalldata.h \
     variantdataset.h \
     variantbardataproxy.h \
-    variantbardatamapping.h
+    variantbardatamapping.h \
+    scattergraph.h \
+    scatterdatamodifier.h \
+    axesinputhandler.h
 
 RESOURCES += graphgallery.qrc
 

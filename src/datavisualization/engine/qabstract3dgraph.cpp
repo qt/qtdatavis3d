@@ -567,7 +567,7 @@ QCustom3DItem *QAbstract3DGraph::selectedCustomItem() const
  * \c selectedElementChanged signal is emitted.
  *
  * The signal can be used for example for implementing custom input handlers, as
- * demonstrated by the \l {Input Handling for Axes} example.
+ * demonstrated in the \l {Graph Gallery} example under \uicontrol {Scatter Graph} tab.
  *
  * \sa selectedLabelIndex(), selectedAxis(), selectedCustomItemIndex(), selectedCustomItem(),
  * Q3DBars::selectedSeries(), Q3DScatter::selectedSeries(), Q3DSurface::selectedSeries(),

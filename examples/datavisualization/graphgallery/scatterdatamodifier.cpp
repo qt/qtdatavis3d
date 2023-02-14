@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "scatterdatamodifier.h"
@@ -10,43 +10,51 @@
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtCore/qmath.h>
 #include <QtCore/qrandom.h>
-#include <QtWidgets/QComboBox>
+#include <QtWidgets/qcombobox.h>
 
 //#define RANDOM_SCATTER // Uncomment this to switch to random scatter
 
-const int numberOfItems = 3600;
-const float curveDivider = 3.0f;
+const int numberOfItems = 10000;
+const float curveDivider = 7.5f;
 const int lowerNumberOfItems = 900;
 const float lowerCurveDivider = 0.75f;
 
 ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
-      m_fontSize(40.0f),
-      m_style(QAbstract3DSeries::MeshSphere),
-      m_smooth(true),
       m_itemCount(lowerNumberOfItems),
-      m_curveDivider(lowerCurveDivider)
+      m_curveDivider(lowerCurveDivider),
+      //! [7]
+      m_inputHandler(new AxesInputHandler(scatter))
+      //! [7]
 {
     //! [0]
-    m_graph->activeTheme()->setType(Q3DTheme::ThemeEbony);
-    QFont font = m_graph->activeTheme()->font();
-    font.setPointSize(m_fontSize);
-    m_graph->activeTheme()->setFont(font);
-    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftLow);
+    m_graph->activeTheme()->setType(Q3DTheme::ThemeStoneMoss);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftHigh);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
+    m_graph->scene()->activeCamera()->setZoomLevel(80.f);
     //! [0]
 
-    //! [2]
+    //! [1]
     QScatterDataProxy *proxy = new QScatterDataProxy;
     QScatter3DSeries *series = new QScatter3DSeries(proxy);
     series->setItemLabelFormat(QStringLiteral("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel"));
     series->setMeshSmooth(m_smooth);
     m_graph->addSeries(series);
-    //! [2]
+    //! [1]
 
-    //! [3]
+    //! [8]
+    // Give ownership of the handler to the graph and make it the active handler
+    m_graph->setActiveInputHandler(m_inputHandler);
+    //! [8]
+
+    //! [9]
+    // Give our axes to the input handler
+    m_inputHandler->setAxes(m_graph->axisX(), m_graph->axisZ(), m_graph->axisY());
+    //! [9]
+
+    //! [2]
     addData();
-    //! [3]
+    //! [2]
 }
 
 ScatterDataModifier::~ScatterDataModifier()
@@ -57,17 +65,17 @@ ScatterDataModifier::~ScatterDataModifier()
 void ScatterDataModifier::addData()
 {
     // Configure the axes according to the data
-    //! [4]
+    //! [3]
     m_graph->axisX()->setTitle("X");
     m_graph->axisY()->setTitle("Y");
     m_graph->axisZ()->setTitle("Z");
-    //! [4]
+    //! [3]
 
-    //! [5]
+    //! [4]
     QScatterDataArray *dataArray = new QScatterDataArray;
     dataArray->resize(m_itemCount);
     QScatterDataItem *ptrToDataArray = &dataArray->first();
-    //! [5]
+    //! [4]
 
 #ifdef RANDOM_SCATTER
     for (int i = 0; i < m_itemCount; i++) {
@@ -75,7 +83,7 @@ void ScatterDataModifier::addData()
         ptrToDataArray++;
     }
 #else
-    //! [6]
+    //! [5]
     float limit = qSqrt(m_itemCount) / 2.0f;
     for (int i = -limit; i < limit; i++) {
         for (int j = -limit; j < limit; j++) {
@@ -85,15 +93,14 @@ void ScatterDataModifier::addData()
             ptrToDataArray++;
         }
     }
-    //! [6]
+    //! [5]
 #endif
 
-    //! [7]
+    //! [6]
     m_graph->seriesList().at(0)->dataProxy()->resetArray(dataArray);
-    //! [7]
+    //! [6]
 }
 
-//! [8]
 void ScatterDataModifier::changeStyle(int style)
 {
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
@@ -117,7 +124,6 @@ void ScatterDataModifier::changeTheme(int theme)
     currentTheme->setType(Q3DTheme::Theme(theme));
     emit backgroundEnabledChanged(currentTheme->isBackgroundEnabled());
     emit gridEnabledChanged(currentTheme->isGridEnabled());
-    emit fontChanged(currentTheme->font());
 }
 
 void ScatterDataModifier::changePresetCamera()
@@ -130,22 +136,10 @@ void ScatterDataModifier::changePresetCamera()
         preset = Q3DCamera::CameraPresetFrontLow;
 }
 
-void ScatterDataModifier::changeLabelStyle()
-{
-    m_graph->activeTheme()->setLabelBackgroundEnabled(!m_graph->activeTheme()->isLabelBackgroundEnabled());
-}
-
-void ScatterDataModifier::changeFont(const QFont &font)
-{
-    QFont newFont = font;
-    newFont.setPointSizeF(m_fontSize);
-    m_graph->activeTheme()->setFont(newFont);
-}
-
 void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
-    emit shadowQualityChanged(quality); // connected to a checkbox in main.cpp
+    emit shadowQualityChanged(quality); // connected to a checkbox in scattergraph.cpp
 }
 
 void ScatterDataModifier::changeShadowQuality(int quality)
@@ -163,7 +157,6 @@ void ScatterDataModifier::setGridEnabled(int enabled)
 {
     m_graph->activeTheme()->setGridEnabled((bool)enabled);
 }
-//! [8]
 
 void ScatterDataModifier::toggleItemCount()
 {
@@ -176,6 +169,21 @@ void ScatterDataModifier::toggleItemCount()
     }
     m_graph->seriesList().at(0)->dataProxy()->resetArray(0);
     addData();
+}
+
+void ScatterDataModifier::toggleRanges()
+{
+    if (!m_autoAdjust) {
+        m_graph->axisX()->setAutoAdjustRange(true);
+        m_graph->axisZ()->setAutoAdjustRange(true);
+        m_inputHandler->setDragSpeedModifier(1.5f);
+        m_autoAdjust = true;
+    } else {
+        m_graph->axisX()->setRange(-10.0f, 10.0f);
+        m_graph->axisZ()->setRange(-10.0f, 10.0f);
+        m_inputHandler->setDragSpeedModifier(15.0f);
+        m_autoAdjust = false;
+    }
 }
 
 QVector3D ScatterDataModifier::randVector()

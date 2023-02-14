@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "bargraph.h"
+#include "scattergraph.h"
 
 #include <QtWidgets/qapplication.h>
 #include <QtWidgets/qwidget.h>
@@ -18,12 +19,19 @@ int main(int argc, char **argv)
     if (!bars->initialize())
         return -1;
 
-    // Create a tab widget for creating own tabs for Bars3D, Scatter3D, and Surface3D
+    // Create scatter graph
+    ScatterGraph *scatter = new ScatterGraph();
+    if (!scatter->initialize())
+        return -1;
+
+    // Create a tab widget for creating own tabs for Q3DBars, Q3DScatter, and Q3DSurface
     QTabWidget *tabWidget = new QTabWidget();
     tabWidget->setWindowTitle(QLatin1String("Graph Gallery"));
 
     // Add bars widget
     tabWidget->addTab(bars->barsWidget(), QLatin1String("Bar Graph"));
+    // Add scatter widget
+    tabWidget->addTab(scatter->scatterWidget(), QLatin1String("Scatter Graph"));
 
     tabWidget->show();
     return app.exec();

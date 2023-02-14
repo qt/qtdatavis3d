@@ -113,9 +113,9 @@
     QHeightMapSurfaceDataProxy is a specialized proxy for generating a surface graph from a
     heightmap image. See the QHeightMapSurfaceDataProxy documentation for more information.
 
-    The \l{Data from Custom Proxy}{Custom Proxy} example shows how a custom proxy can be created. It
-    defines a custom data set based on variant lists and an extension of the basic proxy to resolve
-    that data with an associated mapper.
+    The \l{Graph Gallery} example shows how a custom proxy can be created, under the
+    \uicontrol {Bar Graph} tab. It defines a custom data set based on variant lists and an
+    extension of the basic proxy to resolve that data with an associated mapper.
 
     \section1 Dealing with Real-time Data
 
@@ -163,8 +163,8 @@
     the default touch controls, see QTouch3DInputHandler. The default handlers
     must be disabled when using customized input handlers.
 
-    The \l{Input Handling for Axes} illustrates how to use a custom input handler
-    to drag an axis label to move the visible part of the data.
+    The \l{Graph Gallery} example, under \uicontrol {Scatter Graph} tab, illustrates how to use
+    a custom input handler to drag an axis label to move the visible part of the data.
 
     In addition to perspective projection, orthographic projection can be used
     to create 2D graphs by replacing the default input handler with one that
