@@ -38,7 +38,7 @@ bool BarGraph::initialize()
     }
 
     QSize screenSize = m_barsGraph->screen()->size();
-    m_container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.5));
+    m_container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.75));
     m_container->setMaximumSize(screenSize);
     m_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_container->setFocusPolicy(Qt::StrongFocus);
@@ -50,9 +50,6 @@ bool BarGraph::initialize()
     hLayout->addWidget(m_container, 1);
     hLayout->addLayout(vLayout);
     //! [1]
-
-    // TODO: Add a label into the main widget to show the title of the current example?
-    //m_barsWidget->setWindowTitle(QStringLiteral("Average temperatures in Oulu and Helsinki, Finland (2015-2022)"));
 
     QComboBox *themeList = new QComboBox(m_barsWidget);
     themeList->addItem(QStringLiteral("Qt"));

@@ -40,7 +40,7 @@ RainfallData::RainfallData()
     months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
     m_rowAxis->setTitle("Year");
     m_colAxis->setTitle("Month");
-    m_valueAxis->setTitle("rainfall");
+    m_valueAxis->setTitle("rainfall (mm)");
     m_valueAxis->setSegmentCount(5);
     m_rowAxis->setLabels(m_years);
     m_colAxis->setLabels(months);

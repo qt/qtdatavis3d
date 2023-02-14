@@ -3,7 +3,7 @@
 
 /*!
     \example graphgallery
-    \meta tags {DataVisualization, Q3DBars, Bar Graph, Custom Proxy}
+    \meta tags {DataVisualization, Q3DBars, Bar Graph, Custom Proxy, Q3DScatter, Scatter Graph, Custom Input Handler}
     \meta category {Graphics}
     \title Graph Gallery
     \ingroup qtdatavisualization_examples
@@ -52,7 +52,7 @@
 
     \snippet graphgallery/bargraph.cpp 2
 
-    \section2 Setting up the Graph
+    \section2 Setting up the Bar Graph
 
     Set up the graph in the constructor of the \c GraphModifier class:
 
@@ -279,4 +279,144 @@
 
     \snippet graphgallery/rainfalldata.h 0
 
+    \section1 Scatter Graph
+
+    In the \uicontrol {Scatter Graph} tab, create a 3D scatter graph using Q3DScatter.
+    The example shows how to:
+
+    \list
+        \li Set up Q3DScatter graph
+        \li Use QScatterDataProxy to set data to the graph
+        \li Create a custom input handler by extending Q3DInputHandler
+    \endlist
+
+    For basic application creation, see \l {Bar Graph}.
+
+    \section2 Setting up the Scatter Graph
+
+    First, set up some visual qualities for the graph in the constructor of the
+    \c ScatterDataModifier:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 0
+
+    None of these are mandatory, but are used to override graph defaults. You can try how it looks
+    with the preset defaults by commenting out the block above.
+
+    Next, create a QScatterDataProxy and the associated QScatter3DSeries. Set a custom label format
+    and mesh smoothing for the series and add it to the graph:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 1
+
+    \section2 Adding Scatter Data
+
+    The last thing to do in the \c ScatterDataModifier constructor is to add data to the graph:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 2
+
+    The actual data addition is done in \c addData() method. First, configure the axes:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 3
+
+    You could do this also in the constructor of \c {ScatterDataModifier}. Doing it here
+    keeps the constructor simpler and the axes' configuration near the data.
+
+    Next, create a data array and populate it:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 4
+    \dots
+    \snippet graphgallery/scatterdatamodifier.cpp 5
+
+    Finally, tell the proxy to start using the data we gave it:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 6
+
+    Now, the graph has the data and is ready for use. For information about adding widgets
+    to control the graph, see \l {Using Widgets to Control the Graph}.
+
+    \section2 Replacing Default Input Handling
+
+    Initialize \c m_inputHandler in the constructor with a pointer to the scatter graph instance:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 7
+
+    Replace the default input handling mechanism by setting the active input handler of
+    Q3DScatter to \c {AxesInputHandler}, which implements the custom behavior:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 8
+
+    The input handler needs access to the axes of the graph, so pass them to it:
+
+    \snippet graphgallery/scatterdatamodifier.cpp 9
+
+    \section2 Extending Mouse Event Handling
+
+    First, inherit the custom input handler from Q3DInputHandler instead of QAbstract3DInputHandler
+    to keep all the functionality of the default input handling, and to add the custom
+    functionality on top of it:
+
+    \snippet graphgallery/axesinputhandler.h 0
+
+    Start extending the default functionality by re-implementing some of the mouse events.
+    First, extend \c {mousePressEvent}. Add a \c{m_mousePressed} flag for the left mouse button
+    to it, and keep the rest of the default functionality:
+
+    \snippet graphgallery/axesinputhandler.cpp 0
+
+    Next, modify \c mouseReleaseEvent to clear the flag, and reset the internal state:
+
+    \snippet graphgallery/axesinputhandler.cpp 1
+
+    Then, modify \c {mouseMoveEvent}. Check if \c m_mousePressed flag is \c {true} and
+    the internal state is something other than \c StateNormal. If so, set the input positions
+    for mouse movement distance calculations, and call the axis dragging function (see
+    \l {Implementing Axis Dragging} for details):
+
+    \snippet graphgallery/axesinputhandler.cpp 2
+
+    \section2 Implementing Axis Dragging
+
+    First, start listening to the selection signal from the graph. Do that in the
+    constructor, and connect it to the \c handleElementSelected method:
+
+    \snippet graphgallery/axesinputhandler.cpp 3
+
+    In \c {handleElementSelected}, check the type of the selection, and set the internal state
+    based on it:
+
+    \snippet graphgallery/axesinputhandler.cpp 4
+
+    The actual dragging logic is implemented in the \c handleAxisDragging method, which is called
+    from \c {mouseMoveEvent}, if the required conditions are met:
+
+    \snippet graphgallery/axesinputhandler.cpp 5
+
+    In \c {handleAxisDragging}, first get the scene orientation from the active camera:
+
+    \snippet graphgallery/axesinputhandler.cpp 6
+
+    Then, calculate the modifiers for mouse movement direction based on the orientation:
+
+    \snippet graphgallery/axesinputhandler.cpp 7
+
+    After that, calculate the mouse movement, and modify it based on the y rotation of the
+    camera:
+
+    \snippet graphgallery/axesinputhandler.cpp 8
+
+    Then, apply the moved distance to the correct axis:
+
+    \snippet graphgallery/axesinputhandler.cpp 9
+
+    Finally, add a function for setting the dragging speed:
+
+    \snippet graphgallery/axesinputhandler.h 1
+
+    This is needed, as the mouse movement distance is absolute in screen coordinates, and you
+    need to adjust it to the axis range. The larger the value, the slower the dragging will be.
+    Note that in this example, the scene zoom level is not taken into account when determining the
+    drag speed, so you'll notice changes in the range adjustment as you change the zoom level.
+
+    You could also adjust the modifier automatically based on the axis range and camera zoom level.
+
+    \section1 Example Contents
 */
