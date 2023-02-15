@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "highlightseries.h"
 
 //! [2]
-const float darkRedPos = 1.0f;
+const float darkRedPos = 1.f;
 const float redPos = 0.8f;
 const float yellowPos = 0.6f;
 const float greenPos = 0.4f;
@@ -12,8 +12,6 @@ const float darkGreenPos = 0.2f;
 //! [2]
 
 HighlightSeries::HighlightSeries()
-    : m_width(100),
-      m_height(100)
 {
     setDrawMode(QSurface3DSeries::DrawSurface);
     setFlatShadingEnabled(true);
@@ -43,7 +41,6 @@ void HighlightSeries::handlePositionChange(const QPoint &position)
 
     if (position == invalidSelectionPosition()) {
         setVisible(false);
-
         return;
     }
 
@@ -89,7 +86,7 @@ void HighlightSeries::handleGradientChange(float value)
     float ratio = m_minHeight / value;
 
     QLinearGradient gr;
-    gr.setColorAt(0.0f, Qt::black);
+    gr.setColorAt(0.f, Qt::black);
     gr.setColorAt(darkGreenPos * ratio, Qt::darkGreen);
     gr.setColorAt(greenPos * ratio, Qt::green);
     gr.setColorAt(yellowPos * ratio, Qt::yellow);

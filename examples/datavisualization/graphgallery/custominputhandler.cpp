@@ -1,19 +1,13 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "custominputhandler.h"
 
-#include <QtDataVisualization/Q3DCamera>
+#include <QtDataVisualization/q3dcamera.h>
 #include <QtCore/qmath.h>
 
 CustomInputHandler::CustomInputHandler(QAbstract3DGraph *graph, QObject *parent) :
-    Q3DInputHandler(parent),
-    m_highlight(0),
-    m_mousePressed(false),
-    m_state(StateNormal),
-    m_axisX(0),
-    m_axisZ(0),
-    m_speedModifier(20.0f)
+    Q3DInputHandler(parent)
 {
     // Connect to the item selection signal from graph
     connect(graph, &QAbstract3DGraph::selectedElementChanged, this,
@@ -43,7 +37,7 @@ void CustomInputHandler::wheelEvent(QWheelEvent *event)
     float y = (m_axisXMaxValue - m_axisXMinValue) * m_aspectRatio;
 
     m_axisX->setRange(m_axisXMinValue, m_axisXMaxValue);
-    m_axisY->setRange(100.0f, y);
+    m_axisY->setRange(100.f, y);
     m_axisZ->setRange(m_axisZMinValue, m_axisZMaxValue);
 }
 //! [1]
@@ -84,7 +78,7 @@ void CustomInputHandler::handleElementSelected(QAbstract3DGraph::ElementType typ
 
 void CustomInputHandler::handleAxisDragging()
 {
-    float distance = 0.0f;
+    float distance = 0.f;
 
     // Get scene orientation from active camera
     float xRotation = scene()->activeCamera()->xRotation();
@@ -100,7 +94,7 @@ void CustomInputHandler::handleAxisDragging()
 
     // Adjust axes
     switch (m_state) {
-//! [0]
+    //! [0]
     case StateDraggingX:
         distance = (move.x() * xMulX - move.y() * xMulY) * m_speedModifier;
         m_axisXMinValue -= distance;
@@ -117,7 +111,7 @@ void CustomInputHandler::handleAxisDragging()
         }
         m_axisX->setRange(m_axisXMinValue, m_axisXMaxValue);
         break;
-//! [0]
+        //! [0]
     case StateDraggingZ:
         distance = (move.x() * zMulX + move.y() * zMulY) * m_speedModifier;
         m_axisZMinValue += distance;
@@ -141,18 +135,18 @@ void CustomInputHandler::handleAxisDragging()
 
 void CustomInputHandler::checkConstraints()
 {
-//! [2]
+    //! [2]
     if (m_axisXMinValue < m_areaMinValue)
         m_axisXMinValue = m_areaMinValue;
     if (m_axisXMaxValue > m_areaMaxValue)
         m_axisXMaxValue = m_areaMaxValue;
     // Don't allow too much zoom in
     if ((m_axisXMaxValue - m_axisXMinValue) < m_axisXMinRange) {
-        float adjust = (m_axisXMinRange - (m_axisXMaxValue - m_axisXMinValue)) / 2.0f;
+        float adjust = (m_axisXMinRange - (m_axisXMaxValue - m_axisXMinValue)) / 2.f;
         m_axisXMinValue -= adjust;
         m_axisXMaxValue += adjust;
     }
-//! [2]
+    //! [2]
 
     if (m_axisZMinValue < m_areaMinValue)
         m_axisZMinValue = m_areaMinValue;
@@ -160,7 +154,7 @@ void CustomInputHandler::checkConstraints()
         m_axisZMaxValue = m_areaMaxValue;
     // Don't allow too much zoom in
     if ((m_axisZMaxValue - m_axisZMinValue) < m_axisZMinRange) {
-        float adjust = (m_axisZMinRange - (m_axisZMaxValue - m_axisZMinValue)) / 2.0f;
+        float adjust = (m_axisZMinRange - (m_axisZMaxValue - m_axisZMinValue)) / 2.f;
         m_axisZMinValue -= adjust;
         m_axisZMaxValue += adjust;
     }

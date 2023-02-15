@@ -32,6 +32,11 @@ qt_add_executable(graphgallery
     scattergraph.cpp scattergraph.h
     scatterdatamodifier.cpp scatterdatamodifier.h
     axesinputhandler.cpp axesinputhandler.h
+    surfacegraph.cpp surfacegraph.h
+    surfacegraphmodifier.cpp surfacegraphmodifier.h
+    custominputhandler.cpp custominputhandler.h
+    highlightseries.cpp highlightseries.h
+    topographicseries.cpp topographicseries.h
 )
 set_target_properties(graphgallery PROPERTIES
     WIN32_EXECUTABLE TRUE
@@ -46,6 +51,14 @@ target_link_libraries(graphgallery PUBLIC
 
 set(graphgallery_resource_files
     "data/raindata.txt"
+    "data/layer_1.png"
+    "data/layer_2.png"
+    "data/layer_3.png"
+    "data/oilrig.obj"
+    "data/pipe.obj"
+    "data/refinery.obj"
+    "data/maptexture.jpg"
+    "data/topography.png"
 )
 
 qt6_add_resources(graphgallery "graphgallery"
