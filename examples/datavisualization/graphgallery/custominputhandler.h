@@ -1,13 +1,14 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef CUSTOMINPUTHANDLER_H
 #define CUSTOMINPUTHANDLER_H
 
-#include <QtDataVisualization/Q3DInputHandler>
-#include <QtDataVisualization/QAbstract3DGraph>
-#include <QtDataVisualization/QValue3DAxis>
 #include "highlightseries.h"
+
+#include <QtDataVisualization/q3dinputhandler.h>
+#include <QtDataVisualization/qabstract3dgraph.h>
+#include <QtDataVisualization/qvalue3daxis.h>
 
 class CustomInputHandler : public Q3DInputHandler
 {
@@ -42,6 +43,7 @@ public:
     inline void setHighlightSeries(HighlightSeries *series) { m_highlight = series; }
     inline void setDragSpeedModifier(float modifier) { m_speedModifier = modifier; }
 
+protected:
     virtual void mousePressEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void mouseMoveEvent(QMouseEvent *event, const QPoint &mousePos);
     virtual void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
@@ -53,22 +55,22 @@ private:
     void checkConstraints();
 
 private:
-    HighlightSeries *m_highlight;
-    bool m_mousePressed;
-    InputState m_state;
-    QValue3DAxis *m_axisX;
-    QValue3DAxis *m_axisY;
-    QValue3DAxis *m_axisZ;
-    float m_speedModifier;
-    float m_aspectRatio;
-    float m_axisXMinValue;
-    float m_axisXMaxValue;
-    float m_axisXMinRange;
-    float m_axisZMinValue;
-    float m_axisZMaxValue;
-    float m_axisZMinRange;
-    float m_areaMinValue;
-    float m_areaMaxValue;
+    HighlightSeries *m_highlight = nullptr;
+    bool m_mousePressed = false;
+    InputState m_state = StateNormal;
+    QValue3DAxis *m_axisX = nullptr;
+    QValue3DAxis *m_axisY = nullptr;
+    QValue3DAxis *m_axisZ = nullptr;
+    float m_speedModifier = 20.f;
+    float m_aspectRatio = 0.f;
+    float m_axisXMinValue = 0.f;
+    float m_axisXMaxValue = 0.f;
+    float m_axisXMinRange = 0.f;
+    float m_axisZMinValue = 0.f;
+    float m_axisZMaxValue = 0.f;
+    float m_axisZMinRange = 0.f;
+    float m_areaMinValue = 0.f;
+    float m_areaMaxValue = 0.f;
 };
 
 #endif

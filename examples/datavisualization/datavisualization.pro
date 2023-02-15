@@ -8,9 +8,6 @@ qtHaveModule(quick) {
 
 !android:!ios:!winrt {
     SUBDIRS += graphgallery \
-               surface \
-               customitems \
-               texturesurface \
                volumetric
 }
 

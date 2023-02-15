@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef HIGHLIGHTSERIES_H
 #define HIGHLIGHTSERIES_H
 
-#include <QtDataVisualization/QSurface3DSeries>
+#include <QtDataVisualization/qsurface3dseries.h>
 
 #include "topographicseries.h"
 
@@ -23,13 +23,13 @@ public Q_SLOTS:
     void handleGradientChange(float value);
 
 private:
-    int m_width;
-    int m_height;
-    int m_srcWidth;
-    int m_srcHeight;
-    QPoint m_position;
-    TopographicSeries *m_topographicSeries;
-    float m_minHeight;
+    int m_width = 100;
+    int m_height = 100;
+    int m_srcWidth = 0;
+    int m_srcHeight = 0;
+    QPoint m_position = {};
+    TopographicSeries *m_topographicSeries = nullptr;
+    float m_minHeight = 0.f;
 };
 
 #endif // HIGHLIGHTSERIES_H

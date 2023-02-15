@@ -3,6 +3,7 @@
 
 #include "bargraph.h"
 #include "scattergraph.h"
+#include "surfacegraph.h"
 
 #include <QtWidgets/qapplication.h>
 #include <QtWidgets/qwidget.h>
@@ -24,6 +25,11 @@ int main(int argc, char **argv)
     if (!scatter->initialize())
         return -1;
 
+    // Create surface graph
+    SurfaceGraph *surface = new SurfaceGraph();
+    if (!surface->initialize())
+        return -1;
+
     // Create a tab widget for creating own tabs for Q3DBars, Q3DScatter, and Q3DSurface
     QTabWidget *tabWidget = new QTabWidget();
     tabWidget->setWindowTitle(QLatin1String("Graph Gallery"));
@@ -32,6 +38,8 @@ int main(int argc, char **argv)
     tabWidget->addTab(bars->barsWidget(), QLatin1String("Bar Graph"));
     // Add scatter widget
     tabWidget->addTab(scatter->scatterWidget(), QLatin1String("Scatter Graph"));
+    // Add surface widget
+    tabWidget->addTab(surface->surfaceWidget(), QLatin1String("Surface Graph"));
 
     tabWidget->show();
     return app.exec();

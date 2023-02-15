@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef TOPOGRAPHICSERIES_H
 #define TOPOGRAPHICSERIES_H
 
-#include <QtDataVisualization/QSurface3DSeries>
+#include <QtDataVisualization/qsurface3dseries.h>
 
 class TopographicSeries : public QSurface3DSeries
 {
@@ -21,8 +21,8 @@ public:
 public Q_SLOTS:
 
 private:
-    float m_sampleCountX;
-    float m_sampleCountZ;
+    float m_sampleCountX = 0.f;
+    float m_sampleCountZ = 0.f;
 };
 
 #endif // TOPOGRAPHICSERIES_H
