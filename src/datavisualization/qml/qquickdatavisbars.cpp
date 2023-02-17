@@ -419,6 +419,7 @@ void QQuickDataVisBars::updateParameters() {
     }
 
     m_axisRangeChanged = true;
+    createSliceView();
     update();
 }
 
@@ -1052,7 +1053,10 @@ QQuick3DTexture *QQuickDataVisBars::createTexture()
     return texture;
 }
 
-void QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event){
+void QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
+{
+    QQuickDataVisItem::handleMousePressedEvent(event);
+
     if (Qt::LeftButton == event->button()) {
         auto mousePos = event->pos();
         QList<QQuick3DPickResult> pickResults = pickAll(mousePos.x(), mousePos.y());
@@ -1101,6 +1105,10 @@ void QQuickDataVisBars::setSelectedBar(QBar3DSeries *series, const QPoint &coord
     if (coord != m_selectedBarCoord || series != m_selectedBarSeries) {
         m_selectedBarSeries = series;
         m_selectedBarCoord = coord;
+        if (isSliceEnabled()) {
+            m_barsController->setSlicingActive(true);
+            setSliceActivatedChanged(true);
+        }
 
         // Clear selection from other series and finally set new selection to the specified series
         for (auto it = m_barModelsMap.begin(); it != m_barModelsMap.end(); it++) {

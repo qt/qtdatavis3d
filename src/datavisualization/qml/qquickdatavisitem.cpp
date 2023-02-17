@@ -16,6 +16,7 @@
 #include <QtQuick3D/private/qquick3dprincipledmaterial_p.h>
 #include <QtQuick3D/private/qquick3ddirectionallight_p.h>
 #include <QtQuick3D/private/qquick3drepeater_p.h>
+#include <QtQuick/private/qquickitem_p.h>
 
 #if defined(Q_OS_IOS)
 #include <QtCore/QTimer>
@@ -1780,14 +1781,6 @@ void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
     connect(m_controller.data(), &Abstract3DController::needRender, window, &QQuickWindow::update);
     updateWindowParameters();
 
-    if (sliceView()) {
-        float pixelRatio = window->devicePixelRatio();
-        float magnification = 100.0f * pixelRatio + 50.0f;
-        QQuick3DOrthographicCamera *camera = static_cast<QQuick3DOrthographicCamera *>(sliceView()->camera());
-        camera->setHorizontalMagnification(magnification);
-        camera->setVerticalMagnification(magnification);
-    }
-
 #if defined(Q_OS_IOS)
     // Scenegraph render cycle in iOS sometimes misses update after beforeSynchronizing signal.
     // This ensures we don't end up displaying the graph without any data, in case update is
@@ -2183,6 +2176,14 @@ void QQuickDataVisItem::updateSliceGraph()
         setHeight(height() * 5.f);
         m_sliceView->setVisible(false);
     } else {
+        float pixelRatio = QQuick3DObjectPrivate::get(rootNode())->sceneManager->window()->devicePixelRatio();
+        float magnification = 100.0f * pixelRatio + 50.0f;
+        QQuick3DOrthographicCamera *camera = static_cast<QQuick3DOrthographicCamera *>(sliceView()->camera());
+        camera->setHorizontalMagnification(magnification);
+        camera->setVerticalMagnification(magnification);
+        QQuickItem *anchor = QQuickItemPrivate::get(this)->anchors()->fill();
+        if (anchor)
+            QQuickItemPrivate::get(this)->anchors()->resetFill();
         setWidth(width() * .2f);
         setHeight(height() * .2f);
         m_sliceView->setVisible(true);
@@ -2357,19 +2358,17 @@ void QQuickDataVisItem::updateSliceGrid()
     float linePosY = .0f;
     float linePosZ = .0f;
 
-    for (int i = 0; i < m_sliceVerticalGridRepeater->count(); i++) {
-        QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_sliceVerticalGridRepeater->objectAt(i));
-        if (horizontalAxis->type() == QAbstract3DAxis::AxisTypeValue) {
+    if (horizontalAxis->type() == QAbstract3DAxis::AxisTypeValue) {
+        for (int i = 0; i < m_sliceVerticalGridRepeater->count(); i++) {
+            QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_sliceVerticalGridRepeater->objectAt(i));
             auto axis = static_cast<QValue3DAxis *>(horizontalAxis);
             if (i % 2 == 0)
                 linePosX = axis->gridPositionAt(i / 2) * scale * 2.0f - translate;
             else
                 linePosX = axis->subGridPositionAt(i / 2) * scale * 2.0f - translate;
-        } else if (horizontalAxis->type() == QAbstract3DAxis::AxisTypeCategory) {
-            linePosX = calculateCategoryGridLinePosition(horizontalAxis, i);
+            lineNode->setProperty("lineColor", QColor(0, 0, 0));
+            positionAndScaleLine(lineNode, verticalScale, QVector3D(linePosX, linePosY, linePosZ));
         }
-        lineNode->setProperty("lineColor", QColor(0, 0, 0));
-        positionAndScaleLine(lineNode, verticalScale, QVector3D(linePosX, linePosY, linePosZ));
     }
 
     linePosX = 0;
@@ -2378,14 +2377,14 @@ void QQuickDataVisItem::updateSliceGrid()
 
     for (int i = 0; i < m_sliceHorizontalGridRepeater->count(); i++) {
         QQuick3DNode *lineNode = static_cast<QQuick3DNode *>(m_sliceHorizontalGridRepeater->objectAt(i));
-        if (verticalAxis->type() == QAbstract3DAxis::AxisTypeValue) {
-            auto axis = static_cast<QValue3DAxis *>(verticalAxis);
+        auto axis = static_cast<QValue3DAxis *>(verticalAxis);
+        if (horizontalAxis->type() == QAbstract3DAxis::AxisTypeValue) {
             if (i % 2 == 0)
                 linePosY = axis->gridPositionAt(i / 2) * scale * 2.0f - translate;
             else
                 linePosY = axis->subGridPositionAt(i / 2) * scale * 2.0f - translate;
-        } else if (verticalAxis->type() == QAbstract3DAxis::AxisTypeCategory) {
-            linePosY = calculateCategoryGridLinePosition(verticalAxis, i);
+        } else if (horizontalAxis->type() == QAbstract3DAxis::AxisTypeCategory) {
+            linePosY = axis->gridPositionAt(i) * scale * 2.0f - translate;
         }
         lineNode->setProperty("lineColor", QColor(0, 0, 0));
         positionAndScaleLine(lineNode, horizontalScale, QVector3D(linePosX, linePosY, linePosZ));
@@ -2478,9 +2477,11 @@ void QQuickDataVisItem::updateSliceLabels()
     } else if (horizontalAxis->type() == QAbstract3DAxis::AxisTypeCategory) {
         for (int i = 0; i < m_sliceHorizontalLabelRepeater->count(); i++) {
             labelTrans = calculateCategoryLabelPosition(horizontalAxis, labelTrans, i);
+            labelTrans.setY(labelTrans.y() - adjustment);
             auto obj = static_cast<QQuick3DNode *>(m_sliceHorizontalLabelRepeater->objectAt(i));
             obj->setScale(fontScaled);
             obj->setPosition(labelTrans);
+            obj->setEulerRotation(QVector3D(0.0f, 0.0f, -45.0f));
             obj->setProperty("labelText", labels[i]);
             obj->setProperty("labelWidth", labelsMaxWidth);
             obj->setProperty("labelHeight", labelHeight);
@@ -2557,16 +2558,20 @@ void QQuickDataVisItem::updateSliceLabels()
     yPos = backgroundScale.y() * 1.5f + adjustment;
     labelTrans = QVector3D(0.0f, -yPos, 0.0f);
 
-    m_sliceHorizontalTitleLabel->setScale(fontScaled);
-    m_sliceHorizontalTitleLabel->setPosition(labelTrans);
-    m_sliceHorizontalTitleLabel->setProperty("labelWidth", labelWidth);
-    m_sliceHorizontalTitleLabel->setProperty("labelHeight", labelHeight);
-    m_sliceHorizontalTitleLabel->setProperty("labelText", horizontalAxis->title());
-    m_sliceHorizontalTitleLabel->setProperty("labelFont", font);
-    m_sliceHorizontalTitleLabel->setProperty("borderEnabled", borderEnabled);
-    m_sliceHorizontalTitleLabel->setProperty("labelTextColor", labelTextColor);
-    m_sliceHorizontalTitleLabel->setProperty("backgroundEnabled", backgroundEnabled);
-    m_sliceHorizontalTitleLabel->setProperty("backgroundColor", backgroundColor);
+    if (!horizontalAxis->title().isEmpty()) {
+        m_sliceHorizontalTitleLabel->setScale(fontScaled);
+        m_sliceHorizontalTitleLabel->setPosition(labelTrans);
+        m_sliceHorizontalTitleLabel->setProperty("labelWidth", labelWidth);
+        m_sliceHorizontalTitleLabel->setProperty("labelHeight", labelHeight);
+        m_sliceHorizontalTitleLabel->setProperty("labelText", horizontalAxis->title());
+        m_sliceHorizontalTitleLabel->setProperty("labelFont", font);
+        m_sliceHorizontalTitleLabel->setProperty("borderEnabled", borderEnabled);
+        m_sliceHorizontalTitleLabel->setProperty("labelTextColor", labelTextColor);
+        m_sliceHorizontalTitleLabel->setProperty("backgroundEnabled", backgroundEnabled);
+        m_sliceHorizontalTitleLabel->setProperty("backgroundColor", backgroundColor);
+    } else {
+        m_sliceHorizontalTitleLabel->setVisible(false);
+    }
 }
 
 void QQuickDataVisItem::setUpCamera()

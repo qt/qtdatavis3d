@@ -65,7 +65,7 @@ Item {
             width: dataView.width
             height: dataView.height
             shadowQuality: AbstractGraph3D.ShadowQualityMedium
-            selectionMode: AbstractGraph3D.SelectionItem
+            selectionMode: AbstractGraph3D.SelectionItemAndRow | AbstractGraph3D.SelectionSlice
             theme: Theme3D {
                 type: Theme3D.ThemeRetro
                 labelBorderEnabled: true
