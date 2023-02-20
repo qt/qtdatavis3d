@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QABSTRACT3DSERIES_H
 #define QABSTRACT3DSERIES_H
 
-#include <QtDataVisualization/q3dtheme.h>
+#include <QtGraphs/q3dtheme.h>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QString>
@@ -15,7 +15,7 @@ QT_BEGIN_NAMESPACE
 
 class QAbstract3DSeriesPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
+class Q_GRAPHS_EXPORT QAbstract3DSeries : public QObject
 {
     Q_OBJECT
     Q_ENUMS(SeriesType)
@@ -35,8 +35,8 @@ class Q_DATAVISUALIZATION_EXPORT QAbstract3DSeries : public QObject
     Q_PROPERTY(QColor multiHighlightColor READ multiHighlightColor WRITE setMultiHighlightColor NOTIFY multiHighlightColorChanged)
     Q_PROPERTY(QLinearGradient multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_PROPERTY(QString name READ name WRITE setName NOTIFY nameChanged)
-    Q_PROPERTY(QString itemLabel READ itemLabel NOTIFY itemLabelChanged REVISION(1, 1))
-    Q_PROPERTY(bool itemLabelVisible READ isItemLabelVisible WRITE setItemLabelVisible NOTIFY itemLabelVisibilityChanged REVISION(1, 1))
+    Q_PROPERTY(QString itemLabel READ itemLabel NOTIFY itemLabelChanged)
+    Q_PROPERTY(bool itemLabelVisible READ isItemLabelVisible WRITE setItemLabelVisible NOTIFY itemLabelVisibilityChanged)
 
 public:
     enum SeriesType {
@@ -125,8 +125,8 @@ Q_SIGNALS:
     void multiHighlightColorChanged(const QColor &color);
     void multiHighlightGradientChanged(const QLinearGradient &gradient);
     void nameChanged(const QString &name);
-    Q_REVISION(1, 1) void itemLabelChanged(const QString &label);
-    Q_REVISION(1, 1) void itemLabelVisibilityChanged(bool visible);
+    void itemLabelChanged(const QString &label);
+    void itemLabelVisibilityChanged(bool visible);
 
 protected:
     QScopedPointer<QAbstract3DSeriesPrivate> d_ptr;

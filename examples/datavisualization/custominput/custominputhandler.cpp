@@ -1,9 +1,9 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "custominputhandler.h"
 
-#include <QtDataVisualization/Q3DCamera>
+#include <QtGraphs/Q3DCamera>
 
 CustomInputHandler::CustomInputHandler(QObject *parent) :
     QAbstract3DInputHandler(parent)

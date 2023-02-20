@@ -6,5 +6,5 @@ qt_internal_add_test(q3dtheme
         tst_theme.cpp
     LIBRARIES
         Qt::Gui
-        Qt::DataVisualization
+        Qt::Graphs
 )

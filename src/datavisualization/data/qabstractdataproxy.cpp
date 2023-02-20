@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qabstractdataproxy_p.h"
@@ -8,29 +8,27 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstractDataProxy
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QAbstractDataProxy class is a base class for all data
  * visualization data proxies.
- * \since QtDataVisualization 1.0
  *
  * The following visualization type specific inherited classes are used instead
  * of the base class: QBarDataProxy, QScatterDataProxy, and QSurfaceDataProxy.
  *
- * For more information, see \l{Qt Data Visualization Data Handling}.
+ * For more information, see \l{Qt Graphs Data Handling}.
  */
 
 /*!
  * \qmltype AbstractDataProxy
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QAbstractDataProxy
- * \brief Base type for all QtDataVisualization data proxies.
+ * \brief Base type for all QtGraphs data proxies.
  *
  * This type is uncreatable, but contains properties that are exposed via the
  * following subtypes: BarDataProxy, ScatterDataProxy, SurfaceDataProxy.
  *
- * For more information, see \l {Qt Data Visualization Data Handling}.
+ * For more information, see \l {Qt Graphs Data Handling}.
  */
 
 /*!

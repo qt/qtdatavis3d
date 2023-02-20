@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef DATASOURCE_H
 #define DATASOURCE_H
 
-#include <QtDataVisualization/QCustom3DVolume>
+#include <QtGraphs/QCustom3DVolume>
 #include <QtCore/QObject>
 
 class DataSource : public QObject

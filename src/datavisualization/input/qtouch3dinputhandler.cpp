@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qtouch3dinputhandler_p.h"
@@ -20,9 +20,8 @@ static const float touchZoomDrift = 0.02f;
 
 /*!
  * \class QTouch3DInputHandler
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Basic touch display based input handler.
- * \since QtDataVisualization 1.0
  *
  * QTouch3DInputHandler is the basic input handler for touch screen devices.
  *
@@ -57,9 +56,8 @@ static const float touchZoomDrift = 0.02f;
 
 /*!
  * \qmltype TouchInputHandler3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.2
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QTouch3DInputHandler
  * \inherits InputHandler3D
  * \brief Basic touch display based input handler.

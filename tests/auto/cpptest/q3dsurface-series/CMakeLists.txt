@@ -6,5 +6,5 @@ qt_internal_add_test(q3dsurface-series
         tst_series.cpp
     LIBRARIES
         Qt::Gui
-        Qt::DataVisualization
+        Qt::Graphs
 )

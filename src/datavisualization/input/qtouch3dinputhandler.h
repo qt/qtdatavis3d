@@ -1,16 +1,16 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QTOUCH3DINPUTHANDLER_H
 #define QTOUCH3DINPUTHANDLER_H
 
-#include <QtDataVisualization/q3dinputhandler.h>
+#include <QtGraphs/q3dinputhandler.h>
 
 QT_BEGIN_NAMESPACE
 
 class QTouch3DInputHandlerPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QTouch3DInputHandler : public Q3DInputHandler
+class Q_GRAPHS_EXPORT QTouch3DInputHandler : public Q3DInputHandler
 {
     Q_OBJECT
 

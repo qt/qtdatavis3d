@@ -4,16 +4,15 @@
 cmake_minimum_required(VERSION 3.16)
 
 include(.cmake.conf)
-project(QtDataVisualization
+project(QtGraphs
     VERSION "${QT_REPO_MODULE_VERSION}"
-    DESCRIPTION "Qt Data Visualization Libraries"
+    DESCRIPTION "Qt Graphs Libraries"
     HOMEPAGE_URL "https://qt.io/"
     LANGUAGES CXX C
 )
 
 find_package(Qt6 ${PROJECT_VERSION} CONFIG REQUIRED COMPONENTS BuildInternals)
-find_package(Qt6 ${PROJECT_VERSION} CONFIG OPTIONAL_COMPONENTS
-    Core OpenGL Quick Qml Gui Widgets QuickTest QuickWidgets Test Quick3D)
+find_package(Qt6 ${PROJECT_VERSION} CONFIG OPTIONAL_COMPONENTS Core OpenGL Quick Qml Gui Widgets QuickTest QuickWidgets Test Quick3D)
 
 macro(assertTargets)
     foreach(qtTarget IN ITEMS ${ARGN})

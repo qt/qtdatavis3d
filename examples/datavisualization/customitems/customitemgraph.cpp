@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "customitemgraph.h"
 
-#include <QtDataVisualization/Q3DTheme>
-#include <QtDataVisualization/QCustom3DItem>
-#include <QtDataVisualization/QCustom3DLabel>
+#include <QtGraphs/Q3DTheme>
+#include <QtGraphs/QCustom3DItem>
+#include <QtGraphs/QCustom3DLabel>
 #include <QtGui/QImage>
 
 CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)

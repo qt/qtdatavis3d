@@ -1,14 +1,14 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef VOLUMETRICMODIFIER_H
 #define VOLUMETRICMODIFIER_H
 
-#include <QtDataVisualization/qcustom3dvolume.h>
-#include <QtDataVisualization/qcustom3ditem.h>
-#include <QtDataVisualization/q3dscatter.h>
-#include <QtDataVisualization/q3dsurface.h>
-#include <QtDataVisualization/q3dbars.h>
+#include <QtGraphs/qcustom3dvolume.h>
+#include <QtGraphs/qcustom3ditem.h>
+#include <QtGraphs/q3dscatter.h>
+#include <QtGraphs/q3dsurface.h>
+#include <QtGraphs/q3dbars.h>
 #include <QtWidgets/QLabel>
 
 class VolumetricModifier : public QObject

@@ -1,13 +1,13 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QSURFACEDATAPROXY_H
 #define QSURFACEDATAPROXY_H
 
-#include <QtDataVisualization/qabstractdataproxy.h>
-#include <QtDataVisualization/qsurfacedataitem.h>
+#include <QtGraphs/qabstractdataproxy.h>
+#include <QtGraphs/qsurfacedataitem.h>
 
-Q_MOC_INCLUDE(<QtDataVisualization/qsurface3dseries.h>)
+Q_MOC_INCLUDE(<QtGraphs/qsurface3dseries.h>)
 
 QT_BEGIN_NAMESPACE
 
@@ -17,7 +17,7 @@ class QSurface3DSeries;
 typedef QList<QSurfaceDataItem> QSurfaceDataRow;
 typedef QList<QSurfaceDataRow *> QSurfaceDataArray;
 
-class Q_DATAVISUALIZATION_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
+class Q_GRAPHS_EXPORT QSurfaceDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 

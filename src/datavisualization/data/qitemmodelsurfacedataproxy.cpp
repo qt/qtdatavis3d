@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qitemmodelsurfacedataproxy_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QItemModelSurfaceDataProxy
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Proxy class for presenting data in item models with Q3DSurface.
- * \since QtDataVisualization 1.0
  *
  * QItemModelSurfaceDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DSurface. It uses the defined mappings to map data from the model to rows, columns, and
@@ -51,7 +50,7 @@ QT_BEGIN_NAMESPACE
  * autogeneration.
  * You could do the following to display the data in a surface graph:
  *
- * \snippet doc_src_qtdatavisualization.cpp 5
+ * \snippet doc_src_qtgraphs.cpp 5
  *
  * If the fields of the model do not contain the data in the exact format you need, you can specify
  * a search pattern regular expression and a replace rule for each role to get the value in a
@@ -63,14 +62,13 @@ QT_BEGIN_NAMESPACE
  * For example about using the search patterns in conjunction with the roles, see
  * ItemModelBarDataProxy usage in \l{Qt Quick 2 Bars Example}.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
  * \qmltype ItemModelSurfaceDataProxy
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QItemModelSurfaceDataProxy
  * \inherits SurfaceDataProxy
  * \brief Proxy class for presenting data in item models with Surface3D.
@@ -86,9 +84,9 @@ QT_BEGIN_NAMESPACE
  *
  * Usage example:
  *
- * \snippet doc_src_qmldatavisualization.cpp 9
+ * \snippet doc_src_qmlgraphs.cpp 9
  *
- * \sa SurfaceDataProxy, {Qt Data Visualization Data Handling}
+ * \sa SurfaceDataProxy, {Qt Graphs Data Handling}
  */
 
 /*!

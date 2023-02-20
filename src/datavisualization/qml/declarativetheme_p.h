@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the QtDataVisualization API.  It exists purely as an
+// This file is not part of the QtGraphs API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -14,7 +14,7 @@
 #ifndef DECLARATIVETHEME_P_H
 #define DECLARATIVETHEME_P_H
 
-#include <private/datavisualizationglobal_p.h>
+#include <private/graphsglobal_p.h>
 #include <private/q3dtheme_p.h>
 
 #include "declarativecolor_p.h"
@@ -36,7 +36,7 @@ class DeclarativeTheme3D : public Q3DTheme, public QQmlParserStatus
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
     Q_CLASSINFO("DefaultProperty", "themeChildren")
     QML_NAMED_ELEMENT(Theme3D)
-    QML_ADDED_IN_VERSION(1, 0)
+    QML_ADDED_IN_VERSION(6, 6)
 
 public:
     DeclarativeTheme3D(QObject *parent = 0);

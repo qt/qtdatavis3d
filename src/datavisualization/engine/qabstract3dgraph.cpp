@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qabstract3dgraph.h"
@@ -24,16 +24,15 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstract3DGraph
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QAbstract3DGraph class provides a window and render loop for graphs.
- * \since QtDataVisualization 1.0
  *
  * This class subclasses a QWindow and provides render loop for graphs inheriting it.
  *
  * You should not need to use this class directly, but one of its subclasses instead.
  *
  * Anti-aliasing is turned on by default on C++, except in OpenGL ES2
- * environments, where anti-aliasing is not supported by Qt Data Visualization.
+ * environments, where anti-aliasing is not supported by Qt Graphs.
  * To specify non-default anti-aliasing for a graph, give a custom surface format as
  * a constructor parameter. You can use the convenience function \c qDefaultSurfaceFormat()
  * to create the surface format object.
@@ -47,7 +46,7 @@ QT_BEGIN_NAMESPACE
  *  graphWindow->setFlags(graphWindow->flags() ^ Qt::FramelessWindowHint);
  * \endcode
  *
- * \sa Q3DBars, Q3DScatter, Q3DSurface, {Qt Data Visualization C++ Classes}
+ * \sa Q3DBars, Q3DScatter, Q3DSurface, {Qt Graphs C++ Classes}
  */
 
 /*!
@@ -113,7 +112,6 @@ QT_BEGIN_NAMESPACE
 
 /*!
     \enum QAbstract3DGraph::ElementType
-    \since QtDataVisualization 1.1
 
     Type of an element in the graph.
 
@@ -133,7 +131,7 @@ QT_BEGIN_NAMESPACE
 
 /*!
     \enum QAbstract3DGraph::OptimizationHint
-    \since Qt Data Visualization 1.1
+    \since Qt Graphs 1.1
 
     The optimization hint for rendering.
 
@@ -434,7 +432,6 @@ bool QAbstract3DGraph::hasSeries(QAbstract3DSeries *series) const
  *
  * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt(), customItems()
  *
- * \since QtDataVisualization 1.1
  */
 int QAbstract3DGraph::addCustomItem(QCustom3DItem *item)
 {
@@ -444,7 +441,6 @@ int QAbstract3DGraph::addCustomItem(QCustom3DItem *item)
 /*!
  * Removes all custom items. Deletes the resources allocated to them.
  *
- * \since QtDataVisualization 1.1
  */
 void QAbstract3DGraph::removeCustomItems()
 {
@@ -454,7 +450,6 @@ void QAbstract3DGraph::removeCustomItems()
 /*!
  * Removes the custom \a {item}. Deletes the resources allocated to it.
  *
- * \since QtDataVisualization 1.1
  */
 void QAbstract3DGraph::removeCustomItem(QCustom3DItem *item)
 {
@@ -464,7 +459,6 @@ void QAbstract3DGraph::removeCustomItem(QCustom3DItem *item)
 /*!
  * Removes all custom items at \a {position}. Deletes the resources allocated to them.
  *
- * \since QtDataVisualization 1.1
  */
 void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
 {
@@ -474,7 +468,6 @@ void QAbstract3DGraph::removeCustomItemAt(const QVector3D &position)
 /*!
  * Gets ownership of given \a item back and removes the \a item from the graph.
  *
- * \since QtDataVisualization 1.1
  *
  * \note If the same item is added back to the graph, the texture or the texture file needs to be
  * re-set.
@@ -488,7 +481,6 @@ void QAbstract3DGraph::releaseCustomItem(QCustom3DItem *item)
 
 /*!
  * Returns the list of all added custom items.
- * \since QtDataVisualization 1.2
  * \sa addCustomItem()
  */
 QList<QCustom3DItem *> QAbstract3DGraph::customItems() const
@@ -502,8 +494,6 @@ QList<QCustom3DItem *> QAbstract3DGraph::customItems() const
  *
  * Returns the index of the selected label, or -1.
  *
- * \since QtDataVisualization 1.1
- *
  * \sa selectedElement
  */
 int QAbstract3DGraph::selectedLabelIndex() const
@@ -516,8 +506,6 @@ int QAbstract3DGraph::selectedLabelIndex() const
  * type. Selection is valid until the next \c selectedElementChanged signal.
  *
  * Returns the pointer to the selected axis, or null.
- *
- * \since QtDataVisualization 1.1
  *
  * \sa selectedElement
  */
@@ -533,8 +521,6 @@ QAbstract3DAxis *QAbstract3DGraph::selectedAxis() const
  *
  * Returns the index of the selected custom item, or -1.
  *
- * \since QtDataVisualization 1.1
- *
  * \sa selectedElement
  */
 int QAbstract3DGraph::selectedCustomItemIndex() const
@@ -548,8 +534,6 @@ int QAbstract3DGraph::selectedCustomItemIndex() const
  * Selection is valid until the next \c selectedElementChanged signal.
  *
  * Returns the pointer to the selected custom item, or null.
- *
- * \since QtDataVisualization 1.1
  *
  * \sa selectedElement
  */
@@ -574,7 +558,6 @@ QCustom3DItem *QAbstract3DGraph::selectedCustomItem() const
  * Q3DBars::selectedSeries(), Q3DScatter::selectedSeries(), Q3DSurface::selectedSeries(),
  * Q3DScene::setSelectionQueryPosition()
  *
- * \since QtDataVisualization 1.1
  */
 QAbstract3DGraph::ElementType QAbstract3DGraph::selectedElement() const
 {
@@ -584,8 +567,6 @@ QAbstract3DGraph::ElementType QAbstract3DGraph::selectedElement() const
 /*!
  * Renders current frame to an image of \a imageSize. Default size is the window size. Image is
  * rendered with antialiasing level given in \a msaaSamples. Default level is \c{0}.
- *
- * \since QtDataVisualization 1.1
  *
  * Returns the rendered image.
  *
@@ -601,7 +582,6 @@ QImage QAbstract3DGraph::renderToImage(int msaaSamples, const QSize &imageSize)
 
 /*!
  * \property QAbstract3DGraph::measureFps
- * \since QtDataVisualization 1.1
  *
  * \brief Whether rendering is done continuously instead of on demand.
  *
@@ -622,7 +602,6 @@ bool QAbstract3DGraph::measureFps() const
 
 /*!
  * \property QAbstract3DGraph::currentFps
- * \since QtDataVisualization 1.1
  *
  * \brief The rendering results for the last second.
  *
@@ -639,7 +618,6 @@ qreal QAbstract3DGraph::currentFps() const
 
 /*!
  * \property QAbstract3DGraph::orthoProjection
- * \since QtDataVisualization 1.1
  *
  * \brief Whether orthographic projection is used for displaying the graph.
  *
@@ -660,7 +638,6 @@ bool QAbstract3DGraph::isOrthoProjection() const
 
 /*!
  * \property QAbstract3DGraph::aspectRatio
- * \since QtDataVisualization 1.1
  *
  * \brief The ratio of the graph scaling between the longest axis on the
  * horizontal plane and the y-axis.
@@ -714,7 +691,6 @@ QAbstract3DGraph::OptimizationHints QAbstract3DGraph::optimizationHints() const
 
 /*!
  * \property QAbstract3DGraph::polar
- * \since QtDataVisualization 1.2
  *
  * \brief Whether horizontal axes are changed into polar axes.
  *
@@ -738,7 +714,6 @@ bool QAbstract3DGraph::isPolar() const
 
 /*!
  * \property QAbstract3DGraph::radialLabelOffset
- * \since QtDataVisualization 1.2
  *
  * \brief The normalized horizontal offset for the axis labels of the radial
  * polar axis.
@@ -763,7 +738,6 @@ float QAbstract3DGraph::radialLabelOffset() const
 
 /*!
  * \property QAbstract3DGraph::horizontalAspectRatio
- * \since QtDataVisualization 1.2
  *
  * \brief The ratio of the graph scaling between the x-axis and z-axis.
  *
@@ -788,7 +762,6 @@ qreal QAbstract3DGraph::horizontalAspectRatio() const
 
 /*!
  * \property QAbstract3DGraph::reflection
- * \since QtDataVisualization 1.2
  *
  * \brief Whether floor reflections are on or off.
  *
@@ -816,7 +789,6 @@ bool QAbstract3DGraph::isReflection() const
 
 /*!
  * \property QAbstract3DGraph::reflectivity
- * \since QtDataVisualization 1.2
  *
  * \brief Floor reflectivity.
  *
@@ -839,7 +811,6 @@ qreal QAbstract3DGraph::reflectivity() const
 
 /*!
  * \property QAbstract3DGraph::locale
- * \since QtDataVisualization 1.2
  *
  * \brief The locale used for formatting various numeric labels.
  *
@@ -859,7 +830,6 @@ QLocale QAbstract3DGraph::locale() const
 
 /*!
  * \property QAbstract3DGraph::queriedGraphPosition
- * \since QtDataVisualization 1.2
  *
  * \brief The latest queried graph position values along each axis.
  *
@@ -886,7 +856,6 @@ QVector3D QAbstract3DGraph::queriedGraphPosition() const
 
 /*!
  * \property QAbstract3DGraph::margin
- * \since QtDataVisualization 1.2
  *
  * \brief The absolute value used for the space left between the edge of the
  * plottable graph area and the edge of the graph background.

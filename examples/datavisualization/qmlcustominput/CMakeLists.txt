@@ -20,7 +20,7 @@ find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Qml)
 find_package(Qt6 COMPONENTS Quick)
-find_package(Qt6 COMPONENTS DataVisualization)
+find_package(Qt6 COMPONENTS Graphs)
 
 qt_add_executable(qmlcustominput
     main.cpp
@@ -34,7 +34,7 @@ target_link_libraries(qmlcustominput PUBLIC
     Qt::Gui
     Qt::Qml
     Qt::Quick
-    Qt::DataVisualization
+    Qt::Graphs
 )
 
 set(qmlcustominput_resource_files

@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qabstract3daxis_p.h"
@@ -7,9 +7,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstract3DAxis
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QAbstract3DAxis class is a base class for the axes of a graph.
- * \since QtDataVisualization 1.0
  *
  * This class specifies the enumerations, properties, and functions shared by
  * graph axes. It should not be used directly, but one of its subclasses should
@@ -20,9 +19,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype AbstractAxis3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QAbstract3DAxis
  * \brief A base type for the axes of a graph.
  *

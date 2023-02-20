@@ -1,14 +1,14 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "scatterdatamodifier.h"
-#include <QtDataVisualization/qscatterdataproxy.h>
-#include <QtDataVisualization/qvalue3daxis.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QtDataVisualization/q3dcamera.h>
-#include <QtDataVisualization/qscatter3dseries.h>
-#include <QtDataVisualization/q3dtheme.h>
-#include <QtDataVisualization/QCustom3DItem>
+#include <QtGraphs/qscatterdataproxy.h>
+#include <QtGraphs/qvalue3daxis.h>
+#include <QtGraphs/q3dscene.h>
+#include <QtGraphs/q3dcamera.h>
+#include <QtGraphs/qscatter3dseries.h>
+#include <QtGraphs/q3dtheme.h>
+#include <QtGraphs/QCustom3DItem>
 #include <QtCore/qmath.h>
 
 static const float verticalRange = 8.0f;

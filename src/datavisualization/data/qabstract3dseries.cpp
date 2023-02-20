@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qabstract3dseries_p.h"
@@ -9,14 +9,13 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstract3DSeries
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QAbstract3DSeries class is a base class for all data series.
- * \since QtDataVisualization 1.0
  *
  * There are inherited classes for each supported series type: QBar3DSeries,
  * QScatter3DSeries, and QSurface3DSeries.
  *
- * For more information, see \l{Qt Data Visualization Data Handling}.
+ * For more information, see \l{Qt Graphs Data Handling}.
  */
 
 /*!
@@ -31,16 +30,15 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype Abstract3DSeries
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QAbstract3DSeries
  * \brief A base type for all data series.
  *
  * This type is uncreatable, but contains properties that are exposed via the
  * following subtypes: Bar3DSeries, Scatter3DSeries, and Surface3DSeries.
  *
- * For more information, see \l{Qt Data Visualization Data Handling}.
+ * For more information, see \l{Qt Graphs Data Handling}.
  */
 
 /*!
@@ -218,7 +216,6 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty string Abstract3DSeries::itemLabel
- * \since QtDataVisualization 1.1
  *
  * The formatted item label. If there is no selected item or the selected item is not
  * visible, returns an empty string.
@@ -228,7 +225,6 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty bool Abstract3DSeries::itemLabelVisible
- * \since QtDataVisualization 1.1
  *
  * If \c true, item labels are drawn as floating labels in the graph. Otherwise,
  * item labels are not drawn. To show the item label in an external control,
@@ -593,7 +589,6 @@ QString QAbstract3DSeries::name() const
 
 /*!
  * \property QAbstract3DSeries::itemLabel
- * \since QtDataVisualization 1.1
  *
  * \brief The formatted item label.
  *
@@ -609,7 +604,6 @@ QString QAbstract3DSeries::itemLabel() const
 
 /*!
  * \property QAbstract3DSeries::itemLabelVisible
- * \since QtDataVisualization 1.1
  *
  * \brief The visibility of item labels in the graph.
  *

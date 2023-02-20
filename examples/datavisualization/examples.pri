@@ -4,7 +4,7 @@ LIBS += -L$$OUT_PWD/../../../lib
 
 TEMPLATE = app
 
-QT += datavisualization
+QT += graphs
 
 contains(TARGET, qml.*) {
     QT += qml quick

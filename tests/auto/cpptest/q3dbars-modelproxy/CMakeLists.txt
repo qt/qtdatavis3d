@@ -10,5 +10,5 @@ qt_internal_add_test(q3dbars-modelproxy
         Qt::Gui
         Qt::GuiPrivate
         Qt::Widgets
-        Qt::DataVisualization
+        Qt::Graphs
 )

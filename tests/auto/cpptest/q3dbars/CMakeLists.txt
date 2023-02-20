@@ -9,5 +9,5 @@ qt_internal_add_test(q3dbars
     LIBRARIES
         Qt::Gui
         Qt::GuiPrivate
-        Qt::DataVisualization
+        Qt::Graphs
 )

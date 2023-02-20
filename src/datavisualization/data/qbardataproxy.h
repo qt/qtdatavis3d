@@ -1,15 +1,15 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QBARDATAPROXY_H
 #define QBARDATAPROXY_H
 
-#include <QtDataVisualization/qabstractdataproxy.h>
-#include <QtDataVisualization/qbardataitem.h>
+#include <QtGraphs/qabstractdataproxy.h>
+#include <QtGraphs/qbardataitem.h>
 #include <QtCore/QList>
 #include <QtCore/QStringList>
 
-Q_MOC_INCLUDE(<QtDataVisualization/qbar3dseries.h>)
+Q_MOC_INCLUDE(<QtGraphs/qbar3dseries.h>)
 
 QT_BEGIN_NAMESPACE
 
@@ -19,7 +19,7 @@ class QBar3DSeries;
 typedef QList<QBarDataItem> QBarDataRow;
 typedef QList<QBarDataRow *> QBarDataArray;
 
-class Q_DATAVISUALIZATION_EXPORT QBarDataProxy : public QAbstractDataProxy
+class Q_GRAPHS_EXPORT QBarDataProxy : public QAbstractDataProxy
 {
     Q_OBJECT
 

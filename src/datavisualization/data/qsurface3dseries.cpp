@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qsurface3dseries_p.h"
@@ -8,10 +8,9 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QSurface3DSeries
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QSurface3DSeries class represents a data series in a 3D surface
  * graph.
- * \since QtDataVisualization 1.0
  *
  * This class manages the series specific visual elements, as well as the series
  * data (via a data proxy).
@@ -47,16 +46,15 @@ QT_BEGIN_NAMESPACE
  * \endtable
  *
  * For example:
- * \snippet doc_src_qtdatavisualization.cpp 1
+ * \snippet doc_src_qtgraphs.cpp 1
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
  * \qmltype Surface3DSeries
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QSurface3DSeries
  * \inherits Abstract3DSeries
  * \brief Represents a data series in a 3D surface graph.
@@ -66,7 +64,7 @@ QT_BEGIN_NAMESPACE
  *
  * For a more complete description, see QSurface3DSeries.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
@@ -141,7 +139,6 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty color Surface3DSeries::wireframeColor
- * \since 6.3
  *
  * The color used to draw the gridlines of the surface wireframe.
  */
@@ -380,7 +377,6 @@ QString QSurface3DSeries::textureFile() const
 
 /*!
  * \property QSurface3DSeries::wireframeColor
- * \since 6.3
  *
  * \brief The color for the surface wireframe.
  */

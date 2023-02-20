@@ -1,16 +1,16 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QBARDATAITEM_H
 #define QBARDATAITEM_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
+#include <QtGraphs/qgraphsglobal.h>
 
 QT_BEGIN_NAMESPACE
 
 class QBarDataItemPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QBarDataItem
+class Q_GRAPHS_EXPORT QBarDataItem
 {
 public:
     QBarDataItem();

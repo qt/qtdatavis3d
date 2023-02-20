@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef CUSTOMINPUTHANDLER_H
 #define CUSTOMINPUTHANDLER_H
 
-#include <QtDataVisualization/QAbstract3DInputHandler>
+#include <QtGraphs/QAbstract3DInputHandler>
 
 class CustomInputHandler : public QAbstract3DInputHandler
 {

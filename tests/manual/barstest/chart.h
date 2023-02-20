@@ -1,13 +1,13 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef CHARTMODIFIER_H
 #define CHARTMODIFIER_H
 
-#include <QtDataVisualization/q3dbars.h>
-#include <QtDataVisualization/q3dinputhandler.h>
-#include <QtDataVisualization/qbar3dseries.h>
-#include <QtDataVisualization/q3dtheme.h>
+#include <QtGraphs/q3dbars.h>
+#include <QtGraphs/q3dinputhandler.h>
+#include <QtGraphs/qbar3dseries.h>
+#include <QtGraphs/q3dtheme.h>
 #include <QFont>
 #include <QDebug>
 #include <QStringList>

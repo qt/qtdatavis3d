@@ -1,12 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
     \example qmlaxisformatter
     \title Qt Quick 2 Axis Formatter Example
-    \ingroup qtdatavisualization_examples
+    \ingroup qtgraphs_examples
     \brief Example of a hybrid C++ and QML application demonstrating different axis formatters.
-    \since QtDataVisualization 1.1
 
     The Qt Quick axis formatter example shows how to use predefined axis formatters and how to
     create a custom one.

@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "surfacegraph.h"
 
-#include <QtDataVisualization/QValue3DAxis>
-#include <QtDataVisualization/Q3DTheme>
+#include <QtGraphs/QValue3DAxis>
+#include <QtGraphs/Q3DTheme>
 #include <QtGui/QImage>
 #include <QtCore/qmath.h>
 

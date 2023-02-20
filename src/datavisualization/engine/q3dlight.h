@@ -1,19 +1,19 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef Q3DLIGHT_H
 #define Q3DLIGHT_H
 
-#include <QtDataVisualization/q3dobject.h>
+#include <QtGraphs/q3dobject.h>
 
 QT_BEGIN_NAMESPACE
 
 class Q3DLightPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT Q3DLight : public Q3DObject
+class Q_GRAPHS_EXPORT Q3DLight : public Q3DObject
 {
     Q_OBJECT
-    Q_PROPERTY(bool autoPosition READ isAutoPosition WRITE setAutoPosition NOTIFY autoPositionChanged REVISION(1, 3))
+    Q_PROPERTY(bool autoPosition READ isAutoPosition WRITE setAutoPosition NOTIFY autoPositionChanged)
 
 public:
     explicit Q3DLight(QObject *parent = nullptr);
@@ -23,7 +23,7 @@ public:
     bool isAutoPosition();
 
 Q_SIGNALS:
-    Q_REVISION(1, 3) void autoPositionChanged(bool autoPosition);
+    void autoPositionChanged(bool autoPosition);
 
 private:
     QScopedPointer<Q3DLightPrivate> d_ptr;

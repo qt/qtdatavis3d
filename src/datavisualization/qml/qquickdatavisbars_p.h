@@ -1,11 +1,11 @@
-// Copyright (C) 2022 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the QtDataVisualization API.  It exists purely as an
+// This file is not part of the QtGraphs API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -34,15 +34,15 @@ class QQuickDataVisBars : public QQuickDataVisItem
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
-    Q_PROPERTY(QSizeF barSeriesMargin READ barSeriesMargin WRITE setBarSeriesMargin NOTIFY barSeriesMarginChanged REVISION(6, 3))
+    Q_PROPERTY(QSizeF barSeriesMargin READ barSeriesMargin WRITE setBarSeriesMargin NOTIFY barSeriesMarginChanged)
     Q_PROPERTY(QQmlListProperty<QBar3DSeries> seriesList READ seriesList)
     Q_PROPERTY(QBar3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QBar3DSeries *primarySeries READ primarySeries WRITE setPrimarySeries NOTIFY primarySeriesChanged)
-    Q_PROPERTY(float floorLevel READ floorLevel WRITE setFloorLevel NOTIFY floorLevelChanged REVISION(1, 2))
+    Q_PROPERTY(float floorLevel READ floorLevel WRITE setFloorLevel NOTIFY floorLevelChanged)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
     QML_NAMED_ELEMENT(Bars3DNG)
-    QML_ADDED_IN_VERSION(1, 0)
+    QML_ADDED_IN_VERSION(6, 6)
 
 public:
     explicit QQuickDataVisBars(QQuickItem *parent = 0);
@@ -118,11 +118,11 @@ Q_SIGNALS:
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(const QSizeF &spacing);
     void barSpacingRelativeChanged(bool relative);
-    Q_REVISION(6, 3) void barSeriesMarginChanged(const QSizeF &margin);
+    void barSeriesMarginChanged(const QSizeF &margin);
     void meshFileNameChanged(const QString &filename);
     void primarySeriesChanged(QBar3DSeries *series);
     void selectedSeriesChanged(QBar3DSeries *series);
-    Q_REVISION(1, 2) void floorLevelChanged(float level);
+    void floorLevelChanged(float level);
 
 private:
     Bars3DController *m_barsController;

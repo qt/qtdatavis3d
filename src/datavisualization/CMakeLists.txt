@@ -14,10 +14,10 @@ set_source_files_properties(${qml_files} PROPERTIES
     QT_QML_SKIP_QMLDIR_ENTRY TRUE
 )
 
-qt_internal_add_qml_module(DataVisualization
-    URI "QtDataVisualization"
-    TARGET_PRODUCT "Qt Data Visualization (Qt $$QT_VERSION)"
-    TARGET_DESCRIPTION "3D Data Visualization component for Qt."
+qt_internal_add_qml_module(Graphs
+    URI "QtGraphs"
+    TARGET_PRODUCT "Qt Graphs (Qt $$QT_VERSION)"
+    TARGET_DESCRIPTION "Qt Graphs 3D Visualization component for Qt."
     VERSION "${PROJECT_VERSION}"
     PAST_MAJOR_VERSIONS 1
     DEPENDENCIES
@@ -86,8 +86,8 @@ qt_internal_add_qml_module(DataVisualization
         engine/surface3drenderer.cpp engine/surface3drenderer_p.h
         engine/surfaceseriesrendercache.cpp engine/surfaceseriesrendercache_p.h
         engine/surfaceselectioninstancing.cpp engine/surfaceselectioninstancing_p.h
-        global/datavisualizationglobal_p.h
-        global/qdatavisualizationglobal.h
+        global/graphsglobal_p.h
+        global/qgraphsglobal.h
         input/q3dinputhandler.cpp input/q3dinputhandler.h input/q3dinputhandler_p.h
         input/qabstract3dinputhandler.cpp input/qabstract3dinputhandler.h input/qabstract3dinputhandler_p.h
         input/qtouch3dinputhandler.cpp input/qtouch3dinputhandler.h input/qtouch3dinputhandler_p.h
@@ -202,7 +202,7 @@ set(qml_material_resources
 )
 
 set(resources
-    "qml/designer/qtdatavisualization.metainfo"
+    "qml/designer/Graphs.metainfo"
     "qml/designer/images/bars3d-icon.png"
     "qml/designer/images/bars3d-icon16.png"
     "qml/designer/images/scatter3d-icon.png"
@@ -611,7 +611,7 @@ set(shader_resource_files
     "engine/shaders/texture_ES2.frag"
 )
 
-qt_internal_add_resource(DataVisualization "shaders"
+qt_internal_add_resource(Graphs "shaders"
     PREFIX
         "/shaders"
     BASE
@@ -620,7 +620,7 @@ qt_internal_add_resource(DataVisualization "shaders"
         ${shader_resource_files}
 )
 
-qt_internal_add_resource(DataVisualization "meshes"
+qt_internal_add_resource(Graphs "meshes"
     PREFIX
         "/defaultMeshes"
     BASE
@@ -630,7 +630,7 @@ qt_internal_add_resource(DataVisualization "meshes"
         ${obj_resource_files}
 )
 
-qt_internal_add_resource(DataVisualization "qml_component_resources"
+qt_internal_add_resource(Graphs "qml_component_resources"
     PREFIX
         "/datapointModels"
     BASE
@@ -639,7 +639,7 @@ qt_internal_add_resource(DataVisualization "qml_component_resources"
         ${qml_component_resources}
 )
 
-qt_internal_add_resource(DataVisualization "qml_axis_resurces"
+qt_internal_add_resource(Graphs "qml_axis_resurces"
     PREFIX
         "/axis"
     BASE
@@ -648,7 +648,7 @@ qt_internal_add_resource(DataVisualization "qml_axis_resurces"
         ${qml_axis_resurces}
 )
 
-qt_internal_add_resource(DataVisualization "qml_material_resources"
+qt_internal_add_resource(Graphs "qml_material_resources"
     PREFIX
         "/materials"
     BASE
@@ -657,7 +657,7 @@ qt_internal_add_resource(DataVisualization "qml_material_resources"
         ${qml_material_resources}
 )
 
-qt_internal_extend_target(DataVisualization CONDITION MACOS
+qt_internal_extend_target(Graphs CONDITION MACOS
     LIBRARIES
         Qt::GuiPrivate
     PUBLIC_LIBRARIES
@@ -665,7 +665,7 @@ qt_internal_extend_target(DataVisualization CONDITION MACOS
     PRIVATE_MODULE_INTERFACE
         Qt::GuiPrivate
 )
-qt_internal_add_docs(DataVisualization
-    doc/qtdatavis3d.qdocconf
+qt_internal_add_docs(Graphs
+    doc/qtgraphs.qdocconf
 )
 

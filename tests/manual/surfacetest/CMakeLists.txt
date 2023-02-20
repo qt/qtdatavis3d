@@ -14,7 +14,7 @@ qt_internal_add_manual_test(surfacetest
 target_link_libraries(surfacetest PUBLIC
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
     )
 
 set_source_files_properties("Heightmap.png"

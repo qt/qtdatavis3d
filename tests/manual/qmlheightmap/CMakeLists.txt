@@ -10,7 +10,7 @@ qt_internal_add_manual_test(qmlheightmap
     )
 target_link_libraries(qmlheightmap PUBLIC
     Qt::Gui
-    Qt::DataVisualization
+    Qt::Graphs
     )
 
 set_source_files_properties("gradientGRAY8.png"

@@ -13,7 +13,7 @@ qt_internal_add_manual_test(volumetrictest
 target_link_libraries(volumetrictest PUBLIC
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
     )
 
 set_source_files_properties("cubeFilledFlat.obj"

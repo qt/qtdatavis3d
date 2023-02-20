@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the QtDataVisualization API.  It exists purely as an
+// This file is not part of the QtGraphs API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -17,7 +17,7 @@
 #include "abstractdeclarative_p.h"
 #include "qsurface3dseries.h"
 
-#include <private/datavisualizationglobal_p.h>
+#include <private/graphsglobal_p.h>
 #include <private/surface3dcontroller_p.h>
 
 QT_BEGIN_NAMESPACE
@@ -30,11 +30,11 @@ class DeclarativeSurface : public AbstractDeclarative
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
     Q_PROPERTY(QSurface3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
     Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
-    Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged REVISION(1, 2))
+    Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
     QML_NAMED_ELEMENT(Surface3D)
-    QML_ADDED_IN_VERSION(1, 0)
+    QML_ADDED_IN_VERSION(6, 6)
 
 public:
     explicit DeclarativeSurface(QQuickItem *parent = 0);
@@ -69,7 +69,7 @@ Q_SIGNALS:
     void axisYChanged(QValue3DAxis *axis);
     void axisZChanged(QValue3DAxis *axis);
     void selectedSeriesChanged(QSurface3DSeries *series);
-    Q_REVISION(1, 2) void flipHorizontalGridChanged(bool flip);
+    void flipHorizontalGridChanged(bool flip);
 
 private:
     Surface3DController *m_surfaceController;

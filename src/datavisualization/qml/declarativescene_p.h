@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the QtDataVisualization API.  It exists purely as an
+// This file is not part of the QtGraphs API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -15,8 +15,8 @@
 #define DECLARATIVESCENE_P_H
 
 #include <QtQml/qqml.h>
-#include <private/datavisualizationglobal_p.h>
-#include <QtDataVisualization/q3dscene.h>
+#include <private/graphsglobal_p.h>
+#include <QtGraphs/q3dscene.h>
 
 QT_BEGIN_NAMESPACE
 
@@ -30,7 +30,7 @@ class Declarative3DScene : public Q3DScene
     Q_PROPERTY(QPoint invalidSelectionPoint READ invalidSelectionPoint CONSTANT)
 
     QML_NAMED_ELEMENT(Scene3D)
-    QML_ADDED_IN_VERSION(1, 0)
+    QML_ADDED_IN_VERSION(6, 6)
     QML_UNCREATABLE("Trying to create uncreatable: Scene3D.")
 
 public:

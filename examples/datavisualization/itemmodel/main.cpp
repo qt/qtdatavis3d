@@ -1,14 +1,14 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include <QtDataVisualization/q3dbars.h>
-#include <QtDataVisualization/qcategory3daxis.h>
-#include <QtDataVisualization/qitemmodelbardataproxy.h>
-#include <QtDataVisualization/qvalue3daxis.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QtDataVisualization/q3dcamera.h>
-#include <QtDataVisualization/qbar3dseries.h>
-#include <QtDataVisualization/q3dtheme.h>
+#include <QtGraphs/q3dbars.h>
+#include <QtGraphs/qcategory3daxis.h>
+#include <QtGraphs/qitemmodelbardataproxy.h>
+#include <QtGraphs/qvalue3daxis.h>
+#include <QtGraphs/q3dscene.h>
+#include <QtGraphs/q3dcamera.h>
+#include <QtGraphs/qbar3dseries.h>
+#include <QtGraphs/q3dtheme.h>
 
 #include <QtWidgets/QApplication>
 #include <QtWidgets/QVBoxLayout>

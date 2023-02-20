@@ -13,7 +13,7 @@ find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Qml)
 find_package(Qt6 COMPONENTS Quick)
-find_package(Qt6 COMPONENTS DataVisualization)
+find_package(Qt6 COMPONENTS Graphs)
 
 set_target_properties(qmlbarsrowcolors PROPERTIES
     WIN32_EXECUTABLE TRUE
@@ -28,7 +28,7 @@ target_link_libraries(qmlbarsrowcolors PUBLIC
     Qt::Gui
     Qt::Qml
     Qt::Quick
-    Qt::DataVisualization
+    Qt::Graphs
 )
 
 set(qmlbarsrowcolors_resource_files

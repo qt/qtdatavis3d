@@ -1,16 +1,16 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
     \example qmlscatter
     \title Qt Quick 2 Scatter Example
-    \ingroup qtdatavisualization_examples
+    \ingroup qtgraphs_examples
     \brief Using Scatter3D in a QML application.
 
     The Qt Quick 2 scatter example shows how to make a simple scatter graph visualization using
     Scatter3D and Qt Quick 2.
 
-    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+    For instructions about how to interact with the graph, see \l{Qt Graphs Interacting with Data}{this page}.
 
     For instructions how to create a new Qt Quick 2 application of your own, see Qt Creator help.
 

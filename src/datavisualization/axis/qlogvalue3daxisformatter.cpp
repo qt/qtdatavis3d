@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qlogvalue3daxisformatter_p.h"
@@ -9,10 +9,9 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QLogValue3DAxisFormatter
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QLogValue3DAxisFormatter class provides formatting rules for a
  * logarithmic value axis.
- * \since QtDataVisualization 1.1
  *
  * When a formatter is attached to a value axis, the axis range
  * cannot include negative values or the zero.
@@ -22,9 +21,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype LogValueAxis3DFormatter
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.1
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QLogValue3DAxisFormatter
  * \inherits ValueAxis3DFormatter
  * \brief Provides formatting rules for a logarithmic value axis.

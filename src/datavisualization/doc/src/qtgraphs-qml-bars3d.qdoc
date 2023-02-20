@@ -1,27 +1,26 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
  * \qmltype Bars3D
  * \inherits AbstractGraph3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \brief 3D bar graph.
  *
  * This type enables developers to render bar graphs in 3D with Qt Quick 2.
  *
  * You will need to import data visualization module to use this type:
  *
- * \snippet doc_src_qmldatavisualization.cpp 0
+ * \snippet doc_src_qmlgraphs.cpp 0
  *
  * After that you can use Bars3D in your qml files:
  *
- * \snippet doc_src_qmldatavisualization.cpp 1
+ * \snippet doc_src_qmlgraphs.cpp 1
  *
  * See \l{Qt Quick 2 Bars Example} for more thorough usage example.
  *
- * \sa Bar3DSeries, ItemModelBarDataProxy, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
+ * \sa Bar3DSeries, ItemModelBarDataProxy, Scatter3D, Surface3D, {Qt Graphs C++ Classes}
  */
 
 /*!

@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qitemmodelbardataproxy_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QItemModelBarDataProxy
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Proxy class for presenting data in item models with Q3DBars.
- * \since QtDataVisualization 1.0
  *
  * QItemModelBarDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DBars. It uses the defined mappings to map data from the model to rows, columns, and
@@ -45,7 +44,7 @@ QT_BEGIN_NAMESPACE
  * Each item in the model has the roles "year", "month", "income", and "expenses".
  * You could do the following to display the data in a bar graph:
  *
- * \snippet doc_src_qtdatavisualization.cpp 3
+ * \snippet doc_src_qtgraphs.cpp 3
  *
  * If the fields of the model do not contain the data in the exact format you need, you can specify
  * a search pattern regular expression and a replace rule for each role to get the value in a
@@ -57,14 +56,13 @@ QT_BEGIN_NAMESPACE
  * For example about using the search patterns in conjunction with the roles, see
  * \l{Qt Quick 2 Bars Example}.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
  * \qmltype ItemModelBarDataProxy
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QItemModelBarDataProxy
  * \inherits BarDataProxy
  * \brief Proxy class for presenting data in item models with Bars3D.
@@ -80,9 +78,9 @@ QT_BEGIN_NAMESPACE
  *
  * Usage example:
  *
- * \snippet doc_src_qmldatavisualization.cpp 7
+ * \snippet doc_src_qmlgraphs.cpp 7
  *
- * \sa BarDataProxy, {Qt Data Visualization Data Handling}
+ * \sa BarDataProxy, {Qt Graphs Data Handling}
  */
 
 /*!

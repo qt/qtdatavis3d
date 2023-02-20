@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dtheme_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DTheme
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Q3DTheme class provides a visual style for graphs.
- * \since QtDataVisualization 1.0
  *
  * Specifies visual properties that affect the whole graph. There are several
  * built-in themes that can be used as is or modified freely.
@@ -162,9 +161,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype Theme3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates Q3DTheme
  * \brief A visual style for graphs.
  *

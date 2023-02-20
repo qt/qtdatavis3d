@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dlight_p.h"
@@ -7,9 +7,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DLight
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Representation of a light source in 3D space.
- * \since QtDataVisualization 1.0
  *
  * Q3DLight represents a monochrome light source in 3D space.
  *
@@ -18,9 +17,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype Light3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates Q3DLight
  * \brief Representation of a light source in 3D space.
  *
@@ -31,7 +29,6 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty bool Light3D::autoPosition
- * \since QtDataVisualization 1.3
  * Defines whether the light position follows the camera automatically.
  * \note Has no effect if shadows are enabled. Remember to disable shadows before setting light's
  * position, or it will be overwritten by automatic positioning if this
@@ -57,7 +54,6 @@ Q3DLight::~Q3DLight()
 
 /*!
  * \property Q3DLight::autoPosition
- * \since QtDataVisualization 5.9
  * \brief Whether the light position follows the camera automatically.
  * \note Has no effect if shadows are enabled. Remember to disable shadows before setting light's
  * position, or it will be overwritten by automatic positioning if

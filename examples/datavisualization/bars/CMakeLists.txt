@@ -20,7 +20,7 @@ find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Quick)
 find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Widgets)
-find_package(Qt6 COMPONENTS DataVisualization)
+find_package(Qt6 COMPONENTS Graphs)
 
 qt_add_executable(bars
     graphmodifier.cpp graphmodifier.h
@@ -34,7 +34,7 @@ target_link_libraries(bars PUBLIC
     Qt::Core
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
 )
 
 install(TARGETS bars

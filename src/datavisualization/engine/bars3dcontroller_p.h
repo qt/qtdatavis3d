@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the QtDataVisualization API.  It exists purely as an
+// This file is not part of the QtGraphs API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -15,7 +15,7 @@
 #define Q3DBARSCONTROLLER_p_H
 
 #include "axishelper_p.h"
-#include <private/datavisualizationglobal_p.h>
+#include <private/graphsglobal_p.h>
 #include <private/abstract3dcontroller_p.h>
 #include <QtQuick3D/private/qquick3drepeater_p.h>
 
@@ -47,7 +47,7 @@ struct Bars3DChangeBitField {
     }
 };
 
-class Q_DATAVISUALIZATION_EXPORT Bars3DController : public Abstract3DController
+class Q_GRAPHS_EXPORT Bars3DController : public Abstract3DController
 {
     Q_OBJECT
 

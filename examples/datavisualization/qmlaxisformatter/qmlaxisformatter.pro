@@ -2,7 +2,7 @@
     error( "Couldn't find the examples.pri file!" )
 }
 
-QT += datavisualization
+QT += graphs
 
 # The .cpp file which was generated for your project. Feel free to hack it.
 SOURCES += main.cpp \

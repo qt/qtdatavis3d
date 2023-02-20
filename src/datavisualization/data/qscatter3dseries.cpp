@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qscatter3dseries_p.h"
@@ -8,10 +8,9 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QScatter3DSeries
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QScatter3DSeries class represents a data series in a 3D scatter
  * graph.
- * \since QtDataVisualization 1.0
  *
  * This class manages the series specific visual elements, as well as the series
  * data (via a data proxy).
@@ -44,16 +43,15 @@ QT_BEGIN_NAMESPACE
  * \endtable
  *
  * For example:
- * \snippet doc_src_qtdatavisualization.cpp 1
+ * \snippet doc_src_qtgraphs.cpp 1
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
  * \qmltype Scatter3DSeries
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QScatter3DSeries
  * \inherits Abstract3DSeries
  * \brief Represents a data series in a 3D scatter graph.
@@ -63,7 +61,7 @@ QT_BEGIN_NAMESPACE
  *
  * For a more complete description, see QScatter3DSeries.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!

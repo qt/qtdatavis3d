@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qcustom3ditem_p.h"
@@ -7,9 +7,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QCustom3DItem
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QCustom3DItem class adds a custom item to a graph.
- * \since QtDataVisualization 1.1
  *
  * A custom item has a custom mesh, position, scaling, rotation, and an optional
  * texture.
@@ -19,9 +18,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype Custom3DItem
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.1
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QCustom3DItem
  * \brief Adds a custom item to a graph.
  *
@@ -85,7 +83,6 @@ QT_BEGIN_NAMESPACE
  */
 
 /*! \qmlproperty bool Custom3DItem::scalingAbsolute
- * \since QtDataVisualization 1.2
  *
  * Defines whether item scaling is to be handled in data values or in absolute
  * values. Defaults to \c{true}. Items with absolute scaling will be rendered at the same
@@ -279,7 +276,6 @@ QVector3D QCustom3DItem::scaling() const
 }
 
 /*! \property QCustom3DItem::scalingAbsolute
- * \since QtDataVisualization 1.2
  *
  * \brief Whether item scaling is to be handled in data values or in absolute
  * values.

@@ -6,7 +6,7 @@ qt_internal_add_test(q3dsurface-heightproxy
         tst_proxy.cpp
     LIBRARIES
         Qt::Gui
-        Qt::DataVisualization
+        Qt::Graphs
 )
 
 set(q3dsurface-heightproxy_resource_files

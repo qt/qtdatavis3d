@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dscene_p.h"
@@ -9,9 +9,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DScene
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Q3DScene class provides description of the 3D scene being visualized.
- * \since QtDataVisualization 1.0
  *
  * The 3D scene contains a single active camera and a single active light source.
  * Visualized data is assumed to be at a fixed location.
@@ -33,9 +32,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype Scene3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates Q3DScene
  * \brief Scene3D type provides description of the 3D scene being visualized.
  *

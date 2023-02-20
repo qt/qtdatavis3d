@@ -1,17 +1,17 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QSCATTER3DSERIES_H
 #define QSCATTER3DSERIES_H
 
-#include <QtDataVisualization/qabstract3dseries.h>
-#include <QtDataVisualization/qscatterdataproxy.h>
+#include <QtGraphs/qabstract3dseries.h>
+#include <QtGraphs/qscatterdataproxy.h>
 
 QT_BEGIN_NAMESPACE
 
 class QScatter3DSeriesPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QScatter3DSeries : public QAbstract3DSeries
+class Q_GRAPHS_EXPORT QScatter3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QScatterDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)

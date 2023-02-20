@@ -1,8 +1,8 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 import QtQuick 2.0
-import QtDataVisualization
+import QtGraphs
 import QtTest 1.0
 
 Item {
@@ -18,7 +18,7 @@ Item {
     function constructEmpty() {
         empty = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization
+        import QtGraphs
         Bars3D {
         }", top)
     }
@@ -26,7 +26,7 @@ Item {
     function constructBasic() {
         basic = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization
+        import QtGraphs
         Bars3D {
             anchors.fill: parent
             multiSeriesUniform: true
@@ -44,7 +44,7 @@ Item {
     function constructCommon() {
         common = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization
+        import QtGraphs
         Bars3D {
             anchors.fill: parent
         }", top)
@@ -54,7 +54,7 @@ Item {
     function constructCommonInit() {
         common_init = Qt.createQmlObject("
         import QtQuick 2.2
-        import QtDataVisualization
+        import QtGraphs
         Bars3D {
             anchors.fill: parent
             selectionMode: AbstractGraph3D.SelectionNone

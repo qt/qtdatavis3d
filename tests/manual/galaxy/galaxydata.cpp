@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 /*
@@ -11,19 +11,19 @@
 #include "galaxydata.h"
 #include "cumulativedistributor.h"
 #include "star.h"
-#include <QtDataVisualization/qscatterdataproxy.h>
-#include <QtDataVisualization/qvalue3daxis.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QtDataVisualization/q3dcamera.h>
-#include <QtDataVisualization/qscatter3dseries.h>
-#include <QtDataVisualization/q3dtheme.h>
+#include <QtGraphs/qscatterdataproxy.h>
+#include <QtGraphs/qvalue3daxis.h>
+#include <QtGraphs/q3dscene.h>
+#include <QtGraphs/q3dcamera.h>
+#include <QtGraphs/qscatter3dseries.h>
+#include <QtGraphs/q3dtheme.h>
 #include <QtCore/qmath.h>
 #include <QtCore/qrandom.h>
 #include <QPainter>
 
 #include <QDebug>
 
-using namespace QtDataVisualization;
+using namespace QtGraphs;
 
 static const int numOfStars = 70000;
 static const int numOfDust = numOfStars / 2;

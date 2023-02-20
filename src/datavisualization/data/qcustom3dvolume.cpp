@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qcustom3dvolume_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QCustom3DVolume
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QCustom3DVolume class adds a volume rendered object to a graph.
- * \since QtDataVisualization 1.2
  *
  * A volume rendered
  * object is a box with a 3D texture. Three slice planes are supported for the volume, one along
@@ -33,9 +32,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype Custom3DVolume
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.2
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QCustom3DVolume
  * \inherits Custom3DItem
  * \brief Adds a volume rendered object to a graph.

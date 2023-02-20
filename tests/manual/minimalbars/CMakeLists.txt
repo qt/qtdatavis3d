@@ -8,5 +8,5 @@ qt_internal_add_manual_test(MinimalBars
     )
 target_link_libraries(MinimalBars PUBLIC
     Qt::Gui
-    Qt::DataVisualization
+    Qt::Graphs
     )

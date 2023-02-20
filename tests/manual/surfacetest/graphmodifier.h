@@ -1,12 +1,12 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef GRAPHMODIFIER_H
 #define GRAPHMODIFIER_H
 
-#include <QtDataVisualization/Q3DSurface>
-#include <QtDataVisualization/QSurfaceDataProxy>
-#include <QtDataVisualization/QSurface3DSeries>
+#include <QtGraphs/Q3DSurface>
+#include <QtGraphs/QSurfaceDataProxy>
+#include <QtGraphs/QSurface3DSeries>
 #include <QSlider>
 #include <QTimer>
 #include <QLabel>

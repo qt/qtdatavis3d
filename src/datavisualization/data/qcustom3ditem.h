@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QCUSTOM3DITEM_H
 #define QCUSTOM3DITEM_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
+#include <QtGraphs/qgraphsglobal.h>
 #include <QtGui/QImage>
 #include <QtGui/QVector3D>
 #include <QtGui/QQuaternion>
@@ -14,7 +14,7 @@ QT_BEGIN_NAMESPACE
 
 class QCustom3DItemPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
+class Q_GRAPHS_EXPORT QCustom3DItem : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QString meshFile READ meshFile WRITE setMeshFile NOTIFY meshFileChanged)
@@ -25,7 +25,7 @@ class Q_DATAVISUALIZATION_EXPORT QCustom3DItem : public QObject
     Q_PROPERTY(QQuaternion rotation READ rotation WRITE setRotation NOTIFY rotationChanged)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibleChanged)
     Q_PROPERTY(bool shadowCasting READ isShadowCasting WRITE setShadowCasting NOTIFY shadowCastingChanged)
-    Q_PROPERTY(bool scalingAbsolute READ isScalingAbsolute WRITE setScalingAbsolute NOTIFY scalingAbsoluteChanged REVISION(1, 2))
+    Q_PROPERTY(bool scalingAbsolute READ isScalingAbsolute WRITE setScalingAbsolute NOTIFY scalingAbsoluteChanged)
 
 public:
     explicit QCustom3DItem(QObject *parent = nullptr);
@@ -74,7 +74,7 @@ Q_SIGNALS:
     void rotationChanged(const QQuaternion &rotation);
     void visibleChanged(bool visible);
     void shadowCastingChanged(bool shadowCasting);
-    Q_REVISION(1, 2) void scalingAbsoluteChanged(bool scalingAbsolute);
+    void scalingAbsoluteChanged(bool scalingAbsolute);
 
 protected:
     QCustom3DItem(QCustom3DItemPrivate *d, QObject *parent = nullptr);

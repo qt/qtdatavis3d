@@ -12,7 +12,7 @@ qt_internal_add_manual_test(multigraphs
 target_link_libraries(multigraphs PUBLIC
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
     )
 
 set(multigraphs_resource_files

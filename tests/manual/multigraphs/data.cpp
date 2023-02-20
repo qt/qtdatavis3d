@@ -1,15 +1,15 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #define NOMINMAX
 
 #include "data.h"
-#include <QtDataVisualization/QValue3DAxis>
-#include <QtDataVisualization/Q3DCamera>
-#include <QtDataVisualization/QBar3DSeries>
-#include <QtDataVisualization/QScatter3DSeries>
-#include <QtDataVisualization/QSurface3DSeries>
-#include <QtDataVisualization/Q3DTheme>
+#include <QtGraphs/QValue3DAxis>
+#include <QtGraphs/Q3DCamera>
+#include <QtGraphs/QBar3DSeries>
+#include <QtGraphs/QScatter3DSeries>
+#include <QtGraphs/QSurface3DSeries>
+#include <QtGraphs/Q3DTheme>
 #include <QScrollBar>
 #include <QSize>
 #include <QImage>

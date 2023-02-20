@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef SURFACEGRAPH_H
 #define SURFACEGRAPH_H
 
-#include <QtDataVisualization/Q3DSurface>
-#include <QtDataVisualization/QSurface3DSeries>
+#include <QtGraphs/Q3DSurface>
+#include <QtGraphs/QSurface3DSeries>
 #include <QtWidgets/QSlider>
 #include "topographicseries.h"
 #include "highlightseries.h"

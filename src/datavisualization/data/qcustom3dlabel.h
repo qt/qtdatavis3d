@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QCUSTOMLABELITEM_H
 #define QCUSTOMLABELITEM_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
-#include <QtDataVisualization/QCustom3DItem>
+#include <QtGraphs/qgraphsglobal.h>
+#include <QtGraphs/QCustom3DItem>
 #include <QtGui/QVector3D>
 #include <QtGui/QQuaternion>
 #include <QtGui/QFont>
@@ -15,7 +15,7 @@ QT_BEGIN_NAMESPACE
 
 class QCustom3DLabelPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QCustom3DLabel : public QCustom3DItem
+class Q_GRAPHS_EXPORT QCustom3DLabel : public QCustom3DItem
 {
     Q_OBJECT
     Q_PROPERTY(QString text READ text WRITE setText NOTIFY textChanged)

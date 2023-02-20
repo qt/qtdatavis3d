@@ -7,5 +7,5 @@ qt_internal_add_test(q3dscatter-modelproxy
     LIBRARIES
         Qt::Gui
         Qt::Widgets
-        Qt::DataVisualization
+        Qt::Graphs
 )

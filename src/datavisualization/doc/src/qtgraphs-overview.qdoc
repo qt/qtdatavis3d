@@ -1,14 +1,14 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
-    \title Qt Data Visualization Overview
-    \page qtdatavisualization-overview.html
-    \brief An overview of the Qt Data Visualization module.
+    \title Qt Graphs Overview
+    \page qtgraphs-overview.html
+    \brief An overview of the Qt Graphs module.
 
-    The Qt Data Visualization module provides a way to develop rapidly
+    The Qt Graphs module provides a way to develop rapidly
     responding, complex, and dynamic 3D visualization for analytical demanding
-    industries such as academic research and medical. Qt 3D Data Visualization
+    industries such as academic research and medical. Qt 3D Graphs
     provides 3D bars, scatter, and surface visualizations. Combining user
     interaction and real time 3D drawing visualizations enables creating user
     interfaces that use space effectively. Changing between 3D and 2D
@@ -19,20 +19,20 @@
     specifying settings for the camera, and individual items can be customized
     by using predefined or user-defined meshes.
 
-    Qt Data Visualization offers ready-made data proxies that can be used to
+    Qt Graphs offers ready-made data proxies that can be used to
     visualize data from Qt item models and height maps. Each graph type has a
     basic proxy type, which accepts data in a format suitable for that
-    visualization. For more information, see \l{Qt Data Visualization Data
+    visualization. For more information, see \l{Qt Graphs Data
     Handling}.
 
     End users can interact with the data presented by graphs in several ways,
     including rotating graphs, zooming into and out of data, selecting items,
     and viewing 2D slices of the 3D data for increased readability. For more
-    information, see \l{Qt Data Visualization Interacting with Data}.
+    information, see \l{Qt Graphs Interacting with Data}.
 
     \section1 Graph Types
 
-    The Qt Data Visualization module provides the following 3D graph types:
+    The Qt Graphs module provides the following 3D graph types:
 
     \list
         \li \l{3D Bar Graphs}{3D bar graphs}
@@ -119,7 +119,7 @@
 
     \section1 3D Axes
 
-    Qt Data Visualization supports the following axis types:
+    Qt Graphs supports the following axis types:
 
     \list
         \li Value axis
@@ -203,7 +203,7 @@
 
     \section1 Customizing Items
 
-    Qt Data Visualization has predefined mesh types for bars, items, and
+    Qt Graphs has predefined mesh types for bars, items, and
     surfaces. The mesh type determines how a bar, an item, or a surface looks on
     a graph. A user-defined mesh can be specified as a Wavefront OBJ geometry
     definition file. For more variety, a quaternion can be set for mesh

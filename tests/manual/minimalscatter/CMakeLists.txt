@@ -8,5 +8,5 @@ qt_internal_add_manual_test(MinimalScatter
     )
 target_link_libraries(MinimalScatter PUBLIC
     Qt::Gui
-    Qt::DataVisualization
+    Qt::Graphs
     )

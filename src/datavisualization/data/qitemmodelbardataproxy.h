@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QITEMMODELBARDATAPROXY_H
 #define QITEMMODELBARDATAPROXY_H
 
-#include <QtDataVisualization/qbardataproxy.h>
+#include <QtGraphs/qbardataproxy.h>
 #include <QtCore/QAbstractItemModel>
 #include <QtCore/QRegularExpression>
 
@@ -12,7 +12,7 @@ QT_BEGIN_NAMESPACE
 
 class QItemModelBarDataProxyPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QItemModelBarDataProxy : public QBarDataProxy
+class Q_GRAPHS_EXPORT QItemModelBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
     Q_ENUMS(MultiMatchBehavior)
@@ -26,15 +26,15 @@ class Q_DATAVISUALIZATION_EXPORT QItemModelBarDataProxy : public QBarDataProxy
     Q_PROPERTY(bool useModelCategories READ useModelCategories WRITE setUseModelCategories NOTIFY useModelCategoriesChanged)
     Q_PROPERTY(bool autoRowCategories READ autoRowCategories WRITE setAutoRowCategories NOTIFY autoRowCategoriesChanged)
     Q_PROPERTY(bool autoColumnCategories READ autoColumnCategories WRITE setAutoColumnCategories NOTIFY autoColumnCategoriesChanged)
-    Q_PROPERTY(QRegularExpression rowRolePattern READ rowRolePattern WRITE setRowRolePattern NOTIFY rowRolePatternChanged REVISION(1, 1))
-    Q_PROPERTY(QRegularExpression columnRolePattern READ columnRolePattern WRITE setColumnRolePattern NOTIFY columnRolePatternChanged REVISION(1, 1))
-    Q_PROPERTY(QRegularExpression valueRolePattern READ valueRolePattern WRITE setValueRolePattern NOTIFY valueRolePatternChanged REVISION(1, 1))
-    Q_PROPERTY(QRegularExpression rotationRolePattern READ rotationRolePattern WRITE setRotationRolePattern NOTIFY rotationRolePatternChanged REVISION(1, 1))
-    Q_PROPERTY(QString rowRoleReplace READ rowRoleReplace WRITE setRowRoleReplace NOTIFY rowRoleReplaceChanged REVISION(1, 1))
-    Q_PROPERTY(QString columnRoleReplace READ columnRoleReplace WRITE setColumnRoleReplace NOTIFY columnRoleReplaceChanged REVISION(1, 1))
-    Q_PROPERTY(QString valueRoleReplace READ valueRoleReplace WRITE setValueRoleReplace NOTIFY valueRoleReplaceChanged REVISION(1, 1))
-    Q_PROPERTY(QString rotationRoleReplace READ rotationRoleReplace WRITE setRotationRoleReplace NOTIFY rotationRoleReplaceChanged REVISION(1, 1))
-    Q_PROPERTY(MultiMatchBehavior multiMatchBehavior READ multiMatchBehavior WRITE setMultiMatchBehavior NOTIFY multiMatchBehaviorChanged REVISION(1, 1))
+    Q_PROPERTY(QRegularExpression rowRolePattern READ rowRolePattern WRITE setRowRolePattern NOTIFY rowRolePatternChanged)
+    Q_PROPERTY(QRegularExpression columnRolePattern READ columnRolePattern WRITE setColumnRolePattern NOTIFY columnRolePatternChanged)
+    Q_PROPERTY(QRegularExpression valueRolePattern READ valueRolePattern WRITE setValueRolePattern NOTIFY valueRolePatternChanged)
+    Q_PROPERTY(QRegularExpression rotationRolePattern READ rotationRolePattern WRITE setRotationRolePattern NOTIFY rotationRolePatternChanged)
+    Q_PROPERTY(QString rowRoleReplace READ rowRoleReplace WRITE setRowRoleReplace NOTIFY rowRoleReplaceChanged)
+    Q_PROPERTY(QString columnRoleReplace READ columnRoleReplace WRITE setColumnRoleReplace NOTIFY columnRoleReplaceChanged)
+    Q_PROPERTY(QString valueRoleReplace READ valueRoleReplace WRITE setValueRoleReplace NOTIFY valueRoleReplaceChanged)
+    Q_PROPERTY(QString rotationRoleReplace READ rotationRoleReplace WRITE setRotationRoleReplace NOTIFY rotationRoleReplaceChanged)
+    Q_PROPERTY(MultiMatchBehavior multiMatchBehavior READ multiMatchBehavior WRITE setMultiMatchBehavior NOTIFY multiMatchBehaviorChanged)
 
 public:
     enum MultiMatchBehavior {
@@ -128,15 +128,15 @@ Q_SIGNALS:
     void useModelCategoriesChanged(bool enable);
     void autoRowCategoriesChanged(bool enable);
     void autoColumnCategoriesChanged(bool enable);
-    Q_REVISION(1, 1) void rowRolePatternChanged(const QRegularExpression &pattern);
-    Q_REVISION(1, 1) void columnRolePatternChanged(const QRegularExpression &pattern);
-    Q_REVISION(1, 1) void valueRolePatternChanged(const QRegularExpression &pattern);
-    Q_REVISION(1, 1) void rotationRolePatternChanged(const QRegularExpression &pattern);
-    Q_REVISION(1, 1) void rowRoleReplaceChanged(const QString &replace);
-    Q_REVISION(1, 1) void columnRoleReplaceChanged(const QString &replace);
-    Q_REVISION(1, 1) void valueRoleReplaceChanged(const QString &replace);
-    Q_REVISION(1, 1) void rotationRoleReplaceChanged(const QString &replace);
-    Q_REVISION(1, 1) void multiMatchBehaviorChanged(MultiMatchBehavior behavior);
+    void rowRolePatternChanged(const QRegularExpression &pattern);
+    void columnRolePatternChanged(const QRegularExpression &pattern);
+    void valueRolePatternChanged(const QRegularExpression &pattern);
+    void rotationRolePatternChanged(const QRegularExpression &pattern);
+    void rowRoleReplaceChanged(const QString &replace);
+    void columnRoleReplaceChanged(const QString &replace);
+    void valueRoleReplaceChanged(const QString &replace);
+    void rotationRoleReplaceChanged(const QString &replace);
+    void multiMatchBehaviorChanged(MultiMatchBehavior behavior);
 
 protected:
     QItemModelBarDataProxyPrivate *dptr();

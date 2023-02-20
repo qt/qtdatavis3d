@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dbars_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DBars
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The Q3DBars class provides methods for rendering 3D bar graphs.
- * \since QtDataVisualization 1.0
  *
  * This class enables developers to render bar graphs in 3D and to view them by rotating the scene
  * freely. Rotation is done by holding down the right mouse button and moving the mouse. Zooming
@@ -65,7 +64,7 @@ QT_BEGIN_NAMESPACE
  * but no other interaction is included in this minimal code example. You can learn more by
  * familiarizing yourself with the examples provided, like the \l{Bars Example}.
  *
- * \sa Q3DScatter, Q3DSurface, {Qt Data Visualization C++ Classes}
+ * \sa Q3DScatter, Q3DSurface, {Qt Graphs C++ Classes}
  */
 
 /*!
@@ -476,7 +475,7 @@ Q3DBars *Q3DBarsPrivate::qptr()
 Q3DBarsNG::Q3DBarsNG() : QAbstract3DGraphNG()
 {
     QQmlComponent *component = new QQmlComponent(engine(), this);
-    component->setData("import QtQuick; import QtDataVisualization; Bars3DNG { anchors.fill: parent; }", QUrl());
+    component->setData("import QtQuick; import QtGraphs; Bars3DNG { anchors.fill: parent; }", QUrl());
     d_ptr.reset(qobject_cast<QQuickDataVisBars *>(component->create()));
     setContent(component->url(), component, d_ptr.data());
 }

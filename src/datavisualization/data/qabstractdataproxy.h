@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QABSTRACTDATAPROXY_H
 #define QABSTRACTDATAPROXY_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
+#include <QtGraphs/qgraphsglobal.h>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 
@@ -12,7 +12,7 @@ QT_BEGIN_NAMESPACE
 
 class QAbstractDataProxyPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QAbstractDataProxy : public QObject
+class Q_GRAPHS_EXPORT QAbstractDataProxy : public QObject
 {
     Q_OBJECT
     Q_ENUMS(DataType)

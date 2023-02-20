@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qbardataitem_p.h"
@@ -7,14 +7,13 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QBarDataItem
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QBarDataItem class provides a container for resolved data to be added to bar graphs.
- * \since QtDataVisualization 1.0
  *
  * A bar data item holds the data for a single rendered bar in a graph.
  * Bar data proxies parse data into QBarDataItem instances for visualization.
  *
- * \sa QBarDataProxy, {Qt Data Visualization C++ Classes}
+ * \sa QBarDataProxy, {Qt Graphs C++ Classes}
  */
 
 /*!

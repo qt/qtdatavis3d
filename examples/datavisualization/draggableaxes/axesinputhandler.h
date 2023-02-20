@@ -1,12 +1,12 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef AXESINPUTHANDLER_H
 #define AXESINPUTHANDLER_H
 
-#include <QtDataVisualization/Q3DInputHandler>
-#include <QtDataVisualization/QAbstract3DGraph>
-#include <QtDataVisualization/QValue3DAxis>
+#include <QtGraphs/Q3DInputHandler>
+#include <QtGraphs/QAbstract3DGraph>
+#include <QtGraphs/QValue3DAxis>
 
 //! [0]
 class AxesInputHandler : public Q3DInputHandler

@@ -11,7 +11,7 @@ qt_internal_add_manual_test(qmlvolume
     )
 target_link_libraries(qmlvolume PUBLIC
     Qt::Gui
-    Qt::DataVisualization
+    Qt::Graphs
     )
 
 set(qmlvolume_resource_files

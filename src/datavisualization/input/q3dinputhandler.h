@@ -1,16 +1,16 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef Q3DINPUTHANDLER_H
 #define Q3DINPUTHANDLER_H
 
-#include <QtDataVisualization/qabstract3dinputhandler.h>
+#include <QtGraphs/qabstract3dinputhandler.h>
 
 QT_BEGIN_NAMESPACE
 
 class Q3DInputHandlerPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT Q3DInputHandler : public QAbstract3DInputHandler
+class Q_GRAPHS_EXPORT Q3DInputHandler : public QAbstract3DInputHandler
 {
     Q_OBJECT
     Q_PROPERTY(bool rotationEnabled READ isRotationEnabled WRITE setRotationEnabled NOTIFY rotationEnabledChanged)

@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QCUSTOM3DVOLUME_H
 #define QCUSTOM3DVOLUME_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
-#include <QtDataVisualization/QCustom3DItem>
+#include <QtGraphs/qgraphsglobal.h>
+#include <QtGraphs/QCustom3DItem>
 #include <QtGui/QColor>
 #include <QtGui/QImage>
 
@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
 
 class QCustom3DVolumePrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem
+class Q_GRAPHS_EXPORT QCustom3DVolume : public QCustom3DItem
 {
     Q_OBJECT
     Q_PROPERTY(int textureWidth READ textureWidth WRITE setTextureWidth NOTIFY textureWidthChanged)

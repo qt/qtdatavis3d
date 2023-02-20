@@ -9,5 +9,5 @@ qt_internal_add_manual_test(itemmodeltest
 target_link_libraries(itemmodeltest PUBLIC
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
     )

@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dcamera_p.h"
@@ -10,9 +10,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DCamera
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Representation of a camera in 3D space.
- * \since QtDataVisualization 1.0
  *
  * Q3DCamera represents a basic orbit around centerpoint 3D camera that is used when rendering the
  * data visualization. The class offers simple methods for rotating the camera around the origin
@@ -57,9 +56,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype Camera3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates Q3DCamera
  * \brief Representation of a camera in 3D space.
  *
@@ -154,7 +152,6 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty vector3d Camera3D::target
- * \since QtDataVisualization 1.2
  *
  * The camera target as a vector3d. Defaults to \c {vector3d(0.0, 0.0, 0.0)}.
  *
@@ -564,7 +561,6 @@ void Q3DCamera::setCameraPosition(float horizontal, float vertical, float zoom)
 
 /*!
  * \property Q3DCamera::target
- * \since QtDataVisualization 1.2
  *
  * \brief The camera target as a vector or vertex in the 3D space.
  *

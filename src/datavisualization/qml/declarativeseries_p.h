@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the QtDataVisualization API.  It exists purely as an
+// This file is not part of the QtGraphs API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -20,7 +20,7 @@
 #include "colorgradient_p.h"
 #include "declarativecolor_p.h"
 
-#include <private/datavisualizationglobal_p.h>
+#include <private/graphsglobal_p.h>
 #include <QtQml/qqml.h>
 
 QT_BEGIN_NAMESPACE
@@ -43,11 +43,11 @@ class DeclarativeBar3DSeries : public QBar3DSeries
     Q_PROPERTY(ColorGradient *baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
-    Q_PROPERTY(QQmlListProperty<DeclarativeColor> rowColors READ rowColors REVISION(6, 3))
+    Q_PROPERTY(QQmlListProperty<DeclarativeColor> rowColors READ rowColors)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
 
     QML_NAMED_ELEMENT(Bar3DSeries)
-    QML_ADDED_IN_VERSION(1, 0)
+    QML_ADDED_IN_VERSION(6, 6)
 
 public:
     DeclarativeBar3DSeries(QObject *parent = 0);
@@ -113,7 +113,7 @@ class DeclarativeScatter3DSeries : public QScatter3DSeries
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
 
     QML_NAMED_ELEMENT(Scatter3DSeries)
-    QML_ADDED_IN_VERSION(1, 0)
+    QML_ADDED_IN_VERSION(6, 6)
 
 public:
     DeclarativeScatter3DSeries(QObject *parent = 0);
@@ -162,7 +162,7 @@ class DeclarativeSurface3DSeries : public QSurface3DSeries
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
 
     QML_NAMED_ELEMENT(Surface3DSeries)
-    QML_ADDED_IN_VERSION(1, 0)
+    QML_ADDED_IN_VERSION(6, 6)
 
 public:
     DeclarativeSurface3DSeries(QObject *parent = 0);

@@ -1,24 +1,24 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QBAR3DSERIES_H
 #define QBAR3DSERIES_H
 
-#include <QtDataVisualization/qabstract3dseries.h>
-#include <QtDataVisualization/qbardataproxy.h>
+#include <QtGraphs/qabstract3dseries.h>
+#include <QtGraphs/qbardataproxy.h>
 #include <QtCore/QPoint>
 
 QT_BEGIN_NAMESPACE
 
 class QBar3DSeriesPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QBar3DSeries : public QAbstract3DSeries
+class Q_GRAPHS_EXPORT QBar3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_PROPERTY(QBarDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
     Q_PROPERTY(QPoint selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
     Q_PROPERTY(float meshAngle READ meshAngle WRITE setMeshAngle NOTIFY meshAngleChanged)
-    Q_PROPERTY(QList<QColor> rowColors READ rowColors WRITE setRowColors NOTIFY rowColorsChanged REVISION(6, 3))
+    Q_PROPERTY(QList<QColor> rowColors READ rowColors WRITE setRowColors NOTIFY rowColorsChanged)
 
 public:
     explicit QBar3DSeries(QObject *parent = nullptr);
@@ -42,7 +42,7 @@ Q_SIGNALS:
     void dataProxyChanged(QBarDataProxy *proxy);
     void selectedBarChanged(const QPoint &position);
     void meshAngleChanged(float angle);
-    Q_REVISION(6, 3) void rowColorsChanged(const QList<QColor> &rowcolors);
+    void rowColorsChanged(const QList<QColor> &rowcolors);
 
 protected:
     QBar3DSeriesPrivate *dptr();

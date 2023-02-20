@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QABSTRACT3DAXIS_H
 #define QABSTRACT3DAXIS_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
+#include <QtGraphs/qgraphsglobal.h>
 #include <QtCore/QObject>
 #include <QtCore/QScopedPointer>
 #include <QtCore/QStringList>
@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
 
 class QAbstract3DAxisPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QAbstract3DAxis : public QObject
+class Q_GRAPHS_EXPORT QAbstract3DAxis : public QObject
 {
     Q_OBJECT
     Q_ENUMS(AxisOrientation)
@@ -25,9 +25,9 @@ class Q_DATAVISUALIZATION_EXPORT QAbstract3DAxis : public QObject
     Q_PROPERTY(float min READ min WRITE setMin NOTIFY minChanged)
     Q_PROPERTY(float max READ max WRITE setMax NOTIFY maxChanged)
     Q_PROPERTY(bool autoAdjustRange READ isAutoAdjustRange WRITE setAutoAdjustRange NOTIFY autoAdjustRangeChanged)
-    Q_PROPERTY(float labelAutoRotation READ labelAutoRotation WRITE setLabelAutoRotation NOTIFY labelAutoRotationChanged REVISION(1, 1))
-    Q_PROPERTY(bool titleVisible READ isTitleVisible WRITE setTitleVisible NOTIFY titleVisibilityChanged REVISION(1, 1))
-    Q_PROPERTY(bool titleFixed READ isTitleFixed WRITE setTitleFixed NOTIFY titleFixedChanged REVISION(1, 1))
+    Q_PROPERTY(float labelAutoRotation READ labelAutoRotation WRITE setLabelAutoRotation NOTIFY labelAutoRotationChanged)
+    Q_PROPERTY(bool titleVisible READ isTitleVisible WRITE setTitleVisible NOTIFY titleVisibilityChanged)
+    Q_PROPERTY(bool titleFixed READ isTitleFixed WRITE setTitleFixed NOTIFY titleFixedChanged)
 
 public:
     enum AxisOrientation {
@@ -86,9 +86,9 @@ Q_SIGNALS:
     void maxChanged(float value);
     void rangeChanged(float min, float max);
     void autoAdjustRangeChanged(bool autoAdjust);
-    Q_REVISION(1, 1) void labelAutoRotationChanged(float angle);
-    Q_REVISION(1, 1) void titleVisibilityChanged(bool visible);
-    Q_REVISION(1, 1) void titleFixedChanged(bool fixed);
+    void labelAutoRotationChanged(float angle);
+    void titleVisibilityChanged(bool visible);
+    void titleFixedChanged(bool fixed);
 
 protected:
     QScopedPointer<QAbstract3DAxisPrivate> d_ptr;

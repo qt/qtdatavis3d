@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qsurfacedataitem_p.h"
@@ -7,16 +7,15 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QSurfaceDataItem
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QSurfaceDataItem class provides a container for resolved data to be added to surface
  * graphs.
- * \since QtDataVisualization 1.0
  *
  * A surface data item holds the data for a single vertex in a surface graph.
  * Surface data proxies parse data into QSurfaceDataItem instances for
  * visualization.
  *
- * \sa QSurfaceDataProxy, {Qt Data Visualization C++ Classes}
+ * \sa QSurfaceDataProxy, {Qt Graphs C++ Classes}
  */
 
 /*!

@@ -1,12 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
     \example volumetric
     \title Volumetric rendering Example
-    \ingroup qtdatavisualization_examples
+    \ingroup qtgraphs_examples
     \brief Rendering volumetric objects.
-    \since QtDataVisualization 1.2
 
     This example shows how to use QCustom3DVolume items to display volumetric data.
 

@@ -1,17 +1,17 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QSURFACE3DSERIES_H
 #define QSURFACE3DSERIES_H
 
-#include <QtDataVisualization/qabstract3dseries.h>
-#include <QtDataVisualization/qsurfacedataproxy.h>
+#include <QtGraphs/qabstract3dseries.h>
+#include <QtGraphs/qsurfacedataproxy.h>
 
 QT_BEGIN_NAMESPACE
 
 class QSurface3DSeriesPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
+class Q_GRAPHS_EXPORT QSurface3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
     Q_FLAGS(DrawFlag DrawFlags)
@@ -22,7 +22,7 @@ class Q_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
     Q_PROPERTY(DrawFlags drawMode READ drawMode WRITE setDrawMode NOTIFY drawModeChanged)
     Q_PROPERTY(QImage texture READ texture WRITE setTexture NOTIFY textureChanged)
     Q_PROPERTY(QString textureFile READ textureFile WRITE setTextureFile NOTIFY textureFileChanged)
-    Q_PROPERTY(QColor wireframeColor READ wireframeColor WRITE setWireframeColor NOTIFY wireframeColorChanged REVISION(6, 3))
+    Q_PROPERTY(QColor wireframeColor READ wireframeColor WRITE setWireframeColor NOTIFY wireframeColorChanged)
 
 public:
     enum DrawFlag {
@@ -67,7 +67,7 @@ Q_SIGNALS:
     void drawModeChanged(QSurface3DSeries::DrawFlags mode);
     void textureChanged(const QImage &image);
     void textureFileChanged(const QString &filename);
-    Q_REVISION(6, 3) void wireframeColorChanged(const QColor &color);
+    void wireframeColorChanged(const QColor &color);
 
 protected:
     explicit QSurface3DSeries(QSurface3DSeriesPrivate *d, QObject *parent = nullptr);

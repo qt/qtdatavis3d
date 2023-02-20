@@ -1,19 +1,19 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef Q3DSCATTER_H
 #define Q3DSCATTER_H
 
-#include <QtDataVisualization/qabstract3dgraph.h>
-#include <QtDataVisualization/qvalue3daxis.h>
-#include <QtDataVisualization/qscatter3dseries.h>
+#include <QtGraphs/qabstract3dgraph.h>
+#include <QtGraphs/qvalue3daxis.h>
+#include <QtGraphs/qscatter3dseries.h>
 
 QT_BEGIN_NAMESPACE
 
 class Q3DScatterPrivate;
 class QQuickDataVisScatter;
 
-class Q_DATAVISUALIZATION_EXPORT Q3DScatter : public QAbstract3DGraph
+class Q_GRAPHS_EXPORT Q3DScatter : public QAbstract3DGraph
 {
     Q_OBJECT
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
@@ -53,7 +53,7 @@ private:
     Q_DISABLE_COPY(Q3DScatter)
 };
 
-class Q_DATAVISUALIZATION_EXPORT Q3DScatterNG : public QAbstract3DGraphNG
+class Q_GRAPHS_EXPORT Q3DScatterNG : public QAbstract3DGraphNG
 {
     Q_OBJECT
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)

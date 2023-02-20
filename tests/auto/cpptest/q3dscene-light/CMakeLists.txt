@@ -6,5 +6,5 @@ qt_internal_add_test(q3dscene-light
         tst_light.cpp
     LIBRARIES
         Qt::Gui
-        Qt::DataVisualization
+        Qt::Graphs
 )

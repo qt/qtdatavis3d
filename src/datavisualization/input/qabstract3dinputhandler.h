@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QABSTRACT3DINPUTHANDLER_H
 #define QABSTRACT3DINPUTHANDLER_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
-#include <QtDataVisualization/q3dscene.h>
+#include <QtGraphs/qgraphsglobal.h>
+#include <QtGraphs/q3dscene.h>
 #include <QtCore/QObject>
 #include <QtCore/QPoint>
 #include <QtGui/QWheelEvent>
@@ -16,7 +16,7 @@ QT_BEGIN_NAMESPACE
 
 class QAbstract3DInputHandlerPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QAbstract3DInputHandler : public QObject
+class Q_GRAPHS_EXPORT QAbstract3DInputHandler : public QObject
 {
     Q_OBJECT
     Q_ENUMS(InputView)

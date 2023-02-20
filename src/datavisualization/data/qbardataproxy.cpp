@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qbardataproxy_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QBarDataProxy
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QBarDataProxy class is the data proxy for a 3D bars graph.
- * \since QtDataVisualization 1.0
  *
  * A bar data proxy handles adding, inserting, changing, and removing rows of
  * data.
@@ -18,8 +17,8 @@ QT_BEGIN_NAMESPACE
  * The data array is a list of vectors (rows) of QBarDataItem instances.
  * Each row can contain a different number of items or even be null.
  *
- * QBarDataProxy takes ownership of all QtDataVisualization::QBarDataRow objects
- * passed to it, whether directly or in a QtDataVisualization::QBarDataArray container.
+ * QBarDataProxy takes ownership of all QtGraphs::QBarDataRow objects
+ * passed to it, whether directly or in a QtGraphs::QBarDataArray container.
  * If bar data row pointers are used to directly modify data after adding the
  * array to the proxy, the appropriate signal must be emitted to update the
  * graph.
@@ -30,7 +29,7 @@ QT_BEGIN_NAMESPACE
  * This enables the option of having row labels that relate to the position of the data in the
  * array rather than the data itself.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
@@ -49,9 +48,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype BarDataProxy
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QBarDataProxy
  * \inherits AbstractDataProxy
  * \brief The data proxy for a 3D bars graph.
@@ -62,7 +60,7 @@ QT_BEGIN_NAMESPACE
  *
  * For a more complete description, see QBarDataProxy.
  *
- * \sa ItemModelBarDataProxy, {Qt Data Visualization Data Handling}
+ * \sa ItemModelBarDataProxy, {Qt Graphs Data Handling}
  */
 
 /*!

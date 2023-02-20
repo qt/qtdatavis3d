@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef DATA_H
@@ -6,7 +6,7 @@
 
 #include "axesinputhandler.h"
 
-#include <QtDataVisualization/q3dscatter.h>
+#include <QtGraphs/q3dscatter.h>
 #include <QtGui/QVector3D>
 
 class Data : public QObject

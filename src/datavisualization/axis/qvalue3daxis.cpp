@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qvalue3daxis_p.h"
@@ -9,9 +9,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QValue3DAxis
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QValue3DAxis class manipulates an axis of a graph.
- * \since QtDataVisualization 1.0
  *
  * A value axis can be given a range of values and segment and subsegment
  * counts to divide the range into.
@@ -23,9 +22,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ValueAxis3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QValue3DAxis
  * \inherits AbstractAxis3D
  * \brief Manipulates an axis of a graph.
@@ -71,7 +69,6 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty ValueAxis3DFormatter ValueAxis3D::formatter
- * \since QtDataVisualization 1.1
  *
  * The axis formatter to be used. Any existing formatter is deleted when a new formatter
  * is set.
@@ -80,7 +77,6 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmlproperty bool ValueAxis3D::reversed
- * \since QtDataVisualization 1.1
  *
  * If \c{true}, the axis will be rendered in reverse. That is, the positions of
  * the minimum and maximum values are swapped when the graph is rendered. This
@@ -198,7 +194,6 @@ QString QValue3DAxis::labelFormat() const
 
 /*!
  * \property QValue3DAxis::formatter
- * \since QtDataVisualization 1.1
  *
  * \brief The axis formatter to be used.
  *
@@ -229,7 +224,6 @@ QValue3DAxisFormatter *QValue3DAxis::formatter() const
 
 /*!
  * \property QValue3DAxis::reversed
- * \since QtDataVisualization 1.1
  *
  * \brief Whether the axis is rendered in reverse.
  *

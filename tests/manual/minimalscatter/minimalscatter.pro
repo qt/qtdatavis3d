@@ -2,7 +2,7 @@
     error( "Couldn't find the tests.pri file!" )
 }
 
-QT += core gui datavisualization
+QT += core gui graphs
 
 TARGET = MinimalScatter
 TEMPLATE = app

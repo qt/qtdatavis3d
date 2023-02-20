@@ -18,7 +18,7 @@ set(INSTALL_EXAMPLEDIR "${INSTALL_EXAMPLESDIR}")
 
 find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Gui)
-find_package(Qt6 COMPONENTS DataVisualization)
+find_package(Qt6 COMPONENTS Graphs)
 
 qt_add_executable(customproxy
     main.cpp
@@ -34,7 +34,7 @@ set_target_properties(customproxy PROPERTIES
 target_link_libraries(customproxy PUBLIC
     Qt::Core
     Qt::Gui
-    Qt::DataVisualization
+    Qt::Graphs
 )
 
 set(customproxy_resource_files

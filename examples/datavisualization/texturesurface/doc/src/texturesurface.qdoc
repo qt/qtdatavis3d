@@ -1,12 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
     \example texturesurface
     \title Textured Surface Example
-    \ingroup qtdatavisualization_examples
+    \ingroup qtgraphs_examples
     \brief Using texture with Q3DSurface.
-    \since QtDataVisualization 1.2
 
     The textured surface example shows how to add an image as a texture for a surface. The example
     shows also how to:
@@ -41,7 +40,7 @@
     The multiplier is calculated simply by dividing the largest 24 bit value with the highest point
     in Finland.
 
-    Qt Data Visualization has a special proxy for height map image files, but it converts
+    Qt Graphs has a special proxy for height map image files, but it converts
     only one byte values. So to utilize the bigger accuracy on the data from National Land
     Survey of Finland, we read the data from the PNG file and decode it into QSurface3DSeries.
     The following code samples show how this is done.

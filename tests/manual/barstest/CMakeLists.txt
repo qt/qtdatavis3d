@@ -15,7 +15,7 @@ qt_internal_add_manual_test(barstest
 target_link_libraries(barstest PUBLIC
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
     )
 
 set(barstest_resource_files

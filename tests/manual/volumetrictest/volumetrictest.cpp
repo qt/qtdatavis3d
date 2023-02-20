@@ -1,13 +1,13 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "volumetrictest.h"
-#include <QtDataVisualization/qbar3dseries.h>
-#include <QtDataVisualization/qvalue3daxis.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QtDataVisualization/q3dcamera.h>
-#include <QtDataVisualization/q3dtheme.h>
-#include <QtDataVisualization/qcustom3dlabel.h>
+#include <QtGraphs/qbar3dseries.h>
+#include <QtGraphs/qvalue3daxis.h>
+#include <QtGraphs/q3dscene.h>
+#include <QtGraphs/q3dcamera.h>
+#include <QtGraphs/q3dtheme.h>
+#include <QtGraphs/qcustom3dlabel.h>
 #include <QtCore/qmath.h>
 #include <QtGui/QRgb>
 #include <QtGui/QImage>

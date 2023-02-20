@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "chart.h"
@@ -22,9 +22,9 @@
 #include <QLineEdit>
 #include <QSpinBox>
 #include <QtGui/QOpenGLContext>
-#include <QtDataVisualization/QCustom3DItem>
-#include <QtDataVisualization/QCustom3DLabel>
-#include <QtDataVisualization/QCustom3DVolume>
+#include <QtGraphs/QCustom3DItem>
+#include <QtGraphs/QCustom3DLabel>
+#include <QtGraphs/QCustom3DVolume>
 
 int main(int argc, char **argv)
 {

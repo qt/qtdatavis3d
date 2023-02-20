@@ -1,12 +1,12 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef Q3DSCENE_H
 #define Q3DSCENE_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
-#include <QtDataVisualization/q3dcamera.h>
-#include <QtDataVisualization/q3dlight.h>
+#include <QtGraphs/qgraphsglobal.h>
+#include <QtGraphs/q3dcamera.h>
+#include <QtGraphs/q3dlight.h>
 #include <QtCore/QObject>
 #include <QtCore/QRect>
 
@@ -14,7 +14,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DScenePrivate;
 
-class Q_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
+class Q_GRAPHS_EXPORT Q3DScene : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(QRect viewport READ viewport NOTIFY viewportChanged)
@@ -26,7 +26,7 @@ class Q_DATAVISUALIZATION_EXPORT Q3DScene : public QObject
     Q_PROPERTY(Q3DCamera* activeCamera READ activeCamera WRITE setActiveCamera NOTIFY activeCameraChanged)
     Q_PROPERTY(Q3DLight* activeLight READ activeLight WRITE setActiveLight NOTIFY activeLightChanged)
     Q_PROPERTY(float devicePixelRatio READ devicePixelRatio WRITE setDevicePixelRatio NOTIFY devicePixelRatioChanged)
-    Q_PROPERTY(QPoint graphPositionQuery READ graphPositionQuery WRITE setGraphPositionQuery NOTIFY graphPositionQueryChanged REVISION(1, 2))
+    Q_PROPERTY(QPoint graphPositionQuery READ graphPositionQuery WRITE setGraphPositionQuery NOTIFY graphPositionQueryChanged)
 
 public:
     explicit Q3DScene(QObject *parent = nullptr);
@@ -74,7 +74,7 @@ Q_SIGNALS:
     void activeLightChanged(Q3DLight *light);
     void devicePixelRatioChanged(float pixelRatio);
     void selectionQueryPositionChanged(const QPoint &position);
-    Q_REVISION(1, 2) void graphPositionQueryChanged(const QPoint &position);
+    void graphPositionQueryChanged(const QPoint &position);
 
 private:
     QScopedPointer<Q3DScenePrivate> d_ptr;

@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qsurfacedataproxy_p.h"
@@ -9,13 +9,12 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QSurfaceDataProxy
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QSurfaceDataProxy class is the data proxy for a 3D surface graph.
- * \since QtDataVisualization 1.0
  *
  * A surface data proxy handles surface related data in rows. For this it
- * provides two auxiliary typedefs: QtDataVisualization::QSurfaceDataArray and
- * QtDataVisualization::QSurfaceDataRow. \c QSurfaceDataArray is a QList that
+ * provides two auxiliary typedefs: QtGraphs::QSurfaceDataArray and
+ * QtGraphs::QSurfaceDataRow. \c QSurfaceDataArray is a QList that
  * controls the rows. \c QSurfaceDataRow is a QList that contains
  * QSurfaceDataItem objects. For more information about how to feed the data to
  * the proxy, see the sample code in the Q3DSurface documentation.
@@ -46,7 +45,7 @@ QT_BEGIN_NAMESPACE
  * they exceed the per-draw vertex count supported by the graphics driver.
  * This is mostly an issue on 32-bit and OpenGL ES2 platforms.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
@@ -65,9 +64,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype SurfaceDataProxy
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QSurfaceDataProxy
  * \inherits AbstractDataProxy
  * \brief The data proxy for a 3D surface graph.
@@ -79,7 +77,7 @@ QT_BEGIN_NAMESPACE
  *
  * For a more complete description, see QSurfaceDataProxy.
  *
- * \sa ItemModelSurfaceDataProxy, {Qt Data Visualization Data Handling}
+ * \sa ItemModelSurfaceDataProxy, {Qt Graphs Data Handling}
  */
 
 /*!

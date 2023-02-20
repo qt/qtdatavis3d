@@ -16,7 +16,7 @@ def _get_qt_minor_version() -> str:
     return ".".join(_parse_qt_version_by_key("QT_REPO_MODULE_VERSION").split(".")[:2])
 
 
-class QtDataVisualization(ConanFile):
+class QtGraphs(ConanFile):
     name = "qtdatavis3d"
     license = "GPL-3.0+, Commercial Qt License Agreement"
     author = "The Qt Company <https://www.qt.io/contact-us>"

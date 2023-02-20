@@ -1,21 +1,21 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef Q3DOBJECT_H
 #define Q3DOBJECT_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
+#include <QtGraphs/qgraphsglobal.h>
 #include <QtCore/QObject>
 #include <QtGui/QVector3D>
 
-Q_MOC_INCLUDE(<QtDataVisualization/q3dscene.h>)
+Q_MOC_INCLUDE(<QtGraphs/q3dscene.h>)
 
 QT_BEGIN_NAMESPACE
 
 class Q3DObjectPrivate;
 class Q3DScene;
 
-class Q_DATAVISUALIZATION_EXPORT Q3DObject : public QObject
+class Q_GRAPHS_EXPORT Q3DObject : public QObject
 {
     Q_OBJECT
     Q_PROPERTY(Q3DScene* parentScene READ parentScene)

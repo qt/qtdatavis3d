@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dsurface.h"
@@ -9,9 +9,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DSurface
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The Q3DSurface class provides methods for rendering 3D surface plots.
- * \since QtDataVisualization 1.0
  *
  * This class enables developers to render 3D surface plots and to view them by rotating the scene
  * freely. The visual properties of the surface such as draw mode and shading can be controlled
@@ -69,7 +68,7 @@ QT_BEGIN_NAMESPACE
  * like the \l{Surface Example}.
  *
  *
- * \sa Q3DBars, Q3DScatter, {Qt Data Visualization C++ Classes}
+ * \sa Q3DBars, Q3DScatter, {Qt Graphs C++ Classes}
  */
 
 /*!
@@ -239,7 +238,6 @@ QSurface3DSeries *Q3DSurface::selectedSeries() const
 
 /*!
  * \property Q3DSurface::flipHorizontalGrid
- * \since QtDataVisualization 1.2
  *
  * \brief Whether the horizontal axis grid is displayed on top of the graph
  * rather than on the bottom.
@@ -340,7 +338,7 @@ Q3DSurface *Q3DSurfacePrivate::qptr()
 Q3DSurfaceNG::Q3DSurfaceNG() : QAbstract3DGraphNG()
 {
     QQmlComponent *component = new QQmlComponent(engine(), this);
-    component->setData("import QtQuick; import QtDataVisualization; Surface3DNG { anchors.fill: parent; }", QUrl());
+    component->setData("import QtQuick; import QtGraphs; Surface3DNG { anchors.fill: parent; }", QUrl());
     d_ptr.reset(qobject_cast<QQuickDataVisSurface *>(component->create()));
     setContent(component->url(), component, d_ptr.data());
 }

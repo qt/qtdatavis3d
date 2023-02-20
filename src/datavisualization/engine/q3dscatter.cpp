@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dscatter.h"
@@ -9,9 +9,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class Q3DScatter
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The Q3DScatter class provides methods for rendering 3D scatter graphs.
- * \since QtDataVisualization 1.0
  *
  * This class enables developers to render scatter graphs in 3D and to view them by rotating the scene
  * freely. Rotation is done by holding down the right mouse button and moving the mouse. Zooming
@@ -54,7 +53,7 @@ QT_BEGIN_NAMESPACE
  * You can learn more by familiarizing yourself with the examples provided, like
  * the \l{Scatter Example}.
  *
- * \sa Q3DBars, Q3DSurface, {Qt Data Visualization C++ Classes}
+ * \sa Q3DBars, Q3DSurface, {Qt Graphs C++ Classes}
  */
 
 /*!
@@ -290,7 +289,7 @@ Q3DScatter *Q3DScatterPrivate::qptr()
 Q3DScatterNG::Q3DScatterNG() : QAbstract3DGraphNG()
 {
     QQmlComponent *component = new QQmlComponent(engine(), this);
-    component->setData("import QtQuick; import QtDataVisualization; Scatter3DNG { anchors.fill: parent; }", QUrl());
+    component->setData("import QtQuick; import QtGraphs; Scatter3DNG { anchors.fill: parent; }", QUrl());
     d_ptr.reset(qobject_cast<QQuickDataVisScatter *>(component->create()));
     setContent(component->url(), component, d_ptr.data());
 }

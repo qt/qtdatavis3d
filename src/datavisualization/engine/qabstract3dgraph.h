@@ -1,13 +1,13 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QABSTRACT3DGRAPH_H
 #define QABSTRACT3DGRAPH_H
 
-#include <QtDataVisualization/qdatavisualizationglobal.h>
-#include <QtDataVisualization/q3dtheme.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QtDataVisualization/qabstract3dinputhandler.h>
+#include <QtGraphs/qgraphsglobal.h>
+#include <QtGraphs/q3dtheme.h>
+#include <QtGraphs/q3dscene.h>
+#include <QtGraphs/qabstract3dinputhandler.h>
 #include <QtGui/QWindow>
 #include <QtGui/QOpenGLFunctions>
 #include <QtCore/QLocale>
@@ -23,7 +23,7 @@ class QAbstract3DSeries;
 
 class QQuickDataVisItem;
 
-class Q_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
+class Q_GRAPHS_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
     Q_ENUMS(ShadowQuality)
@@ -222,7 +222,7 @@ private:
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::SelectionFlags)
 Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::OptimizationHints)
 
-class Q_DATAVISUALIZATION_EXPORT QAbstract3DGraphNG : public QQuickWidget
+class Q_GRAPHS_EXPORT QAbstract3DGraphNG : public QQuickWidget
 {
     Q_OBJECT
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)

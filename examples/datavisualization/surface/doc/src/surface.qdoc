@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
     \example surface
     \title Surface Example
-    \ingroup qtdatavisualization_examples
+    \ingroup qtgraphs_examples
     \brief Using Q3DSurface in a widget application.
 
     The surface example shows how to make a simple 3D surface graph using Q3DSurface and
@@ -20,7 +20,7 @@
         \li How to set a custom surface gradient.
     \endlist
 
-    For instructions about how to interact with the graph, see \l{Qt Data Visualization Interacting with Data}{this page}.
+    For instructions about how to interact with the graph, see \l{Qt Graphs Interacting with Data}{this page}.
 
     \image surface-example.png
 
@@ -105,7 +105,7 @@
 
     \section1 Themes
 
-    Q3DSurface supports all the themes Qt Data Visualization has. The example has a pull
+    Q3DSurface supports all the themes Qt Graphs has. The example has a pull
     down menu for selecting the theme. The following method is connected to the
     menu to activate the selected theme. The theme type is changed to another predefined theme,
     which overwrites all theme properties to predefined values:

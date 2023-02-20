@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qscatterdataproxy_p.h"
@@ -9,18 +9,17 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QScatterDataProxy
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QScatterDataProxy class is the data proxy for 3D scatter graphs.
- * \since QtDataVisualization 1.0
  *
  * A scatter data proxy handles adding, inserting, changing, and removing data
  * items.
  *
  * QScatterDataProxy takes ownership of all
- * QtDataVisualization::QScatterDataArray and QScatterDataItem objects passed to
+ * QtGraphs::QScatterDataArray and QScatterDataItem objects passed to
  * it.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
@@ -32,9 +31,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ScatterDataProxy
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QScatterDataProxy
  * \inherits AbstractDataProxy
  * \brief The data proxy for 3D scatter graphs.
@@ -43,7 +41,7 @@ QT_BEGIN_NAMESPACE
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
  *
- * \sa ItemModelScatterDataProxy, {Qt Data Visualization Data Handling}
+ * \sa ItemModelScatterDataProxy, {Qt Graphs Data Handling}
  */
 
 /*!

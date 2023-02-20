@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QHEIGHTMAPSURFACEDATAPROXY_H
 #define QHEIGHTMAPSURFACEDATAPROXY_H
 
-#include <QtDataVisualization/qsurfacedataproxy.h>
+#include <QtGraphs/qsurfacedataproxy.h>
 #include <QtGui/QImage>
 #include <QtCore/QString>
 
@@ -12,7 +12,7 @@ QT_BEGIN_NAMESPACE
 
 class QHeightMapSurfaceDataProxyPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QHeightMapSurfaceDataProxy : public QSurfaceDataProxy
+class Q_GRAPHS_EXPORT QHeightMapSurfaceDataProxy : public QSurfaceDataProxy
 {
     Q_OBJECT
 
@@ -22,9 +22,9 @@ class Q_DATAVISUALIZATION_EXPORT QHeightMapSurfaceDataProxy : public QSurfaceDat
     Q_PROPERTY(float maxXValue READ maxXValue WRITE setMaxXValue NOTIFY maxXValueChanged)
     Q_PROPERTY(float minZValue READ minZValue WRITE setMinZValue NOTIFY minZValueChanged)
     Q_PROPERTY(float maxZValue READ maxZValue WRITE setMaxZValue NOTIFY maxZValueChanged)
-    Q_PROPERTY(float minYValue READ minYValue WRITE setMinYValue NOTIFY minYValueChanged REVISION(6, 3))
-    Q_PROPERTY(float maxYValue READ maxYValue WRITE setMaxYValue NOTIFY maxYValueChanged REVISION(6, 3))
-    Q_PROPERTY(bool autoScaleY READ autoScaleY WRITE setAutoScaleY NOTIFY autoScaleYChanged REVISION(6, 3))
+    Q_PROPERTY(float minYValue READ minYValue WRITE setMinYValue NOTIFY minYValueChanged)
+    Q_PROPERTY(float maxYValue READ maxYValue WRITE setMaxYValue NOTIFY maxYValueChanged)
+    Q_PROPERTY(bool autoScaleY READ autoScaleY WRITE setAutoScaleY NOTIFY autoScaleYChanged)
 
 public:
     explicit QHeightMapSurfaceDataProxy(QObject *parent = nullptr);
@@ -60,9 +60,9 @@ Q_SIGNALS:
     void maxXValueChanged(float value);
     void minZValueChanged(float value);
     void maxZValueChanged(float value);
-    Q_REVISION(6, 3) void minYValueChanged(float value);
-    Q_REVISION(6, 3) void maxYValueChanged(float value);
-    Q_REVISION(6, 3) void autoScaleYChanged(bool enabled);
+    void minYValueChanged(float value);
+    void maxYValueChanged(float value);
+    void autoScaleYChanged(bool enabled);
 
 protected:
     explicit QHeightMapSurfaceDataProxy(QHeightMapSurfaceDataProxyPrivate *d, QObject *parent = nullptr);

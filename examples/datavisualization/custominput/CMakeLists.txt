@@ -19,7 +19,7 @@ set(INSTALL_EXAMPLEDIR "${INSTALL_EXAMPLESDIR}")
 find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Widgets)
-find_package(Qt6 COMPONENTS DataVisualization)
+find_package(Qt6 COMPONENTS Graphs)
 
 qt_add_executable(custominput
     custominputhandler.cpp custominputhandler.h
@@ -34,7 +34,7 @@ target_link_libraries(custominput PUBLIC
     Qt::Core
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
 )
 
 set(custominput_resource_files

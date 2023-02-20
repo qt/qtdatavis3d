@@ -12,5 +12,5 @@ qt_internal_add_manual_test(directional
 target_link_libraries(directional PUBLIC
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
     )

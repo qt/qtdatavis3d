@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dobject_p.h"
@@ -8,10 +8,9 @@ QT_BEGIN_NAMESPACE
 
 /*!
    \class Q3DObject
-   \inmodule QtDataVisualization
+   \inmodule QtGraphs
    \brief The Q3DObject class is a simple base class for all the objects in a
    3D scene.
-   \since QtDataVisualization 1.0
 
     Contains position information for an object in a 3D scene.
     The object is considered to be a single point in the coordinate space without dimensions.
@@ -19,9 +18,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
    \qmltype Object3D
-   \inqmlmodule QtDataVisualization
-   \since QtDataVisualization 1.0
-   \ingroup datavisualization_qml
+   \inqmlmodule QtGraphs
+   \ingroup graphs_qml
    \instantiates Q3DObject
    \brief A base type for all the objects in a 3D scene.
 

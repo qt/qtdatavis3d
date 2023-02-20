@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef RAINFALLGRAPH_H
 #define RAINFALLGRAPH_H
 
 #include "variantbardataproxy.h"
-#include <QtDataVisualization/q3dbars.h>
+#include <QtGraphs/q3dbars.h>
 
 class RainfallGraph : public QObject
 {

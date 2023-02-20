@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
     \example qml3doscilloscope
     \title Qt Quick 2 Oscilloscope Example
-    \ingroup qtdatavisualization_examples
+    \ingroup qtgraphs_examples
     \brief Example of a hybrid C++ and QML application.
 
     The Qt Quick 2 oscilloscope example shows how to combine C++ and QML in an application,
@@ -91,7 +91,7 @@
     Since this application potentially deals with a lot of rapidly changing data, we use direct
     rendering mode for performance. To enable antialiasing in this mode the surface format of the application
     window needs to be changed, as the default format used by QQuickView doesn't support antialiasing.
-    We use the utility function provided by Qt Data Visualization to change the surface format
+    We use the utility function provided by Qt Graphs to change the surface format
     in \c main.cpp:
 
     \snippet qml3doscilloscope/main.cpp 1

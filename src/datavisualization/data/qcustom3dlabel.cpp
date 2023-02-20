@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qcustom3dlabel_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QCustom3DLabel
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QCustom3DLabel class adds a custom label to a graph.
- * \since QtDataVisualization 1.1
  *
  * The text, font, position, scaling, rotation, and colors of a custom label can
  * be set. In addition, the visibility of the borders and background of the
@@ -25,9 +24,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype Custom3DLabel
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.1
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QCustom3DLabel
  * \inherits Custom3DItem
  * \brief Adds a custom label to a graph.

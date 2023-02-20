@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qcategory3daxis_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QCategory3DAxis
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QCategory3DAxis class manipulates an axis of a graph.
- * \since QtDataVisualization 1.0
  *
  * QCategory3DAxis provides an axis that can be given labels. The axis is divided into equal-sized
  * categories based on the data window size defined by setting the axis range.
@@ -21,9 +20,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype CategoryAxis3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QCategory3DAxis
  * \inherits AbstractAxis3D
  * \brief Manipulates an axis of a graph.

@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef VOLUMETRICMODIFIER_H
 #define VOLUMETRICMODIFIER_H
 
-#include <QtDataVisualization/q3dscatter.h>
-#include <QtDataVisualization/qcustom3dvolume.h>
+#include <QtGraphs/q3dscatter.h>
+#include <QtGraphs/qcustom3dvolume.h>
 #include <QtCore/QTimer>
 #include <QtGui/QRgb>
 #include <QtWidgets/QLabel>

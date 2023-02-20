@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qheightmapsurfacedataproxy_p.h"
@@ -11,9 +11,8 @@ const float defaultMaxValue = 10.0f;
 
 /*!
  * \class QHeightMapSurfaceDataProxy
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Base proxy class for Q3DSurface.
- * \since QtDataVisualization 1.0
  *
  * QHeightMapSurfaceDataProxy takes care of surface related height map data handling. It provides a
  * way to give a height map to be visualized as a surface plot.
@@ -23,14 +22,13 @@ const float defaultMaxValue = 10.0f;
  * to image horizontal direction and Z-value to the vertical. Setting any of these
  * properties triggers asynchronous re-resolving of any existing height map.
  *
- * \sa QSurfaceDataProxy, {Qt Data Visualization Data Handling}
+ * \sa QSurfaceDataProxy, {Qt Graphs Data Handling}
  */
 
 /*!
  * \qmltype HeightMapSurfaceDataProxy
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QHeightMapSurfaceDataProxy
  * \inherits SurfaceDataProxy
  * \brief Base proxy type for Surface3D.
@@ -40,7 +38,7 @@ const float defaultMaxValue = 10.0f;
  *
  * For more complete description, see QHeightMapSurfaceDataProxy.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
@@ -102,7 +100,6 @@ const float defaultMaxValue = 10.0f;
 
 /*!
  * \qmlproperty real HeightMapSurfaceDataProxy::minYValue
- * \since 6.3
  *
  * The minimum Y value for the generated surface points. Defaults to \c{0.0}.
  * When setting this property the corresponding maximum value is adjusted if necessary,
@@ -111,7 +108,6 @@ const float defaultMaxValue = 10.0f;
 
 /*!
  * \qmlproperty real HeightMapSurfaceDataProxy::maxYValue
- * \since 6.3
  *
  * The maximum Y value for the generated surface points. Defaults to \c{10.0}.
  * When setting this property the corresponding minimum value is adjusted if necessary,
@@ -120,7 +116,6 @@ const float defaultMaxValue = 10.0f;
 
 /*!
  * \qmlproperty real HeightMapSurfaceDataProxy::autoScaleY
- * \since 6.3
  *
  * Scale height values to Y-axis. Defaults to \c{false}. When this property is set to \c{true},
  * the height values are scaled to fit on the Y-axis between \c{minYValue} and \c{maxYValue}.
@@ -329,7 +324,6 @@ float QHeightMapSurfaceDataProxy::maxZValue() const
 
 /*!
  * \property QHeightMapSurfaceDataProxy::minYValue
- * \since 6.3
  *
  * \brief The minimum Y value for the generated surface points.
  *
@@ -352,7 +346,6 @@ float QHeightMapSurfaceDataProxy::minYValue() const
 
 /*!
  * \property QHeightMapSurfaceDataProxy::maxYValue
- * \since 6.3
  *
  * \brief The maximum Y value for the generated surface points.
  *
@@ -375,7 +368,6 @@ float QHeightMapSurfaceDataProxy::maxYValue() const
 
 /*!
  * \property QHeightMapSurfaceDataProxy::autoScaleY
- * \since 6.3
  *
  * \brief Scale height values to Y-axis.
  *

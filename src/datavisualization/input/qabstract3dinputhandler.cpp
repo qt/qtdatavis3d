@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qabstract3dinputhandler_p.h"
@@ -7,9 +7,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QAbstract3DInputHandler
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The base class for implementations of input handlers.
- * \since QtDataVisualization 1.0
  *
  * QAbstract3DInputHandler is the base class that is subclassed by different input handling implementations
  * that take input events and translate those to camera and light movements. Input handlers also translate
@@ -32,11 +31,10 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype AbstractInputHandler3D
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QAbstract3DInputHandler
- * \brief Base type for all QtDataVisualization input handlers.
+ * \brief Base type for all QtGraphs input handlers.
  *
  * This type is uncreatable.
  *

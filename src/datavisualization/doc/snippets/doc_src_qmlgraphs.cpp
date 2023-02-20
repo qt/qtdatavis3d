@@ -1,13 +1,13 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //! [0]
-import QtDataVisualization 1.2
+import QtGraphs
 //! [0]
 
 //! [1]
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtGraphs
 
 Item {
     width: 640
@@ -46,7 +46,7 @@ Item {
 
 //! [2]
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtGraphs
 
 Item {
     width: 640
@@ -79,7 +79,7 @@ Item {
 
 //! [3]
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtGraphs
 
 Item {
     width: 640

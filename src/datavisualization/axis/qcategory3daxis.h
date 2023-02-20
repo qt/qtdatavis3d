@@ -1,16 +1,16 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QCATEGORY3DAXIS_H
 #define QCATEGORY3DAXIS_H
 
-#include <QtDataVisualization/qabstract3daxis.h>
+#include <QtGraphs/qabstract3daxis.h>
 
 QT_BEGIN_NAMESPACE
 
 class QCategory3DAxisPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QCategory3DAxis : public QAbstract3DAxis
+class Q_GRAPHS_EXPORT QCategory3DAxis : public QAbstract3DAxis
 {
     Q_OBJECT
     Q_PROPERTY(QStringList labels READ labels WRITE setLabels NOTIFY labelsChanged)

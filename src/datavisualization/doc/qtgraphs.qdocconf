@@ -1,0 +1,51 @@
+include($QT_INSTALL_DOCS/global/qt-module-defaults.qdocconf)
+include($QT_INSTALL_DOCS/config/exampleurl-qtdatavis3d.qdocconf) # TODO: exampleurl-qtdatavis3d.qdocconf
+
+project             = QtGraphs
+description         = Qt Graphs Reference Documentation
+version             = $QT_VERSION
+buildversion        = Qt Graphs | Commercial or GPLv3
+moduleheader        = QtGraphs
+
+examplesinstallpath = graphs
+exampledirs += ../../../examples/datavisualization \
+               snippets
+
+{headerdirs,sourcedirs} += ..
+
+imagedirs  += ../images \
+              images
+
+depends = qtcore qtgui qtqml qtquick qtdoc qtcmake qtwidgets
+
+qhp.projects                 = QtGraphs
+
+qhp.QtGraphs.file            = qtgraphsd.qhp
+qhp.QtGraphs.namespace       = org.qt-project.qtgraphs.$QT_VERSION_TAG
+qhp.QtGraphs.virtualFolder   = qtgraphs
+qhp.QtGraphs.indexTitle      = Qt Graphs
+qhp.QtGraphs.indexRoot       =
+
+qhp.QtGraphs.subprojects                             = gettingstarted examples classes types
+qhp.QtGraphs.subprojects.gettingstarted.title        = Getting Started
+qhp.QtGraphs.subprojects.gettingstarted.indexTitle   = Qt Graphs Getting Started
+qhp.QtGraphs.subprojects.gettingstarted.selectors    = doc:page
+qhp.QtGraphs.subprojects.gettingstarted.sortPages    = true
+qhp.QtGraphs.subprojects.examples.title              = Examples
+qhp.QtGraphs.subprojects.examples.indexTitle         = Qt Graphs Examples
+qhp.QtGraphs.subprojects.examples.selectors          = doc:example
+qhp.QtGraphs.subprojects.examples.sortPages          = true
+qhp.QtGraphs.subprojects.classes.title               = C++ Classes
+qhp.QtGraphs.subprojects.classes.indexTitle          = Qt Graphs C++ Classes
+qhp.QtGraphs.subprojects.classes.selectors           = class
+qhp.QtGraphs.subprojects.classes.sortPages           = true
+qhp.QtGraphs.subprojects.types.title                 = QML Types
+qhp.QtGraphs.subprojects.types.indexTitle            = Qt Graphs QML Types
+qhp.QtGraphs.subprojects.types.selectors             = qmlclass
+qhp.QtGraphs.subprojects.types.sortPages             = true
+
+navigation.landingpage = Qt Graphs
+navigation.cppclassespage = Qt Graphs C++ Classes
+navigation.qmltypespage = Qt Graphs QML Types
+
+manifestmeta.highlighted.names = "QtGraphs/Textured Surface Example" # TODO: Replace with an existing revamped example

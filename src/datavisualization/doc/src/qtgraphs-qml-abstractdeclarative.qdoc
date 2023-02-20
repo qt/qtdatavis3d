@@ -1,19 +1,18 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GFDL-1.3-no-invariants-only
 
 /*!
   \qmltype AbstractGraph3D
-  \inqmlmodule QtDataVisualization
-  \since QtDataVisualization 1.0
-  \ingroup datavisualization_qml
+  \inqmlmodule QtGraphs
+  \ingroup graphs_qml
   \brief Base type for 3D visualizations.
 
-  The base type for all 3D visualizations in QtDataVisualization.
+  The base type for all 3D visualizations in QtGraphs.
 
   This type is uncreatable, but it contains properties that are shared between
   the 3D visualizations.
 
-  \sa Bars3D, Scatter3D, Surface3D, {Qt Data Visualization C++ Classes}
+  \sa Bars3D, Scatter3D, Surface3D, {Qt Graphs C++ Classes}
  */
 
 /*!
@@ -69,7 +68,7 @@
   rendered on top of it. Using non-transparent QML item as a background will hide the graph.
   Clears the whole window before rendering the graph, including the areas
   outside the graph. If the surface format of the window supports antialiasing, it will be used (see
-  \c {QtDataVisualization::qDefaultSurfaceFormat()}).
+  \c {QtGraphs::qDefaultSurfaceFormat()}).
   This rendering mode offers the best performance at the expense of non-standard QML behavior. For example,
   the graphs do not obey the z ordering of QML items and the opacity value has no effect on them.
 
@@ -107,7 +106,6 @@
 
 /*!
  * \qmlproperty bool AbstractGraph3D::measureFps
- * \since QtDataVisualization 1.1
  *
  * If \c {true}, the rendering is done continuously instead of on demand, and
  * the value of the currentFps property is updated. Defaults to \c{false}.
@@ -117,7 +115,6 @@
 
 /*!
  * \qmlproperty int AbstractGraph3D::currentFps
- * \since QtDataVisualization 1.1
  *
  * When FPS measuring is enabled, the results for the last second are stored in this read-only
  * property. It takes at least a second before this value updates after measuring is activated.
@@ -127,7 +124,6 @@
 
 /*!
  * \qmlproperty list<Custom3DItem> AbstractGraph3D::customItemList
- * \since QtDataVisualization 1.1
  *
  * The list of \l{Custom3DItem} items added to the graph. The graph takes ownership
  * of the added items.
@@ -135,7 +131,6 @@
 
 /*!
  * \qmlproperty bool AbstractGraph3D::polar
- * \since QtDataVisualization 1.2
  *
  * If \c {true}, the horizontal axes are changed into polar axes. The x-axis
  * becomes the angular axis and the z-axis becomes the radial axis.
@@ -148,7 +143,6 @@
 
 /*!
  * \qmlproperty real AbstractGraph3D::radialLabelOffset
- * \since QtDataVisualization 1.2
  *
  * This property specifies the normalized horizontal offset for the axis labels of the radial
  * polar axis. The value \c 0.0 indicates that the labels should be drawn next
@@ -181,7 +175,6 @@
  *
  * \sa removeCustomItems(), removeCustomItem(), removeCustomItemAt()
  *
- * \since QtDataVisualization 1.1
  */
 
 /*!
@@ -189,7 +182,6 @@
  *
  * Removes all custom items. Deletes the resources allocated to them.
  *
- * \since QtDataVisualization 1.1
  */
 
 /*!
@@ -197,7 +189,6 @@
  *
  * Removes the custom \a {item}. Deletes the resources allocated to it.
  *
- * \since QtDataVisualization 1.1
  */
 
 /*!
@@ -205,15 +196,12 @@
  *
  * Removes all custom items at \a {position}. Deletes the resources allocated to them.
  *
- * \since QtDataVisualization 1.1
  */
 
 /*!
  * \qmlmethod void AbstractGraph3D::releaseCustomItem(Custom3DItem item)
  *
  * Gets ownership of \a item back and removes the \a item from the graph.
- *
- * \since QtDataVisualization 1.1
  *
  * \note If the same item is added back to the graph, the texture file needs to be re-set.
  *
@@ -228,8 +216,6 @@
  *
  * \return index of the selected label, or -1.
  *
- * \since QtDataVisualization 1.1
- *
  * \sa selectedElement
  */
 
@@ -240,8 +226,6 @@
  * type. Selection is valid until the next \c selectedElementChanged signal.
  *
  * \return the selected axis, or null.
- *
- * \since QtDataVisualization 1.1
  *
  * \sa selectedElement
  */
@@ -255,8 +239,6 @@
  *
  * \return index of the selected custom item, or -1.
  *
- * \since QtDataVisualization 1.1
- *
  * \sa selectedElement
  */
 
@@ -268,8 +250,6 @@
  * with the graph. Selection is valid until the next \c selectedElementChanged signal.
  *
  * \return the selected custom item, or null.
- *
- * \since QtDataVisualization 1.1
  *
  * \sa selectedElement
  */
@@ -290,12 +270,10 @@
  * Bars3D::selectedSeries, Scatter3D::selectedSeries, Scene3D::selectionQueryPosition,
  * QAbstract3DGraph::ElementType
  *
- * \since QtDataVisualization 1.1
  */
 
 /*!
  * \qmlproperty bool AbstractGraph3D::orthoProjection
- * \since QtDataVisualization 1.1
  *
  * If \c {true}, orthographic projection will be used for displaying the graph. Defaults to \c{false}.
  * \note Shadows will be disabled when set to \c{true}.
@@ -303,7 +281,6 @@
 
 /*!
  * \qmlproperty real AbstractGraph3D::aspectRatio
- * \since QtDataVisualization 1.1
  *
  * The ratio of the graph scaling between the longest axis on the horizontal
  * plane and the y-axis. Defaults to \c{2.0}.
@@ -315,7 +292,6 @@
 
 /*!
  * \qmlproperty real AbstractGraph3D::horizontalAspectRatio
- * \since QtDataVisualization 1.2
  *
  * The ratio of the graph scaling between the x-axis and z-axis.
  * The value of \c 0.0 indicates automatic scaling according to axis ranges.
@@ -330,7 +306,6 @@
 
 /*!
  * \qmlproperty AbstractGraph3D.OptimizationHints AbstractGraph3D::optimizationHints
- * \since QtDataVisualization 1.1
  *
  * Whether the default or static mode is used for rendering optimization.
  *
@@ -353,7 +328,6 @@
 
 /*!
  * \qmlproperty bool AbstractGraph3D::reflection
- * \since QtDataVisualization 1.2
  *
  * Sets floor reflections on or off. Defaults to \c{false}.
  *
@@ -367,7 +341,6 @@
 
 /*!
  * \qmlproperty real AbstractGraph3D::reflectivity
- * \since QtDataVisualization 1.2
  *
  * Sets floor reflectivity. Larger numbers make the floor more reflective. The
  * valid range is \c{[0...1]}.
@@ -380,7 +353,6 @@
 
 /*!
  * \qmlproperty locale AbstractGraph3D::locale
- * \since QtDataVisualization 1.2
  *
  * Sets the locale used for formatting various numeric labels.
  * Defaults to the \c{"C"} locale.
@@ -390,7 +362,6 @@
 
 /*!
  * \qmlproperty vector3d AbstractGraph3D::queriedGraphPosition
- * \since QtDataVisualization 1.2
  *
  * This read-only property contains the latest graph position values along each axis queried using
  * Scene3D::graphPositionQuery. The values are normalized to range \c{[-1, 1]}.
@@ -411,7 +382,6 @@
 
 /*!
  * \qmlproperty real AbstractGraph3D::margin
- * \since QtDataVisualization 1.2
  *
  * The absolute value used for the space left between the edge of the
  * plottable graph area and the edge of the graph background.

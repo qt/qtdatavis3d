@@ -1,16 +1,16 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef Q3DCAMERA_H
 #define Q3DCAMERA_H
 
-#include <QtDataVisualization/q3dobject.h>
+#include <QtGraphs/q3dobject.h>
 
 QT_BEGIN_NAMESPACE
 
 class Q3DCameraPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
+class Q_GRAPHS_EXPORT Q3DCamera : public Q3DObject
 {
     Q_OBJECT
     Q_ENUMS(CameraPreset)
@@ -20,9 +20,9 @@ class Q_DATAVISUALIZATION_EXPORT Q3DCamera : public Q3DObject
     Q_PROPERTY(CameraPreset cameraPreset READ cameraPreset WRITE setCameraPreset NOTIFY cameraPresetChanged)
     Q_PROPERTY(bool wrapXRotation READ wrapXRotation WRITE setWrapXRotation NOTIFY wrapXRotationChanged)
     Q_PROPERTY(bool wrapYRotation READ wrapYRotation WRITE setWrapYRotation NOTIFY wrapYRotationChanged)
-    Q_PROPERTY(QVector3D target READ target WRITE setTarget NOTIFY targetChanged REVISION(1, 2))
-    Q_PROPERTY(float minZoomLevel READ minZoomLevel WRITE setMinZoomLevel NOTIFY minZoomLevelChanged REVISION(1, 2))
-    Q_PROPERTY(float maxZoomLevel READ maxZoomLevel WRITE setMaxZoomLevel NOTIFY maxZoomLevelChanged REVISION(1, 2))
+    Q_PROPERTY(QVector3D target READ target WRITE setTarget NOTIFY targetChanged)
+    Q_PROPERTY(float minZoomLevel READ minZoomLevel WRITE setMinZoomLevel NOTIFY minZoomLevelChanged)
+    Q_PROPERTY(float maxZoomLevel READ maxZoomLevel WRITE setMaxZoomLevel NOTIFY maxZoomLevelChanged)
 
 public:
     enum CameraPreset {
@@ -91,9 +91,9 @@ Q_SIGNALS:
     void cameraPresetChanged(Q3DCamera::CameraPreset preset);
     void wrapXRotationChanged(bool isEnabled);
     void wrapYRotationChanged(bool isEnabled);
-    Q_REVISION(1, 2) void targetChanged(const QVector3D &target);
-    Q_REVISION(1, 2) void minZoomLevelChanged(float zoomLevel);
-    Q_REVISION(1, 2) void maxZoomLevelChanged(float zoomLevel);
+    void targetChanged(const QVector3D &target);
+    void minZoomLevelChanged(float zoomLevel);
+    void maxZoomLevelChanged(float zoomLevel);
 
 private:
     QScopedPointer<Q3DCameraPrivate> d_ptr;

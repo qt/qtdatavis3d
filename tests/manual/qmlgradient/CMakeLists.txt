@@ -8,7 +8,7 @@ qt_internal_add_manual_test(qmlgradient
     )
 target_link_libraries(qmlgradient PUBLIC
     Qt::Gui
-    Qt::DataVisualization
+    Qt::Graphs
     )
 
 set(qmlgradient_resource_files

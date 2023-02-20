@@ -8,5 +8,5 @@ qt_internal_add_manual_test(MinimalSurface
     )
 target_link_libraries(MinimalSurface PUBLIC
     Qt::Gui
-    Qt::DataVisualization
+    Qt::Graphs
     )

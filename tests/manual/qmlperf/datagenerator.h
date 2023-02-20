@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef DATAGENERATOR_H
 #define DATAGENERATOR_H
 
-#include <QtDataVisualization/QScatter3DSeries>
+#include <QtGraphs/QScatter3DSeries>
 #include <QtCore/QFile>
 
 class DataGenerator  : public QObject

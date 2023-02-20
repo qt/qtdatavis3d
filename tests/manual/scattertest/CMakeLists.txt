@@ -12,5 +12,5 @@ qt_internal_add_manual_test(scattertest
 target_link_libraries(scattertest PUBLIC
     Qt::Gui
     Qt::Widgets
-    Qt::DataVisualization
+    Qt::Graphs
     )

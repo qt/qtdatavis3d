@@ -1,16 +1,16 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef QLOGVALUE3DAXISFORMATTER_H
 #define QLOGVALUE3DAXISFORMATTER_H
 
-#include <QtDataVisualization/qvalue3daxisformatter.h>
+#include <QtGraphs/qvalue3daxisformatter.h>
 
 QT_BEGIN_NAMESPACE
 
 class QLogValue3DAxisFormatterPrivate;
 
-class Q_DATAVISUALIZATION_EXPORT QLogValue3DAxisFormatter : public QValue3DAxisFormatter
+class Q_GRAPHS_EXPORT QLogValue3DAxisFormatter : public QValue3DAxisFormatter
 {
     Q_OBJECT
 

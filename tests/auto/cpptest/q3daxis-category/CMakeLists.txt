@@ -6,5 +6,5 @@ qt_internal_add_test(q3daxis-category
         tst_axis.cpp
     LIBRARIES
         Qt::Gui
-        Qt::DataVisualization
+        Qt::Graphs
 )

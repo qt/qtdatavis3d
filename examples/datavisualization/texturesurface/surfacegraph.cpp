@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "surfacegraph.h"
 #include "topographicseries.h"
 
-#include <QtDataVisualization/QValue3DAxis>
-#include <QtDataVisualization/Q3DTheme>
+#include <QtGraphs/QValue3DAxis>
+#include <QtGraphs/Q3DTheme>
 
 const float areaWidth = 8000.0f;
 const float areaHeight = 8000.0f;

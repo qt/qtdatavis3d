@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qscatterdataitem_p.h"
@@ -7,16 +7,15 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QScatterDataItem
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QScatterDataItem class provides a container for resolved data to be added to scatter
  * graphs.
- * \since QtDataVisualization 1.0
  *
  * A scatter data item holds the data for a single rendered item in a scatter
  * graph. Scatter data proxies parse data into QScatterDataItem instances for
  * visualization.
  *
- * \sa QScatterDataProxy, {Qt Data Visualization C++ Classes}
+ * \sa QScatterDataProxy, {Qt Graphs C++ Classes}
  */
 
 /*!

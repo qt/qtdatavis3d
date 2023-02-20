@@ -1,14 +1,14 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "scatterdatamodifier.h"
 
-#include <QtDataVisualization/QScatterDataProxy>
-#include <QtDataVisualization/QValue3DAxis>
-#include <QtDataVisualization/Q3DScene>
-#include <QtDataVisualization/Q3DCamera>
-#include <QtDataVisualization/QScatter3DSeries>
-#include <QtDataVisualization/Q3DTheme>
+#include <QtGraphs/QScatterDataProxy>
+#include <QtGraphs/QValue3DAxis>
+#include <QtGraphs/Q3DScene>
+#include <QtGraphs/Q3DCamera>
+#include <QtGraphs/QScatter3DSeries>
+#include <QtGraphs/Q3DTheme>
 #include <QtCore/qmath.h>
 #include <QtCore/QFile>
 #include <QtCore/QTextStream>

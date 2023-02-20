@@ -20,7 +20,7 @@ find_package(Qt6 COMPONENTS Core)
 find_package(Qt6 COMPONENTS Gui)
 find_package(Qt6 COMPONENTS Qml)
 find_package(Qt6 COMPONENTS Quick)
-find_package(Qt6 COMPONENTS DataVisualization)
+find_package(Qt6 COMPONENTS Graphs)
 
 qt_add_executable(qmlbars
     main.cpp
@@ -38,7 +38,7 @@ target_link_libraries(qmlbars PUBLIC
     Qt::Gui
     Qt::Qml
     Qt::Quick
-    Qt::DataVisualization
+    Qt::Graphs
 )
 
 set(qmlbars_resource_files

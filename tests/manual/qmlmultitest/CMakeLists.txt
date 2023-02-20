@@ -8,7 +8,7 @@ qt_internal_add_manual_test(qmlmultitest
     )
 target_link_libraries(qmlmultitest PUBLIC
     Qt::Gui
-    Qt::DataVisualization
+    Qt::Graphs
     )
 
 set(qmlmultitest_resource_files

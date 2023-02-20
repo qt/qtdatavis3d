@@ -1,4 +1,4 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qitemmodelscatterdataproxy_p.h"
@@ -8,9 +8,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QItemModelScatterDataProxy
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief Proxy class for presenting data in item models with Q3DScatter.
- * \since QtDataVisualization 1.0
  *
  * QItemModelScatterDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DScatter. It maps roles of QAbstractItemModel to the XYZ-values of Q3DScatter points.
@@ -28,7 +27,7 @@ QT_BEGIN_NAMESPACE
  * done on material samples, providing data for roles such as "density", "hardness", and
  * "conductivity". You could visualize these properties on a scatter graph using this proxy:
  *
- * \snippet doc_src_qtdatavisualization.cpp 4
+ * \snippet doc_src_qtgraphs.cpp 4
  *
  * If the fields of the model do not contain the data in the exact format you need, you can specify
  * a search pattern regular expression and a replace rule for each role to get the value in a
@@ -40,14 +39,13 @@ QT_BEGIN_NAMESPACE
  * For example about using the search patterns in conjunction with the roles, see
  * ItemModelBarDataProxy usage in \l{Qt Quick 2 Bars Example}.
  *
- * \sa {Qt Data Visualization Data Handling}
+ * \sa {Qt Graphs Data Handling}
  */
 
 /*!
  * \qmltype ItemModelScatterDataProxy
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.0
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QItemModelScatterDataProxy
  * \inherits ScatterDataProxy
  * \brief Proxy class for presenting data in item models with Scatter3D.
@@ -61,9 +59,9 @@ QT_BEGIN_NAMESPACE
  *
  * Usage example:
  *
- * \snippet doc_src_qmldatavisualization.cpp 8
+ * \snippet doc_src_qmlgraphs.cpp 8
  *
- * \sa ScatterDataProxy, {Qt Data Visualization Data Handling}
+ * \sa ScatterDataProxy, {Qt Graphs Data Handling}
  */
 
 /*!

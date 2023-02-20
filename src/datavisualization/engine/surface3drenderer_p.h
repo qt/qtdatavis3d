@@ -1,11 +1,11 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the QtDataVisualization API.  It exists purely as an
+// This file is not part of the QtGraphs API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -14,7 +14,7 @@
 #ifndef SURFACE3DRENDERER_P_H
 #define SURFACE3DRENDERER_P_H
 
-#include "datavisualizationglobal_p.h"
+#include "graphsglobal_p.h"
 #include "surface3dcontroller_p.h"
 #include "abstract3drenderer_p.h"
 #include "surfaceseriesrendercache_p.h"
@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE
 class ShaderHelper;
 class Q3DScene;
 
-class Q_DATAVISUALIZATION_EXPORT Surface3DRenderer : public Abstract3DRenderer
+class Q_GRAPHS_EXPORT Surface3DRenderer : public Abstract3DRenderer
 {
     Q_OBJECT
 

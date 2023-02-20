@@ -1,4 +1,4 @@
-// Copyright (C) 2017 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qvalue3daxisformatter_p.h"
@@ -8,10 +8,9 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \class QValue3DAxisFormatter
- * \inmodule QtDataVisualization
+ * \inmodule QtGraphs
  * \brief The QValue3DAxisFormatter class is a base class for value axis
  * formatters.
- * \since QtDataVisualization 1.1
  *
  * This class provides formatting rules for a linear value 3D axis. Subclass it if you
  * want to implement custom value axes.
@@ -24,9 +23,8 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * \qmltype ValueAxis3DFormatter
- * \inqmlmodule QtDataVisualization
- * \since QtDataVisualization 1.1
- * \ingroup datavisualization_qml
+ * \inqmlmodule QtGraphs
+ * \ingroup graphs_qml
  * \instantiates QValue3DAxisFormatter
  * \brief A base type for value axis formatters.
  *

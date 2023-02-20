@@ -1,10 +1,10 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include <QtTest/QtTest>
 
-#include <QtDataVisualization/QItemModelScatterDataProxy>
-#include <QtDataVisualization/Q3DScatter>
+#include <QtGraphs/QItemModelScatterDataProxy>
+#include <QtGraphs/Q3DScatter>
 #include <QtWidgets/QTableWidget>
 
 class tst_proxy: public QObject

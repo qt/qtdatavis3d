@@ -1,11 +1,11 @@
-// Copyright (C) 2021 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 //
 //  W A R N I N G
 //  -------------
 //
-// This file is not part of the QtDataVisualization API.  It exists purely as an
+// This file is not part of the QtGraphs API.  It exists purely as an
 // implementation detail.  This header file may change from version to
 // version without notice, or even be removed.
 //
@@ -18,34 +18,34 @@
 
 #include <QtCore/qabstractitemmodel.h>
 
-#include <QtDataVisualization/q3dcamera.h>
-#include <QtDataVisualization/q3dinputhandler.h>
-#include <QtDataVisualization/q3dlight.h>
-#include <QtDataVisualization/q3dobject.h>
-#include <QtDataVisualization/q3dscene.h>
-#include <QtDataVisualization/q3dtheme.h>
-#include <QtDataVisualization/qabstract3daxis.h>
-#include <QtDataVisualization/qabstract3dinputhandler.h>
-#include <QtDataVisualization/qabstract3dseries.h>
-#include <QtDataVisualization/qabstractdataproxy.h>
-#include <QtDataVisualization/qbar3dseries.h>
-#include <QtDataVisualization/qbardataproxy.h>
-#include <QtDataVisualization/qcategory3daxis.h>
-#include <QtDataVisualization/qcustom3ditem.h>
-#include <QtDataVisualization/qcustom3dlabel.h>
-#include <QtDataVisualization/qcustom3dvolume.h>
-#include <QtDataVisualization/qheightmapsurfacedataproxy.h>
-#include <QtDataVisualization/qitemmodelbardataproxy.h>
-#include <QtDataVisualization/qitemmodelscatterdataproxy.h>
-#include <QtDataVisualization/qitemmodelsurfacedataproxy.h>
-#include <QtDataVisualization/qlogvalue3daxisformatter.h>
-#include <QtDataVisualization/qscatter3dseries.h>
-#include <QtDataVisualization/qscatterdataproxy.h>
-#include <QtDataVisualization/qsurface3dseries.h>
-#include <QtDataVisualization/qsurfacedataproxy.h>
-#include <QtDataVisualization/qtouch3dinputhandler.h>
-#include <QtDataVisualization/qvalue3daxis.h>
-#include <QtDataVisualization/qvalue3daxisformatter.h>
+#include <QtGraphs/q3dcamera.h>
+#include <QtGraphs/q3dinputhandler.h>
+#include <QtGraphs/q3dlight.h>
+#include <QtGraphs/q3dobject.h>
+#include <QtGraphs/q3dscene.h>
+#include <QtGraphs/q3dtheme.h>
+#include <QtGraphs/qabstract3daxis.h>
+#include <QtGraphs/qabstract3dinputhandler.h>
+#include <QtGraphs/qabstract3dseries.h>
+#include <QtGraphs/qabstractdataproxy.h>
+#include <QtGraphs/qbar3dseries.h>
+#include <QtGraphs/qbardataproxy.h>
+#include <QtGraphs/qcategory3daxis.h>
+#include <QtGraphs/qcustom3ditem.h>
+#include <QtGraphs/qcustom3dlabel.h>
+#include <QtGraphs/qcustom3dvolume.h>
+#include <QtGraphs/qheightmapsurfacedataproxy.h>
+#include <QtGraphs/qitemmodelbardataproxy.h>
+#include <QtGraphs/qitemmodelscatterdataproxy.h>
+#include <QtGraphs/qitemmodelsurfacedataproxy.h>
+#include <QtGraphs/qlogvalue3daxisformatter.h>
+#include <QtGraphs/qscatter3dseries.h>
+#include <QtGraphs/qscatterdataproxy.h>
+#include <QtGraphs/qsurface3dseries.h>
+#include <QtGraphs/qsurfacedataproxy.h>
+#include <QtGraphs/qtouch3dinputhandler.h>
+#include <QtGraphs/qvalue3daxis.h>
+#include <QtGraphs/qvalue3daxisformatter.h>
 #include <QtCore/private/qglobal_p.h>
 
 QT_BEGIN_NAMESPACE
@@ -80,7 +80,7 @@ struct Q3DSceneForeign
 {
     Q_GADGET
     QML_ANONYMOUS
-    QML_ADDED_IN_VERSION(1, 0)
+    QML_ADDED_IN_VERSION(6, 6)
     QML_FOREIGN(Q3DScene)
 };
 

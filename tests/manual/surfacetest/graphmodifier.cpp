@@ -1,12 +1,12 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "graphmodifier.h"
-#include <QtDataVisualization/QValue3DAxis>
-#include <QtDataVisualization/QSurfaceDataProxy>
-#include <QtDataVisualization/QSurface3DSeries>
-#include <QtDataVisualization/Q3DTheme>
-#include <QtDataVisualization/Q3DInputHandler>
+#include <QtGraphs/QValue3DAxis>
+#include <QtGraphs/QSurfaceDataProxy>
+#include <QtGraphs/QSurface3DSeries>
+#include <QtGraphs/Q3DTheme>
+#include <QtGraphs/Q3DInputHandler>
 
 #include <qmath.h>
 #include <qrandom.h>

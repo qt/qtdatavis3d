@@ -1,27 +1,27 @@
-// Copyright (C) 2016 The Qt Company Ltd.
+// Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #ifndef Q3DBARS_H
 #define Q3DBARS_H
 
-#include <QtDataVisualization/qabstract3dgraph.h>
-#include <QtDataVisualization/qvalue3daxis.h>
-#include <QtDataVisualization/qcategory3daxis.h>
-#include <QtDataVisualization/qbar3dseries.h>
+#include <QtGraphs/qabstract3dgraph.h>
+#include <QtGraphs/qvalue3daxis.h>
+#include <QtGraphs/qcategory3daxis.h>
+#include <QtGraphs/qbar3dseries.h>
 
 QT_BEGIN_NAMESPACE
 
 class Q3DBarsPrivate;
 class QQuickDataVisBars;
 
-class Q_DATAVISUALIZATION_EXPORT Q3DBars : public QAbstract3DGraph
+class Q_GRAPHS_EXPORT Q3DBars : public QAbstract3DGraph
 {
     Q_OBJECT
     Q_PROPERTY(bool multiSeriesUniform READ isMultiSeriesUniform WRITE setMultiSeriesUniform NOTIFY multiSeriesUniformChanged)
     Q_PROPERTY(float barThickness READ barThickness WRITE setBarThickness NOTIFY barThicknessChanged)
     Q_PROPERTY(QSizeF barSpacing READ barSpacing WRITE setBarSpacing NOTIFY barSpacingChanged)
     Q_PROPERTY(bool barSpacingRelative READ isBarSpacingRelative WRITE setBarSpacingRelative NOTIFY barSpacingRelativeChanged)
-    Q_PROPERTY(QSizeF barSeriesMargin READ barSeriesMargin WRITE setBarSeriesMargin NOTIFY barSeriesMarginChanged REVISION(6, 3))
+    Q_PROPERTY(QSizeF barSeriesMargin READ barSeriesMargin WRITE setBarSeriesMargin NOTIFY barSeriesMarginChanged)
     Q_PROPERTY(QCategory3DAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
     Q_PROPERTY(QCategory3DAxis *columnAxis READ columnAxis WRITE setColumnAxis NOTIFY columnAxisChanged)
     Q_PROPERTY(QValue3DAxis *valueAxis READ valueAxis WRITE setValueAxis NOTIFY valueAxisChanged)
@@ -74,7 +74,7 @@ Q_SIGNALS:
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(const QSizeF &spacing);
     void barSpacingRelativeChanged(bool relative);
-    Q_REVISION(6, 3) void barSeriesMarginChanged(const QSizeF &margin);
+    void barSeriesMarginChanged(const QSizeF &margin);
     void rowAxisChanged(QCategory3DAxis *axis);
     void columnAxisChanged(QCategory3DAxis *axis);
     void valueAxisChanged(QValue3DAxis *axis);
@@ -88,7 +88,7 @@ private:
     Q_DISABLE_COPY(Q3DBars)
 };
 
-class Q_DATAVISUALIZATION_EXPORT Q3DBarsNG : public QAbstract3DGraphNG
+class Q_GRAPHS_EXPORT Q3DBarsNG : public QAbstract3DGraphNG
 {
     Q_OBJECT
     Q_PROPERTY(bool multiSeriesUniform READ isMultiSeriesUniform WRITE setMultiSeriesUniform NOTIFY multiSeriesUniformChanged)
@@ -152,7 +152,7 @@ Q_SIGNALS:
     void barThicknessChanged(float thicknessRatio);
     void barSpacingChanged(const QSizeF &spacing);
     void barSpacingRelativeChanged(bool relative);
-    Q_REVISION(6, 3) void barSeriesMarginChanged(const QSizeF &margin);
+    void barSeriesMarginChanged(const QSizeF &margin);
     void rowAxisChanged(QCategory3DAxis *axis);
     void columnAxisChanged(QCategory3DAxis *axis);
     void valueAxisChanged(QValue3DAxis *axis);
