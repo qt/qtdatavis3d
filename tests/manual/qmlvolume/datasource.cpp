@@ -24,7 +24,7 @@ void DataSource::fillVolume(QCustom3DVolume *volumeItem)
     // This can take a while if the dimensions are large, so we support incremental data generation.
 
     int index = 0;
-    int textureSize = 256;
+    int textureSize = 1024;
     QVector3D midPoint(float(textureSize) / 2.0f,
                        float(textureSize) / 2.0f,
                        float(textureSize) / 2.0f);

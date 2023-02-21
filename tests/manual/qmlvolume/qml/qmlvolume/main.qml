@@ -34,7 +34,7 @@ Item {
                 itemLabelVisible: false
 
                 onItemLabelChanged: {
-                    if (surfaceSeries.selectedPoint === surfaceSeries.invalidSelectionPosition)
+                    if (surfaceSeries.selectedPoint == surfaceSeries.invalidSelectionPosition)
                         selectionText.text = "No selection"
                     else
                         selectionText.text = surfaceSeries.itemLabel
@@ -101,7 +101,7 @@ Item {
                     text: "Slice"
 
                     onClicked: {
-                        if (volumeItem.sliceIndexZ == -1) {
+                        if (volumeItem.sliceIndexZ === -1) {
                             volumeItem.sliceIndexZ = 128
                             volumeItem.drawSlices = true
                             volumeItem.drawSliceFrames = true
@@ -123,7 +123,27 @@ Item {
                 }
             }
         }
+    }
 
+    SequentialAnimation {
+        running: volumeItem.drawSlices
+        loops: Animation.Infinite
+
+        PropertyAnimation {
+            target: volumeItem
+            property: "sliceIndexZ"
+            from: 0
+            to: 1024
+            duration: 5000
+        }
+
+        PropertyAnimation {
+            target: volumeItem
+            property: "sliceIndexZ"
+            from: 1024
+            to: 0
+            duration: 5000
+        }
     }
 
     Custom3DVolume {
