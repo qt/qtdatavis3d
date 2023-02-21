@@ -9,12 +9,6 @@ qt_internal_add_manual_test(qmlbarsrowcolors
         main.cpp
     )
 
-find_package(Qt6 COMPONENTS Core)
-find_package(Qt6 COMPONENTS Gui)
-find_package(Qt6 COMPONENTS Qml)
-find_package(Qt6 COMPONENTS Quick)
-find_package(Qt6 COMPONENTS DataVisualization)
-
 set_target_properties(qmlbarsrowcolors PROPERTIES
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
