@@ -319,6 +319,7 @@ void GraphModifier::releaseSeries()
 
 void GraphModifier::flipViews(bool checked)
 {
+    Q_UNUSED(checked)
     m_graph->scene()->setSecondarySubviewOnTop(!m_graph->scene()->isSecondarySubviewOnTop());
     qDebug() << "secondary subview on top:" << m_graph->scene()->isSecondarySubviewOnTop();
     qDebug() << "point (50, 50) in primary subview:" << m_graph->scene()->isPointInPrimarySubView(QPoint(50, 50));
@@ -804,6 +805,7 @@ QBarDataArray *GraphModifier::makeDummyData()
 // Executes one step of the primary series test
 void GraphModifier::primarySeriesTest(bool checked)
 {
+    Q_UNUSED(checked)
     static int nextStep = 0;
 
     QStringList testLabels;
@@ -1026,6 +1028,7 @@ void GraphModifier::insertRemoveTestToggle()
 
 void GraphModifier::toggleRotation(bool checked)
 {
+    Q_UNUSED(checked)
     if (m_rotationTimer.isActive())
         m_rotationTimer.stop();
     else
@@ -1034,6 +1037,7 @@ void GraphModifier::toggleRotation(bool checked)
 
 void GraphModifier::useLogAxis(bool checked)
 {
+    Q_UNUSED(checked)
     static int counter = -1;
     static QLogValue3DAxisFormatter *logFormatter = 0;
     static float minRange = 1.0f;
@@ -1190,6 +1194,7 @@ void GraphModifier::addRemoveSeries()
 
 void GraphModifier::testItemAndRowChanges(bool checked)
 {
+    Q_UNUSED(checked)
     static int counter = 0;
     const int rowCount = 12;
     const int colCount = 10;
@@ -1649,6 +1654,7 @@ void GraphModifier::setMaxY(int max)
 
 void GraphModifier::changeColorStyle(bool checked)
 {
+    Q_UNUSED(checked)
     int style = m_graph->activeTheme()->colorStyle();
 
     if (++style > Q3DTheme::ColorStyleRangeGradient)
@@ -1659,6 +1665,7 @@ void GraphModifier::changeColorStyle(bool checked)
 
 void GraphModifier::useOwnTheme(bool checked)
 {
+    Q_UNUSED(checked)
     // Own theme is persistent, any changes to it via UI will be remembered
     if (!m_ownTheme) {
         m_ownTheme = new Q3DTheme();
@@ -1698,6 +1705,7 @@ void GraphModifier::changeBaseColor(const QColor &color)
 
 void GraphModifier::setGradient(bool checked)
 {
+    Q_UNUSED(checked)
     QLinearGradient barGradient(0, 0, 1, 100);
     barGradient.setColorAt(1.0, Qt::lightGray);
     barGradient.setColorAt(0.75001, Qt::lightGray);

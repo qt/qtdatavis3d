@@ -5,19 +5,19 @@
   \qmltype AbstractGraph3D
   \inqmlmodule QtGraphs
   \ingroup graphs_qml
-  \brief Base type for 3D visualizations.
+  \brief Base type for 3D graphs.
 
-  The base type for all 3D visualizations in QtGraphs.
+  The base type for all 3D graphs in QtGraphs.
 
   This type is uncreatable, but it contains properties that are shared between
-  the 3D visualizations.
+  the 3D graphs types.
 
   \sa Bars3D, Scatter3D, Surface3D, {Qt Graphs C++ Classes}
  */
 
 /*!
   \qmlproperty AbstractGraph3D.SelectionMode AbstractGraph3D::selectionMode
-  The active selection mode in the visualization.
+  The active selection mode in the graph.
   One of the QAbstract3DGraph::SelectionFlag enum values.
 
   \sa QAbstract3DGraph::SelectionFlag

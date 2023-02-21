@@ -229,18 +229,18 @@ void Data::setData(const QImage &image)
 
 void Data::changeMode(int mode)
 {
-    m_mode = VisualizationMode(mode);
+    m_mode = GraphsMode(mode);
     switch (m_mode) {
     case Surface: {
-        m_statusArea->append(QStringLiteral("<b>Visualization Type:</b> Surface"));
+        m_statusArea->append(QStringLiteral("<b>Graphs Type:</b> Surface"));
         break;
     }
     case Scatter: {
-        m_statusArea->append(QStringLiteral("<b>Visualization Type:</b> Scatter"));
+        m_statusArea->append(QStringLiteral("<b>Graphs Type:</b> Scatter"));
         break;
     }
     default: {
-        m_statusArea->append(QStringLiteral("<b>Visualization Type:</b> Bars"));
+        m_statusArea->append(QStringLiteral("<b>Graphs Type:</b> Bars"));
         break;
     }
     }

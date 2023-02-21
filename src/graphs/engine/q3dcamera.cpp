@@ -14,8 +14,8 @@ QT_BEGIN_NAMESPACE
  * \brief Representation of a camera in 3D space.
  *
  * Q3DCamera represents a basic orbit around centerpoint 3D camera that is used when rendering the
- * data visualization. The class offers simple methods for rotating the camera around the origin
- * and setting zoom level.
+ * graphs. The class offers simple methods for rotating the camera around the origin
+ * and setting the zoom level.
  */
 
 /*!
@@ -62,8 +62,8 @@ QT_BEGIN_NAMESPACE
  * \brief Representation of a camera in 3D space.
  *
  * Camera3D represents a basic orbit around centerpoint 3D camera that is used when rendering the
- * data visualization. The type offers simple methods for rotating the camera around the origin
- * and setting zoom level.
+ * graphs. The type offers simple methods for rotating the camera around the origin
+ * and setting the zoom level.
  *
  * For Camera3D enums, see \l{Q3DCamera::CameraPreset}.
  */
@@ -773,7 +773,7 @@ void Q3DCameraPrivate::setMaxYRotation(float maxRotation)
 }
 
 // Recalculates the view matrix based on the currently set base orientation, rotation and zoom level values.
-//  zoomAdjustment is adjustment to ensure that the 3D visualization stays inside the view area in the 100% zoom.
+// zoomAdjustment is adjustment to ensure that the 3D visualization stays inside the view area in the 100% zoom.
 void Q3DCameraPrivate::updateViewMatrix(float zoomAdjustment)
 {
     if (!m_isViewMatrixUpdateActive)
@@ -864,10 +864,9 @@ void Q3DCameraPrivate::setBaseOrientation(const QVector3D &basePosition,
  * Calculates and returns a position relative to the camera using the given parameters
  * and the current camera viewMatrix property.
  * The relative 3D offset to the current camera position is defined in \a relativePosition.
- * An optional fixed rotation of the calculated point around the data visualization area can be
+ * An optional fixed rotation of the calculated point around the graph area can be
  * given in \a fixedRotation. The rotation is given in degrees.
- * An optional \a distanceModifier modifies the distance of the calculated point from the data
- * visualization.
+ * An optional \a distanceModifier modifies the distance of the calculated point from the graph.
  * \return calculated position relative to this camera's position.
  */
 QVector3D Q3DCameraPrivate::calculatePositionRelativeToCamera(const QVector3D &relativePosition,

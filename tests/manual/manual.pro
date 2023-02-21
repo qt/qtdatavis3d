@@ -20,5 +20,4 @@ qtHaveModule(quick) {
     SUBDIRS += minimalbars \
                minimalscatter \
                minimalsurface
-
 }

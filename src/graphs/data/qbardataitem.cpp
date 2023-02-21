@@ -11,7 +11,7 @@ QT_BEGIN_NAMESPACE
  * \brief The QBarDataItem class provides a container for resolved data to be added to bar graphs.
  *
  * A bar data item holds the data for a single rendered bar in a graph.
- * Bar data proxies parse data into QBarDataItem instances for visualization.
+ * Bar data proxies parse data into QBarDataItem instances for bar graphs.
  *
  * \sa QBarDataProxy, {Qt Graphs C++ Classes}
  */

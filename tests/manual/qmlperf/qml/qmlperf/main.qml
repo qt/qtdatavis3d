@@ -98,7 +98,7 @@ Item {
         anchors.left: mainview.left
         state: "meshsphere"
 
-        Scatter3D {
+        Scatter3DNG {
             id: scatterPlot
             width: graphView.width
             height: graphView.height

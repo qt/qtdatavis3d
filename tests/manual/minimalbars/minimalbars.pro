@@ -7,4 +7,4 @@ QT += core gui graphs
 TARGET = MinimalBars
 TEMPLATE = app
 
-SOURCES += ../../../src/datavisualization/doc/snippets/doc_src_q3dbars_construction.cpp
+SOURCES += ../../../src/graphs/doc/snippets/doc_src_q3dbars_construction.cpp

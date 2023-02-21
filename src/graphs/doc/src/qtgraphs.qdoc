@@ -47,7 +47,7 @@
 
     A series is a combination of a logically connected set of data items (handled by a data proxy)
     and visual properties that describe how the data items should be rendered, such as item
-    meshes and colors. Each visualization type has its own series type. For example, bar graphs
+    meshes and colors. Each graphs type has its own series type. For example, bar graphs
     use QBar3DSeries. All graphs can have multiple series added simultaneously.
 
     This code snippet shows how to use QBar3DSeries to render bars as cylinders and with a
@@ -59,8 +59,8 @@
 
     The data that users wish to visualize comes in many formats, all of which cannot obviously be
     directly supported. Therefore, Qt Graphs implements data proxies into which
-    user can feed their data in a known format. Each visualization type has a basic proxy type,
-    which takes data in a format suitable for that visualization.
+    user can feed their data in a known format. Each graphs type has a basic proxy type,
+    which takes data in a format suitable for that graph.
     For example, the basic proxy for QBar3DSeries is QBarDataProxy, which stores rows of QBarDataItem
     objects. Each QBarDataItem stores a single bar value. Additional typedefs are provided for
     \c QBarDataArray and \c QBarDataRow containers.
@@ -80,7 +80,7 @@
 
     For common use cases, Qt Graphs offers specialized proxies. One such case is having
     data in an item model (QAbstractItemModel subclass), which is a common way to store data in
-    Qt applications. Each of the visualization types offers a special proxy class for this purpose,
+    Qt applications. Each of the graphs types offers a special proxy class for this purpose,
     for example, QItemModelBarDataProxy for QBar3DSeries.
     These proxies are simple to use: just give them a pointer to the item model containing the
     data and the rules how to map the data into format the basic proxy can digest.
@@ -98,7 +98,7 @@
     by item model proxies. You can also use this mechanism to reformat data even in one-to-one
     mapping cases.
 
-    Depending on the visualization type, proxies may support other functionalities as well,
+    Depending on the grpahs type, proxies may support other functionalities as well,
     such as QItemModelBarDataProxy optionally mapping QAbstractItemModel rows and columns directly
     into bar graph rows and columns.
 
@@ -172,7 +172,7 @@
 
     \section1 Data Selection Modes
 
-    All visualization types support selecting a single data item - a bar, a scatter item, or a surface
+    All graphs types support selecting a single data item - a bar, a scatter item, or a surface
     vertex - using mouse, touch, and programmatically via the series APIs. The selected item is highlighted
     in the rendered graph, and selecting causes emission of a series specific signal for this purpose,
     for example, QBar3DSeries::selectedBarChanged(), which the application can handle.

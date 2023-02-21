@@ -9,10 +9,9 @@ QT_BEGIN_NAMESPACE
 /*!
  * \class QAbstractDataProxy
  * \inmodule QtGraphs
- * \brief The QAbstractDataProxy class is a base class for all data
- * visualization data proxies.
+ * \brief The QAbstractDataProxy class is a base class for all graphs proxies.
  *
- * The following visualization type specific inherited classes are used instead
+ * The following graphs type specific inherited classes are used instead
  * of the base class: QBarDataProxy, QScatterDataProxy, and QSurfaceDataProxy.
  *
  * For more information, see \l{Qt Graphs Data Handling}.

@@ -18,7 +18,7 @@ Item {
         width: parent.width
         height: parent.height - buttonLayout.height
 
-        Surface3D {
+        Surface3DNG {
             id: surfaceGraph
 
             width: dataView.width

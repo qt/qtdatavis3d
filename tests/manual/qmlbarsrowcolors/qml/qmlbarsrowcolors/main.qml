@@ -140,7 +140,7 @@ Item {
         anchors.right: mainview.right;
         anchors.bottom: mainview.bottom
 
-        Bars3D {
+        Bars3DNG {
             id: barGraph
             width: dataView.width
             height: dataView.height

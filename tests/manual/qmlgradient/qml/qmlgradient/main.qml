@@ -72,7 +72,7 @@ Item {
             baseGradients: [secondaryGradient]
         }
 
-        Surface3D {
+        Surface3DNG {
             id: surfaceGraph
             width: surfaceview.width
             height: surfaceview.height

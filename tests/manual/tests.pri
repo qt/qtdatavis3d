@@ -10,5 +10,5 @@ contains(TARGET, qml.*) {
     QT += qml quick
 }
 
-target.path = $$[QT_INSTALL_TESTS]/datavisualization/$$TARGET
+target.path = $$[QT_INSTALL_TESTS]/graphs/$$TARGET
 INSTALLS += target

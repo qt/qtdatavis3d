@@ -91,7 +91,7 @@ Item {
         width: parent.width
         height: parent.height - shadowToggle.height
 
-        Scatter3D {
+        Scatter3DNG {
             id: scatterGraph
             width: dataView.width
             height: dataView.height

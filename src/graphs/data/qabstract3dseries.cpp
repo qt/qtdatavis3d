@@ -59,7 +59,7 @@ QT_BEGIN_NAMESPACE
 /*!
  *  \enum QAbstract3DSeries::Mesh
  *
- *  Predefined mesh types. All styles are not usable with all visualization types.
+ *  Predefined mesh types. All styles are not usable with all graphs types.
  *
  *  \value MeshUserDefined
  *         User defined mesh, set via QAbstract3DSeries::userDefinedMesh property.

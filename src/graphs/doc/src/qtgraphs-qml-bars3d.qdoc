@@ -8,9 +8,9 @@
  * \ingroup graphs_qml
  * \brief 3D bar graph.
  *
- * This type enables developers to render bar graphs in 3D with Qt Quick 2.
+ * This type enables developers to render bar graphs in 3D with Qt Quick.
  *
- * You will need to import data visualization module to use this type:
+ * You will need to import Qt Graphs module to use this type:
  *
  * \snippet doc_src_qmlgraphs.cpp 0
  *

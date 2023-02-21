@@ -1,2 +1,2 @@
 TEMPLATE = subdirs
-SUBDIRS += datavisualization
+SUBDIRS += graphs

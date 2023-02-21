@@ -114,7 +114,7 @@ int main(int argc, char **argv)
     vLayout->addWidget(stopButton);
     vLayout->addWidget(new QLabel(QStringLiteral("Change resolution")));
     vLayout->addWidget(resolutionBox);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change visualization type")));
+    vLayout->addWidget(new QLabel(QStringLiteral("Change graphs type")));
     vLayout->addWidget(modeBox);
     vLayout->addWidget(new QLabel(QStringLiteral("Change color scheme")));
     vLayout->addWidget(gradientOneButton);

@@ -15,14 +15,14 @@ QT_BEGIN_NAMESPACE
  * The 3D scene contains a single active camera and a single active light source.
  * Visualized data is assumed to be at a fixed location.
  *
- * The 3D scene also keeps track of the viewport in which visualization rendering is done,
- * the primary subviewport inside the viewport where the main 3D data visualization view resides
+ * The 3D scene also keeps track of the viewport in which graph rendering is done,
+ * the primary subviewport inside the viewport where the main 3D graphs view resides
  * and the secondary subviewport where the 2D sliced view of the data resides. The subviewports are
  * by default resized by the \a Q3DScene. To override the resize behavior you need to listen to both
  * \l viewportChanged() and \l slicingActiveChanged() signals and recalculate the subviewports accordingly.
  *
  * Also the scene has flag for tracking if the secondary 2D slicing view is currently active or not.
- * \note Not all visualizations support the secondary 2D slicing view.
+ * \note Not all graphs support the secondary 2D slicing view.
  */
 
 /*!
@@ -40,12 +40,12 @@ QT_BEGIN_NAMESPACE
  * The 3D scene contains a single active camera and a single active light source.
  * Visualized data is assumed to be at a fixed location.
  *
- * The 3D scene also keeps track of the viewport in which visualization rendering is done,
- * the primary subviewport inside the viewport where the main 3D data visualization view resides
+ * The 3D scene also keeps track of the viewport in which graph rendering is done,
+ * the primary subviewport inside the viewport where the main 3D graphs view resides
  * and the secondary subviewport where the 2D sliced view of the data resides.
  *
  * Also the scene has flag for tracking if the secondary 2D slicing view is currently active or not.
- * \note Not all visualizations support the secondary 2D slicing view.
+ * \note Not all graphs support the secondary 2D slicing view.
  */
 
 /*!
@@ -58,7 +58,7 @@ QT_BEGIN_NAMESPACE
  * \qmlproperty rect Scene3D::primarySubViewport
  *
  * The current subviewport rectangle inside the viewport where the
- * primary view of the data visualization is targeted.
+ * primary view of the graphs is targeted.
  *
  * If slicingActive is \c false, the primary sub viewport will be equal to the
  * viewport. If slicingActive is \c true and the primary sub viewport has not
@@ -70,7 +70,7 @@ QT_BEGIN_NAMESPACE
  * \qmlproperty rect Scene3D::secondarySubViewport
  *
  * The secondary viewport rectangle inside the viewport. The secondary viewport
- * is used for drawing the 2D slice view in some visualizations. If it has not
+ * is used for drawing the 2D slice view in some graphs. If it has not
  * been explicitly set, it will be null. If slicingActive is \c true, it will
  * be equal to the viewport.
  * \note If the secondary sub viewport is larger than or outside of the
@@ -116,7 +116,7 @@ QT_BEGIN_NAMESPACE
  * \l{QAbstract3DGraph::SelectionRow}{AbstractGraph3D.SelectionRow} or
  * \l{QAbstract3DGraph::SelectionColumn}{AbstractGraph3D.SelectionColumn}
  * set to a valid selection.
- * \note Not all visualizations support the 2D slicing view.
+ * \note Not all graphs support the 2D slicing view.
  */
 
 /*!
@@ -187,7 +187,7 @@ QRect Q3DScene::viewport() const
  * \property Q3DScene::primarySubViewport
  *
  * \brief The current subviewport rectangle inside the viewport where the
- * primary view of the data visualization is targeted.
+ * primary view of the graphs is targeted.
  *
  * If isSlicingActive() is \c false, the primary sub viewport is equal to
  * viewport(). If isSlicingActive() is \c true and the primary sub viewport has
@@ -278,7 +278,7 @@ bool Q3DScene::isPointInSecondarySubView(const QPoint &point)
  * \brief The secondary viewport rectangle inside the viewport.
  *
  * The secondary viewport is used for drawing the 2D slice view in some
- * visualizations. If it has not been explicitly set, it will be equal to
+ * graphs. If it has not been explicitly set, it will be equal to
  * QRect. If isSlicingActive() is \c true, it will be equal to \l viewport.
  * \note If the secondary sub viewport is larger than or outside of the
  * viewport, the viewport is resized accordingly.
@@ -409,7 +409,7 @@ QPoint Q3DScene::graphPositionQuery() const
  * If \c true, QAbstract3DGraph::selectionMode must have either
  * QAbstract3DGraph::SelectionRow or QAbstract3DGraph::SelectionColumn set
  * to a valid selection.
- * \note Not all visualizations support the 2D slicing view.
+ * \note Not all graphs support the 2D slicing view.
  */
 bool Q3DScene::isSlicingActive() const
 {
@@ -777,9 +777,9 @@ QRect Q3DScenePrivate::glSecondarySubViewport()
  * Calculates and sets the light position relative to the currently active camera using the given
  * parameters.
  * The relative 3D offset to the current camera position is defined in \a relativePosition.
- * Optional \a fixedRotation fixes the light rotation around the data visualization area to the
+ * Optional \a fixedRotation fixes the light rotation around the graph area to the
  * given value in degrees.
- * Optional \a distanceModifier modifies the distance of the light from the data visualization.
+ * Optional \a distanceModifier modifies the distance of the light from the graph.
  */
 void Q3DScenePrivate::setLightPositionRelativeToCamera(const QVector3D &relativePosition,
                                                        float fixedRotation, float distanceModifier)

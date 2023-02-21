@@ -7,10 +7,10 @@
     \brief An overview of the Qt Graphs module.
 
     The Qt Graphs module provides a way to develop rapidly
-    responding, complex, and dynamic 3D visualization for analytical demanding
+    responding, complex, and dynamic 3D graphs for analytical demanding
     industries such as academic research and medical. Qt 3D Graphs
-    provides 3D bars, scatter, and surface visualizations. Combining user
-    interaction and real time 3D drawing visualizations enables creating user
+    provides 3D bars, scatter, and surface graphs. Combining user
+    interaction and real time 3D drawing graphs enables creating user
     interfaces that use space effectively. Changing between 3D and 2D
     presentation enables truly utilizing the value of 3D in visualizing data.
 
@@ -22,7 +22,7 @@
     Qt Graphs offers ready-made data proxies that can be used to
     visualize data from Qt item models and height maps. Each graph type has a
     basic proxy type, which accepts data in a format suitable for that
-    visualization. For more information, see \l{Qt Graphs Data
+    graph. For more information, see \l{Qt Graphs Data
     Handling}.
 
     End users can interact with the data presented by graphs in several ways,
@@ -114,8 +114,8 @@
     be partially transparent. Therefore, changing the rendering mode is a
     question of performance versus quality.
 
-    Qt Quick 2 uses a dedicated scenegraph for data rendering, and is therefore
-    the best choice for data visualization.
+    Qt Quick uses a dedicated scenegraph for data rendering, and is therefore
+    the best choice for graphs.
 
     \section1 3D Axes
 

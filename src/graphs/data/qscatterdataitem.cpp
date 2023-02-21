@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
  *
  * A scatter data item holds the data for a single rendered item in a scatter
  * graph. Scatter data proxies parse data into QScatterDataItem instances for
- * visualization.
+ * scatter graphs.
  *
  * \sa QScatterDataProxy, {Qt Graphs C++ Classes}
  */

@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
  *
  * A surface data item holds the data for a single vertex in a surface graph.
  * Surface data proxies parse data into QSurfaceDataItem instances for
- * visualization.
+ * surface graphs.
  *
  * \sa QSurfaceDataProxy, {Qt Graphs C++ Classes}
  */

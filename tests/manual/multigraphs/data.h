@@ -33,7 +33,7 @@ public:
     void useGradientTwo();
 
 public:
-    enum VisualizationMode {
+    enum GraphsMode {
         Surface = 0,
         Scatter,
         Bars
@@ -52,7 +52,7 @@ private:
     bool m_resize;
     QSize m_resolution;
     int m_resolutionLevel;
-    VisualizationMode m_mode;
+    GraphsMode m_mode;
     QScatterDataArray *m_scatterDataArray;
     QBarDataArray *m_barDataArray;
     bool m_started;
