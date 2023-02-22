@@ -89,9 +89,6 @@ public:
     Q3DCamera::CameraPreset m_activePreset;
     QVector3D m_requestedTarget;
 
-    friend class Bars3DRenderer;
-    friend class Surface3DRenderer;
-    friend class Scatter3DRenderer;
     friend class SelectionPointer;
     friend class Q3DInputHandler;
     friend class QTouch3DInputHandler;

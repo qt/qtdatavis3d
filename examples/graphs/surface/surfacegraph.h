@@ -4,7 +4,7 @@
 #ifndef SURFACEGRAPH_H
 #define SURFACEGRAPH_H
 
-#include <QtGraphs/Q3DSurface>
+#include <QtGraphs/Q3DSurfaceNG>
 #include <QtGraphs/QSurfaceDataProxy>
 #include <QtGraphs/QHeightMapSurfaceDataProxy>
 #include <QtGraphs/QSurface3DSeries>
@@ -21,12 +21,12 @@ public:
     void enableSqrtSinModel(bool enable);
 
     //! [0]
-    void toggleModeNone() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionNone); }
-    void toggleModeItem() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItem); }
-    void toggleModeSliceRow() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow
-                                                          | QAbstract3DGraph::SelectionSlice); }
-    void toggleModeSliceColumn() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndColumn
-                                                             | QAbstract3DGraph::SelectionSlice); }
+    void toggleModeNone() { m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionNone); }
+    void toggleModeItem() { m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItem); }
+    void toggleModeSliceRow() { m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItemAndRow
+                                                          | QAbstract3DGraphNG::SelectionSlice); }
+    void toggleModeSliceColumn() { m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItemAndColumn
+                                                             | QAbstract3DGraphNG::SelectionSlice); }
     //! [0]
 
     void setBlackToYellowGradient();

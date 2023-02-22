@@ -80,7 +80,7 @@ Item {
             width: dataView.width
             height: dataView.height
             theme: themeIsabelle
-            shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
+            shadowQuality: AbstractGraph3DNG.ShadowQualitySoftLow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricRight
             //! [3]
             axisZ: valueAxis

@@ -56,16 +56,11 @@ private:
 
     friend class Abstract3DController;
     friend class Scatter3DController;
-    friend class Abstract3DRenderer;
-    friend class Bars3DRenderer;
-    friend class Scatter3DRenderer;
-    friend class Surface3DRenderer;
     friend class SurfaceObject;
     friend class QValue3DAxisFormatterPrivate;
     friend class QLogValue3DAxisFormatter;
     friend class QValue3DAxis;
     friend class QValue3DAxisPrivate;
-    friend class AxisRenderCache;
     friend class AxisHelper;
     friend class QBar3DSeriesPrivate;
     friend class QScatter3DSeriesPrivate;

@@ -17,10 +17,8 @@
 #include <private/graphsglobal_p.h>
 
 #include "qabstract3daxis.h"
-#include "drawer_p.h"
 #include "qabstract3dinputhandler.h"
 #include "qabstract3dgraph.h"
-#include "q3dscene_p.h"
 #include "qcustom3ditem.h"
 #include <QtGui/QLinearGradient>
 #include <QtCore/QElapsedTimer>
@@ -31,9 +29,10 @@ QT_FORWARD_DECLARE_CLASS(QOpenGLFramebufferObject)
 
 QT_BEGIN_NAMESPACE
 
+class QValue3DAxis;
+class QCategory3DAxis;
 class AbstractDeclarativeInterface;
 class AbstractDeclarative;
-class Abstract3DRenderer;
 class QAbstract3DSeries;
 class ThemeManager;
 
@@ -155,12 +154,12 @@ public:
 private:
     Abstract3DChangeBitField m_changeTracker;
     ThemeManager *m_themeManager;
-    QAbstract3DGraph::SelectionFlags m_selectionMode;
-    QAbstract3DGraph::ShadowQuality m_shadowQuality;
+    QAbstract3DGraphNG::SelectionFlags m_selectionMode;
+    QAbstract3DGraphNG::ShadowQuality m_shadowQuality;
     bool m_useOrthoProjection;
     qreal m_aspectRatio;
     qreal m_horizontalAspectRatio;
-    QAbstract3DGraph::OptimizationHints m_optimizationHints;
+    QAbstract3DGraphNG::OptimizationHints m_optimizationHints;
     bool m_reflectionEnabled;
     qreal m_reflectivity;
     QLocale m_locale;
@@ -177,7 +176,6 @@ protected:
     QAbstract3DAxis *m_axisZ;
 
     QList<QAbstract3DAxis *> m_axes; // List of all added axes
-    Abstract3DRenderer *m_renderer;
     bool m_isDataDirty;
     bool m_isCustomDataDirty;
     bool m_isCustomItemDirty;
@@ -197,7 +195,7 @@ protected:
 
     QList<QCustom3DItem *> m_customItems;
 
-    QAbstract3DGraph::ElementType m_clickedType;
+    QAbstract3DGraphNG::ElementType m_clickedType;
     int m_selectedLabelIndex;
     int m_selectedCustomItemIndex;
     qreal m_margin;
@@ -209,12 +207,6 @@ protected:
 
 public:
     virtual ~Abstract3DController();
-
-    inline bool isInitialized() { return (m_renderer != 0); }
-    virtual void synchDataToRenderer();
-    virtual void render(const GLuint defaultFboHandle = 0);
-    virtual void initializeOpenGL() = 0;
-    void setRenderer(Abstract3DRenderer *renderer);
 
     virtual void addSeries(QAbstract3DSeries *series);
     virtual void insertSeries(int index, QAbstract3DSeries *series);
@@ -244,16 +236,16 @@ public:
     virtual Q3DTheme *activeTheme() const;
     virtual QList<Q3DTheme *> themes() const;
 
-    virtual void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
-    virtual QAbstract3DGraph::SelectionFlags selectionMode() const;
+    virtual void setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode);
+    virtual QAbstract3DGraphNG::SelectionFlags selectionMode() const;
 
-    virtual void setShadowQuality(QAbstract3DGraph::ShadowQuality quality);
-    virtual void doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality);
-    virtual QAbstract3DGraph::ShadowQuality shadowQuality() const;
+    virtual void setShadowQuality(QAbstract3DGraphNG::ShadowQuality quality);
+    virtual void doSetShadowQuality(QAbstract3DGraphNG::ShadowQuality quality);
+    virtual QAbstract3DGraphNG::ShadowQuality shadowQuality() const;
     virtual bool shadowsSupported() const;
 
-    void setOptimizationHints(QAbstract3DGraph::OptimizationHints hints);
-    QAbstract3DGraph::OptimizationHints optimizationHints() const;
+    void setOptimizationHints(QAbstract3DGraphNG::OptimizationHints hints);
+    QAbstract3DGraphNG::OptimizationHints optimizationHints() const;
 
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
@@ -284,7 +276,7 @@ public:
     inline bool measureFps() const { return m_measureFps; }
     inline qreal currentFps() const { return m_currentFps; }
 
-    QAbstract3DGraph::ElementType selectedElement() const;
+    QAbstract3DGraphNG::ElementType selectedElement() const;
 
     void setAspectRatio(qreal ratio);
     qreal aspectRatio();
@@ -337,8 +329,6 @@ public:
     virtual void handleAxisTitleVisibilityChangedBySender(QObject *sender);
     virtual void handleAxisTitleFixedChangedBySender(QObject *sender);
     virtual void handleSeriesVisibilityChangedBySender(QObject *sender);
-    virtual void handlePendingClick();
-    virtual void handlePendingGraphPositionQuery();
     virtual void adjustAxisRanges() = 0;
 
     void markSeriesItemLabelsDirty();
@@ -348,8 +338,6 @@ public:
     void setGraphPositionQueryPending(const bool &pending) { m_graphPositionQueryPending = pending; }
 
 public Q_SLOTS:
-    void destroyRenderer();
-
     void handleAxisTitleChanged(const QString &title);
     void handleAxisLabelsChanged();
     void handleAxisRangeChanged(float min, float max);
@@ -376,26 +364,26 @@ public Q_SLOTS:
     void handleThemeTypeChanged(Q3DTheme::Theme theme);
 
     // Renderer callback handlers
-    void handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality);
+    void handleRequestShadowQuality(QAbstract3DGraphNG::ShadowQuality quality);
 
     void updateCustomItem();
 
 Q_SIGNALS:
-    void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
+    void shadowQualityChanged(QAbstract3DGraphNG::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *activeTheme);
-    void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);
+    void selectionModeChanged(QAbstract3DGraphNG::SelectionFlags mode);
     void needRender();
     void axisXChanged(QAbstract3DAxis *axis);
     void axisYChanged(QAbstract3DAxis *axis);
     void axisZChanged(QAbstract3DAxis *axis);
-    void elementSelected(QAbstract3DGraph::ElementType type);
+    void elementSelected(QAbstract3DGraphNG::ElementType type);
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);
     void aspectRatioChanged(qreal ratio);
     void horizontalAspectRatioChanged(qreal ratio);
-    void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    void optimizationHintsChanged(QAbstract3DGraphNG::OptimizationHints hints);
     void polarChanged(bool enabled);
     void radialLabelOffsetChanged(float offset);
     void reflectionChanged(bool enabled);

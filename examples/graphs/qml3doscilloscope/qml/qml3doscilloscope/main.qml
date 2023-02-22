@@ -32,8 +32,8 @@ Item {
 
             width: dataView.width
             height: dataView.height
-            shadowQuality: AbstractGraph3D.ShadowQualityNone
-            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
+            shadowQuality: AbstractGraph3DNG.ShadowQualityNone
+            selectionMode: AbstractGraph3DNG.SelectionSlice | AbstractGraph3DNG.SelectionItemAndRow
 
             axisX.labelFormat: "%d ms"
             axisY.labelFormat: "%d W"
@@ -48,7 +48,7 @@ Item {
             axisY.segmentCount: 4
             axisZ.segmentCount: 4
             measureFps: true
-            renderingMode: AbstractGraph3D.RenderDirectToBackground
+            renderingMode: AbstractGraph3DNG.RenderDirectToBackground
 
             onCurrentFpsChanged: (fps)=> {
                 if (fps > 10)

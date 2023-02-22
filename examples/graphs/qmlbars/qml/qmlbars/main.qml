@@ -64,8 +64,8 @@ Item {
             id: barGraph
             width: dataView.width
             height: dataView.height
-            shadowQuality: AbstractGraph3D.ShadowQualityMedium
-            selectionMode: AbstractGraph3D.SelectionItemAndRow | AbstractGraph3D.SelectionSlice
+            shadowQuality: AbstractGraph3DNG.ShadowQualityMedium
+            selectionMode: AbstractGraph3DNG.SelectionItemAndRow | AbstractGraph3DNG.SelectionSlice
             theme: Theme3D {
                 type: Theme3D.ThemeRetro
                 labelBorderEnabled: true
@@ -295,11 +295,11 @@ Item {
             clip: true
             enabled: barGraph.shadowsSupported
             onClicked: {
-                if (barGraph.shadowQuality == AbstractGraph3D.ShadowQualityNone) {
-                    barGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
+                if (barGraph.shadowQuality == AbstractGraph3DNG.ShadowQualityNone) {
+                    barGraph.shadowQuality = AbstractGraph3DNG.ShadowQualityMedium;
                     text = "Hide Shadows"
                 } else {
-                    barGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                    barGraph.shadowQuality = AbstractGraph3DNG.ShadowQualityNone;
                     text = "Show Shadows"
                 }
             }

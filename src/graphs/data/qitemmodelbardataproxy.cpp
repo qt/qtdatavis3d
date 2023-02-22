@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
  *
  * QItemModelBarDataProxy allows you to use QAbstractItemModel derived models as a data source
  * for Q3DBars. It uses the defined mappings to map data from the model to rows, columns, and
- * values of Q3DBars graph.
+ * values of Q3DBarsNG graph.
  *
  * The data is resolved asynchronously whenever mappings or the model changes.
  * QBarDataProxy::arrayReset() is emitted when the data has been resolved.

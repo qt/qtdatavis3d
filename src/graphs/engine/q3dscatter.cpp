@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dscatter.h"
-#include "q3dscatter_p.h"
 #include "qquickdatavisscatter_p.h"
 
 QT_BEGIN_NAMESPACE
@@ -60,67 +59,30 @@ QT_BEGIN_NAMESPACE
  * Constructs a new 3D scatter graph with optional \a parent window
  * and surface \a format.
  */
-Q3DScatter::Q3DScatter(const QSurfaceFormat *format, QWindow *parent)
-    : QAbstract3DGraph(new Q3DScatterPrivate(this), format, parent)
-{
-    if (!dptr()->m_initialized)
-        return;
-
-    dptr()->m_shared = new Scatter3DController(geometry());
-    d_ptr->setVisualController(dptr()->m_shared);
-    dptr()->m_shared->initializeOpenGL();
-    QObject::connect(dptr()->m_shared, &Scatter3DController::selectedSeriesChanged,
-                     this, &Q3DScatter::selectedSeriesChanged);
-}
 
 /*!
  * Destroys the 3D scatter graph.
  */
-Q3DScatter::~Q3DScatter()
-{
-}
 
 /*!
  * Adds the \a series to the graph. A graph can contain multiple series, but has only one set of
  * axes. If the newly added series has specified a selected item, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  *
- * \sa QAbstract3DGraph::hasSeries()
+ * \sa QAbstract3DGraphNG::hasSeries()
  */
-void Q3DScatter::addSeries(QScatter3DSeries *series)
-{
-    dptr()->m_shared->addSeries(series);
-}
 
 /*!
  * Removes the \a series from the graph.
  *
- * \sa QAbstract3DGraph::hasSeries()
+ * \sa QAbstract3DGraphNG::hasSeries()
  */
-void Q3DScatter::removeSeries(QScatter3DSeries *series)
-{
-    dptr()->m_shared->removeSeries(series);
-}
 
 /*!
  * Returns the list of series added to this graph.
  *
- * \sa QAbstract3DGraph::hasSeries()
+ * \sa QAbstract3DGraphNG::hasSeries()
  */
-QList<QScatter3DSeries *> Q3DScatter::seriesList() const
-{
-    return dptrc()->m_shared->scatterSeriesList();
-}
-
-Q3DScatterPrivate *Q3DScatter::dptr()
-{
-    return static_cast<Q3DScatterPrivate *>(d_ptr.data());
-}
-
-const Q3DScatterPrivate *Q3DScatter::dptrc() const
-{
-    return static_cast<const Q3DScatterPrivate *>(d_ptr.data());
-}
 
 /*!
  * \property Q3DScatter::axisX
@@ -139,15 +101,6 @@ const Q3DScatterPrivate *Q3DScatter::dptrc() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisX(QValue3DAxis *axis)
-{
-    dptr()->m_shared->setAxisX(axis);
-}
-
-QValue3DAxis *Q3DScatter::axisX() const
-{
-    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisX());
-}
 
 /*!
  * \property Q3DScatter::axisY
@@ -166,15 +119,6 @@ QValue3DAxis *Q3DScatter::axisX() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisY(QValue3DAxis *axis)
-{
-    dptr()->m_shared->setAxisY(axis);
-}
-
-QValue3DAxis *Q3DScatter::axisY() const
-{
-    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
-}
 
 /*!
  * \property Q3DScatter::axisZ
@@ -193,28 +137,16 @@ QValue3DAxis *Q3DScatter::axisY() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DScatter::setAxisZ(QValue3DAxis *axis)
-{
-    dptr()->m_shared->setAxisZ(axis);
-}
 
 /*!
  * Returns the used z-axis.
  */
-QValue3DAxis *Q3DScatter::axisZ() const
-{
-    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisZ());
-}
 
 /*!
  * \property Q3DScatter::selectedSeries
  *
  * \brief The selected series or null.
  */
-QScatter3DSeries *Q3DScatter::selectedSeries() const
-{
-    return dptrc()->m_shared->selectedSeries();
-}
 
 /*!
  * Adds \a axis to the graph. The axes added via addAxis are not yet taken to use,
@@ -223,10 +155,6 @@ QScatter3DSeries *Q3DScatter::selectedSeries() const
  *
  * \sa releaseAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
-void Q3DScatter::addAxis(QValue3DAxis *axis)
-{
-    dptr()->m_shared->addAxis(axis);
-}
 
 /*!
  * Releases the ownership of the \a axis back to the caller, if it is added to this graph.
@@ -236,55 +164,12 @@ void Q3DScatter::addAxis(QValue3DAxis *axis)
  *
  * \sa addAxis(), setAxisX(), setAxisY(), setAxisZ()
  */
-void Q3DScatter::releaseAxis(QValue3DAxis *axis)
-{
-    dptr()->m_shared->releaseAxis(axis);
-}
 
 /*!
  * Returns the list of all added axes.
  *
  * \sa addAxis()
  */
-QList<QValue3DAxis *> Q3DScatter::axes() const
-{
-    QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_shared->axes();
-    QList<QValue3DAxis *> retList;
-    foreach (QAbstract3DAxis *axis, abstractAxes)
-        retList.append(static_cast<QValue3DAxis *>(axis));
-
-    return retList;
-}
-
-Q3DScatterPrivate::Q3DScatterPrivate(Q3DScatter *q)
-    : QAbstract3DGraphPrivate(q),
-    m_shared(0)
-{
-}
-
-Q3DScatterPrivate::~Q3DScatterPrivate()
-{
-}
-
-void Q3DScatterPrivate::handleAxisXChanged(QAbstract3DAxis *axis)
-{
-    emit qptr()->axisXChanged(static_cast<QValue3DAxis *>(axis));
-}
-
-void Q3DScatterPrivate::handleAxisYChanged(QAbstract3DAxis *axis)
-{
-    emit qptr()->axisYChanged(static_cast<QValue3DAxis *>(axis));
-}
-
-void Q3DScatterPrivate::handleAxisZChanged(QAbstract3DAxis *axis)
-{
-    emit qptr()->axisZChanged(static_cast<QValue3DAxis *>(axis));
-}
-
-Q3DScatter *Q3DScatterPrivate::qptr()
-{
-    return static_cast<Q3DScatter *>(q_ptr);
-}
 
 Q3DScatterNG::Q3DScatterNG() : QAbstract3DGraphNG()
 {

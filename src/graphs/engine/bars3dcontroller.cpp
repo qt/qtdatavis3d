@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "bars3dcontroller_p.h"
-#include "bars3drenderer_p.h"
 #include "qvalue3daxis_p.h"
 #include "qcategory3daxis_p.h"
 #include "qbardataproxy_p.h"
@@ -23,8 +22,7 @@ Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
       m_barThicknessRatio(1.0f),
       m_barSpacing(QSizeF(1.0, 1.0)),
       m_floorLevel(0.0f),
-      m_barSeriesMargin(0.0f, 0.0f),
-      m_renderer(0)
+      m_barSeriesMargin(0.0f, 0.0f)
 {
     // Setting a null axis creates a new default axis according to orientation and graph type.
     // Note: these cannot be set in the Abstract3DController constructor, as they will call virtual
@@ -36,93 +34,6 @@ Bars3DController::Bars3DController(QRect boundRect, Q3DScene *scene)
 
 Bars3DController::~Bars3DController()
 {
-}
-
-void Bars3DController::initializeOpenGL()
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-
-    // Initialization is called multiple times when Qt Quick components are used
-    if (isInitialized())
-        return;
-
-    m_renderer = new Bars3DRenderer(this);
-
-    setRenderer(m_renderer);
-
-    mutexLocker.unlock();
-    synchDataToRenderer();
-
-    emitNeedRender();
-}
-
-void Bars3DController::synchDataToRenderer()
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-
-    if (!isInitialized())
-        return;
-
-    // Background change requires reloading the meshes in bar graphs, so dirty the series visuals
-    if (m_themeManager->activeTheme()->d_ptr->m_dirtyBits.backgroundEnabledDirty) {
-        m_isSeriesVisualsDirty = true;
-        foreach (QAbstract3DSeries *series, m_seriesList)
-            series->d_ptr->m_changeTracker.meshChanged = true;
-    }
-
-    // If y range or reverse changed, scene needs to be updated to update camera limits
-    bool needSceneUpdate = false;
-    if (Abstract3DController::m_changeTracker.axisYRangeChanged
-            || Abstract3DController::m_changeTracker.axisYReversedChanged) {
-        needSceneUpdate = true;
-    }
-
-    // Floor level update requires data update, so do before abstract sync
-    if (m_changeTracker.floorLevelChanged) {
-        m_renderer->updateFloorLevel(m_floorLevel);
-        m_changeTracker.floorLevelChanged = false;
-    }
-
-    if (m_changeTracker.barSeriesMarginChanged) {
-        m_renderer->updateBarSeriesMargin(m_barSeriesMargin);
-        m_changeTracker.barSeriesMarginChanged = false;
-    }
-
-    Abstract3DController::synchDataToRenderer();
-
-    // Notify changes to renderer
-    if (m_changeTracker.rowsChanged) {
-        m_renderer->updateRows(m_changedRows);
-        m_changeTracker.rowsChanged = false;
-        m_changedRows.clear();
-    }
-
-    if (m_changeTracker.itemChanged) {
-        m_renderer->updateItems(m_changedItems);
-        m_changeTracker.itemChanged = false;
-        m_changedItems.clear();
-    }
-
-    if (m_changeTracker.multiSeriesScalingChanged) {
-        m_renderer->updateMultiSeriesScaling(m_isMultiSeriesUniform);
-        m_changeTracker.multiSeriesScalingChanged = false;
-    }
-
-    if (m_changeTracker.barSpecsChanged) {
-        m_renderer->updateBarSpecs(m_barThicknessRatio, m_barSpacing, m_isBarSpecRelative);
-        m_changeTracker.barSpecsChanged = false;
-    }
-
-    // Needs to be done after data is set, as it needs to know the visual array.
-    if (m_changeTracker.selectedBarChanged) {
-        m_renderer->updateSelectedBar(m_selectedBar, m_selectedBarSeries);
-        m_changeTracker.selectedBarChanged = false;
-    }
-
-    // Since scene is updated before axis updates are handled, do another render pass to
-    // properly update controller side camera limits.
-    if (needSceneUpdate)
-        m_scene->d_ptr->markDirty();
 }
 
 void Bars3DController::handleArrayReset()
@@ -325,19 +236,6 @@ void Bars3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
     setSelectedBar(m_selectedBar, m_selectedBarSeries, false);
 }
 
-void Bars3DController::handlePendingClick()
-{
-    // This function is called while doing the sync, so it is okay to query from renderer
-    QPoint position = m_renderer->clickedPosition();
-    QBar3DSeries *series = static_cast<QBar3DSeries *>(m_renderer->clickedSeries());
-
-    setSelectedBar(position, series, true);
-
-    Abstract3DController::handlePendingClick();
-
-    m_renderer->resetClickedStatus();
-}
-
 QPoint Bars3DController::invalidSelectionPosition()
 {
     static QPoint invalidSelectionPos(-1, -1);
@@ -526,14 +424,14 @@ float Bars3DController::floorLevel() const
     return m_floorLevel;
 }
 
-void Bars3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
+void Bars3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
 {
-    if (mode.testFlag(QAbstract3DGraph::SelectionSlice)
-            && (mode.testFlag(QAbstract3DGraph::SelectionRow)
-                == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
+    if (mode.testFlag(QAbstract3DGraphNG::SelectionSlice)
+            && (mode.testFlag(QAbstract3DGraphNG::SelectionRow)
+                == mode.testFlag(QAbstract3DGraphNG::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
-        QAbstract3DGraph::SelectionFlags oldMode = selectionMode();
+        QAbstract3DGraphNG::SelectionFlags oldMode = selectionMode();
 
         Abstract3DController::setSelectionMode(mode);
 
@@ -544,8 +442,8 @@ void Bars3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 
             // Special case: Always deactivate slicing when changing away from slice
             // automanagement, as this can't be handled in setSelectedBar.
-            if (!mode.testFlag(QAbstract3DGraph::SelectionSlice)
-                    && oldMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
+            if (!mode.testFlag(QAbstract3DGraphNG::SelectionSlice)
+                    && oldMode.testFlag(QAbstract3DGraphNG::SelectionSlice)) {
                 scene()->setSlicingActive(false);
             }
         }
@@ -563,7 +461,7 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
 
     adjustSelectionPosition(pos, series);
 
-    if (selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
+    if (selectionMode().testFlag(QAbstract3DGraphNG::SelectionSlice)) {
         // If the selected bar is outside data window, or there is no visible selected bar,
         // disable slicing.
         if (pos.x() < m_axisZ->min() || pos.x() > m_axisZ->max()

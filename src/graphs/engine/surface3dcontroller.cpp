@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "surface3dcontroller_p.h"
-#include "surface3drenderer_p.h"
 #include "qvalue3daxis_p.h"
 #include "qsurfacedataproxy_p.h"
 #include "qsurface3dseries_p.h"
@@ -12,7 +11,6 @@ QT_BEGIN_NAMESPACE
 
 Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
     : Abstract3DController(rect, scene),
-      m_renderer(0),
       m_selectedPoint(invalidSelectionPosition()),
       m_selectedSeries(0),
       m_flatShadingSupported(true),
@@ -28,59 +26,6 @@ Surface3DController::Surface3DController(QRect rect, Q3DScene *scene)
 
 Surface3DController::~Surface3DController()
 {
-}
-
-void Surface3DController::initializeOpenGL()
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-
-    // Initialization is called multiple times when Qt Quick components are used
-    if (isInitialized())
-        return;
-
-    m_renderer = new Surface3DRenderer(this);
-    setRenderer(m_renderer);
-
-    emitNeedRender();
-}
-
-void Surface3DController::synchDataToRenderer()
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-
-    if (!isInitialized())
-        return;
-
-    Abstract3DController::synchDataToRenderer();
-
-    // Notify changes to renderer
-    if (m_changeTracker.rowsChanged) {
-        m_renderer->updateRows(m_changedRows);
-        m_changeTracker.rowsChanged = false;
-        m_changedRows.clear();
-    }
-
-    if (m_changeTracker.itemChanged) {
-        m_renderer->updateItems(m_changedItems);
-        m_changeTracker.itemChanged = false;
-        m_changedItems.clear();
-    }
-
-    if (m_changeTracker.selectedPointChanged) {
-        m_renderer->updateSelectedPoint(m_selectedPoint, m_selectedSeries);
-        m_changeTracker.selectedPointChanged = false;
-    }
-
-    if (m_changeTracker.flipHorizontalGridChanged) {
-        m_renderer->updateFlipHorizontalGrid(m_flipHorizontalGrid);
-        m_changeTracker.flipHorizontalGridChanged = false;
-    }
-
-    if (m_changeTracker.surfaceTextureChanged) {
-        m_renderer->updateSurfaceTextures(m_changedTextures);
-        m_changeTracker.surfaceTextureChanged = false;
-        m_changedTextures.clear();
-    }
 }
 
 void Surface3DController::handleAxisAutoAdjustRangeChangedInOrientation(
@@ -107,19 +52,6 @@ void Surface3DController::handleSeriesVisibilityChangedBySender(QObject *sender)
     // Visibility changes may require disabling slicing,
     // so just reset selection to ensure everything is still valid.
     setSelectedPoint(m_selectedPoint, m_selectedSeries, false);
-}
-
-void Surface3DController::handlePendingClick()
-{
-    // This function is called while doing the sync, so it is okay to query from renderer
-    QPoint position = m_renderer->clickedPosition();
-    QSurface3DSeries *series = static_cast<QSurface3DSeries *>(m_renderer->clickedSeries());
-
-    setSelectedPoint(position, series, true);
-
-    Abstract3DController::handlePendingClick();
-
-    m_renderer->resetClickedStatus();
 }
 
 QPoint Surface3DController::invalidSelectionPosition()
@@ -188,20 +120,20 @@ bool Surface3DController::flipHorizontalGrid() const
     return m_flipHorizontalGrid;
 }
 
-void Surface3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
+void Surface3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
 {
     // Currently surface only supports row and column modes when also slicing
-    if ((mode.testFlag(QAbstract3DGraph::SelectionRow)
-         || mode.testFlag(QAbstract3DGraph::SelectionColumn))
-            && !mode.testFlag(QAbstract3DGraph::SelectionSlice)) {
+    if ((mode.testFlag(QAbstract3DGraphNG::SelectionRow)
+         || mode.testFlag(QAbstract3DGraphNG::SelectionColumn))
+            && !mode.testFlag(QAbstract3DGraphNG::SelectionSlice)) {
         qWarning("Unsupported selection mode.");
         return;
-    } else if (mode.testFlag(QAbstract3DGraph::SelectionSlice)
-               && (mode.testFlag(QAbstract3DGraph::SelectionRow)
-                   == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
+    } else if (mode.testFlag(QAbstract3DGraphNG::SelectionSlice)
+               && (mode.testFlag(QAbstract3DGraphNG::SelectionRow)
+                   == mode.testFlag(QAbstract3DGraphNG::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
-        QAbstract3DGraph::SelectionFlags oldMode = selectionMode();
+        QAbstract3DGraphNG::SelectionFlags oldMode = selectionMode();
 
         Abstract3DController::setSelectionMode(mode);
 
@@ -212,8 +144,8 @@ void Surface3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode
 
             // Special case: Always deactivate slicing when changing away from slice
             // automanagement, as this can't be handled in setSelectedBar.
-            if (!mode.testFlag(QAbstract3DGraph::SelectionSlice)
-                    && oldMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
+            if (!mode.testFlag(QAbstract3DGraphNG::SelectionSlice)
+                    && oldMode.testFlag(QAbstract3DGraphNG::SelectionSlice)) {
                 scene()->setSlicingActive(false);
             }
         }
@@ -245,7 +177,7 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
             pos = invalidSelectionPosition();
     }
 
-    if (selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
+    if (selectionMode().testFlag(QAbstract3DGraphNG::SelectionSlice)) {
         if (pos == invalidSelectionPosition() || !series->isVisible()) {
             scene()->setSlicingActive(false);
         } else {

@@ -36,7 +36,7 @@ GraphModifier::GraphModifier(Q3DBarsNG *bargraph)
       m_smooth(false)
 {
     //! [2]
-    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftMedium);
+    m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualitySoftMedium);
     m_graph->activeTheme()->setBackgroundEnabled(false);
     m_graph->activeTheme()->setFont(QFont("Times New Roman", m_fontSize));
     m_graph->activeTheme()->setLabelBackgroundEnabled(true);
@@ -242,7 +242,7 @@ void GraphModifier::changeSelectionMode(int selectionMode)
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
         int flags = comboBox->itemData(selectionMode).toInt();
-        m_graph->setSelectionMode(QAbstract3DGraph::SelectionFlags(flags));
+        m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionFlags(flags));
     }
 }
 
@@ -260,7 +260,7 @@ void GraphModifier::changeFontSize(int fontsize)
     m_graph->activeTheme()->setFont(font);
 }
 
-void GraphModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
+void GraphModifier::shadowQualityUpdatedByVisual(QAbstract3DGraphNG::ShadowQuality sq)
 {
     int quality = int(sq);
     // Updates the UI component to show correct shadow quality
@@ -358,7 +358,7 @@ void GraphModifier::zoomToSelectedBar()
 
 void GraphModifier::changeShadowQuality(int quality)
 {
-    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
+    QAbstract3DGraphNG::ShadowQuality sq = QAbstract3DGraphNG::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
     emit shadowQualityChanged(quality);
 }

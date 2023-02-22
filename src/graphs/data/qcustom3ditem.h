@@ -84,7 +84,6 @@ protected:
 private:
     Q_DISABLE_COPY(QCustom3DItem)
 
-    friend class Abstract3DRenderer;
     friend class Abstract3DController;
 };
 

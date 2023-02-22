@@ -35,7 +35,7 @@ Item {
         Bars3DNG {
             id: barGraph
             anchors.fill: parent
-            selectionMode: AbstractGraph3D.SelectionItemAndRow
+            selectionMode: AbstractGraph3DNG.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
             theme: firstTheme
             valueAxis.labelFormat: "%d\u00B0C"

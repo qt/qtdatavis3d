@@ -3,6 +3,8 @@
 
 #include "qscatter3dseries_p.h"
 #include "scatter3dcontroller_p.h"
+#include "qvalue3daxis.h"
+#include "qcategory3daxis.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -179,7 +181,7 @@ QScatterDataProxy *QScatter3DSeries::dataProxy() const
  * Removing items from or inserting items to the series before the selected item
  * will adjust the selection so that the same item will stay selected.
  *
- * \sa QAbstract3DGraph::clearSelection()
+ * \sa QAbstract3DGraphNG::clearSelection()
  */
 void QScatter3DSeries::setSelectedItem(int index)
 {
@@ -225,7 +227,7 @@ float QScatter3DSeries::itemSize() const
  * Returns an invalid index for selection. This index is set to the selectedItem
  * property to clear the selection from this series.
  *
- * \sa QAbstract3DGraph::clearSelection()
+ * \sa QAbstract3DGraphNG::clearSelection()
  */
 int QScatter3DSeries::invalidSelectionIndex()
 {

@@ -1,12 +1,12 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "qquickdatavisitem_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
-#include "abstractdeclarativeinterface_p.h"
-#include "abstract3drenderer_p.h"
+#include "qcategory3daxis_p.h"
+#include "qabstract3dseries_p.h"
+#include "q3dscene_p.h"
 #include "qabstract3dinputhandler_p.h"
 #include "qtouch3dinputhandler.h"
 #include "thememanager_p.h"
@@ -16,10 +16,6 @@
 #include <QtCore/QThread>
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtCore/QMutexLocker>
-//#include <QtQuick3D/private/qquick3ddefaultmaterial_p.h>
-//#include <QtQuick3D/private/qquick3dprincipledmaterial_p.h>
-//#include <QtQuick3DUtils/private/qssgutils_p.h>
-//#include "datavisquick3dtexturedata_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -27,12 +23,12 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
                                            QObject *parent) :
     QObject(parent),
     m_themeManager(new ThemeManager(this)),
-    m_selectionMode(QAbstract3DGraph::SelectionItem),
-    m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
+    m_selectionMode(QAbstract3DGraphNG::SelectionItem),
+    m_shadowQuality(QAbstract3DGraphNG::ShadowQualityMedium),
     m_useOrthoProjection(false),
     m_aspectRatio(2.0),
     m_horizontalAspectRatio(0.0),
-    m_optimizationHints(QAbstract3DGraph::OptimizationDefault),
+    m_optimizationHints(QAbstract3DGraphNG::OptimizationDefault),
     m_reflectionEnabled(false),
     m_reflectivity(0.5),
     m_locale(QLocale::c()),
@@ -41,7 +37,6 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_axisX(0),
     m_axisY(0),
     m_axisZ(0),
-    m_renderer(0),
     m_isDataDirty(true),
     m_isCustomDataDirty(true),
     m_isCustomItemDirty(true),
@@ -52,7 +47,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_measureFps(false),
     m_numFrames(0),
     m_currentFps(0.0),
-    m_clickedType(QAbstract3DGraph::ElementNone),
+    m_clickedType(QAbstract3DGraphNG::ElementNone),
     m_selectedLabelIndex(-1),
     m_selectedCustomItemIndex(-1),
     m_margin(-1.0)
@@ -80,40 +75,11 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
 
 Abstract3DController::~Abstract3DController()
 {
-    destroyRenderer();
     delete m_scene;
     delete m_themeManager;
     foreach (QCustom3DItem *item, m_customItems)
         delete item;
     m_customItems.clear();
-}
-
-void Abstract3DController::destroyRenderer()
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-    // Renderer can be in another thread, don't delete it directly in that case
-    if (m_renderer && m_renderer->thread() && m_renderer->thread() != this->thread())
-        m_renderer->deleteLater();
-    else
-        delete m_renderer;
-    m_renderer = 0;
-}
-
-/**
- * @brief setRenderer Sets the renderer to be used. isInitialized returns true from this point onwards.
- * @param renderer Renderer to be used.
- */
-void Abstract3DController::setRenderer(Abstract3DRenderer *renderer)
-{
-    // Note: This function must be called within render mutex
-    m_renderer = renderer;
-
-    // If renderer is created in different thread than controller, make sure renderer gets
-    // destroyed before the render thread finishes.
-    if (renderer->thread() != this->thread()) {
-        QObject::connect(renderer->thread(), &QThread::finished, this,
-                         &Abstract3DController::destroyRenderer, Qt::DirectConnection);
-    }
 }
 
 void Abstract3DController::addSeries(QAbstract3DSeries *series)
@@ -166,382 +132,6 @@ bool Abstract3DController::hasSeries(QAbstract3DSeries *series)
 QList<QAbstract3DSeries *> Abstract3DController::seriesList()
 {
     return m_seriesList;
-}
-
-/**
- * @brief synchDataToRenderer Called on the render thread while main GUI thread is blocked before rendering.
- */
-void Abstract3DController::synchDataToRenderer()
-{
-    // Subclass implementations check for renderer validity already, so no need to check here.
-
-    m_renderPending = false;
-
-    // If there are pending queries, handle those first
-    if (m_renderer->isGraphPositionQueryResolved())
-        handlePendingGraphPositionQuery();
-
-    if (m_renderer->isClickQueryResolved())
-        handlePendingClick();
-
-    startRecordingRemovesAndInserts();
-
-    if (m_scene->d_ptr->m_sceneDirty)
-        m_renderer->updateScene(m_scene);
-
-    m_renderer->updateTheme(m_themeManager->activeTheme());
-
-    if (m_changeTracker.polarChanged) {
-        m_renderer->updatePolar(m_isPolar);
-        m_changeTracker.polarChanged = false;
-    }
-
-    if (m_changeTracker.radialLabelOffsetChanged) {
-        m_renderer->updateRadialLabelOffset(m_radialLabelOffset);
-        m_changeTracker.radialLabelOffsetChanged = false;
-    }
-
-    if (m_changeTracker.shadowQualityChanged) {
-        m_renderer->updateShadowQuality(m_shadowQuality);
-        m_changeTracker.shadowQualityChanged = false;
-    }
-
-    if (m_changeTracker.selectionModeChanged) {
-        m_renderer->updateSelectionMode(m_selectionMode);
-        m_changeTracker.selectionModeChanged = false;
-    }
-
-    if (m_changeTracker.projectionChanged) {
-        m_renderer->m_useOrthoProjection = m_useOrthoProjection;
-        m_changeTracker.projectionChanged = false;
-    }
-
-    if (m_changeTracker.aspectRatioChanged) {
-        m_renderer->updateAspectRatio(float(m_aspectRatio));
-        m_changeTracker.aspectRatioChanged = false;
-    }
-
-    if (m_changeTracker.horizontalAspectRatioChanged) {
-        m_renderer->updateHorizontalAspectRatio(float(m_horizontalAspectRatio));
-        m_changeTracker.horizontalAspectRatioChanged = false;
-    }
-
-    if (m_changeTracker.optimizationHintChanged) {
-        m_renderer->updateOptimizationHint(m_optimizationHints);
-        m_changeTracker.optimizationHintChanged = false;
-    }
-
-    if (m_changeTracker.reflectionChanged) {
-        m_renderer->m_reflectionEnabled = m_reflectionEnabled;
-        m_changeTracker.reflectionChanged = false;
-    }
-
-    if (m_changeTracker.reflectivityChanged) {
-        // Invert value to match functionality to the property description
-        m_renderer->m_reflectivity = -(m_reflectivity - 1.0);
-        m_changeTracker.reflectivityChanged = false;
-    }
-
-    if (m_changeTracker.axisXFormatterChanged) {
-        m_changeTracker.axisXFormatterChanged = false;
-        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
-            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationX,
-                                            valueAxisX->formatter());
-        }
-    }
-    if (m_changeTracker.axisYFormatterChanged) {
-        m_changeTracker.axisYFormatterChanged = false;
-        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
-            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationY,
-                                            valueAxisY->formatter());
-        }
-    }
-    if (m_changeTracker.axisZFormatterChanged) {
-        m_changeTracker.axisZFormatterChanged = false;
-        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
-            m_renderer->updateAxisFormatter(QAbstract3DAxis::AxisOrientationZ,
-                                            valueAxisZ->formatter());
-        }
-    }
-
-    if (m_changeTracker.axisXTypeChanged) {
-        m_renderer->updateAxisType(QAbstract3DAxis::AxisOrientationX, m_axisX->type());
-        m_changeTracker.axisXTypeChanged = false;
-    }
-
-    if (m_changeTracker.axisYTypeChanged) {
-        m_renderer->updateAxisType(QAbstract3DAxis::AxisOrientationY, m_axisY->type());
-        m_changeTracker.axisYTypeChanged = false;
-    }
-
-    if (m_changeTracker.axisZTypeChanged) {
-        m_renderer->updateAxisType(QAbstract3DAxis::AxisOrientationZ, m_axisZ->type());
-        m_changeTracker.axisZTypeChanged = false;
-    }
-
-    if (m_changeTracker.axisXTitleChanged) {
-        m_renderer->updateAxisTitle(QAbstract3DAxis::AxisOrientationX, m_axisX->title());
-        m_changeTracker.axisXTitleChanged = false;
-    }
-
-    if (m_changeTracker.axisYTitleChanged) {
-        m_renderer->updateAxisTitle(QAbstract3DAxis::AxisOrientationY, m_axisY->title());
-        m_changeTracker.axisYTitleChanged = false;
-    }
-
-    if (m_changeTracker.axisZTitleChanged) {
-        m_renderer->updateAxisTitle(QAbstract3DAxis::AxisOrientationZ, m_axisZ->title());
-        m_changeTracker.axisZTitleChanged = false;
-    }
-
-    if (m_changeTracker.axisXLabelsChanged) {
-        m_renderer->updateAxisLabels(QAbstract3DAxis::AxisOrientationX, m_axisX->labels());
-        m_changeTracker.axisXLabelsChanged = false;
-    }
-
-    if (m_changeTracker.axisYLabelsChanged) {
-        m_renderer->updateAxisLabels(QAbstract3DAxis::AxisOrientationY, m_axisY->labels());
-        m_changeTracker.axisYLabelsChanged = false;
-    }
-    if (m_changeTracker.axisZLabelsChanged) {
-        m_renderer->updateAxisLabels(QAbstract3DAxis::AxisOrientationZ, m_axisZ->labels());
-        m_changeTracker.axisZLabelsChanged = false;
-    }
-
-    if (m_changeTracker.axisXRangeChanged) {
-        m_renderer->updateAxisRange(QAbstract3DAxis::AxisOrientationX, m_axisX->min(),
-                                    m_axisX->max());
-        m_changeTracker.axisXRangeChanged = false;
-    }
-
-    if (m_changeTracker.axisYRangeChanged) {
-        m_renderer->updateAxisRange(QAbstract3DAxis::AxisOrientationY, m_axisY->min(),
-                                    m_axisY->max());
-        m_changeTracker.axisYRangeChanged = false;
-    }
-
-    if (m_changeTracker.axisZRangeChanged) {
-        m_renderer->updateAxisRange(QAbstract3DAxis::AxisOrientationZ, m_axisZ->min(),
-                                    m_axisZ->max());
-        m_changeTracker.axisZRangeChanged = false;
-    }
-
-    if (m_changeTracker.axisXSegmentCountChanged) {
-        m_changeTracker.axisXSegmentCountChanged = false;
-        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
-            m_renderer->updateAxisSegmentCount(QAbstract3DAxis::AxisOrientationX,
-                                               valueAxisX->segmentCount());
-        }
-    }
-
-    if (m_changeTracker.axisYSegmentCountChanged) {
-        m_changeTracker.axisYSegmentCountChanged = false;
-        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
-            m_renderer->updateAxisSegmentCount(QAbstract3DAxis::AxisOrientationY,
-                                               valueAxisY->segmentCount());
-        }
-    }
-
-    if (m_changeTracker.axisZSegmentCountChanged) {
-        m_changeTracker.axisZSegmentCountChanged = false;
-        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
-            m_renderer->updateAxisSegmentCount(QAbstract3DAxis::AxisOrientationZ,
-                                               valueAxisZ->segmentCount());
-        }
-    }
-
-    if (m_changeTracker.axisXSubSegmentCountChanged) {
-        m_changeTracker.axisXSubSegmentCountChanged = false;
-        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
-            m_renderer->updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientationX,
-                                                  valueAxisX->subSegmentCount());
-        }
-    }
-
-    if (m_changeTracker.axisYSubSegmentCountChanged) {
-        m_changeTracker.axisYSubSegmentCountChanged = false;
-        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
-            m_renderer->updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientationY,
-                                                  valueAxisY->subSegmentCount());
-        }
-    }
-
-    if (m_changeTracker.axisZSubSegmentCountChanged) {
-        m_changeTracker.axisZSubSegmentCountChanged = false;
-        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
-            m_renderer->updateAxisSubSegmentCount(QAbstract3DAxis::AxisOrientationZ,
-                                                  valueAxisZ->subSegmentCount());
-        }
-    }
-
-    if (m_changeTracker.axisXLabelFormatChanged) {
-        m_changeTracker.axisXLabelFormatChanged = false;
-        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
-            m_renderer->updateAxisLabelFormat(QAbstract3DAxis::AxisOrientationX,
-                                              valueAxisX->labelFormat());
-        }
-    }
-
-    if (m_changeTracker.axisYLabelFormatChanged) {
-        m_changeTracker.axisYLabelFormatChanged = false;
-        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
-            m_renderer->updateAxisLabelFormat(QAbstract3DAxis::AxisOrientationY,
-                                              valueAxisY->labelFormat());
-        }
-    }
-
-    if (m_changeTracker.axisZLabelFormatChanged) {
-        m_changeTracker.axisZLabelFormatChanged = false;
-        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
-            m_renderer->updateAxisLabelFormat(QAbstract3DAxis::AxisOrientationZ,
-                                              valueAxisZ->labelFormat());
-        }
-    }
-
-    if (m_changeTracker.axisXReversedChanged) {
-        m_changeTracker.axisXReversedChanged = false;
-        if (m_axisX->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisX = static_cast<QValue3DAxis *>(m_axisX);
-            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationX,
-                                           valueAxisX->reversed());
-        }
-    }
-
-    if (m_changeTracker.axisYReversedChanged) {
-        m_changeTracker.axisYReversedChanged = false;
-        if (m_axisY->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisY = static_cast<QValue3DAxis *>(m_axisY);
-            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationY,
-                                           valueAxisY->reversed());
-        }
-    }
-
-    if (m_changeTracker.axisZReversedChanged) {
-        m_changeTracker.axisZReversedChanged = false;
-        if (m_axisZ->type() & QAbstract3DAxis::AxisTypeValue) {
-            QValue3DAxis *valueAxisZ = static_cast<QValue3DAxis *>(m_axisZ);
-            m_renderer->updateAxisReversed(QAbstract3DAxis::AxisOrientationZ,
-                                           valueAxisZ->reversed());
-        }
-    }
-
-    if (m_changeTracker.axisXLabelAutoRotationChanged) {
-        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationX,
-                                                m_axisX->labelAutoRotation());
-        m_changeTracker.axisXLabelAutoRotationChanged = false;
-    }
-
-    if (m_changeTracker.axisYLabelAutoRotationChanged) {
-        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationY,
-                                                m_axisY->labelAutoRotation());
-        m_changeTracker.axisYLabelAutoRotationChanged = false;
-    }
-
-    if (m_changeTracker.axisZLabelAutoRotationChanged) {
-        m_renderer->updateAxisLabelAutoRotation(QAbstract3DAxis::AxisOrientationZ,
-                                                m_axisZ->labelAutoRotation());
-        m_changeTracker.axisZLabelAutoRotationChanged = false;
-    }
-
-    if (m_changeTracker.axisXTitleVisibilityChanged) {
-        m_renderer->updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientationX,
-                                              m_axisX->isTitleVisible());
-        m_changeTracker.axisXTitleVisibilityChanged = false;
-    }
-    if (m_changeTracker.axisYTitleVisibilityChanged) {
-        m_renderer->updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientationY,
-                                              m_axisY->isTitleVisible());
-        m_changeTracker.axisYTitleVisibilityChanged = false;
-    }
-    if (m_changeTracker.axisZTitleVisibilityChanged) {
-        m_renderer->updateAxisTitleVisibility(QAbstract3DAxis::AxisOrientationZ,
-                                              m_axisZ->isTitleVisible());
-        m_changeTracker.axisZTitleVisibilityChanged = false;
-    }
-    if (m_changeTracker.axisXTitleFixedChanged) {
-        m_renderer->updateAxisTitleFixed(QAbstract3DAxis::AxisOrientationX,
-                                         m_axisX->isTitleFixed());
-        m_changeTracker.axisXTitleFixedChanged = false;
-    }
-    if (m_changeTracker.axisYTitleFixedChanged) {
-        m_renderer->updateAxisTitleFixed(QAbstract3DAxis::AxisOrientationY,
-                                         m_axisY->isTitleFixed());
-        m_changeTracker.axisYTitleFixedChanged = false;
-    }
-    if (m_changeTracker.axisZTitleFixedChanged) {
-        m_renderer->updateAxisTitleFixed(QAbstract3DAxis::AxisOrientationZ,
-                                         m_axisZ->isTitleFixed());
-        m_changeTracker.axisZTitleFixedChanged = false;
-    }
-
-    if (m_changeTracker.marginChanged) {
-        m_renderer->updateMargin(float(m_margin));
-        m_changeTracker.marginChanged = false;
-    }
-
-    if (m_changedSeriesList.size()) {
-        m_renderer->modifiedSeriesList(m_changedSeriesList);
-        m_changedSeriesList.clear();
-    }
-
-    if (m_isSeriesVisualsDirty) {
-        m_renderer->updateSeries(m_seriesList);
-        m_isSeriesVisualsDirty = false;
-    }
-
-    if (m_isDataDirty) {
-        // Series list supplied above in updateSeries() is used to access the data,
-        // so no data needs to be passed in updateData()
-        m_renderer->updateData();
-        m_isDataDirty = false;
-    }
-
-    if (m_isCustomDataDirty) {
-        m_renderer->updateCustomData(m_customItems);
-        m_isCustomDataDirty = false;
-    }
-
-    if (m_isCustomItemDirty) {
-        m_renderer->updateCustomItems();
-        m_isCustomItemDirty = false;
-    }
-}
-
-void Abstract3DController::render(const GLuint defaultFboHandle)
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-
-    // If not initialized, do nothing.
-    if (!m_renderer)
-        return;
-
-    if (m_measureFps) {
-        // Measure speed (as milliseconds per frame)
-        m_numFrames++;
-        int elapsed = m_frameTimer.elapsed();
-        if (elapsed >= 1000) {
-            m_currentFps = qreal(m_numFrames) * 1000.0 / qreal(elapsed);
-            emit currentFpsChanged(m_currentFps);
-            m_numFrames = 0;
-            m_frameTimer.restart();
-        }
-        // To get meaningful framerate, don't just do render on demand.
-        emitNeedRender();
-    }
-
-    m_renderer->render(defaultFboHandle);
 }
 
 void Abstract3DController::mouseDoubleClickEvent(QMouseEvent *event)
@@ -682,7 +272,7 @@ void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
 
     // Changing theme type is logically equivalent of changing the entire theme
     // object, so reset all attached series to the new theme.
-    bool force = m_qml->isReady();
+    bool force = true;//m_qml->isReady(); // TODO: Is this needed?
     Q3DTheme *activeTheme = m_themeManager->activeTheme();
     for (int i = 0; i < m_seriesList.size(); i++)
         m_seriesList.at(i)->d_ptr->resetToTheme(*activeTheme, i, force);
@@ -892,7 +482,7 @@ Q3DTheme *Abstract3DController::activeTheme() const
     return m_themeManager->activeTheme();
 }
 
-void Abstract3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
+void Abstract3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
 {
     if (mode != m_selectionMode) {
         m_selectionMode = mode;
@@ -902,18 +492,18 @@ void Abstract3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mod
     }
 }
 
-QAbstract3DGraph::SelectionFlags Abstract3DController::selectionMode() const
+QAbstract3DGraphNG::SelectionFlags Abstract3DController::selectionMode() const
 {
     return m_selectionMode;
 }
 
-void Abstract3DController::setShadowQuality(QAbstract3DGraph::ShadowQuality quality)
+void Abstract3DController::setShadowQuality(QAbstract3DGraphNG::ShadowQuality quality)
 {
     if (!m_useOrthoProjection)
         doSetShadowQuality(quality);
 }
 
-void Abstract3DController::doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality)
+void Abstract3DController::doSetShadowQuality(QAbstract3DGraphNG::ShadowQuality quality)
 {
     if (quality != m_shadowQuality) {
         m_shadowQuality = quality;
@@ -923,12 +513,12 @@ void Abstract3DController::doSetShadowQuality(QAbstract3DGraph::ShadowQuality qu
     }
 }
 
-QAbstract3DGraph::ShadowQuality Abstract3DController::shadowQuality() const
+QAbstract3DGraphNG::ShadowQuality Abstract3DController::shadowQuality() const
 {
     return m_shadowQuality;
 }
 
-void Abstract3DController::setOptimizationHints(QAbstract3DGraph::OptimizationHints hints)
+void Abstract3DController::setOptimizationHints(QAbstract3DGraphNG::OptimizationHints hints)
 {
     if (hints != m_optimizationHints) {
         m_optimizationHints = hints;
@@ -939,7 +529,7 @@ void Abstract3DController::setOptimizationHints(QAbstract3DGraph::OptimizationHi
     }
 }
 
-QAbstract3DGraph::OptimizationHints Abstract3DController::optimizationHints() const
+QAbstract3DGraphNG::OptimizationHints Abstract3DController::optimizationHints() const
 {
     return m_optimizationHints;
 }
@@ -976,12 +566,6 @@ void Abstract3DController::markSeriesVisualsDirty()
 {
     m_isSeriesVisualsDirty = true;
     emitNeedRender();
-}
-
-void Abstract3DController::requestRender(QOpenGLFramebufferObject *fbo)
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-    m_renderer->render(fbo->handle());
 }
 
 int Abstract3DController::addCustomItem(QCustom3DItem *item)
@@ -1208,7 +792,7 @@ void Abstract3DController::handleAxisTitleFixedChanged(bool fixed)
 void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::InputView view)
 {
     // When in automatic slicing mode, input view change to primary disables slice mode
-    if (m_selectionMode.testFlag(QAbstract3DGraph::SelectionSlice)
+    if (m_selectionMode.testFlag(QAbstract3DGraphNG::SelectionSlice)
             && view == QAbstract3DInputHandler::InputViewOnPrimary) {
         setSlicingActive(false);
     }
@@ -1229,7 +813,7 @@ void Abstract3DController::handleSeriesVisibilityChanged(bool visible)
     handleSeriesVisibilityChangedBySender(sender());
 }
 
-void Abstract3DController::handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality)
+void Abstract3DController::handleRequestShadowQuality(QAbstract3DGraphNG::ShadowQuality quality)
 {
     setShadowQuality(quality);
 }
@@ -1494,36 +1078,6 @@ void Abstract3DController::emitNeedRender()
     }
 }
 
-void Abstract3DController::handlePendingClick()
-{
-    m_clickedType = m_renderer->clickedType();
-    m_selectedLabelIndex = m_renderer->m_selectedLabelIndex;
-    m_selectedCustomItemIndex = m_renderer->m_selectedCustomItemIndex;
-
-    // Invalidate query position to indicate the query has been handled, unless another
-    // point has been queried.
-    if (m_renderer->cachedClickQuery() == m_scene->selectionQueryPosition())
-        m_scene->setSelectionQueryPosition(Q3DScene::invalidSelectionPoint());
-
-    m_renderer->clearClickQueryResolved();
-
-    emit elementSelected(m_clickedType);
-}
-
-void Abstract3DController::handlePendingGraphPositionQuery()
-{
-    m_queriedGraphPosition = m_renderer->queriedGraphPosition();
-
-    // Invalidate query position to indicate the query has been handled, unless another
-    // point has been queried.
-    if (m_renderer->cachedGraphPositionQuery() == m_scene->graphPositionQuery())
-        m_scene->setGraphPositionQuery(Q3DScene::invalidSelectionPoint());
-
-    m_renderer->clearGraphPositionQueryResolved();
-
-    emit queriedGraphPositionChanged(m_queriedGraphPosition);
-}
-
 int Abstract3DController::selectedLabelIndex() const
 {
     int index = m_selectedLabelIndex;
@@ -1536,15 +1090,15 @@ int Abstract3DController::selectedLabelIndex() const
 QAbstract3DAxis *Abstract3DController::selectedAxis() const
 {
     QAbstract3DAxis *axis = 0;
-    QAbstract3DGraph::ElementType type = m_clickedType;
+    QAbstract3DGraphNG::ElementType type = m_clickedType;
     switch (type) {
-    case QAbstract3DGraph::ElementAxisXLabel:
+    case QAbstract3DGraphNG::ElementAxisXLabel:
         axis = axisX();
         break;
-    case QAbstract3DGraph::ElementAxisYLabel:
+    case QAbstract3DGraphNG::ElementAxisYLabel:
         axis = axisY();
         break;
-    case QAbstract3DGraph::ElementAxisZLabel:
+    case QAbstract3DGraphNG::ElementAxisZLabel:
         axis = axisZ();
         break;
     default:
@@ -1572,7 +1126,7 @@ QCustom3DItem *Abstract3DController::selectedCustomItem() const
     return item;
 }
 
-QAbstract3DGraph::ElementType Abstract3DController::selectedElement() const
+QAbstract3DGraphNG::ElementType Abstract3DController::selectedElement() const
 {
     return m_clickedType;
 }
@@ -1585,7 +1139,7 @@ void Abstract3DController::setOrthoProjection(bool enable)
         emit orthoProjectionChanged(m_useOrthoProjection);
         // If changed to ortho, disable shadows
         if (m_useOrthoProjection)
-            doSetShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+            doSetShadowQuality(QAbstract3DGraphNG::ShadowQualityNone);
         emitNeedRender();
     }
 }

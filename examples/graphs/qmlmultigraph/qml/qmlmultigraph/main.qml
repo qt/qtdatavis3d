@@ -151,7 +151,7 @@ Item {
                     type: Theme3D.ThemeQt
                     font.pointSize: 60
                 }
-                selectionMode: AbstractGraph3D.SelectionItemAndRow | AbstractGraph3D.SelectionSlice
+                selectionMode: AbstractGraph3DNG.SelectionItemAndRow | AbstractGraph3DNG.SelectionSlice
                 scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
 
                 Bar3DSeries {

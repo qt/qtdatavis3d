@@ -99,7 +99,7 @@ Item {
                 type: Theme3D.ThemeQt
                 baseColors: [dynamicColor]
             }
-            shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
+            shadowQuality: AbstractGraph3DNG.ShadowQualitySoftMedium
             scene.activeCamera.yRotation: 30.0
             inputHandler: null
             axisX.min: 0
@@ -209,11 +209,11 @@ Item {
         anchors.left: parent.left
 
         onClicked: {
-            if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftMedium;
+            if (scatterGraph.shadowQuality === AbstractGraph3DNG.ShadowQualityNone) {
+                scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualitySoftMedium;
                 text = "Hide Shadows";
             } else {
-                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualityNone;
                 text = "Show Shadows";
             }
         }

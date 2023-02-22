@@ -26,7 +26,7 @@ public:
 
 public Q_SLOTS:
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraphNG::ShadowQuality shadowQuality);
     void triggerSelection();
 
 Q_SIGNALS:

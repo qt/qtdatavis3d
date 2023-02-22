@@ -75,7 +75,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
       m_sliceLabelZ(0)
 {
     m_graph->activeTheme()->setType(Q3DTheme::ThemeQt);
-    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+    m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualityNone);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     //! [6]
     m_graph->setOrthoProjection(true);
@@ -201,7 +201,7 @@ VolumetricModifier::VolumetricModifier(Q3DScatter *scatter)
         m_graph->addCustomItem(warningLabel);
     }
 
-    QObject::connect(m_graph, &QAbstract3DGraph::currentFpsChanged, this,
+    QObject::connect(m_graph, &QAbstract3DGraphNG::currentFpsChanged, this,
                      &VolumetricModifier::handleFpsChange);
     QObject::connect(&m_timer, &QTimer::timeout, this,
                      &VolumetricModifier::handleTimeout);

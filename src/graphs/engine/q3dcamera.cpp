@@ -45,7 +45,7 @@ QT_BEGIN_NAMESPACE
  * \value CameraPresetDirectlyAboveCW45
  * \value CameraPresetDirectlyAboveCCW45
  * \value CameraPresetFrontBelow
- *        In Q3DBars from CameraPresetFrontBelow onward these only work for graphs including negative
+ *        In Q3DBarsNG from CameraPresetFrontBelow onward these only work for graphs including negative
  *        values. They act as Preset...Low for positive-only values.
  * \value CameraPresetLeftBelow
  * \value CameraPresetRightBelow

@@ -31,7 +31,7 @@ public Q_SLOTS:
     void changeStyle(int style);
     void changeTheme(int theme);
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraphNG::ShadowQuality shadowQuality);
 
 Q_SIGNALS:
     void backgroundEnabledChanged(bool enabled);

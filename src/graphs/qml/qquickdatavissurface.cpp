@@ -7,7 +7,9 @@
 #include "declarativescene_p.h"
 #include "surface3dcontroller_p.h"
 #include "surfaceselectioninstancing_p.h"
-#include "utils_p.h"
+#include "qvalue3daxis_p.h"
+#include "qcategory3daxis_p.h"
+//#include "utils_p.h"
 
 #include <QtQuick3D/private/qquick3drepeater_p.h>
 #include <QtQuick3D/private/qquick3dprincipledmaterial_p.h>
@@ -187,7 +189,7 @@ void QQuickDataVisSurface::componentComplete()
         model->setParentItem(scene);
         model->setObjectName(QStringLiteral("SurfaceModel"));
         model->setVisible(visible);
-        if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionNone))
+        if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraphNG::SelectionNone))
             model->setPickable(false);
         else
             model->setPickable(true);
@@ -978,7 +980,7 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
         QQuick3DModel *pickedModel = nullptr;
 
         auto selectionMode = m_surfaceController->selectionMode();
-        if (!selectionMode.testFlag(QAbstract3DGraph::SelectionNone)) {
+        if (!selectionMode.testFlag(QAbstract3DGraphNG::SelectionNone)) {
             for (auto picked : pickResult) {
                 if (picked.objectHit()->objectName().contains(QStringLiteral("SurfaceModel"))) {
                     pickedPos = picked.position();
@@ -1019,8 +1021,8 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
                     else
                         model->selectedVertex = SurfaceVertex();
 
-                    if (selectionMode.testFlag(QAbstract3DGraph::SelectionItem)) {
-                        if (selectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)) {
+                    if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionItem)) {
+                        if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionMultiSeries)) {
                             if (model->picked) {
                                 model->selectedVertex = selectedVertex;
                             } else {
@@ -1043,7 +1045,7 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
 
                     QVector<SurfaceVertex> selectedSeries;
 
-                    if (selectionMode.testFlag(QAbstract3DGraph::SelectionRow)
+                    if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow)
                             && model->picked) {
                         int selectedColumn = model->selectedVertex.coord.y();
                         int selectedRow = selectedColumn * model->columnCount;
@@ -1052,7 +1054,7 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
                             selectedSeries.append(model->vertices.at(selectedRow + i));
                     }
 
-                    if (selectionMode.testFlag(QAbstract3DGraph::SelectionColumn)
+                    if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn)
                             && model->picked) {
                         int selectedRow = model->selectedVertex.coord.x();
                         selectedSeries.reserve(model->columnCount);
@@ -1108,7 +1110,7 @@ void QQuickDataVisSurface::addModel(QSurface3DSeries *series)
     model->setParentItem(scene);
     model->setObjectName(QStringLiteral("SurfaceModel"));
     model->setVisible(visible);
-    if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionNone))
+    if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraphNG::SelectionNone))
         model->setPickable(false);
     else
         model->setPickable(true);

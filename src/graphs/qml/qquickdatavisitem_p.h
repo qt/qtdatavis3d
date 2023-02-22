@@ -322,10 +322,10 @@ protected:
     virtual void handleWindowChanged(/*QQuickWindow *win*/);
     void itemChange(ItemChange change, const ItemChangeData &value) override;
     virtual void updateWindowParameters();
-    virtual void handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode);
-    virtual void handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality);
-    virtual void handleSelectedElementChange(QAbstract3DGraph::ElementType type);
-    virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
+    virtual void handleSelectionModeChange(QAbstract3DGraphNG::SelectionFlags mode);
+    virtual void handleShadowQualityChange(QAbstract3DGraphNG::ShadowQuality quality);
+    virtual void handleSelectedElementChange(QAbstract3DGraphNG::ElementType type);
+    virtual void handleOptimizationHintChange(QAbstract3DGraphNG::OptimizationHints hints);
     virtual void keyPressEvent(QKeyEvent *ev) override;
     virtual void handleMousePressedEvent(QMouseEvent *event);
 

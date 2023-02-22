@@ -2,13 +2,15 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "qquickdatavisbars_p.h"
+#include "datavisquick3dtexturedata_p.h"
 #include "bars3dcontroller_p.h"
 #include "declarativescene_p.h"
 #include "qbar3dseries_p.h"
-
+#include "qvalue3daxis_p.h"
+#include "qcategory3daxis_p.h"
 #include "q3dcamera_p.h"
 #include <QtCore/QMutexLocker>
-#include "utils_p.h"
+//#include "utils_p.h"
 #include <QColor>
 
 #include <QtQuick3D/private/qquick3drepeater_p.h>
@@ -612,13 +614,13 @@ void QQuickDataVisBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
 {
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     m_meshType = mesh;
-    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+    if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
         for (auto series : m_barsController->barSeriesList()) {
             if (m_barModelsMap.contains(series))
                 removeDataItems(series);
         }
         generateBars(barSeriesList);
-    } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+    } else if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic) {
         resetClickedStatus();
 //        m_instancingRootItem->setSource(QUrl(getMeshFileName()));
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
@@ -628,7 +630,7 @@ void QQuickDataVisBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
     }
 }
 
-void QQuickDataVisBars::handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints)
+void QQuickDataVisBars::handleOptimizationHintsChanged(QAbstract3DGraphNG::OptimizationHints hints)
 {
     Q_UNUSED(hints);
     //    setup();
@@ -639,13 +641,13 @@ void QQuickDataVisBars::handleMeshSmoothChanged(bool enable)
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     m_smooth = enable;
 
-    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+    if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
         for (auto series : m_barsController->barSeriesList()) {
             if (m_barModelsMap.contains(series))
                 removeDataItems(series);
         }
         generateBars(barSeriesList);
-    } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+    } else if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic) {
         resetClickedStatus();
 //        m_instancingRootItem->setSource(QUrl(getMeshFileName()));
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
@@ -833,7 +835,7 @@ void QQuickDataVisBars::updateBarPositions(QBar3DSeries *series)
     m_zeroPosition = m_helperAxisY.itemPositionAt(m_actualFloorLevel);
 
     QVector<BarModel *> barList = *m_barModelsMap.value(series);
-    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+    if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
         for (int i = 0; i < barList.count(); i++) {
             QBarDataItem *item = const_cast<QBarDataItem *>((barList.at(i)->barItem));
             QQuick3DModel *model = barList.at(i)->model;
@@ -930,7 +932,7 @@ void QQuickDataVisBars::updateBarVisuals(QBar3DSeries *series)
     bool rangeGradient = (useGradient && series->d_ptr->m_colorStyle == Q3DTheme::ColorStyleRangeGradient)
                         ? true : false;
 
-    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+    if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
         if (!rangeGradient) {
             for (int i = 0; i < barList.count(); i++) {
                 QQuick3DModel *model = barList.at(i)->model;
@@ -1062,7 +1064,7 @@ void QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
         QList<QQuick3DPickResult> pickResults = pickAll(mousePos.x(), mousePos.y());
         auto selectionMode = m_barsController->selectionMode();
         QQuick3DModel *selectedModel = nullptr;
-        if (!selectionMode.testFlag(QAbstract3DGraph::SelectionNone)) {
+        if (!selectionMode.testFlag(QAbstract3DGraphNG::SelectionNone)) {
             for (const auto &picked : std::as_const(pickResults)) {
                 if (picked.objectHit()->visible()) {
                     if (picked.objectHit() == backgroundBB() || picked.objectHit() == background()) {
@@ -1185,16 +1187,16 @@ Abstract3DController::SelectionType QQuickDataVisBars::isSelected(int row, int b
 {
     Bars3DController::SelectionType isSelectedType = Bars3DController::SelectionNone;
     auto selectionMode = m_barsController->selectionMode();
-    if ((selectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)
+    if ((selectionMode.testFlag(QAbstract3DGraphNG::SelectionMultiSeries)
          && m_selectedBarSeries) || series == m_selectedBarSeries) {
         if (row == m_selectedBarCoord.x() && bar == m_selectedBarCoord.y()
-                && (selectionMode.testFlag(QAbstract3DGraph::SelectionItem))) {
+                && (selectionMode.testFlag(QAbstract3DGraphNG::SelectionItem))) {
             isSelectedType = Bars3DController::SelectionItem;
         } else if (row == m_selectedBarCoord.x()
-                   && (selectionMode.testFlag(QAbstract3DGraph::SelectionRow))) {
+                   && (selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow))) {
             isSelectedType = Bars3DController::SelectionRow;
         } else if (bar == m_selectedBarCoord.y()
-                   && (selectionMode.testFlag(QAbstract3DGraph::SelectionColumn))) {
+                   && (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn))) {
             isSelectedType = Bars3DController::SelectionColumn;
         }
     }

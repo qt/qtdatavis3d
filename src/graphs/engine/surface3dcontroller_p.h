@@ -19,7 +19,6 @@
 
 QT_BEGIN_NAMESPACE
 
-class Surface3DRenderer;
 class QSurface3DSeries;
 
 struct Surface3DChangeBitField {
@@ -63,10 +62,7 @@ public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
     ~Surface3DController();
 
-    void initializeOpenGL() override;
-    void synchDataToRenderer() override;
-
-    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode) override;
+    void setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode) override;
     void setSelectedPoint(const QPoint &position, QSurface3DSeries *series, bool enterSlice);
     void clearSelection() override;
 
@@ -76,7 +72,6 @@ public:
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) override;
     void handleAxisRangeChangedBySender(QObject *sender) override;
     void handleSeriesVisibilityChangedBySender(QObject *sender) override;
-    void handlePendingClick() override;
     void adjustAxisRanges() override;
 
     static QPoint invalidSelectionPosition();
@@ -120,7 +115,6 @@ Q_SIGNALS:
 
 private:
     Surface3DChangeBitField m_changeTracker;
-    Surface3DRenderer *m_renderer;
     QPoint m_selectedPoint;
     QSurface3DSeries *m_selectedSeries; // Points to the series for which the point is selected in
                                         // single series selection cases.

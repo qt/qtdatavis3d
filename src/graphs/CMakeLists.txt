@@ -30,12 +30,9 @@ qt_internal_add_qml_module(Graphs
         axis/qlogvalue3daxisformatter.cpp axis/qlogvalue3daxisformatter.h axis/qlogvalue3daxisformatter_p.h
         axis/qvalue3daxis.cpp axis/qvalue3daxis.h axis/qvalue3daxis_p.h
         axis/qvalue3daxisformatter.cpp axis/qvalue3daxisformatter.h axis/qvalue3daxisformatter_p.h
+
         data/abstractitemmodelhandler.cpp data/abstractitemmodelhandler_p.h
-        data/abstractrenderitem.cpp data/abstractrenderitem_p.h
         data/baritemmodelhandler.cpp data/baritemmodelhandler_p.h
-        data/barrenderitem.cpp data/barrenderitem_p.h
-        data/customrenderitem.cpp data/customrenderitem_p.h
-        data/labelitem.cpp data/labelitem_p.h
         data/qabstract3dseries.cpp data/qabstract3dseries.h data/qabstract3dseries_p.h
         data/qabstractdataproxy.cpp data/qabstractdataproxy.h data/qabstractdataproxy_p.h
         data/qbar3dseries.cpp data/qbar3dseries.h data/qbar3dseries_p.h
@@ -55,70 +52,44 @@ qt_internal_add_qml_module(Graphs
         data/qsurfacedataitem.cpp data/qsurfacedataitem.h data/qsurfacedataitem_p.h
         data/qsurfacedataproxy.cpp data/qsurfacedataproxy.h data/qsurfacedataproxy_p.h
         data/scatteritemmodelhandler.cpp data/scatteritemmodelhandler_p.h
-        data/scatterrenderitem.cpp data/scatterrenderitem_p.h
         data/surfaceitemmodelhandler.cpp data/surfaceitemmodelhandler_p.h
-        engine/abstractdeclarativeinterface.cpp engine/abstractdeclarativeinterface_p.h
+
         engine/abstract3dcontroller.cpp engine/abstract3dcontroller_p.h
-        engine/abstract3drenderer.cpp engine/abstract3drenderer_p.h
-        engine/axisrendercache.cpp engine/axisrendercache_p.h
         engine/axishelper.cpp engine/axishelper_p.h
         engine/bars3dcontroller.cpp engine/bars3dcontroller_p.h
-        engine/bars3drenderer.cpp engine/bars3drenderer_p.h
-        engine/barseriesrendercache.cpp engine/barseriesrendercache_p.h
         engine/scatterinstancing.cpp engine/scatterinstancing_p.h
-        engine/drawer.cpp engine/drawer_p.h
-        engine/q3dbars.cpp engine/q3dbars.h engine/q3dbars_p.h
+        engine/q3dbars.cpp engine/q3dbars.h
         engine/q3dcamera.cpp engine/q3dcamera.h engine/q3dcamera_p.h
         engine/q3dlight.cpp engine/q3dlight.h engine/q3dlight_p.h
         engine/q3dobject.cpp engine/q3dobject.h engine/q3dobject_p.h
-        engine/q3dscatter.cpp engine/q3dscatter.h engine/q3dscatter_p.h
+        engine/q3dscatter.cpp engine/q3dscatter.h
         engine/q3dscene.cpp engine/q3dscene.h engine/q3dscene_p.h
-        engine/q3dsurface.cpp engine/q3dsurface.h engine/q3dsurface_p.h
-        engine/qabstract3dgraph.cpp engine/qabstract3dgraph.h engine/qabstract3dgraph_p.h
+        engine/q3dsurface.cpp engine/q3dsurface.h
+        engine/qabstract3dgraph.cpp engine/qabstract3dgraph.h
         engine/scatter3dcontroller.cpp engine/scatter3dcontroller_p.h
-        engine/scatter3drenderer.cpp engine/scatter3drenderer_p.h
-
-        engine/scatterseriesrendercache.cpp engine/scatterseriesrendercache_p.h
-        engine/selectionpointer.cpp engine/selectionpointer_p.h
-        engine/seriesrendercache.cpp engine/seriesrendercache_p.h
         engine/surface3dcontroller.cpp engine/surface3dcontroller_p.h
         engine/datavisquick3dtexturedata.cpp engine/datavisquick3dtexturedata_p.h # Maybe change this location
-        engine/surface3drenderer.cpp engine/surface3drenderer_p.h
-        engine/surfaceseriesrendercache.cpp engine/surfaceseriesrendercache_p.h
         engine/surfaceselectioninstancing.cpp engine/surfaceselectioninstancing_p.h
+
         global/graphsglobal_p.h
         global/qgraphsglobal.h
+
         input/q3dinputhandler.cpp input/q3dinputhandler.h input/q3dinputhandler_p.h
         input/qabstract3dinputhandler.cpp input/qabstract3dinputhandler.h input/qabstract3dinputhandler_p.h
         input/qtouch3dinputhandler.cpp input/qtouch3dinputhandler.h input/qtouch3dinputhandler_p.h
+
         theme/q3dtheme.cpp theme/q3dtheme.h theme/q3dtheme_p.h
         theme/thememanager.cpp theme/thememanager_p.h
-        utils/abstractobjecthelper.cpp utils/abstractobjecthelper_p.h
-        utils/camerahelper.cpp utils/camerahelper_p.h
-        utils/meshloader.cpp utils/meshloader_p.h
-        utils/objecthelper.cpp utils/objecthelper_p.h
+
         utils/qutils.h
-        utils/scatterobjectbufferhelper.cpp utils/scatterobjectbufferhelper_p.h
-        utils/scatterpointbufferhelper.cpp utils/scatterpointbufferhelper_p.h
-        utils/shaderhelper.cpp utils/shaderhelper_p.h
-        utils/surfaceobject.cpp utils/surfaceobject_p.h
-        utils/texturehelper.cpp utils/texturehelper_p.h
         utils/utils.cpp utils/utils_p.h
-        utils/vertexindexer.cpp utils/vertexindexer_p.h
-        # Qml files
-        qml/abstractdeclarative.cpp qml/abstractdeclarative_p.h
+
+        qml/foreigntypes_p.h
         qml/colorgradient.cpp qml/colorgradient_p.h
-        qml/declarativebars.cpp qml/declarativebars_p.h
         qml/declarativecolor.cpp qml/declarativecolor_p.h
-        qml/declarativerendernode.cpp qml/declarativerendernode_p.h
-        qml/declarativescatter.cpp qml/declarativescatter_p.h
         qml/declarativescene.cpp qml/declarativescene_p.h
         qml/declarativeseries.cpp qml/declarativeseries_p.h
-        qml/declarativesurface.cpp qml/declarativesurface_p.h
         qml/declarativetheme.cpp qml/declarativetheme_p.h
-        qml/enumtostringmap.cpp qml/enumtostringmap_p.h
-        qml/foreigntypes_p.h
-        qml/glstatestore.cpp qml/glstatestore_p.h
         qml/qquickdatavisitem.cpp qml/qquickdatavisitem_p.h
         qml/qquickdatavisbars.cpp qml/qquickdatavisbars_p.h
         qml/qquickdatavissurface.cpp qml/qquickdatavissurface_p.h

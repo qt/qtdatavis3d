@@ -53,7 +53,7 @@ Item {
             //! [2]
             //! [3]
             theme: themeIsabelle
-            shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
+            shadowQuality: AbstractGraph3DNG.ShadowQualitySoftLow
             //! [3]
             //! [6]
             axisX.segmentCount: 3
@@ -129,11 +129,11 @@ Item {
             text: scatterGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
             enabled: scatterGraph.shadowsSupported
             onClicked: {
-                if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;
+                if (scatterGraph.shadowQuality === AbstractGraph3DNG.ShadowQualityNone) {
+                    scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualitySoftLow;
                     text = "Hide Shadows";
                 } else {
-                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                    scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualityNone;
                     text = "Show Shadows";
                 }
             }

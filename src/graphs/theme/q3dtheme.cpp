@@ -625,8 +625,8 @@ QColor Q3DTheme::gridLineColor() const
  *
  * \brief The highlight color for a selected object.
  *
- * Used if \l{QAbstract3DGraph::selectionMode}{selectionMode} has the
- * \c QAbstract3DGraph::SelectionItem flag set.
+ * Used if \l{QAbstract3DGraphNG::selectionMode}{selectionMode} has the
+ * \c QAbstract3DGraphNG::SelectionItem flag set.
  */
 void Q3DTheme::setSingleHighlightColor(const QColor &color)
 {
@@ -647,8 +647,8 @@ QColor Q3DTheme::singleHighlightColor() const
  *
  * \brief The highlight color for selected objects.
  *
- * Used if \l{QAbstract3DGraph::selectionMode}{selectionMode} has the
- * \c QAbstract3DGraph::SelectionRow or \c QAbstract3DGraph::SelectionColumn
+ * Used if \l{QAbstract3DGraphNG::selectionMode}{selectionMode} has the
+ * \c QAbstract3DGraphNG::SelectionRow or \c QAbstract3DGraphNG::SelectionColumn
  * flag set.
  */
 void Q3DTheme::setMultiHighlightColor(const QColor &color)
@@ -725,8 +725,8 @@ QList<QLinearGradient> Q3DTheme::baseGradients() const
  *
  * \brief The highlight gradient for a selected object.
  *
- * Used if \l{QAbstract3DGraph::selectionMode}{selectionMode}
- * has the \c QAbstract3DGraph::SelectionItem flag set.
+ * Used if \l{QAbstract3DGraphNG::selectionMode}{selectionMode}
+ * has the \c QAbstract3DGraphNG::SelectionItem flag set.
  */
 void Q3DTheme::setSingleHighlightGradient(const QLinearGradient &gradient)
 {
@@ -747,9 +747,9 @@ QLinearGradient Q3DTheme::singleHighlightGradient() const
  *
  * \brief The highlight gradient for selected objects.
  *
- * Used if \l{QAbstract3DGraph::selectionMode}{selectionMode}
- * has the \c QAbstract3DGraph::SelectionRow or
- * \c QAbstract3DGraph::SelectionColumn flag set.
+ * Used if \l{QAbstract3DGraphNG::selectionMode}{selectionMode}
+ * has the \c QAbstract3DGraphNG::SelectionRow or
+ * \c QAbstract3DGraphNG::SelectionColumn flag set.
  */
 void Q3DTheme::setMultiHighlightGradient(const QLinearGradient &gradient)
 {

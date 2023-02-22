@@ -268,7 +268,7 @@ QStringList &QValue3DAxisFormatter::labelStrings() const
  * is set as an active axis of the graph, the axis formatter is set to an axis attached to
  * the graph, or the graph's locale changes.
  *
- * \sa locale(), QAbstract3DGraph::locale
+ * \sa locale(), QAbstract3DGraphNG::locale
  */
 void QValue3DAxisFormatter::setLocale(const QLocale &locale)
 {

@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "scatter3dcontroller_p.h"
-#include "scatter3drenderer_p.h"
 #include "qvalue3daxis_p.h"
 #include "qscatterdataproxy_p.h"
 #include "qscatter3dseries_p.h"
@@ -14,7 +13,6 @@ static const int insertRemoveRecordReserveSize = 31;
 
 Scatter3DController::Scatter3DController(QRect boundRect, Q3DScene *scene)
     : Abstract3DController(boundRect, scene),
-      m_renderer(0),
       m_selectedItem(invalidSelectionIndex()),
       m_selectedItemSeries(0),
       m_recordInsertsAndRemoves(false)
@@ -29,45 +27,6 @@ Scatter3DController::Scatter3DController(QRect boundRect, Q3DScene *scene)
 
 Scatter3DController::~Scatter3DController()
 {
-}
-
-void Scatter3DController::initializeOpenGL()
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-
-    // Initialization is called multiple times when Qt Quick components are used
-    if (isInitialized())
-        return;
-
-    m_renderer = new Scatter3DRenderer(this);
-    setRenderer(m_renderer);
-
-    mutexLocker.unlock();
-    synchDataToRenderer();
-
-    emitNeedRender();
-}
-
-void Scatter3DController::synchDataToRenderer()
-{
-    QMutexLocker mutexLocker(&m_renderMutex);
-
-    if (!isInitialized())
-        return;
-
-    Abstract3DController::synchDataToRenderer();
-
-    // Notify changes to renderer
-    if (m_changeTracker.itemChanged) {
-        m_renderer->updateItems(m_changedItems);
-        m_changeTracker.itemChanged = false;
-        m_changedItems.clear();
-    }
-
-    if (m_changeTracker.selectedItemChanged) {
-        m_renderer->updateSelectedItem(m_selectedItem, m_selectedItemSeries);
-        m_changeTracker.selectedItemChanged = false;
-    }
 }
 
 void Scatter3DController::addSeries(QAbstract3DSeries *series)
@@ -270,42 +229,10 @@ void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
 }
 
-void Scatter3DController::handlePendingClick()
-{
-    int index = m_renderer->clickedIndex();
-    QScatter3DSeries *series = static_cast<QScatter3DSeries *>(m_renderer->clickedSeries());
-
-    // Adjust position according to recorded events
-    int recordCount = m_insertRemoveRecords.size();
-    if (recordCount) {
-        for (int i = 0; i < recordCount; i++) {
-            const InsertRemoveRecord &record = m_insertRemoveRecords.at(i);
-            if (series == record.m_series && record.m_startIndex <= index) {
-                if (record.m_isInsert) {
-                    index += record.m_count;
-                } else {
-                    if ((record.m_startIndex + record.m_count) > index) {
-                        index = -1; // Selected row removed
-                        break;
-                    } else {
-                        index -= record.m_count; // Move selected item down by amount of items removed
-                    }
-                }
-            }
-        }
-    }
-
-    setSelectedItem(index, series);
-
-    Abstract3DController::handlePendingClick();
-
-    m_renderer->resetClickedStatus();
-}
-
-void Scatter3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
+void Scatter3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
 {
     // We only support single item selection mode and no selection mode
-    if (mode != QAbstract3DGraph::SelectionItem && mode != QAbstract3DGraph::SelectionNone) {
+    if (mode != QAbstract3DGraphNG::SelectionItem && mode != QAbstract3DGraphNG::SelectionNone) {
         qWarning("Unsupported selection mode - only none and item selection modes are supported.");
         return;
     }

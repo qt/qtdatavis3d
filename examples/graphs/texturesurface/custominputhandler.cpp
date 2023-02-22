@@ -6,7 +6,7 @@
 #include <QtGraphs/Q3DCamera>
 #include <QtCore/qmath.h>
 
-CustomInputHandler::CustomInputHandler(QAbstract3DGraph *graph, QObject *parent) :
+CustomInputHandler::CustomInputHandler(QAbstract3DGraphNG *graph, QObject *parent) :
     Q3DInputHandler(parent),
     m_highlight(0),
     m_mousePressed(false),
@@ -16,7 +16,7 @@ CustomInputHandler::CustomInputHandler(QAbstract3DGraph *graph, QObject *parent)
     m_speedModifier(20.0f)
 {
     // Connect to the item selection signal from graph
-    connect(graph, &QAbstract3DGraph::selectedElementChanged, this,
+    connect(graph, &QAbstract3DGraphNG::selectedElementChanged, this,
             &CustomInputHandler::handleElementSelected);
 }
 
@@ -67,13 +67,13 @@ void CustomInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mou
     m_state = StateNormal;
 }
 
-void CustomInputHandler::handleElementSelected(QAbstract3DGraph::ElementType type)
+void CustomInputHandler::handleElementSelected(QAbstract3DGraphNG::ElementType type)
 {
     switch (type) {
-    case QAbstract3DGraph::ElementAxisXLabel:
+    case QAbstract3DGraphNG::ElementAxisXLabel:
         m_state = StateDraggingX;
         break;
-    case QAbstract3DGraph::ElementAxisZLabel:
+    case QAbstract3DGraphNG::ElementAxisZLabel:
         m_state = StateDraggingZ;
         break;
     default:

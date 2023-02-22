@@ -91,8 +91,8 @@ Window {
             width: surfaceView.width
             height: surfaceView.height
 
-            shadowQuality: AbstractGraph3D.ShadowQualityNone
-            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndColumn
+            shadowQuality: AbstractGraph3DNG.ShadowQualityNone
+            selectionMode: AbstractGraph3DNG.SelectionSlice | AbstractGraph3DNG.SelectionItemAndColumn
             axisX: xAxis
             axisY: yAxis
             axisZ: zAxis

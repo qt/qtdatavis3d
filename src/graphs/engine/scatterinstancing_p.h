@@ -13,7 +13,9 @@
 
 #ifndef SCATTERINSTANCING_H
 #define SCATTERINSTANCING_H
+
 #include <QtQuick3D/private/qquick3dinstancing_p.h>
+
 struct DataItemHolder {
     QVector3D position;
     QQuaternion rotation;
@@ -40,6 +42,7 @@ public:
 
 protected:
     QByteArray getInstanceBuffer(int *instanceCount) override;
+
 private:
     QByteArray m_instanceData;
     QList<DataItemHolder> m_dataArray;

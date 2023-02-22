@@ -22,7 +22,7 @@ class AxesInputHandler : public Q3DInputHandler
     };
 
 public:
-    explicit AxesInputHandler(QAbstract3DGraph *graph, QObject *parent = 0);
+    explicit AxesInputHandler(QAbstract3DGraphNG *graph, QObject *parent = 0);
 
     inline void setAxes(QValue3DAxis *axisX, QValue3DAxis *axisZ, QValue3DAxis *axisY) {
         m_axisX = axisX;
@@ -39,7 +39,7 @@ public:
     virtual void mouseReleaseEvent(QMouseEvent *event, const QPoint &mousePos);
 
 private:
-    void handleElementSelected(QAbstract3DGraph::ElementType type);
+    void handleElementSelected(QAbstract3DGraphNG::ElementType type);
     void handleAxisDragging();
 
 private:

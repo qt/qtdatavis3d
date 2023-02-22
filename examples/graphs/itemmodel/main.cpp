@@ -26,7 +26,7 @@
 class GraphDataGenerator : public QObject
 {
 public:
-    explicit GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWidget);
+    explicit GraphDataGenerator(Q3DBarsNG *bargraph, QTableWidget *tableWidget);
     ~GraphDataGenerator();
 
     void setupModel();
@@ -40,14 +40,14 @@ public:
     void fixTableSize();
 
 private:
-    Q3DBars *m_graph;
+    Q3DBarsNG *m_graph;
     QTimer *m_dataTimer;
     int m_columnCount;
     int m_rowCount;
     QTableWidget *m_tableWidget; // not owned
 };
 
-GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWidget)
+GraphDataGenerator::GraphDataGenerator(Q3DBarsNG *bargraph, QTableWidget *tableWidget)
     : m_graph(bargraph),
       m_dataTimer(0),
       m_columnCount(100),
@@ -68,7 +68,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
     m_tableWidget->setColumnCount(m_columnCount);
 
     // Set selection mode to full
-    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemRowAndColumn);
+    m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItemRowAndColumn);
 
     // Hide axis labels by explicitly setting one empty string as label list
     m_graph->rowAxis()->setLabels(QStringList(QString()));
@@ -78,7 +78,7 @@ GraphDataGenerator::GraphDataGenerator(Q3DBars *bargraph, QTableWidget *tableWid
 #else
     //! [6]
     // Set selection mode to slice row
-    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow | QAbstract3DGraph::SelectionSlice);
+    m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItemAndRow | QAbstract3DGraphNG::SelectionSlice);
 
     //! [6]
 #endif
@@ -224,7 +224,7 @@ int main(int argc, char **argv)
     qputenv("QSG_RHI_BACKEND", "opengl");
     //! [0]
     QApplication app(argc, argv);
-    Q3DBars *graph = new Q3DBars();
+    Q3DBarsNG *graph = new Q3DBars();
     QWidget *container = QWidget::createWindowContainer(graph);
     //! [0]
 

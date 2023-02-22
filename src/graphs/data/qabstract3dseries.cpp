@@ -698,7 +698,7 @@ void QAbstract3DSeriesPrivate::setMesh(QAbstract3DSeries::Mesh mesh)
     if (m_controller) {
         m_controller->markSeriesVisualsDirty();
 
-        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraphNG::OptimizationStatic))
             m_controller->markDataDirty();
     }
 }
@@ -710,7 +710,7 @@ void QAbstract3DSeriesPrivate::setMeshSmooth(bool enable)
     if (m_controller) {
         m_controller->markSeriesVisualsDirty();
 
-        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraphNG::OptimizationStatic))
             m_controller->markDataDirty();
     }
 }
@@ -722,7 +722,7 @@ void QAbstract3DSeriesPrivate::setMeshRotation(const QQuaternion &rotation)
     if (m_controller) {
         m_controller->markSeriesVisualsDirty();
 
-        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraphNG::OptimizationStatic))
             m_controller->markDataDirty();
     }
 }
@@ -734,7 +734,7 @@ void QAbstract3DSeriesPrivate::setUserDefinedMesh(const QString &meshFile)
     if (m_controller) {
         m_controller->markSeriesVisualsDirty();
 
-        if (m_controller->optimizationHints().testFlag(QAbstract3DGraph::OptimizationStatic))
+        if (m_controller->optimizationHints().testFlag(QAbstract3DGraphNG::OptimizationStatic))
             m_controller->markDataDirty();
     }
 }

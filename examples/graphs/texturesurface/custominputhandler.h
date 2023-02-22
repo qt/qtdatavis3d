@@ -21,7 +21,7 @@ class CustomInputHandler : public Q3DInputHandler
     };
 
 public:
-    explicit CustomInputHandler(QAbstract3DGraph *graph, QObject *parent = 0);
+    explicit CustomInputHandler(QAbstract3DGraphNG *graph, QObject *parent = 0);
 
     inline void setLimits(float min, float max, float minRange) {
         m_areaMinValue = min;
@@ -48,7 +48,7 @@ public:
     virtual void wheelEvent(QWheelEvent *event);
 
 private:
-    void handleElementSelected(QAbstract3DGraph::ElementType type);
+    void handleElementSelected(QAbstract3DGraphNG::ElementType type);
     void handleAxisDragging();
     void checkConstraints();
 

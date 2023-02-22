@@ -15,15 +15,15 @@ qtHaveModule(quick) {
 
 !android:!ios:!winrt {
     SUBDIRS += bars \
-               custominput \
-               customproxy \
-               itemmodel \
+#               custominput \
+#               customproxy \
+#               itemmodel \
                scatter \
-               surface \
-               rotations \
-               draggableaxes \
-               customitems \
-               texturesurface \
-               volumetric
+               surface #\
+#               rotations \
+#               draggableaxes \
+#               customitems \
+#               texturesurface \
+#               volumetric
 }
 

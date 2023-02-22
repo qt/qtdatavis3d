@@ -112,7 +112,7 @@ Item {
             width: dataView.width
             height: dataView.height
             theme: dynamicColorTheme
-            shadowQuality: AbstractGraph3D.ShadowQualityLow
+            shadowQuality: AbstractGraph3DNG.ShadowQualityLow
             scene.activeCamera.yRotation: 45.0
             scene.activeCamera.xRotation: 45.0
             scene.activeCamera.zoomLevel: 75.0
@@ -143,8 +143,8 @@ Item {
             //! [9]
             //! [5]
             onSelectedElementChanged: {
-                if (selectedElement >= AbstractGraph3D.ElementAxisXLabel
-                        && selectedElement <= AbstractGraph3D.ElementAxisZLabel)
+                if (selectedElement >= AbstractGraph3DNG.ElementAxisXLabel
+                        && selectedElement <= AbstractGraph3DNG.ElementAxisZLabel)
                     selectedAxisLabel = selectedElement
                 else
                     selectedAxisLabel = -1
@@ -208,7 +208,7 @@ Item {
 
         // Adjust axes
         switch (selectedAxisLabel) {
-        case AbstractGraph3D.ElementAxisXLabel:
+        case AbstractGraph3DNG.ElementAxisXLabel:
             var distance = ((moveX - moveY) * cameraMultiplier) / dragSpeedModifier
             // Check if we need to change min or max first to avoid invalid ranges
             if (distance > 0) {
@@ -219,7 +219,7 @@ Item {
                 scatterGraph.axisX.min -= distance
             }
             break
-        case AbstractGraph3D.ElementAxisYLabel:
+        case AbstractGraph3DNG.ElementAxisYLabel:
             distance = moveY / dragSpeedModifier
             // Check if we need to change min or max first to avoid invalid ranges
             if (distance > 0) {
@@ -230,7 +230,7 @@ Item {
                 scatterGraph.axisY.max += distance
             }
             break
-        case AbstractGraph3D.ElementAxisZLabel:
+        case AbstractGraph3DNG.ElementAxisZLabel:
             distance = ((moveX + moveY) * cameraMultiplier) / dragSpeedModifier
             // Check if we need to change min or max first to avoid invalid ranges
             if (distance > 0) {
@@ -284,7 +284,7 @@ Item {
                 text = "Display Orthographic";
                 scatterGraph.orthoProjection = false
                 // Orthographic projection disables shadows, so we need to switch them back on
-                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityLow
+                scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualityLow
             } else {
                 text = "Display Perspective";
                 scatterGraph.orthoProjection = true

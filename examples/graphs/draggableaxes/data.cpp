@@ -24,7 +24,7 @@ Data::Data(Q3DScatter *scatter)
     m_graph->activeTheme()->setLabelBackgroundColor(QColor(QRgb(0x151550)));
     m_graph->activeTheme()->setLabelTextColor(Qt::lightGray);
     m_graph->activeTheme()->setFont(QFont("Arial Black", 30));
-    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
+    m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualityMedium);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetIsometricRight);
 
     m_graph->axisX()->setRange(-20.0f, 20.0f);

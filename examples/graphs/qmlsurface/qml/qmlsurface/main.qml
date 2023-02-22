@@ -46,8 +46,8 @@ Rectangle {
                 baseGradients: [surfaceGradient]
             }
             //! [7]
-            shadowQuality: AbstractGraph3D.ShadowQualityMedium
-            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
+            shadowQuality: AbstractGraph3DNG.ShadowQualityMedium
+            selectionMode: AbstractGraph3DNG.SelectionSlice | AbstractGraph3DNG.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
             axisY.min: 0.0
             axisY.max: 500.0

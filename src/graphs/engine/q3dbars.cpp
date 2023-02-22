@@ -1,7 +1,7 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "q3dbars_p.h"
+#include "q3dbars.h"
 #include "qquickdatavisbars_p.h"
 
 QT_BEGIN_NAMESPACE
@@ -9,7 +9,7 @@ QT_BEGIN_NAMESPACE
 /*!
  * \class Q3DBars
  * \inmodule QtGraphs
- * \brief The Q3DBars class provides methods for rendering 3D bar graphs.
+ * \brief The Q3DBarsNG class provides methods for rendering 3D bar graphs.
  *
  * This class enables developers to render bar graphs in 3D and to view them by rotating the scene
  * freely. Rotation is done by holding down the right mouse button and moving the mouse. Zooming
@@ -21,12 +21,12 @@ QT_BEGIN_NAMESPACE
  * These default axes can be modified via axis accessors, but as soon any axis is set explicitly
  * for the orientation, the default axis for that orientation is destroyed.
  *
- * Q3DBars supports more than one series visible at the same time. It is not necessary for all series
+ * Q3DBarsNG supports more than one series visible at the same time. It is not necessary for all series
  * to have the same amount of rows and columns.
  * Row and column labels are taken from the first added series, unless explicitly defined to
  * row and column axes.
  *
- * \section1 How to construct a minimal Q3DBars graph
+ * \section1 How to construct a minimal Q3DBarsNG graph
  *
  * First, construct an instance of Q3DBars. Since we are running the graph as top level window
  * in this example, we need to clear the \c Qt::FramelessWindowHint flag, which gets set by
@@ -41,7 +41,7 @@ QT_BEGIN_NAMESPACE
  *
  * \snippet doc_src_q3dbars_construction.cpp 0
  *
- * Now Q3DBars is ready to receive data to be rendered. Create a series with one row of 5 values:
+ * Now Q3DBarsNG is ready to receive data to be rendered. Create a series with one row of 5 values:
  *
  * \snippet doc_src_q3dbars_construction.cpp 1
  *
@@ -71,27 +71,10 @@ QT_BEGIN_NAMESPACE
  * Constructs a new 3D bar graph with optional \a parent window
  * and surface \a format.
  */
-Q3DBars::Q3DBars(const QSurfaceFormat *format, QWindow *parent)
-    : QAbstract3DGraph(new Q3DBarsPrivate(this), format, parent)
-{
-    if (!dptr()->m_initialized)
-        return;
-
-    dptr()->m_shared = new Bars3DController(geometry());
-    d_ptr->setVisualController(dptr()->m_shared);
-    dptr()->m_shared->initializeOpenGL();
-    QObject::connect(dptr()->m_shared, &Bars3DController::primarySeriesChanged,
-                     this, &Q3DBars::primarySeriesChanged);
-    QObject::connect(dptr()->m_shared, &Bars3DController::selectedSeriesChanged,
-                     this, &Q3DBars::selectedSeriesChanged);
-}
 
 /*!
  * Destroys the 3D bar graph.
  */
-Q3DBars::~Q3DBars()
-{
-}
 
 /*!
  * \property Q3DBars::primarySeries
@@ -113,15 +96,6 @@ Q3DBars::~Q3DBars()
  * If \a series is null, this property resets to default.
  * Defaults to the first added series or zero if no series are added to the graph.
  */
-void Q3DBars::setPrimarySeries(QBar3DSeries *series)
-{
-    dptr()->m_shared->setPrimarySeries(series);
-}
-
-QBar3DSeries *Q3DBars::primarySeries() const
-{
-    return dptrc()->m_shared->primarySeries();
-}
 
 /*!
  * Adds the \a series to the graph. A graph can contain multiple series, but only one set of axes,
@@ -131,22 +105,14 @@ QBar3DSeries *Q3DBars::primarySeries() const
  * to the axes. If the newly added series has specified a selected bar, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  *
- * \sa seriesList(), primarySeries, QAbstract3DGraph::hasSeries()
+ * \sa seriesList(), primarySeries, QAbstract3DGraphNG::hasSeries()
  */
-void Q3DBars::addSeries(QBar3DSeries *series)
-{
-    dptr()->m_shared->addSeries(series);
-}
 
 /*!
  * Removes the \a series from the graph.
  *
- * \sa QAbstract3DGraph::hasSeries()
+ * \sa QAbstract3DGraphNG::hasSeries()
  */
-void Q3DBars::removeSeries(QBar3DSeries *series)
-{
-    dptr()->m_shared->removeSeries(series);
-}
 
 /*!
  * Inserts the \a series into the position \a index in the series list.
@@ -156,22 +122,14 @@ void Q3DBars::removeSeries(QBar3DSeries *series)
  * the new position in list is calculated as if the series was still in its old
  * index, so the final index is actually the \a index decremented by one.
  *
- * \sa addSeries(), seriesList(), QAbstract3DGraph::hasSeries()
+ * \sa addSeries(), seriesList(), QAbstract3DGraphNG::hasSeries()
  */
-void Q3DBars::insertSeries(int index, QBar3DSeries *series)
-{
-    dptr()->m_shared->insertSeries(index, series);
-}
 
 /*!
  * Returns the list of series added to this graph.
  *
- * \sa QAbstract3DGraph::hasSeries()
+ * \sa QAbstract3DGraphNG::hasSeries()
  */
-QList<QBar3DSeries *> Q3DBars::seriesList() const
-{
-    return dptrc()->m_shared->barSeriesList();
-}
 
 /*!
  * \property Q3DBars::multiSeriesUniform
@@ -182,18 +140,6 @@ QList<QBar3DSeries *> Q3DBars::seriesList() const
  * If set to \c {true}, \l{barSpacing}{bar spacing} will be correctly applied
  * only to the X-axis. Preset to \c false by default.
  */
-void Q3DBars::setMultiSeriesUniform(bool uniform)
-{
-    if (uniform != isMultiSeriesUniform()) {
-        dptr()->m_shared->setMultiSeriesScaling(uniform);
-        emit multiSeriesUniformChanged(uniform);
-    }
-}
-
-bool Q3DBars::isMultiSeriesUniform() const
-{
-    return dptrc()->m_shared->multiSeriesScaling();
-}
 
 /*!
  * \property Q3DBars::barThickness
@@ -203,19 +149,6 @@ bool Q3DBars::isMultiSeriesUniform() const
  * The value \c 1.0 means that the bars are as wide as they are deep, whereas
  *\c 0.5 makes them twice as deep as they are wide. Preset to \c 1.0 by default.
  */
-void Q3DBars::setBarThickness(float thicknessRatio)
-{
-    if (thicknessRatio != barThickness()) {
-        dptr()->m_shared->setBarSpecs(GLfloat(thicknessRatio), barSpacing(),
-                                      isBarSpacingRelative());
-        emit barThicknessChanged(thicknessRatio);
-    }
-}
-
-float Q3DBars::barThickness() const
-{
-    return dptrc()->m_shared->barThickness();
-}
 
 /*!
  * \property Q3DBars::barSpacing
@@ -227,18 +160,6 @@ float Q3DBars::barThickness() const
  *
  * \sa barSpacingRelative, multiSeriesUniform, barSeriesMargin
  */
-void Q3DBars::setBarSpacing(const QSizeF &spacing)
-{
-    if (spacing != barSpacing()) {
-        dptr()->m_shared->setBarSpecs(GLfloat(barThickness()), spacing, isBarSpacingRelative());
-        emit barSpacingChanged(spacing);
-    }
-}
-
-QSizeF Q3DBars::barSpacing() const
-{
-    return dptrc()->m_shared->barSpacing();
-}
 
 /*!
  * \property Q3DBars::barSpacingRelative
@@ -249,18 +170,6 @@ QSizeF Q3DBars::barSpacing() const
  * side-to-side, \c 1.0 means that a space as wide as the thickness of one bar
  * is left between the bars, and so on. Preset to \c true.
  */
-void Q3DBars::setBarSpacingRelative(bool relative)
-{
-    if (relative != isBarSpacingRelative()) {
-        dptr()->m_shared->setBarSpecs(GLfloat(barThickness()), barSpacing(), relative);
-        emit barSpacingRelativeChanged(relative);
-    }
-}
-
-bool Q3DBars::isBarSpacingRelative() const
-{
-    return dptrc()->m_shared->isBarSpecRelative();
-}
 
 /*!
  * \property Q3DBars::barSeriesMargin
@@ -274,18 +183,6 @@ bool Q3DBars::isBarSpacingRelative() const
  *
  * \sa barSpacing
  */
-void Q3DBars::setBarSeriesMargin(const QSizeF &margin)
-{
-    if (margin != barSeriesMargin()) {
-        dptr()->m_shared->setBarSeriesMargin(margin);
-        emit barSeriesMarginChanged(margin);
-    }
-}
-
-QSizeF Q3DBars::barSeriesMargin() const
-{
-    return dptrc()->m_shared->barSeriesMargin();
-}
 
 /*!
  * \property Q3DBars::rowAxis
@@ -303,15 +200,6 @@ QSizeF Q3DBars::barSeriesMargin() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DBars::setRowAxis(QCategory3DAxis *axis)
-{
-    dptr()->m_shared->setAxisZ(axis);
-}
-
-QCategory3DAxis *Q3DBars::rowAxis() const
-{
-    return static_cast<QCategory3DAxis *>(dptrc()->m_shared->axisZ());
-}
 
 /*!
  * \property Q3DBars::columnAxis
@@ -329,15 +217,6 @@ QCategory3DAxis *Q3DBars::rowAxis() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DBars::setColumnAxis(QCategory3DAxis *axis)
-{
-    dptr()->m_shared->setAxisX(axis);
-}
-
-QCategory3DAxis *Q3DBars::columnAxis() const
-{
-    return static_cast<QCategory3DAxis *>(dptrc()->m_shared->axisX());
-}
 
 /*!
  * \property Q3DBars::valueAxis
@@ -352,15 +231,6 @@ QCategory3DAxis *Q3DBars::columnAxis() const
  *
  * \sa addAxis(), releaseAxis()
  */
-void Q3DBars::setValueAxis(QValue3DAxis *axis)
-{
-    dptr()->m_shared->setAxisY(axis);
-}
-
-QValue3DAxis *Q3DBars::valueAxis() const
-{
-    return static_cast<QValue3DAxis *>(dptrc()->m_shared->axisY());
-}
 
 /*!
  * \property Q3DBars::selectedSeries
@@ -370,10 +240,6 @@ QValue3DAxis *Q3DBars::valueAxis() const
  * If selectionMode has the \c SelectionMultiSeries flag set, this
  * property holds the series that owns the selected bar.
  */
-QBar3DSeries *Q3DBars::selectedSeries() const
-{
-    return dptrc()->m_shared->selectedSeries();
-}
 
 /*!
  * \property Q3DBars::floorLevel
@@ -384,18 +250,6 @@ QBar3DSeries *Q3DBars::selectedSeries() const
  * values.
  * Defaults to zero.
  */
-void Q3DBars::setFloorLevel(float level)
-{
-    if (level != floorLevel()) {
-        dptr()->m_shared->setFloorLevel(level);
-        emit floorLevelChanged(level);
-    }
-}
-
-float Q3DBars::floorLevel() const
-{
-    return dptrc()->m_shared->floorLevel();
-}
 
 /*!
  * Adds \a axis to the graph. The axes added via addAxis are not yet taken to use,
@@ -404,10 +258,6 @@ float Q3DBars::floorLevel() const
  *
  * \sa releaseAxis(), setValueAxis(), setRowAxis(), setColumnAxis()
  */
-void Q3DBars::addAxis(QAbstract3DAxis *axis)
-{
-    dptr()->m_shared->addAxis(axis);
-}
 
 /*!
  * Releases the ownership of the \a axis back to the caller, if it is added to this graph.
@@ -417,60 +267,12 @@ void Q3DBars::addAxis(QAbstract3DAxis *axis)
  *
  * \sa addAxis(), setValueAxis(), setRowAxis(), setColumnAxis()
  */
-void Q3DBars::releaseAxis(QAbstract3DAxis *axis)
-{
-    dptr()->m_shared->releaseAxis(axis);
-}
 
 /*!
  * Returns the list of all added axes.
  *
  * \sa addAxis()
  */
-QList<QAbstract3DAxis *> Q3DBars::axes() const
-{
-    return dptrc()->m_shared->axes();
-}
-
-Q3DBarsPrivate *Q3DBars::dptr()
-{
-    return static_cast<Q3DBarsPrivate *>(d_ptr.data());
-}
-
-const Q3DBarsPrivate *Q3DBars::dptrc() const
-{
-    return static_cast<const Q3DBarsPrivate *>(d_ptr.data());
-}
-
-Q3DBarsPrivate::Q3DBarsPrivate(Q3DBars *q)
-    : QAbstract3DGraphPrivate(q),
-      m_shared(0)
-{
-}
-
-Q3DBarsPrivate::~Q3DBarsPrivate()
-{
-}
-
-void Q3DBarsPrivate::handleAxisXChanged(QAbstract3DAxis *axis)
-{
-    emit qptr()->columnAxisChanged(static_cast<QCategory3DAxis *>(axis));
-}
-
-void Q3DBarsPrivate::handleAxisYChanged(QAbstract3DAxis *axis)
-{
-    emit qptr()->valueAxisChanged(static_cast<QValue3DAxis *>(axis));
-}
-
-void Q3DBarsPrivate::handleAxisZChanged(QAbstract3DAxis *axis)
-{
-    emit qptr()->rowAxisChanged(static_cast<QCategory3DAxis *>(axis));
-}
-
-Q3DBars *Q3DBarsPrivate::qptr()
-{
-    return static_cast<Q3DBars *>(q_ptr);
-}
 
 Q3DBarsNG::Q3DBarsNG() : QAbstract3DGraphNG()
 {

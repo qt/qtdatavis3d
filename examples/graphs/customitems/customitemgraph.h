@@ -27,7 +27,7 @@ public:
     void toggleShadows(bool shadows);
 
 private:
-    void handleElementSelected(QAbstract3DGraph::ElementType type);
+    void handleElementSelected(QAbstract3DGraphNG::ElementType type);
     void resetSelection();
 
 private:

@@ -124,8 +124,6 @@ protected:
 
 private:
     Q_DISABLE_COPY(QCustom3DVolume)
-
-    friend class Abstract3DRenderer;
 };
 
 QT_END_NAMESPACE

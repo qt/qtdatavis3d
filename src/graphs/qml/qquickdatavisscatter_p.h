@@ -184,7 +184,7 @@ private:
     void synchData() override;
 
     // Change selection mode
-    void setSelectionModeNG(QAbstract3DGraph::SelectionFlags mode);
+    void setSelectionModeNG(QAbstract3DGraphNG::SelectionFlags mode);
 
     friend class Q3DScatterNG;
 };

@@ -37,14 +37,14 @@ static const float rotationSpeed      = 100.0f;
  *          \li Left click
  *          \li Select item under cursor or remove selection if none.
  *              May open the secondary view depending on the
- *              \l {QAbstract3DGraph::selectionMode}{selection mode}.
+ *              \l {QAbstract3DGraphNG::selectionMode}{selection mode}.
  *      \row
  *          \li Mouse wheel
  *          \li Zoom in/out within the allowable zoom range set for Q3DCamera.
  *      \row
  *          \li Left click on the primary view when the secondary view is visible
  *          \li Closes the secondary view.
- *          \note Secondary view is available only for Q3DBars and Q3DSurface graphs.
+ *          \note Secondary view is available only for Q3DBarsNG and Q3DSurface graphs.
  * \endtable
  *
  * Rotation, zoom, and selection can each be individually disabled using

@@ -165,7 +165,6 @@ private:
     Q_DISABLE_COPY(Q3DTheme)
 
     friend class ThemeManager;
-    friend class Abstract3DRenderer;
     friend class Bars3DController;
     friend class AbstractDeclarative;
     friend class Abstract3DController;

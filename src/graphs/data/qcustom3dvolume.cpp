@@ -27,7 +27,7 @@ QT_BEGIN_NAMESPACE
  *
  * \note Volumetric objects utilize 3D textures, which are not supported in OpenGL ES2 environments.
  *
- * \sa QAbstract3DGraph::addCustomItem(), QAbstract3DGraph::orthoProjection, useHighDefShader
+ * \sa QAbstract3DGraphNG::addCustomItem(), QAbstract3DGraphNG::orthoProjection, useHighDefShader
  */
 
 /*!

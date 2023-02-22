@@ -4,6 +4,8 @@
 #include "qml/qquickdatavisscatter_p.h"
 #include "qml/declarativescene_p.h"
 #include "data/qscatter3dseries_p.h"
+#include "qvalue3daxis_p.h"
+#include "qcategory3daxis_p.h"
 #include "axis/qvalue3daxisformatter_p.h"
 #include "engine/q3dcamera_p.h"
 #include "engine/datavisquick3dtexturedata_p.h"
@@ -88,7 +90,7 @@ void QQuickDataVisScatter::disconnectSeries(QScatter3DSeries *series)
 void QQuickDataVisScatter::generatePointsForScatterModel(ScatterModel *graphModel)
 {
     QList<QQuick3DModel *> itemList;
-    if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+    if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
         int itemCount = graphModel->series->dataProxy()->itemCount();
         if (graphModel->series->dataProxy()->itemCount() > 0)
             itemList.resize(itemCount);
@@ -102,8 +104,8 @@ void QQuickDataVisScatter::generatePointsForScatterModel(ScatterModel *graphMode
         }
         graphModel->dataItems = itemList;
         m_scatterController->markDataDirty();
-    } else if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
-        if (m_scatterController->selectionMode() != QAbstract3DGraph::SelectionNone)
+    } else if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic) {
+        if (m_scatterController->selectionMode() != QAbstract3DGraphNG::SelectionNone)
             m_instancingRootItem->setPickable(true);
     }
     m_scatterController->markSeriesVisualsDirty();
@@ -112,7 +114,7 @@ void QQuickDataVisScatter::generatePointsForScatterModel(ScatterModel *graphMode
 qsizetype QQuickDataVisScatter::getItemIndex(QQuick3DModel *item)
 {
     Q_UNUSED(item);
-    if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationDefault)
+    if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault)
         return 0;
 
     return -1;
@@ -121,7 +123,7 @@ qsizetype QQuickDataVisScatter::getItemIndex(QQuick3DModel *item)
 void QQuickDataVisScatter::resetSelection()
 {
     if (m_selectedIndex != -1) {
-        if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+        if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic) {
             m_selectionActive = false;
             m_selectionIndicator->setVisible(false);
         }
@@ -138,7 +140,7 @@ void QQuickDataVisScatter::updateScatterGraphItemPositions(ScatterModel *graphMo
     if (itemSize == 0.0f)
         itemSize = m_pointScale;
 
-    if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+    if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
         if (dataProxy->itemCount() != itemList.size())
             qWarning() << __func__ << "Item count differs from itemList count";
 
@@ -157,7 +159,7 @@ void QQuickDataVisScatter::updateScatterGraphItemPositions(ScatterModel *graphMo
             dataPoint->setRotation(dotRot * meshRotation);
             dataPoint->setScale(QVector3D(itemSize, itemSize, itemSize));
         }
-    } else if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationStatic)  {
+    } else if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic)  {
         int count = dataProxy->itemCount();
         QList<DataItemHolder> positions;
         positions.resize(count);
@@ -221,7 +223,7 @@ void QQuickDataVisScatter::updateScatterGraphItemVisuals(ScatterModel *graphMode
     bool rangeGradient = (useGradient && graphModel->series->d_ptr->m_colorStyle
                           == Q3DTheme::ColorStyleRangeGradient) ? true : false;
 
-    if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+    if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
         QList<QQuick3DModel *> itemList = graphModel->dataItems;
 
         if (itemCount != itemList.size())
@@ -255,7 +257,7 @@ void QQuickDataVisScatter::updateScatterGraphItemVisuals(ScatterModel *graphMode
                 updateCustomMaterial(obj, graphModel->highlightTexture);
             }
         }
-    } else if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+    } else if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic) {
         updateItemInstancedMaterial(m_instancingRootItem, useGradient, rangeGradient);
         m_instancing->setRangeGradient(rangeGradient);
         if (!rangeGradient) {
@@ -535,9 +537,9 @@ QVector3D QQuickDataVisScatter::selectedItemPosition()
         return QVector3D();
 
     QVector3D position;
-    if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationDefault)
+    if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault)
         position = {0.0f, 0.0f, 0.0f};
-    else if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationStatic)
+    else if (m_scatterController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic)
         position = {0.0f, 0.0f, 0.0f};
 
     return position;
@@ -704,7 +706,7 @@ void QQuickDataVisScatter::handleAxisZChanged(QAbstract3DAxis *axis)
 void QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
-        if (selectionMode() == QAbstract3DGraph::SelectionItem) {
+        if (selectionMode() == QAbstract3DGraphNG::SelectionItem) {
             const auto clickPosition = event->pos();
             QList<QQuick3DPickResult> results = pickAll(clickPosition.x(), clickPosition.y());
             if (!results.empty()) {
@@ -714,10 +716,10 @@ void QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
                             clearSelectionModel();
                             continue;
                         }
-                        if (optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
+                        if (optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
                             setSelected(hit);
                             break;
-                        } else if (optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
+                        } else if (optimizationHints() == QAbstract3DGraphNG::OptimizationStatic) {
                             setSelected(hit, result.instanceIndex());
                             break;
                         }

@@ -144,8 +144,8 @@ Item {
             id: barGraph
             width: dataView.width
             height: dataView.height
-            shadowQuality: AbstractGraph3D.ShadowQualityMedium
-            selectionMode: AbstractGraph3D.SelectionItem
+            shadowQuality: AbstractGraph3DNG.ShadowQualityMedium
+            selectionMode: AbstractGraph3DNG.SelectionItem
             theme: theme1
             barThickness: 0.7
             barSpacing: Qt.size(0.5, 0.5)

@@ -69,8 +69,6 @@ protected:
 
 private:
     Q_DISABLE_COPY(QCustom3DLabel)
-
-    friend class Abstract3DRenderer;
 };
 
 QT_END_NAMESPACE

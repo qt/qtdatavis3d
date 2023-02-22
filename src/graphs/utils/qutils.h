@@ -86,3 +86,4 @@ static inline QSurfaceFormat qDefaultSurfaceFormat(bool antialias)
 QT_END_NAMESPACE
 
 #endif
+

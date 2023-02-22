@@ -19,7 +19,6 @@
 
 QT_BEGIN_NAMESPACE
 
-class Scatter3DRenderer;
 class QScatterDataProxy;
 class QScatter3DSeries;
 
@@ -48,7 +47,6 @@ private:
     QList<ChangeItem> m_changedItems;
 
     // Rendering
-    Scatter3DRenderer *m_renderer;
     int m_selectedItem;
     QScatter3DSeries *m_selectedItemSeries; // Points to the series for which the bar is selected
                                             // in single series selection cases.
@@ -81,18 +79,14 @@ public:
     explicit Scatter3DController(QRect rect, Q3DScene *scene = 0);
     ~Scatter3DController();
 
-    void initializeOpenGL() override;
-
     // Change selection mode
-    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode) override;
+    void setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode) override;
 
     inline QScatter3DSeries *selectedSeries() const { return m_selectedItemSeries; }
 
     void setSelectedItem(int index, QScatter3DSeries *series);
     static inline int invalidSelectionIndex() { return -1; }
     void clearSelection() override;
-
-    void synchDataToRenderer() override;
 
     void addSeries(QAbstract3DSeries *series) override;
     void removeSeries(QAbstract3DSeries *series) override;
@@ -108,7 +102,6 @@ public:
     void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) override;
     void handleAxisRangeChangedBySender(QObject *sender) override;
-    void handlePendingClick() override;
     void adjustAxisRanges() override;
     inline bool hasChangedSeriesList() const { return !m_changedSeriesList.empty(); }
     inline bool isSeriesVisualsDirty() const { return m_isSeriesVisualsDirty; }

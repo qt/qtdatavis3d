@@ -29,7 +29,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_angleOffset(0.0f),
       m_angleStep(doublePi / m_arrowsPerLine / animationFrames)
 {
-    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
+    m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualityNone);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
     // Magnetic field lines use custom narrow arrow

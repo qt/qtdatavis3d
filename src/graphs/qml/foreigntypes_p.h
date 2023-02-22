@@ -54,25 +54,25 @@ QT_BEGIN_NAMESPACE
         Q_GADGET \
         QML_NAMED_ELEMENT(name) \
         QML_FOREIGN(type) \
-        QML_ADDED_IN_VERSION(1, minor) \
+        QML_ADDED_IN_VERSION(6, minor) \
 
 #define DEFINE_FOREIGN_UNCREATABLE_TYPE(type, name) \
-    struct type##DataVisForeign \
+    struct type##GraphsForeign \
     { \
-        DEFINE_FOREIGN_BASE_ATTRIBUTES(type, name, 0) \
+        DEFINE_FOREIGN_BASE_ATTRIBUTES(type, name, 6) \
         QML_UNCREATABLE("Trying to create uncreatable: " #name ".") \
     };
 
 #define DEFINE_FOREIGN_CREATABLE_TYPE(type, name, minor) \
-    struct type##DataVisForeign \
+    struct type##GraphsForeign \
     { \
         DEFINE_FOREIGN_BASE_ATTRIBUTES(type, name, minor) \
     };
 
 #define DEFINE_FOREIGN_REPLACED_TYPE(type, name, better) \
-    struct type##DataVisForeign \
+    struct type##GraphsForeign \
     { \
-        DEFINE_FOREIGN_BASE_ATTRIBUTES(type, name, 0) \
+        DEFINE_FOREIGN_BASE_ATTRIBUTES(type, name, 6) \
         QML_UNCREATABLE("Trying to create uncreatable: " #name ", use " #better " instead.") \
     };
 
@@ -84,23 +84,23 @@ struct Q3DSceneForeign
     QML_FOREIGN(Q3DScene)
 };
 
-DEFINE_FOREIGN_CREATABLE_TYPE(Q3DCamera, Camera3D, 0)
-DEFINE_FOREIGN_CREATABLE_TYPE(Q3DLight, Light3D, 0)
-DEFINE_FOREIGN_CREATABLE_TYPE(QCategory3DAxis, CategoryAxis3D, 0)
-DEFINE_FOREIGN_CREATABLE_TYPE(QHeightMapSurfaceDataProxy, HeightMapSurfaceDataProxy, 0)
-DEFINE_FOREIGN_CREATABLE_TYPE(QItemModelBarDataProxy, ItemModelBarDataProxy, 0)
-DEFINE_FOREIGN_CREATABLE_TYPE(QItemModelScatterDataProxy, ItemModelScatterDataProxy, 0)
-DEFINE_FOREIGN_CREATABLE_TYPE(QItemModelSurfaceDataProxy, ItemModelSurfaceDataProxy, 0)
-DEFINE_FOREIGN_CREATABLE_TYPE(QValue3DAxis, ValueAxis3D, 0)
+DEFINE_FOREIGN_CREATABLE_TYPE(Q3DCamera, Camera3D, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(Q3DLight, Light3D, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QCategory3DAxis, CategoryAxis3D, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QHeightMapSurfaceDataProxy, HeightMapSurfaceDataProxy, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QItemModelBarDataProxy, ItemModelBarDataProxy, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QItemModelScatterDataProxy, ItemModelScatterDataProxy, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QItemModelSurfaceDataProxy, ItemModelSurfaceDataProxy, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QValue3DAxis, ValueAxis3D, 6)
 
-DEFINE_FOREIGN_CREATABLE_TYPE(QCustom3DItem, Custom3DItem, 1)
-DEFINE_FOREIGN_CREATABLE_TYPE(QCustom3DLabel, Custom3DLabel, 1)
-DEFINE_FOREIGN_CREATABLE_TYPE(QLogValue3DAxisFormatter, LogValueAxis3DFormatter, 1)
-DEFINE_FOREIGN_CREATABLE_TYPE(QValue3DAxisFormatter, ValueAxis3DFormatter, 1)
+DEFINE_FOREIGN_CREATABLE_TYPE(QCustom3DItem, Custom3DItem, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QCustom3DLabel, Custom3DLabel, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QLogValue3DAxisFormatter, LogValueAxis3DFormatter, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QValue3DAxisFormatter, ValueAxis3DFormatter, 6)
 
-DEFINE_FOREIGN_CREATABLE_TYPE(Q3DInputHandler, InputHandler3D, 2)
-DEFINE_FOREIGN_CREATABLE_TYPE(QCustom3DVolume, Custom3DVolume, 2)
-DEFINE_FOREIGN_CREATABLE_TYPE(QTouch3DInputHandler, TouchInputHandler3D, 2)
+DEFINE_FOREIGN_CREATABLE_TYPE(Q3DInputHandler, InputHandler3D, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QCustom3DVolume, Custom3DVolume, 6)
+DEFINE_FOREIGN_CREATABLE_TYPE(QTouch3DInputHandler, TouchInputHandler3D, 6)
 
 DEFINE_FOREIGN_REPLACED_TYPE(Q3DTheme, Q3DTheme, Theme3D)
 DEFINE_FOREIGN_REPLACED_TYPE(QBar3DSeries, QBar3DSeries, Bar3DSeries)

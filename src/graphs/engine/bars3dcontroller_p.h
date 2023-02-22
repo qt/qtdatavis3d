@@ -21,7 +21,6 @@
 
 QT_BEGIN_NAMESPACE
 
-class Bars3DRenderer;
 class QBarDataProxy;
 class QBar3DSeries;
 class QQuick3DModel;
@@ -80,15 +79,9 @@ private:
     float m_floorLevel;
     QSizeF m_barSeriesMargin;
 
-    // Rendering
-    Bars3DRenderer *m_renderer;
-
 public:
     explicit Bars3DController(QRect rect, Q3DScene *scene = 0);
     ~Bars3DController();
-
-    void initializeOpenGL() override;
-    void synchDataToRenderer() override;
 
     void setMultiSeriesScaling(bool uniform);
     bool multiSeriesScaling() const;
@@ -110,14 +103,13 @@ public:
 
     inline QBar3DSeries *selectedSeries() const { return m_selectedBarSeries; }
 
-    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode) override;
+    void setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode) override;
     void setSelectedBar(const QPoint &position, QBar3DSeries *series, bool enterSlice);
     void clearSelection() override;
 
     void handleAxisAutoAdjustRangeChangedInOrientation(
             QAbstract3DAxis::AxisOrientation orientation, bool autoAdjust) override;
     void handleSeriesVisibilityChangedBySender(QObject *sender) override;
-    void handlePendingClick() override;
 
     static QPoint invalidSelectionPosition();
 

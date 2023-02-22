@@ -105,7 +105,7 @@ public Q_SLOTS:
     void handleAxisYChanged(QAbstract3DAxis *axis) override;
     void handleAxisZChanged(QAbstract3DAxis *axis) override;
     void handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh);
-    void handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
+    void handleOptimizationHintsChanged(QAbstract3DGraphNG::OptimizationHints hints);
     void handleMeshSmoothChanged(bool enable);
     void handleRowCountChanged();
     void handleColCountChanged();
