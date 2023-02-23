@@ -267,9 +267,6 @@ void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
 {
     Q_UNUSED(theme);
 
-    if (!m_qml)
-        return;
-
     // Changing theme type is logically equivalent of changing the entire theme
     // object, so reset all attached series to the new theme.
     bool force = true;//m_qml->isReady(); // TODO: Is this needed?
@@ -278,6 +275,8 @@ void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
         m_seriesList.at(i)->d_ptr->resetToTheme(*activeTheme, i, force);
 
     markSeriesVisualsDirty();
+
+    emit themeTypeChanged();
 }
 
 void Abstract3DController::setAxisX(QAbstract3DAxis *axis)

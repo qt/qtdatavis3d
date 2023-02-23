@@ -391,6 +391,7 @@ Q_SIGNALS:
     void localeChanged(const QLocale &locale);
     void queriedGraphPositionChanged(const QVector3D &data);
     void marginChanged(qreal margin);
+    void themeTypeChanged();
 
 protected:
     virtual QAbstract3DAxis *createDefaultAxis(QAbstract3DAxis::AxisOrientation orientation);

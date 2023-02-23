@@ -493,56 +493,7 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
         geometry->setBounds(boundsMin, boundsMax);
         geometry->update();
 
-        auto axisY = m_surfaceController->axisY();
-        float maxY = axisY->max();
-        float minY = axisY->min();
-        QQmlListReference materialRef(model->model, "materials");
-        auto material = static_cast<QQuick3DDefaultMaterial *>(materialRef.at(0));
-        auto textureData = material->diffuseMap()->textureData();
-        textureData->setSize(QSize(rowCount, columnCount));
-        textureData->setFormat(QQuick3DTextureData::RGBA8);
-        QByteArray imageData;
-        imageData.resize(model->height.size() * 4);
-        QLinearGradient gradient = model->series->baseGradient();
-        auto stops = gradient.stops();
-        for (int i = 0; i < model->height.size(); i++) {
-            float height = model->height.at(i);
-            float normalizedHeight = (height - minY) / (maxY - minY);
-            for (int j = 0; j < stops.size(); j++) {
-                if (normalizedHeight < stops.at(j).first ||
-                        (normalizedHeight >= (float)stops.at(j).first && j == stops.size() - 1)) {
-                    QColor color;
-                    if (j == 0 || normalizedHeight >= (float)stops.at(j).first) {
-                        color = stops.at(j).second;
-                    } else {
-                        float normalLowerBound = stops.at(j - 1).first;
-                        float normalUpperBound = stops.at(j).first;
-                        normalizedHeight = (normalizedHeight - normalLowerBound) / (normalUpperBound - normalLowerBound);
-                        QColor start = stops.at(j - 1).second;
-                        QColor end = stops.at(j).second;
-                        float red = start.redF() + ((end.redF() - start.redF()) * normalizedHeight);
-                        float green = start.greenF() + ((end.greenF() - start.greenF()) * normalizedHeight);
-                        float blue = start.blueF() + ((end.blueF() - start.blueF()) * normalizedHeight);
-                        color.setRedF(red);
-                        color.setGreenF(green);
-                        color.setBlueF(blue);
-                    }
-                    imageData.data()[i * 4 + 0] = char(color.red());
-                    imageData.data()[i * 4 + 1] = char(color.green());
-                    imageData.data()[i * 4 + 2] = char(color.blue());
-                    imageData.data()[i * 4 + 3] = char(color.alpha());
-                    break;
-                }
-            }
-        }
-        textureData->setTextureData(imageData);
-
-        QQmlListReference sliceMaterialRef(model->sliceModel, "materials");
-        material = static_cast<QQuick3DDefaultMaterial *>(sliceMaterialRef.at(0));
-        textureData = material->diffuseMap()->textureData();
-        textureData->setSize(QSize(rowCount, columnCount));
-        textureData->setFormat(QQuick3DTextureData::RGBA8);
-        textureData->setTextureData(imageData);
+        updateMaterial(model);
 
         createGridlineIndices(model, 0, 0, colLimit, rowLimit);
 
@@ -563,6 +514,60 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
         QColor gridColor = model->series->wireframeColor();
         gridMaterial->setBaseColor(gridColor);
     }
+}
+
+void QQuickDataVisSurface::updateMaterial(SurfaceModel *model)
+{
+    auto axisY = m_surfaceController->axisY();
+    float maxY = axisY->max();
+    float minY = axisY->min();
+    QQmlListReference materialRef(model->model, "materials");
+    auto material = static_cast<QQuick3DDefaultMaterial *>(materialRef.at(0));
+    auto textureData = material->diffuseMap()->textureData();
+    textureData->setSize(QSize(model->rowCount, model->columnCount));
+    textureData->setFormat(QQuick3DTextureData::RGBA8);
+    QByteArray imageData;
+    imageData.resize(model->height.size() * 4);
+    QLinearGradient gradient = model->series->baseGradient();
+    auto stops = gradient.stops();
+    for (int i = 0; i < model->height.size(); i++) {
+        float height = model->height.at(i);
+        float normalizedHeight = (height - minY) / (maxY - minY);
+        for (int j = 0; j < stops.size(); j++) {
+            if (normalizedHeight < stops.at(j).first ||
+                    (normalizedHeight >= (float)stops.at(j).first && j == stops.size() - 1)) {
+                QColor color;
+                if (j == 0 || normalizedHeight >= (float)stops.at(j).first) {
+                    color = stops.at(j).second;
+                } else {
+                    float normalLowerBound = stops.at(j - 1).first;
+                    float normalUpperBound = stops.at(j).first;
+                    normalizedHeight = (normalizedHeight - normalLowerBound) / (normalUpperBound - normalLowerBound);
+                    QColor start = stops.at(j - 1).second;
+                    QColor end = stops.at(j).second;
+                    float red = start.redF() + ((end.redF() - start.redF()) * normalizedHeight);
+                    float green = start.greenF() + ((end.greenF() - start.greenF()) * normalizedHeight);
+                    float blue = start.blueF() + ((end.blueF() - start.blueF()) * normalizedHeight);
+                    color.setRedF(red);
+                    color.setGreenF(green);
+                    color.setBlueF(blue);
+                }
+                imageData.data()[i * 4 + 0] = char(color.red());
+                imageData.data()[i * 4 + 1] = char(color.green());
+                imageData.data()[i * 4 + 2] = char(color.blue());
+                imageData.data()[i * 4 + 3] = char(color.alpha());
+                break;
+            }
+        }
+    }
+    textureData->setTextureData(imageData);
+
+    QQmlListReference sliceMaterialRef(model->sliceModel, "materials");
+    material = static_cast<QQuick3DDefaultMaterial *>(sliceMaterialRef.at(0));
+    textureData = material->diffuseMap()->textureData();
+    textureData->setSize(QSize(model->rowCount, model->columnCount));
+    textureData->setFormat(QQuick3DTextureData::RGBA8);
+    textureData->setTextureData(imageData);
 }
 
 QVector3D QQuickDataVisSurface::getNormalizedVertex(SurfaceModel *model, const QSurfaceDataItem &data, bool polar, bool flipXZ)
@@ -1325,4 +1330,11 @@ void QQuickDataVisSurface::updateSingleHighlightColor()
     if (sliceView())
         m_sliceInstancing->setColor(m_surfaceController->activeTheme()->singleHighlightColor());
 }
+
+void QQuickDataVisSurface::handleThemeTypeChange()
+{
+    for (auto model : m_model)
+        updateMaterial(model);
+}
+
 QT_END_NAMESPACE

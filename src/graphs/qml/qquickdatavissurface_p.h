@@ -72,6 +72,7 @@ protected:
     void updateSliceGraph() override;
     void handleMousePressedEvent(QMouseEvent *event) override;
     void updateSingleHighlightColor() override;
+    void handleThemeTypeChange() override;
 
 public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
@@ -121,6 +122,7 @@ private:
     void createGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY);
     void handleChangedSeries();
     void updateModel(SurfaceModel *model);
+    void updateMaterial(SurfaceModel *model);
     void updateSelectedPoint();
     void addModel(QSurface3DSeries *series);
 

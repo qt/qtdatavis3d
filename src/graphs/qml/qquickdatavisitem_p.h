@@ -326,6 +326,7 @@ protected:
     virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
     virtual void keyPressEvent(QKeyEvent *ev) override;
     virtual void handleMousePressedEvent(QMouseEvent *event);
+    virtual void handleThemeTypeChange();
 
     void componentComplete() override;
 

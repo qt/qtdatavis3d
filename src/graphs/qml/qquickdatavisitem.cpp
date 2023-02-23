@@ -128,6 +128,10 @@ void QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
     }
 }
 
+void QQuickDataVisItem::handleThemeTypeChange()
+{
+}
+
 void QQuickDataVisItem::handleFpsChanged()
 {
     int fps = renderStats()->fps();
@@ -422,6 +426,8 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
                      &QQuickDataVisItem::inputHandlerChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::activeThemeChanged, this,
                      &QQuickDataVisItem::themeChanged);
+    QObject::connect(m_controller.data(), &Abstract3DController::themeTypeChanged, this,
+                     &QQuickDataVisItem::handleThemeTypeChange);
     QObject::connect(m_controller.data(), &Abstract3DController::selectionModeChanged, this,
                      &QQuickDataVisItem::handleSelectionModeChange);
     QObject::connect(m_controller.data(), &Abstract3DController::elementSelected, this,
