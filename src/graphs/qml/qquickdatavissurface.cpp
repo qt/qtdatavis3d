@@ -1120,8 +1120,8 @@ void QQuickDataVisSurface::updateSelectedPoint()
             }
             if (model->picked) {
                 const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
-                const QSurfaceDataRow &rowArray = *array.at(selectedVertex.coord.y());
-                QVector3D value = rowArray.at(selectedVertex.coord.x()).position();
+                const QSurfaceDataRow &rowArray = *array.at(selectedVertex.coord.x());
+                QVector3D value = rowArray.at(selectedVertex.coord.y()).position();
                 QVector3D labelPosition = selectedVertex.position;
                 QString x = static_cast<QValue3DAxis *>(m_surfaceController->axisX())->stringForValue(value.x());
                 QString y = static_cast<QValue3DAxis *>(m_surfaceController->axisY())->stringForValue(value.y());
