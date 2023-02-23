@@ -81,6 +81,16 @@ void QQuickDataVisSurface::handleFlatShadingEnabledChanged()
     }
 }
 
+void QQuickDataVisSurface::handleWireframeColorChanged()
+{
+    for (auto model : m_model) {
+        QQmlListReference gridMaterialRef(model->gridModel, "materials");
+        auto gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
+        QColor gridColor = model->series->wireframeColor();
+        gridMaterial->setBaseColor(gridColor);
+    }
+}
+
 QSurface3DSeries *QQuickDataVisSurface::selectedSeries() const
 {
     return m_surfaceController->selectedSeries();
@@ -1287,7 +1297,14 @@ void QQuickDataVisSurface::addModel(QSurface3DSeries *series)
 
     m_model.push_back(surfaceModel);
 
-    connect(series, &QSurface3DSeries::flatShadingEnabledChanged, this, &QQuickDataVisSurface::handleFlatShadingEnabledChanged);
+    connect(series,
+            &QSurface3DSeries::flatShadingEnabledChanged,
+            this,
+            &QQuickDataVisSurface::handleFlatShadingEnabledChanged);
+    connect(series,
+            &QSurface3DSeries::wireframeColorChanged,
+            this,
+            &QQuickDataVisSurface::handleWireframeColorChanged);
 }
 
 void QQuickDataVisSurface::updateSingleHighlightColor()

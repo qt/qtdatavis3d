@@ -79,6 +79,7 @@ public Q_SLOTS:
     void handleAxisZChanged(QAbstract3DAxis *axis) override;
 
     void handleFlatShadingEnabledChanged();
+    void handleWireframeColorChanged();
 
 Q_SIGNALS:
     void axisXChanged(QValue3DAxis *axis);
