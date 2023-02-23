@@ -4,7 +4,7 @@
 #include <QtTest/QtTest>
 
 #include <QtGraphs/QItemModelSurfaceDataProxy>
-#include <QtGraphs/Q3DSurface>
+#include <QtGraphs/Q3DSurfaceNG>
 #include <QtWidgets/QTableWidget>
 
 #include "cpptestutil.h"
@@ -211,7 +211,7 @@ void tst_proxy::multiMatch()
     if (!CpptestUtil::isOpenGLSupported())
         QSKIP("OpenGL not supported on this platform");
 
-    Q3DSurface graph;
+    Q3DSurfaceNG graph;
 
     QTableWidget table;
     QStringList rows;

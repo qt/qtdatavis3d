@@ -26,7 +26,6 @@ int main(int argc, char **argv)
         return QTest::qExec(&skip, argc, argv);
     }
 #endif
-    qputenv("QSG_RHI_BACKEND", "opengl");
     QTEST_SET_MAIN_SOURCE_PATH
     return quick_test_main(argc, argv, "qmltest", QUICK_TEST_SOURCE_DIR);
 }

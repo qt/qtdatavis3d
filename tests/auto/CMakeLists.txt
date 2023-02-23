@@ -5,5 +5,5 @@ if(NOT ANDROID)
     add_subdirectory(cpptest)
 endif()
 if(TARGET Qt::Quick AND NOT boot2qt)
-#    add_subdirectory(qmltest) # TODO: commented out for now; see QTBUG-110000 & QTBUG-110001
+    add_subdirectory(qmltest)
 endif()

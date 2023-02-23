@@ -4,7 +4,7 @@
 #include <QtTest/QtTest>
 
 #include <QtGraphs/QItemModelScatterDataProxy>
-#include <QtGraphs/Q3DScatter>
+#include <QtGraphs/Q3DScatterNG>
 #include <QtWidgets/QTableWidget>
 
 class tst_proxy: public QObject
