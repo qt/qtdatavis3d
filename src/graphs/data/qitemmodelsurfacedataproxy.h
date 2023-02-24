@@ -153,7 +153,7 @@ Q_SIGNALS:
     void xPosRoleReplaceChanged(const QString &replace);
     void yPosRoleReplaceChanged(const QString &replace);
     void zPosRoleReplaceChanged(const QString &replace);
-    void multiMatchBehaviorChanged(MultiMatchBehavior behavior);
+    void multiMatchBehaviorChanged(QItemModelSurfaceDataProxy::MultiMatchBehavior behavior);
 
 protected:
     QItemModelSurfaceDataProxyPrivate *dptr();

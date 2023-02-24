@@ -136,7 +136,7 @@ Q_SIGNALS:
     void columnRoleReplaceChanged(const QString &replace);
     void valueRoleReplaceChanged(const QString &replace);
     void rotationRoleReplaceChanged(const QString &replace);
-    void multiMatchBehaviorChanged(MultiMatchBehavior behavior);
+    void multiMatchBehaviorChanged(QItemModelBarDataProxy::MultiMatchBehavior behavior);
 
 protected:
     QItemModelBarDataProxyPrivate *dptr();
