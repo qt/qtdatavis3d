@@ -25,7 +25,7 @@ bool ScatterGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
         return false;
 
     m_scatterWidget = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout(m_scatterWidget);
+    auto *hLayout = new QHBoxLayout(m_scatterWidget);
     m_container = QWidget::createWindowContainer(m_scatterGraph, m_scatterWidget);
     m_container->setMinimumSize(minimumGraphSize);
     m_container->setMaximumSize(maximumGraphSize);
@@ -33,44 +33,44 @@ bool ScatterGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
     m_container->setFocusPolicy(Qt::StrongFocus);
     hLayout->addWidget(m_container, 1);
 
-    QVBoxLayout *vLayout = new QVBoxLayout();
+    auto *vLayout = new QVBoxLayout();
     hLayout->addLayout(vLayout);
 
-    QCommandLinkButton *cameraButton = new QCommandLinkButton(m_scatterWidget);
+    auto *cameraButton = new QCommandLinkButton(m_scatterWidget);
     cameraButton->setText(u"Change camera preset"_s);
     cameraButton->setDescription(u"Switch between a number of preset camera positions"_s);
     cameraButton->setIconSize(QSize(0, 0));
 
-    QCommandLinkButton *itemCountButton = new QCommandLinkButton(m_scatterWidget);
+    auto *itemCountButton = new QCommandLinkButton(m_scatterWidget);
     itemCountButton->setText(u"Toggle item count"_s);
     itemCountButton->setDescription(u"Switch between 900 and 10000 data points"_s);
     itemCountButton->setIconSize(QSize(0, 0));
 
-    QCommandLinkButton *rangeButton = new QCommandLinkButton(m_scatterWidget);
+    auto *rangeButton = new QCommandLinkButton(m_scatterWidget);
     rangeButton->setText(u"Toggle axis ranges"_s);
     rangeButton->setDescription(u"Switch between automatic axis ranges and preset ranges"_s);
     rangeButton->setIconSize(QSize(0, 0));
 
-    QCheckBox *backgroundCheckBox = new QCheckBox(m_scatterWidget);
+    auto *backgroundCheckBox = new QCheckBox(m_scatterWidget);
     backgroundCheckBox->setText(u"Show background"_s);
     backgroundCheckBox->setChecked(true);
 
-    QCheckBox *gridCheckBox = new QCheckBox(m_scatterWidget);
+    auto *gridCheckBox = new QCheckBox(m_scatterWidget);
     gridCheckBox->setText(u"Show grid"_s);
     gridCheckBox->setChecked(true);
 
-    QCheckBox *smoothCheckBox = new QCheckBox(m_scatterWidget);
+    auto *smoothCheckBox = new QCheckBox(m_scatterWidget);
     smoothCheckBox->setText(u"Smooth dots"_s);
     smoothCheckBox->setChecked(true);
 
-    QComboBox *itemStyleList = new QComboBox(m_scatterWidget);
+    auto *itemStyleList = new QComboBox(m_scatterWidget);
     itemStyleList->addItem(u"Sphere"_s, QAbstract3DSeries::MeshSphere);
     itemStyleList->addItem(u"Cube"_s, QAbstract3DSeries::MeshCube);
     itemStyleList->addItem(u"Minimal"_s, QAbstract3DSeries::MeshMinimal);
     itemStyleList->addItem(u"Point"_s, QAbstract3DSeries::MeshPoint);
     itemStyleList->setCurrentIndex(0);
 
-    QComboBox *themeList = new QComboBox(m_scatterWidget);
+    auto *themeList = new QComboBox(m_scatterWidget);
     themeList->addItem(u"Qt"_s);
     themeList->addItem(u"Primary Colors"_s);
     themeList->addItem(u"Digia"_s);
@@ -81,7 +81,7 @@ bool ScatterGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
     themeList->addItem(u"Isabelle"_s);
     themeList->setCurrentIndex(3);
 
-    QComboBox *shadowQuality = new QComboBox(m_scatterWidget);
+    auto *shadowQuality = new QComboBox(m_scatterWidget);
     shadowQuality->addItem(u"None"_s);
     shadowQuality->addItem(u"Low"_s);
     shadowQuality->addItem(u"Medium"_s);
@@ -104,7 +104,7 @@ bool ScatterGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
     vLayout->addWidget(new QLabel(u"Adjust shadow quality"_s));
     vLayout->addWidget(shadowQuality, 1, Qt::AlignTop);
 
-    ScatterDataModifier *modifier = new ScatterDataModifier(m_scatterGraph, this);
+    auto *modifier = new ScatterDataModifier(m_scatterGraph, this);
 
     QObject::connect(cameraButton, &QCommandLinkButton::clicked, modifier,
                      &ScatterDataModifier::changePresetCamera);

@@ -159,16 +159,14 @@ void GraphModifier::resetTemperatureData()
 
     // Create data arrays
     //! [9b]
-    QBarDataArray *dataSet = new QBarDataArray;
-    QBarDataArray *dataSet2 = new QBarDataArray;
-    QBarDataRow *dataRow = nullptr;
-    QBarDataRow *dataRow2= nullptr;
+    auto *dataSet = new QBarDataArray;
+    auto *dataSet2 = new QBarDataArray;
 
     dataSet->reserve(m_years.size());
     for (qsizetype year = 0; year < m_years.size(); ++year) {
         // Create a data row
-        dataRow = new QBarDataRow(m_months.size());
-        dataRow2 = new QBarDataRow(m_months.size());
+        auto *dataRow = new QBarDataRow(m_months.size());
+        auto *dataRow2 = new QBarDataRow(m_months.size());
         for (qsizetype month = 0; month < m_months.size(); ++month) {
             // Add data to the row
             (*dataRow)[month].setValue(tempOulu[year][month]);
@@ -195,7 +193,7 @@ void GraphModifier::changeRange(int range)
 
 void GraphModifier::changeStyle(int style)
 {
-    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    auto *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
         m_barMesh = comboBox->itemData(style).value<QAbstract3DSeries::Mesh>();
         m_primarySeries->setMesh(m_barMesh);
@@ -241,7 +239,7 @@ void GraphModifier::changeLabelBackground()
 
 void GraphModifier::changeSelectionMode(int selectionMode)
 {
-    QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
+    auto *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
         int flags = comboBox->itemData(selectionMode).toInt();
         m_graph->setSelectionMode(QAbstract3DGraph::SelectionFlags(flags));
