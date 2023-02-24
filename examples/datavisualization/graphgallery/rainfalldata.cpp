@@ -9,6 +9,8 @@
 #include <QtCore/qtextstream.h>
 #include <QtCore/qfile.h>
 
+using namespace Qt::StringLiterals;
+
 RainfallData::RainfallData()
 {
     // In data file the months are in numeric format, so create custom list
@@ -25,7 +27,7 @@ RainfallData::RainfallData()
     m_series = new QBar3DSeries(m_proxy);
     //! [0]
 
-    m_series->setItemLabelFormat(QString(QStringLiteral("%.1f mm")));
+    m_series->setItemLabelFormat(u"%.1f mm"_s);
 
     // Create the axes
     m_rowAxis = new QCategory3DAxis(this);

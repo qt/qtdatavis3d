@@ -9,6 +9,8 @@
 #include <QtWidgets/qwidget.h>
 #include <QtWidgets/qtabwidget.h>
 
+using namespace Qt::StringLiterals;
+
 int main(int argc, char **argv)
 {
     qputenv("QSG_RHI_BACKEND", "opengl");
@@ -32,14 +34,14 @@ int main(int argc, char **argv)
 
     // Create a tab widget for creating own tabs for Q3DBars, Q3DScatter, and Q3DSurface
     QTabWidget tabWidget;
-    tabWidget.setWindowTitle(QLatin1String("Graph Gallery"));
+    tabWidget.setWindowTitle(u"Graph Gallery"_s);
 
     // Add bars widget
-    tabWidget.addTab(bars.barsWidget(), QLatin1String("Bar Graph"));
+    tabWidget.addTab(bars.barsWidget(), u"Bar Graph"_s);
     // Add scatter widget
-    tabWidget.addTab(scatter.scatterWidget(), QLatin1String("Scatter Graph"));
+    tabWidget.addTab(scatter.scatterWidget(), u"Scatter Graph"_s);
     // Add surface widget
-    tabWidget.addTab(surface.surfaceWidget(), QLatin1String("Surface Graph"));
+    tabWidget.addTab(surface.surfaceWidget(), u"Surface Graph"_s);
 
     tabWidget.show();
     return app.exec();

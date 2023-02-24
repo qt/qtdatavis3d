@@ -12,6 +12,8 @@
 #include <QtCore/qrandom.h>
 #include <QtWidgets/qcombobox.h>
 
+using namespace Qt::StringLiterals;
+
 //#define RANDOM_SCATTER // Uncomment this to switch to random scatter
 
 const int numberOfItems = 10000;
@@ -37,7 +39,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     //! [1]
     QScatterDataProxy *proxy = new QScatterDataProxy;
     QScatter3DSeries *series = new QScatter3DSeries(proxy);
-    series->setItemLabelFormat(QStringLiteral("@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel"));
+    series->setItemLabelFormat(u"@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel"_s);
     series->setMeshSmooth(m_smooth);
     m_graph->addSeries(series);
     //! [1]

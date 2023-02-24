@@ -80,7 +80,7 @@ private:
     float m_defaultAngleY = 0.f;
     float m_defaultZoom = 0.f;
     QVector3D m_defaultTarget = {};
-    const QString m_celsiusString = QString(QChar(0xB0)) + QLatin1String("C");
+    const QString m_celsiusString;
     RainfallData *m_customData = nullptr;
 };
 

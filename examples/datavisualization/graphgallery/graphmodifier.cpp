@@ -14,18 +14,21 @@
 #include <QtCore/qmath.h>
 #include <QtWidgets/qcombobox.h>
 
+using namespace Qt::StringLiterals;
+
 // TODO: Many of the values do not affect custom proxy series now - should be fixed
 
 //! [0]
-GraphModifier::GraphModifier(Q3DBars *bargraph)
-    : m_graph(bargraph),
+GraphModifier::GraphModifier(Q3DBars *bargraph) :
+      m_graph(bargraph),
       //! [0]
       //! [1]
       m_temperatureAxis(new QValue3DAxis),
       m_yearAxis(new QCategory3DAxis),
       m_monthAxis(new QCategory3DAxis),
       m_primarySeries(new QBar3DSeries),
-      m_secondarySeries(new QBar3DSeries)
+      m_secondarySeries(new QBar3DSeries),
+      m_celsiusString(u"°C"_s)
     //! [1]
 {
     //! [2]
@@ -45,7 +48,7 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_temperatureAxis->setSegmentCount(m_segments);
     m_temperatureAxis->setSubSegmentCount(m_subSegments);
     m_temperatureAxis->setRange(m_minval, m_maxval);
-    m_temperatureAxis->setLabelFormat(QString(QStringLiteral("%.1f ") + m_celsiusString));
+    m_temperatureAxis->setLabelFormat(u"%.1f "_s + m_celsiusString);
     m_temperatureAxis->setLabelAutoRotation(30.0f);
     m_temperatureAxis->setTitleVisible(true);
 
@@ -62,11 +65,11 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     //! [3]
 
     //! [4]
-    m_primarySeries->setItemLabelFormat(QStringLiteral("Oulu - @colLabel @rowLabel: @valueLabel"));
+    m_primarySeries->setItemLabelFormat(u"Oulu - @colLabel @rowLabel: @valueLabel"_s);
     m_primarySeries->setMesh(QAbstract3DSeries::MeshBevelBar);
     m_primarySeries->setMeshSmooth(false);
 
-    m_secondarySeries->setItemLabelFormat(QStringLiteral("Helsinki - @colLabel @rowLabel: @valueLabel"));
+    m_secondarySeries->setItemLabelFormat(u"Helsinki - @colLabel @rowLabel: @valueLabel"_s);
     m_secondarySeries->setMesh(QAbstract3DSeries::MeshBevelBar);
     m_secondarySeries->setMeshSmooth(false);
     m_secondarySeries->setVisible(false);

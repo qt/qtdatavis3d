@@ -15,6 +15,8 @@
 #include <QtWidgets/qbuttongroup.h>
 #include <QtGui/qfontdatabase.h>
 
+using namespace Qt::StringLiterals;
+
 BarGraph::BarGraph()
 {
     //! [0]
@@ -52,92 +54,92 @@ bool BarGraph::initialize()
     //! [1]
 
     QComboBox *themeList = new QComboBox(m_barsWidget);
-    themeList->addItem(QStringLiteral("Qt"));
-    themeList->addItem(QStringLiteral("Primary Colors"));
-    themeList->addItem(QStringLiteral("Digia"));
-    themeList->addItem(QStringLiteral("Stone Moss"));
-    themeList->addItem(QStringLiteral("Army Blue"));
-    themeList->addItem(QStringLiteral("Retro"));
-    themeList->addItem(QStringLiteral("Ebony"));
-    themeList->addItem(QStringLiteral("Isabelle"));
+    themeList->addItem(u"Qt"_s);
+    themeList->addItem(u"Primary Colors"_s);
+    themeList->addItem(u"Digia"_s);
+    themeList->addItem(u"Stone Moss"_s);
+    themeList->addItem(u"Army Blue"_s);
+    themeList->addItem(u"Retro"_s);
+    themeList->addItem(u"Ebony"_s);
+    themeList->addItem(u"Isabelle"_s);
     themeList->setCurrentIndex(0);
 
     QPushButton *labelButton = new QPushButton(m_barsWidget);
-    labelButton->setText(QStringLiteral("Change label style"));
+    labelButton->setText(u"Change label style"_s);
 
     QCheckBox *smoothCheckBox = new QCheckBox(m_barsWidget);
-    smoothCheckBox->setText(QStringLiteral("Smooth bars"));
+    smoothCheckBox->setText(u"Smooth bars"_s);
     smoothCheckBox->setChecked(false);
 
     QComboBox *barStyleList = new QComboBox(m_barsWidget);
-    barStyleList->addItem(QStringLiteral("Bar"), int(QAbstract3DSeries::MeshBar));
-    barStyleList->addItem(QStringLiteral("Pyramid"), int(QAbstract3DSeries::MeshPyramid));
-    barStyleList->addItem(QStringLiteral("Cone"), int(QAbstract3DSeries::MeshCone));
-    barStyleList->addItem(QStringLiteral("Cylinder"), int(QAbstract3DSeries::MeshCylinder));
-    barStyleList->addItem(QStringLiteral("Bevel bar"), int(QAbstract3DSeries::MeshBevelBar));
-    barStyleList->addItem(QStringLiteral("Sphere"), int(QAbstract3DSeries::MeshSphere));
+    barStyleList->addItem(u"Bar"_s, int(QAbstract3DSeries::MeshBar));
+    barStyleList->addItem(u"Pyramid"_s, int(QAbstract3DSeries::MeshPyramid));
+    barStyleList->addItem(u"Cone"_s, int(QAbstract3DSeries::MeshCone));
+    barStyleList->addItem(u"Cylinder"_s, int(QAbstract3DSeries::MeshCylinder));
+    barStyleList->addItem(u"Bevel bar"_s, int(QAbstract3DSeries::MeshBevelBar));
+    barStyleList->addItem(u"Sphere"_s, int(QAbstract3DSeries::MeshSphere));
     barStyleList->setCurrentIndex(4);
 
     QPushButton *cameraButton = new QPushButton(m_barsWidget);
-    cameraButton->setText(QStringLiteral("Change camera preset"));
+    cameraButton->setText(u"Change camera preset"_s);
 
     QPushButton *zoomToSelectedButton = new QPushButton(m_barsWidget);
-    zoomToSelectedButton->setText(QStringLiteral("Zoom to selected bar"));
+    zoomToSelectedButton->setText(u"Zoom to selected bar"_s);
 
     QComboBox *selectionModeList = new QComboBox(m_barsWidget);
-    selectionModeList->addItem(QStringLiteral("None"),
+    selectionModeList->addItem(u"None"_s,
                                int(QAbstract3DGraph::SelectionNone));
-    selectionModeList->addItem(QStringLiteral("Bar"),
+    selectionModeList->addItem(u"Bar"_s,
                                int(QAbstract3DGraph::SelectionItem));
-    selectionModeList->addItem(QStringLiteral("Row"),
+    selectionModeList->addItem(u"Row"_s,
                                int(QAbstract3DGraph::SelectionRow));
-    selectionModeList->addItem(QStringLiteral("Bar and Row"),
+    selectionModeList->addItem(u"Bar and Row"_s,
                                int(QAbstract3DGraph::SelectionItemAndRow));
-    selectionModeList->addItem(QStringLiteral("Column"),
+    selectionModeList->addItem(u"Column"_s,
                                int(QAbstract3DGraph::SelectionColumn));
-    selectionModeList->addItem(QStringLiteral("Bar and Column"),
+    selectionModeList->addItem(u"Bar and Column"_s,
                                int(QAbstract3DGraph::SelectionItemAndColumn));
-    selectionModeList->addItem(QStringLiteral("Row and Column"),
+    selectionModeList->addItem(u"Row and Column"_s,
                                int(QAbstract3DGraph::SelectionRowAndColumn));
-    selectionModeList->addItem(QStringLiteral("Bar, Row and Column"),
+    selectionModeList->addItem(u"Bar, Row and Column"_s,
                                int(QAbstract3DGraph::SelectionItemRowAndColumn));
-    selectionModeList->addItem(QStringLiteral("Slice into Row"),
+    selectionModeList->addItem(u"Slice into Row"_s,
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionRow));
-    selectionModeList->addItem(QStringLiteral("Slice into Row and Item"),
+    selectionModeList->addItem(u"Slice into Row and Item"_s,
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndRow));
-    selectionModeList->addItem(QStringLiteral("Slice into Column"),
+    selectionModeList->addItem(u"Slice into Column"_s,
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionColumn));
-    selectionModeList->addItem(QStringLiteral("Slice into Column and Item"),
+    selectionModeList->addItem(u"Slice into Column and Item"_s,
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn));
-    selectionModeList->addItem(QStringLiteral("Multi: Bar, Row, Col"),
+    selectionModeList->addItem(u"Multi: Bar, Row, Col"_s,
                                int(QAbstract3DGraph::SelectionItemRowAndColumn
                                    | QAbstract3DGraph::SelectionMultiSeries));
-    selectionModeList->addItem(QStringLiteral("Multi, Slice: Row, Item"),
+    selectionModeList->addItem(u"Multi, Slice: Row, Item"_s,
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndRow
                                    | QAbstract3DGraph::SelectionMultiSeries));
-    selectionModeList->addItem(QStringLiteral("Multi, Slice: Col, Item"),
+    selectionModeList->addItem(u"Multi, Slice: Col, Item"_s,
                                int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn
                                    | QAbstract3DGraph::SelectionMultiSeries));
     selectionModeList->setCurrentIndex(1);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(m_barsWidget);
-    backgroundCheckBox->setText(QStringLiteral("Show background"));
+    backgroundCheckBox->setText(u"Show background"_s);
     backgroundCheckBox->setChecked(false);
 
     QCheckBox *gridCheckBox = new QCheckBox(m_barsWidget);
-    gridCheckBox->setText(QStringLiteral("Show grid"));
+    gridCheckBox->setText(u"Show grid"_s);
     gridCheckBox->setChecked(true);
 
     QCheckBox *seriesCheckBox = new QCheckBox(m_barsWidget);
-    seriesCheckBox->setText(QStringLiteral("Show second series"));
+    seriesCheckBox->setText(u"Show second series"_s);
     seriesCheckBox->setChecked(false);
 
     QCheckBox *reverseValueAxisCheckBox = new QCheckBox(m_barsWidget);
-    reverseValueAxisCheckBox->setText(QStringLiteral("Reverse value axis"));
+    reverseValueAxisCheckBox->setText(u"Reverse value axis"_s);
     reverseValueAxisCheckBox->setChecked(false);
 
     QCheckBox *reflectionCheckBox = new QCheckBox(m_barsWidget);
-    reflectionCheckBox->setText(QStringLiteral("Show reflections"));
+    reflectionCheckBox->setText(u"Show reflections"_s);
     reflectionCheckBox->setChecked(false);
 
     //! [3]
@@ -166,33 +168,33 @@ bool BarGraph::initialize()
     fontList->setCurrentFont(QFont("Times New Roman"));
 
     QComboBox *shadowQuality = new QComboBox(m_barsWidget);
-    shadowQuality->addItem(QStringLiteral("None"));
-    shadowQuality->addItem(QStringLiteral("Low"));
-    shadowQuality->addItem(QStringLiteral("Medium"));
-    shadowQuality->addItem(QStringLiteral("High"));
-    shadowQuality->addItem(QStringLiteral("Low Soft"));
-    shadowQuality->addItem(QStringLiteral("Medium Soft"));
-    shadowQuality->addItem(QStringLiteral("High Soft"));
+    shadowQuality->addItem(u"None"_s);
+    shadowQuality->addItem(u"Low"_s);
+    shadowQuality->addItem(u"Medium"_s);
+    shadowQuality->addItem(u"High"_s);
+    shadowQuality->addItem(u"Low Soft"_s);
+    shadowQuality->addItem(u"Medium Soft"_s);
+    shadowQuality->addItem(u"High Soft"_s);
     shadowQuality->setCurrentIndex(5);
 
     QComboBox *rangeList = new QComboBox(m_barsWidget);
-    rangeList->addItem(QStringLiteral("2015"));
-    rangeList->addItem(QStringLiteral("2016"));
-    rangeList->addItem(QStringLiteral("2017"));
-    rangeList->addItem(QStringLiteral("2018"));
-    rangeList->addItem(QStringLiteral("2019"));
-    rangeList->addItem(QStringLiteral("2020"));
-    rangeList->addItem(QStringLiteral("2021"));
-    rangeList->addItem(QStringLiteral("2022"));
-    rangeList->addItem(QStringLiteral("All"));
+    rangeList->addItem(u"2015"_s);
+    rangeList->addItem(u"2016"_s);
+    rangeList->addItem(u"2017"_s);
+    rangeList->addItem(u"2018"_s);
+    rangeList->addItem(u"2019"_s);
+    rangeList->addItem(u"2020"_s);
+    rangeList->addItem(u"2021"_s);
+    rangeList->addItem(u"2022"_s);
+    rangeList->addItem(u"All"_s);
     rangeList->setCurrentIndex(8);
 
     QCheckBox *axisTitlesVisibleCB = new QCheckBox(m_barsWidget);
-    axisTitlesVisibleCB->setText(QStringLiteral("Axis titles visible"));
+    axisTitlesVisibleCB->setText(u"Axis titles visible"_s);
     axisTitlesVisibleCB->setChecked(true);
 
     QCheckBox *axisTitlesFixedCB = new QCheckBox(m_barsWidget);
-    axisTitlesFixedCB->setText(QStringLiteral("Axis titles fixed"));
+    axisTitlesFixedCB->setText(u"Axis titles fixed"_s);
     axisTitlesFixedCB->setChecked(true);
 
     QSlider *axisLabelRotationSlider = new QSlider(Qt::Horizontal, m_barsWidget);
@@ -203,17 +205,17 @@ bool BarGraph::initialize()
     axisLabelRotationSlider->setMaximum(90);
 
     QButtonGroup *modeGroup = new QButtonGroup(m_barsWidget);
-    QRadioButton *modeWeather = new QRadioButton(QStringLiteral("Temperature Data"), m_barsWidget);
+    QRadioButton *modeWeather = new QRadioButton(u"Temperature Data"_s, m_barsWidget);
     modeWeather->setChecked(true);
-    QRadioButton *modeCustomProxy = new QRadioButton(QStringLiteral("Custom Proxy Data"), m_barsWidget);
+    QRadioButton *modeCustomProxy = new QRadioButton(u"Custom Proxy Data"_s, m_barsWidget);
     modeGroup->addButton(modeWeather);
     modeGroup->addButton(modeCustomProxy);
 
     //! [4]
-    vLayout->addWidget(new QLabel(QStringLiteral("Rotate horizontally")));
+    vLayout->addWidget(new QLabel(u"Rotate horizontally"_s));
     vLayout->addWidget(rotationSliderX, 0, Qt::AlignTop);
     //! [4]
-    vLayout->addWidget(new QLabel(QStringLiteral("Rotate vertically")));
+    vLayout->addWidget(new QLabel(u"Rotate vertically"_s));
     vLayout->addWidget(rotationSliderY, 0, Qt::AlignTop);
     vLayout->addWidget(labelButton, 0, Qt::AlignTop);
     vLayout->addWidget(cameraButton, 0, Qt::AlignTop);
@@ -226,21 +228,21 @@ bool BarGraph::initialize()
     vLayout->addWidget(reverseValueAxisCheckBox);
     vLayout->addWidget(axisTitlesVisibleCB);
     vLayout->addWidget(axisTitlesFixedCB);
-    vLayout->addWidget(new QLabel(QStringLiteral("Show year")));
+    vLayout->addWidget(new QLabel(u"Show year"_s));
     vLayout->addWidget(rangeList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change bar style")));
+    vLayout->addWidget(new QLabel(u"Change bar style"_s));
     vLayout->addWidget(barStyleList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change selection mode")));
+    vLayout->addWidget(new QLabel(u"Change selection mode"_s));
     vLayout->addWidget(selectionModeList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
+    vLayout->addWidget(new QLabel(u"Change theme"_s));
     vLayout->addWidget(themeList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout->addWidget(new QLabel(u"Adjust shadow quality"_s));
     vLayout->addWidget(shadowQuality);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change font")));
+    vLayout->addWidget(new QLabel(u"Change font"_s));
     vLayout->addWidget(fontList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust font size")));
+    vLayout->addWidget(new QLabel(u"Adjust font size"_s));
     vLayout->addWidget(fontSizeSlider);
-    vLayout->addWidget(new QLabel(QStringLiteral("Axis label rotation")));
+    vLayout->addWidget(new QLabel(u"Axis label rotation"_s));
     vLayout->addWidget(axisLabelRotationSlider, 0, Qt::AlignTop);
     vLayout->addWidget(modeWeather, 0, Qt::AlignTop);
     vLayout->addWidget(modeCustomProxy, 1, Qt::AlignTop);

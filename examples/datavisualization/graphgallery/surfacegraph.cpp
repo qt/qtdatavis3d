@@ -14,6 +14,8 @@
 #include <QtWidgets/qcommandlinkbutton.h>
 #include <QtGui/qpainter.h>
 
+using namespace Qt::StringLiterals;
+
 SurfaceGraph::SurfaceGraph()
 {
     m_surfaceGraph = new Q3DSurface();
@@ -48,18 +50,18 @@ bool SurfaceGraph::initialize()
     vLayout->setAlignment(Qt::AlignTop);
 
     // Create control widgets
-    QGroupBox *modelGroupBox = new QGroupBox(QLatin1String("Model"));
+    QGroupBox *modelGroupBox = new QGroupBox(u"Model"_s);
 
     QRadioButton *sqrtSinModelRB = new QRadioButton(m_surfaceWidget);
-    sqrtSinModelRB->setText(QLatin1String("Sqrt && Sin"));
+    sqrtSinModelRB->setText(u"_sqrt && Sin"_s);
     sqrtSinModelRB->setChecked(false);
 
     QRadioButton *heightMapModelRB = new QRadioButton(m_surfaceWidget);
-    heightMapModelRB->setText(QLatin1String("Multiseries\nHeight Map"));
+    heightMapModelRB->setText(u"Multiseries\nHeight Map"_s);
     heightMapModelRB->setChecked(false);
 
     QRadioButton *texturedModelRB = new QRadioButton(m_surfaceWidget);
-    texturedModelRB->setText(QLatin1String("Textured\nTopography"));
+    texturedModelRB->setText(u"Textured\nTopography"_s);
     texturedModelRB->setChecked(false);
 
     QVBoxLayout *modelVBox = new QVBoxLayout;
@@ -68,22 +70,22 @@ bool SurfaceGraph::initialize()
     modelVBox->addWidget(texturedModelRB);
     modelGroupBox->setLayout(modelVBox);
 
-    QGroupBox *selectionGroupBox = new QGroupBox(QLatin1String("Graph Selection Mode"));
+    QGroupBox *selectionGroupBox = new QGroupBox(u"Graph Selection Mode"_s);
 
     QRadioButton *modeNoneRB = new QRadioButton(m_surfaceWidget);
-    modeNoneRB->setText(QLatin1String("No selection"));
+    modeNoneRB->setText(u"No selection"_s);
     modeNoneRB->setChecked(false);
 
     QRadioButton *modeItemRB = new QRadioButton(m_surfaceWidget);
-    modeItemRB->setText(QLatin1String("Item"));
+    modeItemRB->setText(u"Item"_s);
     modeItemRB->setChecked(false);
 
     QRadioButton *modeSliceRowRB = new QRadioButton(m_surfaceWidget);
-    modeSliceRowRB->setText(QLatin1String("Row Slice"));
+    modeSliceRowRB->setText(u"Row Slice"_s);
     modeSliceRowRB->setChecked(false);
 
     QRadioButton *modeSliceColumnRB = new QRadioButton(m_surfaceWidget);
-    modeSliceColumnRB->setText(QLatin1String("Column Slice"));
+    modeSliceColumnRB->setText(u"Column Slice"_s);
     modeSliceColumnRB->setChecked(false);
 
     QVBoxLayout *selectionVBox = new QVBoxLayout;
@@ -93,7 +95,7 @@ bool SurfaceGraph::initialize()
     selectionVBox->addWidget(modeSliceColumnRB);
     selectionGroupBox->setLayout(selectionVBox);
 
-    QGroupBox *axisGroupBox = new QGroupBox(QLatin1String("Axis ranges"));
+    QGroupBox *axisGroupBox = new QGroupBox(u"Axis ranges"_s);
 
     QSlider *axisMinSliderX = new QSlider(Qt::Horizontal);
     axisMinSliderX->setMinimum(0);
@@ -113,17 +115,17 @@ bool SurfaceGraph::initialize()
     axisMaxSliderZ->setEnabled(true);
 
     QVBoxLayout *axisVBox = new QVBoxLayout;
-    axisVBox->addWidget(new QLabel(QLatin1String("Column range")));
+    axisVBox->addWidget(new QLabel(u"Column range"_s));
     axisVBox->addWidget(axisMinSliderX);
     axisVBox->addWidget(axisMaxSliderX);
-    axisVBox->addWidget(new QLabel(QLatin1String("Row range")));
+    axisVBox->addWidget(new QLabel(u"Row range"_s));
     axisVBox->addWidget(axisMinSliderZ);
     axisVBox->addWidget(axisMaxSliderZ);
     axisGroupBox->setLayout(axisVBox);
 
     // Mode-dependent controls
     // sqrt-sin
-    QGroupBox *colorGroupBox = new QGroupBox(QLatin1String("Custom gradient"));
+    QGroupBox *colorGroupBox = new QGroupBox(u"Custom gradient"_s);
 
     QLinearGradient grBtoY(0, 0, 1, 100);
     grBtoY.setColorAt(1.f, Qt::black);
@@ -156,16 +158,16 @@ bool SurfaceGraph::initialize()
     colorGroupBox->setLayout(colorHBox);
 
     // Multiseries heightmap
-    QGroupBox *showGroupBox = new QGroupBox(QLatin1String("Show Object"));
+    QGroupBox *showGroupBox = new QGroupBox(u"_show Object"_s);
     showGroupBox->setVisible(false);
 
-    QCheckBox *checkboxShowOilRigOne = new QCheckBox(QLatin1String("Oil Rig 1"));
+    QCheckBox *checkboxShowOilRigOne = new QCheckBox(u"Oil Rig 1"_s);
     checkboxShowOilRigOne->setChecked(true);
 
-    QCheckBox *checkboxShowOilRigTwo = new QCheckBox(QLatin1String("Oil Rig 2"));
+    QCheckBox *checkboxShowOilRigTwo = new QCheckBox(u"Oil Rig 2"_s);
     checkboxShowOilRigTwo->setChecked(true);
 
-    QCheckBox *checkboxShowRefinery = new QCheckBox(QLatin1String("Refinery"));
+    QCheckBox *checkboxShowRefinery = new QCheckBox(u"Refinery"_s);
 
     QVBoxLayout *showVBox = new QVBoxLayout;
     showVBox->addWidget(checkboxShowOilRigOne);
@@ -173,14 +175,14 @@ bool SurfaceGraph::initialize()
     showVBox->addWidget(checkboxShowRefinery);
     showGroupBox->setLayout(showVBox);
 
-    QGroupBox *visualsGroupBox = new QGroupBox(QLatin1String("Visuals"));
+    QGroupBox *visualsGroupBox = new QGroupBox(u"Visuals"_s);
     visualsGroupBox->setVisible(false);
 
-    QCheckBox *checkboxVisualsSeeThrough = new QCheckBox(QLatin1String("See-Through"));
+    QCheckBox *checkboxVisualsSeeThrough = new QCheckBox(u"_see-Through"_s);
 
-    QCheckBox *checkboxHighlightOil = new QCheckBox(QLatin1String("Highlight Oil"));
+    QCheckBox *checkboxHighlightOil = new QCheckBox(u"Highlight Oil"_s);
 
-    QCheckBox *checkboxShowShadows = new QCheckBox(QLatin1String("Shadows"));
+    QCheckBox *checkboxShowShadows = new QCheckBox(u"_shadows"_s);
     checkboxShowShadows->setChecked(true);
 
     QVBoxLayout *visualVBox = new QVBoxLayout;
@@ -189,14 +191,14 @@ bool SurfaceGraph::initialize()
     visualVBox->addWidget(checkboxShowShadows);
     visualsGroupBox->setLayout(visualVBox);
 
-    QLabel *labelSelection = new QLabel(QLatin1String("Selection:"));
+    QLabel *labelSelection = new QLabel(u"_selection:"_s);
     labelSelection->setVisible(false);
 
-    QLabel *labelSelectedItem = new QLabel(QLatin1String("Nothing"));
+    QLabel *labelSelectedItem = new QLabel(u"Nothing"_s);
     labelSelectedItem->setVisible(false);
 
     // Textured topography heightmap
-    QCheckBox *enableTexture = new QCheckBox(QLatin1String("Surface texture"));
+    QCheckBox *enableTexture = new QCheckBox(u"_surface texture"_s);
     enableTexture->setVisible(false);
 
     int height = 400;
@@ -221,13 +223,14 @@ bool SurfaceGraph::initialize()
     for (int i = 0; i < 6; i++) {
         int yPos = i * step + border;
         pmpHighlight.drawLine(border, yPos, 55, yPos);
-        pmpHighlight.drawText(60, yPos + 2, QString("%1 m").arg(550 - (i * 110)));
+        const int height = 550 - (i * 110);
+        pmpHighlight.drawText(60, yPos + 2, QString::number(height) + u" m"_s);
     }
 
     QLabel *label = new QLabel(m_surfaceWidget);
     label->setPixmap(pmHighlight);
 
-    QGroupBox *heightMapGroupBox = new QGroupBox(QLatin1String("Highlight color map"));
+    QGroupBox *heightMapGroupBox = new QGroupBox(u"Highlight color map"_s);
     QVBoxLayout *colorMapVBox = new QVBoxLayout;
     colorMapVBox->addWidget(label);
     heightMapGroupBox->setLayout(colorMapVBox);

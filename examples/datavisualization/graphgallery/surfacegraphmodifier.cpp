@@ -11,6 +11,8 @@
 #include <QtGui/qimage.h>
 #include <QtCore/qmath.h>
 
+using namespace Qt::StringLiterals;
+
 const int sampleCountX = 150;
 const int sampleCountZ = 150;
 const int heightMapGridStepX = 6;
@@ -52,7 +54,7 @@ SurfaceGraphModifier::SurfaceGraphModifier(Q3DSurface *surface, QLabel *label)
     QImage heightMapImageOne(":/data/layer_1.png");
     m_heightMapProxyOne = new QHeightMapSurfaceDataProxy(heightMapImageOne);
     m_heightMapSeriesOne = new QSurface3DSeries(m_heightMapProxyOne);
-    m_heightMapSeriesOne->setItemLabelFormat(QStringLiteral("(@xLabel, @zLabel): @yLabel"));
+    m_heightMapSeriesOne->setItemLabelFormat(u"(@xLabel, @zLabel): @yLabel"_s);
     m_heightMapProxyOne->setValueRanges(34.f, 40.f, 18.f, 24.f);
     //! [2]
 
@@ -60,13 +62,13 @@ SurfaceGraphModifier::SurfaceGraphModifier(Q3DSurface *surface, QLabel *label)
     QImage heightMapImageTwo(":/data/layer_2.png");
     m_heightMapProxyTwo = new QHeightMapSurfaceDataProxy(heightMapImageTwo);
     m_heightMapSeriesTwo = new QSurface3DSeries(m_heightMapProxyTwo);
-    m_heightMapSeriesTwo->setItemLabelFormat(QStringLiteral("(@xLabel, @zLabel): @yLabel"));
+    m_heightMapSeriesTwo->setItemLabelFormat(u"(@xLabel, @zLabel): @yLabel"_s);
     m_heightMapProxyTwo->setValueRanges(34.f, 40.f, 18.f, 24.f);
 
     QImage heightMapImageThree(":/data/layer_3.png");
     m_heightMapProxyThree = new QHeightMapSurfaceDataProxy(heightMapImageThree);
     m_heightMapSeriesThree = new QSurface3DSeries(m_heightMapProxyThree);
-    m_heightMapSeriesThree->setItemLabelFormat(QStringLiteral("(@xLabel, @zLabel): @yLabel"));
+    m_heightMapSeriesThree->setItemLabelFormat(u"(@xLabel, @zLabel): @yLabel"_s);
     m_heightMapProxyThree->setValueRanges(34.f, 40.f, 18.f, 24.f);
 
     // The images are the same size, so it's enough to get the dimensions from one
@@ -125,7 +127,7 @@ SurfaceGraphModifier::SurfaceGraphModifier(Q3DSurface *surface, QLabel *label)
     //
     m_topography = new TopographicSeries();
     m_topography->setTopographyFile(":/data/topography.png", areaWidth, areaHeight);
-    m_topography->setItemLabelFormat(QStringLiteral("@yLabel m"));
+    m_topography->setItemLabelFormat(u"@yLabel m"_s);
 
     m_highlight = new HighlightSeries();
     m_highlight->setTopographicSeries(m_topography);
@@ -205,9 +207,9 @@ void SurfaceGraphModifier::enableSqrtSinModel(bool enable)
         m_graph->axisY()->setTitleVisible(false);
         m_graph->axisZ()->setTitleVisible(false);
 
-        m_graph->axisX()->setTitle(QStringLiteral(""));
-        m_graph->axisY()->setTitle(QStringLiteral(""));
-        m_graph->axisZ()->setTitle(QStringLiteral(""));
+        m_graph->axisX()->setTitle({});
+        m_graph->axisY()->setTitle({});
+        m_graph->axisZ()->setTitle({});
 
         m_graph->setActiveInputHandler(m_defaultInputHandler);
 
@@ -251,9 +253,9 @@ void SurfaceGraphModifier::enableHeightMapModel(bool enable)
         //! [4]
         m_graph->axisZ()->setRange(18.f, 24.f);
 
-        m_graph->axisX()->setTitle(QStringLiteral("Latitude"));
-        m_graph->axisY()->setTitle(QStringLiteral("Height"));
-        m_graph->axisZ()->setTitle(QStringLiteral("Longitude"));
+        m_graph->axisX()->setTitle(u"Latitude"_s);
+        m_graph->axisY()->setTitle(u"Height"_s);
+        m_graph->axisZ()->setTitle(u"Longitude"_s);
 
         m_graph->removeSeries(m_sqrtSinSeries);
         m_graph->removeSeries(m_topography);
@@ -314,9 +316,9 @@ void SurfaceGraphModifier::enableTopographyModel(bool enable)
         m_graph->axisY()->setTitleVisible(false);
         m_graph->axisZ()->setTitleVisible(false);
 
-        m_graph->axisX()->setTitle(QStringLiteral(""));
-        m_graph->axisY()->setTitle(QStringLiteral(""));
-        m_graph->axisZ()->setTitle(QStringLiteral(""));
+        m_graph->axisX()->setTitle({});
+        m_graph->axisY()->setTitle({});
+        m_graph->axisZ()->setTitle({});
 
         //! [5]
         m_graph->setActiveInputHandler(m_customInputHandler);

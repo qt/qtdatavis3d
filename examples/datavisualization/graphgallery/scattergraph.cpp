@@ -11,6 +11,8 @@
 #include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qcommandlinkbutton.h>
 
+using namespace Qt::StringLiterals;
+
 ScatterGraph::ScatterGraph()
 {
     m_scatterGraph = new Q3DScatter();
@@ -44,58 +46,58 @@ bool ScatterGraph::initialize()
     hLayout->addLayout(vLayout);
 
     QCommandLinkButton *cameraButton = new QCommandLinkButton(m_scatterWidget);
-    cameraButton->setText(QStringLiteral("Change camera preset"));
-    cameraButton->setDescription(QStringLiteral("Switch between a number of preset camera positions"));
+    cameraButton->setText(u"Change camera preset"_s);
+    cameraButton->setDescription(u"Switch between a number of preset camera positions"_s);
     cameraButton->setIconSize(QSize(0, 0));
 
     QCommandLinkButton *itemCountButton = new QCommandLinkButton(m_scatterWidget);
-    itemCountButton->setText(QStringLiteral("Toggle item count"));
-    itemCountButton->setDescription(QStringLiteral("Switch between 900 and 10000 data points"));
+    itemCountButton->setText(u"Toggle item count"_s);
+    itemCountButton->setDescription(u"Switch between 900 and 10000 data points"_s);
     itemCountButton->setIconSize(QSize(0, 0));
 
     QCommandLinkButton *rangeButton = new QCommandLinkButton(m_scatterWidget);
-    rangeButton->setText(QStringLiteral("Toggle axis ranges"));
-    rangeButton->setDescription(QStringLiteral("Switch between automatic axis ranges and preset ranges"));
+    rangeButton->setText(u"Toggle axis ranges"_s);
+    rangeButton->setDescription(u"Switch between automatic axis ranges and preset ranges"_s);
     rangeButton->setIconSize(QSize(0, 0));
 
     QCheckBox *backgroundCheckBox = new QCheckBox(m_scatterWidget);
-    backgroundCheckBox->setText(QStringLiteral("Show background"));
+    backgroundCheckBox->setText(u"Show background"_s);
     backgroundCheckBox->setChecked(true);
 
     QCheckBox *gridCheckBox = new QCheckBox(m_scatterWidget);
-    gridCheckBox->setText(QStringLiteral("Show grid"));
+    gridCheckBox->setText(u"Show grid"_s);
     gridCheckBox->setChecked(true);
 
     QCheckBox *smoothCheckBox = new QCheckBox(m_scatterWidget);
-    smoothCheckBox->setText(QStringLiteral("Smooth dots"));
+    smoothCheckBox->setText(u"Smooth dots"_s);
     smoothCheckBox->setChecked(true);
 
     QComboBox *itemStyleList = new QComboBox(m_scatterWidget);
-    itemStyleList->addItem(QStringLiteral("Sphere"), int(QAbstract3DSeries::MeshSphere));
-    itemStyleList->addItem(QStringLiteral("Cube"), int(QAbstract3DSeries::MeshCube));
-    itemStyleList->addItem(QStringLiteral("Minimal"), int(QAbstract3DSeries::MeshMinimal));
-    itemStyleList->addItem(QStringLiteral("Point"), int(QAbstract3DSeries::MeshPoint));
+    itemStyleList->addItem(u"Sphere"_s, int(QAbstract3DSeries::MeshSphere));
+    itemStyleList->addItem(u"Cube"_s, int(QAbstract3DSeries::MeshCube));
+    itemStyleList->addItem(u"Minimal"_s, int(QAbstract3DSeries::MeshMinimal));
+    itemStyleList->addItem(u"Point"_s, int(QAbstract3DSeries::MeshPoint));
     itemStyleList->setCurrentIndex(0);
 
     QComboBox *themeList = new QComboBox(m_scatterWidget);
-    themeList->addItem(QStringLiteral("Qt"));
-    themeList->addItem(QStringLiteral("Primary Colors"));
-    themeList->addItem(QStringLiteral("Digia"));
-    themeList->addItem(QStringLiteral("Stone Moss"));
-    themeList->addItem(QStringLiteral("Army Blue"));
-    themeList->addItem(QStringLiteral("Retro"));
-    themeList->addItem(QStringLiteral("Ebony"));
-    themeList->addItem(QStringLiteral("Isabelle"));
+    themeList->addItem(u"Qt"_s);
+    themeList->addItem(u"Primary Colors"_s);
+    themeList->addItem(u"Digia"_s);
+    themeList->addItem(u"Stone Moss"_s);
+    themeList->addItem(u"Army Blue"_s);
+    themeList->addItem(u"Retro"_s);
+    themeList->addItem(u"Ebony"_s);
+    themeList->addItem(u"Isabelle"_s);
     themeList->setCurrentIndex(3);
 
     QComboBox *shadowQuality = new QComboBox(m_scatterWidget);
-    shadowQuality->addItem(QStringLiteral("None"));
-    shadowQuality->addItem(QStringLiteral("Low"));
-    shadowQuality->addItem(QStringLiteral("Medium"));
-    shadowQuality->addItem(QStringLiteral("High"));
-    shadowQuality->addItem(QStringLiteral("Low Soft"));
-    shadowQuality->addItem(QStringLiteral("Medium Soft"));
-    shadowQuality->addItem(QStringLiteral("High Soft"));
+    shadowQuality->addItem(u"None"_s);
+    shadowQuality->addItem(u"Low"_s);
+    shadowQuality->addItem(u"Medium"_s);
+    shadowQuality->addItem(u"High"_s);
+    shadowQuality->addItem(u"Low Soft"_s);
+    shadowQuality->addItem(u"Medium Soft"_s);
+    shadowQuality->addItem(u"High Soft"_s);
     shadowQuality->setCurrentIndex(6);
 
     vLayout->addWidget(cameraButton);
@@ -104,11 +106,11 @@ bool ScatterGraph::initialize()
     vLayout->addWidget(backgroundCheckBox);
     vLayout->addWidget(gridCheckBox);
     vLayout->addWidget(smoothCheckBox);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change dot style")));
+    vLayout->addWidget(new QLabel(u"Change dot style"_s));
     vLayout->addWidget(itemStyleList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Change theme")));
+    vLayout->addWidget(new QLabel(u"Change theme"_s));
     vLayout->addWidget(themeList);
-    vLayout->addWidget(new QLabel(QStringLiteral("Adjust shadow quality")));
+    vLayout->addWidget(new QLabel(u"Adjust shadow quality"_s));
     vLayout->addWidget(shadowQuality, 1, Qt::AlignTop);
 
     ScatterDataModifier *modifier = new ScatterDataModifier(m_scatterGraph);
