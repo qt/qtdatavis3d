@@ -41,7 +41,6 @@ static const QVector3D zeroVector = QVector3D(0.0f, 0.0f, 0.0f);
 static const QVector3D oneVector = QVector3D(1.0f, 1.0f, 1.0f);
 static const QVector3D upVector = QVector3D(0.0f, 1.0f, 0.0f);
 static const QVector3D cameraDistanceVector = QVector3D(0.0f, 0.0f, cameraDistance);
-static const QQuaternion identityQuaternion;
 
 // Skip color == selection texture's background color
 static const QVector4D selectionSkipColor = QVector4D(255.0f, 255.0f, 255.0f, 255.0f);

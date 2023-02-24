@@ -673,7 +673,8 @@ void QQuickDataVisScatter::removeSeries(QScatter3DSeries *series)
     series->setParent(this); // Reparent as removing will leave series parentless
 
     // Find scattergraph model
-    for (QList<ScatterModel *>::Iterator it = m_scatterGraphs.begin(); it != m_scatterGraphs.end(); ++it) {
+    for (QList<ScatterModel *>::const_iterator it = m_scatterGraphs.constBegin();
+         it != m_scatterGraphs.constEnd(); ++it) {
         if ((*it)->series == series) {
             removeDataItems((*it)->dataItems);
 

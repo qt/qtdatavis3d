@@ -30,8 +30,6 @@
 
 QT_BEGIN_NAMESPACE
 
-static QHash<QQuickDataVisItem *, QQuickWindow *> graphWindowList;
-
 QQuickDataVisItem::QQuickDataVisItem(QQuickItem *parent) :
     QQuick3DViewport(parent),
     m_controller(0),
@@ -1962,8 +1960,8 @@ void QQuickDataVisItem::wheelEvent(QWheelEvent *event)
 
 void QQuickDataVisItem::checkWindowList(QQuickWindow *window)
 {
-    QQuickWindow *oldWindow = graphWindowList.value(this);
-    graphWindowList[this] = window;
+    QQuickWindow *oldWindow = m_graphWindowList.value(this);
+    m_graphWindowList[this] = window;
 
     if (oldWindow != window && oldWindow) {
         QObject::disconnect(oldWindow, &QObject::destroyed, this,
@@ -1978,15 +1976,15 @@ void QQuickDataVisItem::checkWindowList(QQuickWindow *window)
 
     QList<QQuickWindow *> windowList;
 
-    foreach (QQuickDataVisItem *graph, graphWindowList.keys()) {
+    foreach (QQuickDataVisItem *graph, m_graphWindowList.keys()) {
         if (graph->m_renderMode == RenderDirectToBackground
                 || graph->m_renderMode == RenderDirectToBackground_NoClear) {
-            windowList.append(graphWindowList.value(graph));
+            windowList.append(m_graphWindowList.value(graph));
         }
     }
 
     if (!window) {
-        graphWindowList.remove(this);
+        m_graphWindowList.remove(this);
         return;
     }
 }
@@ -2242,10 +2240,10 @@ void QQuickDataVisItem::windowDestroyed(QObject *obj)
 {
     // Remove destroyed window from window lists
     QQuickWindow *win = static_cast<QQuickWindow *>(obj);
-    QQuickWindow *oldWindow = graphWindowList.value(this);
+    QQuickWindow *oldWindow = m_graphWindowList.value(this);
 
     if (win == oldWindow)
-        graphWindowList.remove(this);
+        m_graphWindowList.remove(this);
 }
 
 QQmlComponent *QQuickDataVisItem::createRepeaterDelegateComponent(const QString &fileName)

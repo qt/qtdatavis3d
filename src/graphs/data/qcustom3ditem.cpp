@@ -455,7 +455,7 @@ QCustom3DItemPrivate::QCustom3DItemPrivate(QCustom3DItem *q) :
     m_positionAbsolute(false),
     m_scaling(QVector3D(0.1f, 0.1f, 0.1f)),
     m_scalingAbsolute(true),
-    m_rotation(identityQuaternion),
+    m_rotation(QQuaternion()),
     m_visible(true),
     m_shadowCasting(true),
     m_isLabelItem(false),

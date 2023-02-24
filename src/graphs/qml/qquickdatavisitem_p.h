@@ -456,6 +456,8 @@ private:
     void updateCamera();
     QVector3D calculateLabelRotation(float labelAutoAngle);
 
+    QHash<QQuickDataVisItem *, QQuickWindow *> m_graphWindowList = {};
+
     friend class Scatter3DController;
 };
 Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::SelectionFlags)

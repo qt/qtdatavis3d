@@ -865,7 +865,7 @@ void QQuickDataVisBars::updateBarPositions(QBar3DSeries *series)
                             QQuaternion::fromAxisAndAngle(
                                 upVector, angle));
             } else {
-                model->setRotation(identityQuaternion);
+                model->setRotation(QQuaternion());
             }
 
             if (heightValue < 0.f) {
