@@ -22,9 +22,6 @@ public:
     void setLabels(const QStringList &labels);
     QStringList labels() const;
 
-Q_SIGNALS:
-    void labelsChanged();
-
 protected:
     QCategory3DAxisPrivate *dptr();
 

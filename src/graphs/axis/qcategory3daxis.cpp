@@ -43,7 +43,6 @@ QT_BEGIN_NAMESPACE
 QCategory3DAxis::QCategory3DAxis(QObject *parent) :
     QAbstract3DAxis(new QCategory3DAxisPrivate(this), parent)
 {
-    connect(this, &QCategory3DAxis::labelsChanged, this, &QAbstract3DAxis::labelsChanged);
 }
 
 /*!
@@ -88,7 +87,7 @@ void QCategory3DAxis::setLabels(const QStringList &labels)
 
     if (!labelsFromData && d_ptr->m_labels != labels) {
         d_ptr->m_labels = labels;
-        emit labelsChanged();
+        emit QAbstract3DAxis::labelsChanged();
     }
 }
 
@@ -119,7 +118,7 @@ void QCategory3DAxisPrivate::setDataLabels(const QStringList &labels)
 {
     if (!m_labelsExplicitlySet && m_labels != labels) {
         m_labels = labels;
-        emit qptr()->labelsChanged();
+        emit qptr()->QAbstract3DAxis::labelsChanged();
     }
 }
 
