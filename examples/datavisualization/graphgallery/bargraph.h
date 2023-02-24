@@ -11,7 +11,7 @@ class BarGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit BarGraph();
+    BarGraph();
     ~BarGraph();
 
     bool initialize();

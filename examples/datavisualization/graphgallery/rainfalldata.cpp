@@ -36,8 +36,9 @@ RainfallData::RainfallData()
     m_valueAxis->setAutoAdjustRange(true);
 
     // Set axis labels and titles
-    QStringList months;
-    months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
+    QStringList months{"January", "February", "March", "April",
+                       "May", "June", "July", "August", "September", "October",
+                       "November","December"};
     m_rowAxis->setTitle("Year");
     m_colAxis->setTitle("Month");
     m_valueAxis->setTitle("rainfall (mm)");
@@ -82,9 +83,9 @@ void RainfallData::addDataSet()
         stream.setDevice(&dataFile);
         while (!stream.atEnd()) {
             QString line = stream.readLine();
-            if (line.startsWith("#")) // Ignore comments
+            if (line.startsWith('#')) // Ignore comments
                 continue;
-            QStringList strList = line.split(",", Qt::SkipEmptyParts);
+            QStringList strList = line.split(',', Qt::SkipEmptyParts);
             // Each line has three data items: Year, month, and rainfall value
             if (strList.size() < 3) {
                 qWarning() << "Invalid row read from data:" << line;

@@ -3,21 +3,22 @@
 
 #include "variantbardatamapping.h"
 
-VariantBarDataMapping::VariantBarDataMapping()
-    : QObject(0)
-{
-}
+VariantBarDataMapping::VariantBarDataMapping() = default;
 
-VariantBarDataMapping::VariantBarDataMapping(const VariantBarDataMapping &other)
-    : QObject(0)
+VariantBarDataMapping::VariantBarDataMapping(const VariantBarDataMapping &other) :
+    QObject(nullptr),
+    m_rowIndex(other.m_rowIndex),
+    m_columnIndex(other.m_columnIndex),
+    m_valueIndex(other.m_valueIndex),
+    m_rowCategories(other.m_rowCategories),
+    m_columnCategories(other.m_columnCategories)
 {
-    operator=(other);
 }
 
 VariantBarDataMapping::VariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
                                              const QStringList &rowCategories,
                                              const QStringList &columnCategories)
-    : QObject(0)
+    : QObject(nullptr)
 {
     m_rowIndex = rowIndex;
     m_columnIndex = columnIndex;
@@ -26,18 +27,17 @@ VariantBarDataMapping::VariantBarDataMapping(int rowIndex, int columnIndex, int 
     m_columnCategories = columnCategories;
 }
 
-VariantBarDataMapping::~VariantBarDataMapping()
-{
-}
+VariantBarDataMapping::~VariantBarDataMapping() = default;
 
 VariantBarDataMapping &VariantBarDataMapping::operator=(const VariantBarDataMapping &other)
 {
-    m_rowIndex = other.m_rowIndex;
-    m_columnIndex = other.m_columnIndex;
-    m_valueIndex = other.m_valueIndex;
-    m_rowCategories = other.m_rowCategories;
-    m_columnCategories = other.m_columnCategories;
-
+    if (this != &other) {
+        m_rowIndex = other.m_rowIndex;
+        m_columnIndex = other.m_columnIndex;
+        m_valueIndex = other.m_valueIndex;
+        m_rowCategories = other.m_rowCategories;
+        m_columnCategories = other.m_columnCategories;
+    }
     return *this;
 }
 

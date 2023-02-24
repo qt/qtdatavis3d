@@ -7,8 +7,6 @@
 #include "variantdataset.h"
 #include "variantbardatamapping.h"
 #include <QtDataVisualization/qbardataproxy.h>
-#include <QtCore/qstringlist.h>
-#include <QtCore/qmap.h>
 #include <QtCore/qpointer.h>
 
 //! [0]

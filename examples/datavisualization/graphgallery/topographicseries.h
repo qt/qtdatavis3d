@@ -10,15 +10,13 @@ class TopographicSeries : public QSurface3DSeries
 {
     Q_OBJECT
 public:
-    explicit TopographicSeries();
+    TopographicSeries();
     ~TopographicSeries();
 
     void setTopographyFile(const QString file, float width, float height);
 
     float sampleCountX() { return m_sampleCountX; }
     float sampleCountZ() { return m_sampleCountZ; }
-
-public Q_SLOTS:
 
 private:
     float m_sampleCountX = 0.f;

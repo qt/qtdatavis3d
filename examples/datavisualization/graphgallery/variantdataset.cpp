@@ -3,10 +3,7 @@
 
 #include "variantdataset.h"
 
-VariantDataSet::VariantDataSet()
-    : QObject(0)
-{
-}
+VariantDataSet::VariantDataSet() = default;
 
 VariantDataSet::~VariantDataSet()
 {

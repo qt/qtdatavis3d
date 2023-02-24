@@ -15,9 +15,7 @@ TopographicSeries::TopographicSeries()
     setBaseColor(Qt::white);
 }
 
-TopographicSeries::~TopographicSeries()
-{
-}
+TopographicSeries::~TopographicSeries() = default;
 
 void TopographicSeries::setTopographyFile(const QString file, float width, float height)
 {
