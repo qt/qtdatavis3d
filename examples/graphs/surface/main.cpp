@@ -19,7 +19,6 @@
 
 int main(int argc, char **argv)
 {
-    qputenv("QSG_RHI_BACKEND", "opengl");
     //! [0]
     QApplication app(argc, argv);
     Q3DSurfaceNG *graph = new Q3DSurfaceNG();
