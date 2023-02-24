@@ -9,14 +9,6 @@ qt_internal_add_manual_test(qmlbarsrowcolors
         main.cpp
     )
 
-set_target_properties(qmlbarsrowcolors PROPERTIES
-    WIN32_EXECUTABLE TRUE
-    MACOSX_BUNDLE TRUE
-)
-target_compile_definitions(qmlbarsrowcolors PUBLIC
-    QT_DISABLE_DEPRECATED_BEFORE=0x050F00
-)
-
 target_link_libraries(qmlbarsrowcolors PUBLIC
     Qt::Core
     Qt::Gui
@@ -36,10 +28,4 @@ qt6_add_resources(qmlbarsrowcolors "qmlbarsrowcolors"
         "/"
     FILES
         ${qmlbarsrowcolors_resource_files}
-)
-
-install(TARGETS qmlbarsrowcolors
-    RUNTIME DESTINATION "${INSTALL_EXAMPLEDIR}"
-    BUNDLE DESTINATION "${INSTALL_EXAMPLEDIR}"
-    LIBRARY DESTINATION "${INSTALL_EXAMPLEDIR}"
 )
