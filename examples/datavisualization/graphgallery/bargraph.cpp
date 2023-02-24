@@ -21,14 +21,10 @@ BarGraph::BarGraph()
 {
     //! [0]
     m_barsGraph = new Q3DBars();
-    m_container = QWidget::createWindowContainer(m_barsGraph);
     //! [0]
 }
 
-BarGraph::~BarGraph()
-{
-    delete m_container;
-}
+BarGraph::~BarGraph() = default;
 
 bool BarGraph::initialize()
 {
@@ -39,17 +35,18 @@ bool BarGraph::initialize()
         return false;
     }
 
+    //! [1]
+    m_barsWidget = new QWidget;
+    QHBoxLayout *hLayout = new QHBoxLayout(m_barsWidget);
+    m_container = QWidget::createWindowContainer(m_barsGraph, m_barsWidget);
     QSize screenSize = m_barsGraph->screen()->size();
     m_container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.75));
     m_container->setMaximumSize(screenSize);
     m_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_container->setFocusPolicy(Qt::StrongFocus);
-
-    //! [1]
-    m_barsWidget = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout(m_barsWidget);
-    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addWidget(m_container, 1);
+
+    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addLayout(vLayout);
     //! [1]
 
