@@ -13,7 +13,6 @@ class Q3DCameraPrivate;
 class Q_GRAPHS_EXPORT Q3DCamera : public Q3DObject
 {
     Q_OBJECT
-    Q_ENUMS(CameraPreset)
     Q_PROPERTY(float xRotation READ xRotation WRITE setXRotation NOTIFY xRotationChanged)
     Q_PROPERTY(float yRotation READ yRotation WRITE setYRotation NOTIFY yRotationChanged)
     Q_PROPERTY(float zoomLevel READ zoomLevel WRITE setZoomLevel NOTIFY zoomLevelChanged)
@@ -52,6 +51,7 @@ public:
         CameraPresetBehindBelow,
         CameraPresetDirectlyBelow
     };
+    Q_ENUM(CameraPreset)
 
     explicit Q3DCamera(QObject *parent = nullptr);
     virtual ~Q3DCamera();

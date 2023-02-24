@@ -24,8 +24,6 @@ class QQuickDataVisItem;
 class Q_GRAPHS_EXPORT QAbstract3DGraphNG : public QQuickWidget
 {
     Q_OBJECT
-    Q_ENUMS(ShadowQuality)
-    Q_ENUMS(ElementType)
     Q_FLAGS(SelectionFlag SelectionFlags)
     Q_FLAGS(OptimizationHint OptimizationHints)
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
@@ -57,6 +55,7 @@ public:
         ShadowQualitySoftMedium,
         ShadowQualitySoftHigh
     };
+    Q_ENUM(ShadowQuality)
 
     enum ElementType {
         ElementNone = 0,
@@ -66,6 +65,7 @@ public:
         ElementAxisZLabel,
         ElementCustomItem
     };
+    Q_ENUM(ElementType)
 
     enum OptimizationHint {
         OptimizationDefault = 0,

@@ -16,8 +16,6 @@ class QAbstract3DAxisPrivate;
 class Q_GRAPHS_EXPORT QAbstract3DAxis : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(AxisOrientation)
-    Q_ENUMS(AxisType)
     Q_PROPERTY(QString title READ title WRITE setTitle NOTIFY titleChanged)
     Q_PROPERTY(QStringList labels READ labels WRITE setLabels NOTIFY labelsChanged)
     Q_PROPERTY(AxisOrientation orientation READ orientation NOTIFY orientationChanged)
@@ -36,12 +34,14 @@ public:
         AxisOrientationY = 2,
         AxisOrientationZ = 4
     };
+    Q_ENUM(AxisOrientation)
 
     enum AxisType {
         AxisTypeNone = 0,
         AxisTypeCategory = 1,
         AxisTypeValue = 2
     };
+    Q_ENUM(AxisType)
 
 protected:
     explicit QAbstract3DAxis(QAbstract3DAxisPrivate *d, QObject *parent = nullptr);

@@ -15,7 +15,6 @@ class QAbstractDataProxyPrivate;
 class Q_GRAPHS_EXPORT QAbstractDataProxy : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(DataType)
     Q_PROPERTY(DataType type READ type CONSTANT)
 
 public:
@@ -25,6 +24,7 @@ public:
         DataTypeScatter = 2,
         DataTypeSurface = 4
     };
+    Q_ENUM(DataType)
 
 protected:
     explicit QAbstractDataProxy(QAbstractDataProxyPrivate *d, QObject *parent = nullptr);

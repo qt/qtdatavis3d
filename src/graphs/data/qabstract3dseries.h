@@ -18,8 +18,6 @@ class QAbstract3DSeriesPrivate;
 class Q_GRAPHS_EXPORT QAbstract3DSeries : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(SeriesType)
-    Q_ENUMS(Mesh)
     Q_PROPERTY(SeriesType type READ type CONSTANT)
     Q_PROPERTY(QString itemLabelFormat READ itemLabelFormat WRITE setItemLabelFormat NOTIFY itemLabelFormatChanged)
     Q_PROPERTY(bool visible READ isVisible WRITE setVisible NOTIFY visibilityChanged)
@@ -45,6 +43,7 @@ public:
         SeriesTypeScatter = 2,
         SeriesTypeSurface = 4
     };
+    Q_ENUM(SeriesType)
 
     enum Mesh {
         MeshUserDefined = 0,
@@ -60,6 +59,7 @@ public:
         MeshArrow,
         MeshPoint
     };
+    Q_ENUM(Mesh)
 
 protected:
     explicit QAbstract3DSeries(QAbstract3DSeriesPrivate *d, QObject *parent = nullptr);

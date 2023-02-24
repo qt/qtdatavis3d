@@ -17,8 +17,6 @@ class Q3DThemePrivate;
 class Q_GRAPHS_EXPORT Q3DTheme : public QObject
 {
     Q_OBJECT
-    Q_ENUMS(ColorStyle)
-    Q_ENUMS(Theme)
     Q_PROPERTY(Theme type READ type WRITE setType NOTIFY typeChanged)
     Q_PROPERTY(QList<QColor> baseColors READ baseColors WRITE setBaseColors NOTIFY baseColorsChanged)
     Q_PROPERTY(QColor backgroundColor READ backgroundColor WRITE setBackgroundColor NOTIFY backgroundColorChanged)
@@ -48,6 +46,7 @@ public:
         ColorStyleObjectGradient,
         ColorStyleRangeGradient
     };
+    Q_ENUM(ColorStyle)
 
     enum Theme {
         ThemeQt,
@@ -60,6 +59,7 @@ public:
         ThemeIsabelle,
         ThemeUserDefined
     };
+    Q_ENUM(Theme)
 
 public:
     explicit Q3DTheme(QObject *parent = nullptr);

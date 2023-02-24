@@ -15,7 +15,6 @@ class QItemModelBarDataProxyPrivate;
 class Q_GRAPHS_EXPORT QItemModelBarDataProxy : public QBarDataProxy
 {
     Q_OBJECT
-    Q_ENUMS(MultiMatchBehavior)
     Q_PROPERTY(QAbstractItemModel* itemModel READ itemModel WRITE setItemModel NOTIFY itemModelChanged)
     Q_PROPERTY(QString rowRole READ rowRole WRITE setRowRole NOTIFY rowRoleChanged)
     Q_PROPERTY(QString columnRole READ columnRole WRITE setColumnRole NOTIFY columnRoleChanged)
@@ -43,6 +42,7 @@ public:
         MMBAverage = 2,
         MMBCumulative = 3
     };
+    Q_ENUM(MultiMatchBehavior)
 
     explicit QItemModelBarDataProxy(QObject *parent = nullptr);
     explicit QItemModelBarDataProxy(QAbstractItemModel *itemModel, QObject *parent = nullptr);
