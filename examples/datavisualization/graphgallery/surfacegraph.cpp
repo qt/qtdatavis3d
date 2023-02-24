@@ -19,13 +19,9 @@ using namespace Qt::StringLiterals;
 SurfaceGraph::SurfaceGraph()
 {
     m_surfaceGraph = new Q3DSurface();
-    m_container = QWidget::createWindowContainer(m_surfaceGraph);
 }
 
-SurfaceGraph::~SurfaceGraph()
-{
-    delete m_container;
-}
+SurfaceGraph::~SurfaceGraph() = default;
 
 bool SurfaceGraph::initialize()
 {
@@ -36,16 +32,17 @@ bool SurfaceGraph::initialize()
         return -1;
     }
 
+    m_surfaceWidget = new QWidget;
+    QHBoxLayout *hLayout = new QHBoxLayout(m_surfaceWidget);
+    m_container = QWidget::createWindowContainer(m_surfaceGraph, m_surfaceWidget);
     QSize screenSize = m_surfaceGraph->screen()->size();
     m_container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.75));
     m_container->setMaximumSize(screenSize);
     m_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_container->setFocusPolicy(Qt::StrongFocus);
-
-    m_surfaceWidget = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout(m_surfaceWidget);
-    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addWidget(m_container, 1);
+
+    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addLayout(vLayout);
     vLayout->setAlignment(Qt::AlignTop);
 

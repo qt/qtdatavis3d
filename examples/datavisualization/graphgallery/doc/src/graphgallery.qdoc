@@ -34,15 +34,18 @@
 
     \section2 Creating the Application
 
-    First, in \c{bargraph.cpp}, instantiate Q3DBars and a window container for it:
+    First, in \c{bargraph.cpp}, instantiate Q3DBars:
 
     \snippet graphgallery/bargraph.cpp 0
 
-    The call to QWidget::createWindowContainer is required, as all data visualization graph classes
-    (Q3DBars, Q3DScatter, Q3DSurface) inherit QWindow. This is the only way to use a class that
-    inherits QWindow as a widget.
+    Then, create the widget, and horizontal and vertical layouts.
 
-    Then, create horizontal and vertical layouts. Add the graph and the vertical layout to the
+    The graph is embedded in a window container using
+    QWidget::createWindowContainer(). This is required because all data
+    visualization graph classes (Q3DBars, Q3DScatter, Q3DSurface) inherit
+    QWindow. This is the only way to use a class inheriting QWindow as a widget.
+
+    Add the graph and the vertical layout to the
     horizontal one:
 
     \snippet graphgallery/bargraph.cpp 1

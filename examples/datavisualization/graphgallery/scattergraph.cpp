@@ -16,13 +16,9 @@ using namespace Qt::StringLiterals;
 ScatterGraph::ScatterGraph()
 {
     m_scatterGraph = new Q3DScatter();
-    m_container = QWidget::createWindowContainer(m_scatterGraph);
 }
 
-ScatterGraph::~ScatterGraph()
-{
-    delete m_container;
-}
+ScatterGraph::~ScatterGraph() = default;
 
 bool ScatterGraph::initialize()
 {
@@ -33,16 +29,17 @@ bool ScatterGraph::initialize()
         return -1;
     }
 
+    m_scatterWidget = new QWidget;
+    QHBoxLayout *hLayout = new QHBoxLayout(m_scatterWidget);
+    m_container = QWidget::createWindowContainer(m_scatterGraph, m_scatterWidget);
     QSize screenSize = m_scatterGraph->screen()->size();
     m_container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.75));
     m_container->setMaximumSize(screenSize);
     m_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_container->setFocusPolicy(Qt::StrongFocus);
-
-    m_scatterWidget = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout(m_scatterWidget);
-    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addWidget(m_container, 1);
+
+    QVBoxLayout *vLayout = new QVBoxLayout();
     hLayout->addLayout(vLayout);
 
     QCommandLinkButton *cameraButton = new QCommandLinkButton(m_scatterWidget);
