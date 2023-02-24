@@ -35,7 +35,7 @@ class QQuickDataVisSurface : public QQuickDataVisItem
     Q_PROPERTY(QValue3DAxis *axisY READ axisY WRITE setAxisY NOTIFY axisYChanged)
     Q_PROPERTY(QValue3DAxis *axisZ READ axisZ WRITE setAxisZ NOTIFY axisZChanged)
     Q_PROPERTY(QSurface3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
-    Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList)
+    Q_PROPERTY(QQmlListProperty<QSurface3DSeries> seriesList READ seriesList CONSTANT)
     Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 

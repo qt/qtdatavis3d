@@ -45,7 +45,7 @@ class QQuickDataVisItem : public QQuick3DViewport
     Q_PROPERTY(RenderingMode renderingMode READ renderingMode WRITE setRenderingMode NOTIFY renderingModeChanged)
     Q_PROPERTY(bool measureFps READ measureFps WRITE setMeasureFps NOTIFY measureFpsChanged)
     Q_PROPERTY(int currentFps READ currentFps NOTIFY currentFpsChanged)
-    Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList)
+    Q_PROPERTY(QQmlListProperty<QCustom3DItem> customItemList READ customItemList CONSTANT)
     Q_PROPERTY(bool orthoProjection READ isOrthoProjection WRITE setOrthoProjection NOTIFY orthoProjectionChanged)
     Q_PROPERTY(ElementType selectedElement READ selectedElement NOTIFY selectedElementChanged)
     Q_PROPERTY(qreal aspectRatio READ aspectRatio WRITE setAspectRatio NOTIFY aspectRatioChanged)

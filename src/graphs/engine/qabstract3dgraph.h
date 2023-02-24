@@ -29,7 +29,7 @@ class Q_GRAPHS_EXPORT QAbstract3DGraphNG : public QQuickWidget
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
     Q_PROPERTY(QAbstract3DGraphNG::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
     Q_PROPERTY(QAbstract3DGraphNG::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
-    Q_PROPERTY(Q3DScene* scene READ scene)
+    Q_PROPERTY(Q3DScene* scene READ scene CONSTANT)
 
 public:
      enum SelectionFlag {

@@ -34,7 +34,7 @@ enum GradientType {
 class DeclarativeBar3DSeries : public QBar3DSeries
 {
     Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
+    Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren CONSTANT)
     // This property is overloaded to use QPointF instead of QPoint to work around qml bug
     // where Qt.point(0, 0) can't be assigned due to error "Cannot assign QPointF to QPoint".
     Q_PROPERTY(QPointF selectedBar READ selectedBar WRITE setSelectedBar NOTIFY selectedBarChanged)
@@ -43,7 +43,7 @@ class DeclarativeBar3DSeries : public QBar3DSeries
     Q_PROPERTY(ColorGradient *baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
-    Q_PROPERTY(QQmlListProperty<DeclarativeColor> rowColors READ rowColors)
+    Q_PROPERTY(QQmlListProperty<DeclarativeColor> rowColors READ rowColors CONSTANT)
     Q_CLASSINFO("DefaultProperty", "seriesChildren")
 
     QML_NAMED_ELEMENT(Bar3DSeries)
@@ -104,7 +104,7 @@ private:
 class DeclarativeScatter3DSeries : public QScatter3DSeries
 {
     Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
+    Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren CONSTANT)
     Q_PROPERTY(ColorGradient *baseGradient READ baseGradient WRITE setBaseGradient NOTIFY baseGradientChanged)
     Q_PROPERTY(ColorGradient *singleHighlightGradient READ singleHighlightGradient WRITE setSingleHighlightGradient NOTIFY singleHighlightGradientChanged)
     Q_PROPERTY(ColorGradient *multiHighlightGradient READ multiHighlightGradient WRITE setMultiHighlightGradient NOTIFY multiHighlightGradientChanged)
@@ -150,7 +150,7 @@ private:
 class DeclarativeSurface3DSeries : public QSurface3DSeries
 {
     Q_OBJECT
-    Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren)
+    Q_PROPERTY(QQmlListProperty<QObject> seriesChildren READ seriesChildren CONSTANT)
     // This property is overloaded to use QPointF instead of QPoint to work around qml bug
     // where Qt.point(0, 0) can't be assigned due to error "Cannot assign QPointF to QPoint".
     Q_PROPERTY(QPointF selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)

@@ -55,7 +55,7 @@ class ColorGradient : public QObject
 {
     Q_OBJECT
 
-    Q_PROPERTY(QQmlListProperty<ColorGradientStop> stops READ stops)
+    Q_PROPERTY(QQmlListProperty<ColorGradientStop> stops READ stops CONSTANT)
     Q_CLASSINFO("DefaultProperty", "stops")
 
     QML_ELEMENT

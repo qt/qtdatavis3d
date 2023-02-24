@@ -18,7 +18,7 @@ class Q3DScene;
 class Q_GRAPHS_EXPORT Q3DObject : public QObject
 {
     Q_OBJECT
-    Q_PROPERTY(Q3DScene* parentScene READ parentScene)
+    Q_PROPERTY(Q3DScene* parentScene READ parentScene CONSTANT)
     Q_PROPERTY(QVector3D position READ position WRITE setPosition NOTIFY positionChanged)
 
 public:
