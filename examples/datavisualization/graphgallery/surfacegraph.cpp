@@ -87,7 +87,7 @@ bool SurfaceGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
         return false;
 
     m_surfaceWidget = new QWidget;
-    QHBoxLayout *hLayout = new QHBoxLayout(m_surfaceWidget);
+    auto *hLayout = new QHBoxLayout(m_surfaceWidget);
     m_container = QWidget::createWindowContainer(m_surfaceGraph, m_surfaceWidget);
     m_container->setMinimumSize(minimumGraphSize);
     m_container->setMaximumSize(maximumGraphSize);
@@ -95,76 +95,76 @@ bool SurfaceGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
     m_container->setFocusPolicy(Qt::StrongFocus);
     hLayout->addWidget(m_container, 1);
 
-    QVBoxLayout *vLayout = new QVBoxLayout();
+    auto *vLayout = new QVBoxLayout();
     hLayout->addLayout(vLayout);
     vLayout->setAlignment(Qt::AlignTop);
 
     // Create control widgets
-    QGroupBox *modelGroupBox = new QGroupBox(u"Model"_s);
+    auto *modelGroupBox = new QGroupBox(u"Model"_s);
 
-    QRadioButton *sqrtSinModelRB = new QRadioButton(m_surfaceWidget);
+    auto *sqrtSinModelRB = new QRadioButton(m_surfaceWidget);
     sqrtSinModelRB->setText(u"Sqrt && Sin"_s);
     sqrtSinModelRB->setChecked(false);
 
-    QRadioButton *heightMapModelRB = new QRadioButton(m_surfaceWidget);
+    auto *heightMapModelRB = new QRadioButton(m_surfaceWidget);
     heightMapModelRB->setText(u"Multiseries\nHeight Map"_s);
     heightMapModelRB->setChecked(false);
 
-    QRadioButton *texturedModelRB = new QRadioButton(m_surfaceWidget);
+    auto *texturedModelRB = new QRadioButton(m_surfaceWidget);
     texturedModelRB->setText(u"Textured\nTopography"_s);
     texturedModelRB->setChecked(false);
 
-    QVBoxLayout *modelVBox = new QVBoxLayout;
+    auto *modelVBox = new QVBoxLayout;
     modelVBox->addWidget(sqrtSinModelRB);
     modelVBox->addWidget(heightMapModelRB);
     modelVBox->addWidget(texturedModelRB);
     modelGroupBox->setLayout(modelVBox);
 
-    QGroupBox *selectionGroupBox = new QGroupBox(u"Graph Selection Mode"_s);
+    auto *selectionGroupBox = new QGroupBox(u"Graph Selection Mode"_s);
 
-    QRadioButton *modeNoneRB = new QRadioButton(m_surfaceWidget);
+    auto *modeNoneRB = new QRadioButton(m_surfaceWidget);
     modeNoneRB->setText(u"No selection"_s);
     modeNoneRB->setChecked(false);
 
-    QRadioButton *modeItemRB = new QRadioButton(m_surfaceWidget);
+    auto *modeItemRB = new QRadioButton(m_surfaceWidget);
     modeItemRB->setText(u"Item"_s);
     modeItemRB->setChecked(false);
 
-    QRadioButton *modeSliceRowRB = new QRadioButton(m_surfaceWidget);
+    auto *modeSliceRowRB = new QRadioButton(m_surfaceWidget);
     modeSliceRowRB->setText(u"Row Slice"_s);
     modeSliceRowRB->setChecked(false);
 
-    QRadioButton *modeSliceColumnRB = new QRadioButton(m_surfaceWidget);
+    auto *modeSliceColumnRB = new QRadioButton(m_surfaceWidget);
     modeSliceColumnRB->setText(u"Column Slice"_s);
     modeSliceColumnRB->setChecked(false);
 
-    QVBoxLayout *selectionVBox = new QVBoxLayout;
+    auto *selectionVBox = new QVBoxLayout;
     selectionVBox->addWidget(modeNoneRB);
     selectionVBox->addWidget(modeItemRB);
     selectionVBox->addWidget(modeSliceRowRB);
     selectionVBox->addWidget(modeSliceColumnRB);
     selectionGroupBox->setLayout(selectionVBox);
 
-    QGroupBox *axisGroupBox = new QGroupBox(u"Axis ranges"_s);
+    auto *axisGroupBox = new QGroupBox(u"Axis ranges"_s);
 
-    QSlider *axisMinSliderX = new QSlider(Qt::Horizontal);
+    auto *axisMinSliderX = new QSlider(Qt::Horizontal);
     axisMinSliderX->setMinimum(0);
     axisMinSliderX->setTickInterval(1);
     axisMinSliderX->setEnabled(true);
-    QSlider *axisMaxSliderX = new QSlider(Qt::Horizontal);
+    auto *axisMaxSliderX = new QSlider(Qt::Horizontal);
     axisMaxSliderX->setMinimum(1);
     axisMaxSliderX->setTickInterval(1);
     axisMaxSliderX->setEnabled(true);
-    QSlider *axisMinSliderZ = new QSlider(Qt::Horizontal);
+    auto *axisMinSliderZ = new QSlider(Qt::Horizontal);
     axisMinSliderZ->setMinimum(0);
     axisMinSliderZ->setTickInterval(1);
     axisMinSliderZ->setEnabled(true);
-    QSlider *axisMaxSliderZ = new QSlider(Qt::Horizontal);
+    auto *axisMaxSliderZ = new QSlider(Qt::Horizontal);
     axisMaxSliderZ->setMinimum(1);
     axisMaxSliderZ->setTickInterval(1);
     axisMaxSliderZ->setEnabled(true);
 
-    QVBoxLayout *axisVBox = new QVBoxLayout;
+    auto *axisVBox = new QVBoxLayout;
     axisVBox->addWidget(new QLabel(u"Column range"_s));
     axisVBox->addWidget(axisMinSliderX);
     axisVBox->addWidget(axisMaxSliderX);
@@ -175,72 +175,71 @@ bool SurfaceGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
 
     // Mode-dependent controls
     // sqrt-sin
-    QGroupBox *colorGroupBox = new QGroupBox(u"Custom gradient"_s);
+    auto *colorGroupBox = new QGroupBox(u"Custom gradient"_s);
 
     QPixmap pixmap = gradientBtoYPB_Pixmap();
-    QPushButton *gradientBtoYPB = new QPushButton(m_surfaceWidget);
+    auto *gradientBtoYPB = new QPushButton(m_surfaceWidget);
     gradientBtoYPB->setIcon(QIcon(pixmap));
     gradientBtoYPB->setIconSize(pixmap.size());
 
     pixmap = gradientGtoRPB_Pixmap();
-    QPushButton *gradientGtoRPB = new QPushButton(m_surfaceWidget);
+    auto *gradientGtoRPB = new QPushButton(m_surfaceWidget);
     gradientGtoRPB->setIcon(QIcon(pixmap));
     gradientGtoRPB->setIconSize(pixmap.size());
-
-    QHBoxLayout *colorHBox = new QHBoxLayout;
+    auto *colorHBox = new QHBoxLayout;
     colorHBox->addWidget(gradientBtoYPB);
     colorHBox->addWidget(gradientGtoRPB);
     colorGroupBox->setLayout(colorHBox);
 
     // Multiseries heightmap
-    QGroupBox *showGroupBox = new QGroupBox(u"_show Object"_s);
+    auto *showGroupBox = new QGroupBox(u"_show Object"_s);
     showGroupBox->setVisible(false);
 
-    QCheckBox *checkboxShowOilRigOne = new QCheckBox(u"Oil Rig 1"_s);
+    auto *checkboxShowOilRigOne = new QCheckBox(u"Oil Rig 1"_s);
     checkboxShowOilRigOne->setChecked(true);
 
-    QCheckBox *checkboxShowOilRigTwo = new QCheckBox(u"Oil Rig 2"_s);
+    auto *checkboxShowOilRigTwo = new QCheckBox(u"Oil Rig 2"_s);
     checkboxShowOilRigTwo->setChecked(true);
 
-    QCheckBox *checkboxShowRefinery = new QCheckBox(u"Refinery"_s);
+    auto *checkboxShowRefinery = new QCheckBox(u"Refinery"_s);
 
-    QVBoxLayout *showVBox = new QVBoxLayout;
+    auto *showVBox = new QVBoxLayout;
     showVBox->addWidget(checkboxShowOilRigOne);
     showVBox->addWidget(checkboxShowOilRigTwo);
     showVBox->addWidget(checkboxShowRefinery);
     showGroupBox->setLayout(showVBox);
 
-    QGroupBox *visualsGroupBox = new QGroupBox(u"Visuals"_s);
+    auto *visualsGroupBox = new QGroupBox(u"Visuals"_s);
     visualsGroupBox->setVisible(false);
 
-    QCheckBox *checkboxVisualsSeeThrough = new QCheckBox(u"See-Through"_s);
+    auto *checkboxVisualsSeeThrough = new QCheckBox(u"See-Through"_s);
 
-    QCheckBox *checkboxHighlightOil = new QCheckBox(u"Highlight Oil"_s);
+    auto *checkboxHighlightOil = new QCheckBox(u"Highlight Oil"_s);
 
-    QCheckBox *checkboxShowShadows = new QCheckBox(u"Shadows"_s);
+    auto *checkboxShowShadows = new QCheckBox(u"Shadows"_s);
     checkboxShowShadows->setChecked(true);
 
-    QVBoxLayout *visualVBox = new QVBoxLayout;
+    auto *visualVBox = new QVBoxLayout;
     visualVBox->addWidget(checkboxVisualsSeeThrough);
     visualVBox->addWidget(checkboxHighlightOil);
     visualVBox->addWidget(checkboxShowShadows);
     visualsGroupBox->setLayout(visualVBox);
 
-    QLabel *labelSelection = new QLabel(u"Selection:"_s);
+    auto *labelSelection = new QLabel(u"Selection:"_s);
     labelSelection->setVisible(false);
 
-    QLabel *labelSelectedItem = new QLabel(u"Nothing"_s);
+    auto *labelSelectedItem = new QLabel(u"Nothing"_s);
     labelSelectedItem->setVisible(false);
 
     // Textured topography heightmap
-    QCheckBox *enableTexture = new QCheckBox(u"Surface texture"_s);
+    auto *enableTexture = new QCheckBox(u"Surface texture"_s);
     enableTexture->setVisible(false);
 
-    QLabel *label = new QLabel(m_surfaceWidget);
+    auto *label = new QLabel(m_surfaceWidget);
     label->setPixmap(highlightPixmap());
 
-    QGroupBox *heightMapGroupBox = new QGroupBox(u"Highlight color map"_s);
-    QVBoxLayout *colorMapVBox = new QVBoxLayout;
+    auto *heightMapGroupBox = new QGroupBox(u"Highlight color map"_s);
+    auto *colorMapVBox = new QVBoxLayout;
     colorMapVBox->addWidget(label);
     heightMapGroupBox->setLayout(colorMapVBox);
     heightMapGroupBox->setVisible(false);
@@ -265,7 +264,7 @@ bool SurfaceGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
     vLayout->addWidget(enableTexture);
 
     // Create the controller
-    SurfaceGraphModifier *modifier = new SurfaceGraphModifier(m_surfaceGraph, labelSelectedItem, this);
+    auto *modifier = new SurfaceGraphModifier(m_surfaceGraph, labelSelectedItem, this);
 
     // Connect widget controls to controller
     QObject::connect(heightMapModelRB, &QRadioButton::toggled,
