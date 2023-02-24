@@ -611,6 +611,14 @@ void QQuickDataVisItem::synchData()
             m_titleLabelY->setProperty("backgroundColor", labelBackgroundColor);
             m_titleLabelZ->setProperty("backgroundColor", labelBackgroundColor);
             m_itemLabel->setProperty("backgroundColor", labelBackgroundColor);
+
+            if (m_sliceView) {
+                changeLabelBackgroundColor(m_sliceHorizontalLabelRepeater, labelBackgroundColor);
+                changeLabelBackgroundColor(m_sliceVerticalLabelRepeater, labelBackgroundColor);
+                m_sliceItemLabel->setProperty("backgroundColor", labelBackgroundColor);
+                m_sliceHorizontalTitleLabel->setProperty("backgroundColor", labelBackgroundColor);
+                m_sliceVerticalTitleLabel->setProperty("backgroundColor", labelBackgroundColor);
+            }
             theme->d_ptr->m_dirtyBits.labelBackgroundColorDirty = false;
         }
 
@@ -623,6 +631,14 @@ void QQuickDataVisItem::synchData()
             m_titleLabelY->setProperty("backgroundEnabled", enabled);
             m_titleLabelZ->setProperty("backgroundEnabled", enabled);
             m_itemLabel->setProperty("backgroundEnabled", enabled);
+
+            if (m_sliceView) {
+                changeLabelBackgroundEnabled(m_sliceHorizontalLabelRepeater, enabled);
+                changeLabelBackgroundEnabled(m_sliceVerticalLabelRepeater, enabled);
+                m_sliceItemLabel->setProperty("backgroundEnabled", enabled);
+                m_sliceHorizontalTitleLabel->setProperty("backgroundEnabled", enabled);
+                m_sliceVerticalTitleLabel->setProperty("backgroundEnabled", enabled);
+            }
             theme->d_ptr->m_dirtyBits.labelBackgroundEnabledDirty = false;
         }
 
@@ -635,6 +651,14 @@ void QQuickDataVisItem::synchData()
             m_titleLabelY->setProperty("borderEnabled", enabled);
             m_titleLabelZ->setProperty("borderEnabled", enabled);
             m_itemLabel->setProperty("borderEnabled", enabled);
+
+            if (m_sliceView) {
+                changeLabelBorderEnabled(m_sliceHorizontalLabelRepeater, enabled);
+                changeLabelBorderEnabled(m_sliceVerticalLabelRepeater, enabled);
+                m_sliceItemLabel->setProperty("borderEnabled", enabled);
+                m_sliceHorizontalTitleLabel->setProperty("borderEnabled", enabled);
+                m_sliceVerticalTitleLabel->setProperty("borderEnabled", enabled);
+            }
             theme->d_ptr->m_dirtyBits.labelBorderEnabledDirty = false;
         }
 
@@ -647,6 +671,14 @@ void QQuickDataVisItem::synchData()
             m_titleLabelY->setProperty("labelTextColor", labelTextColor);
             m_titleLabelZ->setProperty("labelTextColor", labelTextColor);
             m_itemLabel->setProperty("labelTextColor", labelTextColor);
+
+            if (m_sliceView) {
+                changeLabelTextColor(m_sliceHorizontalLabelRepeater, labelTextColor);
+                changeLabelTextColor(m_sliceVerticalLabelRepeater, labelTextColor);
+                m_sliceItemLabel->setProperty("labelTextColor", labelTextColor);
+                m_sliceHorizontalTitleLabel->setProperty("labelTextColor", labelTextColor);
+                m_sliceVerticalTitleLabel->setProperty("labelTextColor", labelTextColor);
+            }
             theme->d_ptr->m_dirtyBits.labelTextColorDirty = false;
         }
 
@@ -660,6 +692,15 @@ void QQuickDataVisItem::synchData()
             m_titleLabelZ->setProperty("labelFont", font);
             m_itemLabel->setProperty("labelFont", font);
             updateLabels();
+
+            if (m_sliceView) {
+                changeLabelFont(m_sliceHorizontalLabelRepeater, font);
+                changeLabelFont(m_sliceVerticalLabelRepeater, font);
+                m_sliceItemLabel->setProperty("labelFont", font);
+                m_sliceHorizontalTitleLabel->setProperty("labelFont", font);
+                m_sliceVerticalTitleLabel->setProperty("labelFont", font);
+                updateSliceLabels();
+            }
             theme->d_ptr->m_dirtyBits.fontDirty = false;
         }
 
@@ -1068,8 +1109,6 @@ void QQuickDataVisItem::updateLabels()
     QVector3D fontScaled = QVector3D(scaleFactor, scaleFactor, 0.0f);
 
     m_itemLabel->setScale(fontScaled);
-    if (m_sliceEnabled)
-        m_sliceItemLabel->setScale(fontScaled);
 
     float labelsMaxWidth = 0.0f;
     labelsMaxWidth = qMax(labelsMaxWidth, float(findLabelsMaxWidth(axisX->labels()))) + textPadding;
@@ -2580,6 +2619,15 @@ void QQuickDataVisItem::updateSliceLabels()
     } else {
         m_sliceHorizontalTitleLabel->setVisible(false);
     }
+
+    m_sliceItemLabel->setScale(fontScaled);
+    m_sliceItemLabel->setProperty("labelWidth", labelWidth);
+    m_sliceItemLabel->setProperty("labelHeight", labelHeight);
+    m_sliceItemLabel->setProperty("labelFont", font);
+    m_sliceItemLabel->setProperty("borderEnabled", borderEnabled);
+    m_sliceItemLabel->setProperty("labelTextColor", labelTextColor);
+    m_sliceItemLabel->setProperty("backgroundEnabled", backgroundEnabled);
+    m_sliceItemLabel->setProperty("backgroundColor", backgroundColor);
 }
 
 void QQuickDataVisItem::setUpCamera()

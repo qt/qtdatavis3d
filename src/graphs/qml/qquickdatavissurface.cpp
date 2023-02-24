@@ -1149,7 +1149,8 @@ void QQuickDataVisSurface::updateSelectedPoint()
                 labelVisible = true;
 
                 if (isSliceEnabled()) {
-                    labelPosition.setZ(.0f);
+                    labelPosition.setZ(.1f);
+                    labelPosition.setY(labelPosition.y() + .05f);
                     sliceItemLabel()->setPosition(labelPosition);
                     sliceItemLabel()->setProperty("labelText", label);
                 }
