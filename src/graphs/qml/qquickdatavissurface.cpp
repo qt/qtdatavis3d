@@ -88,6 +88,12 @@ void QQuickDataVisSurface::handleWireframeColorChanged()
         auto gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
         QColor gridColor = model->series->wireframeColor();
         gridMaterial->setBaseColor(gridColor);
+
+        if (sliceView()) {
+            QQmlListReference gridMaterialRef(model->sliceGridModel, "materials");
+            auto gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
+            gridMaterial->setBaseColor(gridColor);
+        }
     }
 }
 
@@ -677,6 +683,11 @@ void QQuickDataVisSurface::updateSliceGraph()
                                    gridIndices.size() * sizeof(quint32));
         geometry->setIndexData(gridIndexBuffer);
         geometry->update();
+
+        QQmlListReference gridMaterialRef(model->sliceGridModel, "materials");
+        auto gridMaterial = static_cast<QQuick3DPrincipledMaterial *>(gridMaterialRef.at(0));
+        QColor gridColor = model->series->wireframeColor();
+        gridMaterial->setBaseColor(gridColor);
     }
 }
 
