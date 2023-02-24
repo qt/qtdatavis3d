@@ -826,11 +826,13 @@ void QQuickDataVisScatter::setSelected(QQuick3DModel *newSelected)
             }
         }
 
-        qsizetype index = graphModel->dataItems.indexOf(m_selected);
-        setSelectedItem(index, series);
+        if (graphModel) {
+            qsizetype index = graphModel->dataItems.indexOf(m_selected);
+            setSelectedItem(index, series);
 
-        m_scatterController->setSeriesVisualsDirty();
-        m_scatterController->setSelectedItemChanged(true);
+            m_scatterController->setSeriesVisualsDirty();
+            m_scatterController->setSelectedItemChanged(true);
+        }
     }
 }
 

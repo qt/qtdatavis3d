@@ -457,11 +457,11 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
 
     // Series may already have been removed, so check it before setting the selection.
     if (!m_seriesList.contains(series))
-        series = 0;
+        series = nullptr;
 
     adjustSelectionPosition(pos, series);
 
-    if (selectionMode().testFlag(QAbstract3DGraphNG::SelectionSlice)) {
+    if (series && selectionMode().testFlag(QAbstract3DGraphNG::SelectionSlice)) {
         // If the selected bar is outside data window, or there is no visible selected bar,
         // disable slicing.
         if (pos.x() < m_axisZ->min() || pos.x() > m_axisZ->max()

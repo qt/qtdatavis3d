@@ -386,6 +386,8 @@ void QBar3DSeriesPrivate::createItemLabel()
     QLocale locale(QLocale::c());
     if (m_controller)
         locale = m_controller->locale();
+    else
+        return;
 
     QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_controller->axisZ());
     QCategory3DAxis *categoryAxisX = static_cast<QCategory3DAxis *>(m_controller->axisX());
