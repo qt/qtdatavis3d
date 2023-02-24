@@ -28,12 +28,12 @@ void TopographicSeries::setTopographyFile(const QString file, float width, float
     float stepX = width / float(imageWidth);
     float stepZ = height / float(imageHeight);
 
-    QSurfaceDataArray *dataArray = new QSurfaceDataArray;
+    auto *dataArray = new QSurfaceDataArray;
     dataArray->reserve(imageHeight);
     for (int i = 0; i < imageHeight; ++i) {
         int p = i * widthBits;
         float z = height - float(i) * stepZ;
-        QSurfaceDataRow *newRow = new QSurfaceDataRow;
+        auto *newRow = new QSurfaceDataRow;
         newRow->reserve(imageWidth);
         for (int j = 0; j < imageWidth; ++j) {
             uchar aa = bits[p + 0];

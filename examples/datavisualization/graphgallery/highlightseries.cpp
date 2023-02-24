@@ -63,10 +63,10 @@ void HighlightSeries::handlePositionChange(const QPoint &position)
     QSurfaceDataProxy *srcProxy = m_topographicSeries->dataProxy();
     const QSurfaceDataArray &srcArray = *srcProxy->array();
 
-    QSurfaceDataArray *dataArray = new QSurfaceDataArray;
+    auto *dataArray = new QSurfaceDataArray;
     dataArray->reserve(endZ - startZ);
     for (int i = startZ; i < endZ; ++i) {
-        QSurfaceDataRow *newRow = new QSurfaceDataRow;
+        auto *newRow = new QSurfaceDataRow;
         newRow->reserve(endX - startX);
         QSurfaceDataRow *srcRow = srcArray.at(i);
         for (int j = startX; j < endX; ++j) {

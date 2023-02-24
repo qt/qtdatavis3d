@@ -38,8 +38,8 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter, QObject *parent) :
     //! [0]
 
     //! [1]
-    QScatterDataProxy *proxy = new QScatterDataProxy;
-    QScatter3DSeries *series = new QScatter3DSeries(proxy);
+    auto *proxy = new QScatterDataProxy;
+    auto *series = new QScatter3DSeries(proxy);
     series->setItemLabelFormat(u"@xTitle: @xLabel @yTitle: @yLabel @zTitle: @zLabel"_s);
     series->setMeshSmooth(m_smooth);
     m_graph->addSeries(series);
@@ -70,7 +70,7 @@ void ScatterDataModifier::addData()
     //! [3]
 
     //! [4]
-    QScatterDataArray *dataArray = new QScatterDataArray;
+    auto *dataArray = new QScatterDataArray;
     dataArray->reserve(m_itemCount);
     //! [4]
 

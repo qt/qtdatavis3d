@@ -76,7 +76,7 @@ void RainfallData::addDataSet()
 {
     // Create a new variant data set and data item list
     m_dataSet =  new VariantDataSet;
-    VariantDataItemList *itemList = new VariantDataItemList;
+    auto *itemList = new VariantDataItemList;
 
     // Read data from a data file into the data item list
     QFile dataFile(":/data/raindata.txt");
@@ -94,7 +94,7 @@ void RainfallData::addDataSet()
             }
             // Store year and month as strings, and rainfall value as double
             // into a variant data item and add the item to the item list.
-            VariantDataItem *newItem = new VariantDataItem;
+            auto *newItem = new VariantDataItem;
             for (int i = 0; i < 2; ++i)
                 newItem->append(strList.at(i).trimmed().toString());
             newItem->append(strList.at(2).trimmed().toDouble());

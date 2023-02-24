@@ -100,9 +100,9 @@ void VariantBarDataProxy::resolveDataSet()
     }
 
     // Create a new data array in format the parent class understands
-    QBarDataArray *newProxyArray = new QBarDataArray;
+    auto *newProxyArray = new QBarDataArray;
     for (const QString &rowKey : rowList) {
-        QBarDataRow *newProxyRow = new QBarDataRow(columnList.size());
+        auto *newProxyRow = new QBarDataRow(columnList.size());
         for (qsizetype i = 0; i < columnList.size(); ++i)
             (*newProxyRow)[i].setValue(itemValueMap[rowKey][columnList.at(i)]);
         newProxyArray->append(newProxyRow);
