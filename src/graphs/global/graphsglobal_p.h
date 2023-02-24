@@ -25,10 +25,10 @@ QT_BEGIN_NAMESPACE
 
 // Constants used in several files
 // Distance from camera to origin
-static const GLfloat cameraDistance = 6.0f;
+static const float cameraDistance = 6.0f;
 // Size of font to be used in label texture rendering. Doesn't affect the actual font size.
 static const int textureFontSize = 50;
-static const GLfloat defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
+static const float defaultRatio = 1.0f / 1.6f; // default aspect ratio 16:10
 #if !(defined QT_OPENGL_ES)
 static const float gridLineOffset = 0.0001f; // Offset for lifting grid lines off background
 #else
@@ -46,17 +46,17 @@ static const QQuaternion identityQuaternion;
 // Skip color == selection texture's background color
 static const QVector4D selectionSkipColor = QVector4D(255.0f, 255.0f, 255.0f, 255.0f);
 static const QVector4D invalidColorVector = QVector4D(-1.0f, -1.0f, -1.0f, -1.0f);
-static const GLfloat itemAlpha = 0.0f;
-static const GLfloat customItemAlpha = 252.0f;
-static const GLfloat labelValueAlpha = 253.0f;
-static const GLfloat labelRowAlpha = 254.0f;
-static const GLfloat labelColumnAlpha = 255.0f;
-static const GLfloat gradientTextureHeight = 1024.0f;
-static const GLfloat gradientTextureWidth = 2.0f;
-static const GLfloat uniformTextureHeight = 64.0f;
-static const GLfloat uniformTextureWidth = 2.0f;
-static const GLfloat labelMargin = 0.05f;
-static const GLfloat gridLineWidth = 0.005f;
+static const float itemAlpha = 0.0f;
+static const float customItemAlpha = 252.0f;
+static const float labelValueAlpha = 253.0f;
+static const float labelRowAlpha = 254.0f;
+static const float labelColumnAlpha = 255.0f;
+static const float gradientTextureHeight = 1024.0f;
+static const float gradientTextureWidth = 2.0f;
+static const float uniformTextureHeight = 64.0f;
+static const float uniformTextureWidth = 2.0f;
+static const float labelMargin = 0.05f;
+static const float gridLineWidth = 0.005f;
 
 QT_END_NAMESPACE
 
