@@ -16,31 +16,31 @@ int main(int argc, char **argv)
     QApplication app(argc, argv);
 
     // Create bar graph
-    BarGraph *bars = new BarGraph();
-    if (!bars->initialize())
+    BarGraph bars;
+    if (!bars.initialize())
         return -1;
 
     // Create scatter graph
-    ScatterGraph *scatter = new ScatterGraph();
-    if (!scatter->initialize())
+    ScatterGraph scatter;
+    if (!scatter.initialize())
         return -1;
 
     // Create surface graph
-    SurfaceGraph *surface = new SurfaceGraph();
-    if (!surface->initialize())
+    SurfaceGraph surface;
+    if (!surface.initialize())
         return -1;
 
     // Create a tab widget for creating own tabs for Q3DBars, Q3DScatter, and Q3DSurface
-    QTabWidget *tabWidget = new QTabWidget();
-    tabWidget->setWindowTitle(QLatin1String("Graph Gallery"));
+    QTabWidget tabWidget;
+    tabWidget.setWindowTitle(QLatin1String("Graph Gallery"));
 
     // Add bars widget
-    tabWidget->addTab(bars->barsWidget(), QLatin1String("Bar Graph"));
+    tabWidget.addTab(bars.barsWidget(), QLatin1String("Bar Graph"));
     // Add scatter widget
-    tabWidget->addTab(scatter->scatterWidget(), QLatin1String("Scatter Graph"));
+    tabWidget.addTab(scatter.scatterWidget(), QLatin1String("Scatter Graph"));
     // Add surface widget
-    tabWidget->addTab(surface->surfaceWidget(), QLatin1String("Surface Graph"));
+    tabWidget.addTab(surface.surfaceWidget(), QLatin1String("Surface Graph"));
 
-    tabWidget->show();
+    tabWidget.show();
     return app.exec();
 }

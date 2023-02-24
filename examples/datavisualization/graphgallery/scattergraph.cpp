@@ -132,13 +132,13 @@ bool ScatterGraph::initialize()
     QObject::connect(modifier, &ScatterDataModifier::gridEnabledChanged,
                      gridCheckBox, &QCheckBox::setChecked);
     QObject::connect(itemStyleList, &QComboBox::currentIndexChanged, modifier,
-                     qOverload<int>(&ScatterDataModifier::changeStyle));
+                     &ScatterDataModifier::changeStyle);
 
     QObject::connect(themeList, &QComboBox::currentIndexChanged, modifier,
-                     qOverload<int>(&ScatterDataModifier::changeTheme));
+                     &ScatterDataModifier::changeTheme);
 
     QObject::connect(shadowQuality, &QComboBox::currentIndexChanged, modifier,
-                     qOverload<int>(&ScatterDataModifier::changeShadowQuality));
+                     &ScatterDataModifier::changeShadowQuality);
 
     QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);

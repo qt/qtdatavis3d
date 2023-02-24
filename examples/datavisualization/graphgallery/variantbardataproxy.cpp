@@ -3,10 +3,7 @@
 
 #include "variantbardataproxy.h"
 
-VariantBarDataProxy::VariantBarDataProxy() :
-    QBarDataProxy()
-{
-}
+VariantBarDataProxy::VariantBarDataProxy() = default;
 
 VariantBarDataProxy::VariantBarDataProxy(VariantDataSet *newSet,
                                          VariantBarDataMapping *mapping) :
@@ -24,7 +21,7 @@ VariantBarDataProxy::~VariantBarDataProxy()
 void VariantBarDataProxy::setDataSet(VariantDataSet *newSet)
 {
     if (!m_dataSet.isNull())
-        QObject::disconnect(m_dataSet.data(), 0, this, 0);
+        QObject::disconnect(m_dataSet.data(), nullptr, this, nullptr);
 
     m_dataSet = newSet;
 
@@ -76,7 +73,7 @@ void VariantBarDataProxy::handleItemsAdded(int index, int count)
 void VariantBarDataProxy::handleDataCleared()
 {
     // Data cleared, reset array
-    resetArray(0);
+    resetArray(nullptr);
 }
 
 void VariantBarDataProxy::handleMappingChanged()
@@ -91,7 +88,7 @@ void VariantBarDataProxy::resolveDataSet()
     // If we have no data or mapping, or the categories are not defined, simply clear the array
     if (m_dataSet.isNull() || m_mapping.isNull() || !m_mapping->rowCategories().size()
             || !m_mapping->columnCategories().size()) {
-        resetArray(0);
+        resetArray(nullptr);
         return;
     }
     const VariantDataItemList &itemList = m_dataSet->itemList();
@@ -103,7 +100,7 @@ void VariantBarDataProxy::resolveDataSet()
     const QStringList &columnList = m_mapping->columnCategories();
 
     // Sort values into rows and columns
-    typedef QHash<QString, float> ColumnValueMap;
+    using ColumnValueMap = QHash<QString, float>;
     QHash <QString, ColumnValueMap> itemValueMap;
     for (const VariantDataItem *item : itemList) {
         itemValueMap[item->at(rowIndex).toString()][item->at(columnIndex).toString()]
@@ -114,7 +111,7 @@ void VariantBarDataProxy::resolveDataSet()
     QBarDataArray *newProxyArray = new QBarDataArray;
     for (const QString &rowKey : rowList) {
         QBarDataRow *newProxyRow = new QBarDataRow(columnList.size());
-        for (int i = 0; i < columnList.size(); i++)
+        for (qsizetype i = 0; i < columnList.size(); ++i)
             (*newProxyRow)[i].setValue(itemValueMap[rowKey][columnList.at(i)]);
         newProxyArray->append(newProxyRow);
     }

@@ -11,7 +11,7 @@ class SurfaceGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit SurfaceGraph();
+    SurfaceGraph();
     ~SurfaceGraph();
 
     bool initialize();

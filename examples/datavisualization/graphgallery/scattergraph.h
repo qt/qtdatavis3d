@@ -11,7 +11,7 @@ class ScatterGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit ScatterGraph();
+    ScatterGraph();
     ~ScatterGraph();
 
     bool initialize();

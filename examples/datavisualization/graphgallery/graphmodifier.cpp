@@ -36,8 +36,9 @@ GraphModifier::GraphModifier(Q3DBars *bargraph)
     m_graph->setMultiSeriesUniform(true);
     //! [2]
 
-    m_months << "January" << "February" << "March" << "April" << "May" << "June" << "July" << "August" << "September" << "October" << "November" << "December";
-    m_years << "2015" << "2016" << "2017" << "2018" << "2019" << "2020" << "2021" << "2022";
+    m_months = {"January", "February", "March", "April", "May", "June" , "July",
+                "August", "September", "October" , "November", "December"};
+    m_years = {"2015", "2016", "2017", "2018", "2019", "2020", "2021", "2022"};
 
     //! [3]
     m_temperatureAxis->setTitle("Average temperature");
@@ -161,11 +162,11 @@ void GraphModifier::resetTemperatureData()
     QBarDataRow *dataRow2= nullptr;
 
     dataSet->reserve(m_years.size());
-    for (int year = 0; year < m_years.size(); year++) {
+    for (qsizetype year = 0; year < m_years.size(); ++year) {
         // Create a data row
         dataRow = new QBarDataRow(m_months.size());
         dataRow2 = new QBarDataRow(m_months.size());
-        for (int month = 0; month < m_months.size(); month++) {
+        for (qsizetype month = 0; month < m_months.size(); ++month) {
             // Add data to the row
             (*dataRow)[month].setValue(tempOulu[year][month]);
             (*dataRow2)[month].setValue(tempHelsinki[year][month]);

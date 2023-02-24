@@ -7,8 +7,8 @@
 #include <QtCore/qvariantlist.h>
 
 //! [0]
-typedef QVariantList VariantDataItem;
-typedef QList<VariantDataItem *> VariantDataItemList;
+using VariantDataItem = QVariantList;
+using VariantDataItemList = QList<VariantDataItem *>;
 //! [0]
 
 class VariantDataSet : public QObject
