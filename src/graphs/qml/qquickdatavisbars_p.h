@@ -98,7 +98,7 @@ protected:
     QVector3D calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition,
                                              int index) override;
     float calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index) override;
-    void handleMousePressedEvent(QMouseEvent *event) override;
+    bool handleMousePressedEvent(QMouseEvent *event) override;
     void updateSliceGraph() override;
 
 public Q_SLOTS:

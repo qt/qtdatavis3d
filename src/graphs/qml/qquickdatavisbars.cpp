@@ -1054,7 +1054,7 @@ QQuick3DTexture *QQuickDataVisBars::createTexture()
     return texture;
 }
 
-void QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
+bool QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
 {
     QQuickDataVisItem::handleMousePressedEvent(event);
 
@@ -1096,6 +1096,8 @@ void QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
             }
         }
     }
+
+    return true;
 }
 
 void QQuickDataVisBars::setSelectedBar(QBar3DSeries *series, const QPoint &coord)

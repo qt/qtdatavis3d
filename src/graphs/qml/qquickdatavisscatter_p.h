@@ -72,7 +72,7 @@ Q_SIGNALS:
     void selectedSeriesChanged(QScatter3DSeries *series);
 
 protected:
-    void handleMousePressedEvent(QMouseEvent *event) override;
+    bool handleMousePressedEvent(QMouseEvent *event) override;
 
 private:
 

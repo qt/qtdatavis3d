@@ -70,7 +70,7 @@ protected:
     void synchData() override;
     void updateGraph() override;
     void updateSliceGraph() override;
-    void handleMousePressedEvent(QMouseEvent *event) override;
+    bool handleMousePressedEvent(QMouseEvent *event) override;
     void updateSingleHighlightColor() override;
     void handleThemeTypeChange() override;
 

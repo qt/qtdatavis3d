@@ -1039,9 +1039,10 @@ void QQuickDataVisSurface::createGridlineIndices(SurfaceModel *model, int x, int
     }
 }
 
-void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
+bool QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
 {
-    QQuickDataVisItem::handleMousePressedEvent(event);
+    if (!QQuickDataVisItem::handleMousePressedEvent(event))
+        return true;
 
     if (Qt::LeftButton == event->button()) {
         auto mousePos = event->pos();
@@ -1114,6 +1115,8 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
             }
         }
     }
+
+    return true;
 }
 
 void QQuickDataVisSurface::updateSelectedPoint()

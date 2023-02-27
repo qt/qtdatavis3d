@@ -111,13 +111,13 @@ void QQuickDataVisItem::keyPressEvent(QKeyEvent *ev)
     update();
 }
 
-void QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
+bool QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
         if (m_sliceEnabled && m_controller->isSlicingActive()) {
             m_sliceEnabled = false;
             m_sliceActivatedChanged = true;
-            return;
+            return false;
         }
         auto selectionMode = m_controller->selectionMode();
         if (selectionMode.testFlag(QAbstract3DGraph::SelectionSlice)
@@ -126,6 +126,7 @@ void QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
             m_sliceEnabled = true;
         }
     }
+    return true;
 }
 
 void QQuickDataVisItem::handleThemeTypeChange()

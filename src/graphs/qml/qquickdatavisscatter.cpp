@@ -704,7 +704,7 @@ void QQuickDataVisScatter::handleAxisZChanged(QAbstract3DAxis *axis)
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-void QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
+bool QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
         if (selectionMode() == QAbstract3DGraph::SelectionItem) {
@@ -731,6 +731,8 @@ void QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
             }
         }
     }
+
+    return true;
 }
 
 void QQuickDataVisScatter::calculateSceneScalingFactors()
