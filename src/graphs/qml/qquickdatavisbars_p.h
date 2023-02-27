@@ -99,6 +99,7 @@ protected:
                                              int index) override;
     float calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index) override;
     void handleMousePressedEvent(QMouseEvent *event) override;
+    void updateSliceGraph() override;
 
 public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
@@ -210,7 +211,7 @@ private:
     QQuaternion m_meshRotation;
     QQuick3DTexture *m_highlightTexture = nullptr;
     QQuick3DModel *m_selectionIndicator = nullptr;
-    QQuick3DNode *m_itemLabel = nullptr;
+    QVector<BarModel *> m_sliceViewBars;
 
     void calculateSceneScalingFactors();
     void calculateHeightAdjustment();
@@ -218,7 +219,7 @@ private:
     void connectSeries(QBar3DSeries *series);
     void disconnectSeries(QBar3DSeries *series);
     void generateBars(QList<QBar3DSeries *> &barSeriesList);
-    QQuick3DModel *createDataItem();
+    QQuick3DModel *createDataItem(QQuick3DNode *scene);
     QString getMeshFileName();
     void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
     void updateBarVisuality(QBar3DSeries *series, int visualIndex);

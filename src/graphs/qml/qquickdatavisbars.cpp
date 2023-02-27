@@ -10,7 +10,6 @@
 #include "qcategory3daxis_p.h"
 #include "q3dcamera_p.h"
 #include <QtCore/QMutexLocker>
-//#include "utils_p.h"
 #include <QColor>
 
 #include <QtQuick3D/private/qquick3drepeater_p.h>
@@ -727,7 +726,8 @@ void QQuickDataVisBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
                 Q_ASSERT(dataRow->size() == dataColCount);
                 for (int i = 0; i < dataColCount; i++) {
                     QBarDataItem *dataItem = const_cast <QBarDataItem *> (&(dataRow->at(i)));
-                    QQuick3DModel *model = createDataItem();
+                    auto scene = QQuick3DViewport::scene();
+                    QQuick3DModel *model = createDataItem(scene);
                     model->setVisible(visible);
 
                     BarModel *barModel = new BarModel();
@@ -747,9 +747,8 @@ void QQuickDataVisBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
     }
 }
 
-QQuick3DModel *QQuickDataVisBars::createDataItem()
+QQuick3DModel *QQuickDataVisBars::createDataItem(QQuick3DNode *scene)
 {
-    auto scene = QQuick3DViewport::scene();
     auto model = new QQuick3DModel();
     model->setParent(scene);
     model->setParentItem(scene);
@@ -1177,6 +1176,12 @@ void QQuickDataVisBars::updateSelectedBar()
                     break;
                 }
             }
+
+            if (isSliceEnabled()) {
+                sliceItemLabel()->setPosition(m_selectedBarPos);
+                sliceItemLabel()->setProperty("labelText", (m_selectedBarSeries->dptr()->itemLabel()));
+                sliceItemLabel()->setVisible(true);
+            }
         }
     }
     itemLabel()->setVisible(visible);
@@ -1210,6 +1215,73 @@ void QQuickDataVisBars::resetClickedStatus()
     m_selectedBarPos = QVector3D(0.0f, 0.0f, 0.0f);
     m_selectedBarCoord = Bars3DController::invalidSelectionPosition();
     m_selectedBarSeries = 0;
+    m_barsController->clearSelection();
+}
+
+void QQuickDataVisBars::updateSliceGraph()
+{
+    QQuickDataVisItem::updateSliceGraph();
+
+    if (!sliceView()->isVisible()) {
+        if (!m_sliceViewBars.isEmpty()) {
+            for (int i = 0; i < m_sliceViewBars.count(); i++) {
+                m_sliceViewBars.at(i)->model->setPickable(false);
+                m_sliceViewBars.at(i)->model->setVisible(false);
+                QQmlListReference materialsRef(m_sliceViewBars.at(i)->model, "materials");
+                if (materialsRef.size()) {
+                    auto material = materialsRef.at(0);
+                    delete material;
+                }
+                delete m_sliceViewBars.at(i)->model;
+            }
+            m_sliceViewBars.clear();
+            return;
+        }
+    }
+
+    auto selectionMode = m_barsController->selectionMode();
+    QVector<BarModel *> barList = *m_barModelsMap.value(m_selectedBarSeries);
+    if (selectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
+        for (int col = 0; col < m_selectedBarSeries->dataProxy()->colCount(); col++) {
+            auto index = (m_selectedBarCoord.x() * m_selectedBarSeries->dataProxy()->colCount()) + col;
+
+            QQuick3DViewport *sliceParent = sliceView();
+            QQuick3DModel *model = createDataItem(sliceParent->scene());
+
+            BarModel *barModel = new BarModel();
+            barModel->model = model;
+            barModel->model->setVisible(sliceView()->isVisible());
+
+            QQuick3DTexture *texture = createTexture();
+            texture->setParent(barModel->model);
+            texture->setParentItem(barModel->model);
+            auto gradient = m_selectedBarSeries->baseGradient();
+            auto textureData = static_cast<DatavisQuick3DTextureData *>(texture->textureData());
+            textureData->createGradient(gradient);
+
+            barModel->texture = texture;
+            barModel->barItem = barList.at(index)->barItem;
+            barModel->coord = barList.at(index)->coord;
+            barModel->visualIndex = barList.at(index)->visualIndex;
+            barModel->heightValue = barList.at(index)->heightValue;
+
+            barModel->model->setPosition(QVector3D(barList.at(index)->model->x(),
+                                                   barList.at(index)->model->y(), 0.0f));
+            barModel->model->setScale(barList.at(index)->model->scale());
+
+            bool useGradient = m_selectedBarSeries->d_ptr->isUsingGradient();
+            bool rangeGradient = (useGradient && m_selectedBarSeries->d_ptr->m_colorStyle ==
+                                  Q3DTheme::ColorStyleRangeGradient) ? true : false;
+
+            updateItemMaterial(barModel->model, useGradient, rangeGradient);
+            updatePrincipledMaterial(barModel->model,
+                                     m_selectedBarSeries->baseColor(),
+                                     m_selectedBarSeries->d_ptr->isUsingGradient(), false,
+                                     barModel->texture);
+
+            m_sliceViewBars.append(barModel);
+        }
+    }
 }
 
 void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative)
