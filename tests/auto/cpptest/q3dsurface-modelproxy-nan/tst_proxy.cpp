@@ -4,7 +4,7 @@
 #include <QtTest/QtTest>
 
 #include <QtGraphs/QItemModelSurfaceDataProxy>
-#include <QtGraphs/Q3DSurfaceNG>
+#include <QtGraphs/Q3DSurface>
 
 #include "cpptestutil.h"
 
@@ -49,7 +49,7 @@ void tst_proxy::dataContainingNaNFirstRow()
 
     QItemModelSurfaceDataProxy *proxy  = new QItemModelSurfaceDataProxy();
     QSurface3DSeries *series = new QSurface3DSeries(proxy);
-    Q3DSurfaceNG *graph = new Q3DSurfaceNG();
+    Q3DSurface *graph = new Q3DSurface();
     graph->addSeries(series);
 
     // X
@@ -123,7 +123,7 @@ void tst_proxy::dataContainingNaNLastRow()
     const int missingRow = size -  1;
     QItemModelSurfaceDataProxy *proxy  = new QItemModelSurfaceDataProxy();
     QSurface3DSeries *series = new QSurface3DSeries(proxy);
-    Q3DSurfaceNG *graph = new Q3DSurfaceNG();
+    Q3DSurface *graph = new Q3DSurface();
     graph->addSeries(series);
 
     // X
@@ -196,7 +196,7 @@ void tst_proxy::dataContainingNaNFirstLastRow()
     const int rowLast = size -  1;
     QItemModelSurfaceDataProxy *proxy = new QItemModelSurfaceDataProxy();
     QSurface3DSeries *series = new QSurface3DSeries(proxy);
-    Q3DSurfaceNG *graph = new Q3DSurfaceNG();
+    Q3DSurface *graph = new Q3DSurface();
     graph->addSeries(series);
 
     // X

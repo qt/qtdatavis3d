@@ -113,8 +113,8 @@ QT_BEGIN_NAMESPACE
  *
  * Defines whether the 2D slicing view is currently active. If \c true,
  * AbstractGraph3D::selectionMode must have either the
- * \l{QAbstract3DGraphNG::SelectionRow}{AbstractGraph3D.SelectionRow} or
- * \l{QAbstract3DGraphNG::SelectionColumn}{AbstractGraph3D.SelectionColumn}
+ * \l{QAbstract3DGraph::SelectionRow}{AbstractGraph3D.SelectionRow} or
+ * \l{QAbstract3DGraph::SelectionColumn}{AbstractGraph3D.SelectionColumn}
  * set to a valid selection.
  * \note Not all graphs support the 2D slicing view.
  */
@@ -335,7 +335,7 @@ void Q3DScene::setSecondarySubViewport(const QRect &secondarySubViewport)
  * After the rendering pass, the property is returned to its default state of
  * invalidSelectionPoint().
  *
- * \sa QAbstract3DGraphNG::selectedElement
+ * \sa QAbstract3DGraph::selectedElement
  */
 void Q3DScene::setSelectionQueryPosition(const QPoint &point)
 {
@@ -374,7 +374,7 @@ QPoint Q3DScene::invalidSelectionPoint()
  * within the primary viewport.
  * After the rendering pass, this property is returned to its default state of
  * invalidSelectionPoint(). The queried graph position can be read from the
- * QAbstract3DGraphNG::queriedGraphPosition property after the next render pass.
+ * QAbstract3DGraph::queriedGraphPosition property after the next render pass.
  *
  * There is no single correct 3D coordinate to match a particular screen position, so to be
  * consistent, the queries are always done against the inner sides of an invisible box surrounding
@@ -382,7 +382,7 @@ QPoint Q3DScene::invalidSelectionPoint()
  *
  * \note Bar graphs allow graph position queries only at the graph floor level.
  *
- * \sa QAbstract3DGraphNG::queriedGraphPosition
+ * \sa QAbstract3DGraph::queriedGraphPosition
  */
 void Q3DScene::setGraphPositionQuery(const QPoint &point)
 {
@@ -406,8 +406,8 @@ QPoint Q3DScene::graphPositionQuery() const
  *
  * \brief Whether the 2D slicing view is currently active.
  *
- * If \c true, QAbstract3DGraphNG::selectionMode must have either
- * QAbstract3DGraphNG::SelectionRow or QAbstract3DGraphNG::SelectionColumn set
+ * If \c true, QAbstract3DGraph::selectionMode must have either
+ * QAbstract3DGraph::SelectionRow or QAbstract3DGraph::SelectionColumn set
  * to a valid selection.
  * \note Not all graphs support the 2D slicing view.
  */

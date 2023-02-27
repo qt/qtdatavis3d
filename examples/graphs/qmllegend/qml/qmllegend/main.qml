@@ -32,10 +32,10 @@ Item {
         id: dataView
         anchors.fill: parent
 
-        Bars3DNG {
+        Bars3D {
             id: barGraph
             anchors.fill: parent
-            selectionMode: AbstractGraph3DNG.SelectionItemAndRow
+            selectionMode: AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
             theme: firstTheme
             valueAxis.labelFormat: "%d\u00B0C"

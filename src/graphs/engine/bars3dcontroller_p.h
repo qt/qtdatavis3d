@@ -103,7 +103,7 @@ public:
 
     inline QBar3DSeries *selectedSeries() const { return m_selectedBarSeries; }
 
-    void setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode) override;
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode) override;
     void setSelectedBar(const QPoint &position, QBar3DSeries *series, bool enterSlice);
     void clearSelection() override;
 

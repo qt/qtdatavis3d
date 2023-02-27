@@ -11,14 +11,14 @@ Item {
     width: 150
 
 //    TODO: Needs either redoing, or fixing the code; see QTBUG-110000 & QTBUG-110001
-//    Scatter3DNG {
+//    Scatter3D {
 //        id: series
 //        anchors.fill: parent
 //    }
 
 //    TODO: Needs either redoing, or fixing the code; see QTBUG-110000 & QTBUG-110001
 //    TestCase {
-//        name: "Scatter3DNG Series"
+//        name: "Scatter3D Series"
 
 //        Scatter3DSeries { id: series1 }
 //        Scatter3DSeries { id: series2 }

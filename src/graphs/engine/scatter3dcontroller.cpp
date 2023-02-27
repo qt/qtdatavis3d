@@ -229,10 +229,10 @@ void Scatter3DController::handleAxisRangeChangedBySender(QObject *sender)
     setSelectedItem(m_selectedItem, m_selectedItemSeries);
 }
 
-void Scatter3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
+void Scatter3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     // We only support single item selection mode and no selection mode
-    if (mode != QAbstract3DGraphNG::SelectionItem && mode != QAbstract3DGraphNG::SelectionNone) {
+    if (mode != QAbstract3DGraph::SelectionItem && mode != QAbstract3DGraph::SelectionNone) {
         qWarning("Unsupported selection mode - only none and item selection modes are supported.");
         return;
     }

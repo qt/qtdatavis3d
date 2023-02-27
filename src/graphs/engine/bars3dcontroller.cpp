@@ -424,14 +424,14 @@ float Bars3DController::floorLevel() const
     return m_floorLevel;
 }
 
-void Bars3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
+void Bars3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
-    if (mode.testFlag(QAbstract3DGraphNG::SelectionSlice)
-            && (mode.testFlag(QAbstract3DGraphNG::SelectionRow)
-                == mode.testFlag(QAbstract3DGraphNG::SelectionColumn))) {
+    if (mode.testFlag(QAbstract3DGraph::SelectionSlice)
+            && (mode.testFlag(QAbstract3DGraph::SelectionRow)
+                == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
-        QAbstract3DGraphNG::SelectionFlags oldMode = selectionMode();
+        QAbstract3DGraph::SelectionFlags oldMode = selectionMode();
 
         Abstract3DController::setSelectionMode(mode);
 
@@ -442,8 +442,8 @@ void Bars3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
 
             // Special case: Always deactivate slicing when changing away from slice
             // automanagement, as this can't be handled in setSelectedBar.
-            if (!mode.testFlag(QAbstract3DGraphNG::SelectionSlice)
-                    && oldMode.testFlag(QAbstract3DGraphNG::SelectionSlice)) {
+            if (!mode.testFlag(QAbstract3DGraph::SelectionSlice)
+                    && oldMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
                 scene()->setSlicingActive(false);
             }
         }
@@ -461,7 +461,7 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
 
     adjustSelectionPosition(pos, series);
 
-    if (series && selectionMode().testFlag(QAbstract3DGraphNG::SelectionSlice)) {
+    if (series && selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
         // If the selected bar is outside data window, or there is no visible selected bar,
         // disable slicing.
         if (pos.x() < m_axisZ->min() || pos.x() > m_axisZ->max()

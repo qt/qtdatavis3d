@@ -23,12 +23,12 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
                                            QObject *parent) :
     QObject(parent),
     m_themeManager(new ThemeManager(this)),
-    m_selectionMode(QAbstract3DGraphNG::SelectionItem),
-    m_shadowQuality(QAbstract3DGraphNG::ShadowQualityMedium),
+    m_selectionMode(QAbstract3DGraph::SelectionItem),
+    m_shadowQuality(QAbstract3DGraph::ShadowQualityMedium),
     m_useOrthoProjection(false),
     m_aspectRatio(2.0),
     m_horizontalAspectRatio(0.0),
-    m_optimizationHints(QAbstract3DGraphNG::OptimizationDefault),
+    m_optimizationHints(QAbstract3DGraph::OptimizationDefault),
     m_reflectionEnabled(false),
     m_reflectivity(0.5),
     m_locale(QLocale::c()),
@@ -47,7 +47,7 @@ Abstract3DController::Abstract3DController(QRect initialViewport, Q3DScene *scen
     m_measureFps(false),
     m_numFrames(0),
     m_currentFps(0.0),
-    m_clickedType(QAbstract3DGraphNG::ElementNone),
+    m_clickedType(QAbstract3DGraph::ElementNone),
     m_selectedLabelIndex(-1),
     m_selectedCustomItemIndex(-1),
     m_margin(-1.0)
@@ -482,7 +482,7 @@ Q3DTheme *Abstract3DController::activeTheme() const
     return m_themeManager->activeTheme();
 }
 
-void Abstract3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
+void Abstract3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     if (mode != m_selectionMode) {
         m_selectionMode = mode;
@@ -492,18 +492,18 @@ void Abstract3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags m
     }
 }
 
-QAbstract3DGraphNG::SelectionFlags Abstract3DController::selectionMode() const
+QAbstract3DGraph::SelectionFlags Abstract3DController::selectionMode() const
 {
     return m_selectionMode;
 }
 
-void Abstract3DController::setShadowQuality(QAbstract3DGraphNG::ShadowQuality quality)
+void Abstract3DController::setShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     if (!m_useOrthoProjection)
         doSetShadowQuality(quality);
 }
 
-void Abstract3DController::doSetShadowQuality(QAbstract3DGraphNG::ShadowQuality quality)
+void Abstract3DController::doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     if (quality != m_shadowQuality) {
         m_shadowQuality = quality;
@@ -513,12 +513,12 @@ void Abstract3DController::doSetShadowQuality(QAbstract3DGraphNG::ShadowQuality 
     }
 }
 
-QAbstract3DGraphNG::ShadowQuality Abstract3DController::shadowQuality() const
+QAbstract3DGraph::ShadowQuality Abstract3DController::shadowQuality() const
 {
     return m_shadowQuality;
 }
 
-void Abstract3DController::setOptimizationHints(QAbstract3DGraphNG::OptimizationHints hints)
+void Abstract3DController::setOptimizationHints(QAbstract3DGraph::OptimizationHints hints)
 {
     if (hints != m_optimizationHints) {
         m_optimizationHints = hints;
@@ -529,7 +529,7 @@ void Abstract3DController::setOptimizationHints(QAbstract3DGraphNG::Optimization
     }
 }
 
-QAbstract3DGraphNG::OptimizationHints Abstract3DController::optimizationHints() const
+QAbstract3DGraph::OptimizationHints Abstract3DController::optimizationHints() const
 {
     return m_optimizationHints;
 }
@@ -792,7 +792,7 @@ void Abstract3DController::handleAxisTitleFixedChanged(bool fixed)
 void Abstract3DController::handleInputViewChanged(QAbstract3DInputHandler::InputView view)
 {
     // When in automatic slicing mode, input view change to primary disables slice mode
-    if (m_selectionMode.testFlag(QAbstract3DGraphNG::SelectionSlice)
+    if (m_selectionMode.testFlag(QAbstract3DGraph::SelectionSlice)
             && view == QAbstract3DInputHandler::InputViewOnPrimary) {
         setSlicingActive(false);
     }
@@ -813,7 +813,7 @@ void Abstract3DController::handleSeriesVisibilityChanged(bool visible)
     handleSeriesVisibilityChangedBySender(sender());
 }
 
-void Abstract3DController::handleRequestShadowQuality(QAbstract3DGraphNG::ShadowQuality quality)
+void Abstract3DController::handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality)
 {
     setShadowQuality(quality);
 }
@@ -1090,15 +1090,15 @@ int Abstract3DController::selectedLabelIndex() const
 QAbstract3DAxis *Abstract3DController::selectedAxis() const
 {
     QAbstract3DAxis *axis = 0;
-    QAbstract3DGraphNG::ElementType type = m_clickedType;
+    QAbstract3DGraph::ElementType type = m_clickedType;
     switch (type) {
-    case QAbstract3DGraphNG::ElementAxisXLabel:
+    case QAbstract3DGraph::ElementAxisXLabel:
         axis = axisX();
         break;
-    case QAbstract3DGraphNG::ElementAxisYLabel:
+    case QAbstract3DGraph::ElementAxisYLabel:
         axis = axisY();
         break;
-    case QAbstract3DGraphNG::ElementAxisZLabel:
+    case QAbstract3DGraph::ElementAxisZLabel:
         axis = axisZ();
         break;
     default:
@@ -1126,7 +1126,7 @@ QCustom3DItem *Abstract3DController::selectedCustomItem() const
     return item;
 }
 
-QAbstract3DGraphNG::ElementType Abstract3DController::selectedElement() const
+QAbstract3DGraph::ElementType Abstract3DController::selectedElement() const
 {
     return m_clickedType;
 }
@@ -1139,7 +1139,7 @@ void Abstract3DController::setOrthoProjection(bool enable)
         emit orthoProjectionChanged(m_useOrthoProjection);
         // If changed to ortho, disable shadows
         if (m_useOrthoProjection)
-            doSetShadowQuality(QAbstract3DGraphNG::ShadowQualityNone);
+            doSetShadowQuality(QAbstract3DGraph::ShadowQualityNone);
         emitNeedRender();
     }
 }

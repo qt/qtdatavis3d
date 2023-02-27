@@ -21,14 +21,14 @@ class QAbstract3DAxis;
 class QAbstract3DSeries;
 class QQuickDataVisItem;
 
-class Q_GRAPHS_EXPORT QAbstract3DGraphNG : public QQuickWidget
+class Q_GRAPHS_EXPORT QAbstract3DGraph : public QQuickWidget
 {
     Q_OBJECT
     Q_FLAGS(SelectionFlag SelectionFlags)
     Q_FLAGS(OptimizationHint OptimizationHints)
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
-    Q_PROPERTY(QAbstract3DGraphNG::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
-    Q_PROPERTY(QAbstract3DGraphNG::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
+    Q_PROPERTY(QAbstract3DGraph::SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
+    Q_PROPERTY(QAbstract3DGraph::ShadowQuality shadowQuality READ shadowQuality WRITE setShadowQuality NOTIFY shadowQualityChanged)
     Q_PROPERTY(Q3DScene* scene READ scene CONSTANT)
 
 public:
@@ -74,32 +74,32 @@ public:
     Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
 
     Q3DScene *scene() const;
-    QAbstract3DGraphNG::ShadowQuality shadowQuality() const;
-    void setShadowQuality(const QAbstract3DGraphNG::ShadowQuality &shadowQuality);
+    QAbstract3DGraph::ShadowQuality shadowQuality() const;
+    void setShadowQuality(const QAbstract3DGraph::ShadowQuality &shadowQuality);
     Q3DTheme *activeTheme() const;
     void setActiveTheme(Q3DTheme *activeTheme);
-    QAbstract3DGraphNG::SelectionFlags selectionMode() const;
-    void setSelectionMode(const QAbstract3DGraphNG::SelectionFlags &selectionMode);
-    virtual ~QAbstract3DGraphNG();
+    QAbstract3DGraph::SelectionFlags selectionMode() const;
+    void setSelectionMode(const QAbstract3DGraph::SelectionFlags &selectionMode);
+    virtual ~QAbstract3DGraph();
 
 protected:
-    QAbstract3DGraphNG();
+    QAbstract3DGraph();
 
 Q_SIGNALS:
-    void shadowQualityChanged(QAbstract3DGraphNG::ShadowQuality quality);
+    void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
     void activeThemeChanged(Q3DTheme *activeTheme);
-    void selectionModeChanged(const QAbstract3DGraphNG::SelectionFlags selectionMode);
+    void selectionModeChanged(const QAbstract3DGraph::SelectionFlags selectionMode);
 
 private:
-    Q_DISABLE_COPY(QAbstract3DGraphNG)
+    Q_DISABLE_COPY(QAbstract3DGraph)
     QScopedPointer<QQuickDataVisItem> d_ptr;
 
-    friend class Q3DBarsNG;
-    friend class Q3DScatterNG;
-    friend class Q3DSurfaceNG;
+    friend class Q3DBars;
+    friend class Q3DScatter;
+    friend class Q3DSurface;
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraphNG::SelectionFlags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraphNG::OptimizationHints)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::SelectionFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QAbstract3DGraph::OptimizationHints)
 
 QT_END_NAMESPACE
 

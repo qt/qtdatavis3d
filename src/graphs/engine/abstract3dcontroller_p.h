@@ -154,12 +154,12 @@ public:
 private:
     Abstract3DChangeBitField m_changeTracker;
     ThemeManager *m_themeManager;
-    QAbstract3DGraphNG::SelectionFlags m_selectionMode;
-    QAbstract3DGraphNG::ShadowQuality m_shadowQuality;
+    QAbstract3DGraph::SelectionFlags m_selectionMode;
+    QAbstract3DGraph::ShadowQuality m_shadowQuality;
     bool m_useOrthoProjection;
     qreal m_aspectRatio;
     qreal m_horizontalAspectRatio;
-    QAbstract3DGraphNG::OptimizationHints m_optimizationHints;
+    QAbstract3DGraph::OptimizationHints m_optimizationHints;
     bool m_reflectionEnabled;
     qreal m_reflectivity;
     QLocale m_locale;
@@ -195,7 +195,7 @@ protected:
 
     QList<QCustom3DItem *> m_customItems;
 
-    QAbstract3DGraphNG::ElementType m_clickedType;
+    QAbstract3DGraph::ElementType m_clickedType;
     int m_selectedLabelIndex;
     int m_selectedCustomItemIndex;
     qreal m_margin;
@@ -236,16 +236,16 @@ public:
     virtual Q3DTheme *activeTheme() const;
     virtual QList<Q3DTheme *> themes() const;
 
-    virtual void setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode);
-    virtual QAbstract3DGraphNG::SelectionFlags selectionMode() const;
+    virtual void setSelectionMode(QAbstract3DGraph::SelectionFlags mode);
+    virtual QAbstract3DGraph::SelectionFlags selectionMode() const;
 
-    virtual void setShadowQuality(QAbstract3DGraphNG::ShadowQuality quality);
-    virtual void doSetShadowQuality(QAbstract3DGraphNG::ShadowQuality quality);
-    virtual QAbstract3DGraphNG::ShadowQuality shadowQuality() const;
+    virtual void setShadowQuality(QAbstract3DGraph::ShadowQuality quality);
+    virtual void doSetShadowQuality(QAbstract3DGraph::ShadowQuality quality);
+    virtual QAbstract3DGraph::ShadowQuality shadowQuality() const;
     virtual bool shadowsSupported() const;
 
-    void setOptimizationHints(QAbstract3DGraphNG::OptimizationHints hints);
-    QAbstract3DGraphNG::OptimizationHints optimizationHints() const;
+    void setOptimizationHints(QAbstract3DGraph::OptimizationHints hints);
+    QAbstract3DGraph::OptimizationHints optimizationHints() const;
 
     bool isSlicingActive() const;
     void setSlicingActive(bool isSlicing);
@@ -276,7 +276,7 @@ public:
     inline bool measureFps() const { return m_measureFps; }
     inline qreal currentFps() const { return m_currentFps; }
 
-    QAbstract3DGraphNG::ElementType selectedElement() const;
+    QAbstract3DGraph::ElementType selectedElement() const;
 
     void setAspectRatio(qreal ratio);
     qreal aspectRatio();
@@ -364,26 +364,26 @@ public Q_SLOTS:
     void handleThemeTypeChanged(Q3DTheme::Theme theme);
 
     // Renderer callback handlers
-    void handleRequestShadowQuality(QAbstract3DGraphNG::ShadowQuality quality);
+    void handleRequestShadowQuality(QAbstract3DGraph::ShadowQuality quality);
 
     void updateCustomItem();
 
 Q_SIGNALS:
-    void shadowQualityChanged(QAbstract3DGraphNG::ShadowQuality quality);
+    void shadowQualityChanged(QAbstract3DGraph::ShadowQuality quality);
     void activeInputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void activeThemeChanged(Q3DTheme *activeTheme);
-    void selectionModeChanged(QAbstract3DGraphNG::SelectionFlags mode);
+    void selectionModeChanged(QAbstract3DGraph::SelectionFlags mode);
     void needRender();
     void axisXChanged(QAbstract3DAxis *axis);
     void axisYChanged(QAbstract3DAxis *axis);
     void axisZChanged(QAbstract3DAxis *axis);
-    void elementSelected(QAbstract3DGraphNG::ElementType type);
+    void elementSelected(QAbstract3DGraph::ElementType type);
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(qreal fps);
     void orthoProjectionChanged(bool enabled);
     void aspectRatioChanged(qreal ratio);
     void horizontalAspectRatioChanged(qreal ratio);
-    void optimizationHintsChanged(QAbstract3DGraphNG::OptimizationHints hints);
+    void optimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
     void polarChanged(bool enabled);
     void radialLabelOffsetChanged(float offset);
     void reflectionChanged(bool enabled);

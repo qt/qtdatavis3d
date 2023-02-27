@@ -26,7 +26,7 @@ class QValue3DAxis;
 class QSurface3DSeries;
 class Surface3DController;
 class SurfaceSelectionInstancing;
-class Q3DSurfaceNG;
+class Q3DSurface;
 
 class QQuickDataVisSurface : public QQuickDataVisItem
 {
@@ -39,7 +39,7 @@ class QQuickDataVisSurface : public QQuickDataVisItem
     Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
-    QML_NAMED_ELEMENT(Surface3DNG)
+    QML_NAMED_ELEMENT(Surface3D)
     QML_ADDED_IN_VERSION(6, 6)
 
 public:
@@ -132,7 +132,7 @@ private:
     SurfaceSelectionInstancing *m_sliceInstancing = nullptr;
 
 
-    friend class Q3DSurfaceNG;
+    friend class Q3DSurface;
 };
 
 QT_END_NAMESPACE

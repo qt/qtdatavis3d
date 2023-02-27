@@ -14,7 +14,7 @@
 #include <QtCore/QTextStream>
 #include <QtCore/QFile>
 
-RainfallGraph::RainfallGraph(Q3DBarsNG *rainfall)
+RainfallGraph::RainfallGraph(Q3DBars *rainfall)
     : m_graph(rainfall)
 {
     // In data file the months are in numeric format, so create custom list
@@ -49,10 +49,10 @@ RainfallGraph::RainfallGraph(Q3DBarsNG *rainfall)
     series->setMesh(QAbstract3DSeries::MeshCylinder);
 
     // Set shadows to medium
-    m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualityMedium);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
 
     // Set selection mode to bar and column
-    m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItemAndColumn | QAbstract3DGraphNG::SelectionSlice);
+    m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndColumn | QAbstract3DGraph::SelectionSlice);
 
     // Set theme
     m_graph->activeTheme()->setType(Q3DTheme::ThemeArmyBlue);

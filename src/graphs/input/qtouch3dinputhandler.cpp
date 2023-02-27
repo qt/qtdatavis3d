@@ -37,7 +37,7 @@ static const float touchZoomDrift = 0.02f;
  *          \li Tap
  *          \li Select the item tapped or remove selection if none.
  *              May open the secondary view depending on the
- *              \l {QAbstract3DGraphNG::selectionMode}{selection mode}.
+ *              \l {QAbstract3DGraph::selectionMode}{selection mode}.
  *      \row
  *          \li Tap-And-Hold
  *          \li Same as tap.
@@ -47,7 +47,7 @@ static const float touchZoomDrift = 0.02f;
  *      \row
  *          \li Tap on the primary view when the secondary view is visible
  *          \li Closes the secondary view.
- *          \note Secondary view is available only for Q3DBarsNG and Q3DSurface graphs.
+ *          \note Secondary view is available only for Q3DBars and Q3DSurface graphs.
  * \endtable
  *
  * Rotation, zoom, and selection can each be individually disabled using

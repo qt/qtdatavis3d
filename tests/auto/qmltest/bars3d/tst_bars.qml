@@ -16,7 +16,7 @@ Item {
 //        bars3d = Qt.createQmlObject("
 //        import QtQuick 2.2
 //        import QtGraphs
-//        Bars3DNG {
+//        Bars3D {
 //            anchors.fill: parent
 //        }", top)
 //        bars3d.anchors.fill = top
@@ -88,7 +88,7 @@ Item {
 //        bars3d = Qt.createQmlObject("
 //        import QtQuick 2.2
 //        import QtGraphs
-//        Bars3DNG {
+//        Bars3D {
 //            anchors.fill: parent
 //            customItemList: [item1, item2]
 //        }", top)

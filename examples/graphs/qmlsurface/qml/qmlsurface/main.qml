@@ -33,7 +33,7 @@ Rectangle {
         }
         //! [0]
 
-        Surface3DNG {
+        Surface3D {
             id: surfacePlot
             width: surfaceView.width
             height: surfaceView.height
@@ -46,8 +46,8 @@ Rectangle {
                 baseGradients: [surfaceGradient]
             }
             //! [7]
-            shadowQuality: AbstractGraph3DNG.ShadowQualityMedium
-            selectionMode: AbstractGraph3DNG.SelectionSlice | AbstractGraph3DNG.SelectionItemAndRow
+            shadowQuality: AbstractGraph3D.ShadowQualityMedium
+            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeft
             axisY.min: 0.0
             axisY.max: 500.0

@@ -75,12 +75,12 @@ Item {
         width: parent.width
         height: parent.height - buttonLayout.height
 
-        Scatter3DNG {
+        Scatter3D {
             id: scatterGraph
             width: dataView.width
             height: dataView.height
             theme: themeIsabelle
-            shadowQuality: AbstractGraph3DNG.ShadowQualitySoftLow
+            shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricRight
             //! [3]
             axisZ: valueAxis

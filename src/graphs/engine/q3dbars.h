@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
 
 class QQuickDataVisBars;
 
-class Q_GRAPHS_EXPORT Q3DBarsNG : public QAbstract3DGraphNG
+class Q_GRAPHS_EXPORT Q3DBars : public QAbstract3DGraph
 {
     Q_OBJECT
     Q_PROPERTY(bool multiSeriesUniform READ isMultiSeriesUniform WRITE setMultiSeriesUniform NOTIFY multiSeriesUniformChanged)
@@ -30,8 +30,8 @@ class Q_GRAPHS_EXPORT Q3DBarsNG : public QAbstract3DGraphNG
     Q_PROPERTY(bool reflection READ isReflection WRITE setReflection NOTIFY reflectionChanged)
 
 public:
-    Q3DBarsNG();
-    ~Q3DBarsNG();
+    Q3DBars();
+    ~Q3DBars();
 
     void setPrimarySeries(QBar3DSeries *series);
     QBar3DSeries *primarySeries() const;

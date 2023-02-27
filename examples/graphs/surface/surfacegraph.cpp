@@ -15,7 +15,7 @@ const int heightMapGridStepZ = 6;
 const float sampleMin = -8.0f;
 const float sampleMax = 8.0f;
 
-SurfaceGraph::SurfaceGraph(Q3DSurfaceNG *surface)
+SurfaceGraph::SurfaceGraph(Q3DSurface *surface)
     : m_graph(surface)
 {
     m_graph->setAxisX(new QValue3DAxis);

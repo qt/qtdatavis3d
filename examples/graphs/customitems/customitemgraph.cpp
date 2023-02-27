@@ -74,7 +74,7 @@ CustomItemGraph::CustomItemGraph(Q3DSurface *surface, QLabel *label)
 
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
-    connect(m_graph, &QAbstract3DGraphNG::selectedElementChanged,
+    connect(m_graph, &QAbstract3DGraph::selectedElementChanged,
             this, &CustomItemGraph::handleElementSelected);
 
     m_selectionAnimation = new QPropertyAnimation(this);
@@ -236,15 +236,15 @@ void CustomItemGraph::toggleOilHighlight(bool highlight)
 void CustomItemGraph::toggleShadows(bool shadows)
 {
     if (shadows)
-        m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualityMedium);
+        m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
     else
-        m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualityNone);
+        m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
 }
 
-void CustomItemGraph::handleElementSelected(QAbstract3DGraphNG::ElementType type)
+void CustomItemGraph::handleElementSelected(QAbstract3DGraph::ElementType type)
 {
     resetSelection();
-    if (type == QAbstract3DGraphNG::ElementCustomItem) {
+    if (type == QAbstract3DGraph::ElementCustomItem) {
         QCustom3DItem *item = m_graph->selectedCustomItem();
         QString text;
         if (qobject_cast<QCustom3DLabel *>(item) != 0) {
@@ -263,7 +263,7 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraphNG::ElementType type
         m_selectionAnimation->setStartValue(item->scaling());
         m_selectionAnimation->setEndValue(item->scaling() * 1.5f);
         m_selectionAnimation->start();
-    } else if (type == QAbstract3DGraphNG::ElementSeries) {
+    } else if (type == QAbstract3DGraph::ElementSeries) {
         QString text = "Surface (";
         QSurface3DSeries *series = m_graph->selectedSeries();
         if (series) {
@@ -277,13 +277,13 @@ void CustomItemGraph::handleElementSelected(QAbstract3DGraphNG::ElementType type
         }
         text.append(")");
         m_textField->setText(text);
-    } else if (type > QAbstract3DGraphNG::ElementSeries
-               && type < QAbstract3DGraphNG::ElementCustomItem) {
+    } else if (type > QAbstract3DGraph::ElementSeries
+               && type < QAbstract3DGraph::ElementCustomItem) {
         int index = m_graph->selectedLabelIndex();
         QString text;
-        if (type == QAbstract3DGraphNG::ElementAxisXLabel)
+        if (type == QAbstract3DGraph::ElementAxisXLabel)
             text.append("Axis X label: ");
-        else if (type == QAbstract3DGraphNG::ElementAxisYLabel)
+        else if (type == QAbstract3DGraph::ElementAxisYLabel)
             text.append("Axis Y label: ");
         else
             text.append("Axis Z label: ");

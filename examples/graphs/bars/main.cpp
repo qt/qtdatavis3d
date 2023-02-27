@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 {
     //! [0]
     QApplication app(argc, argv);
-    Q3DBarsNG *widgetgraph = new Q3DBarsNG();
+    Q3DBars *widgetgraph = new Q3DBars();
     //! [0]
 
     QSize screenSize = widgetgraph->screen()->size();
@@ -76,38 +76,38 @@ int main(int argc, char **argv)
 
     QComboBox *selectionModeList = new QComboBox(widget);
     selectionModeList->addItem(QStringLiteral("None"),
-                               int(QAbstract3DGraphNG::SelectionNone));
+                               int(QAbstract3DGraph::SelectionNone));
     selectionModeList->addItem(QStringLiteral("Bar"),
-                               int(QAbstract3DGraphNG::SelectionItem));
+                               int(QAbstract3DGraph::SelectionItem));
     selectionModeList->addItem(QStringLiteral("Row"),
-                               int(QAbstract3DGraphNG::SelectionRow));
+                               int(QAbstract3DGraph::SelectionRow));
     selectionModeList->addItem(QStringLiteral("Bar and Row"),
-                               int(QAbstract3DGraphNG::SelectionItemAndRow));
+                               int(QAbstract3DGraph::SelectionItemAndRow));
     selectionModeList->addItem(QStringLiteral("Column"),
-                               int(QAbstract3DGraphNG::SelectionColumn));
+                               int(QAbstract3DGraph::SelectionColumn));
     selectionModeList->addItem(QStringLiteral("Bar and Column"),
-                               int(QAbstract3DGraphNG::SelectionItemAndColumn));
+                               int(QAbstract3DGraph::SelectionItemAndColumn));
     selectionModeList->addItem(QStringLiteral("Row and Column"),
-                               int(QAbstract3DGraphNG::SelectionRowAndColumn));
+                               int(QAbstract3DGraph::SelectionRowAndColumn));
     selectionModeList->addItem(QStringLiteral("Bar, Row and Column"),
-                               int(QAbstract3DGraphNG::SelectionItemRowAndColumn));
+                               int(QAbstract3DGraph::SelectionItemRowAndColumn));
     selectionModeList->addItem(QStringLiteral("Slice into Row"),
-                               int(QAbstract3DGraphNG::SelectionSlice | QAbstract3DGraphNG::SelectionRow));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionRow));
     selectionModeList->addItem(QStringLiteral("Slice into Row and Item"),
-                               int(QAbstract3DGraphNG::SelectionSlice | QAbstract3DGraphNG::SelectionItemAndRow));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndRow));
     selectionModeList->addItem(QStringLiteral("Slice into Column"),
-                               int(QAbstract3DGraphNG::SelectionSlice | QAbstract3DGraphNG::SelectionColumn));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionColumn));
     selectionModeList->addItem(QStringLiteral("Slice into Column and Item"),
-                               int(QAbstract3DGraphNG::SelectionSlice | QAbstract3DGraphNG::SelectionItemAndColumn));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn));
     selectionModeList->addItem(QStringLiteral("Multi: Bar, Row, Col"),
-                               int(QAbstract3DGraphNG::SelectionItemRowAndColumn
-                                   | QAbstract3DGraphNG::SelectionMultiSeries));
+                               int(QAbstract3DGraph::SelectionItemRowAndColumn
+                                   | QAbstract3DGraph::SelectionMultiSeries));
     selectionModeList->addItem(QStringLiteral("Multi, Slice: Row, Item"),
-                               int(QAbstract3DGraphNG::SelectionSlice | QAbstract3DGraphNG::SelectionItemAndRow
-                                   | QAbstract3DGraphNG::SelectionMultiSeries));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndRow
+                                   | QAbstract3DGraph::SelectionMultiSeries));
     selectionModeList->addItem(QStringLiteral("Multi, Slice: Col, Item"),
-                               int(QAbstract3DGraphNG::SelectionSlice | QAbstract3DGraphNG::SelectionItemAndColumn
-                                   | QAbstract3DGraphNG::SelectionMultiSeries));
+                               int(QAbstract3DGraph::SelectionSlice | QAbstract3DGraph::SelectionItemAndColumn
+                                   | QAbstract3DGraph::SelectionMultiSeries));
     selectionModeList->setCurrentIndex(1);
 
     QCheckBox *backgroundCheckBox = new QCheckBox(widget);
@@ -277,7 +277,7 @@ int main(int argc, char **argv)
 
     QObject::connect(modifier, &GraphModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
-    QObject::connect(widgetgraph, &Q3DBarsNG::shadowQualityChanged, modifier,
+    QObject::connect(widgetgraph, &Q3DBars::shadowQualityChanged, modifier,
                      &GraphModifier::shadowQualityUpdatedByVisual);
 
     QObject::connect(fontSizeSlider, &QSlider::valueChanged, modifier,

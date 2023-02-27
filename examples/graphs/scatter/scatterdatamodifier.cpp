@@ -19,7 +19,7 @@ const float curveDivider = 3.0f;
 const int lowerNumberOfItems = 900;
 const float lowerCurveDivider = 0.75f;
 
-ScatterDataModifier::ScatterDataModifier(Q3DScatterNG *scatter)
+ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     : m_graph(scatter),
       m_fontSize(40.0f),
       m_style(QAbstract3DSeries::MeshSphere),
@@ -32,7 +32,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatterNG *scatter)
     QFont font = m_graph->activeTheme()->font();
     font.setPointSize(m_fontSize);
     m_graph->activeTheme()->setFont(font);
-    m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualitySoftLow);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualitySoftLow);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
     //! [0]
 
@@ -142,7 +142,7 @@ void ScatterDataModifier::changeFont(const QFont &font)
     m_graph->activeTheme()->setFont(newFont);
 }
 
-void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraphNG::ShadowQuality sq)
+void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
     emit shadowQualityChanged(quality); // connected to a checkbox in main.cpp
@@ -150,7 +150,7 @@ void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraphNG::Shado
 
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
-    QAbstract3DGraphNG::ShadowQuality sq = QAbstract3DGraphNG::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
 }
 

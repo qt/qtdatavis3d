@@ -120,9 +120,9 @@ void QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
             return;
         }
         auto selectionMode = m_controller->selectionMode();
-        if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionSlice)
-                && (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn)
-                    != selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow))) {
+        if (selectionMode.testFlag(QAbstract3DGraph::SelectionSlice)
+                && (selectionMode.testFlag(QAbstract3DGraph::SelectionColumn)
+                    != selectionMode.testFlag(QAbstract3DGraph::SelectionRow))) {
             m_sliceEnabled = true;
         }
     }
@@ -294,7 +294,7 @@ bool QQuickDataVisItem::hasSeries(QAbstract3DSeries *series)
 void QQuickDataVisItem::setSelectionMode(SelectionFlags mode)
 {
     int intmode = int(mode);
-    m_controller->setSelectionMode(QAbstract3DGraphNG::SelectionFlags(intmode));
+    m_controller->setSelectionMode(QAbstract3DGraph::SelectionFlags(intmode));
 }
 
 QQuickDataVisItem::SelectionFlags QQuickDataVisItem::selectionMode() const
@@ -305,7 +305,7 @@ QQuickDataVisItem::SelectionFlags QQuickDataVisItem::selectionMode() const
 
 void QQuickDataVisItem::setShadowQuality(ShadowQuality quality)
 {
-    m_controller->setShadowQuality(QAbstract3DGraphNG::ShadowQuality(quality));
+    m_controller->setShadowQuality(QAbstract3DGraph::ShadowQuality(quality));
 }
 
 QQuickDataVisItem::ShadowQuality QQuickDataVisItem::shadowQuality() const
@@ -1889,23 +1889,23 @@ void QQuickDataVisItem::updateWindowParameters()
     }
 }
 
-void QQuickDataVisItem::handleSelectionModeChange(QAbstract3DGraphNG::SelectionFlags mode)
+void QQuickDataVisItem::handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode)
 {
     int intmode = int(mode);
     emit selectionModeChanged(SelectionFlags(intmode));
 }
 
-void QQuickDataVisItem::handleShadowQualityChange(QAbstract3DGraphNG::ShadowQuality quality)
+void QQuickDataVisItem::handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality)
 {
     emit shadowQualityChanged(ShadowQuality(quality));
 }
 
-void QQuickDataVisItem::handleSelectedElementChange(QAbstract3DGraphNG::ElementType type)
+void QQuickDataVisItem::handleSelectedElementChange(QAbstract3DGraph::ElementType type)
 {
     emit selectedElementChanged(ElementType(type));
 }
 
-void QQuickDataVisItem::handleOptimizationHintChange(QAbstract3DGraphNG::OptimizationHints hints)
+void QQuickDataVisItem::handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints)
 {
     int intHints = int(hints);
     emit optimizationHintsChanged(OptimizationHints(intHints));
@@ -2037,7 +2037,7 @@ qreal QQuickDataVisItem::aspectRatio() const
 void QQuickDataVisItem::setOptimizationHints(OptimizationHints hints)
 {
     int intmode = int(hints);
-    m_controller->setOptimizationHints(QAbstract3DGraphNG::OptimizationHints(intmode));
+    m_controller->setOptimizationHints(QAbstract3DGraph::OptimizationHints(intmode));
 }
 
 QQuickDataVisItem::OptimizationHints QQuickDataVisItem::optimizationHints() const
@@ -2366,14 +2366,14 @@ void QQuickDataVisItem::updateSliceGrid()
                                         backgroundScale.y() * lineLengthScaleFactor(),
                                         lineWidthScaleFactor());
     auto selectionMode = m_controller->selectionMode();
-    if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow)) {
+    if (selectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
         horizontalAxis = m_controller->axisX();
         horizontalScale = QVector3D(backgroundScale.x() * lineLengthScaleFactor(),
                                     lineWidthScaleFactor(),
                                     lineWidthScaleFactor());
         scale = m_scaleWithBackground.x();
         translate = m_scaleWithBackground.x();
-    } else if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn)) {
+    } else if (selectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
         horizontalAxis = m_controller->axisZ();
         horizontalScale = QVector3D(backgroundScale.z() * lineLengthScaleFactor(),
                                     lineWidthScaleFactor(),
@@ -2451,9 +2451,9 @@ void QQuickDataVisItem::updateSliceLabels()
     auto pointSize = m_controller->activeTheme()->font().pointSizeF();
     auto selectionMode = m_controller->selectionMode();
 
-    if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow))
+    if (selectionMode.testFlag(QAbstract3DGraph::SelectionRow))
         horizontalAxis = m_controller->axisX();
-    else if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn))
+    else if (selectionMode.testFlag(QAbstract3DGraph::SelectionColumn))
         horizontalAxis = m_controller->axisZ();
 
     scale = backgroundScale.x() - m_backgroundScaleMargin.x();

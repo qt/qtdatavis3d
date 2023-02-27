@@ -46,14 +46,14 @@ Item {
         //! [8]
 
         //! [2]
-        Scatter3DNG {
+        Scatter3D {
             id: scatterGraph
             width: dataView.width
             height: dataView.height
             //! [2]
             //! [3]
             theme: themeIsabelle
-            shadowQuality: AbstractGraph3DNG.ShadowQualitySoftLow
+            shadowQuality: AbstractGraph3D.ShadowQualitySoftLow
             //! [3]
             //! [6]
             axisX.segmentCount: 3
@@ -129,11 +129,11 @@ Item {
             text: scatterGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
             enabled: scatterGraph.shadowsSupported
             onClicked: {
-                if (scatterGraph.shadowQuality === AbstractGraph3DNG.ShadowQualityNone) {
-                    scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualitySoftLow;
+                if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftLow;
                     text = "Hide Shadows";
                 } else {
-                    scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualityNone;
+                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
                     text = "Show Shadows";
                 }
             }

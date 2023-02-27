@@ -20,7 +20,7 @@ int main(int argc, char **argv)
 {
     //! [0]
     QApplication app(argc, argv);
-    Q3DScatterNG *graph = new Q3DScatterNG();
+    Q3DScatter *graph = new Q3DScatter();
     //! [0]
 
     QSize screenSize = graph->screen()->size();
@@ -145,7 +145,7 @@ int main(int argc, char **argv)
 
     QObject::connect(modifier, &ScatterDataModifier::shadowQualityChanged, shadowQuality,
                      &QComboBox::setCurrentIndex);
-    QObject::connect(graph, &Q3DScatterNG::shadowQualityChanged, modifier,
+    QObject::connect(graph, &Q3DScatter::shadowQualityChanged, modifier,
                      &ScatterDataModifier::shadowQualityUpdatedByVisual);
 
     QObject::connect(fontList, &QFontComboBox::currentFontChanged, modifier,

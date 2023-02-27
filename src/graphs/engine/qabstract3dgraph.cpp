@@ -23,7 +23,7 @@ QT_BEGIN_NAMESPACE
 /*!
  * \class QAbstract3DGraph
  * \inmodule QtGraphs
- * \brief The QAbstract3DGraphNG class provides a window and render loop for graphs.
+ * \brief The QAbstract3DGraph class provides a window and render loop for graphs.
  *
  * This class subclasses a QWindow and provides render loop for graphs inheriting it.
  *
@@ -35,12 +35,12 @@ QT_BEGIN_NAMESPACE
  * a constructor parameter. You can use the convenience function \c qDefaultSurfaceFormat()
  * to create the surface format object.
  *
- * \note QAbstract3DGraphNG sets window flag \c Qt::FramelessWindowHint on by default. If you want to display
+ * \note QAbstract3DGraph sets window flag \c Qt::FramelessWindowHint on by default. If you want to display
  * graph windows as standalone windows with regular window frame, clear this flag after constructing
  * the graph. For example:
  *
  * \code
- *  Q3DBarsNG *graphWindow = new Q3DBars;
+ *  Q3DBars *graphWindow = new Q3DBars;
  *  graphWindow->setFlags(graphWindow->flags() ^ Qt::FramelessWindowHint);
  * \endcode
  *
@@ -48,7 +48,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
-    \enum QAbstract3DGraphNG::SelectionFlag
+    \enum QAbstract3DGraph::SelectionFlag
 
     Item selection modes. Values of this enumeration can be combined with OR operator.
 
@@ -72,7 +72,7 @@ QT_BEGIN_NAMESPACE
            Setting this mode flag indicates that the graph should take care of the slice view handling
            automatically. If you wish to control the slice view yourself via Q3DScene, do not set this
            flag. When setting this mode flag, either \c SelectionRow or \c SelectionColumn must also
-           be set, but not both. Slicing is supported by Q3DBarsNG and Q3DSurface only.
+           be set, but not both. Slicing is supported by Q3DBars and Q3DSurface only.
            When this flag is set, slice mode is entered in the following situations:
            \list
            \li When selection is changed explicitly via series API to a visible item
@@ -88,7 +88,7 @@ QT_BEGIN_NAMESPACE
 */
 
 /*!
-    \enum QAbstract3DGraphNG::ShadowQuality
+    \enum QAbstract3DGraph::ShadowQuality
 
     Quality of shadows.
 
@@ -109,7 +109,7 @@ QT_BEGIN_NAMESPACE
 */
 
 /*!
-    \enum QAbstract3DGraphNG::ElementType
+    \enum QAbstract3DGraph::ElementType
 
     Type of an element in the graph.
 
@@ -128,7 +128,7 @@ QT_BEGIN_NAMESPACE
 */
 
 /*!
-    \enum QAbstract3DGraphNG::OptimizationHint
+    \enum QAbstract3DGraph::OptimizationHint
     \since Qt Graphs 1.1
 
     The optimization hint for rendering.
@@ -161,7 +161,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::activeInputHandler
+ * \property QAbstract3DGraph::activeInputHandler
  *
  * \brief The active input handler used in the graph.
  */
@@ -200,7 +200,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::activeTheme
+ * \property QAbstract3DGraph::activeTheme
  *
  * \brief The active theme of the graph.
  */
@@ -222,7 +222,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::selectionMode
+ * \property QAbstract3DGraph::selectionMode
  *
  * \brief Item selection mode.
  *
@@ -233,7 +233,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::shadowQuality
+ * \property QAbstract3DGraph::shadowQuality
  *
  * \brief The quality of the shadow.
  *
@@ -252,7 +252,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::scene
+ * \property QAbstract3DGraph::scene
  *
  * \brief The Q3DScene pointer that can be used to manipulate the scene and
  * access the scene elements, such as the active camera.
@@ -334,7 +334,7 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * Can be used to query the index of the selected custom item after receiving \c selectedElementChanged
- * signal with QAbstract3DGraphNG::ElementCustomItem type. Selection is valid until the next
+ * signal with QAbstract3DGraph::ElementCustomItem type. Selection is valid until the next
  * \c selectedElementChanged signal.
  *
  * Returns the index of the selected custom item, or -1.
@@ -344,7 +344,7 @@ QT_BEGIN_NAMESPACE
 
 /*!
  * Can be used to get the selected custom item after receiving \c selectedElementChanged signal with
- * QAbstract3DGraphNG::ElementCustomItem type. Ownership of the item remains with the graph.
+ * QAbstract3DGraph::ElementCustomItem type. Ownership of the item remains with the graph.
  * Selection is valid until the next \c selectedElementChanged signal.
  *
  * Returns the pointer to the selected custom item, or null.
@@ -353,7 +353,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::selectedElement
+ * \property QAbstract3DGraph::selectedElement
  *
  * \brief The element selected in the graph.
  *
@@ -380,7 +380,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::measureFps
+ * \property QAbstract3DGraph::measureFps
  *
  * \brief Whether rendering is done continuously instead of on demand.
  *
@@ -391,7 +391,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::currentFps
+ * \property QAbstract3DGraph::currentFps
  *
  * \brief The rendering results for the last second.
  *
@@ -403,7 +403,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::orthoProjection
+ * \property QAbstract3DGraph::orthoProjection
  *
  * \brief Whether orthographic projection is used for displaying the graph.
  *
@@ -414,7 +414,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::aspectRatio
+ * \property QAbstract3DGraph::aspectRatio
  *
  * \brief The ratio of the graph scaling between the longest axis on the
  * horizontal plane and the y-axis.
@@ -427,7 +427,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::optimizationHints
+ * \property QAbstract3DGraph::optimizationHints
  *
  * \brief Whether the default or static mode is used for rendering optimization.
  *
@@ -449,7 +449,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::polar
+ * \property QAbstract3DGraph::polar
  *
  * \brief Whether horizontal axes are changed into polar axes.
  *
@@ -463,7 +463,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::radialLabelOffset
+ * \property QAbstract3DGraph::radialLabelOffset
  *
  * \brief The normalized horizontal offset for the axis labels of the radial
  * polar axis.
@@ -478,7 +478,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::horizontalAspectRatio
+ * \property QAbstract3DGraph::horizontalAspectRatio
  *
  * \brief The ratio of the graph scaling between the x-axis and z-axis.
  *
@@ -493,13 +493,13 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::reflection
+ * \property QAbstract3DGraph::reflection
  *
  * \brief Whether floor reflections are on or off.
  *
  * Defaults to \c{false}.
  *
- * Affects only Q3DBars. However, in Q3DBarsNG graphs holding both positive and
+ * Affects only Q3DBars. However, in Q3DBars graphs holding both positive and
  * negative values, reflections are not supported for custom items that
  * intersect the floor plane. In that case, reflections should be turned off
  * to avoid incorrect rendering.
@@ -511,7 +511,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::reflectivity
+ * \property QAbstract3DGraph::reflectivity
  *
  * \brief Floor reflectivity.
  *
@@ -524,7 +524,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::locale
+ * \property QAbstract3DGraph::locale
  *
  * \brief The locale used for formatting various numeric labels.
  *
@@ -534,7 +534,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::queriedGraphPosition
+ * \property QAbstract3DGraph::queriedGraphPosition
  *
  * \brief The latest queried graph position values along each axis.
  *
@@ -556,7 +556,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \property QAbstract3DGraphNG::margin
+ * \property QAbstract3DGraph::margin
  *
  * \brief The absolute value used for the space left between the edge of the
  * plottable graph area and the edge of the graph background.
@@ -583,48 +583,48 @@ QT_BEGIN_NAMESPACE
  * for OpenGL.
  */
 
-QAbstract3DGraphNG::QAbstract3DGraphNG()
+QAbstract3DGraph::QAbstract3DGraph()
 {
 }
 
-QAbstract3DGraphNG::~QAbstract3DGraphNG()
+QAbstract3DGraph::~QAbstract3DGraph()
 {
 }
 
-Q3DScene *QAbstract3DGraphNG::scene() const
+Q3DScene *QAbstract3DGraph::scene() const
 {
     return (Q3DScene *)d_ptr->scene();
 }
 
-QAbstract3DGraphNG::ShadowQuality QAbstract3DGraphNG::shadowQuality() const
+QAbstract3DGraph::ShadowQuality QAbstract3DGraph::shadowQuality() const
 {
-    return QAbstract3DGraphNG::ShadowQuality(d_ptr->shadowQuality());
+    return QAbstract3DGraph::ShadowQuality(d_ptr->shadowQuality());
 }
 
-void QAbstract3DGraphNG::setShadowQuality(const QAbstract3DGraphNG::ShadowQuality &shadowQuality)
+void QAbstract3DGraph::setShadowQuality(const QAbstract3DGraph::ShadowQuality &shadowQuality)
 {
     d_ptr->setShadowQuality(QQuickDataVisItem::ShadowQuality(shadowQuality));
     emit shadowQualityChanged(shadowQuality);
 }
 
-Q3DTheme *QAbstract3DGraphNG::activeTheme() const
+Q3DTheme *QAbstract3DGraph::activeTheme() const
 {
     return d_ptr->theme();
 }
 
-void QAbstract3DGraphNG::setActiveTheme(Q3DTheme *activeTheme)
+void QAbstract3DGraph::setActiveTheme(Q3DTheme *activeTheme)
 {
     d_ptr->setTheme(activeTheme);
     emit activeThemeChanged(activeTheme);
 }
 
-QAbstract3DGraphNG::SelectionFlags QAbstract3DGraphNG::selectionMode() const
+QAbstract3DGraph::SelectionFlags QAbstract3DGraph::selectionMode() const
 {
     int intmode = int(d_ptr->selectionMode());
-    return QAbstract3DGraphNG::SelectionFlags(intmode);
+    return QAbstract3DGraph::SelectionFlags(intmode);
 }
 
-void QAbstract3DGraphNG::setSelectionMode(const QAbstract3DGraphNG::SelectionFlags &selectionMode)
+void QAbstract3DGraph::setSelectionMode(const QAbstract3DGraph::SelectionFlags &selectionMode)
 {
     int intmode = int(selectionMode);
     d_ptr->setSelectionMode(QQuickDataVisItem::SelectionFlags(intmode));

@@ -176,7 +176,7 @@ Item {
 //    TestCase {
 //        name: "ItemModelBarDataProxy MultiMatchBehaviour"
 
-//        Bars3DNG {
+//        Bars3D {
 //            id: bars1
 
 //            Bar3DSeries {

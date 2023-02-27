@@ -22,7 +22,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class Q3DBarsNG;
+class Q3DBars;
 
 class QQuickDataVisBars : public QQuickDataVisItem
 {
@@ -41,7 +41,7 @@ class QQuickDataVisBars : public QQuickDataVisItem
     Q_PROPERTY(float floorLevel READ floorLevel WRITE setFloorLevel NOTIFY floorLevelChanged)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
-    QML_NAMED_ELEMENT(Bars3DNG)
+    QML_NAMED_ELEMENT(Bars3D)
     QML_ADDED_IN_VERSION(6, 6)
 
 public:
@@ -105,7 +105,7 @@ public Q_SLOTS:
     void handleAxisYChanged(QAbstract3DAxis *axis) override;
     void handleAxisZChanged(QAbstract3DAxis *axis) override;
     void handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh);
-    void handleOptimizationHintsChanged(QAbstract3DGraphNG::OptimizationHints hints);
+    void handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints);
     void handleMeshSmoothChanged(bool enable);
     void handleRowCountChanged();
     void handleColCountChanged();
@@ -240,7 +240,7 @@ private:
     void updateBarSeriesMargin(const QSizeF &margin);
 
     friend class Bars3DController;
-    friend class Q3DBarsNG;
+    friend class Q3DBars;
 };
 
 QT_END_NAMESPACE

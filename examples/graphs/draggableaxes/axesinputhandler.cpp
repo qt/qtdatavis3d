@@ -4,7 +4,7 @@
 #include "axesinputhandler.h"
 #include <QtCore/qmath.h>
 
-AxesInputHandler::AxesInputHandler(QAbstract3DGraphNG *graph, QObject *parent) :
+AxesInputHandler::AxesInputHandler(QAbstract3DGraph *graph, QObject *parent) :
     Q3DInputHandler(parent),
     m_mousePressed(false),
     m_state(StateNormal),
@@ -15,7 +15,7 @@ AxesInputHandler::AxesInputHandler(QAbstract3DGraphNG *graph, QObject *parent) :
 {
     //! [3]
     // Connect to the item selection signal from graph
-    connect(graph, &QAbstract3DGraphNG::selectedElementChanged, this,
+    connect(graph, &QAbstract3DGraph::selectedElementChanged, this,
             &AxesInputHandler::handleElementSelected);
     //! [3]
 }
@@ -54,17 +54,17 @@ void AxesInputHandler::mouseReleaseEvent(QMouseEvent *event, const QPoint &mouse
 }
 //! [1]
 
-void AxesInputHandler::handleElementSelected(QAbstract3DGraphNG::ElementType type)
+void AxesInputHandler::handleElementSelected(QAbstract3DGraph::ElementType type)
 {
     //! [4]
     switch (type) {
-    case QAbstract3DGraphNG::ElementAxisXLabel:
+    case QAbstract3DGraph::ElementAxisXLabel:
         m_state = StateDraggingX;
         break;
-    case QAbstract3DGraphNG::ElementAxisYLabel:
+    case QAbstract3DGraph::ElementAxisYLabel:
         m_state = StateDraggingY;
         break;
-    case QAbstract3DGraphNG::ElementAxisZLabel:
+    case QAbstract3DGraph::ElementAxisZLabel:
         m_state = StateDraggingZ;
         break;
     default:

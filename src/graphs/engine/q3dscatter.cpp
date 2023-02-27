@@ -69,19 +69,19 @@ QT_BEGIN_NAMESPACE
  * axes. If the newly added series has specified a selected item, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  *
- * \sa QAbstract3DGraphNG::hasSeries()
+ * \sa QAbstract3DGraph::hasSeries()
  */
 
 /*!
  * Removes the \a series from the graph.
  *
- * \sa QAbstract3DGraphNG::hasSeries()
+ * \sa QAbstract3DGraph::hasSeries()
  */
 
 /*!
  * Returns the list of series added to this graph.
  *
- * \sa QAbstract3DGraphNG::hasSeries()
+ * \sa QAbstract3DGraph::hasSeries()
  */
 
 /*!
@@ -171,89 +171,89 @@ QT_BEGIN_NAMESPACE
  * \sa addAxis()
  */
 
-Q3DScatterNG::Q3DScatterNG() : QAbstract3DGraphNG()
+Q3DScatter::Q3DScatter() : QAbstract3DGraph()
 {
     QQmlComponent *component = new QQmlComponent(engine(), this);
-    component->setData("import QtQuick; import QtGraphs; Scatter3DNG { anchors.fill: parent; }", QUrl());
+    component->setData("import QtQuick; import QtGraphs; Scatter3D { anchors.fill: parent; }", QUrl());
     d_ptr.reset(qobject_cast<QQuickDataVisScatter *>(component->create()));
     setContent(component->url(), component, d_ptr.data());
 }
 
-Q3DScatterNG::~Q3DScatterNG()
+Q3DScatter::~Q3DScatter()
 {
 }
 
-void Q3DScatterNG::addSeries(QScatter3DSeries *series)
+void Q3DScatter::addSeries(QScatter3DSeries *series)
 {
     dptr()->addSeries(series);
 }
 
-void Q3DScatterNG::removeSeries(QScatter3DSeries *series)
+void Q3DScatter::removeSeries(QScatter3DSeries *series)
 {
     dptr()->removeSeries(series);
 }
 
-QList<QScatter3DSeries *> Q3DScatterNG::seriesList() const
+QList<QScatter3DSeries *> Q3DScatter::seriesList() const
 {
     return dptrc()->m_scatterController->scatterSeriesList();
 }
 
-QQuickDataVisScatter *Q3DScatterNG::dptr()
+QQuickDataVisScatter *Q3DScatter::dptr()
 {
     return static_cast<QQuickDataVisScatter *>(d_ptr.data());
 }
 
-const QQuickDataVisScatter *Q3DScatterNG::dptrc() const
+const QQuickDataVisScatter *Q3DScatter::dptrc() const
 {
     return static_cast<const QQuickDataVisScatter *>(d_ptr.data());
 }
 
-void Q3DScatterNG::setAxisX(QValue3DAxis *axis)
+void Q3DScatter::setAxisX(QValue3DAxis *axis)
 {
     dptr()->setAxisX(axis);
 }
 
-QValue3DAxis *Q3DScatterNG::axisX() const
+QValue3DAxis *Q3DScatter::axisX() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->axisX());
 }
 
-void Q3DScatterNG::setAxisY(QValue3DAxis *axis)
+void Q3DScatter::setAxisY(QValue3DAxis *axis)
 {
     dptr()->setAxisY(axis);
 }
 
-QValue3DAxis *Q3DScatterNG::axisY() const
+QValue3DAxis *Q3DScatter::axisY() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->axisY());
 }
 
-void Q3DScatterNG::setAxisZ(QValue3DAxis *axis)
+void Q3DScatter::setAxisZ(QValue3DAxis *axis)
 {
     dptr()->setAxisZ(axis);
 }
 
-QValue3DAxis *Q3DScatterNG::axisZ() const
+QValue3DAxis *Q3DScatter::axisZ() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->axisZ());
 }
 
-QScatter3DSeries *Q3DScatterNG::selectedSeries() const
+QScatter3DSeries *Q3DScatter::selectedSeries() const
 {
     return dptrc()->selectedSeries();
 }
 
-void Q3DScatterNG::addAxis(QValue3DAxis *axis)
+void Q3DScatter::addAxis(QValue3DAxis *axis)
 {
     dptr()->m_scatterController->addAxis(axis);
 }
 
-void Q3DScatterNG::releaseAxis(QValue3DAxis *axis)
+void Q3DScatter::releaseAxis(QValue3DAxis *axis)
 {
     dptr()->m_scatterController->releaseAxis(axis);
 }
 
-QList<QValue3DAxis *> Q3DScatterNG::axes() const
+QList<QValue3DAxis *> Q3DScatter::axes() const
 {
     QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_scatterController->axes();
     QList<QValue3DAxis *> retList;

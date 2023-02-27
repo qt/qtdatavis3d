@@ -614,13 +614,13 @@ void QQuickDataVisBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
 {
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     m_meshType = mesh;
-    if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         for (auto series : m_barsController->barSeriesList()) {
             if (m_barModelsMap.contains(series))
                 removeDataItems(series);
         }
         generateBars(barSeriesList);
-    } else if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic) {
+    } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
         resetClickedStatus();
 //        m_instancingRootItem->setSource(QUrl(getMeshFileName()));
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
@@ -630,7 +630,7 @@ void QQuickDataVisBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
     }
 }
 
-void QQuickDataVisBars::handleOptimizationHintsChanged(QAbstract3DGraphNG::OptimizationHints hints)
+void QQuickDataVisBars::handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints)
 {
     Q_UNUSED(hints);
     //    setup();
@@ -641,13 +641,13 @@ void QQuickDataVisBars::handleMeshSmoothChanged(bool enable)
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     m_smooth = enable;
 
-    if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         for (auto series : m_barsController->barSeriesList()) {
             if (m_barModelsMap.contains(series))
                 removeDataItems(series);
         }
         generateBars(barSeriesList);
-    } else if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationStatic) {
+    } else if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
         resetClickedStatus();
 //        m_instancingRootItem->setSource(QUrl(getMeshFileName()));
         m_selectionIndicator->setSource(QUrl(getMeshFileName()));
@@ -835,7 +835,7 @@ void QQuickDataVisBars::updateBarPositions(QBar3DSeries *series)
     m_zeroPosition = m_helperAxisY.itemPositionAt(m_actualFloorLevel);
 
     QVector<BarModel *> barList = *m_barModelsMap.value(series);
-    if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         for (int i = 0; i < barList.count(); i++) {
             QBarDataItem *item = const_cast<QBarDataItem *>((barList.at(i)->barItem));
             QQuick3DModel *model = barList.at(i)->model;
@@ -932,7 +932,7 @@ void QQuickDataVisBars::updateBarVisuals(QBar3DSeries *series)
     bool rangeGradient = (useGradient && series->d_ptr->m_colorStyle == Q3DTheme::ColorStyleRangeGradient)
                         ? true : false;
 
-    if (m_barsController->optimizationHints() == QAbstract3DGraphNG::OptimizationDefault) {
+    if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         if (!rangeGradient) {
             for (int i = 0; i < barList.count(); i++) {
                 QQuick3DModel *model = barList.at(i)->model;
@@ -1064,7 +1064,7 @@ void QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
         QList<QQuick3DPickResult> pickResults = pickAll(mousePos.x(), mousePos.y());
         auto selectionMode = m_barsController->selectionMode();
         QQuick3DModel *selectedModel = nullptr;
-        if (!selectionMode.testFlag(QAbstract3DGraphNG::SelectionNone)) {
+        if (!selectionMode.testFlag(QAbstract3DGraph::SelectionNone)) {
             for (const auto &picked : std::as_const(pickResults)) {
                 if (picked.objectHit()->visible()) {
                     if (picked.objectHit() == backgroundBB() || picked.objectHit() == background()) {
@@ -1187,16 +1187,16 @@ Abstract3DController::SelectionType QQuickDataVisBars::isSelected(int row, int b
 {
     Bars3DController::SelectionType isSelectedType = Bars3DController::SelectionNone;
     auto selectionMode = m_barsController->selectionMode();
-    if ((selectionMode.testFlag(QAbstract3DGraphNG::SelectionMultiSeries)
+    if ((selectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)
          && m_selectedBarSeries) || series == m_selectedBarSeries) {
         if (row == m_selectedBarCoord.x() && bar == m_selectedBarCoord.y()
-                && (selectionMode.testFlag(QAbstract3DGraphNG::SelectionItem))) {
+                && (selectionMode.testFlag(QAbstract3DGraph::SelectionItem))) {
             isSelectedType = Bars3DController::SelectionItem;
         } else if (row == m_selectedBarCoord.x()
-                   && (selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow))) {
+                   && (selectionMode.testFlag(QAbstract3DGraph::SelectionRow))) {
             isSelectedType = Bars3DController::SelectionRow;
         } else if (bar == m_selectedBarCoord.y()
-                   && (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn))) {
+                   && (selectionMode.testFlag(QAbstract3DGraph::SelectionColumn))) {
             isSelectedType = Bars3DController::SelectionColumn;
         }
     }

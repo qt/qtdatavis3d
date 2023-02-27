@@ -59,7 +59,7 @@ class QQuickDataVisItem : public QQuick3DViewport
     Q_PROPERTY(QVector3D queriedGraphPosition READ queriedGraphPosition NOTIFY queriedGraphPositionChanged)
     Q_PROPERTY(qreal margin READ margin WRITE setMargin NOTIFY marginChanged)
 
-    QML_NAMED_ELEMENT(AbstractGraph3DNG)
+    QML_NAMED_ELEMENT(AbstractGraph3D)
     QML_ADDED_IN_VERSION(6, 6)
     QML_UNCREATABLE("Trying to create uncreatable: AbstractGraph3D.")
 
@@ -320,10 +320,10 @@ protected:
     virtual void handleWindowChanged(/*QQuickWindow *win*/);
     void itemChange(ItemChange change, const ItemChangeData &value) override;
     virtual void updateWindowParameters();
-    virtual void handleSelectionModeChange(QAbstract3DGraphNG::SelectionFlags mode);
-    virtual void handleShadowQualityChange(QAbstract3DGraphNG::ShadowQuality quality);
-    virtual void handleSelectedElementChange(QAbstract3DGraphNG::ElementType type);
-    virtual void handleOptimizationHintChange(QAbstract3DGraphNG::OptimizationHints hints);
+    virtual void handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode);
+    virtual void handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality);
+    virtual void handleSelectedElementChange(QAbstract3DGraph::ElementType type);
+    virtual void handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints);
     virtual void keyPressEvent(QKeyEvent *ev) override;
     virtual void handleMousePressedEvent(QMouseEvent *event);
 

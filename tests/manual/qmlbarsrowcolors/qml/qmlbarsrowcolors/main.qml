@@ -140,12 +140,12 @@ Item {
         anchors.right: mainview.right;
         anchors.bottom: mainview.bottom
 
-        Bars3DNG {
+        Bars3D {
             id: barGraph
             width: dataView.width
             height: dataView.height
-            shadowQuality: AbstractGraph3DNG.ShadowQualityMedium
-            selectionMode: AbstractGraph3DNG.SelectionItem
+            shadowQuality: AbstractGraph3D.ShadowQualityMedium
+            selectionMode: AbstractGraph3D.SelectionItem
             theme: theme1
             barThickness: 0.7
             barSpacing: Qt.size(0.5, 0.5)

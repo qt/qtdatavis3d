@@ -4,7 +4,7 @@
 #ifndef SURFACEGRAPH_H
 #define SURFACEGRAPH_H
 
-#include <QtGraphs/Q3DSurfaceNG>
+#include <QtGraphs/Q3DSurface>
 #include <QtGraphs/QSurfaceDataProxy>
 #include <QtGraphs/QHeightMapSurfaceDataProxy>
 #include <QtGraphs/QSurface3DSeries>
@@ -14,19 +14,19 @@ class SurfaceGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit SurfaceGraph(Q3DSurfaceNG *surface);
+    explicit SurfaceGraph(Q3DSurface *surface);
     ~SurfaceGraph();
 
     void enableHeightMapModel(bool enable);
     void enableSqrtSinModel(bool enable);
 
     //! [0]
-    void toggleModeNone() { m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionNone); }
-    void toggleModeItem() { m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItem); }
-    void toggleModeSliceRow() { m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItemAndRow
-                                                          | QAbstract3DGraphNG::SelectionSlice); }
-    void toggleModeSliceColumn() { m_graph->setSelectionMode(QAbstract3DGraphNG::SelectionItemAndColumn
-                                                             | QAbstract3DGraphNG::SelectionSlice); }
+    void toggleModeNone() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionNone); }
+    void toggleModeItem() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItem); }
+    void toggleModeSliceRow() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndRow
+                                                          | QAbstract3DGraph::SelectionSlice); }
+    void toggleModeSliceColumn() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionItemAndColumn
+                                                             | QAbstract3DGraph::SelectionSlice); }
     //! [0]
 
     void setBlackToYellowGradient();
@@ -46,7 +46,7 @@ public Q_SLOTS:
     void changeTheme(int theme);
 
 private:
-    Q3DSurfaceNG *m_graph;
+    Q3DSurface *m_graph;
     QHeightMapSurfaceDataProxy *m_heightMapProxy;
     QSurfaceDataProxy *m_sqrtSinProxy;
     QSurface3DSeries *m_heightMapSeries;

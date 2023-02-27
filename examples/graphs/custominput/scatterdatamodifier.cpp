@@ -19,7 +19,7 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
       m_inputHandler(new CustomInputHandler())
 {
     m_graph->activeTheme()->setType(Q3DTheme::ThemeDigia);
-    m_graph->setShadowQuality(QAbstract3DGraphNG::ShadowQualityMedium);
+    m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityMedium);
     m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetFront);
 
     m_graph->setAxisX(new QValue3DAxis);
@@ -145,7 +145,7 @@ void ScatterDataModifier::triggerSelection()
     m_graph->scene()->setSelectionQueryPosition(m_inputHandler->inputPosition());
 }
 
-void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraphNG::ShadowQuality sq)
+void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality sq)
 {
     int quality = int(sq);
     emit shadowQualityChanged(quality); // connected to a checkbox in main.cpp
@@ -153,6 +153,6 @@ void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraphNG::Shado
 
 void ScatterDataModifier::changeShadowQuality(int quality)
 {
-    QAbstract3DGraphNG::ShadowQuality sq = QAbstract3DGraphNG::ShadowQuality(quality);
+    QAbstract3DGraph::ShadowQuality sq = QAbstract3DGraph::ShadowQuality(quality);
     m_graph->setShadowQuality(sq);
 }

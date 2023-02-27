@@ -232,7 +232,7 @@ QSurfaceDataProxy *QSurface3DSeries::dataProxy() const
  * Removing rows from or inserting rows to the series before the row of the selected point
  * will adjust the selection so that the same point will stay selected.
  *
- * \sa QAbstract3DGraphNG::clearSelection()
+ * \sa QAbstract3DGraph::clearSelection()
  */
 void QSurface3DSeries::setSelectedPoint(const QPoint &position)
 {
@@ -252,7 +252,7 @@ QPoint QSurface3DSeries::selectedPoint() const
  * Returns the QPoint signifying an invalid selection position. This is set to
  * the selectedPoint property to clear the selection from this series.
  *
- * \sa QAbstract3DGraphNG::clearSelection()
+ * \sa QAbstract3DGraph::clearSelection()
  */
 QPoint QSurface3DSeries::invalidSelectionPosition()
 {

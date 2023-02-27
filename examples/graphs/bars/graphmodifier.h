@@ -18,7 +18,7 @@ class GraphModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphModifier(Q3DBarsNG *bargraph);
+    explicit GraphModifier(Q3DBars *bargraph);
     ~GraphModifier();
 
     void resetTemperatureData();
@@ -41,7 +41,7 @@ public Q_SLOTS:
     void changeSelectionMode(int selectionMode);
     void changeTheme(int theme);
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QAbstract3DGraphNG::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
     void changeLabelRotation(int rotation);
     void setAxisTitleVisibility(bool enabled);
     void setAxisTitleFixed(bool enabled);
@@ -55,7 +55,7 @@ Q_SIGNALS:
     void fontSizeChanged(int size);
 
 private:
-    Q3DBarsNG *m_graph;
+    Q3DBars *m_graph;
     float m_xRotation;
     float m_yRotation;
     int m_fontSize;

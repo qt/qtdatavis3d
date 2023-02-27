@@ -62,7 +62,7 @@ public:
     explicit Surface3DController(QRect rect, Q3DScene *scene = 0);
     ~Surface3DController();
 
-    void setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode) override;
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode) override;
     void setSelectedPoint(const QPoint &position, QSurface3DSeries *series, bool enterSlice);
     void clearSelection() override;
 

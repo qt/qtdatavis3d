@@ -91,7 +91,7 @@ Item {
         width: parent.width
         height: parent.height - shadowToggle.height
 
-        Scatter3DNG {
+        Scatter3D {
             id: scatterGraph
             width: dataView.width
             height: dataView.height
@@ -99,7 +99,7 @@ Item {
                 type: Theme3D.ThemeQt
                 baseColors: [dynamicColor]
             }
-            shadowQuality: AbstractGraph3DNG.ShadowQualitySoftMedium
+            shadowQuality: AbstractGraph3D.ShadowQualitySoftMedium
             scene.activeCamera.yRotation: 30.0
             inputHandler: null
             axisX.min: 0
@@ -209,11 +209,11 @@ Item {
         anchors.left: parent.left
 
         onClicked: {
-            if (scatterGraph.shadowQuality === AbstractGraph3DNG.ShadowQualityNone) {
-                scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualitySoftMedium;
+            if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualitySoftMedium;
                 text = "Hide Shadows";
             } else {
-                scatterGraph.shadowQuality = AbstractGraph3DNG.ShadowQualityNone;
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
                 text = "Show Shadows";
             }
         }

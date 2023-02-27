@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
 
 class QQuickDataVisSurface;
 
-class Q_GRAPHS_EXPORT Q3DSurfaceNG : public QAbstract3DGraphNG
+class Q_GRAPHS_EXPORT Q3DSurface : public QAbstract3DGraph
 {
     Q_OBJECT
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
@@ -23,8 +23,8 @@ class Q_GRAPHS_EXPORT Q3DSurfaceNG : public QAbstract3DGraphNG
     Q_PROPERTY(bool flipHorizontalGrid READ flipHorizontalGrid WRITE setFlipHorizontalGrid NOTIFY flipHorizontalGridChanged)
 
 public:
-    explicit Q3DSurfaceNG();
-    virtual ~Q3DSurfaceNG();
+    explicit Q3DSurface();
+    virtual ~Q3DSurface();
 
     void addSeries(QSurface3DSeries *series);
     void removeSeries(QSurface3DSeries *series);

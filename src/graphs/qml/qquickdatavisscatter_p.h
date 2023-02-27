@@ -22,7 +22,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class Q3DScatterNG;
+class Q3DScatter;
 
 class QQuickDataVisScatter : public QQuickDataVisItem
 {
@@ -34,7 +34,7 @@ class QQuickDataVisScatter : public QQuickDataVisItem
     Q_PROPERTY(QQmlListProperty<QScatter3DSeries> seriesList READ seriesList CONSTANT)
     Q_CLASSINFO("DefaultProperty", "seriesList")
 
-    QML_NAMED_ELEMENT(Scatter3DNG)
+    QML_NAMED_ELEMENT(Scatter3D)
     QML_ADDED_IN_VERSION(6, 6)
 
 public:
@@ -155,7 +155,6 @@ private:
     void removeDataItems(QList<QQuick3DModel *> &items);
     void fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType);
     QString getMeshFileName(QAbstract3DSeries::Mesh meshType);
-    // ----------------------------------------
 
     void removeDataItems(QList<QQuick3DModel *> &items, qsizetype count);
     void addPointsToScatterModel(ScatterModel *graphModel, qsizetype count);
@@ -183,10 +182,7 @@ private:
     void updateGraph() override;
     void synchData() override;
 
-    // Change selection mode
-    void setSelectionModeNG(QAbstract3DGraphNG::SelectionFlags mode);
-
-    friend class Q3DScatterNG;
+    friend class Q3DScatter;
 };
 
 QT_END_NAMESPACE

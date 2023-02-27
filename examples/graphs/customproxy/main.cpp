@@ -9,7 +9,7 @@ int main(int argc, char **argv)
     qputenv("QSG_RHI_BACKEND", "opengl");
     QGuiApplication app(argc, argv);
 
-    Q3DBarsNG *rainfall = new Q3DBarsNG;
+    Q3DBars *rainfall = new Q3DBars;
 
     if (!rainfall->hasContext()) {
         qWarning() << QStringLiteral("Couldn't initialize the OpenGL context.") ;

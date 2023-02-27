@@ -120,20 +120,20 @@ bool Surface3DController::flipHorizontalGrid() const
     return m_flipHorizontalGrid;
 }
 
-void Surface3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode)
+void Surface3DController::setSelectionMode(QAbstract3DGraph::SelectionFlags mode)
 {
     // Currently surface only supports row and column modes when also slicing
-    if ((mode.testFlag(QAbstract3DGraphNG::SelectionRow)
-         || mode.testFlag(QAbstract3DGraphNG::SelectionColumn))
-            && !mode.testFlag(QAbstract3DGraphNG::SelectionSlice)) {
+    if ((mode.testFlag(QAbstract3DGraph::SelectionRow)
+         || mode.testFlag(QAbstract3DGraph::SelectionColumn))
+            && !mode.testFlag(QAbstract3DGraph::SelectionSlice)) {
         qWarning("Unsupported selection mode.");
         return;
-    } else if (mode.testFlag(QAbstract3DGraphNG::SelectionSlice)
-               && (mode.testFlag(QAbstract3DGraphNG::SelectionRow)
-                   == mode.testFlag(QAbstract3DGraphNG::SelectionColumn))) {
+    } else if (mode.testFlag(QAbstract3DGraph::SelectionSlice)
+               && (mode.testFlag(QAbstract3DGraph::SelectionRow)
+                   == mode.testFlag(QAbstract3DGraph::SelectionColumn))) {
         qWarning("Must specify one of either row or column selection mode in conjunction with slicing mode.");
     } else {
-        QAbstract3DGraphNG::SelectionFlags oldMode = selectionMode();
+        QAbstract3DGraph::SelectionFlags oldMode = selectionMode();
 
         Abstract3DController::setSelectionMode(mode);
 
@@ -144,8 +144,8 @@ void Surface3DController::setSelectionMode(QAbstract3DGraphNG::SelectionFlags mo
 
             // Special case: Always deactivate slicing when changing away from slice
             // automanagement, as this can't be handled in setSelectedBar.
-            if (!mode.testFlag(QAbstract3DGraphNG::SelectionSlice)
-                    && oldMode.testFlag(QAbstract3DGraphNG::SelectionSlice)) {
+            if (!mode.testFlag(QAbstract3DGraph::SelectionSlice)
+                    && oldMode.testFlag(QAbstract3DGraph::SelectionSlice)) {
                 scene()->setSlicingActive(false);
             }
         }
@@ -177,7 +177,7 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
             pos = invalidSelectionPosition();
     }
 
-    if (selectionMode().testFlag(QAbstract3DGraphNG::SelectionSlice)) {
+    if (selectionMode().testFlag(QAbstract3DGraph::SelectionSlice)) {
         if (pos == invalidSelectionPosition() || !series->isVisible()) {
             scene()->setSlicingActive(false);
         } else {

@@ -85,14 +85,14 @@ Window {
 
         //! [0]
         //! [7]
-        Surface3DNG {
+        Surface3D {
             //! [7]
             id: surfaceGraph
             width: surfaceView.width
             height: surfaceView.height
 
-            shadowQuality: AbstractGraph3DNG.ShadowQualityNone
-            selectionMode: AbstractGraph3DNG.SelectionSlice | AbstractGraph3DNG.SelectionItemAndColumn
+            shadowQuality: AbstractGraph3D.ShadowQualityNone
+            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndColumn
             axisX: xAxis
             axisY: yAxis
             axisZ: zAxis

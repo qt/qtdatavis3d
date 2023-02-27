@@ -182,7 +182,7 @@ Item {
 //    TestCase {
 //        name: "ItemModelSurfaceDataProxy MultiMatchBehaviour"
 
-//        Surface3DNG {
+//        Surface3D {
 //            id: surface1
 //            Surface3DSeries {
 //                ItemModelSurfaceDataProxy {

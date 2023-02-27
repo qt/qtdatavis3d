@@ -84,19 +84,19 @@ QT_BEGIN_NAMESPACE
  * axes. If the newly added series has specified a selected item, it will be highlighted and
  * any existing selection will be cleared. Only one added series can have an active selection.
  *
- * \sa  QAbstract3DGraphNG::hasSeries()
+ * \sa  QAbstract3DGraph::hasSeries()
  */
 
 /*!
  * Removes the \a series from the graph.
  *
- * \sa QAbstract3DGraphNG::hasSeries()
+ * \sa QAbstract3DGraph::hasSeries()
  */
 
 /*!
  * Returns the list of series added to this graph.
  *
- * \sa QAbstract3DGraphNG::hasSeries()
+ * \sa QAbstract3DGraph::hasSeries()
  */
 
 /*!
@@ -206,89 +206,89 @@ QT_BEGIN_NAMESPACE
  * \sa addAxis()
  */
 
-Q3DSurfaceNG::Q3DSurfaceNG() : QAbstract3DGraphNG()
+Q3DSurface::Q3DSurface() : QAbstract3DGraph()
 {
     QQmlComponent *component = new QQmlComponent(engine(), this);
-    component->setData("import QtQuick; import QtGraphs; Surface3DNG { anchors.fill: parent; }", QUrl());
+    component->setData("import QtQuick; import QtGraphs; Surface3D { anchors.fill: parent; }", QUrl());
     d_ptr.reset(qobject_cast<QQuickDataVisSurface *>(component->create()));
     setContent(component->url(), component, d_ptr.data());
 }
 
-Q3DSurfaceNG::~Q3DSurfaceNG()
+Q3DSurface::~Q3DSurface()
 {
 }
 
-void Q3DSurfaceNG::addSeries(QSurface3DSeries *series)
+void Q3DSurface::addSeries(QSurface3DSeries *series)
 {
     dptr()->addSeries(series);
 }
 
-void Q3DSurfaceNG::removeSeries(QSurface3DSeries *series)
+void Q3DSurface::removeSeries(QSurface3DSeries *series)
 {
     dptr()->removeSeries(series);
 }
 
-QList<QSurface3DSeries *> Q3DSurfaceNG::seriesList() const
+QList<QSurface3DSeries *> Q3DSurface::seriesList() const
 {
     return dptrc()->m_surfaceController->surfaceSeriesList();
 }
 
-void Q3DSurfaceNG::setAxisX(QValue3DAxis *axis)
+void Q3DSurface::setAxisX(QValue3DAxis *axis)
 {
     dptr()->setAxisX(axis);
 }
 
-QValue3DAxis *Q3DSurfaceNG::axisX() const
+QValue3DAxis *Q3DSurface::axisX() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->axisX());
 }
 
-void Q3DSurfaceNG::setAxisY(QValue3DAxis *axis)
+void Q3DSurface::setAxisY(QValue3DAxis *axis)
 {
     dptr()->setAxisY(axis);
 }
 
-QValue3DAxis *Q3DSurfaceNG::axisY() const
+QValue3DAxis *Q3DSurface::axisY() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->axisY());
 }
 
-void Q3DSurfaceNG::setAxisZ(QValue3DAxis *axis)
+void Q3DSurface::setAxisZ(QValue3DAxis *axis)
 {
     dptr()->setAxisZ(axis);
 }
 
-QValue3DAxis *Q3DSurfaceNG::axisZ() const
+QValue3DAxis *Q3DSurface::axisZ() const
 {
     return static_cast<QValue3DAxis *>(dptrc()->axisZ());
 }
 
-QSurface3DSeries *Q3DSurfaceNG::selectedSeries() const
+QSurface3DSeries *Q3DSurface::selectedSeries() const
 {
     return dptrc()->selectedSeries();
 }
 
-void Q3DSurfaceNG::setFlipHorizontalGrid(bool flip)
+void Q3DSurface::setFlipHorizontalGrid(bool flip)
 {
     dptr()->setFlipHorizontalGrid(flip);
 }
 
-bool Q3DSurfaceNG::flipHorizontalGrid() const
+bool Q3DSurface::flipHorizontalGrid() const
 {
     return dptrc()->flipHorizontalGrid();
 }
 
-void Q3DSurfaceNG::addAxis(QValue3DAxis *axis)
+void Q3DSurface::addAxis(QValue3DAxis *axis)
 {
     return dptrc()->m_surfaceController->addAxis(axis);
 }
 
-void Q3DSurfaceNG::releaseAxis(QValue3DAxis *axis)
+void Q3DSurface::releaseAxis(QValue3DAxis *axis)
 {
     return dptrc()->m_surfaceController->releaseAxis(axis);
 }
 
-QList<QValue3DAxis *> Q3DSurfaceNG::axes() const
+QList<QValue3DAxis *> Q3DSurface::axes() const
 {
     QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_surfaceController->axes();
     QList<QValue3DAxis *> retList;
@@ -298,12 +298,12 @@ QList<QValue3DAxis *> Q3DSurfaceNG::axes() const
     return retList;
 }
 
-QQuickDataVisSurface *Q3DSurfaceNG::dptr()
+QQuickDataVisSurface *Q3DSurface::dptr()
 {
     return static_cast<QQuickDataVisSurface *>(d_ptr.data());
 }
 
-const QQuickDataVisSurface *Q3DSurfaceNG::dptrc() const
+const QQuickDataVisSurface *Q3DSurface::dptrc() const
 {
     return static_cast<const QQuickDataVisSurface *>(d_ptr.data());
 }

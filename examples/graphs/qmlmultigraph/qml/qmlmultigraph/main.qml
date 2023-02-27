@@ -36,7 +36,7 @@ Item {
             border.width: 2
             color: "#00000000"
 
-            Surface3DNG {
+            Surface3D {
                 id: surfaceGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width
@@ -113,7 +113,7 @@ Item {
             border.width: 2
             color: "#00000000"
 
-            Scatter3DNG {
+            Scatter3D {
                 id: scatterGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width
@@ -143,7 +143,7 @@ Item {
             border.width: 2
             color: "#00000000"
 
-            Bars3DNG {
+            Bars3D {
                 id: barGraph
                 anchors.fill: parent
                 anchors.margins: parent.border.width
@@ -151,7 +151,7 @@ Item {
                     type: Theme3D.ThemeQt
                     font.pointSize: 60
                 }
-                selectionMode: AbstractGraph3DNG.SelectionItemAndRow | AbstractGraph3DNG.SelectionSlice
+                selectionMode: AbstractGraph3D.SelectionItemAndRow | AbstractGraph3D.SelectionSlice
                 scene.activeCamera.cameraPreset: Camera3D.CameraPresetIsometricLeftHigh
 
                 Bar3DSeries {

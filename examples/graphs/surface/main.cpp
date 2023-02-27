@@ -21,7 +21,7 @@ int main(int argc, char **argv)
 {
     //! [0]
     QApplication app(argc, argv);
-    Q3DSurfaceNG *graph = new Q3DSurfaceNG();
+    Q3DSurface *graph = new Q3DSurface();
     //! [0]
 
     QSize screenSize = graph->screen()->size();

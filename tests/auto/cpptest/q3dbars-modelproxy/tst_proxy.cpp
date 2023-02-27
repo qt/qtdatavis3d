@@ -4,7 +4,7 @@
 #include <QtTest/QtTest>
 
 #include <QtGraphs/QItemModelBarDataProxy>
-#include <QtGraphs/Q3DBarsNG>
+#include <QtGraphs/Q3DBars>
 #include <QtWidgets/QTableWidget>
 
 #include "cpptestutil.h"
@@ -197,7 +197,7 @@ void tst_proxy::multiMatch()
     if (!CpptestUtil::isOpenGLSupported())
         QSKIP("OpenGL not supported on this platform");
 
-    Q3DBarsNG graph;
+    Q3DBars graph;
 
     QTableWidget table;
     QStringList rows;

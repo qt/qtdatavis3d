@@ -80,7 +80,7 @@ public:
     ~Scatter3DController();
 
     // Change selection mode
-    void setSelectionMode(QAbstract3DGraphNG::SelectionFlags mode) override;
+    void setSelectionMode(QAbstract3DGraph::SelectionFlags mode) override;
 
     inline QScatter3DSeries *selectedSeries() const { return m_selectedItemSeries; }
 

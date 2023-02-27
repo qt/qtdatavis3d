@@ -12,7 +12,7 @@ class ScatterDataModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit ScatterDataModifier(Q3DScatterNG *scatter);
+    explicit ScatterDataModifier(Q3DScatter *scatter);
     ~ScatterDataModifier();
 
     void addData();
@@ -31,7 +31,7 @@ public Q_SLOTS:
     void changeStyle(int style);
     void changeTheme(int theme);
     void changeShadowQuality(int quality);
-    void shadowQualityUpdatedByVisual(QAbstract3DGraphNG::ShadowQuality shadowQuality);
+    void shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQuality shadowQuality);
 
 Q_SIGNALS:
     void backgroundEnabledChanged(bool enabled);
@@ -41,7 +41,7 @@ Q_SIGNALS:
 
 private:
     QVector3D randVector();
-    Q3DScatterNG *m_graph;
+    Q3DScatter *m_graph;
     int m_fontSize;
     QAbstract3DSeries::Mesh m_style;
     bool m_smooth;

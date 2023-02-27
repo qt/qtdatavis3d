@@ -12,7 +12,7 @@ QT_BEGIN_NAMESPACE
 
 class QQuickDataVisScatter;
 
-class Q_GRAPHS_EXPORT Q3DScatterNG : public QAbstract3DGraphNG
+class Q_GRAPHS_EXPORT Q3DScatter : public QAbstract3DGraph
 {
     Q_OBJECT
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
@@ -21,8 +21,8 @@ class Q_GRAPHS_EXPORT Q3DScatterNG : public QAbstract3DGraphNG
     Q_PROPERTY(QScatter3DSeries *selectedSeries READ selectedSeries NOTIFY selectedSeriesChanged)
 
 public:
-    Q3DScatterNG();
-    ~Q3DScatterNG();
+    Q3DScatter();
+    ~Q3DScatter();
 
     void addSeries(QScatter3DSeries *series);
     void removeSeries(QScatter3DSeries *series);
@@ -49,7 +49,7 @@ Q_SIGNALS:
 private:
     QQuickDataVisScatter *dptr();
     const QQuickDataVisScatter *dptrc() const;
-    Q_DISABLE_COPY(Q3DScatterNG)
+    Q_DISABLE_COPY(Q3DScatter)
 };
 
 QT_END_NAMESPACE

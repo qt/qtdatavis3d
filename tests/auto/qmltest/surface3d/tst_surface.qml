@@ -11,14 +11,14 @@ Item {
     width: 150
 
 //    TODO: Needs either redoing, or fixing the code; see QTBUG-110000 & QTBUG-110001
-//    Surface3DNG {
+//    Surface3D {
 //        id: series
 //        anchors.fill: parent
 //    }
 
 //    TODO: Needs either redoing, or fixing the code; see QTBUG-110000 & QTBUG-110001
 //    TestCase {
-//        name: "Surface3DNG Series"
+//        name: "Surface3D Series"
 
 //        Surface3DSeries { id: series1 }
 //        Surface3DSeries { id: series2 }

@@ -11,7 +11,7 @@ class RainfallGraph : public QObject
 {
     Q_OBJECT
 public:
-    explicit RainfallGraph(Q3DBarsNG *rainfall);
+    explicit RainfallGraph(Q3DBars *rainfall);
     ~RainfallGraph();
 
     void addDataSet();
@@ -20,7 +20,7 @@ public:
 private:
 
     void updateYearsList(int start, int end);
-    Q3DBarsNG *m_graph;
+    Q3DBars *m_graph;
     int m_columnCount;
     int m_rowCount;
     QStringList m_years;

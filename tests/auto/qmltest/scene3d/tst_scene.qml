@@ -12,11 +12,11 @@ Item {
 
     // Scene3D is uncreatable, so it needs to be accessed via a graph
 //    TODO: Needs either redoing, or fixing the code; see QTBUG-110000 & QTBUG-110001
-//    Bars3DNG {
+//    Bars3D {
 //        id: initial
 //    }
 
-//    Bars3DNG {
+//    Bars3D {
 //        id: initialized
 //        scene.activeCamera: Camera3D { zoomLevel: 200 }
 //        scene.devicePixelRatio: Screen.devicePixelRatio
@@ -28,11 +28,11 @@ Item {
 //        scene.slicingActive: true
 //    }
 
-//    Bars3DNG {
+//    Bars3D {
 //        id: change
 //    }
 
-//    Bars3DNG {
+//    Bars3D {
 //        id: invalid
 //    }
 

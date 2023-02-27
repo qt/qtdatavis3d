@@ -27,13 +27,13 @@ Item {
         width: parent.width
         height: parent.height - buttonLayout.height
 
-        Surface3DNG {
+        Surface3D {
             id: surfaceGraph
 
             width: dataView.width
             height: dataView.height
-            shadowQuality: AbstractGraph3DNG.ShadowQualityNone
-            selectionMode: AbstractGraph3DNG.SelectionSlice | AbstractGraph3DNG.SelectionItemAndRow
+            shadowQuality: AbstractGraph3D.ShadowQualityNone
+            selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndRow
 
             axisX.labelFormat: "%d ms"
             axisY.labelFormat: "%d W"
@@ -48,7 +48,7 @@ Item {
             axisY.segmentCount: 4
             axisZ.segmentCount: 4
             measureFps: true
-            renderingMode: AbstractGraph3DNG.RenderDirectToBackground
+            renderingMode: AbstractGraph3D.RenderDirectToBackground
 
             onCurrentFpsChanged: (fps)=> {
                 if (fps > 10)

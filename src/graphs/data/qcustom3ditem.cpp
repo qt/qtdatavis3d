@@ -13,7 +13,7 @@ QT_BEGIN_NAMESPACE
  * A custom item has a custom mesh, position, scaling, rotation, and an optional
  * texture.
  *
- * \sa QAbstract3DGraphNG::addCustomItem()
+ * \sa QAbstract3DGraph::addCustomItem()
  */
 
 /*!
@@ -116,7 +116,7 @@ QT_BEGIN_NAMESPACE
  *
  * Defines whether shadow casting for the item is enabled. Defaults to \c{true}.
  * If \c{false}, the item does not cast shadows regardless of
- * \l{QAbstract3DGraphNG::ShadowQuality}{ShadowQuality}.
+ * \l{QAbstract3DGraph::ShadowQuality}{ShadowQuality}.
  */
 
 /*!
@@ -290,7 +290,7 @@ QVector3D QCustom3DItem::scaling() const
  * is calculated on the unrotated item.
  *
  * \note Only absolute scaling is supported for QCustom3DLabel items or for custom items used in
- * \l{QAbstract3DGraphNG::polar}{polar} graphs.
+ * \l{QAbstract3DGraph::polar}{polar} graphs.
  *
  * \note The custom item's mesh must be normalized to the range \c{[-1 ,1]}, or the data
  * scaling will not be accurate.
@@ -362,7 +362,7 @@ bool QCustom3DItem::isVisible() const
  * \brief Whether shadow casting for the item is enabled.
  *
  * Defaults to \c{true}.
- * If \c{false}, the item does not cast shadows regardless of QAbstract3DGraphNG::ShadowQuality.
+ * If \c{false}, the item does not cast shadows regardless of QAbstract3DGraph::ShadowQuality.
  */
 void QCustom3DItem::setShadowCasting(bool enabled)
 {

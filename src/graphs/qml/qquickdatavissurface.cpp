@@ -232,7 +232,7 @@ void QQuickDataVisSurface::synchData()
     QQuickDataVisItem::synchData();
 
     if (m_surfaceController->isSelectedPointChanged()) {
-        if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraphNG::SelectionItem))
+        if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionItem))
             updateSelectedPoint();
         m_surfaceController->setSelectedPointChanged(false);
     }
@@ -316,7 +316,7 @@ void QQuickDataVisSurface::updateGraph()
             }
         }
 
-        if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraphNG::SelectionItem))
+        if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionItem))
             updateSelectedPoint();
     }
 
@@ -612,7 +612,7 @@ void QQuickDataVisSurface::updateSliceGraph()
 
         QVector<SurfaceVertex> selectedSeries;
 
-        if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionRow)) {
+        if (selectionMode.testFlag(QAbstract3DGraph::SelectionRow)) {
             int selectedRow = model->selectedVertex.coord.x() * model->columnCount;
             selectedSeries.reserve(model->rowCount * 2);
             QVector<SurfaceVertex> list;
@@ -628,7 +628,7 @@ void QQuickDataVisSurface::updateSliceGraph()
             selectedSeries.append(list);
         }
 
-        if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionColumn)) {
+        if (selectionMode.testFlag(QAbstract3DGraph::SelectionColumn)) {
             int selectedColumn = model->selectedVertex.coord.y();
             selectedSeries.reserve(model->columnCount * 2);
             QVector<SurfaceVertex> list;
@@ -1045,7 +1045,7 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
         QQuick3DModel *pickedModel = nullptr;
 
         auto selectionMode = m_surfaceController->selectionMode();
-        if (!selectionMode.testFlag(QAbstract3DGraphNG::SelectionNone)) {
+        if (!selectionMode.testFlag(QAbstract3DGraph::SelectionNone)) {
             for (auto picked : pickResult) {
                 if (picked.objectHit()->objectName().contains(QStringLiteral("SurfaceModel"))) {
                     pickedPos = picked.position();
@@ -1086,7 +1086,7 @@ void QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
                     else
                         model->selectedVertex = SurfaceVertex();
 
-                    if (selectionMode.testFlag(QAbstract3DGraphNG::SelectionMultiSeries)) {
+                    if (selectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)) {
                         if (model->picked) {
                             model->selectedVertex = selectedVertex;
                         } else {
@@ -1124,7 +1124,7 @@ void QQuickDataVisSurface::updateSelectedPoint()
             m_instancing->addPosition(selectedVertex.position);
             if (isSliceEnabled()) {
                 QVector3D slicePosition = selectedVertex.position;
-                if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraphNG::SelectionColumn))
+                if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionColumn))
                     slicePosition.setX(slicePosition.z());
                 slicePosition.setZ(.0f);
                 m_sliceInstancing->addPosition(slicePosition);
@@ -1173,7 +1173,7 @@ void QQuickDataVisSurface::addModel(QSurface3DSeries *series)
     model->setParentItem(scene);
     model->setObjectName(QStringLiteral("SurfaceModel"));
     model->setVisible(visible);
-    if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraphNG::SelectionNone))
+    if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionNone))
         model->setPickable(false);
     else
         model->setPickable(true);
