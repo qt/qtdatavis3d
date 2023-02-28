@@ -514,6 +514,19 @@ void QQuickDataVisScatter::removeDataItems(QList<QQuick3DModel *> &items, qsizet
     }
 }
 
+void QQuickDataVisScatter::recreateDataItems()
+{
+    QList<QScatter3DSeries *> seriesList = m_scatterController->scatterSeriesList();
+    for (auto series : seriesList) {
+        for (const auto &model : std::as_const(m_scatterGraphs)) {
+            if (model->series == series) {
+                removeDataItems(model->dataItems);
+                generatePointsForScatterModel(model);
+            }
+        }
+    }
+}
+
 void QQuickDataVisScatter::addPointsToScatterModel(ScatterModel *graphModel, qsizetype count)
 {
     QAbstract3DSeries::Mesh meshType = graphModel->series->mesh();
@@ -663,6 +676,8 @@ void QQuickDataVisScatter::addSeries(QScatter3DSeries *series)
     graphModel->highlightTexture = nullptr;
     m_scatterGraphs.push_back(graphModel);
 
+    connectSeries(series);
+
     if (series->selectedItem() != invalidSelectionIndex())
         setSelectedItem(series->selectedItem(), series);
 }
@@ -687,6 +702,8 @@ void QQuickDataVisScatter::removeSeries(QScatter3DSeries *series)
             m_scatterGraphs.erase(it);
         }
     }
+
+    disconnectSeries(series);
 }
 
 void QQuickDataVisScatter::handleAxisXChanged(QAbstract3DAxis *axis)
@@ -702,6 +719,17 @@ void QQuickDataVisScatter::handleAxisYChanged(QAbstract3DAxis *axis)
 void QQuickDataVisScatter::handleAxisZChanged(QAbstract3DAxis *axis)
 {
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
+}
+
+void QQuickDataVisScatter::handleSeriesMeshChanged()
+{
+    recreateDataItems();
+}
+
+void QQuickDataVisScatter::handleMeshSmoothChanged(bool enable)
+{
+    m_smooth = enable;
+    recreateDataItems();
 }
 
 bool QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
@@ -733,6 +761,16 @@ bool QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
     }
 
     return true;
+}
+
+void QQuickDataVisScatter::connectSeries(QScatter3DSeries *series)
+{
+    m_smooth = series->isMeshSmooth();
+
+    QObject::connect(series, &QScatter3DSeries::meshChanged, this,
+                     &QQuickDataVisScatter::handleSeriesMeshChanged);
+    QObject::connect(series, &QScatter3DSeries::meshSmoothChanged, this,
+                     &QQuickDataVisScatter::handleMeshSmoothChanged);
 }
 
 void QQuickDataVisScatter::calculateSceneScalingFactors()

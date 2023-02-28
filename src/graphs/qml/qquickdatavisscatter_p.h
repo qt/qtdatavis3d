@@ -64,6 +64,8 @@ public Q_SLOTS:
     void handleAxisXChanged(QAbstract3DAxis *axis) override;
     void handleAxisYChanged(QAbstract3DAxis *axis) override;
     void handleAxisZChanged(QAbstract3DAxis *axis) override;
+    void handleSeriesMeshChanged();
+    void handleMeshSmoothChanged(bool enable);
 
 Q_SIGNALS:
     void axisXChanged(QValue3DAxis *axis);
@@ -157,6 +159,7 @@ private:
     QString getMeshFileName(QAbstract3DSeries::Mesh meshType);
 
     void removeDataItems(QList<QQuick3DModel *> &items, qsizetype count);
+    void recreateDataItems();
     void addPointsToScatterModel(ScatterModel *graphModel, qsizetype count);
     int sizeDifference(qsizetype size1, qsizetype size2);
     void handleSeriesChanged(QList<QAbstract3DSeries *> changedSeries);
