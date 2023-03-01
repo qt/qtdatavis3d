@@ -5,14 +5,6 @@
 
 VariantBarDataProxy::VariantBarDataProxy() = default;
 
-VariantBarDataProxy::VariantBarDataProxy(VariantDataSet *newSet,
-                                         VariantBarDataMapping *mapping) :
-    QBarDataProxy()
-{
-    setDataSet(newSet);
-    setMapping(mapping);
-}
-
 VariantBarDataProxy::~VariantBarDataProxy()
 {
     delete m_dataSet;

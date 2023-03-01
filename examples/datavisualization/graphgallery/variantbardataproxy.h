@@ -16,8 +16,7 @@ class VariantBarDataProxy : public QBarDataProxy
     Q_OBJECT
 
 public:
-    explicit VariantBarDataProxy();
-    explicit VariantBarDataProxy(VariantDataSet *newSet, VariantBarDataMapping *mapping);
+    VariantBarDataProxy();
     virtual ~VariantBarDataProxy();
 
     //! [1]
