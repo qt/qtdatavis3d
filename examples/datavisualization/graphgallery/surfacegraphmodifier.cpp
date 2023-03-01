@@ -25,8 +25,9 @@ const float areaHeight = 8000.f;
 const float aspectRatio = 0.1389f;
 const float minRange = areaWidth * 0.49f;
 
-SurfaceGraphModifier::SurfaceGraphModifier(Q3DSurface *surface, QLabel *label)
-    : m_graph(surface),
+SurfaceGraphModifier::SurfaceGraphModifier(Q3DSurface *surface, QLabel *label, QObject *parent) :
+      QObject(parent),
+      m_graph(surface),
       m_textField(label)
 {
     m_graph->scene()->activeCamera()->setZoomLevel(85.f);
@@ -143,11 +144,6 @@ SurfaceGraphModifier::SurfaceGraphModifier(Q3DSurface *surface, QLabel *label)
     m_customInputHandler->setAxes(m_graph->axisX(), m_graph->axisY(), m_graph->axisZ());
     m_customInputHandler->setLimits(0.f, areaWidth, minRange);
     m_customInputHandler->setAspectRatio(aspectRatio);
-}
-
-SurfaceGraphModifier::~SurfaceGraphModifier()
-{
-    delete m_graph;
 }
 
 void SurfaceGraphModifier::fillSqrtSinProxy()

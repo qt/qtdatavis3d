@@ -245,7 +245,7 @@ bool BarGraph::initialize()
     vLayout->addWidget(modeCustomProxy, 1, Qt::AlignTop);
 
     //! [2]
-    GraphModifier *modifier = new GraphModifier(m_barsGraph);
+    GraphModifier *modifier = new GraphModifier(m_barsGraph, this);
     //! [2]
 
     //! [5]

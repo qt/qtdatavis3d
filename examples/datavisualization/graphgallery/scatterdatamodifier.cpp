@@ -21,8 +21,9 @@ const float curveDivider = 7.5f;
 const int lowerNumberOfItems = 900;
 const float lowerCurveDivider = 0.75f;
 
-ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
-    : m_graph(scatter),
+ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter, QObject *parent) :
+      QObject(parent),
+      m_graph(scatter),
       m_itemCount(lowerNumberOfItems),
       m_curveDivider(lowerCurveDivider),
       //! [7]
@@ -57,11 +58,6 @@ ScatterDataModifier::ScatterDataModifier(Q3DScatter *scatter)
     //! [2]
     addData();
     //! [2]
-}
-
-ScatterDataModifier::~ScatterDataModifier()
-{
-    delete m_graph;
 }
 
 void ScatterDataModifier::addData()

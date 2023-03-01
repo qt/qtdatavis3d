@@ -13,8 +13,7 @@ class ScatterDataModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit ScatterDataModifier(Q3DScatter *scatter);
-    ~ScatterDataModifier();
+    explicit ScatterDataModifier(Q3DScatter *scatter, QObject *parent);
 
     void addData();
 

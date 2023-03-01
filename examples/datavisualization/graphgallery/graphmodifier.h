@@ -15,7 +15,7 @@ class GraphModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit GraphModifier(Q3DBars *bargraph);
+    explicit GraphModifier(Q3DBars *bargraph, QObject *parent);
     ~GraphModifier();
 
     void resetTemperatureData();

@@ -19,7 +19,8 @@ using namespace Qt::StringLiterals;
 // TODO: Many of the values do not affect custom proxy series now - should be fixed
 
 //! [0]
-GraphModifier::GraphModifier(Q3DBars *bargraph) :
+GraphModifier::GraphModifier(Q3DBars *bargraph, QObject *parent) :
+      QObject(parent),
       m_graph(bargraph),
       //! [0]
       //! [1]
@@ -127,7 +128,6 @@ GraphModifier::GraphModifier(Q3DBars *bargraph) :
 GraphModifier::~GraphModifier()
 {
     delete m_customData;
-    delete m_graph;
 }
 
 void GraphModifier::resetTemperatureData()

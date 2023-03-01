@@ -23,8 +23,7 @@ class SurfaceGraphModifier : public QObject
 {
     Q_OBJECT
 public:
-    explicit SurfaceGraphModifier(Q3DSurface *surface, QLabel *label);
-    ~SurfaceGraphModifier();
+    explicit SurfaceGraphModifier(Q3DSurface *surface, QLabel *label, QObject *parent);
 
     //! [0]
     void toggleModeNone() { m_graph->setSelectionMode(QAbstract3DGraph::SelectionNone); }
