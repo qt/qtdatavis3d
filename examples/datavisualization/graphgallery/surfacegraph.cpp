@@ -50,7 +50,7 @@ bool SurfaceGraph::initialize()
     QGroupBox *modelGroupBox = new QGroupBox(u"Model"_s);
 
     QRadioButton *sqrtSinModelRB = new QRadioButton(m_surfaceWidget);
-    sqrtSinModelRB->setText(u"_sqrt && Sin"_s);
+    sqrtSinModelRB->setText(u"Sqrt && Sin"_s);
     sqrtSinModelRB->setChecked(false);
 
     QRadioButton *heightMapModelRB = new QRadioButton(m_surfaceWidget);
@@ -175,11 +175,11 @@ bool SurfaceGraph::initialize()
     QGroupBox *visualsGroupBox = new QGroupBox(u"Visuals"_s);
     visualsGroupBox->setVisible(false);
 
-    QCheckBox *checkboxVisualsSeeThrough = new QCheckBox(u"_see-Through"_s);
+    QCheckBox *checkboxVisualsSeeThrough = new QCheckBox(u"See-Through"_s);
 
     QCheckBox *checkboxHighlightOil = new QCheckBox(u"Highlight Oil"_s);
 
-    QCheckBox *checkboxShowShadows = new QCheckBox(u"_shadows"_s);
+    QCheckBox *checkboxShowShadows = new QCheckBox(u"Shadows"_s);
     checkboxShowShadows->setChecked(true);
 
     QVBoxLayout *visualVBox = new QVBoxLayout;
@@ -188,14 +188,14 @@ bool SurfaceGraph::initialize()
     visualVBox->addWidget(checkboxShowShadows);
     visualsGroupBox->setLayout(visualVBox);
 
-    QLabel *labelSelection = new QLabel(u"_selection:"_s);
+    QLabel *labelSelection = new QLabel(u"Selection:"_s);
     labelSelection->setVisible(false);
 
     QLabel *labelSelectedItem = new QLabel(u"Nothing"_s);
     labelSelectedItem->setVisible(false);
 
     // Textured topography heightmap
-    QCheckBox *enableTexture = new QCheckBox(u"_surface texture"_s);
+    QCheckBox *enableTexture = new QCheckBox(u"Surface texture"_s);
     enableTexture->setVisible(false);
 
     int height = 400;
