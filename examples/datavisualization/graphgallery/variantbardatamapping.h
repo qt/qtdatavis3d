@@ -18,16 +18,12 @@ class VariantBarDataMapping : public QObject
     Q_PROPERTY(QStringList columnCategories READ columnCategories WRITE setColumnCategories NOTIFY columnCategoriesChanged)
     //! [0]
 public:
-    explicit VariantBarDataMapping();
-    VariantBarDataMapping(const VariantBarDataMapping &other);
     //! [1]
-    VariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
-                          const QStringList &rowCategories,
-                          const QStringList &columnCategories);
+    explicit VariantBarDataMapping(int rowIndex, int columnIndex, int valueIndex,
+                                   const QStringList &rowCategories,
+                                   const QStringList &columnCategories);
     //! [1]
     virtual ~VariantBarDataMapping();
-
-    VariantBarDataMapping &operator=(const VariantBarDataMapping &other);
 
     void setRowIndex(int index);
     int rowIndex() const;
