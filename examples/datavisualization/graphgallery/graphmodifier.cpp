@@ -197,7 +197,7 @@ void GraphModifier::changeStyle(int style)
 {
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
-        m_barMesh = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
+        m_barMesh = comboBox->itemData(style).value<QAbstract3DSeries::Mesh>();
         m_primarySeries->setMesh(m_barMesh);
         m_secondarySeries->setMesh(m_barMesh);
         m_customData->customSeries()->setMesh(m_barMesh);

@@ -69,12 +69,12 @@ bool BarGraph::initialize()
     smoothCheckBox->setChecked(false);
 
     QComboBox *barStyleList = new QComboBox(m_barsWidget);
-    barStyleList->addItem(u"Bar"_s, int(QAbstract3DSeries::MeshBar));
-    barStyleList->addItem(u"Pyramid"_s, int(QAbstract3DSeries::MeshPyramid));
-    barStyleList->addItem(u"Cone"_s, int(QAbstract3DSeries::MeshCone));
-    barStyleList->addItem(u"Cylinder"_s, int(QAbstract3DSeries::MeshCylinder));
-    barStyleList->addItem(u"Bevel bar"_s, int(QAbstract3DSeries::MeshBevelBar));
-    barStyleList->addItem(u"Sphere"_s, int(QAbstract3DSeries::MeshSphere));
+    barStyleList->addItem(u"Bar"_s, QAbstract3DSeries::MeshBar);
+    barStyleList->addItem(u"Pyramid"_s, QAbstract3DSeries::MeshPyramid);
+    barStyleList->addItem(u"Cone"_s, QAbstract3DSeries::MeshCone);
+    barStyleList->addItem(u"Cylinder"_s, QAbstract3DSeries::MeshCylinder);
+    barStyleList->addItem(u"Bevel bar"_s, QAbstract3DSeries::MeshBevelBar);
+    barStyleList->addItem(u"Sphere"_s, QAbstract3DSeries::MeshSphere);
     barStyleList->setCurrentIndex(4);
 
     QPushButton *cameraButton = new QPushButton(m_barsWidget);

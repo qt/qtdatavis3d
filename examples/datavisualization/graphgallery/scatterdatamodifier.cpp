@@ -107,7 +107,7 @@ void ScatterDataModifier::changeStyle(int style)
 {
     QComboBox *comboBox = qobject_cast<QComboBox *>(sender());
     if (comboBox) {
-        m_style = QAbstract3DSeries::Mesh(comboBox->itemData(style).toInt());
+        m_style = comboBox->itemData(style).value<QAbstract3DSeries::Mesh>();
         if (!m_graph->seriesList().isEmpty())
             m_graph->seriesList().at(0)->setMesh(m_style);
     }
