@@ -81,6 +81,10 @@ bool MeshLoader::loadOBJ(const QString &path, QList<QVector3D> &out_vertices,
             QStringList set1 = lineContents.at(1).split(slashTag);
             QStringList set2 = lineContents.at(2).split(slashTag);
             QStringList set3 = lineContents.at(3).split(slashTag);
+            if (set1.length() < 3 || set2.length() < 3 || set3.length() < 3) {
+                qWarning("The file being loaded is missing UVs and/or normals");
+                return false;
+            }
             vertexIndex[0] = set1.at(0).toUInt();
             vertexIndex[1] = set2.at(0).toUInt();
             vertexIndex[2] = set3.at(0).toUInt();
