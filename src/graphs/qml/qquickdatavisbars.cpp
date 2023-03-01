@@ -404,8 +404,10 @@ void QQuickDataVisBars::updateParameters() {
 
     if (m_cachedRowCount!= m_newRows || m_cachedColumnCount != m_newCols) {
         // Force update for selection related items
-        //m_sliceCache = 0;
-        //m_sliceTitleItem = 0;
+        if (isSliceEnabled() && m_barsController->isSlicingActive()) {
+            setSliceEnabled(false);
+            setSliceActivatedChanged(true);
+        }
 
         m_cachedColumnCount = m_newCols;
         m_cachedRowCount = m_newRows;
@@ -806,6 +808,10 @@ void QQuickDataVisBars::updateBarVisuality(QBar3DSeries *series, int visualIndex
 {
     QVector<BarModel *> barList = *m_barModelsMap.value(series);
     for (int i = 0; i < barList.count(); i++) {
+        if (barList.at(i)->model->visible() != series->isVisible() && isSliceEnabled()) {
+            setSliceEnabled(false);
+            setSliceActivatedChanged(true);
+        }
         barList.at(i)->visualIndex = visualIndex;
         barList.at(i)->model->setVisible(series->isVisible());
     }
@@ -1159,6 +1165,16 @@ void QQuickDataVisBars::updateSelectedBar()
                                 QVector3D(-m_barsController->scene()->activeCamera()->yRotation(),
                                           -m_barsController->scene()->activeCamera()->xRotation(),
                                           0));
+
+                    if (isSliceEnabled()) {
+                        sliceItemLabel()->setPosition(QVector3D((m_selectedBarPos.x() + .05f),
+                                                                (m_selectedBarPos.y() + .5f), 0.0f));
+                        sliceItemLabel()->setScale(sliceItemLabel()->scale() / 1.5f);
+                        sliceItemLabel()->setProperty("labelText", label);
+                        sliceItemLabel()->setEulerRotation(QVector3D(0.0f, 0.0f, 90.0f));
+                        sliceItemLabel()->setVisible(true);
+                    }
+
                     break;
                 }
                 case Bars3DController::SelectionRow: {
@@ -1177,12 +1193,6 @@ void QQuickDataVisBars::updateSelectedBar()
                 default:
                     break;
                 }
-            }
-
-            if (isSliceEnabled()) {
-                sliceItemLabel()->setPosition(m_selectedBarPos);
-                sliceItemLabel()->setProperty("labelText", (m_selectedBarSeries->dptr()->itemLabel()));
-                sliceItemLabel()->setVisible(true);
             }
         }
     }
@@ -1237,8 +1247,8 @@ void QQuickDataVisBars::updateSliceGraph()
                 delete m_sliceViewBars.at(i)->model;
             }
             m_sliceViewBars.clear();
-            return;
         }
+        return;
     }
 
     auto selectionMode = m_barsController->selectionMode();
@@ -1302,13 +1312,12 @@ void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spaci
     }
 
     m_axisRangeChanged = true;
-    /* Will I need those?
-     *
     // Slice mode doesn't update correctly without this
-    if (m_cachedIsSlicingActivated)
-        m_selectionDirty = true;
-     *
-    */
+    if (isSliceEnabled() && m_barsController->isSlicingActive()) {
+        setSliceEnabled(false);
+        setSliceActivatedChanged(true);
+    }
+
     // Calculate here and at setting sample space
     calculateSceneScalingFactors();
 }
