@@ -5,12 +5,11 @@
 #include <QtCore/QDir>
 #include <QtQuick/QQuickView>
 #include <QtQml/QQmlEngine>
-#include <QtQuick3D/qquick3d.h>
 
 int main(int argc, char *argv[])
 {
     QGuiApplication app(argc, argv);
-    QSurfaceFormat::setDefaultFormat(QQuick3D::idealSurfaceFormat());
+
     QQuickView viewer;
 
     // The following are needed to make examples run without having to install the module
@@ -26,7 +25,7 @@ int main(int argc, char *argv[])
     QObject::connect(viewer.engine(), &QQmlEngine::quit, &viewer, &QWindow::close);
     //! [4]
 
-    viewer.setTitle(QStringLiteral("QML scatter example"));
+    viewer.setTitle(QStringLiteral("Simple Scatter Graph"));
 
     //! [3]
     viewer.setSource(QUrl("qrc:/qml/qmlscatter/main.qml"));

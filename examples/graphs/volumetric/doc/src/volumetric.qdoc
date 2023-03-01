@@ -3,11 +3,14 @@
 
 /*!
     \example volumetric
-    \title Volumetric rendering Example
-    \ingroup qtgraphs_examples
+    \meta tags {Graphs, QCustom3DVolume, Custom Item}
+    \meta category {Graphics}
+    \title Volumetric Rendering
+    \ingroup qtdatavisualization_examples
     \brief Rendering volumetric objects.
+    \since QtGraphs 1.2
 
-    This example shows how to use QCustom3DVolume items to display volumetric data.
+    \e {Volumetric Rendering} shows how to use QCustom3DVolume to display volumetric data.
 
     \image volumetric-example.png
 
@@ -17,41 +20,41 @@
 
     The QCustom3DVolume items are special custom items (see QCustom3DItem), which can be used
     to display volumetric data. The volume items are only supported with orthographic projection,
-    so first we make sure the graph is using it:
-
-    \snippet volumetric/volumetric.cpp 6
-
-    The following code shows how to create a volumetric item tied to the data ranges of the axes:
+    so first make sure the graph is using it:
 
     \snippet volumetric/volumetric.cpp 0
 
-    By setting the QCustom3DItem::scalingAbsolute property to \c{false}, we indicate that the
-    scaling of the volume should follow the changes in the data ranges. Next we define the
-    internal contents of the volume:
+    Create a volumetric item tied to the data ranges of the axes:
 
     \snippet volumetric/volumetric.cpp 1
 
-    We use eight bit indexed color for our texture, as it is compact and makes it easy to adjust the
-    colors without needing to reset the whole texture. For the texture data we use the data we
-    created earlier based on some height maps.
-    Typically the data for volume items comes pregenerated in a form of a stack of images, so we are
-    not going to explain the data generation in detail. Please refer to the example code if you
-    are interested in the actual data generation process.
-
-    Since we are using eight bit indexed colors, we need a color table to map the eight bit color
-    indexes to actual colors. We use one we populated on our own, but in a typical use case you
-    would get the color table from the source images:
+    Indicate that the scaling of the volume should follow the changes in the data ranges by setting
+    the QCustom3DItem::scalingAbsolute property to \c{false}. Next, define the internal contents of
+    the volume:
 
     \snippet volumetric/volumetric.cpp 2
 
-    We want to optionally show slice frames around the volume, so we initialize their properties.
-    Initially, the frames will be hidden:
+    Use eight bit indexed color for the texture, as it is compact and makes it easy to adjust the
+    colors without needing to reset the whole texture. For the texture data, use the data created
+    earlier based on height maps.
+    Typically, the data for volume items comes pregenerated in the form of a stack of images, so
+    the data generation details can be skipped. For more information about the actual data
+    generation process, see the example code.
 
-    \snippet volumetric/volumetric.cpp 5
-
-    Finally we add the volume as a custom item to the graph to display it:
+    Since eight bit indexed colors are used, a color table is needed to map the eight bit color
+    indexes to actual colors. In a typical use case, you would get the color table from the source
+    images instead of using one manually defined:
 
     \snippet volumetric/volumetric.cpp 3
+
+    To have an option to show slice frames around the volume, initialize their properties.
+    Initially, the frames will be hidden:
+
+    \snippet volumetric/volumetric.cpp 4
+
+    Finally, add the volume as a custom item to the graph to display it:
+
+    \snippet volumetric/volumetric.cpp 5
 
     \section1 Slicing into the Volume
 
@@ -59,28 +62,27 @@
     not very helpful. One way to inspect the internal structure of the volume is to view the slices
     of the volume. QCustom3DVolume provides two ways to display the slices. The first is to show
     the selected slices in place of the volume. For example, to specify a slice perpendicular to
-    the X-axis, you can use the following method:
+    the X-axis, use the following method:
+
+    \snippet volumetric/volumetric.cpp 6
+
+    To display the slice specified above, the QCustom3DVolume::drawSlices property must also be set:
 
     \snippet volumetric/volumetric.cpp 7
 
-    To actually draw the slice specified above, the QCustom3DVolume::drawSlices property must be
-    also set:
+    The second way to view slices is to use QCustom3DVolume::renderSlice() method, which produces
+    a QImage from the specified slice. This image can then be displayed on another widget, such
+    as a QLabel:
 
     \snippet volumetric/volumetric.cpp 8
 
-    The second way to view slices is to use QCustom3DVolume::renderSlice() method, which produces
-    a QImage from the specified slice. This image can then be displayed on another widget, such
-    as a QLabel here:
-
-    \snippet volumetric/volumetric.cpp 9
-
     \section1 Adjusting Volume Transparency
 
-    Sometimes viewing just the slices doesn't give you a good understanding of the volume's internal
-    structure. QCustom3DVolume provides two properties that can be used to adjust the volume
-    transparency:
+    Sometimes, viewing just the slices doesn't give you a good understanding of the volume's
+    internal structure. QCustom3DVolume provides two properties that can be used to adjust the
+    volume transparency:
 
-    \snippet volumetric/volumetric.cpp 11
+    \snippet volumetric/volumetric.cpp 9
     \dots
     \snippet volumetric/volumetric.cpp 10
 
@@ -90,26 +92,25 @@
     doesn't affect colors that are fully opaque, unless the QCustom3DVolume::preserveOpacity
     property is set to \c{false}.
 
-    An alternative way to adjust the transparency of the volume is adjust the alpha values of the
-    voxels directly. For eight bit indexed textures, this is done simply by modifying and
-    resetting the color table:
+    An alternative way to adjust the transparency of the volume is to adjust the alpha values of the
+    voxels directly. For eight bit indexed textures, this is done simply by modifying and resetting
+    the color table:
 
-    \snippet volumetric/volumetric.cpp 12
+    \snippet volumetric/volumetric.cpp 11
 
     \section1 High Definition vs. Low Definition Shader
 
-    By default the volume rendering uses the high definition shader. It accounts for each
-    voxel of the volume with correct weight when ray-tracing the volume contents,
-    providing an accurate representation of even the finer details of the volume.
+    By default, the volumetric rendering uses a high definition shader. It accounts for each
+    voxel of the volume with the correct weight when ray-tracing the volume contents, providing an
+    accurate representation of even the finer details of the volume.
     However, this is computationally very expensive, so the frame rate suffers.
-    If rendering speed is more important than pixel-perfect
-    accuracy of the volume contents, you can take the much faster low definition shader into use
-    by setting \c{false} for QCustom3DVolume::useHighDefShader property. The low definition shader
-    achieves the speed by making compromises on the accuracy, so it doesn't guarantee each voxel
-    of the volume will be sampled. This can lead to flickering and/or other rendering artifacts
-    on the finer details of the volume.
+    If rendering speed is more important than pixel-perfect accuracy of the volume contents, take
+    the much faster low definition shader into use by setting QCustom3DVolume::useHighDefShader
+    property \c{false}. The low definition shader achieves the speed by making compromises on
+    accuracy, so it doesn't guarantee that every voxel of the volume will be sampled. This can lead
+    to flickering or other rendering artifacts on the finer details of the volume.
 
-    \snippet volumetric/volumetric.cpp 13
+    \snippet volumetric/volumetric.cpp 12
 
     \section1 Example Contents
 */

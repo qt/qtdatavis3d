@@ -3,47 +3,38 @@
 
 #include "volumetric.h"
 
-#include <QtWidgets/QApplication>
-#include <QtWidgets/QWidget>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QVBoxLayout>
-#include <QtWidgets/QRadioButton>
-#include <QtWidgets/QSlider>
-#include <QtWidgets/QCheckBox>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QGroupBox>
-#include <QtWidgets/QMessageBox>
-#include <QtGui/QScreen>
+#include <QtWidgets/qapplication.h>
+#include <QtWidgets/qwidget.h>
+#include <QtWidgets/qboxlayout.h>
+#include <QtWidgets/qradiobutton.h>
+#include <QtWidgets/qslider.h>
+#include <QtWidgets/qcheckbox.h>
+#include <QtWidgets/qlabel.h>
+#include <QtWidgets/qgroupbox.h>
+#include <QtWidgets/qmessagebox.h>
+#include <QtGui/qscreen.h>
 
 int main(int argc, char **argv)
 {
-    qputenv("QSG_RHI_BACKEND", "opengl");
     QApplication app(argc, argv);
     Q3DScatter *graph = new Q3DScatter();
-    QWidget *container = QWidget::createWindowContainer(graph);
-
-    if (!graph->hasContext()) {
-        QMessageBox msgBox;
-        msgBox.setText("Couldn't initialize the OpenGL context.");
-        msgBox.exec();
-        return -1;
-    }
 
     QSize screenSize = graph->screen()->size();
-    container->setMinimumSize(QSize(screenSize.width() / 3, screenSize.height() / 3));
-    container->setMaximumSize(screenSize);
-    container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
-    container->setFocusPolicy(Qt::StrongFocus);
+    graph->setMinimumSize(QSize(screenSize.width() / 3, screenSize.height() / 2));
+    graph->setMaximumSize(screenSize);
+    graph->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    graph->setFocusPolicy(Qt::StrongFocus);
+    graph->setResizeMode(QQuickWidget::SizeRootObjectToView);
 
     QWidget *widget = new QWidget();
     QHBoxLayout *hLayout = new QHBoxLayout(widget);
     QVBoxLayout *vLayout = new QVBoxLayout();
     QVBoxLayout *vLayout2 = new QVBoxLayout();
-    hLayout->addWidget(container, 1);
+    hLayout->addWidget(graph, 1);
     hLayout->addLayout(vLayout);
     hLayout->addLayout(vLayout2);
 
-    widget->setWindowTitle(QStringLiteral("Volumetric object example - 3D terrain"));
+    widget->setWindowTitle(QStringLiteral("Volumetric Rendering - 3D Terrain"));
 
     QCheckBox *sliceXCheckBox = new QCheckBox(widget);
     sliceXCheckBox->setText(QStringLiteral("Slice volume on X axis"));
@@ -79,7 +70,7 @@ int main(int argc, char **argv)
     QGroupBox *textureDetailGroupBox = new QGroupBox(QStringLiteral("Texture detail"));
 
     QRadioButton *lowDetailRB = new QRadioButton(widget);
-    lowDetailRB->setText(QStringLiteral("Low (128x64x128)"));
+    lowDetailRB->setText(QStringLiteral("Low (256x128x256)"));
     lowDetailRB->setChecked(true);
 
     QRadioButton *mediumDetailRB = new QRadioButton(widget);

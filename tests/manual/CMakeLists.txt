@@ -1,4 +1,4 @@
-# Copyright (C) 2022 The Qt Company Ltd.
+# Copyright (C) 2023 The Qt Company Ltd.
 # SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only WITH Qt-GPL-exception-1.0
 
 if(TARGET Qt::Quick)
@@ -9,6 +9,9 @@ if(TARGET Qt::Quick)
     add_subdirectory(qmlgradient)
     add_subdirectory(qmlheightmap)
     add_subdirectory(qmlbarsrowcolors)
+    add_subdirectory(qmlcustominput)
+    add_subdirectory(qmllegend)
+    add_subdirectory(qmlsurfacelayers)
 endif()
 if(NOT ANDROID AND NOT IOS AND NOT WINRT)
 #    add_subdirectory(barstest)
@@ -21,4 +24,7 @@ if(NOT ANDROID AND NOT IOS AND NOT WINRT)
 #    add_subdirectory(minimalbars)
 #    add_subdirectory(minimalscatter)
 #    add_subdirectory(minimalsurface)
+#    add_subdirectory(rotations)
+#    add_subdirectory(custominput)
+#    add_subdirectory(itemmodel)
 endif()

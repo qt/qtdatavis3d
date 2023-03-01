@@ -4,7 +4,13 @@ qtHaveModule(quick) {
     SUBDIRS += qmldynamicdata \
                qmlmultitest \
                qmlvolume \
-               qmlperf
+               qmlperf \
+               qmlgradient \
+               qmlheightmap \
+               qmlbarsrowcolors \
+               qmlcustominput \
+               qmllegend \
+               qmlsurfacelayers
 }
 
 !android:!ios:!winrt {
@@ -14,7 +20,10 @@ qtHaveModule(quick) {
                multigraphs \
                directional \
                itemmodeltest \
-               volumetrictest
+               volumetrictest \
+               rotations \
+               custominput \
+               itemmodel
 
     # For testing code snippets of minimal applications
     SUBDIRS += minimalbars \

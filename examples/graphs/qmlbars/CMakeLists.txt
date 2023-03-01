@@ -1,5 +1,5 @@
-# Copyright (C) 2022 The Qt Company Ltd.
-# SPDX-License-Identifier: LicenseRef-Qt-Commercial OR BSD-3-Clause
+# Copyright (C) 2023 The Qt Company Ltd.
+# SPDX-License-Identifier: BSD-3-Clause
 
 cmake_minimum_required(VERSION 3.16)
 project(qmlbars LANGUAGES CXX)
@@ -30,7 +30,7 @@ set_target_properties(qmlbars PROPERTIES
     MACOSX_BUNDLE TRUE
 )
 target_compile_definitions(qmlbars PUBLIC
-    QT_DISABLE_DEPRECATED_BEFORE=0x050F00
+    QT_DISABLE_DEPRECATED_UP_TO=0x050F00
 )
 
 target_link_libraries(qmlbars PUBLIC
@@ -41,17 +41,14 @@ target_link_libraries(qmlbars PUBLIC
     Qt::Graphs
 )
 
-set(qmlbars_resource_files
-    "qml/qmlbars/Axes.qml"
-    "qml/qmlbars/Data.qml"
-    "qml/qmlbars/main.qml"
-)
-
-qt6_add_resources(qmlbars "qmlbars"
-    PREFIX
-        "/"
-    FILES
-        ${qmlbars_resource_files}
+qt6_add_qml_module(qmlbars
+    URI Bars
+    VERSION 1.0
+    NO_RESOURCE_TARGET_PATH
+    QML_FILES
+        qml/qmlbars/Axes.qml
+        qml/qmlbars/Data.qml
+        qml/qmlbars/main.qml
 )
 
 install(TARGETS qmlbars
