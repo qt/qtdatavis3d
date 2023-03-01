@@ -303,9 +303,17 @@ void QQuickDataVisSurface::updateGraph()
     if (m_surfaceController->isSeriesVisibilityDirty()) {
         for (auto model : m_model) {
             bool visible = model->series->isVisible();
+            if (visible != model->model->visible() && isSliceEnabled()) {
+                setSliceEnabled(false);
+                setSliceActivatedChanged(true);
+            }
             if (!visible) {
                 model->model->setVisible(visible);
                 model->gridModel->setVisible(visible);
+                if (sliceView()) {
+                    model->sliceModel->setVisible(visible);
+                    model->sliceGridModel->setVisible(visible);
+                }
                 continue;
             }
             model->gridModel->setVisible(model->series->drawMode().testFlag(QSurface3DSeries::DrawWireframe));
@@ -1065,9 +1073,6 @@ bool QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
                 SurfaceVertex selectedVertex;
 
                 for (auto model : m_model) {
-                    if (!model->series->isVisible())
-                        continue;
-
                     if (model->model == pickedModel) {
                         model->picked = true;
                         for (auto vertex : model->vertices) {
@@ -1084,9 +1089,6 @@ bool QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
                 }
 
                 for (auto model : m_model) {
-                    if (!model->series->isVisible())
-                        continue;
-
                     if (model->picked)
                         model->selectedVertex = selectedVertex;
                     else
