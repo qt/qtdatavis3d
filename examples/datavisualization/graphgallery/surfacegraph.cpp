@@ -253,7 +253,7 @@ bool SurfaceGraph::initialize()
     vLayout->addWidget(enableTexture);
 
     // Create the controller
-    SurfaceGraphModifier *modifier = new SurfaceGraphModifier(m_surfaceGraph, labelSelectedItem);
+    SurfaceGraphModifier *modifier = new SurfaceGraphModifier(m_surfaceGraph, labelSelectedItem, this);
 
     // Connect widget controls to controller
     QObject::connect(heightMapModelRB, &QRadioButton::toggled,
