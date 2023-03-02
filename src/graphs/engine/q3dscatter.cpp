@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dscatter.h"
-#include "qquickdatavisscatter_p.h"
+#include "qquickgraphsscatter_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -175,7 +175,7 @@ Q3DScatter::Q3DScatter() : QAbstract3DGraph()
 {
     QQmlComponent *component = new QQmlComponent(engine(), this);
     component->setData("import QtQuick; import QtGraphs; Scatter3D { anchors.fill: parent; }", QUrl());
-    d_ptr.reset(qobject_cast<QQuickDataVisScatter *>(component->create()));
+    d_ptr.reset(qobject_cast<QQuickGraphsScatter *>(component->create()));
     setContent(component->url(), component, d_ptr.data());
 }
 
@@ -198,14 +198,14 @@ QList<QScatter3DSeries *> Q3DScatter::seriesList() const
     return dptrc()->m_scatterController->scatterSeriesList();
 }
 
-QQuickDataVisScatter *Q3DScatter::dptr()
+QQuickGraphsScatter *Q3DScatter::dptr()
 {
-    return static_cast<QQuickDataVisScatter *>(d_ptr.data());
+    return static_cast<QQuickGraphsScatter *>(d_ptr.data());
 }
 
-const QQuickDataVisScatter *Q3DScatter::dptrc() const
+const QQuickGraphsScatter *Q3DScatter::dptrc() const
 {
-    return static_cast<const QQuickDataVisScatter *>(d_ptr.data());
+    return static_cast<const QQuickGraphsScatter *>(d_ptr.data());
 }
 
 void Q3DScatter::setAxisX(QValue3DAxis *axis)

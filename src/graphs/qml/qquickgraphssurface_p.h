@@ -11,10 +11,10 @@
 //
 // We mean it.
 
-#ifndef QQUICKDATAVISSURFACE_P_H
-#define QQUICKDATAVISSURFACE_P_H
+#ifndef QQUICKGRAPHSSURFACE_P_H
+#define QQUICKGRAPHSSURFACE_P_H
 
-#include "qquickdatavisitem_p.h"
+#include "qquickgraphsitem_p.h"
 #include "qsurface3dseries.h"
 
 #include <private/graphsglobal_p.h>
@@ -28,7 +28,7 @@ class Surface3DController;
 class SurfaceSelectionInstancing;
 class Q3DSurface;
 
-class QQuickDataVisSurface : public QQuickDataVisItem
+class QQuickGraphsSurface : public QQuickGraphsItem
 {
     Q_OBJECT
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
@@ -43,8 +43,8 @@ class QQuickDataVisSurface : public QQuickDataVisItem
     QML_ADDED_IN_VERSION(6, 6)
 
 public:
-    explicit QQuickDataVisSurface(QQuickItem *parent = 0);
-    ~QQuickDataVisSurface();
+    explicit QQuickGraphsSurface(QQuickItem *parent = 0);
+    ~QQuickGraphsSurface();
 
     QValue3DAxis *axisX() const;
     void setAxisX(QValue3DAxis *axis);
@@ -139,4 +139,4 @@ private:
 
 QT_END_NAMESPACE
 
-#endif // QQUICKDATAVISSURFACE_P_H
+#endif // QQUICKGRAPHSSURFACE_P_H

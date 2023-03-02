@@ -68,7 +68,6 @@ qt_internal_add_qml_module(Graphs
         engine/qabstract3dgraph.cpp engine/qabstract3dgraph.h
         engine/scatter3dcontroller.cpp engine/scatter3dcontroller_p.h
         engine/surface3dcontroller.cpp engine/surface3dcontroller_p.h
-        engine/datavisquick3dtexturedata.cpp engine/datavisquick3dtexturedata_p.h # Maybe change this location
         engine/surfaceselectioninstancing.cpp engine/surfaceselectioninstancing_p.h
 
         global/graphsglobal_p.h
@@ -90,10 +89,11 @@ qt_internal_add_qml_module(Graphs
         qml/declarativescene.cpp qml/declarativescene_p.h
         qml/declarativeseries.cpp qml/declarativeseries_p.h
         qml/declarativetheme.cpp qml/declarativetheme_p.h
-        qml/qquickdatavisitem.cpp qml/qquickdatavisitem_p.h
-        qml/qquickdatavisbars.cpp qml/qquickdatavisbars_p.h
-        qml/qquickdatavissurface.cpp qml/qquickdatavissurface_p.h
-        qml/qquickdatavisscatter.cpp qml/qquickdatavisscatter_p.h
+        qml/qquickgraphsitem.cpp qml/qquickgraphsitem_p.h
+        qml/qquickgraphsbars.cpp qml/qquickgraphsbars_p.h
+        qml/qquickgraphssurface.cpp qml/qquickgraphssurface_p.h
+        qml/qquickgraphsscatter.cpp qml/qquickgraphsscatter_p.h
+        qml/quickgraphstexturedata.cpp qml/quickgraphstexturedata_p.h
     INCLUDE_DIRECTORIES
         axis
         data

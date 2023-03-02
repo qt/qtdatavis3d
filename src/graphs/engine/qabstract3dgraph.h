@@ -19,7 +19,7 @@ QT_BEGIN_NAMESPACE
 class QCustom3DItem;
 class QAbstract3DAxis;
 class QAbstract3DSeries;
-class QQuickDataVisItem;
+class QQuickGraphsItem;
 
 class Q_GRAPHS_EXPORT QAbstract3DGraph : public QQuickWidget
 {
@@ -94,7 +94,7 @@ Q_SIGNALS:
 
 private:
     Q_DISABLE_COPY(QAbstract3DGraph)
-    QScopedPointer<QQuickDataVisItem> d_ptr;
+    QScopedPointer<QQuickGraphsItem> d_ptr;
 
     friend class Q3DBars;
     friend class Q3DScatter;

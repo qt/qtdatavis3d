@@ -11,7 +11,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class QQuickDataVisBars;
+class QQuickGraphsBars;
 
 class Q_GRAPHS_EXPORT Q3DBars : public QAbstract3DGraph
 {
@@ -87,8 +87,8 @@ Q_SIGNALS:
     void reflectionChanged(bool reflection);
 
 private:
-    QQuickDataVisBars *dptr();
-    const QQuickDataVisBars *dptrc() const;
+    QQuickGraphsBars *dptr();
+    const QQuickGraphsBars *dptrc() const;
 };
 
 QT_END_NAMESPACE

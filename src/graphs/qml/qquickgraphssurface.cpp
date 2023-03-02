@@ -1,7 +1,7 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "qquickdatavissurface_p.h"
+#include "qquickgraphssurface_p.h"
 #include <QtCore/QMutexLocker>
 
 #include "declarativescene_p.h"
@@ -15,8 +15,8 @@
 
 QT_BEGIN_NAMESPACE
 
-QQuickDataVisSurface::QQuickDataVisSurface(QQuickItem *parent)
-    : QQuickDataVisItem(parent),
+QQuickGraphsSurface::QQuickGraphsSurface(QQuickItem *parent)
+    : QQuickGraphsItem(parent),
       m_surfaceController(0)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -26,12 +26,12 @@ QQuickDataVisSurface::QQuickDataVisSurface(QQuickItem *parent)
     setSharedController(m_surfaceController);
 
     QObject::connect(m_surfaceController, &Surface3DController::selectedSeriesChanged,
-                     this, &QQuickDataVisSurface::selectedSeriesChanged);
+                     this, &QQuickGraphsSurface::selectedSeriesChanged);
     QObject::connect(m_surfaceController, &Surface3DController::flipHorizontalGridChanged,
-                     this, &QQuickDataVisSurface::flipHorizontalGridChanged);
+                     this, &QQuickGraphsSurface::flipHorizontalGridChanged);
 }
 
-QQuickDataVisSurface::~QQuickDataVisSurface()
+QQuickGraphsSurface::~QQuickGraphsSurface()
 {
     QMutexLocker locker(m_nodeMutex.data());
     const QMutexLocker locker2(mutex());
@@ -40,37 +40,37 @@ QQuickDataVisSurface::~QQuickDataVisSurface()
         delete model;
 }
 
-QValue3DAxis *QQuickDataVisSurface::axisX() const
+QValue3DAxis *QQuickGraphsSurface::axisX() const
 {
     return static_cast<QValue3DAxis *>(m_surfaceController->axisX());
 }
 
-void QQuickDataVisSurface::setAxisX(QValue3DAxis *axis)
+void QQuickGraphsSurface::setAxisX(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisX(axis);
 }
 
-QValue3DAxis *QQuickDataVisSurface::axisY() const
+QValue3DAxis *QQuickGraphsSurface::axisY() const
 {
     return static_cast<QValue3DAxis *>(m_surfaceController->axisY());
 }
 
-void QQuickDataVisSurface::setAxisY(QValue3DAxis *axis)
+void QQuickGraphsSurface::setAxisY(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisY(axis);
 }
 
-QValue3DAxis *QQuickDataVisSurface::axisZ() const
+QValue3DAxis *QQuickGraphsSurface::axisZ() const
 {
     return static_cast<QValue3DAxis *>(m_surfaceController->axisZ());
 }
 
-void QQuickDataVisSurface::setAxisZ(QValue3DAxis *axis)
+void QQuickGraphsSurface::setAxisZ(QValue3DAxis *axis)
 {
     m_surfaceController->setAxisZ(axis);
 }
 
-void QQuickDataVisSurface::handleFlatShadingEnabledChanged()
+void QQuickGraphsSurface::handleFlatShadingEnabledChanged()
 {
     auto series = static_cast<QSurface3DSeries *>(sender());
     for (auto model : m_model) {
@@ -81,7 +81,7 @@ void QQuickDataVisSurface::handleFlatShadingEnabledChanged()
     }
 }
 
-void QQuickDataVisSurface::handleWireframeColorChanged()
+void QQuickGraphsSurface::handleWireframeColorChanged()
 {
     for (auto model : m_model) {
         QQmlListReference gridMaterialRef(model->gridModel, "materials");
@@ -97,64 +97,64 @@ void QQuickDataVisSurface::handleWireframeColorChanged()
     }
 }
 
-QSurface3DSeries *QQuickDataVisSurface::selectedSeries() const
+QSurface3DSeries *QQuickGraphsSurface::selectedSeries() const
 {
     return m_surfaceController->selectedSeries();
 }
 
-void QQuickDataVisSurface::setFlipHorizontalGrid(bool flip)
+void QQuickGraphsSurface::setFlipHorizontalGrid(bool flip)
 {
-   m_surfaceController->setFlipHorizontalGrid(flip);
+    m_surfaceController->setFlipHorizontalGrid(flip);
 }
 
-bool QQuickDataVisSurface::flipHorizontalGrid() const
+bool QQuickGraphsSurface::flipHorizontalGrid() const
 {
     return m_surfaceController->flipHorizontalGrid();
 }
 
-QQmlListProperty<QSurface3DSeries> QQuickDataVisSurface::seriesList()
+QQmlListProperty<QSurface3DSeries> QQuickGraphsSurface::seriesList()
 {
     return QQmlListProperty<QSurface3DSeries>(this, this,
-                                              &QQuickDataVisSurface::appendSeriesFunc,
-                                              &QQuickDataVisSurface::countSeriesFunc,
-                                              &QQuickDataVisSurface::atSeriesFunc,
-                                              &QQuickDataVisSurface::clearSeriesFunc);
+                                              &QQuickGraphsSurface::appendSeriesFunc,
+                                              &QQuickGraphsSurface::countSeriesFunc,
+                                              &QQuickGraphsSurface::atSeriesFunc,
+                                              &QQuickGraphsSurface::clearSeriesFunc);
 }
 
-void QQuickDataVisSurface::appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list,
-                                          QSurface3DSeries *series)
+void QQuickGraphsSurface::appendSeriesFunc(QQmlListProperty<QSurface3DSeries> *list,
+                                           QSurface3DSeries *series)
 {
-    reinterpret_cast<QQuickDataVisSurface *>(list->data)->addSeries(series);
+    reinterpret_cast<QQuickGraphsSurface *>(list->data)->addSeries(series);
 }
 
-qsizetype QQuickDataVisSurface::countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
+qsizetype QQuickGraphsSurface::countSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
 {
-    return reinterpret_cast<QQuickDataVisSurface *>(list->data)->m_surfaceController->surfaceSeriesList().size();
+    return reinterpret_cast<QQuickGraphsSurface *>(list->data)->m_surfaceController->surfaceSeriesList().size();
 }
 
-QSurface3DSeries *QQuickDataVisSurface::atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list,
-                                                   qsizetype index)
+QSurface3DSeries *QQuickGraphsSurface::atSeriesFunc(QQmlListProperty<QSurface3DSeries> *list,
+                                                    qsizetype index)
 {
-    return reinterpret_cast<QQuickDataVisSurface *>(list->data)->m_surfaceController->surfaceSeriesList().at(index);
+    return reinterpret_cast<QQuickGraphsSurface *>(list->data)->m_surfaceController->surfaceSeriesList().at(index);
 }
 
-void QQuickDataVisSurface::clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
+void QQuickGraphsSurface::clearSeriesFunc(QQmlListProperty<QSurface3DSeries> *list)
 {
-    QQuickDataVisSurface *declSurface = reinterpret_cast<QQuickDataVisSurface *>(list->data);
+    QQuickGraphsSurface *declSurface = reinterpret_cast<QQuickGraphsSurface *>(list->data);
     QList<QSurface3DSeries *> realList = declSurface->m_surfaceController->surfaceSeriesList();
     int count = realList.size();
     for (int i = 0; i < count; i++)
         declSurface->removeSeries(realList.at(i));
 }
 
-void QQuickDataVisSurface::addSeries(QSurface3DSeries *series)
+void QQuickGraphsSurface::addSeries(QSurface3DSeries *series)
 {
     m_surfaceController->addSeries(series);
     if (isReady())
         addModel(series);
 }
 
-void QQuickDataVisSurface::removeSeries(QSurface3DSeries *series)
+void QQuickGraphsSurface::removeSeries(QSurface3DSeries *series)
 {
     m_surfaceController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
@@ -169,24 +169,24 @@ void QQuickDataVisSurface::removeSeries(QSurface3DSeries *series)
     }
 }
 
-void QQuickDataVisSurface::handleAxisXChanged(QAbstract3DAxis *axis)
+void QQuickGraphsSurface::handleAxisXChanged(QAbstract3DAxis *axis)
 {
     emit axisXChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-void QQuickDataVisSurface::handleAxisYChanged(QAbstract3DAxis *axis)
+void QQuickGraphsSurface::handleAxisYChanged(QAbstract3DAxis *axis)
 {
     emit axisYChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-void QQuickDataVisSurface::handleAxisZChanged(QAbstract3DAxis *axis)
+void QQuickGraphsSurface::handleAxisZChanged(QAbstract3DAxis *axis)
 {
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-void QQuickDataVisSurface::componentComplete()
+void QQuickGraphsSurface::componentComplete()
 {
-    QQuickDataVisItem::componentComplete();
+    QQuickGraphsItem::componentComplete();
 
     createSliceView();
 
@@ -227,9 +227,9 @@ void QQuickDataVisSurface::componentComplete()
     setScale({2.0f, 1.0f, 2.0f});
 }
 
-void QQuickDataVisSurface::synchData()
+void QQuickGraphsSurface::synchData()
 {
-    QQuickDataVisItem::synchData();
+    QQuickGraphsItem::synchData();
 
     if (m_surfaceController->isSelectedPointChanged()) {
         if (m_surfaceController->selectionMode().testFlag(QAbstract3DGraph::SelectionItem))
@@ -295,7 +295,7 @@ inline static int binarySearchArray(const QSurfaceDataArray &array, int maxIndex
     return retVal;
 }
 
-void QQuickDataVisSurface::updateGraph()
+void QQuickGraphsSurface::updateGraph()
 {
     if (m_surfaceController->hasChangedSeriesList())
         handleChangedSeries();
@@ -337,7 +337,7 @@ void QQuickDataVisSurface::updateGraph()
     }
 }
 
-void QQuickDataVisSurface::handleChangedSeries()
+void QQuickGraphsSurface::handleChangedSeries()
 {
     auto changedSeries = m_surfaceController->changedSeriesList();
 
@@ -350,7 +350,7 @@ void QQuickDataVisSurface::handleChangedSeries()
     }
 }
 
-void QQuickDataVisSurface::updateModel(SurfaceModel *model)
+void QQuickGraphsSurface::updateModel(SurfaceModel *model)
 {
     const QSurfaceDataArray &array = *(model->series->dataProxy())->array();
 
@@ -524,7 +524,7 @@ void QQuickDataVisSurface::updateModel(SurfaceModel *model)
     }
 }
 
-void QQuickDataVisSurface::updateMaterial(SurfaceModel *model)
+void QQuickGraphsSurface::updateMaterial(SurfaceModel *model)
 {
     auto axisY = m_surfaceController->axisY();
     float maxY = axisY->max();
@@ -578,7 +578,7 @@ void QQuickDataVisSurface::updateMaterial(SurfaceModel *model)
     textureData->setTextureData(imageData);
 }
 
-QVector3D QQuickDataVisSurface::getNormalizedVertex(SurfaceModel *model, const QSurfaceDataItem &data, bool polar, bool flipXZ)
+QVector3D QQuickGraphsSurface::getNormalizedVertex(SurfaceModel *model, const QSurfaceDataItem &data, bool polar, bool flipXZ)
 {
     Q_UNUSED(polar);
     Q_UNUSED(flipXZ);
@@ -610,9 +610,9 @@ inline static QVector3D normal(const QVector3D &a, const QVector3D &b, const QVe
     return normal;
 }
 
-void QQuickDataVisSurface::updateSliceGraph()
+void QQuickGraphsSurface::updateSliceGraph()
 {
-    QQuickDataVisItem::updateSliceGraph();
+    QQuickGraphsItem::updateSliceGraph();
 
     if (!sliceView()->isVisible())
         return;
@@ -704,7 +704,7 @@ void QQuickDataVisSurface::updateSliceGraph()
     }
 }
 
-void QQuickDataVisSurface::createSmoothNormalBodyLine(SurfaceModel *model, int &totalIndex, int column)
+void QQuickGraphsSurface::createSmoothNormalBodyLine(SurfaceModel *model, int &totalIndex, int column)
 {
     int columnCount = model->columnCount;
     int colLimit = columnCount - 1;
@@ -768,7 +768,7 @@ void QQuickDataVisSurface::createSmoothNormalBodyLine(SurfaceModel *model, int &
     }
 }
 
-void QQuickDataVisSurface::createSmoothNormalUpperLine(SurfaceModel *model, int &totalIndex)
+void QQuickGraphsSurface::createSmoothNormalUpperLine(SurfaceModel *model, int &totalIndex)
 {
     int columnCount = model->columnCount;
     int rowCount = model->rowCount;
@@ -833,7 +833,7 @@ void QQuickDataVisSurface::createSmoothNormalUpperLine(SurfaceModel *model, int 
     }
 }
 
-void QQuickDataVisSurface::createSmoothIndices(SurfaceModel *model, int x, int y, int endX, int endY)
+void QQuickGraphsSurface::createSmoothIndices(SurfaceModel *model, int x, int y, int endX, int endY)
 {
     int columnCount = model->columnCount;
     int rowCount = model->rowCount;
@@ -888,7 +888,7 @@ void QQuickDataVisSurface::createSmoothIndices(SurfaceModel *model, int x, int y
     }
 }
 
-void QQuickDataVisSurface::createCoarseVertices(SurfaceModel *model, int x, int y, int endX, int endY)
+void QQuickGraphsSurface::createCoarseVertices(SurfaceModel *model, int x, int y, int endX, int endY)
 {
     int columnCount = model->columnCount;
     int rowCount = model->rowCount;
@@ -1012,7 +1012,7 @@ void QQuickDataVisSurface::createCoarseVertices(SurfaceModel *model, int x, int 
     }
 }
 
-void QQuickDataVisSurface::createGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY)
+void QQuickGraphsSurface::createGridlineIndices(SurfaceModel *model, int x, int y, int endX, int endY)
 {
     int columnCount = model->columnCount;
     int rowCount = model->rowCount;
@@ -1047,9 +1047,9 @@ void QQuickDataVisSurface::createGridlineIndices(SurfaceModel *model, int x, int
     }
 }
 
-bool QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
+bool QQuickGraphsSurface::handleMousePressedEvent(QMouseEvent *event)
 {
-    if (!QQuickDataVisItem::handleMousePressedEvent(event))
+    if (!QQuickGraphsItem::handleMousePressedEvent(event))
         return true;
 
     if (Qt::LeftButton == event->button()) {
@@ -1121,7 +1121,7 @@ bool QQuickDataVisSurface::handleMousePressedEvent(QMouseEvent *event)
     return true;
 }
 
-void QQuickDataVisSurface::updateSelectedPoint()
+void QQuickGraphsSurface::updateSelectedPoint()
 {
     bool labelVisible = false;
     m_instancing->resetPositions();
@@ -1148,8 +1148,8 @@ void QQuickDataVisSurface::updateSelectedPoint()
                 QString y = static_cast<QValue3DAxis *>(m_surfaceController->axisY())->stringForValue(value.y());
                 QString z = static_cast<QValue3DAxis *>(m_surfaceController->axisZ())->stringForValue(value.z());
                 QString label = x + QStringLiteral(", ") +
-                            y + QStringLiteral(", ") +
-                            z;
+                        y + QStringLiteral(", ") +
+                        z;
                 itemLabel()->setPosition(labelPosition);
                 itemLabel()->setProperty("labelText", label);
                 itemLabel()->setEulerRotation(QVector3D(
@@ -1172,7 +1172,7 @@ void QQuickDataVisSurface::updateSelectedPoint()
         sliceItemLabel()->setVisible(labelVisible);
 }
 
-void QQuickDataVisSurface::addModel(QSurface3DSeries *series)
+void QQuickGraphsSurface::addModel(QSurface3DSeries *series)
 {
     auto scene = QQuick3DViewport::scene();
     QQuick3DViewport *sliceParent = sliceView();
@@ -1322,21 +1322,21 @@ void QQuickDataVisSurface::addModel(QSurface3DSeries *series)
     connect(series,
             &QSurface3DSeries::flatShadingEnabledChanged,
             this,
-            &QQuickDataVisSurface::handleFlatShadingEnabledChanged);
+            &QQuickGraphsSurface::handleFlatShadingEnabledChanged);
     connect(series,
             &QSurface3DSeries::wireframeColorChanged,
             this,
-            &QQuickDataVisSurface::handleWireframeColorChanged);
+            &QQuickGraphsSurface::handleWireframeColorChanged);
 }
 
-void QQuickDataVisSurface::updateSingleHighlightColor()
+void QQuickGraphsSurface::updateSingleHighlightColor()
 {
     m_instancing->setColor(m_surfaceController->activeTheme()->singleHighlightColor());
     if (sliceView())
         m_sliceInstancing->setColor(m_surfaceController->activeTheme()->singleHighlightColor());
 }
 
-void QQuickDataVisSurface::handleThemeTypeChange()
+void QQuickGraphsSurface::handleThemeTypeChange()
 {
     for (auto model : m_model)
         updateMaterial(model);

@@ -12,19 +12,19 @@
 //
 // We mean it.
 
-#ifndef DATAVISQUICK3DTEXTUREDATA_P_H
-#define DATAVISQUICK3DTEXTUREDATA_P_H
+#ifndef QUICKGRAPHSTEXTUREDATA_P_H
+#define QUICKGRAPHSTEXTUREDATA_P_H
 #include <QtQuick3D/qquick3dtexturedata.h>
 #include <QList>
 #include <QLinearGradient>
 
-class DatavisQuick3DTextureData : public QQuick3DTextureData
+class QuickGraphsTextureData : public QQuick3DTextureData
 {
     Q_OBJECT
 
 public:
-    DatavisQuick3DTextureData();
-    ~DatavisQuick3DTextureData();
+    QuickGraphsTextureData();
+    ~QuickGraphsTextureData();
 
     void createGradient(const QLinearGradient &gradient);
 
@@ -36,4 +36,4 @@ private:
 
 };
 
-#endif // DATAVISQUICK3DTEXTUREDATA_P_H
+#endif // QUICKGRAPHSTEXTUREDATA_P_H

@@ -6,7 +6,7 @@
 #include "qabstract3dinputhandler_p.h"
 #include "q3dscene_p.h"
 #include "utils_p.h"
-#include "qquickdatavisitem_p.h"
+#include "qquickgraphsitem_p.h"
 
 #include <QtGui/QGuiApplication>
 #include <QtGui/QOpenGLContext>
@@ -603,7 +603,7 @@ QAbstract3DGraph::ShadowQuality QAbstract3DGraph::shadowQuality() const
 
 void QAbstract3DGraph::setShadowQuality(const QAbstract3DGraph::ShadowQuality &shadowQuality)
 {
-    d_ptr->setShadowQuality(QQuickDataVisItem::ShadowQuality(shadowQuality));
+    d_ptr->setShadowQuality(QQuickGraphsItem::ShadowQuality(shadowQuality));
     emit shadowQualityChanged(shadowQuality);
 }
 
@@ -627,7 +627,7 @@ QAbstract3DGraph::SelectionFlags QAbstract3DGraph::selectionMode() const
 void QAbstract3DGraph::setSelectionMode(const QAbstract3DGraph::SelectionFlags &selectionMode)
 {
     int intmode = int(selectionMode);
-    d_ptr->setSelectionMode(QQuickDataVisItem::SelectionFlags(intmode));
+    d_ptr->setSelectionMode(QQuickGraphsItem::SelectionFlags(intmode));
     emit selectionModeChanged(selectionMode);
 }
 

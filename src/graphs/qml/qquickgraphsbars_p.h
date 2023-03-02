@@ -11,11 +11,11 @@
 //
 // We mean it.
 
-#ifndef QQUICKDATAVISBARS_H
-#define QQUICKDATAVISBARS_H
+#ifndef QQUICKGRAPHSBARS_H
+#define QQUICKGRAPHSBARS_H
 
 #include "qbar3dseries.h"
-#include "qquickdatavisitem_p.h"
+#include "qquickgraphsitem_p.h"
 #include "bars3dcontroller_p.h"
 
 #include <QtQuick3D/private/qquick3dmaterial_p.h>
@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DBars;
 
-class QQuickDataVisBars : public QQuickDataVisItem
+class QQuickGraphsBars : public QQuickGraphsItem
 {
     Q_OBJECT
     Q_PROPERTY(QCategory3DAxis *rowAxis READ rowAxis WRITE setRowAxis NOTIFY rowAxisChanged)
@@ -45,8 +45,8 @@ class QQuickDataVisBars : public QQuickDataVisItem
     QML_ADDED_IN_VERSION(6, 6)
 
 public:
-    explicit QQuickDataVisBars(QQuickItem *parent = 0);
-    ~QQuickDataVisBars();
+    explicit QQuickGraphsBars(QQuickItem *parent = 0);
+    ~QQuickGraphsBars();
 
     QCategory3DAxis *rowAxis() const;
     void setRowAxis(QCategory3DAxis *axis);
@@ -245,4 +245,4 @@ private:
 };
 
 QT_END_NAMESPACE
-#endif // QQUICKDATAVISBARS_H
+#endif // QQUICKGRAPHSBARS_H

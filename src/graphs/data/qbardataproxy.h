@@ -94,7 +94,7 @@ private:
     Q_DISABLE_COPY(QBarDataProxy)
 
     friend class Bars3DController;
-    friend class QQuickDataVisBars;
+    friend class QQuickGraphsBars;
 };
 
 QT_END_NAMESPACE

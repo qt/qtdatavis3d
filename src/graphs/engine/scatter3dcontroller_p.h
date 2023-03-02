@@ -123,7 +123,7 @@ protected:
 
 private:
 
-    friend class QQuickDataVisScatter;
+    friend class QQuickGraphsScatter;
     Q_DISABLE_COPY(Scatter3DController)
 };
 

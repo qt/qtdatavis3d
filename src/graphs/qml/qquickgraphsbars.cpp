@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "qquickdatavisbars_p.h"
-#include "datavisquick3dtexturedata_p.h"
+#include "qquickgraphsbars_p.h"
+#include "quickgraphstexturedata_p.h"
 #include "bars3dcontroller_p.h"
 #include "declarativescene_p.h"
 #include "qbar3dseries_p.h"
@@ -14,11 +14,11 @@
 
 #include <QtQuick3D/private/qquick3drepeater_p.h>
 #include <QtQuick3D/private/qquick3dprincipledmaterial_p.h>
-#include "datavisquick3dtexturedata_p.h"
+#include "quickgraphstexturedata_p.h"
 #include <QtQuick3D/private/qquick3dcustommaterial_p.h>
 
-QQuickDataVisBars::QQuickDataVisBars(QQuickItem *parent)
-    : QQuickDataVisItem(parent),
+QQuickGraphsBars::QQuickGraphsBars(QQuickItem *parent)
+    : QQuickGraphsItem(parent),
       m_barsController(0),
       m_cachedRowCount(0),
       m_cachedColumnCount(0),
@@ -63,14 +63,14 @@ QQuickDataVisBars::QQuickDataVisBars(QQuickItem *parent)
     scene->setClearColor(Qt::blue);
 
     QObject::connect(m_barsController, &Bars3DController::primarySeriesChanged,
-                     this, &QQuickDataVisBars::primarySeriesChanged);
+                     this, &QQuickGraphsBars::primarySeriesChanged);
     QObject::connect(m_barsController, &Bars3DController::selectedSeriesChanged,
-                     this, &QQuickDataVisBars::selectedSeriesChanged);
+                     this, &QQuickGraphsBars::selectedSeriesChanged);
     QObject::connect(m_barsController, &Abstract3DController::optimizationHintsChanged,
-                     this, &QQuickDataVisBars::handleOptimizationHintsChanged);
+                     this, &QQuickGraphsBars::handleOptimizationHintsChanged);
 }
 
-QQuickDataVisBars::~QQuickDataVisBars()
+QQuickGraphsBars::~QQuickGraphsBars()
 {
     QMutexLocker locker(m_nodeMutex.data());
     const QMutexLocker locker2(mutex());
@@ -78,22 +78,22 @@ QQuickDataVisBars::~QQuickDataVisBars()
     m_barModelsMap.clear();
 }
 
-QCategory3DAxis *QQuickDataVisBars::rowAxis() const
+QCategory3DAxis *QQuickGraphsBars::rowAxis() const
 {
     return static_cast<QCategory3DAxis *>(m_barsController->axisZ());
 }
 
-void QQuickDataVisBars::setRowAxis(QCategory3DAxis *axis)
+void QQuickGraphsBars::setRowAxis(QCategory3DAxis *axis)
 {
     m_barsController->setAxisZ(axis);
 }
 
-QValue3DAxis *QQuickDataVisBars::valueAxis() const
+QValue3DAxis *QQuickGraphsBars::valueAxis() const
 {
     return static_cast<QValue3DAxis *>(m_barsController->axisY());
 }
 
-void QQuickDataVisBars::setValueAxis(QValue3DAxis *axis)
+void QQuickGraphsBars::setValueAxis(QValue3DAxis *axis)
 {
     m_barsController->setAxisY(axis);
     if (segmentLineRepeaterY()) {
@@ -116,17 +116,17 @@ void QQuickDataVisBars::setValueAxis(QValue3DAxis *axis)
     }
 }
 
-QCategory3DAxis *QQuickDataVisBars::columnAxis() const
+QCategory3DAxis *QQuickGraphsBars::columnAxis() const
 {
     return static_cast<QCategory3DAxis *>(m_barsController->axisX());
 }
 
-void QQuickDataVisBars::setColumnAxis(QCategory3DAxis *axis)
+void QQuickGraphsBars::setColumnAxis(QCategory3DAxis *axis)
 {
     m_barsController->setAxisX(axis);
 }
 
-void QQuickDataVisBars::setMultiSeriesUniform(bool uniform)
+void QQuickGraphsBars::setMultiSeriesUniform(bool uniform)
 {
     if (uniform != isMultiSeriesUniform()) {
         m_barsController->setMultiSeriesScaling(uniform);
@@ -134,12 +134,12 @@ void QQuickDataVisBars::setMultiSeriesUniform(bool uniform)
     }
 }
 
-bool QQuickDataVisBars::isMultiSeriesUniform() const
+bool QQuickGraphsBars::isMultiSeriesUniform() const
 {
     return m_barsController->multiSeriesScaling();
 }
 
-void QQuickDataVisBars::setBarThickness(float thicknessRatio)
+void QQuickGraphsBars::setBarThickness(float thicknessRatio)
 {
     if (thicknessRatio != barThickness()) {
         m_barsController->setBarSpecs(thicknessRatio, barSpacing(),
@@ -148,12 +148,12 @@ void QQuickDataVisBars::setBarThickness(float thicknessRatio)
     }
 }
 
-float QQuickDataVisBars::barThickness() const
+float QQuickGraphsBars::barThickness() const
 {
     return m_barsController->barThickness();
 }
 
-void QQuickDataVisBars::setBarSpacing(const QSizeF &spacing)
+void QQuickGraphsBars::setBarSpacing(const QSizeF &spacing)
 {
     if (spacing != barSpacing()) {
         m_barsController->setBarSpecs(barThickness(), spacing, isBarSpacingRelative());
@@ -161,12 +161,12 @@ void QQuickDataVisBars::setBarSpacing(const QSizeF &spacing)
     }
 }
 
-QSizeF QQuickDataVisBars::barSpacing() const
+QSizeF QQuickGraphsBars::barSpacing() const
 {
     return m_barsController->barSpacing();
 }
 
-void QQuickDataVisBars::setBarSpacingRelative(bool relative)
+void QQuickGraphsBars::setBarSpacingRelative(bool relative)
 {
     if (relative != isBarSpacingRelative()) {
         m_barsController->setBarSpecs(barThickness(), barSpacing(), relative);
@@ -174,12 +174,12 @@ void QQuickDataVisBars::setBarSpacingRelative(bool relative)
     }
 }
 
-bool QQuickDataVisBars::isBarSpacingRelative() const
+bool QQuickGraphsBars::isBarSpacingRelative() const
 {
     return m_barsController->isBarSpecRelative();
 }
 
-void QQuickDataVisBars::setBarSeriesMargin(const QSizeF &margin)
+void QQuickGraphsBars::setBarSeriesMargin(const QSizeF &margin)
 {
     if (margin != barSeriesMargin()) {
         m_barsController->setBarSeriesMargin(margin);
@@ -187,45 +187,45 @@ void QQuickDataVisBars::setBarSeriesMargin(const QSizeF &margin)
     }
 }
 
-QSizeF QQuickDataVisBars::barSeriesMargin() const
+QSizeF QQuickGraphsBars::barSeriesMargin() const
 {
     return m_barsController->barSeriesMargin();
 }
 
-QQmlListProperty<QBar3DSeries> QQuickDataVisBars::seriesList()
+QQmlListProperty<QBar3DSeries> QQuickGraphsBars::seriesList()
 {
     return QQmlListProperty<QBar3DSeries>(this, this,
-                                          &QQuickDataVisBars::appendSeriesFunc,
-                                          &QQuickDataVisBars::countSeriesFunc,
-                                          &QQuickDataVisBars::atSeriesFunc,
-                                          &QQuickDataVisBars::clearSeriesFunc);
+                                          &QQuickGraphsBars::appendSeriesFunc,
+                                          &QQuickGraphsBars::countSeriesFunc,
+                                          &QQuickGraphsBars::atSeriesFunc,
+                                          &QQuickGraphsBars::clearSeriesFunc);
 }
 
-void QQuickDataVisBars::appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBar3DSeries *series)
+void QQuickGraphsBars::appendSeriesFunc(QQmlListProperty<QBar3DSeries> *list, QBar3DSeries *series)
 {
-    reinterpret_cast<QQuickDataVisBars *>(list->data)->addSeries(series);
+    reinterpret_cast<QQuickGraphsBars *>(list->data)->addSeries(series);
 }
 
-qsizetype QQuickDataVisBars::countSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
+qsizetype QQuickGraphsBars::countSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
 {
-    return reinterpret_cast<QQuickDataVisBars *>(list->data)->m_barsController->barSeriesList().size();
+    return reinterpret_cast<QQuickGraphsBars *>(list->data)->m_barsController->barSeriesList().size();
 }
 
-QBar3DSeries *QQuickDataVisBars::atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, qsizetype index)
+QBar3DSeries *QQuickGraphsBars::atSeriesFunc(QQmlListProperty<QBar3DSeries> *list, qsizetype index)
 {
-    return reinterpret_cast<QQuickDataVisBars *>(list->data)->m_barsController->barSeriesList().at(index);
+    return reinterpret_cast<QQuickGraphsBars *>(list->data)->m_barsController->barSeriesList().at(index);
 }
 
-void QQuickDataVisBars::clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
+void QQuickGraphsBars::clearSeriesFunc(QQmlListProperty<QBar3DSeries> *list)
 {
-    QQuickDataVisBars *declBars = reinterpret_cast<QQuickDataVisBars *>(list->data);
+    QQuickGraphsBars *declBars = reinterpret_cast<QQuickGraphsBars *>(list->data);
     QList<QBar3DSeries *> realList = declBars->m_barsController->barSeriesList();
     int count = realList.size();
     for (int i = 0; i < count; i++)
         declBars->removeSeries(realList.at(i));
 }
 
-void QQuickDataVisBars::addSeries(QBar3DSeries *series)
+void QQuickGraphsBars::addSeries(QBar3DSeries *series)
 {
     m_barsController->addSeries(series);
     connectSeries(series);
@@ -233,33 +233,33 @@ void QQuickDataVisBars::addSeries(QBar3DSeries *series)
         updateSelectedBar();
 }
 
-void QQuickDataVisBars::removeSeries(QBar3DSeries *series)
+void QQuickGraphsBars::removeSeries(QBar3DSeries *series)
 {
     m_barsController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
 }
 
-void QQuickDataVisBars::insertSeries(int index, QBar3DSeries *series)
+void QQuickGraphsBars::insertSeries(int index, QBar3DSeries *series)
 {
     m_barsController->insertSeries(index, series);
 }
 
-void QQuickDataVisBars::setPrimarySeries(QBar3DSeries *series)
+void QQuickGraphsBars::setPrimarySeries(QBar3DSeries *series)
 {
     m_barsController->setPrimarySeries(series);
 }
 
-QBar3DSeries *QQuickDataVisBars::primarySeries() const
+QBar3DSeries *QQuickGraphsBars::primarySeries() const
 {
     return m_barsController->primarySeries();
 }
 
-QBar3DSeries *QQuickDataVisBars::selectedSeries() const
+QBar3DSeries *QQuickGraphsBars::selectedSeries() const
 {
     return m_barsController->selectedSeries();
 }
 
-void QQuickDataVisBars::setFloorLevel(float level)
+void QQuickGraphsBars::setFloorLevel(float level)
 {
     if (level != floorLevel()) {
         m_barsController->setFloorLevel(level);
@@ -267,14 +267,14 @@ void QQuickDataVisBars::setFloorLevel(float level)
     }
 }
 
-float QQuickDataVisBars::floorLevel() const
+float QQuickGraphsBars::floorLevel() const
 {
     return m_barsController->floorLevel();
 }
 
-void QQuickDataVisBars::componentComplete()
+void QQuickGraphsBars::componentComplete()
 {
-    QQuickDataVisItem::componentComplete();
+    QQuickGraphsItem::componentComplete();
 
     auto wallBackground = background();
     QUrl wallUrl = QUrl(QStringLiteral("defaultMeshes/backgroundNoFloorMesh"));
@@ -305,7 +305,7 @@ void QQuickDataVisBars::componentComplete()
     setVerticalSegmentLine(false);
 }
 
-void QQuickDataVisBars::synchData()
+void QQuickGraphsBars::synchData()
 {
     if (!m_noZeroInRange) {
         m_barsController->m_scene->activeCamera()->d_ptr->setMinYRotation(-90.0f);
@@ -341,7 +341,7 @@ void QQuickDataVisBars::synchData()
     axisY->formatter()->d_ptr->recalculate();
     m_helperAxisY.setFormatter(axisY->formatter());
 
-    QQuickDataVisItem::synchData();
+    QQuickGraphsItem::synchData();
 
     // Needs to be done after data is set, as it needs to know the visual array.
     if (m_barsController->m_changeTracker.selectedBarChanged) {
@@ -394,7 +394,7 @@ void QQuickDataVisBars::synchData()
     }
 }
 
-void QQuickDataVisBars::updateParameters() {
+void QQuickGraphsBars::updateParameters() {
     m_minRow = m_barsController->m_axisZ->min();
     m_maxRow = m_barsController->m_axisZ->max();
     m_minCol = m_barsController->m_axisX->min();
@@ -426,13 +426,13 @@ void QQuickDataVisBars::updateParameters() {
     update();
 }
 
-void QQuickDataVisBars::updateFloorLevel(float level)
+void QQuickGraphsBars::updateFloorLevel(float level)
 {
     setFloorLevel(level);
     calculateHeightAdjustment();
 }
 
-void QQuickDataVisBars::updateGraph()
+void QQuickGraphsBars::updateGraph()
 {
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     calculateSceneScalingFactors();
@@ -457,9 +457,9 @@ void QQuickDataVisBars::updateGraph()
     }
 }
 
-void QQuickDataVisBars::updateAxisRange(float min, float max)
+void QQuickGraphsBars::updateAxisRange(float min, float max)
 {
-    QQuickDataVisItem::updateAxisRange(min, max);
+    QQuickGraphsItem::updateAxisRange(min, max);
 
     m_helperAxisY.setMin(min);
     m_helperAxisY.setMax(max);
@@ -467,13 +467,13 @@ void QQuickDataVisBars::updateAxisRange(float min, float max)
     calculateHeightAdjustment();
 }
 
-void QQuickDataVisBars::updateAxisReversed(bool enable)
+void QQuickGraphsBars::updateAxisReversed(bool enable)
 {
     m_helperAxisY.setReversed(enable);
     calculateHeightAdjustment();
 }
 
-void QQuickDataVisBars::calculateSceneScalingFactors()
+void QQuickGraphsBars::calculateSceneScalingFactors()
 {
     m_rowWidth = (m_cachedColumnCount * m_cachedBarSpacing.width()) * 0.5f;
     m_columnDepth = (m_cachedRowCount * m_cachedBarSpacing.height()) * 0.5f;
@@ -517,7 +517,7 @@ void QQuickDataVisBars::calculateSceneScalingFactors()
     m_helperAxisY.setTranslate(0.0f);
 }
 
-void QQuickDataVisBars::calculateHeightAdjustment()
+void QQuickGraphsBars::calculateHeightAdjustment()
 {
     m_minHeight = m_helperAxisY.min();
     m_maxHeight = m_helperAxisY.max();
@@ -558,14 +558,14 @@ void QQuickDataVisBars::calculateHeightAdjustment()
         m_backgroundAdjustment = newAdjustment;
 }
 
-void QQuickDataVisBars::calculateSeriesStartPosition()
+void QQuickGraphsBars::calculateSeriesStartPosition()
 {
     m_seriesStart = -((float(m_visibleSeriesCount) - 1.0f) * 0.5f)
             * (m_seriesStep - (m_seriesStep * m_cachedBarSeriesMargin.width()));
 }
 
-QVector3D QQuickDataVisBars::calculateCategoryLabelPosition(QAbstract3DAxis *axis,
-                                                            QVector3D labelPosition, int index)
+QVector3D QQuickGraphsBars::calculateCategoryLabelPosition(QAbstract3DAxis *axis,
+                                                           QVector3D labelPosition, int index)
 {
     QVector3D ret = labelPosition;
     if (axis->orientation() == QAbstract3DAxis::AxisOrientationX) {
@@ -580,7 +580,7 @@ QVector3D QQuickDataVisBars::calculateCategoryLabelPosition(QAbstract3DAxis *axi
     return ret;
 }
 
-float QQuickDataVisBars::calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index)
+float QQuickGraphsBars::calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index)
 {
     float ret = 0.0f;
     if (axis->orientation() == QAbstract3DAxis::AxisOrientationZ) {
@@ -596,22 +596,22 @@ float QQuickDataVisBars::calculateCategoryGridLinePosition(QAbstract3DAxis *axis
     return ret;
 }
 
-void QQuickDataVisBars::handleAxisXChanged(QAbstract3DAxis *axis)
+void QQuickGraphsBars::handleAxisXChanged(QAbstract3DAxis *axis)
 {
     emit columnAxisChanged(static_cast<QCategory3DAxis *>(axis));
 }
 
-void QQuickDataVisBars::handleAxisYChanged(QAbstract3DAxis *axis)
+void QQuickGraphsBars::handleAxisYChanged(QAbstract3DAxis *axis)
 {
     emit valueAxisChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-void QQuickDataVisBars::handleAxisZChanged(QAbstract3DAxis *axis)
+void QQuickGraphsBars::handleAxisZChanged(QAbstract3DAxis *axis)
 {
     emit rowAxisChanged(static_cast<QCategory3DAxis *>(axis));
 }
 
-void QQuickDataVisBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
+void QQuickGraphsBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
 {
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     m_meshType = mesh;
@@ -631,13 +631,13 @@ void QQuickDataVisBars::handleSeriesMeshChanged(QAbstract3DSeries::Mesh mesh)
     }
 }
 
-void QQuickDataVisBars::handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints)
+void QQuickGraphsBars::handleOptimizationHintsChanged(QAbstract3DGraph::OptimizationHints hints)
 {
     Q_UNUSED(hints);
-    //    setup();
+//    setup();
 }
 
-void QQuickDataVisBars::handleMeshSmoothChanged(bool enable)
+void QQuickGraphsBars::handleMeshSmoothChanged(bool enable)
 {
     QList<QBar3DSeries *> barSeriesList = m_barsController->barSeriesList();
     m_smooth = enable;
@@ -658,7 +658,7 @@ void QQuickDataVisBars::handleMeshSmoothChanged(bool enable)
     }
 }
 
-void QQuickDataVisBars::handleRowCountChanged()
+void QQuickGraphsBars::handleRowCountChanged()
 {
     QCategory3DAxis *categoryAxisZ = static_cast<QCategory3DAxis *>(m_barsController->axisZ());
     segmentLineRepeaterZ()->setModel(categoryAxisZ->labels().size());
@@ -666,7 +666,7 @@ void QQuickDataVisBars::handleRowCountChanged()
     updateParameters();
 }
 
-void QQuickDataVisBars::handleColCountChanged()
+void QQuickGraphsBars::handleColCountChanged()
 {
     QCategory3DAxis *categoryAxisX = static_cast<QCategory3DAxis *>(m_barsController->axisX());
     segmentLineRepeaterX()->setModel(categoryAxisX->labels().size());
@@ -674,27 +674,27 @@ void QQuickDataVisBars::handleColCountChanged()
     updateParameters();
 }
 
-void QQuickDataVisBars::connectSeries(QBar3DSeries *series)
+void QQuickGraphsBars::connectSeries(QBar3DSeries *series)
 {
     m_meshType = series->mesh();
     m_smooth = series->isMeshSmooth();
 
     QObject::connect(series, &QBar3DSeries::meshChanged, this,
-                     &QQuickDataVisBars::handleSeriesMeshChanged);
+                     &QQuickGraphsBars::handleSeriesMeshChanged);
     QObject::connect(series, &QBar3DSeries::meshSmoothChanged, this,
-                     &QQuickDataVisBars::handleMeshSmoothChanged);
+                     &QQuickGraphsBars::handleMeshSmoothChanged);
     QObject::connect(series->dataProxy(), &QBarDataProxy::rowCountChanged, this,
-                     &QQuickDataVisBars::handleRowCountChanged);
+                     &QQuickGraphsBars::handleRowCountChanged);
     QObject::connect(series->dataProxy(), &QBarDataProxy::colCountChanged, this,
-                     &QQuickDataVisBars::handleColCountChanged);
+                     &QQuickGraphsBars::handleColCountChanged);
 }
 
-void QQuickDataVisBars::disconnectSeries(QBar3DSeries *series)
+void QQuickGraphsBars::disconnectSeries(QBar3DSeries *series)
 {
     QObject::disconnect(series, 0, this, 0);
 }
 
-void QQuickDataVisBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
+void QQuickGraphsBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
 {
     int seriesCount = barSeriesList.size();
     m_visibleSeriesCount = 0;
@@ -709,7 +709,7 @@ void QQuickDataVisBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
             QQuick3DTexture *texture = createTexture();
             texture->setParent(this);
             auto gradient = barSeries->baseGradient();
-            auto textureData = static_cast<DatavisQuick3DTextureData *>(texture->textureData());
+            auto textureData = static_cast<QuickGraphsTextureData *>(texture->textureData());
             textureData->createGradient(gradient);
 
             bool visible = barSeries->isVisible();
@@ -749,7 +749,7 @@ void QQuickDataVisBars::generateBars(QList<QBar3DSeries *> &barSeriesList)
     }
 }
 
-QQuick3DModel *QQuickDataVisBars::createDataItem(QQuick3DNode *scene)
+QQuick3DModel *QQuickGraphsBars::createDataItem(QQuick3DNode *scene)
 {
     auto model = new QQuick3DModel();
     model->setParent(scene);
@@ -760,7 +760,7 @@ QQuick3DModel *QQuickDataVisBars::createDataItem(QQuick3DNode *scene)
     return model;
 }
 
-QString QQuickDataVisBars::getMeshFileName()
+QString QQuickGraphsBars::getMeshFileName()
 {
     QString fileName;
     QString smoothString = QStringLiteral("Smooth");
@@ -796,7 +796,7 @@ QString QQuickDataVisBars::getMeshFileName()
     return fileName;
 }
 
-void QQuickDataVisBars::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType)
+void QQuickGraphsBars::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType)
 {
     if (!m_barsController->activeTheme()->isBackgroundEnabled()
             && meshType != QAbstract3DSeries::MeshSphere) {
@@ -804,7 +804,7 @@ void QQuickDataVisBars::fixMeshFileName(QString &fileName, QAbstract3DSeries::Me
     }
 }
 
-void QQuickDataVisBars::updateBarVisuality(QBar3DSeries *series, int visualIndex)
+void QQuickGraphsBars::updateBarVisuality(QBar3DSeries *series, int visualIndex)
 {
     QVector<BarModel *> barList = *m_barModelsMap.value(series);
     for (int i = 0; i < barList.count(); i++) {
@@ -819,7 +819,7 @@ void QQuickDataVisBars::updateBarVisuality(QBar3DSeries *series, int visualIndex
     itemLabel()->setVisible(false);
 }
 
-void QQuickDataVisBars::updateBarPositions(QBar3DSeries *series)
+void QQuickGraphsBars::updateBarPositions(QBar3DSeries *series)
 {
     QBarDataProxy *dataProxy = series->dataProxy();
     int dataRowCount = 0;
@@ -913,7 +913,7 @@ void QQuickDataVisBars::updateBarPositions(QBar3DSeries *series)
     }
 }
 
-void QQuickDataVisBars::updateBarVisuals(QBar3DSeries *series)
+void QQuickGraphsBars::updateBarVisuals(QBar3DSeries *series)
 {
     QVector<BarModel *> barList = *m_barModelsMap.value(series);
     bool useGradient = series->d_ptr->isUsingGradient();
@@ -925,7 +925,7 @@ void QQuickDataVisBars::updateBarVisuals(QBar3DSeries *series)
             m_hasHighlightTexture = true;
         }
         auto highlightGradient = series->singleHighlightGradient();
-        auto highlightTextureData = static_cast<DatavisQuick3DTextureData *>(m_highlightTexture->textureData());
+        auto highlightTextureData = static_cast<QuickGraphsTextureData *>(m_highlightTexture->textureData());
         highlightTextureData->createGradient(highlightGradient);
     } else {
         if (m_hasHighlightTexture) {
@@ -935,7 +935,7 @@ void QQuickDataVisBars::updateBarVisuals(QBar3DSeries *series)
     }
 
     bool rangeGradient = (useGradient && series->d_ptr->m_colorStyle == Q3DTheme::ColorStyleRangeGradient)
-                        ? true : false;
+            ? true : false;
 
     if (m_barsController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
         if (!rangeGradient) {
@@ -955,7 +955,7 @@ void QQuickDataVisBars::updateBarVisuals(QBar3DSeries *series)
     }
 }
 
-void QQuickDataVisBars::updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient)
+void QQuickGraphsBars::updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient)
 {
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(item, "materials");
@@ -988,8 +988,8 @@ void QQuickDataVisBars::updateItemMaterial(QQuick3DModel *item, bool useGradient
     }
 }
 
-void QQuickDataVisBars::updateCustomMaterial(QQuick3DModel *item, bool isHighlight,
-                                             QQuick3DTexture *texture)
+void QQuickGraphsBars::updateCustomMaterial(QQuick3DModel *item, bool isHighlight,
+                                            QQuick3DTexture *texture)
 {
     QQmlListReference materialsRef(item, "materials");
     auto customMaterial = static_cast<QQuick3DCustomMaterial *>(materialsRef.at(0));
@@ -1006,9 +1006,9 @@ void QQuickDataVisBars::updateCustomMaterial(QQuick3DModel *item, bool isHighlig
     customMaterial->setProperty("gradientPos", value);
 }
 
-void QQuickDataVisBars::updatePrincipledMaterial(QQuick3DModel *model, const QColor &color,
-                                                 bool useGradient, bool isHighlight,
-                                                 QQuick3DTexture *texture)
+void QQuickGraphsBars::updatePrincipledMaterial(QQuick3DModel *model, const QColor &color,
+                                                bool useGradient, bool isHighlight,
+                                                QQuick3DTexture *texture)
 {
     QQmlListReference materialsRef(model, "materials");
     auto principledMaterial = static_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0));
@@ -1025,7 +1025,7 @@ void QQuickDataVisBars::updatePrincipledMaterial(QQuick3DModel *model, const QCo
     }
 }
 
-void QQuickDataVisBars::removeDataItems(QBar3DSeries *series)
+void QQuickGraphsBars::removeDataItems(QBar3DSeries *series)
 {
     if (m_barModelsMap.value(series)->isEmpty())
         return;
@@ -1045,14 +1045,14 @@ void QQuickDataVisBars::removeDataItems(QBar3DSeries *series)
     itemLabel()->setVisible(false);
 }
 
-QQuick3DTexture *QQuickDataVisBars::createTexture()
+QQuick3DTexture *QQuickGraphsBars::createTexture()
 {
     QQuick3DTexture *texture = new QQuick3DTexture();
     texture->setParent(this);
     texture->setRotationUV(-90.0f);
     texture->setHorizontalTiling(QQuick3DTexture::ClampToEdge);
     texture->setVerticalTiling(QQuick3DTexture::ClampToEdge);
-    DatavisQuick3DTextureData *textureData = new DatavisQuick3DTextureData();
+    QuickGraphsTextureData *textureData = new QuickGraphsTextureData();
     textureData->setParent(texture);
     textureData->setParentItem(texture);
     texture->setTextureData(textureData);
@@ -1060,9 +1060,9 @@ QQuick3DTexture *QQuickDataVisBars::createTexture()
     return texture;
 }
 
-bool QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
+bool QQuickGraphsBars::handleMousePressedEvent(QMouseEvent *event)
 {
-    QQuickDataVisItem::handleMousePressedEvent(event);
+    QQuickGraphsItem::handleMousePressedEvent(event);
 
     if (Qt::LeftButton == event->button()) {
         auto mousePos = event->pos();
@@ -1106,7 +1106,7 @@ bool QQuickDataVisBars::handleMousePressedEvent(QMouseEvent *event)
     return true;
 }
 
-void QQuickDataVisBars::setSelectedBar(QBar3DSeries *series, const QPoint &coord)
+void QQuickGraphsBars::setSelectedBar(QBar3DSeries *series, const QPoint &coord)
 {
     if (!m_barModelsMap.contains(series))
         series = 0;
@@ -1131,7 +1131,7 @@ void QQuickDataVisBars::setSelectedBar(QBar3DSeries *series, const QPoint &coord
     }
 }
 
-void QQuickDataVisBars::updateSelectedBar()
+void QQuickGraphsBars::updateSelectedBar()
 {
     bool visible = false;
     if (m_selectedBarSeries) {
@@ -1199,8 +1199,8 @@ void QQuickDataVisBars::updateSelectedBar()
     itemLabel()->setVisible(visible);
 }
 
-Abstract3DController::SelectionType QQuickDataVisBars::isSelected(int row, int bar,
-                                                                  QBar3DSeries *series)
+Abstract3DController::SelectionType QQuickGraphsBars::isSelected(int row, int bar,
+                                                                 QBar3DSeries *series)
 {
     Bars3DController::SelectionType isSelectedType = Bars3DController::SelectionNone;
     auto selectionMode = m_barsController->selectionMode();
@@ -1221,7 +1221,7 @@ Abstract3DController::SelectionType QQuickDataVisBars::isSelected(int row, int b
     return isSelectedType;
 }
 
-void QQuickDataVisBars::resetClickedStatus()
+void QQuickGraphsBars::resetClickedStatus()
 {
     m_barsController->m_isSeriesVisualsDirty = true;
     m_selectedBarPos = QVector3D(0.0f, 0.0f, 0.0f);
@@ -1230,9 +1230,9 @@ void QQuickDataVisBars::resetClickedStatus()
     m_barsController->clearSelection();
 }
 
-void QQuickDataVisBars::updateSliceGraph()
+void QQuickGraphsBars::updateSliceGraph()
 {
-    QQuickDataVisItem::updateSliceGraph();
+    QQuickGraphsItem::updateSliceGraph();
 
     if (!sliceView()->isVisible()) {
         if (!m_sliceViewBars.isEmpty()) {
@@ -1268,7 +1268,7 @@ void QQuickDataVisBars::updateSliceGraph()
             texture->setParent(barModel->model);
             texture->setParentItem(barModel->model);
             auto gradient = m_selectedBarSeries->baseGradient();
-            auto textureData = static_cast<DatavisQuick3DTextureData *>(texture->textureData());
+            auto textureData = static_cast<QuickGraphsTextureData *>(texture->textureData());
             textureData->createGradient(gradient);
 
             barModel->texture = texture;
@@ -1296,7 +1296,7 @@ void QQuickDataVisBars::updateSliceGraph()
     }
 }
 
-void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative)
+void QQuickGraphsBars::updateBarSpecs(float thicknessRatio, const QSizeF &spacing, bool relative)
 {
     // Convert ratio to QSizeF, as we need it in that format for autoscaling calculations
     m_cachedBarThickness.setWidth(1.0);
@@ -1322,7 +1322,7 @@ void QQuickDataVisBars::updateBarSpecs(float thicknessRatio, const QSizeF &spaci
     calculateSceneScalingFactors();
 }
 
-void QQuickDataVisBars::updateBarSeriesMargin(const QSizeF &margin)
+void QQuickGraphsBars::updateBarSeriesMargin(const QSizeF &margin)
 {
     m_cachedBarSeriesMargin = margin;
     calculateSeriesStartPosition();

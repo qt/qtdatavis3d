@@ -1,8 +1,8 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QQUICKDATAVISITEM_H
-#define QQUICKDATAVISITEM_H
+#ifndef QQUICKGRAPHSITEM_H
+#define QQUICKGRAPHSITEM_H
 
 //
 //  W A R N I N G
@@ -32,7 +32,7 @@ class QQuick3DDirectionalLight;
 class QQuick3DPrincipledMaterial;
 class QQuick3DRepeater;
 
-class QQuickDataVisItem : public QQuick3DViewport
+class QQuickGraphsItem : public QQuick3DViewport
 {
     Q_OBJECT
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
@@ -118,19 +118,19 @@ public:
     Q_FLAGS(OptimizationHint OptimizationHints)
 
 public:
-    explicit QQuickDataVisItem(QQuickItem *parent = 0);
-    virtual ~QQuickDataVisItem();
+    explicit QQuickGraphsItem(QQuickItem *parent = 0);
+    virtual ~QQuickGraphsItem();
 
     virtual void setRenderingMode(RenderingMode mode);
-    virtual QQuickDataVisItem::RenderingMode renderingMode() const;
+    virtual QQuickGraphsItem::RenderingMode renderingMode() const;
 
     virtual void setSelectionMode(SelectionFlags mode);
-    virtual QQuickDataVisItem::SelectionFlags selectionMode() const;
+    virtual QQuickGraphsItem::SelectionFlags selectionMode() const;
 
     virtual void setShadowQuality(ShadowQuality quality);
-    virtual QQuickDataVisItem::ShadowQuality shadowQuality() const;
+    virtual QQuickGraphsItem::ShadowQuality shadowQuality() const;
 
-    virtual QQuickDataVisItem::ElementType selectedElement() const;
+    virtual QQuickGraphsItem::ElementType selectedElement() const;
 
     virtual bool shadowsSupported() const;
 
@@ -287,19 +287,19 @@ public Q_SLOTS:
     void windowDestroyed(QObject *obj);
 
 Q_SIGNALS:
-    void selectionModeChanged(QQuickDataVisItem::SelectionFlags mode);
-    void shadowQualityChanged(QQuickDataVisItem::ShadowQuality quality);
+    void selectionModeChanged(QQuickGraphsItem::SelectionFlags mode);
+    void shadowQualityChanged(QQuickGraphsItem::ShadowQuality quality);
     void shadowsSupportedChanged(bool supported);
     void msaaSamplesChanged(int samples);
     void inputHandlerChanged(QAbstract3DInputHandler *inputHandler);
     void themeChanged(Q3DTheme *theme);
-    void renderingModeChanged(QQuickDataVisItem::RenderingMode mode);
+    void renderingModeChanged(QQuickGraphsItem::RenderingMode mode);
     void measureFpsChanged(bool enabled);
     void currentFpsChanged(int fps);
-    void selectedElementChanged(QQuickDataVisItem::ElementType type);
+    void selectedElementChanged(QQuickGraphsItem::ElementType type);
     void orthoProjectionChanged(bool enabled);
     void aspectRatioChanged(qreal ratio);
-    void optimizationHintsChanged(QQuickDataVisItem::OptimizationHints hints);
+    void optimizationHintsChanged(QQuickGraphsItem::OptimizationHints hints);
     void polarChanged(bool enabled);
     void radialLabelOffsetChanged(float offset);
     void horizontalAspectRatioChanged(qreal ratio);
@@ -369,7 +369,7 @@ protected:
     void setSliceActivatedChanged(bool changed) { m_sliceActivatedChanged = changed; }
     virtual void updateSliceGraph();
 
-    virtual void updateShadowQuality(QQuickDataVisItem::ShadowQuality quality);
+    virtual void updateShadowQuality(QQuickGraphsItem::ShadowQuality quality);
     virtual void updateAxisRange(float min, float max);
     virtual void updateAxisReversed(bool enable);
     virtual void updateSingleHighlightColor() {}
@@ -414,7 +414,7 @@ private:
     QQuick3DNode *m_cameraTarget = nullptr;
     QQuick3DDirectionalLight *m_light = nullptr;
     QRectF m_cachedGeometry;
-    QQuickDataVisItem::RenderingMode m_renderMode;
+    QQuickGraphsItem::RenderingMode m_renderMode;
     int m_samples;
     int m_windowSamples;
     QSize m_initialisedSize;
@@ -459,12 +459,12 @@ private:
     void updateCamera();
     QVector3D calculateLabelRotation(float labelAutoAngle);
 
-    QHash<QQuickDataVisItem *, QQuickWindow *> m_graphWindowList = {};
+    QHash<QQuickGraphsItem *, QQuickWindow *> m_graphWindowList = {};
 
     friend class Scatter3DController;
 };
-Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::SelectionFlags)
-Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickDataVisItem::OptimizationHints)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickGraphsItem::SelectionFlags)
+Q_DECLARE_OPERATORS_FOR_FLAGS(QQuickGraphsItem::OptimizationHints)
 
 QT_END_NAMESPACE
 

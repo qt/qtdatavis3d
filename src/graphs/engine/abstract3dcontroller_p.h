@@ -200,7 +200,7 @@ protected:
     qreal m_margin;
 
     QMutex m_renderMutex;
-    QQuickDataVisItem *m_qml = nullptr;
+    QQuickGraphsItem *m_qml = nullptr;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 
@@ -403,7 +403,7 @@ private:
                        QAbstract3DAxis **axisPtr);
 
     friend class AbstractDeclarative;
-    friend class QQuickDataVisItem;
+    friend class QQuickGraphsItem;
     friend class Bars3DController;
     friend class QAbstract3DGraphPrivate;
 };

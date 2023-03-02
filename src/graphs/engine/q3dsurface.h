@@ -11,7 +11,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class QQuickDataVisSurface;
+class QQuickGraphsSurface;
 
 class Q_GRAPHS_EXPORT Q3DSurface : public QAbstract3DGraph
 {
@@ -53,8 +53,8 @@ Q_SIGNALS:
     void flipHorizontalGridChanged(bool flip);
 
 private:
-    QQuickDataVisSurface *dptr();
-    const QQuickDataVisSurface *dptrc() const;
+    QQuickGraphsSurface *dptr();
+    const QQuickGraphsSurface *dptrc() const;
 };
 
 QT_END_NAMESPACE

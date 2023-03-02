@@ -1,17 +1,17 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "datavisquick3dtexturedata_p.h"
+#include "quickgraphstexturedata_p.h"
 
-DatavisQuick3DTextureData::DatavisQuick3DTextureData()
+QuickGraphsTextureData::QuickGraphsTextureData()
 {
 }
 
-DatavisQuick3DTextureData::~DatavisQuick3DTextureData()
+QuickGraphsTextureData::~QuickGraphsTextureData()
 {
 }
 
-void DatavisQuick3DTextureData::createGradient(const QLinearGradient &gradient)
+void QuickGraphsTextureData::createGradient(const QLinearGradient &gradient)
 {
     setSize(QSize(m_width, m_height));
     setFormat(QQuick3DTextureData::RGBA8);
@@ -44,7 +44,7 @@ void DatavisQuick3DTextureData::createGradient(const QLinearGradient &gradient)
     setTextureData(imageData);
 }
 
-QColor DatavisQuick3DTextureData::linearInterpolate(QColor startColor, QColor endColor, float value)
+QColor QuickGraphsTextureData::linearInterpolate(QColor startColor, QColor endColor, float value)
 {
     QColor output;
 

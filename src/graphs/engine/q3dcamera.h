@@ -107,8 +107,8 @@ private:
     friend class SelectionPointer;
     friend class Q3DInputHandler;
     friend class QTouch3DInputHandlerPrivate;
-    friend class QQuickDataVisScatter;
-    friend class QQuickDataVisBars;
+    friend class QQuickGraphsScatter;
+    friend class QQuickGraphsBars;
     friend class GraphSceneNode3D;
 };
 

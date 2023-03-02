@@ -9,11 +9,11 @@
 // version without notice, or even be removed.
 //
 // We mean it.
-#ifndef QQUICKDATAVISSCATTER_P_H
-#define QQUICKDATAVISSCATTER_P_H
+#ifndef QQUICKGRAPHSSCATTER_P_H
+#define QQUICKGRAPHSSCATTER_P_H
 
 #include "qscatter3dseries.h"
-#include "qquickdatavisitem_p.h"
+#include "qquickgraphsitem_p.h"
 #include "scatter3dcontroller_p.h"
 #include "scatterinstancing_p.h"
 
@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE
 
 class Q3DScatter;
 
-class QQuickDataVisScatter : public QQuickDataVisItem
+class QQuickGraphsScatter : public QQuickGraphsItem
 {
     Q_OBJECT
     Q_PROPERTY(QValue3DAxis *axisX READ axisX WRITE setAxisX NOTIFY axisXChanged)
@@ -38,8 +38,8 @@ class QQuickDataVisScatter : public QQuickDataVisItem
     QML_ADDED_IN_VERSION(6, 6)
 
 public:
-    explicit QQuickDataVisScatter(QQuickItem *parent = 0);
-    ~QQuickDataVisScatter();
+    explicit QQuickGraphsScatter(QQuickItem *parent = 0);
+    ~QQuickGraphsScatter();
 
     QValue3DAxis *axisX() const;
     void setAxisX(QValue3DAxis *axis);
@@ -171,7 +171,7 @@ private:
     float calculatePointScaleSize();
     void updatePointScaleSize();
 
-    void updateShadowQuality(QQuickDataVisItem::ShadowQuality quality) override;
+    void updateShadowQuality(QQuickGraphsItem::ShadowQuality quality) override;
 
     void generatePointsForScatterModel(ScatterModel *series);
     void updateScatterGraphItemPositions(ScatterModel *graphModel);
@@ -189,4 +189,4 @@ private:
 };
 
 QT_END_NAMESPACE
-#endif // QQUICKDATAVISSCATTER_P_H
+#endif // QQUICKGRAPHSSCATTER_P_H

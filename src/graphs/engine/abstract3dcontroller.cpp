@@ -5,7 +5,7 @@
 #include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
 #include "qcategory3daxis_p.h"
-#include "qquickdatavisitem_p.h"
+#include "qquickgraphsitem_p.h"
 #include "qabstract3dseries_p.h"
 #include "q3dscene_p.h"
 #include "qabstract3dinputhandler_p.h"

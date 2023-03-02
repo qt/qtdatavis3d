@@ -168,7 +168,7 @@ private:
     friend class Bars3DController;
     friend class AbstractDeclarative;
     friend class Abstract3DController;
-    friend class QQuickDataVisItem;
+    friend class QQuickGraphsItem;
 };
 
 QT_END_NAMESPACE

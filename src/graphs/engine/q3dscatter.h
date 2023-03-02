@@ -10,7 +10,7 @@
 
 QT_BEGIN_NAMESPACE
 
-class QQuickDataVisScatter;
+class QQuickGraphsScatter;
 
 class Q_GRAPHS_EXPORT Q3DScatter : public QAbstract3DGraph
 {
@@ -47,8 +47,8 @@ Q_SIGNALS:
     void selectedSeriesChanged(QScatter3DSeries *series);
 
 private:
-    QQuickDataVisScatter *dptr();
-    const QQuickDataVisScatter *dptrc() const;
+    QQuickGraphsScatter *dptr();
+    const QQuickGraphsScatter *dptrc() const;
     Q_DISABLE_COPY(Q3DScatter)
 };
 

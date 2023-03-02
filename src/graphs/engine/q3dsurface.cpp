@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dsurface.h"
-#include "qquickdatavissurface_p.h"
+#include "qquickgraphssurface_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -210,7 +210,7 @@ Q3DSurface::Q3DSurface() : QAbstract3DGraph()
 {
     QQmlComponent *component = new QQmlComponent(engine(), this);
     component->setData("import QtQuick; import QtGraphs; Surface3D { anchors.fill: parent; }", QUrl());
-    d_ptr.reset(qobject_cast<QQuickDataVisSurface *>(component->create()));
+    d_ptr.reset(qobject_cast<QQuickGraphsSurface *>(component->create()));
     setContent(component->url(), component, d_ptr.data());
 }
 
@@ -298,14 +298,14 @@ QList<QValue3DAxis *> Q3DSurface::axes() const
     return retList;
 }
 
-QQuickDataVisSurface *Q3DSurface::dptr()
+QQuickGraphsSurface *Q3DSurface::dptr()
 {
-    return static_cast<QQuickDataVisSurface *>(d_ptr.data());
+    return static_cast<QQuickGraphsSurface *>(d_ptr.data());
 }
 
-const QQuickDataVisSurface *Q3DSurface::dptrc() const
+const QQuickGraphsSurface *Q3DSurface::dptrc() const
 {
-    return static_cast<const QQuickDataVisSurface *>(d_ptr.data());
+    return static_cast<const QQuickGraphsSurface *>(d_ptr.data());
 }
 
 

@@ -1,14 +1,14 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "qml/qquickdatavisscatter_p.h"
+#include "qml/qquickgraphsscatter_p.h"
 #include "qml/declarativescene_p.h"
 #include "data/qscatter3dseries_p.h"
 #include "qvalue3daxis_p.h"
 #include "qcategory3daxis_p.h"
 #include "axis/qvalue3daxisformatter_p.h"
 #include "engine/q3dcamera_p.h"
-#include "engine/datavisquick3dtexturedata_p.h"
+#include "quickgraphstexturedata_p.h"
 
 #include <QtCore/QMutexLocker>
 #include <QColor>
@@ -22,8 +22,8 @@
 
 QT_BEGIN_NAMESPACE
 
-QQuickDataVisScatter::QQuickDataVisScatter(QQuickItem *parent)
-    : QQuickDataVisItem(parent),
+QQuickGraphsScatter::QQuickGraphsScatter(QQuickItem *parent)
+    : QQuickGraphsItem(parent),
       m_scatterController(0)
 {
     setAcceptedMouseButtons(Qt::AllButtons);
@@ -38,10 +38,10 @@ QQuickDataVisScatter::QQuickDataVisScatter(QQuickItem *parent)
     scene->setClearColor(Qt::blue);
 
     QObject::connect(m_scatterController, &Scatter3DController::selectedSeriesChanged,
-                     this, &QQuickDataVisScatter::selectedSeriesChanged);
+                     this, &QQuickGraphsScatter::selectedSeriesChanged);
 }
 
-QQuickDataVisScatter::~QQuickDataVisScatter()
+QQuickGraphsScatter::~QQuickGraphsScatter()
 {
     QMutexLocker locker(m_nodeMutex.data());
     const QMutexLocker locker2(mutex());
@@ -51,43 +51,43 @@ QQuickDataVisScatter::~QQuickDataVisScatter()
         delete m_instancing;
 }
 
-QValue3DAxis *QQuickDataVisScatter::axisX() const
+QValue3DAxis *QQuickGraphsScatter::axisX() const
 {
     return static_cast<QValue3DAxis *>(m_scatterController->axisX());
 }
 
-void QQuickDataVisScatter::setAxisX(QValue3DAxis *axis)
+void QQuickGraphsScatter::setAxisX(QValue3DAxis *axis)
 {
     m_scatterController->setAxisX(axis);
 }
 
-QValue3DAxis *QQuickDataVisScatter::axisY() const
+QValue3DAxis *QQuickGraphsScatter::axisY() const
 {
     return static_cast<QValue3DAxis *>(m_scatterController->axisY());
 }
 
-void QQuickDataVisScatter::setAxisY(QValue3DAxis *axis)
+void QQuickGraphsScatter::setAxisY(QValue3DAxis *axis)
 {
     m_scatterController->setAxisY(axis);
 }
 
-QValue3DAxis *QQuickDataVisScatter::axisZ() const
+QValue3DAxis *QQuickGraphsScatter::axisZ() const
 {
     return static_cast<QValue3DAxis *>(m_scatterController->axisZ());
 }
 
-void QQuickDataVisScatter::setAxisZ(QValue3DAxis *axis)
+void QQuickGraphsScatter::setAxisZ(QValue3DAxis *axis)
 {
     m_scatterController->setAxisZ(axis);
 }
 
 // From seriesvisualizer
-void QQuickDataVisScatter::disconnectSeries(QScatter3DSeries *series)
+void QQuickGraphsScatter::disconnectSeries(QScatter3DSeries *series)
 {
     QObject::disconnect(series, 0, this, 0);
 }
 
-void QQuickDataVisScatter::generatePointsForScatterModel(ScatterModel *graphModel)
+void QQuickGraphsScatter::generatePointsForScatterModel(ScatterModel *graphModel)
 {
     QList<QQuick3DModel *> itemList;
     if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationDefault) {
@@ -111,7 +111,7 @@ void QQuickDataVisScatter::generatePointsForScatterModel(ScatterModel *graphMode
     m_scatterController->markSeriesVisualsDirty();
 }
 
-qsizetype QQuickDataVisScatter::getItemIndex(QQuick3DModel *item)
+qsizetype QQuickGraphsScatter::getItemIndex(QQuick3DModel *item)
 {
     Q_UNUSED(item);
     if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationDefault)
@@ -120,7 +120,7 @@ qsizetype QQuickDataVisScatter::getItemIndex(QQuick3DModel *item)
     return -1;
 }
 
-void QQuickDataVisScatter::resetSelection()
+void QQuickGraphsScatter::resetSelection()
 {
     if (m_selectedIndex != -1) {
         if (m_scatterController->optimizationHints() == QAbstract3DGraph::OptimizationStatic) {
@@ -130,7 +130,7 @@ void QQuickDataVisScatter::resetSelection()
     }
 }
 
-void QQuickDataVisScatter::updateScatterGraphItemPositions(ScatterModel *graphModel)
+void QQuickGraphsScatter::updateScatterGraphItemPositions(ScatterModel *graphModel)
 {
     float itemSize = graphModel->series->itemSize() / m_itemScaler;
     QQuaternion meshRotation = graphModel->series->meshRotation();
@@ -183,7 +183,7 @@ void QQuickDataVisScatter::updateScatterGraphItemPositions(ScatterModel *graphMo
     }
 }
 
-void QQuickDataVisScatter::updateScatterGraphItemVisuals(ScatterModel *graphModel)
+void QQuickGraphsScatter::updateScatterGraphItemVisuals(ScatterModel *graphModel)
 {
     bool useGradient = graphModel->series->d_ptr->isUsingGradient();
     int itemCount = graphModel->series->dataProxy()->itemCount();
@@ -195,7 +195,7 @@ void QQuickDataVisScatter::updateScatterGraphItemVisuals(ScatterModel *graphMode
         }
 
         QLinearGradient gradient = graphModel->series->baseGradient();
-        auto textureData = static_cast<DatavisQuick3DTextureData *>(
+        auto textureData = static_cast<QuickGraphsTextureData *>(
                     graphModel->seriesTexture->textureData());
         textureData->createGradient(gradient);
 
@@ -205,7 +205,7 @@ void QQuickDataVisScatter::updateScatterGraphItemVisuals(ScatterModel *graphMode
         }
 
         QLinearGradient highlightGradient = graphModel->series->singleHighlightGradient();
-        auto highlightTextureData = static_cast<DatavisQuick3DTextureData *>(
+        auto highlightTextureData = static_cast<QuickGraphsTextureData *>(
                     graphModel->highlightTexture->textureData());
         highlightTextureData->createGradient(highlightGradient);
     } else {
@@ -302,7 +302,7 @@ void QQuickDataVisScatter::updateScatterGraphItemVisuals(ScatterModel *graphMode
     }
 }
 
-void QQuickDataVisScatter::updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient)
+void QQuickGraphsScatter::updateItemMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient)
 {
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(item, "materials");
@@ -334,7 +334,7 @@ void QQuickDataVisScatter::updateItemMaterial(QQuick3DModel *item, bool useGradi
     }
 }
 
-void QQuickDataVisScatter::updateItemInstancedMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient)
+void QQuickGraphsScatter::updateItemInstancedMaterial(QQuick3DModel *item, bool useGradient, bool rangeGradient)
 {
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(item, "materials");
@@ -365,7 +365,7 @@ void QQuickDataVisScatter::updateItemInstancedMaterial(QQuick3DModel *item, bool
     }
 }
 
-void QQuickDataVisScatter::updateSelectionIndicatorMaterial(bool useGradient, bool rangeGradient)
+void QQuickGraphsScatter::updateSelectionIndicatorMaterial(bool useGradient, bool rangeGradient)
 {
     Q_UNUSED(useGradient);
     QQmlListReference materialsRef(m_selectionIndicator, "materials");
@@ -397,9 +397,9 @@ void QQuickDataVisScatter::updateSelectionIndicatorMaterial(bool useGradient, bo
     }
 }
 
-void QQuickDataVisScatter::updateInstancedCustomMaterial(QQuick3DModel *model, bool isHighlight,
-                                                         QQuick3DTexture *seriesTexture,
-                                                         QQuick3DTexture *highlightTexture)
+void QQuickGraphsScatter::updateInstancedCustomMaterial(QQuick3DModel *model, bool isHighlight,
+                                                        QQuick3DTexture *seriesTexture,
+                                                        QQuick3DTexture *highlightTexture)
 {
     QQmlListReference materialsRef(model, "materials");
 
@@ -421,7 +421,7 @@ void QQuickDataVisScatter::updateInstancedCustomMaterial(QQuick3DModel *model, b
     }
 }
 
-void QQuickDataVisScatter::updateCustomMaterial(QQuick3DModel *item, QQuick3DTexture *texture)
+void QQuickGraphsScatter::updateCustomMaterial(QQuick3DModel *item, QQuick3DTexture *texture)
 {
     QQmlListReference materialsRef(item, "materials");
     auto customMaterial = static_cast<QQuick3DCustomMaterial *>(materialsRef.at(0));
@@ -435,8 +435,8 @@ void QQuickDataVisScatter::updateCustomMaterial(QQuick3DModel *item, QQuick3DTex
     customMaterial->setProperty("gradientPos", value);
 }
 
-void QQuickDataVisScatter::updatePrincipledMaterial(QQuick3DModel *model, const QColor &color,
-                                                    bool useGradient, QQuick3DTexture *texture)
+void QQuickGraphsScatter::updatePrincipledMaterial(QQuick3DModel *model, const QColor &color,
+                                                   bool useGradient, QQuick3DTexture *texture)
 {
     QQmlListReference materialsRef(model, "materials");
     auto principledMaterial = static_cast<QQuick3DPrincipledMaterial *>(materialsRef.at(0));
@@ -449,14 +449,14 @@ void QQuickDataVisScatter::updatePrincipledMaterial(QQuick3DModel *model, const 
     }
 }
 
-QQuick3DTexture *QQuickDataVisScatter::createTexture()
+QQuick3DTexture *QQuickGraphsScatter::createTexture()
 {
     QQuick3DTexture *texture = new QQuick3DTexture();
     texture->setParent(this);
     texture->setRotationUV(-90.0f);
     texture->setHorizontalTiling(QQuick3DTexture::ClampToEdge);
     texture->setVerticalTiling(QQuick3DTexture::ClampToEdge);
-    DatavisQuick3DTextureData *textureData = new DatavisQuick3DTextureData();
+    QuickGraphsTextureData *textureData = new QuickGraphsTextureData();
     textureData->setParent(texture);
     textureData->setParentItem(texture);
     texture->setTextureData(textureData);
@@ -464,7 +464,7 @@ QQuick3DTexture *QQuickDataVisScatter::createTexture()
     return texture;
 }
 
-QQuick3DNode *QQuickDataVisScatter::createSeriesRoot()
+QQuick3DNode *QQuickGraphsScatter::createSeriesRoot()
 {
     auto model = new QQuick3DNode();
 
@@ -472,7 +472,7 @@ QQuick3DNode *QQuickDataVisScatter::createSeriesRoot()
     return model;
 }
 
-QQuick3DModel *QQuickDataVisScatter::createDataItem(const QAbstract3DSeries::Mesh meshType)
+QQuick3DModel *QQuickGraphsScatter::createDataItem(const QAbstract3DSeries::Mesh meshType)
 {
     auto model = new QQuick3DModel();
     model->setParent(this);
@@ -483,25 +483,25 @@ QQuick3DModel *QQuickDataVisScatter::createDataItem(const QAbstract3DSeries::Mes
     return model;
 }
 
-void QQuickDataVisScatter::createInstancingRootItem(QAbstract3DSeries::Mesh meshType)
+void QQuickGraphsScatter::createInstancingRootItem(QAbstract3DSeries::Mesh meshType)
 {
     m_instancingRootItem = createDataItem(meshType);
     m_instancingRootItem->setInstancing(m_instancing);
 }
 
-void QQuickDataVisScatter::createSelectionIndicator(QAbstract3DSeries::Mesh meshType)
+void QQuickGraphsScatter::createSelectionIndicator(QAbstract3DSeries::Mesh meshType)
 {
     m_selectionIndicator = createDataItem(meshType);
 
     m_selectionIndicator->setVisible(false);
 }
 
-void QQuickDataVisScatter::removeDataItems(QList<QQuick3DModel *> &items)
+void QQuickGraphsScatter::removeDataItems(QList<QQuick3DModel *> &items)
 {
     removeDataItems(items, items.count());
 }
 
-void QQuickDataVisScatter::removeDataItems(QList<QQuick3DModel *> &items, qsizetype count)
+void QQuickGraphsScatter::removeDataItems(QList<QQuick3DModel *> &items, qsizetype count)
 {
     for (int i = 0; i < count; ++i) {
         QQuick3DModel *item = items.takeLast();
@@ -514,7 +514,7 @@ void QQuickDataVisScatter::removeDataItems(QList<QQuick3DModel *> &items, qsizet
     }
 }
 
-void QQuickDataVisScatter::recreateDataItems()
+void QQuickGraphsScatter::recreateDataItems()
 {
     QList<QScatter3DSeries *> seriesList = m_scatterController->scatterSeriesList();
     for (auto series : seriesList) {
@@ -527,7 +527,7 @@ void QQuickDataVisScatter::recreateDataItems()
     }
 }
 
-void QQuickDataVisScatter::addPointsToScatterModel(ScatterModel *graphModel, qsizetype count)
+void QQuickGraphsScatter::addPointsToScatterModel(ScatterModel *graphModel, qsizetype count)
 {
     QAbstract3DSeries::Mesh meshType = graphModel->series->mesh();
     for (int i = 0; i < count; i++) {
@@ -539,12 +539,12 @@ void QQuickDataVisScatter::addPointsToScatterModel(ScatterModel *graphModel, qsi
     m_scatterController->setSeriesVisualsDirty();
 }
 
-int QQuickDataVisScatter::sizeDifference(qsizetype size1, qsizetype size2)
+int QQuickGraphsScatter::sizeDifference(qsizetype size1, qsizetype size2)
 {
     return size2 - size1;
 }
 
-QVector3D QQuickDataVisScatter::selectedItemPosition()
+QVector3D QQuickGraphsScatter::selectedItemPosition()
 {
     if (m_selectedIndex == -1)
         return QVector3D();
@@ -558,7 +558,7 @@ QVector3D QQuickDataVisScatter::selectedItemPosition()
     return position;
 }
 
-void QQuickDataVisScatter::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType)
+void QQuickGraphsScatter::fixMeshFileName(QString &fileName, QAbstract3DSeries::Mesh meshType)
 {
     if (meshType != QAbstract3DSeries::MeshSphere && meshType != QAbstract3DSeries::MeshArrow
             && meshType != QAbstract3DSeries::MeshMinimal && meshType != QAbstract3DSeries::MeshPoint) {
@@ -566,12 +566,12 @@ void QQuickDataVisScatter::fixMeshFileName(QString &fileName, QAbstract3DSeries:
     }
 }
 
-QString QQuickDataVisScatter::getMeshFileName(QAbstract3DSeries::Mesh meshType)
+QString QQuickGraphsScatter::getMeshFileName(QAbstract3DSeries::Mesh meshType)
 {
     QString fileName;
     QString smoothString = QStringLiteral("Smooth");
     switch (meshType) {
-        case QAbstract3DSeries::MeshSphere:
+    case QAbstract3DSeries::MeshSphere:
         fileName = QStringLiteral("defaultMeshes/sphereMesh");
         break;
     case QAbstract3DSeries::MeshBar:
@@ -611,19 +611,19 @@ QString QQuickDataVisScatter::getMeshFileName(QAbstract3DSeries::Mesh meshType)
     return fileName;
 }
 
-void QQuickDataVisScatter::handleSeriesChanged(QList<QAbstract3DSeries *> changedSeries)
+void QQuickGraphsScatter::handleSeriesChanged(QList<QAbstract3DSeries *> changedSeries)
 {
     Q_UNUSED(changedSeries)
     // TODO: generate items and remove old items
 }
 
 // ------------------------------------------------------------------------------
-QScatter3DSeries *QQuickDataVisScatter::selectedSeries() const
+QScatter3DSeries *QQuickGraphsScatter::selectedSeries() const
 {
     return m_scatterController->selectedSeries();
 }
 
-void QQuickDataVisScatter::setSelectedItem(int index, QScatter3DSeries *series)
+void QQuickGraphsScatter::setSelectedItem(int index, QScatter3DSeries *series)
 {
     m_scatterController->setSelectedItem(index, series);
 
@@ -631,42 +631,42 @@ void QQuickDataVisScatter::setSelectedItem(int index, QScatter3DSeries *series)
         itemLabel()->setVisible(true);
 }
 
-QQmlListProperty<QScatter3DSeries> QQuickDataVisScatter::seriesList()
+QQmlListProperty<QScatter3DSeries> QQuickGraphsScatter::seriesList()
 {
     return QQmlListProperty<QScatter3DSeries>(this, this,
-                                              &QQuickDataVisScatter::appendSeriesFunc,
-                                              &QQuickDataVisScatter::countSeriesFunc,
-                                              &QQuickDataVisScatter::atSeriesFunc,
-                                              &QQuickDataVisScatter::clearSeriesFunc);
+                                              &QQuickGraphsScatter::appendSeriesFunc,
+                                              &QQuickGraphsScatter::countSeriesFunc,
+                                              &QQuickGraphsScatter::atSeriesFunc,
+                                              &QQuickGraphsScatter::clearSeriesFunc);
 }
 
-void QQuickDataVisScatter::appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list,
-                                            QScatter3DSeries *series)
+void QQuickGraphsScatter::appendSeriesFunc(QQmlListProperty<QScatter3DSeries> *list,
+                                           QScatter3DSeries *series)
 {
-    reinterpret_cast<QQuickDataVisScatter *>(list->data)->addSeries(series);
+    reinterpret_cast<QQuickGraphsScatter *>(list->data)->addSeries(series);
 }
 
-qsizetype QQuickDataVisScatter::countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
+qsizetype QQuickGraphsScatter::countSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
 {
-    return reinterpret_cast<QQuickDataVisScatter *>(list->data)->m_scatterController->scatterSeriesList().size();
+    return reinterpret_cast<QQuickGraphsScatter *>(list->data)->m_scatterController->scatterSeriesList().size();
 }
 
-QScatter3DSeries *QQuickDataVisScatter::atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list,
-                                                     qsizetype index)
+QScatter3DSeries *QQuickGraphsScatter::atSeriesFunc(QQmlListProperty<QScatter3DSeries> *list,
+                                                    qsizetype index)
 {
-    return reinterpret_cast<QQuickDataVisScatter *>(list->data)->m_scatterController->scatterSeriesList().at(index);
+    return reinterpret_cast<QQuickGraphsScatter *>(list->data)->m_scatterController->scatterSeriesList().at(index);
 }
 
-void QQuickDataVisScatter::clearSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
+void QQuickGraphsScatter::clearSeriesFunc(QQmlListProperty<QScatter3DSeries> *list)
 {
-    QQuickDataVisScatter *declScatter = reinterpret_cast<QQuickDataVisScatter *>(list->data);
+    QQuickGraphsScatter *declScatter = reinterpret_cast<QQuickGraphsScatter *>(list->data);
     QList<QScatter3DSeries *> realList = declScatter->m_scatterController->scatterSeriesList();
     int count = realList.size();
     for (int i = 0; i < count; i++)
         declScatter->removeSeries(realList.at(i));
 }
 
-void QQuickDataVisScatter::addSeries(QScatter3DSeries *series)
+void QQuickGraphsScatter::addSeries(QScatter3DSeries *series)
 {
     m_scatterController->addSeries(series);
 
@@ -682,7 +682,7 @@ void QQuickDataVisScatter::addSeries(QScatter3DSeries *series)
         setSelectedItem(series->selectedItem(), series);
 }
 
-void QQuickDataVisScatter::removeSeries(QScatter3DSeries *series)
+void QQuickGraphsScatter::removeSeries(QScatter3DSeries *series)
 {
     m_scatterController->removeSeries(series);
     series->setParent(this); // Reparent as removing will leave series parentless
@@ -706,33 +706,33 @@ void QQuickDataVisScatter::removeSeries(QScatter3DSeries *series)
     disconnectSeries(series);
 }
 
-void QQuickDataVisScatter::handleAxisXChanged(QAbstract3DAxis *axis)
+void QQuickGraphsScatter::handleAxisXChanged(QAbstract3DAxis *axis)
 {
     emit axisXChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-void QQuickDataVisScatter::handleAxisYChanged(QAbstract3DAxis *axis)
+void QQuickGraphsScatter::handleAxisYChanged(QAbstract3DAxis *axis)
 {
     emit axisYChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-void QQuickDataVisScatter::handleAxisZChanged(QAbstract3DAxis *axis)
+void QQuickGraphsScatter::handleAxisZChanged(QAbstract3DAxis *axis)
 {
     emit axisZChanged(static_cast<QValue3DAxis *>(axis));
 }
 
-void QQuickDataVisScatter::handleSeriesMeshChanged()
+void QQuickGraphsScatter::handleSeriesMeshChanged()
 {
     recreateDataItems();
 }
 
-void QQuickDataVisScatter::handleMeshSmoothChanged(bool enable)
+void QQuickGraphsScatter::handleMeshSmoothChanged(bool enable)
 {
     m_smooth = enable;
     recreateDataItems();
 }
 
-bool QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
+bool QQuickGraphsScatter::handleMousePressedEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
         if (selectionMode() == QAbstract3DGraph::SelectionItem) {
@@ -763,17 +763,17 @@ bool QQuickDataVisScatter::handleMousePressedEvent(QMouseEvent *event)
     return true;
 }
 
-void QQuickDataVisScatter::connectSeries(QScatter3DSeries *series)
+void QQuickGraphsScatter::connectSeries(QScatter3DSeries *series)
 {
     m_smooth = series->isMeshSmooth();
 
     QObject::connect(series, &QScatter3DSeries::meshChanged, this,
-                     &QQuickDataVisScatter::handleSeriesMeshChanged);
+                     &QQuickGraphsScatter::handleSeriesMeshChanged);
     QObject::connect(series, &QScatter3DSeries::meshSmoothChanged, this,
-                     &QQuickDataVisScatter::handleMeshSmoothChanged);
+                     &QQuickGraphsScatter::handleMeshSmoothChanged);
 }
 
-void QQuickDataVisScatter::calculateSceneScalingFactors()
+void QQuickGraphsScatter::calculateSceneScalingFactors()
 {
     if (m_requestedMargin < 0.0f) {
         if (m_maxItemSize > m_defaultMaxSize)
@@ -822,7 +822,7 @@ void QQuickDataVisScatter::calculateSceneScalingFactors()
     setTranslate({-m_scaleX, -m_scaleY, m_scaleZ});
 }
 
-float QQuickDataVisScatter::calculatePointScaleSize()
+float QQuickGraphsScatter::calculatePointScaleSize()
 {
     QList<QScatter3DSeries *> series = m_scatterController->scatterSeriesList();
     int totalDataSize = 0;
@@ -834,22 +834,22 @@ float QQuickDataVisScatter::calculatePointScaleSize()
     return qBound(m_defaultMinSize, 2.0f / float(qSqrt(qreal(totalDataSize))), m_defaultMaxSize);
 }
 
-void QQuickDataVisScatter::updatePointScaleSize()
+void QQuickGraphsScatter::updatePointScaleSize()
 {
     m_pointScale = calculatePointScaleSize();
 }
 
-void QQuickDataVisScatter::updateShadowQuality(ShadowQuality quality)
+void QQuickGraphsScatter::updateShadowQuality(ShadowQuality quality)
 {
-    QQuickDataVisItem::updateShadowQuality(quality);
+    QQuickGraphsItem::updateShadowQuality(quality);
 }
 
-QQuick3DModel *QQuickDataVisScatter::selected() const
+QQuick3DModel *QQuickGraphsScatter::selected() const
 {
     return m_selected;
 }
 
-void QQuickDataVisScatter::setSelected(QQuick3DModel *newSelected)
+void QQuickGraphsScatter::setSelected(QQuick3DModel *newSelected)
 {
     if (newSelected != m_selected) {
         m_previousSelected = m_selected;
@@ -877,7 +877,7 @@ void QQuickDataVisScatter::setSelected(QQuick3DModel *newSelected)
     }
 }
 
-void QQuickDataVisScatter::setSelected(QQuick3DModel *root, qsizetype index)
+void QQuickGraphsScatter::setSelected(QQuick3DModel *root, qsizetype index)
 {
     if (index != m_scatterController->m_selectedItem) {
         QQuick3DObject *seriesRoot = root->parentItem();
@@ -889,12 +889,12 @@ void QQuickDataVisScatter::setSelected(QQuick3DModel *root, qsizetype index)
     }
 }
 
-void QQuickDataVisScatter::setSelected(qsizetype index)
+void QQuickGraphsScatter::setSelected(qsizetype index)
 {
     m_selectedIndex = index;
 }
 
-void QQuickDataVisScatter::clearSelectionModel()
+void QQuickGraphsScatter::clearSelectionModel()
 {
     setSelectedItem(invalidSelectionIndex(), nullptr);
 
@@ -904,7 +904,7 @@ void QQuickDataVisScatter::clearSelectionModel()
     m_previousSelected = nullptr;
 }
 
-void QQuickDataVisScatter::updateGraph()
+void QQuickGraphsScatter::updateGraph()
 {
     updatePointScaleSize();
     for (auto graphModel : std::as_const(m_scatterGraphs)) {
@@ -939,7 +939,7 @@ void QQuickDataVisScatter::updateGraph()
     }
 }
 
-void QQuickDataVisScatter::synchData()
+void QQuickGraphsScatter::synchData()
 {
     QList<QScatter3DSeries *> seriesList = m_scatterController->scatterSeriesList();
 
@@ -957,7 +957,7 @@ void QQuickDataVisScatter::synchData()
 
     calculateSceneScalingFactors();
     updatePointScaleSize();
-    QQuickDataVisItem::synchData();
+    QQuickGraphsItem::synchData();
     scene()->activeCamera()->d_ptr->setMinYRotation(-90.0f);
 
     QValue3DAxis *aX = axisX();

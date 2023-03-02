@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 #include "q3dbars.h"
-#include "qquickdatavisbars_p.h"
+#include "qquickgraphsbars_p.h"
 
 QT_BEGIN_NAMESPACE
 
@@ -278,7 +278,7 @@ Q3DBars::Q3DBars() : QAbstract3DGraph()
 {
     QQmlComponent *component = new QQmlComponent(engine(), this);
     component->setData("import QtQuick; import QtGraphs; Bars3D { anchors.fill: parent; }", QUrl());
-    d_ptr.reset(qobject_cast<QQuickDataVisBars *>(component->create()));
+    d_ptr.reset(qobject_cast<QQuickGraphsBars *>(component->create()));
     setContent(component->url(), component, d_ptr.data());
 }
 
@@ -447,14 +447,14 @@ void Q3DBars::setReflection(bool reflection)
     emit reflectionChanged(reflection);
 }
 
-QQuickDataVisBars *Q3DBars::dptr()
+QQuickGraphsBars *Q3DBars::dptr()
 {
-    return static_cast<QQuickDataVisBars *>(d_ptr.data());
+    return static_cast<QQuickGraphsBars *>(d_ptr.data());
 }
 
-const QQuickDataVisBars *Q3DBars::dptrc() const
+const QQuickGraphsBars *Q3DBars::dptrc() const
 {
-    return static_cast<const QQuickDataVisBars *>(d_ptr.data());
+    return static_cast<const QQuickGraphsBars *>(d_ptr.data());
 }
 
 QT_END_NAMESPACE

@@ -1,7 +1,7 @@
 // Copyright (C) 2023 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "qquickdatavisitem_p.h"
+#include "qquickgraphsitem_p.h"
 #include "declarativetheme_p.h"
 #include "declarativescene_p.h"
 #include "qvalue3daxis_p.h"
@@ -30,7 +30,7 @@
 
 QT_BEGIN_NAMESPACE
 
-QQuickDataVisItem::QQuickDataVisItem(QQuickItem *parent) :
+QQuickGraphsItem::QQuickGraphsItem(QQuickItem *parent) :
     QQuick3DViewport(parent),
     m_controller(0),
     m_renderMode(RenderIndirect),
@@ -41,7 +41,7 @@ QQuickDataVisItem::QQuickDataVisItem(QQuickItem *parent) :
     m_nodeMutex = QSharedPointer<QMutex>::create();
 
     auto sceneManager = QQuick3DObjectPrivate::get(rootNode())->sceneManager;
-    connect(sceneManager.data(), &QQuick3DSceneManager::windowChanged, this, &QQuickDataVisItem::handleWindowChanged);
+    connect(sceneManager.data(), &QQuick3DSceneManager::windowChanged, this, &QQuickGraphsItem::handleWindowChanged);
     // Set contents to false in case we are in qml designer to make component look nice
     m_runningInDesigner = QGuiApplication::applicationDisplayName() == QLatin1String("Qml2Puppet");
     setFlag(ItemHasContents/*, !m_runningInDesigner*/); // Is this relevant anymore?
@@ -50,7 +50,7 @@ QQuickDataVisItem::QQuickDataVisItem(QQuickItem *parent) :
     setAcceptTouchEvents(true);
 }
 
-QQuickDataVisItem::~QQuickDataVisItem()
+QQuickGraphsItem::~QQuickGraphsItem()
 {
     disconnect(this, 0, this, 0);
     checkWindowList(0);
@@ -62,7 +62,7 @@ QQuickDataVisItem::~QQuickDataVisItem()
     m_nodeMutex.clear();
 }
 
-void QQuickDataVisItem::setRenderingMode(QQuickDataVisItem::RenderingMode mode)
+void QQuickGraphsItem::setRenderingMode(QQuickGraphsItem::RenderingMode mode)
 {
     if (mode == m_renderMode)
         return;
@@ -82,10 +82,10 @@ void QQuickDataVisItem::setRenderingMode(QQuickDataVisItem::RenderingMode mode)
         update();
         setRenderMode(QQuick3DViewport::Underlay);
         if (previousMode == RenderIndirect) {
-                checkWindowList(window());
-                setAntialiasing(m_windowSamples > 0);
-                if (m_windowSamples != m_samples)
-                    emit msaaSamplesChanged(m_windowSamples);
+            checkWindowList(window());
+            setAntialiasing(m_windowSamples > 0);
+            if (m_windowSamples != m_samples)
+                emit msaaSamplesChanged(m_windowSamples);
         }
         break;
     case RenderIndirect:
@@ -99,19 +99,19 @@ void QQuickDataVisItem::setRenderingMode(QQuickDataVisItem::RenderingMode mode)
     emit renderingModeChanged(mode);
 }
 
-QQuickDataVisItem::RenderingMode QQuickDataVisItem::renderingMode() const
+QQuickGraphsItem::RenderingMode QQuickGraphsItem::renderingMode() const
 {
     return m_renderMode;
 }
 
-void QQuickDataVisItem::keyPressEvent(QKeyEvent *ev)
+void QQuickGraphsItem::keyPressEvent(QKeyEvent *ev)
 {
     ev->ignore();
     setFlag(ItemHasContents);
     update();
 }
 
-bool QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
+bool QQuickGraphsItem::handleMousePressedEvent(QMouseEvent *event)
 {
     if (Qt::LeftButton == event->button()) {
         if (m_sliceEnabled && m_controller->isSlicingActive()) {
@@ -129,17 +129,17 @@ bool QQuickDataVisItem::handleMousePressedEvent(QMouseEvent *event)
     return true;
 }
 
-void QQuickDataVisItem::handleThemeTypeChange()
+void QQuickGraphsItem::handleThemeTypeChange()
 {
 }
 
-void QQuickDataVisItem::handleFpsChanged()
+void QQuickGraphsItem::handleFpsChanged()
 {
     int fps = renderStats()->fps();
     emit currentFpsChanged(fps);
 }
 
-void QQuickDataVisItem::componentComplete()
+void QQuickGraphsItem::componentComplete()
 {
     QQuick3DViewport::componentComplete();
 
@@ -271,142 +271,142 @@ void QQuickDataVisItem::componentComplete()
     m_controller->handleAxisLabelsChangedBySender(m_controller->axisZ());
 }
 
-QQuick3DDirectionalLight *QQuickDataVisItem::light() const
+QQuick3DDirectionalLight *QQuickGraphsItem::light() const
 {
     return m_light;
 }
 
-void QQuickDataVisItem::setTheme(Q3DTheme *theme)
+void QQuickGraphsItem::setTheme(Q3DTheme *theme)
 {
     m_controller->setActiveTheme(theme, isComponentComplete());
 }
 
-Q3DTheme *QQuickDataVisItem::theme() const
+Q3DTheme *QQuickGraphsItem::theme() const
 {
     return m_controller->activeTheme();
 }
 
-void QQuickDataVisItem::clearSelection()
+void QQuickGraphsItem::clearSelection()
 {
     m_controller->clearSelection();
 }
 
-bool QQuickDataVisItem::hasSeries(QAbstract3DSeries *series)
+bool QQuickGraphsItem::hasSeries(QAbstract3DSeries *series)
 {
     return m_controller->hasSeries(series);
 }
 
-void QQuickDataVisItem::setSelectionMode(SelectionFlags mode)
+void QQuickGraphsItem::setSelectionMode(SelectionFlags mode)
 {
     int intmode = int(mode);
     m_controller->setSelectionMode(QAbstract3DGraph::SelectionFlags(intmode));
 }
 
-QQuickDataVisItem::SelectionFlags QQuickDataVisItem::selectionMode() const
+QQuickGraphsItem::SelectionFlags QQuickGraphsItem::selectionMode() const
 {
     int intmode = int(m_controller->selectionMode());
     return SelectionFlags(intmode);
 }
 
-void QQuickDataVisItem::setShadowQuality(ShadowQuality quality)
+void QQuickGraphsItem::setShadowQuality(ShadowQuality quality)
 {
     m_controller->setShadowQuality(QAbstract3DGraph::ShadowQuality(quality));
 }
 
-QQuickDataVisItem::ShadowQuality QQuickDataVisItem::shadowQuality() const
+QQuickGraphsItem::ShadowQuality QQuickGraphsItem::shadowQuality() const
 {
     return ShadowQuality(m_controller->shadowQuality());
 }
 
-bool QQuickDataVisItem::shadowsSupported() const
+bool QQuickGraphsItem::shadowsSupported() const
 {
     return m_controller->shadowsSupported();
 }
 
-int QQuickDataVisItem::addCustomItem(QCustom3DItem *item)
+int QQuickGraphsItem::addCustomItem(QCustom3DItem *item)
 {
     return m_controller->addCustomItem(item);
 }
 
-void QQuickDataVisItem::removeCustomItems()
+void QQuickGraphsItem::removeCustomItems()
 {
     m_controller->deleteCustomItems();
 }
 
-void QQuickDataVisItem::removeCustomItem(QCustom3DItem *item)
+void QQuickGraphsItem::removeCustomItem(QCustom3DItem *item)
 {
     m_controller->deleteCustomItem(item);
 }
 
-void QQuickDataVisItem::removeCustomItemAt(const QVector3D &position)
+void QQuickGraphsItem::removeCustomItemAt(const QVector3D &position)
 {
     m_controller->deleteCustomItem(position);
 }
 
-void QQuickDataVisItem::releaseCustomItem(QCustom3DItem *item)
+void QQuickGraphsItem::releaseCustomItem(QCustom3DItem *item)
 {
     m_controller->releaseCustomItem(item);
 }
 
-int QQuickDataVisItem::selectedLabelIndex() const
+int QQuickGraphsItem::selectedLabelIndex() const
 {
     return m_controller->selectedLabelIndex();
 }
 
-QAbstract3DAxis *QQuickDataVisItem::selectedAxis() const
+QAbstract3DAxis *QQuickGraphsItem::selectedAxis() const
 {
     return m_controller->selectedAxis();
 }
 
-int QQuickDataVisItem::selectedCustomItemIndex() const
+int QQuickGraphsItem::selectedCustomItemIndex() const
 {
     return m_controller->selectedCustomItemIndex();
 }
 
-QCustom3DItem *QQuickDataVisItem::selectedCustomItem() const
+QCustom3DItem *QQuickGraphsItem::selectedCustomItem() const
 {
     return m_controller->selectedCustomItem();
 }
 
-QQmlListProperty<QCustom3DItem> QQuickDataVisItem::customItemList()
+QQmlListProperty<QCustom3DItem> QQuickGraphsItem::customItemList()
 {
     return QQmlListProperty<QCustom3DItem>(this, this,
-                                           &QQuickDataVisItem::appendCustomItemFunc,
-                                           &QQuickDataVisItem::countCustomItemFunc,
-                                           &QQuickDataVisItem::atCustomItemFunc,
-                                           &QQuickDataVisItem::clearCustomItemFunc);
+                                           &QQuickGraphsItem::appendCustomItemFunc,
+                                           &QQuickGraphsItem::countCustomItemFunc,
+                                           &QQuickGraphsItem::atCustomItemFunc,
+                                           &QQuickGraphsItem::clearCustomItemFunc);
 }
 
-void QQuickDataVisItem::appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
-                                               QCustom3DItem *item)
+void QQuickGraphsItem::appendCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
+                                            QCustom3DItem *item)
 {
-    QQuickDataVisItem *decl = reinterpret_cast<QQuickDataVisItem *>(list->data);
+    QQuickGraphsItem *decl = reinterpret_cast<QQuickGraphsItem *>(list->data);
     decl->addCustomItem(item);
 }
 
-qsizetype QQuickDataVisItem::countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
+qsizetype QQuickGraphsItem::countCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
 {
     Q_UNUSED(list);
     return 0;
-//    return reinterpret_cast<QQuickDataVisItem *>(list->data)->m_controller->m_customItems.size();
+//    return reinterpret_cast<QQuickGraphsItem *>(list->data)->m_controller->m_customItems.size();
 }
 
-QCustom3DItem *QQuickDataVisItem::atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
-                                                     qsizetype index)
+QCustom3DItem *QQuickGraphsItem::atCustomItemFunc(QQmlListProperty<QCustom3DItem> *list,
+                                                  qsizetype index)
 {
     Q_UNUSED(list);
     Q_UNUSED(index);
     return new QCustom3DItem();
-//    return reinterpret_cast<QQuickDataVisItem *>(list->data)->m_controller->m_customItems.at(index);
+//    return reinterpret_cast<QQuickGraphsItem *>(list->data)->m_controller->m_customItems.at(index);
 }
 
-void QQuickDataVisItem::clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
+void QQuickGraphsItem::clearCustomItemFunc(QQmlListProperty<QCustom3DItem> *list)
 {
-    QQuickDataVisItem *decl = reinterpret_cast<QQuickDataVisItem *>(list->data);
+    QQuickGraphsItem *decl = reinterpret_cast<QQuickGraphsItem *>(list->data);
     decl->removeCustomItems();
 }
 
-void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
+void QQuickGraphsItem::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);
     m_controller = controller;
@@ -422,56 +422,56 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
     m_controller->setActiveTheme(defaultTheme);
 
     QObject::connect(m_controller.data(), &Abstract3DController::shadowQualityChanged, this,
-                     &QQuickDataVisItem::handleShadowQualityChange);
+                     &QQuickGraphsItem::handleShadowQualityChange);
     QObject::connect(m_controller.data(), &Abstract3DController::activeInputHandlerChanged, this,
-                     &QQuickDataVisItem::inputHandlerChanged);
+                     &QQuickGraphsItem::inputHandlerChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::activeThemeChanged, this,
-                     &QQuickDataVisItem::themeChanged);
+                     &QQuickGraphsItem::themeChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::themeTypeChanged, this,
-                     &QQuickDataVisItem::handleThemeTypeChange);
+                     &QQuickGraphsItem::handleThemeTypeChange);
     QObject::connect(m_controller.data(), &Abstract3DController::selectionModeChanged, this,
-                     &QQuickDataVisItem::handleSelectionModeChange);
+                     &QQuickGraphsItem::handleSelectionModeChange);
     QObject::connect(m_controller.data(), &Abstract3DController::elementSelected, this,
-                     &QQuickDataVisItem::handleSelectedElementChange);
+                     &QQuickGraphsItem::handleSelectedElementChange);
 
     QObject::connect(m_controller.data(), &Abstract3DController::axisXChanged, this,
-                     &QQuickDataVisItem::handleAxisXChanged);
+                     &QQuickGraphsItem::handleAxisXChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::axisYChanged, this,
-                     &QQuickDataVisItem::handleAxisYChanged);
+                     &QQuickGraphsItem::handleAxisYChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::axisZChanged, this,
-                     &QQuickDataVisItem::handleAxisZChanged);
+                     &QQuickGraphsItem::handleAxisZChanged);
 
     QObject::connect(m_controller.data(), &Abstract3DController::measureFpsChanged, this,
-                     &QQuickDataVisItem::measureFpsChanged);
+                     &QQuickGraphsItem::measureFpsChanged);
 //    QObject::connect(m_controller.data(), &Abstract3DController::currentFpsChanged, this,
-//                     &QQuickDataVisItem::currentFpsChanged);
+//                     &QQuickGraphsItem::currentFpsChanged);
 
     QObject::connect(m_controller.data(), &Abstract3DController::orthoProjectionChanged, this,
-                     &QQuickDataVisItem::orthoProjectionChanged);
+                     &QQuickGraphsItem::orthoProjectionChanged);
 
     QObject::connect(m_controller.data(), &Abstract3DController::aspectRatioChanged, this,
-                     &QQuickDataVisItem::aspectRatioChanged);
+                     &QQuickGraphsItem::aspectRatioChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::optimizationHintsChanged, this,
-                     &QQuickDataVisItem::handleOptimizationHintChange);
+                     &QQuickGraphsItem::handleOptimizationHintChange);
     QObject::connect(m_controller.data(), &Abstract3DController::polarChanged, this,
-                     &QQuickDataVisItem::polarChanged);
+                     &QQuickGraphsItem::polarChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::radialLabelOffsetChanged, this,
-                     &QQuickDataVisItem::radialLabelOffsetChanged);
+                     &QQuickGraphsItem::radialLabelOffsetChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::horizontalAspectRatioChanged, this,
-                     &QQuickDataVisItem::horizontalAspectRatioChanged);
+                     &QQuickGraphsItem::horizontalAspectRatioChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::reflectionChanged, this,
-                     &QQuickDataVisItem::reflectionChanged);
+                     &QQuickGraphsItem::reflectionChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::reflectivityChanged, this,
-                     &QQuickDataVisItem::reflectivityChanged);
+                     &QQuickGraphsItem::reflectivityChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::localeChanged, this,
-                     &QQuickDataVisItem::localeChanged);
+                     &QQuickGraphsItem::localeChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::queriedGraphPositionChanged, this,
-                     &QQuickDataVisItem::queriedGraphPositionChanged);
+                     &QQuickGraphsItem::queriedGraphPositionChanged);
     QObject::connect(m_controller.data(), &Abstract3DController::marginChanged, this,
-                     &QQuickDataVisItem::marginChanged);
+                     &QQuickGraphsItem::marginChanged);
 }
 
-void QQuickDataVisItem::synchData()
+void QQuickGraphsItem::synchData()
 {
     m_controller->m_renderPending = false;
 
@@ -792,7 +792,7 @@ void QQuickDataVisItem::synchData()
     }
 }
 
-void QQuickDataVisItem::updateGrid()
+void QQuickGraphsItem::updateGrid()
 {
     int gridLineCountX = segmentLineRepeaterX()->count();
     int subGridLineCountX = subsegmentLineRepeaterX()->count();
@@ -1018,7 +1018,7 @@ void QQuickDataVisItem::updateGrid()
     }
 }
 
-void QQuickDataVisItem::updateLabels()
+void QQuickGraphsItem::updateLabels()
 {
     auto axisX = m_controller->axisX();
 
@@ -1390,13 +1390,13 @@ void QQuickDataVisItem::updateLabels()
 
 }
 
-void QQuickDataVisItem::positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position)
+void QQuickGraphsItem::positionAndScaleLine(QQuick3DNode *lineNode, QVector3D scale, QVector3D position)
 {
     lineNode->setScale(scale);
     lineNode->setPosition(position);
 }
 
-void QQuickDataVisItem::graphPositionAt(const QPoint &point)
+void QQuickGraphsItem::graphPositionAt(const QPoint &point)
 {
     bool isHitted = false;
     auto results = pickAll(point.x(), point.y());
@@ -1404,10 +1404,10 @@ void QQuickDataVisItem::graphPositionAt(const QPoint &point)
         if (auto hit = result.objectHit()) {
             isHitted = true;
             m_controller->setQueriedGraphPosition(QVector3D(
-                        result.scenePosition().x(),
-                        result.scenePosition().y(),
-                        result.scenePosition().z()
-                        ));
+                                                      result.scenePosition().x(),
+                                                      result.scenePosition().y(),
+                                                      result.scenePosition().z()
+                                                      ));
             if (m_backgroundBB != hit) {
                 m_controller->setQueriedGraphPosition(hit->position());
                 break;
@@ -1424,23 +1424,23 @@ void QQuickDataVisItem::graphPositionAt(const QPoint &point)
     scene()->setGraphPositionQuery(Q3DScene::invalidSelectionPoint());
 }
 
-void QQuickDataVisItem::updateShadowQuality(ShadowQuality quality)
+void QQuickGraphsItem::updateShadowQuality(ShadowQuality quality)
 {
-    if (quality != QQuickDataVisItem::ShadowQualityNone) {
+    if (quality != QQuickGraphsItem::ShadowQualityNone) {
         light()->setCastsShadow(true);
 
         QQuick3DAbstractLight::QSSGShadowMapQuality shadowMapQuality;
         switch (quality) {
-        case QQuickDataVisItem::ShadowQualityLow:
-        case QQuickDataVisItem::ShadowQualitySoftLow:
+        case QQuickGraphsItem::ShadowQualityLow:
+        case QQuickGraphsItem::ShadowQualitySoftLow:
             shadowMapQuality = QQuick3DAbstractLight::QSSGShadowMapQuality::ShadowMapQualityLow;
             break;
-        case QQuickDataVisItem::ShadowQualityMedium:
-        case QQuickDataVisItem::ShadowQualitySoftMedium:
+        case QQuickGraphsItem::ShadowQualityMedium:
+        case QQuickGraphsItem::ShadowQualitySoftMedium:
             shadowMapQuality = QQuick3DAbstractLight::QSSGShadowMapQuality::ShadowMapQualityMedium;
             break;
-        case QQuickDataVisItem::ShadowQualityHigh:
-        case QQuickDataVisItem::ShadowQualitySoftHigh:
+        case QQuickGraphsItem::ShadowQualityHigh:
+        case QQuickGraphsItem::ShadowQualitySoftHigh:
             shadowMapQuality = QQuick3DAbstractLight::QSSGShadowMapQuality::ShadowMapQualityHigh;
             break;
         default:
@@ -1453,18 +1453,18 @@ void QQuickDataVisItem::updateShadowQuality(ShadowQuality quality)
     }
 }
 
-void QQuickDataVisItem::updateAxisRange(float min, float max)
+void QQuickGraphsItem::updateAxisRange(float min, float max)
 {
     Q_UNUSED(min);
     Q_UNUSED(max);
 }
 
-void QQuickDataVisItem::updateAxisReversed(bool enable)
+void QQuickGraphsItem::updateAxisReversed(bool enable)
 {
     Q_UNUSED(enable);
 }
 
-int QQuickDataVisItem::findLabelsMaxWidth(const QStringList &labels)
+int QQuickGraphsItem::findLabelsMaxWidth(const QStringList &labels)
 {
     int labelWidth = 0;
     QFontMetrics labelFM(m_controller->activeTheme()->font());
@@ -1477,23 +1477,23 @@ int QQuickDataVisItem::findLabelsMaxWidth(const QStringList &labels)
     return labelWidth;
 }
 
-QVector3D QQuickDataVisItem::calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition, int index)
+QVector3D QQuickGraphsItem::calculateCategoryLabelPosition(QAbstract3DAxis *axis, QVector3D labelPosition, int index)
 {
     Q_UNUSED(axis);
     Q_UNUSED(index);
     return labelPosition;
 }
 
-float QQuickDataVisItem::calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index)
+float QQuickGraphsItem::calculateCategoryGridLinePosition(QAbstract3DAxis *axis, int index)
 {
     Q_UNUSED(axis);
     Q_UNUSED(index);
     return 0.0f;
 }
 
-void QQuickDataVisItem::updateXTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
-                                     const QQuaternion &totalRotation, float labelsMaxWidth,
-                                     float labelHeight, const QVector3D &scale)
+void QQuickGraphsItem::updateXTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                                    const QQuaternion &totalRotation, float labelsMaxWidth,
+                                    float labelHeight, const QVector3D &scale)
 {
     float scaledFontSize = (0.05 + m_controller->activeTheme()->font().pointSizeF()) / 500.0f;
     float scaleFactor = scaledFontSize / 115.0f;
@@ -1586,15 +1586,15 @@ void QQuickDataVisItem::updateXTitle(const QVector3D &labelRotation, const QVect
     m_titleLabelX->setProperty("LabelHeight", labelHeight);
 }
 
-void QQuickDataVisItem::updateYTitle(const QVector3D &sideLabelRotation,
-                                     const QVector3D &backLabelRotation,
-                                     const QVector3D &sideLabelTrans,
-                                     const QVector3D &backLabelTrans,
-                                     const QQuaternion &totalSideRotation,
-                                     const QQuaternion &totalBackRotation,
-                                     float labelsMaxWidth,
-                                     float labelHeight,
-                                     const QVector3D &scale)
+void QQuickGraphsItem::updateYTitle(const QVector3D &sideLabelRotation,
+                                    const QVector3D &backLabelRotation,
+                                    const QVector3D &sideLabelTrans,
+                                    const QVector3D &backLabelTrans,
+                                    const QQuaternion &totalSideRotation,
+                                    const QQuaternion &totalBackRotation,
+                                    float labelsMaxWidth,
+                                    float labelHeight,
+                                    const QVector3D &scale)
 {
     float scaledFontSize = (0.05 + m_controller->activeTheme()->font().pointSizeF()) / 500.0f;
     float scaleFactor = scaledFontSize / 115.0f;
@@ -1633,9 +1633,9 @@ void QQuickDataVisItem::updateYTitle(const QVector3D &sideLabelRotation,
     m_titleLabelY->setProperty("LabelHeight", labelHeight);
 }
 
-void QQuickDataVisItem::updateZTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
-                                     const QQuaternion &totalRotation, float labelsMaxWidth,
-                                     float labelHeight, const QVector3D &scale)
+void QQuickGraphsItem::updateZTitle(const QVector3D &labelRotation, const QVector3D &labelTrans,
+                                    const QQuaternion &totalRotation, float labelsMaxWidth,
+                                    float labelHeight, const QVector3D &scale)
 {
     float scaledFontSize = (0.05 + m_controller->activeTheme()->font().pointSizeF()) / 500.0f;
     float scaleFactor = scaledFontSize / 115.0f;
@@ -1713,7 +1713,7 @@ void QQuickDataVisItem::updateZTitle(const QVector3D &labelRotation, const QVect
     m_titleLabelZ->setProperty("LabelHeight", labelHeight);
 }
 
-void QQuickDataVisItem::updateCamera()
+void QQuickGraphsItem::updateCamera()
 {
     float zoom = 720.f / m_controller->scene()->activeCamera()->zoomLevel();
     camera()->setZ(zoom);
@@ -1728,7 +1728,7 @@ void QQuickDataVisItem::updateCamera()
         m_itemLabel->setEulerRotation(rotation);
 }
 
-int QQuickDataVisItem::msaaSamples() const
+int QQuickGraphsItem::msaaSamples() const
 {
     if (m_renderMode == RenderIndirect)
         return m_samples;
@@ -1736,7 +1736,7 @@ int QQuickDataVisItem::msaaSamples() const
         return m_windowSamples;
 }
 
-void QQuickDataVisItem::setMsaaSamples(int samples)
+void QQuickGraphsItem::setMsaaSamples(int samples)
 {
     if (m_renderMode != RenderIndirect) {
         qWarning("Multisampling cannot be adjusted in this render mode");
@@ -1780,12 +1780,12 @@ void QQuickDataVisItem::setMsaaSamples(int samples)
     }
 }
 
-Declarative3DScene *QQuickDataVisItem::scene() const
+Declarative3DScene *QQuickGraphsItem::scene() const
 {
     return static_cast<Declarative3DScene *>(m_controller->scene());
 }
 
-void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
+void QQuickGraphsItem::handleWindowChanged(/*QQuickWindow *window*/)
 {
     auto window = QQuick3DObjectPrivate::get(rootNode())->sceneManager->window();
     checkWindowList(window);
@@ -1804,7 +1804,7 @@ void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
     window->setVisible(previousVisibility);
 #endif
 
-    connect(window, &QObject::destroyed, this, &QQuickDataVisItem::windowDestroyed);
+    connect(window, &QObject::destroyed, this, &QQuickGraphsItem::windowDestroyed);
 
     int oldWindowSamples = m_windowSamples;
     m_windowSamples = window->format().samples();
@@ -1812,7 +1812,7 @@ void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
         m_windowSamples = 0;
 
     connect(window, &QQuickWindow::beforeSynchronizing,
-            this, &QQuickDataVisItem::synchData);
+            this, &QQuickGraphsItem::synchData);
 
     if (m_renderMode == RenderDirectToBackground_NoClear
             || m_renderMode == RenderDirectToBackground) {
@@ -1840,7 +1840,7 @@ void QQuickDataVisItem::handleWindowChanged(/*QQuickWindow *window*/)
 #endif
 }
 
-void QQuickDataVisItem::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
+void QQuickGraphsItem::geometryChange(const QRectF &newGeometry, const QRectF &oldGeometry)
 {
     QQuickItem::geometryChange(newGeometry, oldGeometry);
 
@@ -1849,13 +1849,13 @@ void QQuickDataVisItem::geometryChange(const QRectF &newGeometry, const QRectF &
     updateWindowParameters();
 }
 
-void QQuickDataVisItem::itemChange(ItemChange change, const ItemChangeData  &value)
+void QQuickGraphsItem::itemChange(ItemChange change, const ItemChangeData  &value)
 {
     QQuick3DViewport::itemChange(change, value);
     updateWindowParameters();
 }
 
-void QQuickDataVisItem::updateWindowParameters()
+void QQuickGraphsItem::updateWindowParameters()
 {
     const QMutexLocker locker(&m_mutex);
 
@@ -1896,85 +1896,85 @@ void QQuickDataVisItem::updateWindowParameters()
     }
 }
 
-void QQuickDataVisItem::handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode)
+void QQuickGraphsItem::handleSelectionModeChange(QAbstract3DGraph::SelectionFlags mode)
 {
     int intmode = int(mode);
     emit selectionModeChanged(SelectionFlags(intmode));
 }
 
-void QQuickDataVisItem::handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality)
+void QQuickGraphsItem::handleShadowQualityChange(QAbstract3DGraph::ShadowQuality quality)
 {
     emit shadowQualityChanged(ShadowQuality(quality));
 }
 
-void QQuickDataVisItem::handleSelectedElementChange(QAbstract3DGraph::ElementType type)
+void QQuickGraphsItem::handleSelectedElementChange(QAbstract3DGraph::ElementType type)
 {
     emit selectedElementChanged(ElementType(type));
 }
 
-void QQuickDataVisItem::handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints)
+void QQuickGraphsItem::handleOptimizationHintChange(QAbstract3DGraph::OptimizationHints hints)
 {
     int intHints = int(hints);
     emit optimizationHintsChanged(OptimizationHints(intHints));
 }
 
-QAbstract3DInputHandler *QQuickDataVisItem::inputHandler() const
+QAbstract3DInputHandler *QQuickGraphsItem::inputHandler() const
 {
     return m_controller->activeInputHandler();
 }
 
-void QQuickDataVisItem::setInputHandler(QAbstract3DInputHandler *inputHandler)
+void QQuickGraphsItem::setInputHandler(QAbstract3DInputHandler *inputHandler)
 {
     m_controller->setActiveInputHandler(inputHandler);
 }
 
-void QQuickDataVisItem::mouseDoubleClickEvent(QMouseEvent *event)
+void QQuickGraphsItem::mouseDoubleClickEvent(QMouseEvent *event)
 {
     m_controller->mouseDoubleClickEvent(event);
 }
 
-void QQuickDataVisItem::touchEvent(QTouchEvent *event)
+void QQuickGraphsItem::touchEvent(QTouchEvent *event)
 {
     m_controller->touchEvent(event);
     window()->update();
 }
 
-void QQuickDataVisItem::mousePressEvent(QMouseEvent *event)
+void QQuickGraphsItem::mousePressEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
     handleMousePressedEvent(event);
     m_controller->mousePressEvent(event, mousePos);
 }
 
-void QQuickDataVisItem::mouseReleaseEvent(QMouseEvent *event)
+void QQuickGraphsItem::mouseReleaseEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
     m_controller->mouseReleaseEvent(event, mousePos);
 }
 
-void QQuickDataVisItem::mouseMoveEvent(QMouseEvent *event)
+void QQuickGraphsItem::mouseMoveEvent(QMouseEvent *event)
 {
     QPoint mousePos = event->pos();
     m_controller->mouseMoveEvent(event, mousePos);
 }
 
 #if QT_CONFIG(wheelevent)
-void QQuickDataVisItem::wheelEvent(QWheelEvent *event)
+void QQuickGraphsItem::wheelEvent(QWheelEvent *event)
 {
     m_controller->wheelEvent(event);
 }
 #endif
 
-void QQuickDataVisItem::checkWindowList(QQuickWindow *window)
+void QQuickGraphsItem::checkWindowList(QQuickWindow *window)
 {
     QQuickWindow *oldWindow = m_graphWindowList.value(this);
     m_graphWindowList[this] = window;
 
     if (oldWindow != window && oldWindow) {
         QObject::disconnect(oldWindow, &QObject::destroyed, this,
-                            &QQuickDataVisItem::windowDestroyed);
+                            &QQuickGraphsItem::windowDestroyed);
         QObject::disconnect(oldWindow, &QQuickWindow::beforeSynchronizing, this,
-                            &QQuickDataVisItem::synchData);
+                            &QQuickGraphsItem::synchData);
         if (!m_controller.isNull()) {
             QObject::disconnect(m_controller.data(), &Abstract3DController::needRender,
                                 oldWindow, &QQuickWindow::update);
@@ -1983,7 +1983,7 @@ void QQuickDataVisItem::checkWindowList(QQuickWindow *window)
 
     QList<QQuickWindow *> windowList;
 
-    foreach (QQuickDataVisItem *graph, m_graphWindowList.keys()) {
+    foreach (QQuickGraphsItem *graph, m_graphWindowList.keys()) {
         if (graph->m_renderMode == RenderDirectToBackground
                 || graph->m_renderMode == RenderDirectToBackground_NoClear) {
             windowList.append(m_graphWindowList.value(graph));
@@ -1996,144 +1996,144 @@ void QQuickDataVisItem::checkWindowList(QQuickWindow *window)
     }
 }
 
-void QQuickDataVisItem::setMeasureFps(bool enable)
+void QQuickGraphsItem::setMeasureFps(bool enable)
 {
     m_controller->setMeasureFps(enable);
     if (enable)
-        QObject::connect(renderStats(), &QQuick3DRenderStats::fpsChanged, this, &QQuickDataVisItem::handleFpsChanged);
+        QObject::connect(renderStats(), &QQuick3DRenderStats::fpsChanged, this, &QQuickGraphsItem::handleFpsChanged);
     else
         QObject::disconnect(renderStats(), 0, this, 0);
 
 }
 
-bool QQuickDataVisItem::measureFps() const
+bool QQuickGraphsItem::measureFps() const
 {
     return m_controller->measureFps();
 }
 
-int QQuickDataVisItem::currentFps() const
+int QQuickGraphsItem::currentFps() const
 {
     return m_controller->currentFps();
 }
 
-void QQuickDataVisItem::setOrthoProjection(bool enable)
+void QQuickGraphsItem::setOrthoProjection(bool enable)
 {
     m_controller->setOrthoProjection(enable);
 }
 
-bool QQuickDataVisItem::isOrthoProjection() const
+bool QQuickGraphsItem::isOrthoProjection() const
 {
     return m_controller->isOrthoProjection();
 }
 
-QQuickDataVisItem::ElementType QQuickDataVisItem::selectedElement() const
+QQuickGraphsItem::ElementType QQuickGraphsItem::selectedElement() const
 {
     return ElementType(m_controller->selectedElement());
 }
 
-void QQuickDataVisItem::setAspectRatio(qreal ratio)
+void QQuickGraphsItem::setAspectRatio(qreal ratio)
 {
     m_controller->setAspectRatio(ratio);
 }
 
-qreal QQuickDataVisItem::aspectRatio() const
+qreal QQuickGraphsItem::aspectRatio() const
 {
     return m_controller->aspectRatio();
 }
 
-void QQuickDataVisItem::setOptimizationHints(OptimizationHints hints)
+void QQuickGraphsItem::setOptimizationHints(OptimizationHints hints)
 {
     int intmode = int(hints);
     m_controller->setOptimizationHints(QAbstract3DGraph::OptimizationHints(intmode));
 }
 
-QQuickDataVisItem::OptimizationHints QQuickDataVisItem::optimizationHints() const
+QQuickGraphsItem::OptimizationHints QQuickGraphsItem::optimizationHints() const
 {
     int intmode = int(m_controller->optimizationHints());
     return OptimizationHints(intmode);
 }
 
-void QQuickDataVisItem::setPolar(bool enable)
+void QQuickGraphsItem::setPolar(bool enable)
 {
     m_controller->setPolar(enable);
 }
 
-bool QQuickDataVisItem::isPolar() const
+bool QQuickGraphsItem::isPolar() const
 {
     return m_controller->isPolar();
 }
 
-void QQuickDataVisItem::setRadialLabelOffset(float offset)
+void QQuickGraphsItem::setRadialLabelOffset(float offset)
 {
     m_controller->setRadialLabelOffset(offset);
 }
 
-float QQuickDataVisItem::radialLabelOffset() const
+float QQuickGraphsItem::radialLabelOffset() const
 {
     return m_controller->radialLabelOffset();
 }
 
-void QQuickDataVisItem::setHorizontalAspectRatio(qreal ratio)
+void QQuickGraphsItem::setHorizontalAspectRatio(qreal ratio)
 {
     m_controller->setHorizontalAspectRatio(ratio);
 }
 
-qreal QQuickDataVisItem::horizontalAspectRatio() const
+qreal QQuickGraphsItem::horizontalAspectRatio() const
 {
     return m_controller->horizontalAspectRatio();
 }
 
-void QQuickDataVisItem::setReflection(bool enable)
+void QQuickGraphsItem::setReflection(bool enable)
 {
     m_controller->setReflection(enable);
 }
 
-bool QQuickDataVisItem::isReflection() const
+bool QQuickGraphsItem::isReflection() const
 {
     return m_controller->reflection();
 }
 
-void QQuickDataVisItem::setReflectivity(qreal reflectivity)
+void QQuickGraphsItem::setReflectivity(qreal reflectivity)
 {
     m_controller->setReflectivity(reflectivity);
 }
 
-qreal QQuickDataVisItem::reflectivity() const
+qreal QQuickGraphsItem::reflectivity() const
 {
     return m_controller->reflectivity();
 }
 
-void QQuickDataVisItem::setLocale(const QLocale &locale)
+void QQuickGraphsItem::setLocale(const QLocale &locale)
 {
     m_controller->setLocale(locale);
 }
 
-QLocale QQuickDataVisItem::locale() const
+QLocale QQuickGraphsItem::locale() const
 {
     return m_controller->locale();
 }
 
-QVector3D QQuickDataVisItem::queriedGraphPosition() const
+QVector3D QQuickGraphsItem::queriedGraphPosition() const
 {
     return m_controller->queriedGraphPosition();
 }
 
-void QQuickDataVisItem::setMargin(qreal margin)
+void QQuickGraphsItem::setMargin(qreal margin)
 {
     m_controller->setMargin(margin);
 }
 
-qreal QQuickDataVisItem::margin() const
+qreal QQuickGraphsItem::margin() const
 {
     return m_controller->margin();
 }
 
-QQuick3DNode *QQuickDataVisItem::rootNode() const
+QQuick3DNode *QQuickGraphsItem::rootNode() const
 {
     return QQuick3DViewport::scene();
 }
 
-void QQuickDataVisItem::changeLabelBackgroundColor(QQuick3DRepeater *repeater, const QColor &color)
+void QQuickGraphsItem::changeLabelBackgroundColor(QQuick3DRepeater *repeater, const QColor &color)
 {
     int count = repeater->count();
     for (int i = 0; i < count; i++) {
@@ -2142,7 +2142,7 @@ void QQuickDataVisItem::changeLabelBackgroundColor(QQuick3DRepeater *repeater, c
     }
 }
 
-void QQuickDataVisItem::changeLabelBackgroundEnabled(QQuick3DRepeater *repeater, const bool &enabled)
+void QQuickGraphsItem::changeLabelBackgroundEnabled(QQuick3DRepeater *repeater, const bool &enabled)
 {
     int count = repeater->count();
     for (int i = 0; i < count; i++) {
@@ -2151,7 +2151,7 @@ void QQuickDataVisItem::changeLabelBackgroundEnabled(QQuick3DRepeater *repeater,
     }
 }
 
-void QQuickDataVisItem::changeLabelBorderEnabled(QQuick3DRepeater *repeater, const bool &enabled)
+void QQuickGraphsItem::changeLabelBorderEnabled(QQuick3DRepeater *repeater, const bool &enabled)
 {
     int count = repeater->count();
     for (int i = 0; i < count; i++) {
@@ -2160,7 +2160,7 @@ void QQuickDataVisItem::changeLabelBorderEnabled(QQuick3DRepeater *repeater, con
     }
 }
 
-void QQuickDataVisItem::changeLabelTextColor(QQuick3DRepeater *repeater, const QColor &color)
+void QQuickGraphsItem::changeLabelTextColor(QQuick3DRepeater *repeater, const QColor &color)
 {
     int count = repeater->count();
     for (int i = 0; i < count; i++) {
@@ -2169,7 +2169,7 @@ void QQuickDataVisItem::changeLabelTextColor(QQuick3DRepeater *repeater, const Q
     }
 }
 
-void QQuickDataVisItem::changeLabelFont(QQuick3DRepeater *repeater, const QFont &font)
+void QQuickGraphsItem::changeLabelFont(QQuick3DRepeater *repeater, const QFont &font)
 {
     int count = repeater->count();
     for (int i = 0; i < count; i++) {
@@ -2178,7 +2178,7 @@ void QQuickDataVisItem::changeLabelFont(QQuick3DRepeater *repeater, const QFont 
     }
 }
 
-void QQuickDataVisItem::changeGridLineColor(QQuick3DRepeater *repeater, const QColor &color)
+void QQuickGraphsItem::changeGridLineColor(QQuick3DRepeater *repeater, const QColor &color)
 {
     for (int i = 0; i < repeater->count(); i++) {
         auto lineNode = static_cast<QQuick3DNode *>(repeater->objectAt(i));
@@ -2186,7 +2186,7 @@ void QQuickDataVisItem::changeGridLineColor(QQuick3DRepeater *repeater, const QC
     }
 }
 
-void QQuickDataVisItem::updateTitleLabels()
+void QQuickGraphsItem::updateTitleLabels()
 {
     if (m_controller->m_changeTracker.axisXTitleVisibilityChanged) {
         m_titleLabelX->setVisible(m_controller->axisX()->isTitleVisible());
@@ -2219,7 +2219,7 @@ void QQuickDataVisItem::updateTitleLabels()
     }
 }
 
-void QQuickDataVisItem::updateSliceGraph()
+void QQuickGraphsItem::updateSliceGraph()
 {
     if (!m_sliceEnabled) {
         m_controller->setSlicingActive(false);
@@ -2243,7 +2243,7 @@ void QQuickDataVisItem::updateSliceGraph()
     }
 }
 
-void QQuickDataVisItem::windowDestroyed(QObject *obj)
+void QQuickGraphsItem::windowDestroyed(QObject *obj)
 {
     // Remove destroyed window from window lists
     QQuickWindow *win = static_cast<QQuickWindow *>(obj);
@@ -2253,13 +2253,13 @@ void QQuickDataVisItem::windowDestroyed(QObject *obj)
         m_graphWindowList.remove(this);
 }
 
-QQmlComponent *QQuickDataVisItem::createRepeaterDelegateComponent(const QString &fileName)
+QQmlComponent *QQuickGraphsItem::createRepeaterDelegateComponent(const QString &fileName)
 {
     QQmlComponent component(qmlEngine(this), fileName);
     return qobject_cast<QQmlComponent *>(component.create());
 }
 
-QQuick3DRepeater *QQuickDataVisItem::createRepeater()
+QQuick3DRepeater *QQuickGraphsItem::createRepeater()
 {
     auto engine = qmlEngine(this);
     QQmlComponent repeaterComponent(engine);
@@ -2270,7 +2270,7 @@ QQuick3DRepeater *QQuickDataVisItem::createRepeater()
     return repeater;
 }
 
-QQuick3DNode *QQuickDataVisItem::createTitleLabel()
+QQuick3DNode *QQuickGraphsItem::createTitleLabel()
 {
     QQmlComponent comp(qmlEngine(this), QStringLiteral(":/axis/ItemLabel"));
     auto titleLabel = qobject_cast<QQuick3DNode *>(comp.create());
@@ -2281,26 +2281,26 @@ QQuick3DNode *QQuickDataVisItem::createTitleLabel()
     return titleLabel;
 }
 
-QQuick3DCustomMaterial *QQuickDataVisItem::createQmlCustomMaterial(const QString &fileName)
+QQuick3DCustomMaterial *QQuickGraphsItem::createQmlCustomMaterial(const QString &fileName)
 {
     QQmlComponent component(qmlEngine(this), fileName);
     QQuick3DCustomMaterial *material = qobject_cast<QQuick3DCustomMaterial *>(component.create());
     return material;
 }
 
-QQuick3DPrincipledMaterial *QQuickDataVisItem::createPrincipledMaterial()
+QQuick3DPrincipledMaterial *QQuickGraphsItem::createPrincipledMaterial()
 {
     QQmlComponent component(qmlEngine(this));
     component.setData("import QtQuick3D; PrincipledMaterial{}", QUrl());
     return qobject_cast<QQuick3DPrincipledMaterial *>(component.create());
 }
 
-bool QQuickDataVisItem::event(QEvent *event)
+bool QQuickGraphsItem::event(QEvent *event)
 {
     return QQuickItem::event(event);
 }
 
-void QQuickDataVisItem::createSliceView()
+void QQuickGraphsItem::createSliceView()
 {
     if (m_sliceView)
         return;
@@ -2360,7 +2360,7 @@ void QQuickDataVisItem::createSliceView()
     m_sliceItemLabel->setVisible(false);
 }
 
-void QQuickDataVisItem::updateSliceGrid()
+void QQuickGraphsItem::updateSliceGrid()
 {
     QAbstract3DAxis *horizontalAxis = nullptr;
     QAbstract3DAxis *verticalAxis = m_controller->axisY();
@@ -2405,7 +2405,7 @@ void QQuickDataVisItem::updateSliceGrid()
     if (verticalAxis->type() & QAbstract3DAxis::AxisTypeValue) {
         QValue3DAxis *valueAxis = static_cast<QValue3DAxis *>(verticalAxis);
         m_sliceHorizontalGridRepeater->setModel(valueAxis->gridSize()
-                                              + valueAxis->subGridSize());
+                                                + valueAxis->subGridSize());
     } else if (horizontalAxis->type() & QAbstract3DAxis::AxisTypeCategory) {
         m_sliceHorizontalGridRepeater->setModel(verticalAxis->labels().size());
     }
@@ -2453,7 +2453,7 @@ void QQuickDataVisItem::updateSliceGrid()
     }
 }
 
-void QQuickDataVisItem::updateSliceLabels()
+void QQuickGraphsItem::updateSliceLabels()
 {
     QAbstract3DAxis *horizontalAxis = nullptr;
     QAbstract3DAxis *verticalAxis = m_controller->axisY();
@@ -2645,7 +2645,7 @@ void QQuickDataVisItem::updateSliceLabels()
     m_sliceItemLabel->setProperty("backgroundColor", backgroundColor);
 }
 
-void QQuickDataVisItem::setUpCamera()
+void QQuickGraphsItem::setUpCamera()
 {
     auto useOrtho = m_controller->isOrthoProjection();
     QQuick3DCamera *camera;
@@ -2676,7 +2676,7 @@ void QQuickDataVisItem::setUpCamera()
     setCamera(camera);
 }
 
-void QQuickDataVisItem::setUpLight()
+void QQuickGraphsItem::setUpLight()
 {
     auto light = new QQuick3DDirectionalLight(rootNode());
     QQuick3DObjectPrivate::get(light)->refSceneManager(
