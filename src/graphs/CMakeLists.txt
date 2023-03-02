@@ -582,7 +582,7 @@ set(shader_resource_files
     "engine/shaders/texture_ES2.frag"
 )
 
-qt_internal_add_resource(Graphs "shaders"
+qt_internal_add_resource(Graphs "graphsshaders"
     PREFIX
         "/shaders"
     BASE
@@ -591,7 +591,7 @@ qt_internal_add_resource(Graphs "shaders"
         ${shader_resource_files}
 )
 
-qt_internal_add_resource(Graphs "meshes"
+qt_internal_add_resource(Graphs "graphsmeshes"
     PREFIX
         "/defaultMeshes"
     BASE
