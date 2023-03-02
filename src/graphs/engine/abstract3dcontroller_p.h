@@ -31,7 +31,6 @@ QT_BEGIN_NAMESPACE
 
 class QValue3DAxis;
 class QCategory3DAxis;
-class AbstractDeclarativeInterface;
 class AbstractDeclarative;
 class QAbstract3DSeries;
 class ThemeManager;
@@ -201,7 +200,7 @@ protected:
     qreal m_margin;
 
     QMutex m_renderMutex;
-    AbstractDeclarativeInterface *m_qml = nullptr;
+    QQuickDataVisItem *m_qml = nullptr;
 
     explicit Abstract3DController(QRect initialViewport, Q3DScene *scene, QObject *parent = 0);
 

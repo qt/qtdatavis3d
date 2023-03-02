@@ -5,6 +5,7 @@
 #include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
 #include "qcategory3daxis_p.h"
+#include "qquickdatavisitem_p.h"
 #include "qabstract3dseries_p.h"
 #include "q3dscene_p.h"
 #include "qabstract3dinputhandler_p.h"
@@ -269,8 +270,7 @@ void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
 
     // Changing theme type is logically equivalent of changing the entire theme
     // object, so reset all attached series to the new theme.
-    // TODO: Setting this to true breaks at least series gradient override, probably other things too (QTBUG-111669)
-    bool force = true;//m_qml->isReady();
+    bool force = m_qml->isReady();
     Q3DTheme *activeTheme = m_themeManager->activeTheme();
     for (int i = 0; i < m_seriesList.size(); i++)
         m_seriesList.at(i)->d_ptr->resetToTheme(*activeTheme, i, force);

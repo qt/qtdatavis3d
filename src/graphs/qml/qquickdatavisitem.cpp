@@ -410,7 +410,7 @@ void QQuickDataVisItem::setSharedController(Abstract3DController *controller)
 {
     Q_ASSERT(controller);
     m_controller = controller;
-//    m_controller->m_qml = this;
+    m_controller->m_qml = this;
 
     if (!m_controller->isOpenGLES())
         setMsaaSamples(4);
