@@ -14,7 +14,7 @@ using namespace Qt::StringLiterals;
 RainfallData::RainfallData()
 {
     // In data file the months are in numeric format, so create custom list
-    for (int i = 1; i <= 12; i++)
+    for (int i = 1; i <= 12; ++i)
         m_numericMonths << QString::number(i);
 
     m_columnCount = m_numericMonths.size();
@@ -65,7 +65,7 @@ void RainfallData::updateYearsList(int start, int end)
 {
     m_years.clear();
 
-    for (int i = start; i <= end; i++)
+    for (int i = start; i <= end; ++i)
         m_years << QString::number(i);
 
     m_rowCount = m_years.size();
@@ -79,15 +79,14 @@ void RainfallData::addDataSet()
     VariantDataItemList *itemList = new VariantDataItemList;
 
     // Read data from a data file into the data item list
-    QTextStream stream;
     QFile dataFile(":/data/raindata.txt");
     if (dataFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        stream.setDevice(&dataFile);
+        QTextStream stream(&dataFile);
         while (!stream.atEnd()) {
             QString line = stream.readLine();
             if (line.startsWith('#')) // Ignore comments
                 continue;
-            QStringList strList = line.split(',', Qt::SkipEmptyParts);
+            const auto strList = QStringView{line}.split(',', Qt::SkipEmptyParts);
             // Each line has three data items: Year, month, and rainfall value
             if (strList.size() < 3) {
                 qWarning() << "Invalid row read from data:" << line;
@@ -96,8 +95,8 @@ void RainfallData::addDataSet()
             // Store year and month as strings, and rainfall value as double
             // into a variant data item and add the item to the item list.
             VariantDataItem *newItem = new VariantDataItem;
-            for (int i = 0; i < 2; i++)
-                newItem->append(strList.at(i).trimmed());
+            for (int i = 0; i < 2; ++i)
+                newItem->append(strList.at(i).trimmed().toString());
             newItem->append(strList.at(2).trimmed().toDouble());
             itemList->append(newItem);
         }

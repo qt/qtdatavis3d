@@ -211,7 +211,7 @@ bool SurfaceGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
     pmpHighlight.drawRect(border, border, 35, height - 2 * border);
     pmpHighlight.setPen(Qt::black);
     int step = (height - 2 * border) / 5;
-    for (int i = 0; i < 6; i++) {
+    for (int i = 0; i < 6; ++i) {
         int yPos = i * step + border;
         pmpHighlight.drawLine(border, yPos, 55, yPos);
         const int height = 550 - (i * 110);
