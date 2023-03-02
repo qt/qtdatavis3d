@@ -10,7 +10,6 @@
 #include <QtWidgets/qradiobutton.h>
 #include <QtWidgets/qgroupbox.h>
 #include <QtWidgets/qlabel.h>
-#include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qcommandlinkbutton.h>
 #include <QtGui/qpainter.h>
 
@@ -23,21 +22,16 @@ SurfaceGraph::SurfaceGraph()
 
 SurfaceGraph::~SurfaceGraph() = default;
 
-bool SurfaceGraph::initialize()
+bool SurfaceGraph::initialize(const QSize &minimumGraphSize, const QSize &maximumGraphSize)
 {
-    if (!m_surfaceGraph->hasContext()) {
-        QMessageBox msgBox;
-        msgBox.setText("Couldn't initialize the OpenGL context.");
-        msgBox.exec();
-        return -1;
-    }
+    if (!m_surfaceGraph->hasContext())
+        return false;
 
     m_surfaceWidget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(m_surfaceWidget);
     m_container = QWidget::createWindowContainer(m_surfaceGraph, m_surfaceWidget);
-    QSize screenSize = m_surfaceGraph->screen()->size();
-    m_container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.75));
-    m_container->setMaximumSize(screenSize);
+    m_container->setMinimumSize(minimumGraphSize);
+    m_container->setMaximumSize(maximumGraphSize);
     m_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_container->setFocusPolicy(Qt::StrongFocus);
     hLayout->addWidget(m_container, 1);

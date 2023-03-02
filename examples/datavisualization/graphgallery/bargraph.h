@@ -14,7 +14,7 @@ public:
     BarGraph();
     ~BarGraph();
 
-    bool initialize();
+    bool initialize(const QSize &minimumGraphSize, const QSize &maximumGraphSize);
     QWidget *barsWidget() { return m_barsWidget; }
 
 private:

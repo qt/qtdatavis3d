@@ -14,7 +14,7 @@ public:
     ScatterGraph();
     ~ScatterGraph();
 
-    bool initialize();
+    bool initialize(const QSize &minimumGraphSize, const QSize &maximumGraphSize);
     QWidget *scatterWidget() { return m_scatterWidget; }
 
 private:
