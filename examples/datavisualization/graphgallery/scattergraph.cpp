@@ -8,7 +8,6 @@
 #include <QtWidgets/qcheckbox.h>
 #include <QtWidgets/qcombobox.h>
 #include <QtWidgets/qlabel.h>
-#include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qcommandlinkbutton.h>
 
 using namespace Qt::StringLiterals;
@@ -20,21 +19,16 @@ ScatterGraph::ScatterGraph()
 
 ScatterGraph::~ScatterGraph() = default;
 
-bool ScatterGraph::initialize()
+bool ScatterGraph::initialize(const QSize &minimumGraphSize, const QSize &maximumGraphSize)
 {
-    if (!m_scatterGraph->hasContext()) {
-        QMessageBox msgBox;
-        msgBox.setText("Couldn't initialize the OpenGL context.");
-        msgBox.exec();
-        return -1;
-    }
+    if (!m_scatterGraph->hasContext())
+        return false;
 
     m_scatterWidget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(m_scatterWidget);
     m_container = QWidget::createWindowContainer(m_scatterGraph, m_scatterWidget);
-    QSize screenSize = m_scatterGraph->screen()->size();
-    m_container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.75));
-    m_container->setMaximumSize(screenSize);
+    m_container->setMinimumSize(minimumGraphSize);
+    m_container->setMaximumSize(maximumGraphSize);
     m_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_container->setFocusPolicy(Qt::StrongFocus);
     hLayout->addWidget(m_container, 1);

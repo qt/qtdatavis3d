@@ -10,7 +10,6 @@
 #include <QtWidgets/qslider.h>
 #include <QtWidgets/qfontcombobox.h>
 #include <QtWidgets/qlabel.h>
-#include <QtWidgets/qmessagebox.h>
 #include <QtWidgets/qradiobutton.h>
 #include <QtWidgets/qbuttongroup.h>
 #include <QtGui/qfontdatabase.h>
@@ -26,22 +25,18 @@ BarGraph::BarGraph()
 
 BarGraph::~BarGraph() = default;
 
-bool BarGraph::initialize()
+bool BarGraph::initialize(const QSize &minimumGraphSize, const QSize &maximumGraphSize)
 {
-    if (!m_barsGraph->hasContext()) {
-        QMessageBox msgBox;
-        msgBox.setText("Couldn't initialize the OpenGL context.");
-        msgBox.exec();
+    if (!m_barsGraph->hasContext())
         return false;
-    }
 
     //! [1]
     m_barsWidget = new QWidget;
     QHBoxLayout *hLayout = new QHBoxLayout(m_barsWidget);
     m_container = QWidget::createWindowContainer(m_barsGraph, m_barsWidget);
-    QSize screenSize = m_barsGraph->screen()->size();
-    m_container->setMinimumSize(QSize(screenSize.width() / 2, screenSize.height() / 1.75));
-    m_container->setMaximumSize(screenSize);
+    m_barsGraph->resize(minimumGraphSize);
+    m_container->setMinimumSize(minimumGraphSize);
+    m_container->setMaximumSize(maximumGraphSize);
     m_container->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
     m_container->setFocusPolicy(Qt::StrongFocus);
     hLayout->addWidget(m_container, 1);

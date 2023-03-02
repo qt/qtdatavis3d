@@ -14,7 +14,7 @@ public:
     SurfaceGraph();
     ~SurfaceGraph();
 
-    bool initialize();
+    bool initialize(const QSize &minimumGraphSize, const QSize &maximumGraphSize);
     QWidget *surfaceWidget() { return m_surfaceWidget; }
 
 private:
