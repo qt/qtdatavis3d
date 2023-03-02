@@ -269,7 +269,8 @@ void Abstract3DController::handleThemeTypeChanged(Q3DTheme::Theme theme)
 
     // Changing theme type is logically equivalent of changing the entire theme
     // object, so reset all attached series to the new theme.
-    bool force = true;//m_qml->isReady(); // TODO: Is this needed?
+    // TODO: Setting this to true breaks at least series gradient override, probably other things too (QTBUG-111669)
+    bool force = true;//m_qml->isReady();
     Q3DTheme *activeTheme = m_themeManager->activeTheme();
     for (int i = 0; i < m_seriesList.size(); i++)
         m_seriesList.at(i)->d_ptr->resetToTheme(*activeTheme, i, force);
