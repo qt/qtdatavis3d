@@ -112,6 +112,8 @@ public:
     Q_ENUM(ShadowQuality)
     Q_ENUM(RenderingMode)
     Q_ENUM(ElementType)
+    Q_ENUM(SelectionFlag)
+    Q_ENUM(OptimizationHint)
     Q_FLAGS(SelectionFlag SelectionFlags)
     Q_FLAGS(OptimizationHint OptimizationHints)
 
