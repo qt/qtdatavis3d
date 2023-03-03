@@ -48,4 +48,4 @@ navigation.landingpage = Qt Data Visualization
 navigation.cppclassespage = Qt Data Visualization C++ Classes
 navigation.qmltypespage = Qt Data Visualization QML Types
 
-manifestmeta.highlighted.names = "QtDataVis3D/Textured Surface Example"
+manifestmeta.highlighted.names = "QtDataVis3D/Graph Gallery"
