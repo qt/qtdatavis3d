@@ -15,6 +15,65 @@
 
 using namespace Qt::StringLiterals;
 
+static QPixmap gradientBtoYPB_Pixmap()
+{
+    QLinearGradient grBtoY(0, 0, 1, 100);
+    grBtoY.setColorAt(1.f, Qt::black);
+    grBtoY.setColorAt(0.67f, Qt::blue);
+    grBtoY.setColorAt(0.33f, Qt::red);
+    grBtoY.setColorAt(0.f, Qt::yellow);
+    QPixmap pm(24, 100);
+    QPainter pmp(&pm);
+    pmp.setBrush(QBrush(grBtoY));
+    pmp.setPen(Qt::NoPen);
+    pmp.drawRect(0, 0, 24, 100);
+    return pm;
+}
+
+static QPixmap gradientGtoRPB_Pixmap()
+{
+    QLinearGradient grGtoR(0, 0, 1, 100);
+    grGtoR.setColorAt(1.f, Qt::darkGreen);
+    grGtoR.setColorAt(0.5f, Qt::yellow);
+    grGtoR.setColorAt(0.2f, Qt::red);
+    grGtoR.setColorAt(0.f, Qt::darkRed);
+    QPixmap pm(24, 100);
+    QPainter pmp(&pm);
+    pmp.setBrush(QBrush(grGtoR));
+    pmp.drawRect(0, 0, 24, 100);
+    return pm;
+}
+
+static QPixmap highlightPixmap()
+{
+    constexpr int height = 400;
+    constexpr int width = 110;
+    constexpr int border = 10;
+    QLinearGradient gr(0, 0, 1, height - 2 * border);
+    gr.setColorAt(1.f, Qt::black);
+    gr.setColorAt(0.8f, Qt::darkGreen);
+    gr.setColorAt(0.6f, Qt::green);
+    gr.setColorAt(0.4f, Qt::yellow);
+    gr.setColorAt(0.2f, Qt::red);
+    gr.setColorAt(0.f, Qt::darkRed);
+
+    QPixmap pmHighlight(width, height);
+    pmHighlight.fill(Qt::transparent);
+    QPainter pmpHighlight(&pmHighlight);
+    pmpHighlight.setBrush(QBrush(gr));
+    pmpHighlight.setPen(Qt::NoPen);
+    pmpHighlight.drawRect(border, border, 35, height - 2 * border);
+    pmpHighlight.setPen(Qt::black);
+    int step = (height - 2 * border) / 5;
+    for (int i = 0; i < 6; ++i) {
+        int yPos = i * step + border;
+        pmpHighlight.drawLine(border, yPos, 55, yPos);
+        const int height = 550 - (i * 110);
+        pmpHighlight.drawText(60, yPos + 2, QString::number(height) + u" m"_s);
+    }
+    return pmHighlight;
+}
+
 SurfaceGraph::SurfaceGraph()
 {
     m_surfaceGraph = new Q3DSurface();
@@ -118,30 +177,15 @@ bool SurfaceGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
     // sqrt-sin
     QGroupBox *colorGroupBox = new QGroupBox(u"Custom gradient"_s);
 
-    QLinearGradient grBtoY(0, 0, 1, 100);
-    grBtoY.setColorAt(1.f, Qt::black);
-    grBtoY.setColorAt(0.67f, Qt::blue);
-    grBtoY.setColorAt(0.33f, Qt::red);
-    grBtoY.setColorAt(0.f, Qt::yellow);
-    QPixmap pm(24, 100);
-    QPainter pmp(&pm);
-    pmp.setBrush(QBrush(grBtoY));
-    pmp.setPen(Qt::NoPen);
-    pmp.drawRect(0, 0, 24, 100);
+    QPixmap pixmap = gradientBtoYPB_Pixmap();
     QPushButton *gradientBtoYPB = new QPushButton(m_surfaceWidget);
-    gradientBtoYPB->setIcon(QIcon(pm));
-    gradientBtoYPB->setIconSize(QSize(24, 100));
+    gradientBtoYPB->setIcon(QIcon(pixmap));
+    gradientBtoYPB->setIconSize(pixmap.size());
 
-    QLinearGradient grGtoR(0, 0, 1, 100);
-    grGtoR.setColorAt(1.f, Qt::darkGreen);
-    grGtoR.setColorAt(0.5f, Qt::yellow);
-    grGtoR.setColorAt(0.2f, Qt::red);
-    grGtoR.setColorAt(0.f, Qt::darkRed);
-    pmp.setBrush(QBrush(grGtoR));
-    pmp.drawRect(0, 0, 24, 100);
+    pixmap = gradientGtoRPB_Pixmap();
     QPushButton *gradientGtoRPB = new QPushButton(m_surfaceWidget);
-    gradientGtoRPB->setIcon(QIcon(pm));
-    gradientGtoRPB->setIconSize(QSize(24, 100));
+    gradientGtoRPB->setIcon(QIcon(pixmap));
+    gradientGtoRPB->setIconSize(pixmap.size());
 
     QHBoxLayout *colorHBox = new QHBoxLayout;
     colorHBox->addWidget(gradientBtoYPB);
@@ -192,34 +236,8 @@ bool SurfaceGraph::initialize(const QSize &minimumGraphSize, const QSize &maximu
     QCheckBox *enableTexture = new QCheckBox(u"Surface texture"_s);
     enableTexture->setVisible(false);
 
-    int height = 400;
-    int width = 110;
-    int border = 10;
-    QLinearGradient gr(0, 0, 1, height - 2 * border);
-    gr.setColorAt(1.f, Qt::black);
-    gr.setColorAt(0.8f, Qt::darkGreen);
-    gr.setColorAt(0.6f, Qt::green);
-    gr.setColorAt(0.4f, Qt::yellow);
-    gr.setColorAt(0.2f, Qt::red);
-    gr.setColorAt(0.f, Qt::darkRed);
-
-    QPixmap pmHighlight(width, height);
-    pmHighlight.fill(Qt::transparent);
-    QPainter pmpHighlight(&pmHighlight);
-    pmpHighlight.setBrush(QBrush(gr));
-    pmpHighlight.setPen(Qt::NoPen);
-    pmpHighlight.drawRect(border, border, 35, height - 2 * border);
-    pmpHighlight.setPen(Qt::black);
-    int step = (height - 2 * border) / 5;
-    for (int i = 0; i < 6; ++i) {
-        int yPos = i * step + border;
-        pmpHighlight.drawLine(border, yPos, 55, yPos);
-        const int height = 550 - (i * 110);
-        pmpHighlight.drawText(60, yPos + 2, QString::number(height) + u" m"_s);
-    }
-
     QLabel *label = new QLabel(m_surfaceWidget);
-    label->setPixmap(pmHighlight);
+    label->setPixmap(highlightPixmap());
 
     QGroupBox *heightMapGroupBox = new QGroupBox(u"Highlight color map"_s);
     QVBoxLayout *colorMapVBox = new QVBoxLayout;
