@@ -13,6 +13,8 @@
 #include "datasource.h"
 #endif
 
+using namespace Qt::StringLiterals;
+
 int main(int argc, char *argv[])
 {
     qputenv("QSG_RHI_BACKEND", "opengl");
@@ -32,17 +34,17 @@ int main(int argc, char *argv[])
     // The following are needed to make examples run without having to install the module
     // in desktop environments.
 #ifdef Q_OS_WIN
-    QString extraImportPath(QStringLiteral("%1/../../../../%2"));
+    QString extraImportPath(u"%1/../../../../%2"_s);
 #else
-    QString extraImportPath(QStringLiteral("%1/../../../%2"));
+    QString extraImportPath(u"%1/../../../%2"_s);
 #endif
     viewer.engine()->addImportPath(extraImportPath.arg(QGuiApplication::applicationDirPath(),
-                                                       QString::fromLatin1("qml")));
+                                                       u"qml"_s));
     QObject::connect(viewer.engine(), &QQmlEngine::quit, &viewer, &QWindow::close);
 
-    viewer.setTitle(QStringLiteral("Surface Graph Gallery"));
+    viewer.setTitle(u"Surface Graph Gallery"_s);
 
-    viewer.setSource(QUrl("qrc:/qml/qmlsurfacegallery/main.qml"));
+    viewer.setSource(QUrl(u"qrc:/qml/qmlsurfacegallery/main.qml"_s));
     viewer.setResizeMode(QQuickView::SizeRootObjectToView);
     viewer.show();
 
