@@ -16,7 +16,7 @@ class DataSource : public QObject
     QML_ELEMENT
     //! [2]
 public:
-    explicit DataSource(QObject *parent = 0);
+    explicit DataSource(QObject *parent = nullptr);
     virtual ~DataSource();
 
     //! [1]
@@ -31,8 +31,8 @@ private:
     void clearData();
 
     QList<QSurfaceDataArray> m_data;
-    int m_index;
-    QSurfaceDataArray *m_resetArray;
+    int m_index = -1;
+    QSurfaceDataArray *m_resetArray = nullptr;
 };
 
 #endif
