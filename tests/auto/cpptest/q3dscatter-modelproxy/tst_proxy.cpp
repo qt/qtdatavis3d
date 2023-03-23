@@ -192,9 +192,9 @@ void tst_proxy::addModel()
     m_proxy->setZPosRoleReplace(QStringLiteral("\\1"));
 
     QScatter3DSeries *series = new QScatter3DSeries(m_proxy);
-    Q_UNUSED(series)
 
-    QCoreApplication::processEvents();
+    QSignalSpy spy(series, SIGNAL(dataProxyChanged(QScatterDataProxy *)));
+    spy.wait(1000);
 
     QCOMPARE(m_proxy->itemCount(), 2);
     QVERIFY(m_proxy->series());

@@ -80,15 +80,16 @@ void tst_proxy::construct()
     QImage image(QSize(10, 10), QImage::Format_ARGB32);
     image.fill(0);
     proxy = new QHeightMapSurfaceDataProxy(image);
+    QSignalSpy spy(proxy, SIGNAL(columnCountChanged(int)));
     QVERIFY(proxy);
-    QCoreApplication::processEvents();
+    spy.wait(1000);
     QCOMPARE(proxy->columnCount(), 10);
     QCOMPARE(proxy->rowCount(), 10);
     delete proxy;
 
     proxy = new QHeightMapSurfaceDataProxy(":/customtexture.jpg");
     QVERIFY(proxy);
-    QCoreApplication::processEvents();
+    spy.wait(1000);
     QCOMPARE(proxy->columnCount(), 24);
     QCOMPARE(proxy->rowCount(), 24);
     delete proxy;
