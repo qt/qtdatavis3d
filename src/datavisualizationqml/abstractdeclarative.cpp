@@ -64,8 +64,11 @@ AbstractDeclarative::~AbstractDeclarative()
 
 void AbstractDeclarative::setRenderingMode(AbstractDeclarative::RenderingMode mode)
 {
-    if (mode == m_renderMode)
+    if (mode == m_renderMode
+        || mode <= AbstractDeclarative::RenderingMode::RenderDirectToBackground
+        || mode >= AbstractDeclarative::RenderingMode::RenderIndirect) {
         return;
+    }
 
     RenderingMode previousMode = m_renderMode;
 

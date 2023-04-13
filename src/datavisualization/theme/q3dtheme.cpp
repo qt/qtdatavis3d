@@ -996,11 +996,13 @@ Q3DTheme::ColorStyle Q3DTheme::colorStyle() const
  */
 void Q3DTheme::setType(Theme themeType)
 {
-    d_ptr->m_dirtyBits.themeIdDirty = true;
-    if (d_ptr->m_themeId != themeType) {
-        d_ptr->m_themeId = themeType;
-        ThemeManager::setPredefinedPropertiesToTheme(this, themeType);
-        emit typeChanged(themeType);
+    if (themeType >= ThemeQt && themeType <= ThemeUserDefined) {
+        d_ptr->m_dirtyBits.themeIdDirty = true;
+        if (d_ptr->m_themeId != themeType) {
+            d_ptr->m_themeId = themeType;
+            ThemeManager::setPredefinedPropertiesToTheme(this, themeType);
+            emit typeChanged(themeType);
+        }
     }
 }
 

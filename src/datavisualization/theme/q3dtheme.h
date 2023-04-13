@@ -50,7 +50,7 @@ public:
     };
 
     enum Theme {
-        ThemeQt,
+        ThemeQt = 0,
         ThemePrimaryColors,
         ThemeDigia,
         ThemeStoneMoss,

@@ -1592,7 +1592,7 @@ bool Abstract3DController::isOrthoProjection() const
 
 void Abstract3DController::setAspectRatio(qreal ratio)
 {
-    if (m_aspectRatio != ratio) {
+    if (m_aspectRatio != ratio && ratio > 0) {
         m_aspectRatio = ratio;
         m_changeTracker.aspectRatioChanged = true;
         emit aspectRatioChanged(m_aspectRatio);
@@ -1608,7 +1608,7 @@ qreal Abstract3DController::aspectRatio()
 
 void Abstract3DController::setHorizontalAspectRatio(qreal ratio)
 {
-    if (m_horizontalAspectRatio != ratio) {
+    if (m_horizontalAspectRatio != ratio && ratio > 0) {
         m_horizontalAspectRatio = ratio;
         m_changeTracker.horizontalAspectRatioChanged = true;
         emit horizontalAspectRatioChanged(m_horizontalAspectRatio);
@@ -1639,7 +1639,7 @@ bool Abstract3DController::reflection() const
 
 void Abstract3DController::setReflectivity(qreal reflectivity)
 {
-    if (m_reflectivity != reflectivity) {
+    if (m_reflectivity != reflectivity && reflectivity > 0) {
         m_reflectivity = reflectivity;
         m_changeTracker.reflectivityChanged = true;
         emit reflectivityChanged(m_reflectivity);

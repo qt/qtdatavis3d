@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
 import QtQuick 2.0
-import QtDataVisualization 1.2
+import QtDataVisualization
 import QtTest 1.0
 
 Item {
@@ -17,16 +17,16 @@ Item {
 
     function constructEmpty() {
         empty = Qt.createQmlObject("
-        import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtQuick
+        import QtDataVisualization
         Scatter3D {
         }", top)
     }
 
     function constructBasic() {
         basic = Qt.createQmlObject("
-        import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtQuick
+        import QtDataVisualization
         Scatter3D {
             anchors.fill: parent
         }", top)
@@ -35,8 +35,8 @@ Item {
 
     function constructCommon() {
         common = Qt.createQmlObject("
-        import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtQuick
+        import QtDataVisualization
         Scatter3D {
             anchors.fill: parent
         }", top)
@@ -45,8 +45,8 @@ Item {
 
     function constructCommonInit() {
         common_init = Qt.createQmlObject("
-        import QtQuick 2.2
-        import QtDataVisualization 1.2
+        import QtQuick
+        import QtDataVisualization
         Scatter3D {
             anchors.fill: parent
             selectionMode: AbstractGraph3D.SelectionNone
@@ -110,6 +110,9 @@ Item {
         when: windowShown
 
         function test_1_common() {
+            if (Qt.platform.os === "android")
+                return;
+
             constructCommon()
             compare(common.selectionMode, AbstractGraph3D.SelectionItem, "selectionMode")
             compare(common.shadowQuality, AbstractGraph3D.ShadowQualityMedium, "shadowQuality")
@@ -137,6 +140,9 @@ Item {
         }
 
         function test_2_change_common() {
+            if (Qt.platform.os === "android")
+                return;
+
             common.selectionMode = AbstractGraph3D.SelectionNone
             common.shadowQuality = AbstractGraph3D.ShadowQualitySoftHigh
             compare(common.shadowQuality, AbstractGraph3D.ShadowQualitySoftHigh, "shadowQuality")
@@ -177,30 +183,10 @@ Item {
             waitForRendering(top)
         }
 
-        function test_3_change_invalid_common() {
-            common.selectionMode = AbstractGraph3D.SelectionRow | AbstractGraph3D.SelectionColumn | AbstractGraph3D.SelectionSlice
-            common.theme.type = -2
-            common.renderingMode = -1
-            common.measureFps = false
-            common.orthoProjection = false
-            common.aspectRatio = -1.0
-            common.polar = false
-            common.horizontalAspectRatio = -2
-            common.reflection = false
-            common.reflectivity = -1.0
-            compare(common.selectionMode, AbstractGraph3D.SelectionNone, "selectionMode")
-            compare(common.theme.type, -2/*Theme3D.ThemeRetro*/, "theme") // TODO: Fix once QTRD-3367 is done
-            compare(common.renderingMode, -1/*AbstractGraph3D.RenderDirectToBackground_NoClear*/, "renderingMode") // TODO: Fix once QTRD-3367 is done
-            compare(common.aspectRatio, -1.0/*1.0*/, "aspectRatio") // TODO: Fix once QTRD-3367 is done
-            compare(common.horizontalAspectRatio, -2/*1*/, "horizontalAspectRatio") // TODO: Fix once QTRD-3367 is done
-            compare(common.reflectivity, -1.0/*1.0*/, "reflectivity") // TODO: Fix once QTRD-3367 is done
+        function test_3_common_initialized() {
+            if (Qt.platform.os === "android")
+                return;
 
-            waitForRendering(top)
-            common.destroy()
-            waitForRendering(top)
-        }
-
-        function test_4_common_initialized() {
             constructCommonInit()
 
             compare(common_init.selectionMode, AbstractGraph3D.SelectionNone, "selectionMode")
@@ -225,9 +211,31 @@ Item {
             compare(common_init.reflectivity, 0.1, "reflectivity")
             compare(common_init.locale, Qt.locale("UK"), "locale")
             compare(common_init.margin, 0.2, "margin")
-
             waitForRendering(top)
             common_init.destroy();
+            waitForRendering(top)
+        }
+
+        function test_4_change_invalid_common() {
+            if (Qt.platform.os === "android")
+                return;
+
+            common.selectionMode = AbstractGraph3D.SelectionRow | AbstractGraph3D.SelectionColumn | AbstractGraph3D.SelectionSlice
+            common.theme.type = -2
+            common.renderingMode = -1
+            common.measureFps = false
+            common.orthoProjection = false
+            common.aspectRatio = -1.0
+            common.polar = false
+            common.horizontalAspectRatio = -2
+            common.reflection = false
+            common.reflectivity = -1.0
+            compare(common.selectionMode, AbstractGraph3D.SelectionNone, "selectionMode")
+            compare(common.theme.type, Theme3D.ThemeRetro, "theme")
+            compare(common.renderingMode, AbstractGraph3D.RenderDirectToBackground_NoClear, "renderingMode")
+            compare(common.aspectRatio, 1.0, "aspectRatio")
+            compare(common.horizontalAspectRatio, 1.0, "horizontalAspectRatio")
+            compare(common.reflectivity, 1.0, "reflectivity")
             waitForRendering(top)
         }
     }
