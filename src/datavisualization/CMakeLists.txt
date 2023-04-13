@@ -88,13 +88,10 @@ qt_internal_add_module(DataVisualization
         input
         theme
         utils
-        ../datavisualizationqml
     PUBLIC_LIBRARIES
         Qt::Core
         Qt::Gui
         Qt::OpenGL
-        Qt::Qml
-        Qt::Quick
     GENERATE_CPP_EXPORTS
 )
 

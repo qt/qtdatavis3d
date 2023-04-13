@@ -1,7 +1,7 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#include "abstractdeclarative_p.h"
+#include "abstractdeclarativeinterface_p.h"
 #include "abstract3dcontroller_p.h"
 #include "qabstract3daxis_p.h"
 #include "qvalue3daxis_p.h"
