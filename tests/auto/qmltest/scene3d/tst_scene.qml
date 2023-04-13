@@ -41,7 +41,7 @@ Item {
         function test_initial() {
             verify(initial.scene.activeCamera)
             verify(initial.scene.activeLight)
-            compare(initial.scene.devicePixelRatio, 1.0)
+            compare(initial.scene.devicePixelRatio, Screen.devicePixelRatio)
             compare(initial.scene.graphPositionQuery, Qt.point(-1, -1))
             compare(initial.scene.invalidSelectionPoint, Qt.point(-1, -1))
             compare(initial.scene.primarySubViewport.x, 0)
