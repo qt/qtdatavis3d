@@ -399,6 +399,17 @@ qt_internal_extend_target(DataVisualization CONDITION MACOS
     PRIVATE_MODULE_INTERFACE
         Qt::GuiPrivate
 )
+
+qt_internal_extend_target(DataVisualization CONDITION MINGW
+    NO_UNITY_BUILD_SOURCES
+        data/qbardataitem.cpp
+        data/qscatterdataitem.cpp
+        data/qsurfacedataitem.cpp
+    # MinGW triggers `-Werror=maybe-uninitialized` on d_ptr while
+    # proper checks are in place and d_ptr is initialized in
+    # operator=()
+)
+
 qt_internal_add_docs(DataVisualization
     doc/qtdatavis3d.qdocconf
 )
