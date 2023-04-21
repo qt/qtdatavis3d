@@ -37,6 +37,7 @@ private:
                                  const QList<QVector3D> &indexed_vertices);
 
     float m_scaleY;
+    static const GLfloat itemScaler;
 };
 
 QT_END_NAMESPACE
