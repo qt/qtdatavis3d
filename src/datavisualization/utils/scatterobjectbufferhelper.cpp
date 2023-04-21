@@ -9,7 +9,7 @@
 
 QT_BEGIN_NAMESPACE
 
-const GLfloat itemScaler = 3.0f;
+const GLfloat ScatterObjectBufferHelper::itemScaler = 3.0f;
 
 ScatterObjectBufferHelper::ScatterObjectBufferHelper()
     : m_scaleY(0.0f)
