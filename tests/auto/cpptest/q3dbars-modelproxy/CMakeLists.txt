@@ -1,7 +1,7 @@
 # Copyright (C) 2022 The Qt Company Ltd.
 # SPDX-License-Identifier: BSD-3-Clause
 
-qt_internal_add_test(q3dbars-modelproxy
+qt_internal_add_test(q3dbars-modelproxy_datavis
     SOURCES
         tst_proxy.cpp
     INCLUDE_DIRECTORIES
