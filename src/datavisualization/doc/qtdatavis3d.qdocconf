@@ -47,5 +47,3 @@ qhp.QtDataVis3D.subprojects.types.sortPages             = true
 navigation.landingpage = Qt Data Visualization
 navigation.cppclassespage = Qt Data Visualization C++ Classes
 navigation.qmltypespage = Qt Data Visualization QML Types
-
-manifestmeta.highlighted.names = "QtDataVis3D/Graph Gallery"
