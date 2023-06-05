@@ -30,6 +30,8 @@
 
     The default color is black.
 
+    \note Transparency in a gradient is not supported and will result in undefined behavior.
+
     \sa ColorGradient
 */
 

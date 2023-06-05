@@ -17,4 +17,6 @@
     The color property describes the color of this ThemeColor.
 
     The default color is black.
+
+    \note Transparency is not supported and will result in undefined behavior.
 */

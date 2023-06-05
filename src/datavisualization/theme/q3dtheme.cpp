@@ -309,6 +309,8 @@ QT_BEGIN_NAMESPACE
  * \qmlproperty color Theme3D::gridLineColor
  *
  * The color of the grid lines.
+ *
+ * \note Transparency is not supported and will result in undefined behavior.
  */
 
 /*!
@@ -317,6 +319,8 @@ QT_BEGIN_NAMESPACE
  * The highlight color for a selected object. Used if
  * \l{AbstractGraph3D::selectionMode}{selectionMode}
  * has the \c AbstractGraph3D.SelectionItem flag set.
+ *
+ * \note Transparency is not supported and will result in undefined behavior.
  */
 
 /*!
@@ -326,6 +330,8 @@ QT_BEGIN_NAMESPACE
  * \l{AbstractGraph3D::selectionMode}{selectionMode}
  * has the \c AbstractGraph3D.SelectionRow or \c AbstractGraph3D.SelectionColumn
  * flag set.
+ *
+ * \note Transparency is not supported and will result in undefined behavior.
  */
 
 /*!
@@ -354,6 +360,8 @@ QT_BEGIN_NAMESPACE
  * The highlight gradient for a selected object. Used if
  * \l{AbstractGraph3D::selectionMode}{selectionMode}
  * has the \c AbstractGraph3D.SelectionItem flag set.
+ *
+ * \note Transparency is not supported and will result in undefined behavior.
  */
 
 /*!
@@ -363,6 +371,8 @@ QT_BEGIN_NAMESPACE
  * \l{AbstractGraph3D::selectionMode}{selectionMode}
  * has the \c AbstractGraph3D.SelectionRow or \c AbstractGraph3D.SelectionColumn
  * flag set.
+ *
+ * \note Transparency is not supported and will result in undefined behavior.
  */
 
 /*!
@@ -606,6 +616,8 @@ QColor Q3DTheme::labelBackgroundColor() const
  * \property Q3DTheme::gridLineColor
  *
  * \brief The color of the grid lines.
+ *
+ * \note Transparency is not supported and will result in undefined behavior.
  */
 void Q3DTheme::setGridLineColor(const QColor &color)
 {
