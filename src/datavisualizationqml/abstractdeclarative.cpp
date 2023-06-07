@@ -8,7 +8,7 @@
 #if defined(Q_OS_IOS)
 #include <QtCore/QTimer>
 #endif
-#if defined(Q_OS_OSX)
+#if defined(Q_OS_MACOS)
 #include <qpa/qplatformnativeinterface.h>
 #endif
 
@@ -428,7 +428,7 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     if (!window)
         return;
 
-#if defined(Q_OS_OSX)
+#if defined(Q_OS_MACOS)
     bool previousVisibility = window->isVisible();
     // Enable touch events for Mac touchpads
     window->setVisible(true);
