@@ -8,6 +8,8 @@ qt_internal_add_manual_test(qmldynamicdata
     )
 target_link_libraries(qmldynamicdata PUBLIC
     Qt::Gui
+    Qt::Qml
+    Qt::Quick
     Qt::DataVisualization
     )
 

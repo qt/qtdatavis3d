@@ -11,6 +11,8 @@ qt_internal_add_manual_test(qmlperf
     )
 target_link_libraries(qmlperf PUBLIC
     Qt::Gui
+    Qt::Qml
+    Qt::Quick
     Qt::DataVisualization
     )
 

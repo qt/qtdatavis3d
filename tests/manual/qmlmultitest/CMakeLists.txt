@@ -8,6 +8,8 @@ qt_internal_add_manual_test(qmlmultitest
     )
 target_link_libraries(qmlmultitest PUBLIC
     Qt::Gui
+    Qt::Qml
+    Qt::Quick
     Qt::DataVisualization
     )
 
