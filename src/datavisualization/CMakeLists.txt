@@ -80,6 +80,8 @@ qt_internal_add_module(DataVisualization
         utils/texturehelper.cpp utils/texturehelper_p.h
         utils/utils.cpp utils/utils_p.h
         utils/vertexindexer.cpp utils/vertexindexer_p.h
+    DEFINES
+        QT_NO_CONTEXTLESS_CONNECT
     INCLUDE_DIRECTORIES
         axis
         data

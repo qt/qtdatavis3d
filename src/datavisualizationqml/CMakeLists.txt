@@ -44,6 +44,8 @@ qt_internal_add_qml_module(DataVisualizationQml
         enumtostringmap.cpp enumtostringmap_p.h
         foreigntypes_p.h
         glstatestore.cpp glstatestore_p.h
+    DEFINES
+        QT_NO_CONTEXTLESS_CONNECT
     QML_FILES
         ${qml_files}
     RESOURCES
