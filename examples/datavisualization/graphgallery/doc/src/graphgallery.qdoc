@@ -6,6 +6,7 @@
     \meta tags {DataVisualization, Q3DBars, Bar Graph, Custom Proxy, Q3DScatter, Scatter Graph, Custom Input Handler, Q3DSurface, Surface Graph, QCustom3DItem, Textured Surface}
     \title Graph Gallery
     \ingroup qtdatavisualization_examples
+    \examplecategory {Data Visualization & 3D}
     \brief Gallery of Bar, Scatter, and Surface graphs.
 
     \e {Graph Gallery} demonstrates all three graph types and some of their special features.

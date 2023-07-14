@@ -6,6 +6,7 @@
     \meta tags {DataVisualization, QCustom3DVolume, Custom Item}
     \title Volumetric Rendering
     \ingroup qtdatavisualization_examples
+    \examplecategory {Data Visualization & 3D}
     \brief Rendering volumetric objects.
     \since QtDataVisualization 1.2
 
