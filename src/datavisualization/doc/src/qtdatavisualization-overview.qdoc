@@ -5,6 +5,7 @@
     \title Qt Data Visualization Overview
     \page qtdatavisualization-overview.html
     \brief An overview of the Qt Data Visualization module.
+    \ingroup explanation
 
     The Qt Data Visualization module provides a way to develop rapidly
     responding, complex, and dynamic 3D visualization for analytical demanding
