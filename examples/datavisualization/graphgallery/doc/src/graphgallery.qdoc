@@ -7,6 +7,7 @@
     \examplecategory {Graphics}
     \title Graph Gallery
     \ingroup qtdatavisualization_examples
+    \examplecategory {Data Visualization & 3D}
     \brief Gallery of Bar, Scatter, and Surface graphs.
 
     \e {Graph Gallery} demonstrates all three graph types and some of their special features.
