@@ -565,7 +565,7 @@ void AbstractDeclarative::render()
 
     QOpenGLFunctions *funcs = QOpenGLContext::currentContext()->functions();
 
-    if (isVisible()) {
+    if (funcs && isVisible()) {
         funcs->glDepthMask(GL_TRUE);
         funcs->glEnable(GL_DEPTH_TEST);
         funcs->glDepthFunc(GL_LESS);
