@@ -11,6 +11,8 @@ qt_internal_add_manual_test(barstest
         buttonwrapper.cpp buttonwrapper.h
         custominputhandler.cpp custominputhandler.h
         main.cpp
+    NO_PCH_SOURCES
+        chart.cpp # undef QT_NO_FOREACH
     )
 target_link_libraries(barstest PUBLIC
     Qt::Gui

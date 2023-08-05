@@ -10,6 +10,8 @@ qt_internal_add_manual_test(surfacetest
         checkboxwrapper.cpp checkboxwrapper.h
         graphmodifier.cpp graphmodifier.h
         main.cpp
+    NO_PCH_SOURCES
+        graphmodifier.cpp # undef QT_NO_FOREACH
     )
 target_link_libraries(surfacetest PUBLIC
     Qt::Gui

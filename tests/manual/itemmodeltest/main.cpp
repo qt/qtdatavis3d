@@ -208,8 +208,8 @@ void GraphDataGenerator::changeSelectedButtonClicked()
 {
     // Change all selected cells to a random value 1-10
     QVariant value = QVariant::fromValue(QRandomGenerator::global()->bounded(10.0) + 1);
-    QList<QTableWidgetItem *> selectedItems = m_tableWidget->selectedItems();
-    foreach (QTableWidgetItem *item, selectedItems) {
+    const QList<QTableWidgetItem *> selectedItems = m_tableWidget->selectedItems();
+    for (QTableWidgetItem *item : selectedItems) {
         QString oldData = item->data(Qt::DisplayRole).toString();
         item->setData(Qt::DisplayRole,
                       oldData.left(5)

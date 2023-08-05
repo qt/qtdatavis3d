@@ -82,6 +82,20 @@ qt_internal_add_module(DataVisualization
         utils/vertexindexer.cpp utils/vertexindexer_p.h
     DEFINES
         QT_NO_CONTEXTLESS_CONNECT
+    NO_PCH_SOURCES
+        # undef QT_NO_FOREACH:
+        engine/abstract3dcontroller.cpp
+        engine/abstract3drenderer.cpp
+        engine/axisrendercache.cpp
+        engine/bars3dcontroller.cpp
+        engine/bars3drenderer.cpp
+        engine/q3dscatter.cpp
+        engine/q3dsurface.cpp
+        engine/scatter3dcontroller.cpp
+        engine/scatter3drenderer.cpp
+        engine/surface3dcontroller.cpp
+        engine/surface3drenderer.cpp
+        # end undef QT_NO_FOREACH
     INCLUDE_DIRECTORIES
         axis
         data
