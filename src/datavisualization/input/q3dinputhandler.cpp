@@ -16,7 +16,7 @@ static const int nearZoomRangeDivider = 12;
 static const int midZoomRangeDivider  = 60;
 static const int farZoomRangeDivider  = 120;
 
-static const float rotationSpeed      = 100.0f;
+[[maybe_unused]] static const float rotationSpeed = 100.0f;
 
 /*!
  * \class Q3DInputHandler
