@@ -647,8 +647,8 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
     }
 
     QList<QQuickWindow *> windowList;
-
-    foreach (AbstractDeclarative *graph, graphWindowList.keys()) {
+    const auto graphs = graphWindowList.keys();
+    for (AbstractDeclarative *graph : graphs) {
         if (graph->m_renderMode == RenderDirectToBackground
                 || graph->m_renderMode == RenderDirectToBackground_NoClear) {
             windowList.append(graphWindowList.value(graph));
