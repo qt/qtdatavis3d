@@ -1,8 +1,6 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#undef QT_NO_FOREACH // this file contains unported legacy Q_FOREACH uses
-
 #include "abstractdeclarative_p.h"
 #include "declarativetheme_p.h"
 #include "declarativerendernode_p.h"
@@ -649,8 +647,8 @@ void AbstractDeclarative::checkWindowList(QQuickWindow *window)
     }
 
     QList<QQuickWindow *> windowList;
-
-    foreach (AbstractDeclarative *graph, graphWindowList.keys()) {
+    const auto graphs = graphWindowList.keys();
+    for (AbstractDeclarative *graph : graphs) {
         if (graph->m_renderMode == RenderDirectToBackground
                 || graph->m_renderMode == RenderDirectToBackground_NoClear) {
             windowList.append(graphWindowList.value(graph));
