@@ -80,8 +80,6 @@ qt_internal_add_module(DataVisualization
         utils/texturehelper.cpp utils/texturehelper_p.h
         utils/utils.cpp utils/utils_p.h
         utils/vertexindexer.cpp utils/vertexindexer_p.h
-    DEFINES
-        QT_NO_CONTEXTLESS_CONNECT
     NO_PCH_SOURCES
         # undef QT_NO_FOREACH:
         engine/abstract3dcontroller.cpp
