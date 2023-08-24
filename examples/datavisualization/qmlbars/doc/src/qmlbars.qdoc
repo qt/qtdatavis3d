@@ -7,7 +7,6 @@
     \examplecategory {Graphics}
     \title Simple Bar Graph
     \ingroup qtdatavisualization_qmlexamples
-    \examplecategory {Data Visualization & 3D}
     \brief Using Bars3D in a QML application.
 
     \e {Simple Bar Graph} shows how to make a simple 3D bar graph using Bars3D and QML.

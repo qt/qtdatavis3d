@@ -7,7 +7,6 @@
     \examplecategory {Graphics}
     \title Simple Scatter Graph
     \ingroup qtdatavisualization_qmlexamples
-    \examplecategory {Data Visualization & 3D}
     \brief Using Scatter3D in a QML application.
 
     \e {Simple Scatter Graph} shows how to make a simple scatter graph visualization using

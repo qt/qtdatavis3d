@@ -7,7 +7,6 @@
     \examplecategory {Graphics}
     \title Surface Graph Gallery
     \ingroup qtdatavisualization_qmlexamples
-    \examplecategory {Data Visualization & 3D}
     \brief Gallery with three different ways to use a Surface3D graph.
 
     \e {Surface Graph Gallery} demonstrates three different custom features with Surface3D graphs.
