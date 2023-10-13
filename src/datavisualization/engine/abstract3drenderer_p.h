@@ -24,6 +24,8 @@
 #include "seriesrendercache_p.h"
 #include "customrenderitem_p.h"
 
+#include <QtCore/qpointer.h>
+
 QT_FORWARD_DECLARE_CLASS(QOffscreenSurface)
 
 QT_BEGIN_NAMESPACE
