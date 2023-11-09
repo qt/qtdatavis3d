@@ -1,28 +1,39 @@
----------------------------
-Qt Data Visualization 5.9.0
----------------------------
+# Qt Data Visualization 6.6.1
 
-Qt Data Visualization module provides multiple graph types to visualize data in 3D space
-both with C++ and Qt Quick 2.
+Qt Data Visualization module provides multiple graph types to visualize data in 3D space both with C++ and Qt Quick 2.
 
-System Requirements
-===================
+## Table of Contents
+- [System Requirements](#system-requirements)
+- [Building](#building)
+  - [Building as a Statically Linked Library](#building-as-a-statically-linked-library)
+- [Documentation](#documentation)
+- [Known Issues](#known-issues)
+
+## System Requirements
+
+Before you get started with Qt Data Visualization, make sure your system meets the following requirements:
 
 - Qt 5.2.1 or newer
 - OpenGL 2.1 or newer (recommended) or OpenGL ES2 (reduced feature set)
-- Manipulating Qt Data Visualization graphs with QML Designer requires
-  Qt Creator 3.3 or newer
+- Manipulating Qt Data Visualization graphs with QML Designer requires Qt Creator 3.3 or newer
 
-Building
-========
-Configure the project with qmake:
-    qmake
+## Building
+
+To build the project, follow these steps:
+
+1. Configure the project with qmake:
+  ```
+  qmake
+  ```
 
 After running qmake, build the project with make:
-    (Linux) make
-    (Windows with MinGw) mingw32-make
-    (Windows with Visual Studio) nmake
-    (OS X) make
+  (Linux) ```make```
+
+  (Windows with MinGw) ```mingw32-make```
+
+  (Windows with Visual Studio) ```nmake```
+
+  (OS X) ```make```
 
 The above generates the default makefiles for your configuration, which is typically
 the release build if you are using precompiled binary Qt distribution. To build both
@@ -52,14 +63,12 @@ After building, install the module to your Qt directory:
 If you want to uninstall the module:
     make uninstall
 
-Building as a statically linked library
-=======================================
+## Building as a statically linked library
 
 The same as above applies, you will just have to add static to the CONFIG:
     qmake CONFIG+=static
 
-Documentation
-=============
+## Documentation
 
 The documentation can be generated with:
     make docs
@@ -71,8 +80,7 @@ Both Qt Assistant (qtdatavisualization.qch) and in HTML format
 Please refer to the generated documentation for more information:
     doc/qtdatavisualization/qtdatavisualization-index.html
 
-Known Issues
-============
+## Known Issues
 
 - Some platforms like Android and WinRT cannot handle multiple native windows properly,
   so only the Qt Quick 2 versions of graphs are available in practice for those platforms.
