@@ -57,6 +57,7 @@ qt_internal_add_qml_module(DataVisualizationQml
         Qt::Qml
         Qt::Quick
         Qt::DataVisualizationPrivate
+    NO_GENERATE_CPP_EXPORTS
 )
 
 qt_internal_extend_target(DataVisualizationQml CONDITION MACOS
