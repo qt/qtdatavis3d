@@ -106,7 +106,6 @@ qt_internal_add_module(DataVisualization
         Qt::Core
         Qt::Gui
         Qt::OpenGL
-    GENERATE_CPP_EXPORTS
 )
 
 set_source_files_properties("engine/meshes/arrowFlat.obj"
