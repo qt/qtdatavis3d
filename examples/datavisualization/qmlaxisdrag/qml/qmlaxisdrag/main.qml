@@ -28,7 +28,7 @@
 ****************************************************************************/
 
 import QtQuick
-import QtDataVisualization 1.1
+import QtDataVisualization
 import QtQuick.Controls
 import "."
 
@@ -44,6 +44,8 @@ Item {
     property int currentMouseY: -1
     property int previousMouseX: -1
     property int previousMouseY: -1
+
+    property bool portraitMode: width < height
 
     ListModel {
         id: graphModel
@@ -87,7 +89,7 @@ Item {
                 }
             } else {
                 graphModel.remove(2, 10);
-                if (graphModel.count == 2) {
+                if (graphModel.count === 2) {
                     scatterGraph.theme = dynamicColorTheme
                     isIncreasing = true
                 }
@@ -273,9 +275,11 @@ Item {
 
     Button {
         id: rangeToggle
-        width: parent.width / 3 // We're adding 3 buttons and want to divide them equally
+        // We're adding 3 buttons and want to divide them equally, if not in portrait mode
+        width: portraitMode ? parent.width : parent.width / 3
         text: "Use Preset Range"
         anchors.left: parent.left
+        anchors.top: parent.top
         property bool autoRange: true
         onClicked: {
             if (autoRange) {
@@ -302,9 +306,10 @@ Item {
     //! [8]
     Button {
         id: orthoToggle
-        width: parent.width / 3
+        width: portraitMode ? parent.width : parent.width / 3
         text: "Display Orthographic"
-        anchors.left: rangeToggle.right
+        anchors.left: portraitMode ? parent.left : rangeToggle.right
+        anchors.top: portraitMode ? rangeToggle.bottom : parent.top
         onClicked: {
             if (scatterGraph.orthoProjection) {
                 text = "Display Orthographic";
@@ -321,9 +326,10 @@ Item {
 
     Button {
         id: exitButton
-        width: parent.width / 3
+        width: portraitMode ? parent.width : parent.width / 3
         text: "Quit"
-        anchors.left: orthoToggle.right
+        anchors.left: portraitMode ? parent.left : orthoToggle.right
+        anchors.top: portraitMode ? orthoToggle.bottom : parent.top
         onClicked: Qt.quit();
     }
 }

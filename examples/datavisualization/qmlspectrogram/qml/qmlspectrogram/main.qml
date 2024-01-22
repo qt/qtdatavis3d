@@ -28,10 +28,9 @@
 ****************************************************************************/
 
 import QtQuick
-import QtQuick.Layouts
 import QtQuick.Controls
 import QtQuick.Window
-import QtDataVisualization 1.2
+import QtDataVisualization
 import "."
 
 Window {
@@ -42,16 +41,18 @@ Window {
     height: 768
     color: surfaceGraph.theme.windowColor
 
+    property bool portraitMode: width < height
+
     Data {
         id: surfaceData
     }
 
     Item {
         id: surfaceView
-        width: mainview.width
-        height: mainview.height
-        anchors.top: mainview.top
-        anchors.left: mainview.left
+        anchors.top: buttons.bottom
+        anchors.left: parent.left
+        anchors.right: legend.left
+        anchors.bottom: parent.bottom
 
         ColorGradient {
             id: surfaceGradient
@@ -114,8 +115,7 @@ Window {
         Surface3D {
             //! [7]
             id: surfaceGraph
-            width: surfaceView.width
-            height: surfaceView.height
+            anchors.fill: parent
 
             shadowQuality: AbstractGraph3D.ShadowQualityNone
             selectionMode: AbstractGraph3D.SelectionSlice | AbstractGraph3D.SelectionItemAndColumn
@@ -164,26 +164,29 @@ Window {
         //! [0]
     }
 
-    RowLayout {
-        id: buttonLayout
+    Item {
+        id: buttons
         anchors.top: parent.top
         anchors.left: parent.left
         anchors.right: parent.right
-        opacity: 0.5
+        height: portraitMode ? (polarToggle.height + 10) * 3 : polarToggle.height + 30
+        anchors.margins: 10
 
         //! [3]
         Button {
             id: polarToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Switch to polar"
+            anchors.margins: 5
+            anchors.left: parent.left
+            anchors.top: parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            text: "Switch to\npolar"
             onClicked: {
                 if (surfaceGraph.polar === false) {
                     surfaceGraph.polar = true
-                    text = "Switch to cartesian"
+                    text = "Switch to\ncartesian"
                 } else {
                     surfaceGraph.polar = false
-                    text = "Switch to polar"
+                    text = "Switch to\npolar"
                 }
             }
         }
@@ -191,9 +194,11 @@ Window {
 
         Button {
             id: orthoToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Switch to perspective"
+            anchors.margins: 5
+            anchors.left: polarToggle.right
+            anchors.top: parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            text: "Switch to\nperspective"
             onClicked: {
                 if (surfaceGraph.orthoProjection === true) {
                     surfaceGraph.orthoProjection = false;
@@ -201,7 +206,7 @@ Window {
                     yAxis.labelAutoRotation = 30
                     zAxis.labelAutoRotation = 30
                     customInputHandler.rotationEnabled = true
-                    text = "Switch to orthographic"
+                    text = "Switch to\northographic"
                 } else {
                     surfaceGraph.orthoProjection = true;
                     surfaceGraph.scene.activeCamera.cameraPreset = Camera3D.CameraPresetDirectlyAbove
@@ -210,16 +215,18 @@ Window {
                     yAxis.labelAutoRotation = 0
                     zAxis.labelAutoRotation = 0
                     customInputHandler.rotationEnabled = false
-                    text = "Switch to perspective"
+                    text = "Switch to\nperspective"
                 }
             }
         }
 
         Button {
             id: flipGridToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Toggle axis grid on top"
+            anchors.margins: 5
+            anchors.left: portraitMode ? parent.left : orthoToggle.right
+            anchors.top: portraitMode ? orthoToggle.bottom : parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            text: "Toggle axis\ngrid on top"
             onClicked: {
                 if (surfaceGraph.flipHorizontalGrid === true) {
                     surfaceGraph.flipHorizontalGrid = false;
@@ -231,9 +238,11 @@ Window {
 
         Button {
             id: labelOffsetToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Toggle radial label position"
+            anchors.margins: 5
+            anchors.left: flipGridToggle.right
+            anchors.top: portraitMode ? orthoToggle.bottom : parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            text: "Toggle radial\nlabel position"
             visible: surfaceGraph.polar
             onClicked: {
                 if (surfaceGraph.radialLabelOffset >= 1.0) {
@@ -246,9 +255,16 @@ Window {
 
         Button {
             id: surfaceGridToggle
-            Layout.fillWidth: true
-            Layout.fillHeight: true
-            text: "Toggle surface grid"
+            anchors.margins: 5
+            anchors.left: portraitMode ? (labelOffsetToggle.visible ? parent.left
+                                                                    : flipGridToggle.right)
+                                       : (labelOffsetToggle.visible ? labelOffsetToggle.right
+                                                                    : flipGridToggle.right)
+            anchors.top: portraitMode ? (labelOffsetToggle.visible ? labelOffsetToggle.bottom
+                                                                   : orthoToggle.bottom)
+                                      : parent.top
+            width: portraitMode ? (mainview.width - 35) / 2 : (mainview.width - 50) / 5
+            text: "Toggle\nsurface grid"
             visible: !surfaceGraph.orthoProjection
             onClicked: {
                 if (surfaceSeries.drawMode & Surface3DSeries.DrawWireframe) {
@@ -258,46 +274,53 @@ Window {
                 }
             }
         }
-
     }
 
-    Rectangle {
+    Item {
         id: legend
-        anchors.margins: 20
         anchors.bottom: parent.bottom
-        anchors.top: buttonLayout.bottom
+        anchors.top: buttons.bottom
         anchors.right: parent.right
-        border.color: "black"
-        border.width: 1
-        width: 50
-        rotation: 180
-        gradient: Gradient {
-            GradientStop { position: 0.0; color: "black" }
-            GradientStop { position: 0.2; color: "red" }
-            GradientStop { position: 0.5; color: "blue" }
-            GradientStop { position: 0.8; color: "yellow" }
-            GradientStop { position: 1.0; color: "white" }
+        width: portraitMode ? 100 : 125
+
+        Rectangle {
+            id: gradient
+            anchors.margins: 20
+            anchors.bottom: legend.bottom
+            anchors.top: legend.top
+            anchors.right: legend.right
+            border.color: "black"
+            border.width: 1
+            width: portraitMode ? 25 : 50
+            rotation: 180
+            gradient: Gradient {
+                GradientStop { position: 0.0; color: "black" }
+                GradientStop { position: 0.2; color: "red" }
+                GradientStop { position: 0.5; color: "blue" }
+                GradientStop { position: 0.8; color: "yellow" }
+                GradientStop { position: 1.0; color: "white" }
+            }
         }
-    }
 
-    Text {
-        anchors.verticalCenter: legend.bottom
-        anchors.right: legend.left
-        anchors.margins: 2
-        text: surfaceGraph.axisY.min  + "%"
-    }
+        Text {
+            anchors.verticalCenter: gradient.bottom
+            anchors.right: gradient.left
+            anchors.margins: 2
+            text: surfaceGraph.axisY.min  + "%"
+        }
 
-    Text {
-        anchors.verticalCenter: legend.verticalCenter
-        anchors.right: legend.left
-        anchors.margins: 2
-        text: (surfaceGraph.axisY.max + surfaceGraph.axisY.min) / 2  + "%"
-    }
+        Text {
+            anchors.verticalCenter: gradient.verticalCenter
+            anchors.right: gradient.left
+            anchors.margins: 2
+            text: (surfaceGraph.axisY.max + surfaceGraph.axisY.min) / 2  + "%"
+        }
 
-    Text {
-        anchors.verticalCenter: legend.top
-        anchors.right: legend.left
-        anchors.margins: 2
-        text: surfaceGraph.axisY.max + "%"
+        Text {
+            anchors.verticalCenter: gradient.top
+            anchors.right: gradient.left
+            anchors.margins: 2
+            text: surfaceGraph.axisY.max + "%"
+        }
     }
 }

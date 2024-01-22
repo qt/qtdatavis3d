@@ -38,6 +38,8 @@ Item {
     width: 1280
     height: 720
 
+    property bool portraitMode: width < height
+
     Data {
         id: graphData
     }
@@ -46,7 +48,7 @@ Item {
         id: dataView
         anchors.bottom: parent.bottom
         width: parent.width
-        height: parent.height - buttonLayout.height
+        height: parent.height - (portraitMode ? shadowToggle.height * 3 : shadowToggle.height)
 
         //! [0]
         Scatter3D {
@@ -191,54 +193,50 @@ Item {
     }
     //! [7]
 
-    RowLayout {
-        id: buttonLayout
-        Layout.minimumHeight: shadowToggle.height
-        width: parent.width
+
+    Button {
+        id: shadowToggle
+        width: portraitMode ? parent.width : parent.width / 3
         anchors.left: parent.left
-        spacing: 0
+        anchors.top: parent.top
+        text: scatterGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
+        enabled: scatterGraph.shadowsSupported
 
-        Button {
-            id: shadowToggle
-            Layout.fillHeight: true
-            Layout.minimumWidth: parent.width / 3 // 3 buttons divided equally in the layout
-            text: scatterGraph.shadowsSupported ? "Hide Shadows" : "Shadows not supported"
-            enabled: scatterGraph.shadowsSupported
-
-            onClicked: {
-                if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
-                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
-                    text = "Hide Shadows";
-                } else {
-                    scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
-                    text = "Show Shadows";
-                }
+        onClicked: {
+            if (scatterGraph.shadowQuality === AbstractGraph3D.ShadowQualityNone) {
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityMedium;
+                text = "Hide Shadows";
+            } else {
+                scatterGraph.shadowQuality = AbstractGraph3D.ShadowQualityNone;
+                text = "Show Shadows";
             }
         }
+    }
 
-        Button {
-            id: cameraToggle
-            Layout.fillHeight: true
-            Layout.minimumWidth: parent.width / 3
-            text: "Pause Camera"
+    Button {
+        id: cameraToggle
+        width: portraitMode ? parent.width : parent.width / 3
+        anchors.left: portraitMode ? parent.left : shadowToggle.right
+        anchors.top: portraitMode ? shadowToggle.bottom : parent.top
+        text: "Pause Camera"
 
-            onClicked: {
-                cameraAnimationX.paused = !cameraAnimationX.paused;
-                cameraAnimationY.paused = cameraAnimationX.paused;
-                if (cameraAnimationX.paused) {
-                    text = "Animate Camera";
-                } else {
-                    text = "Pause Camera";
-                }
+        onClicked: {
+            cameraAnimationX.paused = !cameraAnimationX.paused;
+            cameraAnimationY.paused = cameraAnimationX.paused;
+            if (cameraAnimationX.paused) {
+                text = "Animate Camera";
+            } else {
+                text = "Pause Camera";
             }
         }
+    }
 
-        Button {
-            id: exitButton
-            Layout.fillHeight: true
-            Layout.minimumWidth: parent.width / 3
-            text: "Quit"
-            onClicked: Qt.quit();
-        }
+    Button {
+        id: exitButton
+        width: portraitMode ? parent.width : parent.width / 3
+        anchors.left: portraitMode ? parent.left : cameraToggle.right
+        anchors.top: portraitMode ? cameraToggle.bottom : parent.top
+        text: "Quit"
+        onClicked: Qt.quit();
     }
 }

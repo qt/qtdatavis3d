@@ -38,6 +38,8 @@ Item {
     width: 800
     height: 600
 
+    property bool portratiMode: width < height
+
     Data {
         id: data
     }
@@ -102,7 +104,7 @@ Item {
                     Layout.minimumWidth: parent.width / 2
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: "Clear Selections"
+                    text: portratiMode ? "Clear\nSelections" : "Clear Selections"
                     onClicked: clearSelections() // call a helper function to keep button itself simpler
                 }
 
@@ -117,14 +119,14 @@ Item {
                 Button {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: "Reset Cameras"
+                    text: portratiMode ? "Reset\nCameras" : "Reset Cameras"
                     onClicked: resetCameras() // call a helper function to keep button itself simpler
                 }
 
                 Button {
                     Layout.fillHeight: true
                     Layout.fillWidth: true
-                    text: "Toggle Mesh Styles"
+                    text: portratiMode ? "Toggle\nMesh\nStyles" : "Toggle Mesh Styles"
                     onClicked: toggleMeshStyle() // call a helper function to keep button itself simpler
                 }
             }
