@@ -9,6 +9,7 @@ qt_internal_add_manual_test(qmlperf
         datagenerator.cpp datagenerator.h
         main.cpp
     )
+
 target_link_libraries(qmlperf PUBLIC
     Qt::Gui
     Qt::Qml
@@ -18,6 +19,8 @@ target_link_libraries(qmlperf PUBLIC
 
 set(qmlperf_resource_files
     "qml/qmlperf/main.qml"
+    "qml/qmlperf/Tests.qml"
+    "qml/qmlperf/AutoTest.qml"
     )
 
 qt_internal_add_resource(qmlperf "qmlperf"
