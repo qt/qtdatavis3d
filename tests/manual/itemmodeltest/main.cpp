@@ -266,7 +266,7 @@ int main(int argc, char **argv)
     barProxy->setValueRoleReplace(QStringLiteral("\\4"));
     barProxy->setRotationRoleReplace(QStringLiteral("\\5"));
     surfaceProxy->setXPosRole(tableWidget->model()->roleNames().value(Qt::DisplayRole));
-    surfaceProxy->setZPosRole(tableWidget->model()->roleNames().value(Qt::DisplayRole));
+    surfaceProxy->setYPosRole(tableWidget->model()->roleNames().value(Qt::DisplayRole));
     surfaceProxy->setXPosRolePattern(QRegularExpression(QStringLiteral("^(\\d*)\\/(\\d*)\\/\\d*[\\.\\,]?\\d*\\/\\d*[\\.\\,]?\\d*$")));
     surfaceProxy->setXPosRoleReplace(QStringLiteral("\\2"));
     surfaceProxy->setYPosRolePattern(QRegularExpression(QStringLiteral("^\\d*(\\/)(\\d*)\\/(\\d*[\\.\\,]?\\d*)\\/\\d*[\\.\\,]?\\d*$")));
