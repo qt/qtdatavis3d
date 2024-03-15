@@ -1638,7 +1638,7 @@ void Abstract3DRenderer::drawCustomItems(RenderingState state,
                         m_drawer->drawObject(shader, item->mesh(), item->texture());
                     }
                 }
-            } else if (RenderingSelection == state) {
+            } else if (RenderingSelection == state && !volumeDetected) {
                 // Selection render
                 shader->setUniformValue(shader->MVP(), MVPMatrix);
                 QVector4D itemColor = indexToSelectionColor(item->index());
