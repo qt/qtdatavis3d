@@ -129,12 +129,12 @@ Item {
             anchors.fill: parent
             hoverEnabled: true
             acceptedButtons: Qt.LeftButton | Qt.RightButton
-            property int mouseX: -1
-            property int mouseY: -1
+            property int mouseXPos: -1
+            property int mouseYPos: -1
 
             onPositionChanged: (mouse)=> {
-                mouseX = mouse.x;
-                mouseY = mouse.y;
+                mouseXPos = mouse.x;
+                mouseYPos = mouse.y;
             }
 
             onWheel: (wheel)=> {
@@ -161,7 +161,8 @@ Item {
             running: true
             repeat: true
             onTriggered: {
-                scatterGraph.scene.selectionQueryPosition = Qt.point(inputArea.mouseX, inputArea.mouseY);
+                scatterGraph.scene.selectionQueryPosition = Qt.point(inputArea.mouseXPos,
+                                                                     inputArea.mouseYPos);
             }
         }
     }
