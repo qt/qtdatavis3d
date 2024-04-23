@@ -79,7 +79,7 @@
                 "file type" : "examples and snippets",
                 "spdx" : ["LicenseRef-Qt-Commercial OR BSD-3-Clause"]
             },
-            "tests/auto/cpptest/common/cpptestutil.h" : {
+            "tests/auto/cpptest/common/cpptestutil\\.h" : {
                 "comment" : "",
                 "file type" : "util",
                 "spdx" : ["LicenseRef-Qt-Commercial OR GPL-3.0-only WITH Qt-GPL-exception-1.0"]
