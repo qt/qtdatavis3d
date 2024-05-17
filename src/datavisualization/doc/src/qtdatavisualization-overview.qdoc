@@ -31,6 +31,8 @@
     and viewing 2D slices of the 3D data for increased readability. For more
     information, see \l{Qt Data Visualization Interacting with Data}.
 
+    \include maintenance-phase.qdocinc
+
     \section1 Graph Types
 
     The Qt Data Visualization module provides the following 3D graph types:

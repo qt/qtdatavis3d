@@ -6,7 +6,6 @@
     \page qtdatavisualization-index.html
     \brief Provides functionality for 3D visualization.
 
-
     The Qt Data Visualization module enables you to visualize data in 3D as
     bar, scatter, and surface graphs. It's especially useful for visualizing
     depth maps and large quantities of rapidly changing data, such as data
@@ -15,6 +14,8 @@
 
     Qt Data Visualization is built on Qt 6 and OpenGL to take advantage of
     hardware acceleration and Qt Quick.
+
+    \include maintenance-phase.qdocinc
 
     \section1 Using the Module
 

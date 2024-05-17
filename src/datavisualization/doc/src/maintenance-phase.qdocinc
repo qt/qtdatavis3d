@@ -1,0 +1,6 @@
+\note The Qt Data Visualization module is in the maintenance phase. For new
+projects, consider using the \l {Qt Graphs} module. For 3D rendering, QtGraphs
+uses QtQuick3D, which in turn uses QtRhi. QtRhi relies on each platform's native
+rendering backend (Metal on macOS, DirectX on Windows, OpenGL or Vulkan on
+Linux). To migrate from Qt Data Visualization to Qt Graphs module, refer to
+\l {Qt Graphs Migration from Qt DataVisualization}.
