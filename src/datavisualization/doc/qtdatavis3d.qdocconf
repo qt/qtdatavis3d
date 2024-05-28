@@ -16,6 +16,11 @@ exampledirs += ../../../examples/datavisualization \
 imagedirs  += ../images \
               images
 
+# Define a custom file name suffix for C++ types as Qt Graphs
+# module declares identically-named, documented types.
+outputsuffixes      = CPP
+outputsuffixes.CPP  = -qtdatavis
+
 depends = qtcore qtgui qtqml qtquick qtdoc qtcmake qtwidgets
 
 qhp.projects                            = QtDataVis3D
