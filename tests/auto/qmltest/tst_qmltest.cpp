@@ -17,6 +17,16 @@ int main(int argc, char **argv)
         tst_qmltest skip;
         return QTest::qExec(&skip, argc, argv);
     }
+    if (!qEnvironmentVariableIsEmpty("QT_QPA_OFFSCREEN_NO_GLX")) {
+        qWarning("This test would fail due to missing GLX, so it will be skipped.");
+        tst_qmltest skip;
+        return QTest::qExec(&skip, argc, argv);
+    }
+    if (qgetenv("QT_QPA_PLATFORM").contains("offscreen")) {
+        qWarning("This test would fail due to offscreen target, so it will be skipped.");
+        tst_qmltest skip;
+        return QTest::qExec(&skip, argc, argv);
+    }
 #ifdef Q_OS_QNX
     if (qEnvironmentVariable("QTEST_ENVIRONMENT").split(' ').contains("ci") &&
         qEnvironmentVariable("QT_QPA_PLATFORM").split(' ').contains("offscreen")
