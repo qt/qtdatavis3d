@@ -31,11 +31,7 @@ qhp.QtDataVis3D.virtualFolder   = qtdatavisualization
 qhp.QtDataVis3D.indexTitle      = Qt Data Visualization
 qhp.QtDataVis3D.indexRoot       =
 
-qhp.QtDataVis3D.subprojects                             = gettingstarted examples classes types
-qhp.QtDataVis3D.subprojects.gettingstarted.title        = Getting Started
-qhp.QtDataVis3D.subprojects.gettingstarted.indexTitle   = Qt Data Visualization Getting Started
-qhp.QtDataVis3D.subprojects.gettingstarted.selectors    = doc:page
-qhp.QtDataVis3D.subprojects.gettingstarted.sortPages    = true
+qhp.QtDataVis3D.subprojects                             = examples classes types
 qhp.QtDataVis3D.subprojects.examples.title              = Examples
 qhp.QtDataVis3D.subprojects.examples.indexTitle         = Qt Data Visualization Examples
 qhp.QtDataVis3D.subprojects.examples.selectors          = doc:example
