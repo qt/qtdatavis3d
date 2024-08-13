@@ -293,8 +293,8 @@ void QLogValue3DAxisFormatterPrivate::recalculate()
         qreal minDiff = qCeil(logMin) - logMin;
         qreal maxDiff = logMax - qFloor(logMax);
 
-        m_evenMinSegment = qFuzzyCompare(0.0, minDiff);
-        m_evenMaxSegment = qFuzzyCompare(0.0, maxDiff);
+        m_evenMinSegment = qFuzzyCompare(qreal(0), minDiff);
+        m_evenMaxSegment = qFuzzyCompare(qreal(0), maxDiff);
 
         segmentCount = qRound(logRangeNormalizer - minDiff - maxDiff);
 
