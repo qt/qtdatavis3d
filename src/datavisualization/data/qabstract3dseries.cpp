@@ -34,7 +34,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QAbstract3DSeries
+ * \nativetype QAbstract3DSeries
  * \brief A base type for all data series.
  *
  * This type is uncreatable, but contains properties that are exposed via the

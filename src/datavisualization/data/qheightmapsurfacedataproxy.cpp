@@ -31,7 +31,7 @@ const float defaultMaxValue = 10.0f;
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QHeightMapSurfaceDataProxy
+ * \nativetype QHeightMapSurfaceDataProxy
  * \inherits SurfaceDataProxy
  * \brief Base proxy type for Surface3D.
  *

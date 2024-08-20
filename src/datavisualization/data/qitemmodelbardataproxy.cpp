@@ -65,7 +65,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QItemModelBarDataProxy
+ * \nativetype QItemModelBarDataProxy
  * \inherits BarDataProxy
  * \brief Proxy class for presenting data in item models with Bars3D.
  *

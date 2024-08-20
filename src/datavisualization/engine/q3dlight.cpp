@@ -21,7 +21,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates Q3DLight
+ * \nativetype Q3DLight
  * \brief Representation of a light source in 3D space.
  *
  * Light3D represents a monochrome light source in 3D space.

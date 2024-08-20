@@ -28,7 +28,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.1
  * \ingroup datavisualization_qml
- * \instantiates QCustom3DLabel
+ * \nativetype QCustom3DLabel
  * \inherits Custom3DItem
  * \brief Adds a custom label to a graph.
  *

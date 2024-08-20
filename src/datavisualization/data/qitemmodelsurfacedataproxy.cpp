@@ -71,7 +71,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QItemModelSurfaceDataProxy
+ * \nativetype QItemModelSurfaceDataProxy
  * \inherits SurfaceDataProxy
  * \brief Proxy class for presenting data in item models with Surface3D.
  *

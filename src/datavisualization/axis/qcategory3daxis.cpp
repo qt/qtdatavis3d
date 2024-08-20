@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QCategory3DAxis
+ * \nativetype QCategory3DAxis
  * \inherits AbstractAxis3D
  * \brief Manipulates an axis of a graph.
  *

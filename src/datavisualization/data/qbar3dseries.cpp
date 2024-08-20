@@ -57,7 +57,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QBar3DSeries
+ * \nativetype QBar3DSeries
  * \inherits Abstract3DSeries
  * \brief Represents a data series in a 3D bar graph.
  *

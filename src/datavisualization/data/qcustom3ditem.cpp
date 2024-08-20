@@ -22,7 +22,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.1
  * \ingroup datavisualization_qml
- * \instantiates QCustom3DItem
+ * \nativetype QCustom3DItem
  * \brief Adds a custom item to a graph.
  *
  * A custom item has a custom mesh, position, scaling, rotation, and an optional

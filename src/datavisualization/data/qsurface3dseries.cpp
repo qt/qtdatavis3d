@@ -57,7 +57,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QSurface3DSeries
+ * \nativetype QSurface3DSeries
  * \inherits Abstract3DSeries
  * \brief Represents a data series in a 3D surface graph.
  *

@@ -60,7 +60,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates Q3DCamera
+ * \nativetype Q3DCamera
  * \brief Representation of a camera in 3D space.
  *
  * Camera3D represents a basic orbit around centerpoint 3D camera that is used when rendering the
