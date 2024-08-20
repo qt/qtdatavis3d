@@ -22,7 +22,7 @@ QT_BEGIN_NAMESPACE
    \inqmlmodule QtDataVisualization
    \since QtDataVisualization 1.0
    \ingroup datavisualization_qml
-   \instantiates Q3DObject
+   \nativetype Q3DObject
    \brief A base type for all the objects in a 3D scene.
 
     An uncreatable base type that contains position information for an object in

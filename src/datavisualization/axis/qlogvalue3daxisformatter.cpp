@@ -25,7 +25,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.1
  * \ingroup datavisualization_qml
- * \instantiates QLogValue3DAxisFormatter
+ * \nativetype QLogValue3DAxisFormatter
  * \inherits ValueAxis3DFormatter
  * \brief Provides formatting rules for a logarithmic value axis.
  *

@@ -36,7 +36,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.2
  * \ingroup datavisualization_qml
- * \instantiates QCustom3DVolume
+ * \nativetype QCustom3DVolume
  * \inherits Custom3DItem
  * \brief Adds a volume rendered object to a graph.
  *

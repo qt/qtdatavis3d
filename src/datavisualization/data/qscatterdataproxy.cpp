@@ -35,7 +35,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QScatterDataProxy
+ * \nativetype QScatterDataProxy
  * \inherits AbstractDataProxy
  * \brief The data proxy for 3D scatter graphs.
  *

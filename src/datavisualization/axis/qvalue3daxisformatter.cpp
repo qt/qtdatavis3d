@@ -27,7 +27,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.1
  * \ingroup datavisualization_qml
- * \instantiates QValue3DAxisFormatter
+ * \nativetype QValue3DAxisFormatter
  * \brief A base type for value axis formatters.
  *
  * This type provides formatting rules for a linear value 3D axis.

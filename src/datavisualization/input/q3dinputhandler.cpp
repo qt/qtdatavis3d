@@ -57,7 +57,7 @@ static const int farZoomRangeDivider  = 120;
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.2
  * \ingroup datavisualization_qml
- * \instantiates Q3DInputHandler
+ * \nativetype Q3DInputHandler
  * \brief Basic wheel mouse based input handler.
  *
  * InputHandler3D is the basic input handler for wheel mouse type of input devices.

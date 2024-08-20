@@ -165,7 +165,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates Q3DTheme
+ * \nativetype Q3DTheme
  * \brief A visual style for graphs.
  *
  * This type is used to specify visual properties that affect the whole graph. There are several

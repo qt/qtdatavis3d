@@ -68,7 +68,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QSurfaceDataProxy
+ * \nativetype QSurfaceDataProxy
  * \inherits AbstractDataProxy
  * \brief The data proxy for a 3D surface graph.
  *

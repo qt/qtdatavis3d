@@ -24,7 +24,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QAbstractDataProxy
+ * \nativetype QAbstractDataProxy
  * \brief Base type for all QtDataVisualization data proxies.
  *
  * This type is uncreatable, but contains properties that are exposed via the

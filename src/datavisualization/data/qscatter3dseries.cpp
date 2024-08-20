@@ -54,7 +54,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QScatter3DSeries
+ * \nativetype QScatter3DSeries
  * \inherits Abstract3DSeries
  * \brief Represents a data series in a 3D scatter graph.
  *

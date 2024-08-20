@@ -23,7 +23,7 @@ QT_BEGIN_NAMESPACE
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0
  * \ingroup datavisualization_qml
- * \instantiates QAbstract3DAxis
+ * \nativetype QAbstract3DAxis
  * \brief A base type for the axes of a graph.
  *
  * This type is uncreatable, but contains properties that are exposed via subtypes.
