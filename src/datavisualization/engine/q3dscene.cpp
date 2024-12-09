@@ -144,7 +144,7 @@ QT_BEGIN_NAMESPACE
  */
 
 /*!
- * \qmlproperty float Scene3D::devicePixelRatio
+ * \qmlproperty real Scene3D::devicePixelRatio
  *
  * The current device pixel ratio that is used when mapping input
  * coordinates to pixel coordinates.
