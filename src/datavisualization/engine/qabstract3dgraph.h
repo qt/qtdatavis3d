@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QABSTRACT3DGRAPH_H
-#define QABSTRACT3DGRAPH_H
+#ifndef QTDATAVIS3D_QABSTRACT3DGRAPH_H
+#define QTDATAVIS3D_QABSTRACT3DGRAPH_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtDataVisualization/q3dtheme.h>

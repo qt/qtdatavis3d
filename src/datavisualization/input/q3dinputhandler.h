@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef Q3DINPUTHANDLER_H
-#define Q3DINPUTHANDLER_H
+#ifndef QTDATAVIS3D_Q3DINPUTHANDLER_H
+#define QTDATAVIS3D_Q3DINPUTHANDLER_H
 
 #include <QtDataVisualization/qabstract3dinputhandler.h>
 

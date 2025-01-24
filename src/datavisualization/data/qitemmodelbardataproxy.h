@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QITEMMODELBARDATAPROXY_H
-#define QITEMMODELBARDATAPROXY_H
+#ifndef QTDATAVIS3D_QITEMMODELBARDATAPROXY_H
+#define QTDATAVIS3D_QITEMMODELBARDATAPROXY_H
 
 #include <QtDataVisualization/qbardataproxy.h>
 #include <QtCore/QAbstractItemModel>

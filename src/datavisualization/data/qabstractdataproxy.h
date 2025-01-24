@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QABSTRACTDATAPROXY_H
-#define QABSTRACTDATAPROXY_H
+#ifndef QTDATAVIS3D_QABSTRACTDATAPROXY_H
+#define QTDATAVIS3D_QABSTRACTDATAPROXY_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtCore/QObject>

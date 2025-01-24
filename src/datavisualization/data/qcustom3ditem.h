@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QCUSTOM3DITEM_H
-#define QCUSTOM3DITEM_H
+#ifndef QTDATAVIS3D_QCUSTOM3DITEM_H
+#define QTDATAVIS3D_QCUSTOM3DITEM_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtGui/QImage>
