@@ -1,8 +1,13 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QUTILS_H
-#define QUTILS_H
+#ifdef QTGRAPHS_QUTILS_H
+#error Mixing QtDataVisualization and QtGraphs in the same TU is unsupported since they use\
+ the same class names.
+#endif
+
+#ifndef QTDATAVIS3D_QUTILS_H
+#define QTDATAVIS3D_QUTILS_H
 
 #include <QtGui/QSurfaceFormat>
 #include <QtGui/QOpenGLContext>

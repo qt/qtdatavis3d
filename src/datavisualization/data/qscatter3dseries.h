@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QSCATTER3DSERIES_H
-#define QSCATTER3DSERIES_H
+#ifndef QTDATAVIS3D_QSCATTER3DSERIES_H
+#define QTDATAVIS3D_QSCATTER3DSERIES_H
 
 #include <QtDataVisualization/qabstract3dseries.h>
 #include <QtDataVisualization/qscatterdataproxy.h>

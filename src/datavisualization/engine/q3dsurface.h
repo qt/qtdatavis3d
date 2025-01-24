@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef Q3DSURFACE_H
-#define Q3DSURFACE_H
+#ifndef QTDATAVIS3D_Q3DSURFACE_H
+#define QTDATAVIS3D_Q3DSURFACE_H
 
 #include <QtDataVisualization/qabstract3dgraph.h>
 #include <QtDataVisualization/qvalue3daxis.h>
