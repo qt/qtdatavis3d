@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QSURFACEDATAPROXY_H
-#define QSURFACEDATAPROXY_H
+#ifndef QTDATAVIS3D_QSURFACEDATAPROXY_H
+#define QTDATAVIS3D_QSURFACEDATAPROXY_H
 
 #include <QtDataVisualization/qabstractdataproxy.h>
 #include <QtDataVisualization/qsurfacedataitem.h>

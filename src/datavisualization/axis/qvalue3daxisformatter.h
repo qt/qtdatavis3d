@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QVALUE3DAXISFORMATTER_H
-#define QVALUE3DAXISFORMATTER_H
+#ifndef QTDATAVIS3D_QVALUE3DAXISFORMATTER_H
+#define QTDATAVIS3D_QVALUE3DAXISFORMATTER_H
 
 #include <QtDataVisualization/qdatavisualizationglobal.h>
 #include <QtCore/QList>

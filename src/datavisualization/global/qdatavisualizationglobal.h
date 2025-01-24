@@ -19,6 +19,13 @@ QT_BEGIN_NAMESPACE
 */
 #define QT_DATAVISUALIZATION_VERSION_CHECK(major, minor, patch) ((major<<16)|(minor<<8)|(patch))
 
+#ifdef QTGRAPHS_HEADERS
+#error Mixing QtDataVisualization and QtGraphs in the same TU is unsupported since they use\
+ the same class names.
+#endif
+
+#define QTDATAVIS3D_HEADERS
+
 QT_END_NAMESPACE
 
 #endif

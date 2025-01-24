@@ -1,8 +1,8 @@
 // Copyright (C) 2016 The Qt Company Ltd.
 // SPDX-License-Identifier: LicenseRef-Qt-Commercial OR GPL-3.0-only
 
-#ifndef QVALUE3DAXIS_H
-#define QVALUE3DAXIS_H
+#ifndef QTDATAVIS3D_QVALUE3DAXIS_H
+#define QTDATAVIS3D_QVALUE3DAXIS_H
 
 #include <QtDataVisualization/qabstract3daxis.h>
 #include <QtDataVisualization/qvalue3daxisformatter.h>
