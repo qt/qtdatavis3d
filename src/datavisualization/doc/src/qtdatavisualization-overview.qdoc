@@ -31,7 +31,7 @@
     and viewing 2D slices of the 3D data for increased readability. For more
     information, see \l{Qt Data Visualization Interacting with Data}.
 
-    \include maintenance-phase.qdocinc
+    \include deprecation-phase.qdocinc
 
     \section1 Graph Types
 

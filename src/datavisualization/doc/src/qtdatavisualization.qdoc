@@ -7,6 +7,7 @@
     \ingroup modules
     \qtcmakepackage DataVisualization
     \qtvariable datavisualization
+    \deprecated [6.10] Use QtGraphs instead.
 
     \brief C++ classes for the Qt Data Visualization API.
 
@@ -17,6 +18,7 @@
     \qmlmodule QtDataVisualization 1.\QtMinorVersion
     \title Qt Data Visualization QML Types
     \ingroup qmlmodules
+    \deprecated [6.10] Use QtGraphs instead.
 
     \brief QML types for the Qt Data Visualization API.
 
