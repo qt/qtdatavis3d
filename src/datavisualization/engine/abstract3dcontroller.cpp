@@ -532,7 +532,7 @@ void Abstract3DController::render(const GLuint defaultFboHandle)
             m_currentFps = qreal(m_numFrames) * 1000.0 / qreal(elapsed);
             emit currentFpsChanged(m_currentFps);
             m_numFrames = 0;
-            m_frameTimer.restart();
+            m_frameTimer.start();
         }
         // To get meaningful framerate, don't just do render on demand.
         emitNeedRender();
