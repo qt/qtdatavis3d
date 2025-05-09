@@ -203,8 +203,9 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
 #if defined(Q_OS_MACOS)
     // Enable touch events for Mac touchpads
     typedef void * (*EnableTouch)(QWindow*, bool);
-    EnableTouch enableTouch =
-            (EnableTouch)QGuiApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("registertouchwindow");
+    EnableTouch enableTouch = reinterpret_cast<EnableTouch>(
+            QFunctionPointer(QGuiApplication::platformNativeInterface()
+                                     ->nativeResourceFunctionForIntegration("registertouchwindow")));
     if (enableTouch)
         enableTouch(this, true);
 #endif
