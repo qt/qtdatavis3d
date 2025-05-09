@@ -433,8 +433,9 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     // Enable touch events for Mac touchpads
     window->setVisible(true);
     typedef void * (*EnableTouch)(QWindow*, bool);
-    EnableTouch enableTouch =
-            (EnableTouch)QGuiApplication::platformNativeInterface()->nativeResourceFunctionForIntegration("registertouchwindow");
+    EnableTouch enableTouch = reinterpret_cast<EnableTouch>(
+            QFunctionPointer(QGuiApplication::platformNativeInterface()
+                                     ->nativeResourceFunctionForIntegration("registertouchwindow")));
     if (enableTouch)
         enableTouch(window, true);
     window->setVisible(previousVisibility);
