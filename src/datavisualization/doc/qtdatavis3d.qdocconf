@@ -11,6 +11,9 @@ examplesinstallpath = datavisualization
 exampledirs += ../../../examples/datavisualization \
                snippets
 
+# Path to the root of qtdatavis3d (for automatic linking to source code)
+url.sources.rootdir     = ../../..
+
 {headerdirs,sourcedirs} += ..
 
 imagedirs  += ../images \
