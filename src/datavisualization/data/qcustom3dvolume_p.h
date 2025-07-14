@@ -19,6 +19,8 @@
 
 QT_BEGIN_NAMESPACE
 
+class QQuaternion;
+
 struct QCustomVolumeDirtyBitField {
     bool textureDimensionsDirty : 1;
     bool slicesDirty            : 1;

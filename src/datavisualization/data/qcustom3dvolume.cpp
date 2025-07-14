@@ -5,6 +5,8 @@
 #include "qcustom3dvolume_p.h"
 #include "utils_p.h"
 
+#include <QtGui/qquaternion.h>
+
 QT_BEGIN_NAMESPACE
 
 /*!

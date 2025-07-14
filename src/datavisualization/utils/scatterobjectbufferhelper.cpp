@@ -3,8 +3,11 @@
 
 #include "scatterobjectbufferhelper_p.h"
 #include "objecthelper_p.h"
+
 #include <QtGui/QVector2D>
 #include <QtGui/QMatrix4x4>
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE
