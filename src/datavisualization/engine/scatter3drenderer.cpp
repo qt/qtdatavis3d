@@ -12,6 +12,8 @@
 #include "scatterobjectbufferhelper_p.h"
 #include "scatterpointbufferhelper_p.h"
 
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/qmath.h>
 
 // You can verify that depth buffer drawing works correctly by uncommenting this.

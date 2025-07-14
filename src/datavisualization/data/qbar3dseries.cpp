@@ -3,6 +3,9 @@
 
 #include "qbar3dseries_p.h"
 #include "bars3dcontroller_p.h"
+
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/qmath.h>
 
 QT_BEGIN_NAMESPACE

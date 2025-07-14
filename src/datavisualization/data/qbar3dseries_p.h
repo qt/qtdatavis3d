@@ -19,6 +19,8 @@
 
 QT_BEGIN_NAMESPACE
 
+class QQuaternion;
+
 class QBar3DSeriesPrivate : public QAbstract3DSeriesPrivate
 {
     Q_OBJECT
