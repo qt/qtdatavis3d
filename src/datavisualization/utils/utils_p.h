@@ -20,6 +20,8 @@ QT_FORWARD_DECLARE_CLASS(QLinearGradient)
 
 QT_BEGIN_NAMESPACE
 
+class QQuaternion;
+
 class Utils
 {
 public:

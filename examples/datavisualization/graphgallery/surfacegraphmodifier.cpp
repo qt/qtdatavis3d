@@ -8,7 +8,10 @@
 
 #include <QtDataVisualization/qvalue3daxis.h>
 #include <QtDataVisualization/q3dtheme.h>
+
 #include <QtGui/qimage.h>
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/qmath.h>
 
 using namespace Qt::StringLiterals;

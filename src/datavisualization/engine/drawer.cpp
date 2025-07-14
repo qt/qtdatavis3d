@@ -10,6 +10,8 @@
 #include "scatterpointbufferhelper_p.h"
 
 #include <QtGui/QMatrix4x4>
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/qmath.h>
 
 // Resources need to be explicitly initialized when building as static library

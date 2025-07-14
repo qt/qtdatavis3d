@@ -11,6 +11,8 @@
 #include <qmath.h>
 #include <QComboBox>
 
+#include <QtGui/qquaternion.h>
+
 const int numberOfCols = 8;
 const int numberOfRows = 8;
 const float limit = 8.0f;

@@ -11,6 +11,8 @@
 
 QT_BEGIN_NAMESPACE
 
+class QQuaternion;
+
 class QCustom3DVolumePrivate;
 
 class Q_DATAVISUALIZATION_EXPORT QCustom3DVolume : public QCustom3DItem

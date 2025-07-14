@@ -12,6 +12,9 @@
 #include <QtGui/QRgb>
 #include <QtGui/QImage>
 #include <QtWidgets/QLabel>
+
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/QDebug>
 
 const int imageCount = 512;

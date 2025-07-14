@@ -9,6 +9,8 @@
 #include "texturehelper_p.h"
 #include "utils_p.h"
 
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/qmath.h>
 
 static const int ID_TO_RGBA_MASK = 0xff;

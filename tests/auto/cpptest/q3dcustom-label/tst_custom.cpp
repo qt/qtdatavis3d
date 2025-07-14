@@ -7,6 +7,8 @@
 
 #include "cpptestutil.h"
 
+#include <QtGui/qquaternion.h>
+
 class tst_custom: public QObject
 {
     Q_OBJECT
