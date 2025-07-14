@@ -197,3 +197,5 @@ void ScatterDataModifier::toggleRotation()
     else
         m_rotationTimer.start(20);
 }
+
+#undef HEDGEHOG
