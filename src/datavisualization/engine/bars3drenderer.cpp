@@ -10,6 +10,8 @@
 #include "utils_p.h"
 #include "barseriesrendercache_p.h"
 
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/qmath.h>
 
 // You can verify that depth buffer drawing works correctly by uncommenting this.
