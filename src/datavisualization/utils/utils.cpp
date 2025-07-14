@@ -6,6 +6,8 @@
 #include <QtGui/QPainter>
 #include <QtGui/QOpenGLContext>
 #include <QtGui/QOffscreenSurface>
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/QCoreApplication>
 #include <QtCore/QRegularExpression>
 #include <QLocale>

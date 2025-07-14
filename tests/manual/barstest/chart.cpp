@@ -12,6 +12,9 @@
 #include <QtDataVisualization/q3dtheme.h>
 #include <QtDataVisualization/q3dinputhandler.h>
 #include <QtDataVisualization/qcustom3ditem.h>
+
+#include <QtGui/qquaternion.h>
+
 #include <QtCore/QRandomGenerator>
 #include <QtCore/QElapsedTimer>
 #include <QtCore/qmath.h>

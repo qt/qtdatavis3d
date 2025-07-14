@@ -5,6 +5,8 @@
 
 #include <QtDataVisualization/QScatter3DSeries>
 
+#include <QtGui/qquaternion.h>
+
 class tst_series: public QObject
 {
     Q_OBJECT
