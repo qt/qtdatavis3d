@@ -18,6 +18,8 @@
 #include <QtCore/QScopedArrayPointer>
 #include "enumtostringmap_p.h"
 
+QT_BEGIN_NAMESPACE
+
 class GLStateStore : public QObject, protected QOpenGLFunctions
 {
     Q_OBJECT
@@ -75,5 +77,7 @@ public:
     GLfloat m_polygonOffsetFactor;
     GLfloat m_polygonOffsetUnits;
 };
+
+QT_END_NAMESPACE
 
 #endif
