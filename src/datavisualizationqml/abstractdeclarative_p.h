@@ -26,9 +26,10 @@
 #include <QtCore/QMutex>
 #include <QtCore/QSharedPointer>
 
-class GLStateStore;
 
 QT_BEGIN_NAMESPACE
+
+class GLStateStore;
 
 class AbstractDeclarative : public QQuickItem, public AbstractDeclarativeInterface
 {

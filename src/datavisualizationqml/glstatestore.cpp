@@ -11,6 +11,8 @@ static QFile *beforeFile = 0;
 static QFile *afterFile = 0;
 #endif
 
+QT_BEGIN_NAMESPACE
+
 GLStateStore::GLStateStore(QOpenGLContext *context, QObject *parent) :
     QObject(parent),
     QOpenGLFunctions(context)
@@ -365,3 +367,5 @@ void GLStateStore::initGLDefaultState()
     m_polygonOffsetFactor = 0.0;
     m_polygonOffsetUnits = 0.0;
 }
+
+QT_END_NAMESPACE
