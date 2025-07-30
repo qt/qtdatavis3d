@@ -1053,6 +1053,8 @@ void QAbstract3DGraphPrivate::setVisualController(Abstract3DController *controll
 {
     m_visualController = controller;
 
+    q_ptr->setLocale(QLocale());
+
     QObject::connect(m_visualController, &Abstract3DController::activeInputHandlerChanged, q_ptr,
                      &QAbstract3DGraph::activeInputHandlerChanged);
     QObject::connect(m_visualController, &Abstract3DController::activeThemeChanged, q_ptr,

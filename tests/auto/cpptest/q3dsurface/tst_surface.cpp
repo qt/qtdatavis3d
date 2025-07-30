@@ -105,7 +105,7 @@ void tst_surface::initialProperties()
     QCOMPARE(m_graph->horizontalAspectRatio(), 0.0);
     QCOMPARE(m_graph->isReflection(), false);
     QCOMPARE(m_graph->reflectivity(), 0.5);
-    QCOMPARE(m_graph->locale(), QLocale("C"));
+    QCOMPARE(m_graph->locale(), QLocale::system());
     QCOMPARE(m_graph->queriedGraphPosition(), QVector3D(0, 0, 0));
     QCOMPARE(m_graph->margin(), -1.0);
 }
