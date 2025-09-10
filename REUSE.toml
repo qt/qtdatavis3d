@@ -5,14 +5,14 @@ path = ["tools/**"]
 comment = "According to licenseRule.json, files in tools are not tools. module and plugin."
 precedence = "closest"
 SPDX-FileCopyrightText = "Copyright (C) 2024 The Qt Company Ltd."
-SPDX-License-Identifier = "LicenseRef-Qt-Commercial"
+SPDX-License-Identifier = "LicenseRef-Qt-Commercial OR GPL-3.0-only"
 
 [[annotations]]
 path = ["src/datavisualization**"]
 comment = "module and plugin"
 precedence = "closest"
 SPDX-FileCopyrightText = "Copyright (C) 2024 The Qt Company Ltd."
-SPDX-License-Identifier = "LicenseRef-Qt-Commercial"
+SPDX-License-Identifier = "LicenseRef-Qt-Commercial OR GPL-3.0-only"
 
 [[annotations]]
 path = ["tests/**.jpg", "tests/**.obj", "tests/**.png"]
