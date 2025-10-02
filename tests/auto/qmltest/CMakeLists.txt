@@ -12,6 +12,7 @@ qt_internal_add_test(tst_qmltest_datavis
         tst_qmltest.cpp
     LIBRARIES
         Qt::Gui
+        Qt::GuiPrivate
     TESTDATA ${test_data}
 )
 
