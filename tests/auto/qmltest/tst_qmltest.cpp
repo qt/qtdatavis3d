@@ -3,6 +3,9 @@
 
 #include <QtQuickTest/quicktest.h>
 
+#include <private/qguiapplication_p.h>
+#include <qpa/qplatformintegration.h>
+
 class tst_qmltest: public QObject
 {
     Q_OBJECT
@@ -36,6 +39,16 @@ int main(int argc, char **argv)
         return QTest::qExec(&skip, argc, argv);
     }
 #endif
+
+    {
+        QGuiApplication app(argc, argv);
+        if (!QGuiApplicationPrivate::platformIntegration()->hasCapability(QPlatformIntegration::OpenGL)) {
+            qWarning("OpenGL is not enabled in this configuration, so it will be skipped.");
+            tst_qmltest skip;
+            return QTest::qExec(&skip, argc, argv);
+        }
+    }
+
     qputenv("QSG_RHI_BACKEND", "opengl");
     QTEST_SET_MAIN_SOURCE_PATH
     return quick_test_main(argc, argv, "qmltest", QUICK_TEST_SOURCE_DIR);
