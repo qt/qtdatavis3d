@@ -22,8 +22,6 @@ class QAbstract3DSeries;
 class Q_DATAVISUALIZATION_EXPORT QAbstract3DGraph : public QWindow, protected QOpenGLFunctions
 {
     Q_OBJECT
-    Q_FLAGS(SelectionFlag SelectionFlags)
-    Q_FLAGS(OptimizationHint OptimizationHints)
     Q_PROPERTY(QAbstract3DInputHandler* activeInputHandler READ activeInputHandler WRITE setActiveInputHandler NOTIFY activeInputHandlerChanged)
     Q_PROPERTY(Q3DTheme* activeTheme READ activeTheme WRITE setActiveTheme NOTIFY activeThemeChanged)
     Q_PROPERTY(SelectionFlags selectionMode READ selectionMode WRITE setSelectionMode NOTIFY selectionModeChanged)
@@ -61,8 +59,8 @@ public:
         SelectionSlice             = 8,
         SelectionMultiSeries       = 16
     };
-    Q_ENUM(SelectionFlag)
     Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
+    Q_FLAG(SelectionFlags)
 
     enum ShadowQuality {
         ShadowQualityNone = 0,
@@ -89,8 +87,8 @@ public:
         OptimizationDefault = 0,
         OptimizationStatic  = 1
     };
-    Q_ENUM(OptimizationHint)
     Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
+    Q_FLAG(OptimizationHints)
 
 public:
     virtual ~QAbstract3DGraph();

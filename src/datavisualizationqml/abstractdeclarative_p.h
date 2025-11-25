@@ -76,6 +76,7 @@ public:
         SelectionMultiSeries       = 16
     };
     Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
+    Q_FLAG(SelectionFlags)
 
     enum ShadowQuality {
         ShadowQualityNone = 0,
@@ -107,14 +108,11 @@ public:
         OptimizationStatic  = 1
     };
     Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
+    Q_FLAG(OptimizationHints)
 
     Q_ENUM(ShadowQuality)
     Q_ENUM(RenderingMode)
     Q_ENUM(ElementType)
-    Q_ENUM(SelectionFlag)
-    Q_ENUM(OptimizationHint)
-    Q_FLAGS(SelectionFlag SelectionFlags)
-    Q_FLAGS(OptimizationHint OptimizationHints)
 
 public:
     explicit AbstractDeclarative(QQuickItem *parent = 0);
