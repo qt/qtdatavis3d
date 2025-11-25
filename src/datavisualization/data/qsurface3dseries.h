@@ -14,7 +14,6 @@ class QSurface3DSeriesPrivate;
 class Q_DATAVISUALIZATION_EXPORT QSurface3DSeries : public QAbstract3DSeries
 {
     Q_OBJECT
-    Q_FLAGS(DrawFlag DrawFlags)
     Q_PROPERTY(QSurfaceDataProxy *dataProxy READ dataProxy WRITE setDataProxy NOTIFY dataProxyChanged)
     Q_PROPERTY(QPoint selectedPoint READ selectedPoint WRITE setSelectedPoint NOTIFY selectedPointChanged)
     Q_PROPERTY(bool flatShadingEnabled READ isFlatShadingEnabled WRITE setFlatShadingEnabled NOTIFY flatShadingEnabledChanged)
@@ -30,8 +29,8 @@ public:
         DrawSurface = 2,
         DrawSurfaceAndWireframe = DrawWireframe | DrawSurface
     };
-    Q_ENUM(DrawFlag)
     Q_DECLARE_FLAGS(DrawFlags, DrawFlag)
+    Q_FLAG(DrawFlags)
 
     explicit QSurface3DSeries(QObject *parent = nullptr);
     explicit QSurface3DSeries(QSurfaceDataProxy *dataProxy, QObject *parent = nullptr);
