@@ -120,6 +120,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
         }
     } while (!sizeOk);
 
+    return [&] {
     // Create image
     QImage image = QImage(labelSize, QImage::Format_ARGB32);
     image.fill(Qt::transparent);
@@ -165,6 +166,7 @@ QImage Utils::printTextToImage(const QFont &font, const QString &text, const QCo
                          text);
     }
     return image;
+    }();
 }
 
 QVector4D Utils::getSelection(QPoint mousepos, int height)

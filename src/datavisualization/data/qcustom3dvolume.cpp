@@ -1282,6 +1282,7 @@ QImage QCustom3DVolumePrivate::renderSlice(Qt::Axis axis, int index)
             data[i] = static_cast<uchar>(multipliedAlphaValue(data.at(i)));
     }
 
+    return [&] {
     QImage image(data.constData(), x, y, x * pixelWidth, m_textureFormat);
     image.bits(); // Call bits() to detach the new image from local data
     if (m_textureFormat == QImage::Format_Indexed8) {
@@ -1298,6 +1299,7 @@ QImage QCustom3DVolumePrivate::renderSlice(Qt::Axis axis, int index)
     }
 
     return image;
+    }();
 }
 
 int QCustom3DVolumePrivate::multipliedAlphaValue(int alpha)
