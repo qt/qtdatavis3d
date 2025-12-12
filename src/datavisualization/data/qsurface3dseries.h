@@ -29,6 +29,7 @@ public:
         DrawSurface = 2,
         DrawSurfaceAndWireframe = DrawWireframe | DrawSurface
     };
+    Q_ENUM(DrawFlag)
     Q_DECLARE_FLAGS(DrawFlags, DrawFlag)
     Q_FLAG(DrawFlags)
 

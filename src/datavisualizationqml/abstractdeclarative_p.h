@@ -75,6 +75,7 @@ public:
         SelectionSlice             = 8,
         SelectionMultiSeries       = 16
     };
+    Q_ENUM(SelectionFlag)
     Q_DECLARE_FLAGS(SelectionFlags, SelectionFlag)
     Q_FLAG(SelectionFlags)
 
@@ -107,6 +108,7 @@ public:
         OptimizationDefault = 0,
         OptimizationStatic  = 1
     };
+    Q_ENUM(OptimizationHint)
     Q_DECLARE_FLAGS(OptimizationHints, OptimizationHint)
     Q_FLAG(OptimizationHints)
 
