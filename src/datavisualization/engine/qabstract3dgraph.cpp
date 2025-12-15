@@ -1040,8 +1040,10 @@ QAbstract3DGraphPrivate::~QAbstract3DGraphPrivate()
         m_offscreenSurface->destroy();
         delete m_offscreenSurface;
     }
-    if (m_context)
-        m_context->makeCurrent(q_ptr);
+    if (m_context) {
+        if (!m_context->makeCurrent(q_ptr))
+            m_context->doneCurrent();
+    }
 
     delete m_visualController;
 }
