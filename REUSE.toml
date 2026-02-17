@@ -23,7 +23,7 @@ SPDX-License-Identifier = "LicenseRef-Qt-Commercial OR GPL-3.0-only"
 
 [[annotations]]
 path = ["**.pro", "**.qrc", ".cmake.conf", "**.yaml", "**.pri",
-        "**ci_config_linux.json", ".tag"]
+        "**BLACKLIST", "**ci_config_linux.json", ".tag"]
 precedence = "closest"
 comment = "build system"
 SPDX-FileCopyrightText = "Copyright (C) The Qt Company Ltd."
