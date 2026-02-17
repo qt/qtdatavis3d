@@ -12,7 +12,7 @@
         "file_pattern_ending": ["CMakeLists.txt", ".cmake", ".pro", ".pri", ".prf",
                      "configure", "configure.bat", "cmake.in", "plist.in", "CMakeLists.txt.in",
                      ".cmake.conf", ".tag", "ci_config_linux.json",
-                     ".yaml", ".qrc"],
+                     ".yaml", ".qrc", "BLACKLIST"],
         "location": {
             "": {
                 "comment": "Default",
