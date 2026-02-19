@@ -461,7 +461,7 @@ QPoint Surface3DRenderer::mapCoordsToSampleSpace(SurfaceSeriesRenderCache *cache
         int sampleX = int((modelX + (stepX / 2.0f)) / stepX);
 
         QSurfaceDataItem item = dataArray.at(0)->at(sampleX);
-        if (!::qFuzzyCompare(float(coords.x()), item.x())) {
+        if (!QtPrivate::fuzzyCompare(float(coords.x()), item.x())) {
             int direction = 1;
             if (item.x() > coords.x())
                 direction = -1;
@@ -480,7 +480,7 @@ QPoint Surface3DRenderer::mapCoordsToSampleSpace(SurfaceSeriesRenderCache *cache
         int sampleY = int((modelY + (stepY / 2.0f)) / stepY);
 
         QSurfaceDataItem item = dataArray.at(sampleY)->at(0);
-        if (!::qFuzzyCompare(float(coords.y()), item.z())) {
+        if (!QtPrivate::fuzzyCompare(float(coords.y()), item.z())) {
             int direction = 1;
             if (item.z() > coords.y())
                 direction = -1;
