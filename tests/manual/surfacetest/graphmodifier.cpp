@@ -744,7 +744,7 @@ void GraphModifier::toggleXAscending(int enabled)
     m_ascendingX = enabled;
 
     // Flip data array contents if necessary
-    foreach (QSurface3DSeries *series, m_graph->seriesList()) {
+    for (auto series: m_graph->seriesList()) {
         QSurfaceDataArray *array = const_cast<QSurfaceDataArray *>(series->dataProxy()->array());
         const int rowCount = array->size();
         const int columnCount = array->at(0)->size();
@@ -774,7 +774,7 @@ void GraphModifier::toggleZAscending(int enabled)
     m_ascendingZ = enabled;
 
     // Flip data array contents if necessary
-    foreach (QSurface3DSeries *series, m_graph->seriesList()) {
+    for (auto series: m_graph->seriesList()) {
         QSurfaceDataArray *array = const_cast<QSurfaceDataArray *>(series->dataProxy()->array());
         const int rowCount = array->size();
         const int columnCount = array->at(0)->size();
@@ -1375,7 +1375,7 @@ void GraphModifier::massiveDataTest()
         m_graph->setAxisZ(zAxis);
         m_graph->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetRight);
         m_graph->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
-        foreach (QAbstract3DSeries *series, m_graph->seriesList())
+        for (auto series: m_graph->seriesList())
             m_graph->removeSeries(static_cast<QSurface3DSeries *>(series));
 
         qDebug() << __FUNCTION__ << testPhase << ": Creating massive array..."
@@ -1469,9 +1469,9 @@ void GraphModifier::testAxisReverse()
     switch (counter) {
     case 0: {
         qDebug() << __FUNCTION__ << counter << "Setup test";
-        foreach (QSurface3DSeries *series, m_graph->seriesList())
+        for (auto series: m_graph->seriesList())
             m_graph->removeSeries(series);
-        foreach (QValue3DAxis *axis, m_graph->axes())
+        for (auto axis: m_graph->axes())
             m_graph->releaseAxis(axis);
         delete series0;
         delete series1;
@@ -1537,9 +1537,9 @@ void GraphModifier::testDataOrdering()
     switch (counter) {
     case 0: {
         qDebug() << __FUNCTION__ << counter << "Setup test - both ascending";
-        foreach (QSurface3DSeries *series, m_graph->seriesList())
+        for (auto series: m_graph->seriesList())
             m_graph->removeSeries(series);
-        foreach (QValue3DAxis *axis, m_graph->axes())
+        for (auto axis: m_graph->axes())
             m_graph->releaseAxis(axis);
         delete series0;
         delete series1;

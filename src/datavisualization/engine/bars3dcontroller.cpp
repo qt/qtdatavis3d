@@ -68,7 +68,7 @@ void Bars3DController::synchDataToRenderer()
     // Background change requires reloading the meshes in bar graphs, so dirty the series visuals
     if (m_themeManager->activeTheme()->d_ptr->m_dirtyBits.backgroundEnabledDirty) {
         m_isSeriesVisualsDirty = true;
-        foreach (QAbstract3DSeries *series, m_seriesList)
+        for (auto series: m_seriesList)
             series->d_ptr->m_changeTracker.meshChanged = true;
     }
 
@@ -256,7 +256,7 @@ void Bars3DController::handleItemChanged(int rowIndex, int columnIndex)
 
     bool newItem = true;
     QPoint candidate(rowIndex, columnIndex);
-    foreach (ChangeItem item, m_changedItems) {
+    for (auto item: m_changedItems) {
         if (item.point == candidate && item.series == series) {
             newItem = false;
             break;
@@ -439,7 +439,7 @@ QList<QBar3DSeries *> Bars3DController::barSeriesList()
 {
     QList<QAbstract3DSeries *> abstractSeriesList = seriesList();
     QList<QBar3DSeries *> barSeriesList;
-    foreach (QAbstract3DSeries *abstractSeries, abstractSeriesList) {
+    for (auto abstractSeries: abstractSeriesList) {
         QBar3DSeries *barSeries = qobject_cast<QBar3DSeries *>(abstractSeries);
         if (barSeries)
             barSeriesList.append(barSeries);
@@ -584,7 +584,7 @@ void Bars3DController::setSelectedBar(const QPoint &position, QBar3DSeries *seri
         m_changeTracker.selectedBarChanged = true;
 
         // Clear selection from other series and finally set new selection to the specified series
-        foreach (QAbstract3DSeries *otherSeries, m_seriesList) {
+        for (auto otherSeries: m_seriesList) {
             QBar3DSeries *barSeries = static_cast<QBar3DSeries *>(otherSeries);
             if (barSeries != m_selectedBarSeries)
                 barSeries->dptr()->setSelectedBar(invalidSelectionPosition());

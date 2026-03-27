@@ -31,7 +31,7 @@ AxisRenderCache::AxisRenderCache()
 
 AxisRenderCache::~AxisRenderCache()
 {
-    foreach (LabelItem *label, m_labelItems)
+    for (auto label: m_labelItems)
         delete label;
     m_titleItem.clear();
 
@@ -60,7 +60,7 @@ void AxisRenderCache::setType(QAbstract3DAxis::AxisType type)
     m_labelFormat.clear();
 
     m_titleItem.clear();
-    foreach (LabelItem *label, m_labelItems)
+    for (auto label: m_labelItems)
         delete label;
     m_labelItems.clear();
 }

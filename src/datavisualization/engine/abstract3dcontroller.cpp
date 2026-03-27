@@ -80,7 +80,7 @@ Abstract3DController::~Abstract3DController()
     destroyRenderer();
     delete m_scene;
     delete m_themeManager;
-    foreach (QCustom3DItem *item, m_customItems)
+    for (auto item: m_customItems)
         delete item;
     m_customItems.clear();
 }
@@ -582,7 +582,7 @@ void Abstract3DController::wheelEvent(QWheelEvent *event)
 void Abstract3DController::handleThemeColorStyleChanged(Q3DTheme::ColorStyle style)
 {
     // Set value for series that have not explicitly set this value
-    foreach (QAbstract3DSeries *series, m_seriesList) {
+    for (auto series: m_seriesList) {
         if (!series->d_ptr->m_themeTracker.colorStyleOverride) {
             series->setColorStyle(style);
             series->d_ptr->m_themeTracker.colorStyleOverride = false;
@@ -595,7 +595,7 @@ void Abstract3DController::handleThemeBaseColorsChanged(const QList<QColor> &col
 {
     int colorIdx = 0;
     // Set value for series that have not explicitly set this value
-    foreach (QAbstract3DSeries *series, m_seriesList) {
+    for (auto series: m_seriesList) {
         if (!series->d_ptr->m_themeTracker.baseColorOverride) {
             series->setBaseColor(colors.at(colorIdx));
             series->d_ptr->m_themeTracker.baseColorOverride = false;
@@ -610,7 +610,7 @@ void Abstract3DController::handleThemeBaseGradientsChanged(const QList<QLinearGr
 {
     int gradientIdx = 0;
     // Set value for series that have not explicitly set this value
-    foreach (QAbstract3DSeries *series, m_seriesList) {
+    for (auto series: m_seriesList) {
         if (!series->d_ptr->m_themeTracker.baseGradientOverride) {
             series->setBaseGradient(gradients.at(gradientIdx));
             series->d_ptr->m_themeTracker.baseGradientOverride = false;
@@ -624,7 +624,7 @@ void Abstract3DController::handleThemeBaseGradientsChanged(const QList<QLinearGr
 void Abstract3DController::handleThemeSingleHighlightColorChanged(const QColor &color)
 {
     // Set value for series that have not explicitly set this value
-    foreach (QAbstract3DSeries *series, m_seriesList) {
+    for (auto series: m_seriesList) {
         if (!series->d_ptr->m_themeTracker.singleHighlightColorOverride) {
             series->setSingleHighlightColor(color);
             series->d_ptr->m_themeTracker.singleHighlightColorOverride = false;
@@ -637,7 +637,7 @@ void Abstract3DController::handleThemeSingleHighlightGradientChanged(
         const QLinearGradient &gradient)
 {
     // Set value for series that have not explicitly set this value
-    foreach (QAbstract3DSeries *series, m_seriesList) {
+    for (auto series: m_seriesList) {
         if (!series->d_ptr->m_themeTracker.singleHighlightGradientOverride) {
             series->setSingleHighlightGradient(gradient);
             series->d_ptr->m_themeTracker.singleHighlightGradientOverride = false;
@@ -649,7 +649,7 @@ void Abstract3DController::handleThemeSingleHighlightGradientChanged(
 void Abstract3DController::handleThemeMultiHighlightColorChanged(const QColor &color)
 {
     // Set value for series that have not explicitly set this value
-    foreach (QAbstract3DSeries *series, m_seriesList) {
+    for (auto series: m_seriesList) {
         if (!series->d_ptr->m_themeTracker.multiHighlightColorOverride) {
             series->setMultiHighlightColor(color);
             series->d_ptr->m_themeTracker.multiHighlightColorOverride = false;
@@ -661,7 +661,7 @@ void Abstract3DController::handleThemeMultiHighlightColorChanged(const QColor &c
 void Abstract3DController::handleThemeMultiHighlightGradientChanged(const QLinearGradient &gradient)
 {
     // Set value for series that have not explicitly set this value
-    foreach (QAbstract3DSeries *series, m_seriesList) {
+    for (auto series: m_seriesList) {
         if (!series->d_ptr->m_themeTracker.multiHighlightGradientOverride) {
             series->setMultiHighlightGradient(gradient);
             series->d_ptr->m_themeTracker.multiHighlightGradientOverride = false;
@@ -1003,7 +1003,7 @@ int Abstract3DController::addCustomItem(QCustom3DItem *item)
 
 void Abstract3DController::deleteCustomItems()
 {
-    foreach (QCustom3DItem *item, m_customItems)
+    for (auto item: m_customItems)
         delete item;
     m_customItems.clear();
     m_isCustomDataDirty = true;
@@ -1025,7 +1025,7 @@ void Abstract3DController::deleteCustomItem(QCustom3DItem *item)
 void Abstract3DController::deleteCustomItem(const QVector3D &position)
 {
     // Get the item for the position
-    foreach (QCustom3DItem *item, m_customItems) {
+    for (auto item: m_customItems) {
         if (item->position() == position)
             deleteCustomItem(item);
     }

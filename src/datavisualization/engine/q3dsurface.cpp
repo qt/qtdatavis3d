@@ -300,7 +300,7 @@ QList<QValue3DAxis *> Q3DSurface::axes() const
 {
     QList<QAbstract3DAxis *> abstractAxes = dptrc()->m_shared->axes();
     QList<QValue3DAxis *> retList;
-    foreach (QAbstract3DAxis *axis, abstractAxes)
+    for (auto axis: abstractAxes)
         retList.append(static_cast<QValue3DAxis *>(axis));
 
     return retList;

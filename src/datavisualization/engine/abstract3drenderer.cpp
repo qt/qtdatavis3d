@@ -141,13 +141,13 @@ Abstract3DRenderer::~Abstract3DRenderer()
     delete m_labelShader;
     delete m_cursorPositionShader;
 
-    foreach (SeriesRenderCache *cache, m_renderCacheList) {
+    for (auto cache: m_renderCacheList) {
         cache->cleanup(m_textureHelper);
         delete cache;
     }
     m_renderCacheList.clear();
 
-    foreach (CustomRenderItem *item, m_customRenderCache) {
+    for (auto item: m_customRenderCache) {
         GLuint texture = item->texture();
         m_textureHelper->deleteTexture(&texture);
         delete item;
@@ -504,21 +504,21 @@ void Abstract3DRenderer::updateSelectionMode(QAbstract3DGraph::SelectionFlags mo
 void Abstract3DRenderer::updateAspectRatio(float ratio)
 {
     m_graphAspectRatio = ratio;
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setDataDirty(true);
 }
 
 void Abstract3DRenderer::updateHorizontalAspectRatio(float ratio)
 {
     m_graphHorizontalAspectRatio = ratio;
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setDataDirty(true);
 }
 
 void Abstract3DRenderer::updatePolar(bool enable)
 {
     m_polarGraph = enable;
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setDataDirty(true);
 }
 
@@ -535,7 +535,7 @@ void Abstract3DRenderer::updateMargin(float margin)
 void Abstract3DRenderer::updateOptimizationHint(QAbstract3DGraph::OptimizationHints hint)
 {
     m_cachedOptimizationHint = hint;
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setDataDirty(true);
 }
 
@@ -593,7 +593,7 @@ void Abstract3DRenderer::updateAxisRange(QAbstract3DAxis::AxisOrientation orient
     cache.setMin(min);
     cache.setMax(max);
 
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setDataDirty(true);
 }
 
@@ -621,7 +621,7 @@ void Abstract3DRenderer::updateAxisReversed(QAbstract3DAxis::AxisOrientation ori
                                             bool enable)
 {
     axisCacheForOrientation(orientation).setReversed(enable);
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setDataDirty(true);
 }
 
@@ -637,7 +637,7 @@ void Abstract3DRenderer::updateAxisFormatter(QAbstract3DAxis::AxisOrientation or
     formatter->d_ptr->populateCopy(*(cache.formatter()));
     cache.markPositionsDirty();
 
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setDataDirty(true);
 }
 
@@ -667,7 +667,7 @@ void Abstract3DRenderer::updateAxisTitleFixed(QAbstract3DAxis::AxisOrientation o
 
 void Abstract3DRenderer::modifiedSeriesList(const QList<QAbstract3DSeries *> &seriesList)
 {
-    foreach (QAbstract3DSeries *series, seriesList) {
+    for (auto series: seriesList) {
         SeriesRenderCache *cache = m_renderCacheList.value(series, 0);
         if (cache)
             cache->setDataDirty(true);
@@ -683,7 +683,7 @@ void Abstract3DRenderer::fixMeshFileName(QString &fileName, QAbstract3DSeries::M
 
 void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesList)
 {
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setValid(false);
 
     m_visibleSeriesCount = 0;
@@ -704,7 +704,7 @@ void Abstract3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLi
     }
 
     // Remove non-valid objects from the cache list
-    foreach (SeriesRenderCache *cache, m_renderCacheList) {
+    for (auto cache: m_renderCacheList) {
         if (!cache->isValid())
             cleanCache(cache);
     }
@@ -715,7 +715,7 @@ void Abstract3DRenderer::updateCustomData(const QList<QCustom3DItem *> &customIt
     if (customItems.isEmpty() && m_customRenderCache.isEmpty())
         return;
 
-    foreach (CustomRenderItem *item, m_customRenderCache)
+    for (auto item: m_customRenderCache)
         item->setValid(false);
 
     int itemCount = customItems.size();
@@ -732,7 +732,7 @@ void Abstract3DRenderer::updateCustomData(const QList<QCustom3DItem *> &customIt
     }
 
     // Check render item cache and remove items that are not in customItems list anymore
-    foreach (CustomRenderItem *renderItem, m_customRenderCache) {
+    for (auto renderItem: m_customRenderCache) {
         if (!renderItem->isValid()) {
             m_customRenderCache.remove(renderItem->itemPointer());
             GLuint texture = renderItem->texture();
@@ -748,7 +748,7 @@ void Abstract3DRenderer::updateCustomData(const QList<QCustom3DItem *> &customIt
 void Abstract3DRenderer::updateCustomItems()
 {
     // Check all items
-    foreach (CustomRenderItem *item, m_customRenderCache)
+    for (auto item: m_customRenderCache)
         updateCustomItem(item);
 }
 
@@ -1416,7 +1416,7 @@ void Abstract3DRenderer::updateCustomItem(CustomRenderItem *renderItem)
 
 void Abstract3DRenderer::updateCustomItemPositions()
 {
-    foreach (CustomRenderItem *renderItem, m_customRenderCache)
+    for (auto renderItem: m_customRenderCache)
         recalculateCustomItemScalingAndPos(renderItem);
 }
 

@@ -166,7 +166,7 @@ QList<QSurface3DSeries *> Surface3DController::surfaceSeriesList()
 {
     QList<QAbstract3DSeries *> abstractSeriesList = seriesList();
     QList<QSurface3DSeries *> surfaceSeriesList;
-    foreach (QAbstract3DSeries *abstractSeries, abstractSeriesList) {
+    for (auto abstractSeries: abstractSeriesList) {
         QSurface3DSeries *surfaceSeries = qobject_cast<QSurface3DSeries *>(abstractSeries);
         if (surfaceSeries)
             surfaceSeriesList.append(surfaceSeries);
@@ -275,7 +275,7 @@ void Surface3DController::setSelectedPoint(const QPoint &position, QSurface3DSer
         m_changeTracker.selectedPointChanged = true;
 
         // Clear selection from other series and finally set new selection to the specified series
-        foreach (QAbstract3DSeries *otherSeries, m_seriesList) {
+        for (auto otherSeries: m_seriesList) {
             QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(otherSeries);
             if (surfaceSeries != m_selectedSeries)
                 surfaceSeries->dptr()->setSelectedPoint(invalidSelectionPosition());
@@ -322,7 +322,7 @@ void Surface3DController::handleFlatShadingSupportedChange(bool supported)
     if (m_flatShadingSupported != supported) {
         m_flatShadingSupported = supported;
         // Emit the change for all added surfaces
-        foreach (QAbstract3DSeries *series, m_seriesList) {
+        for (auto series: m_seriesList) {
             QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
             emit surfaceSeries->flatShadingSupportedChanged(m_flatShadingSupported);
         }
@@ -370,7 +370,7 @@ void Surface3DController::handleItemChanged(int rowIndex, int columnIndex)
 
     bool newItem = true;
     QPoint candidate(rowIndex, columnIndex);
-    foreach (ChangeItem item, m_changedItems) {
+    for (auto item: m_changedItems) {
         if (item.point == candidate && item.series == series) {
             newItem = false;
             break;

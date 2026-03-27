@@ -202,7 +202,7 @@ void Bars3DRenderer::updateData()
 
     m_zeroPosition = m_axisCacheY.formatter()->positionAt(m_actualFloorLevel);
 
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+    for (auto baseCache: m_renderCacheList) {
         BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
         if (cache->isVisible()) {
             const QBar3DSeries *currentSeries = cache->series();
@@ -345,7 +345,7 @@ void Bars3DRenderer::updateRows(const QList<Bars3DController::ChangeRow> &rows)
     const QBar3DSeries *prevSeries = 0;
     const QBarDataArray *dataArray = 0;
 
-    foreach (Bars3DController::ChangeRow item, rows) {
+    for (auto item: rows) {
         const int row = item.row;
         if (row < minRow || row > maxRow)
             continue;
@@ -380,7 +380,7 @@ void Bars3DRenderer::updateItems(const QList<Bars3DController::ChangeItem> &item
     const QBar3DSeries *prevSeries = 0;
     const QBarDataArray *dataArray = 0;
 
-    foreach (Bars3DController::ChangeItem item, items) {
+    for (auto item: items) {
         const int row = item.point.x();
         const int col = item.point.y();
         if (row < minRow || row > maxRow || col < minCol || col > maxCol)
@@ -666,7 +666,7 @@ void Bars3DRenderer::drawSlicedScene()
     BarRenderSliceItem *selectedItem = 0;
 
     QQuaternion seriesRotation;
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+    for (auto baseCache: m_renderCacheList) {
         if (baseCache->isVisible()
                 && (baseCache == m_selectedSeriesCache
                     || m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries))) {
@@ -829,7 +829,7 @@ void Bars3DRenderer::drawSlicedScene()
     }
 
     if (!sliceGridLabels) {
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             if (baseCache->isVisible()) {
                 BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
                 QList<BarRenderSliceItem> &sliceArray = cache->sliceArray();
@@ -1053,7 +1053,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         // Draw bars to depth buffer
         QVector3D shadowScaler(m_scaleX * m_seriesScaleX * 0.9f, 0.0f,
                                m_scaleZ * m_seriesScaleZ * 0.9f);
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             if (baseCache->isVisible()) {
                 BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
                 float seriesPos = m_seriesStart + m_seriesStep
@@ -1177,7 +1177,7 @@ void Bars3DRenderer::drawScene(GLuint defaultFboHandle)
         glClearColor(1.0f, 1.0f, 1.0f, 1.0f); // Set clear color to white (= selectionSkipColor)
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); // Needed for clearing the frame buffer
         glDisable(GL_DITHER); // disable dithering, it may affect colors if enabled
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             if (baseCache->isVisible()) {
                 BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
                 float seriesPos = m_seriesStart + m_seriesStep
@@ -1439,7 +1439,7 @@ bool Bars3DRenderer::drawBars(BarRenderItem **selectedBar,
     QVector3D modelScaler(m_scaleX * m_seriesScaleX, 0.0f, m_scaleZ * m_seriesScaleZ);
     bool somethingSelected =
             (m_visualSelectedBarPos != Bars3DController::invalidSelectionPosition());
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+    for (auto baseCache: m_renderCacheList) {
         if (baseCache->isVisible()) {
             BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
             float seriesPos = m_seriesStart + m_seriesStep
@@ -2745,7 +2745,7 @@ QBar3DSeries *Bars3DRenderer::selectionColorToSeries(const QVector4D &selectionC
         return 0;
     } else {
         int seriesIndexFromColor(selectionColor.z());
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             BarSeriesRenderCache *cache = static_cast<BarSeriesRenderCache *>(baseCache);
             if (cache->visualIndex() == seriesIndexFromColor)
                 return cache->series();
@@ -2874,7 +2874,7 @@ void Bars3DRenderer::updateAspectRatio(float ratio)
 
 void Bars3DRenderer::updateFloorLevel(float level)
 {
-    foreach (SeriesRenderCache *cache, m_renderCacheList)
+    for (auto cache: m_renderCacheList)
         cache->setDataDirty(true);
     m_floorLevel = level;
     calculateHeightAdjustment();

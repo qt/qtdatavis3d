@@ -100,7 +100,7 @@ QList<QScatter3DSeries *> Scatter3DController::scatterSeriesList()
 {
     QList<QAbstract3DSeries *> abstractSeriesList = seriesList();
     QList<QScatter3DSeries *> scatterSeriesList;
-    foreach (QAbstract3DSeries *abstractSeries, abstractSeriesList) {
+    for (auto abstractSeries: abstractSeriesList) {
         QScatter3DSeries *scatterSeries = qobject_cast<QScatter3DSeries *>(abstractSeries);
         if (scatterSeries)
             scatterSeriesList.append(scatterSeries);
@@ -331,7 +331,7 @@ void Scatter3DController::setSelectedItem(int index, QScatter3DSeries *series)
         m_changeTracker.selectedItemChanged = true;
 
         // Clear selection from other series and finally set new selection to the specified series
-        foreach (QAbstract3DSeries *otherSeries, m_seriesList) {
+        for (auto otherSeries: m_seriesList) {
             QScatter3DSeries *scatterSeries = static_cast<QScatter3DSeries *>(otherSeries);
             if (scatterSeries != m_selectedItemSeries)
                 scatterSeries->dptr()->setSelectedItem(invalidSelectionIndex());

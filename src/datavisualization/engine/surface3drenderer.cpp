@@ -178,7 +178,7 @@ void Surface3DRenderer::updateData()
 {
     calculateSceneScalingFactors();
 
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+    for (auto baseCache: m_renderCacheList) {
         SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
         if (cache->isVisible() && cache->dataDirty()) {
             const QSurface3DSeries *currentSeries = cache->series();
@@ -238,7 +238,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
     Abstract3DRenderer::updateSeries(seriesList);
 
     bool noSelection = true;
-    foreach (QAbstract3DSeries *series, seriesList) {
+    for (auto series: seriesList) {
         QSurface3DSeries *surfaceSeries = static_cast<QSurface3DSeries *>(series);
         SurfaceSeriesRenderCache *cache =
                 static_cast<SurfaceSeriesRenderCache *>( m_renderCacheList.value(series));
@@ -263,7 +263,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
 
     // Selection pointer issues
     if (m_selectedSeries) {
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
             QVector4D highlightColor =
                     Utils::vectorFromColor(cache->series()->singleHighlightColor());
@@ -285,7 +285,7 @@ void Surface3DRenderer::updateSeries(const QList<QAbstract3DSeries *> &seriesLis
 
 void Surface3DRenderer::updateSurfaceTextures(QList<QSurface3DSeries *> seriesList)
 {
-    foreach (QSurface3DSeries *series, seriesList) {
+    for (auto series: seriesList) {
         SurfaceSeriesRenderCache *cache =
                 static_cast<SurfaceSeriesRenderCache *>(m_renderCacheList.value(series));
         if (cache) {
@@ -328,7 +328,7 @@ void Surface3DRenderer::cleanCache(SeriesRenderCache *cache)
 
 void Surface3DRenderer::updateRows(const QList<Surface3DController::ChangeRow> &rows)
 {
-    foreach (Surface3DController::ChangeRow item, rows) {
+    for (auto item: rows) {
         SurfaceSeriesRenderCache *cache =
                 static_cast<SurfaceSeriesRenderCache *>(m_renderCacheList.value(item.series));
         QSurfaceDataArray &dstArray = cache->dataArray();
@@ -369,7 +369,7 @@ void Surface3DRenderer::updateRows(const QList<Surface3DController::ChangeRow> &
 
 void Surface3DRenderer::updateItems(const QList<Surface3DController::ChangeItem> &points)
 {
-    foreach (Surface3DController::ChangeItem item, points) {
+    for (auto item: points) {
         SurfaceSeriesRenderCache *cache =
                 static_cast<SurfaceSeriesRenderCache *>(m_renderCacheList.value(item.series));
         QSurfaceDataArray &dstArray = cache->dataArray();
@@ -411,7 +411,7 @@ void Surface3DRenderer::updateItems(const QList<Surface3DController::ChangeItem>
 
 void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
 {
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList)
+    for (auto baseCache: m_renderCacheList)
         static_cast<SurfaceSeriesRenderCache *>(baseCache)->sliceSurfaceObject()->clear();
 
     if (m_cachedSelectionMode.testFlag(QAbstract3DGraph::SelectionMultiSeries)) {
@@ -423,7 +423,7 @@ void Surface3DRenderer::updateSliceDataModel(const QPoint &point)
         QSurfaceDataItem item = dataArray.at(point.x())->at(point.y());
         QPointF coords(item.x(), item.z());
 
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
             if (cache->series() != m_selectedSeries) {
                 QPoint mappedPoint = mapCoordsToSampleSpace(cache, coords);
@@ -827,7 +827,7 @@ void Surface3DRenderer::drawSlicedScene()
     if (!m_renderCacheList.isEmpty()) {
         bool drawGrid = false;
 
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
             if (cache->sliceSurfaceObject()->indexCount() && cache->renderable()) {
                 if (!drawGrid && cache->surfaceGridVisible()) {
@@ -900,7 +900,7 @@ void Surface3DRenderer::drawSlicedScene()
             m_surfaceGridShader->bind();
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
                                                  Utils::vectorFromColor(m_cachedTheme->gridLineColor()));
-            foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+            for (auto baseCache: m_renderCacheList) {
                 SurfaceSeriesRenderCache *cache =
                         static_cast<SurfaceSeriesRenderCache *>(baseCache);
                 if (cache->sliceSurfaceObject()->indexCount() && cache->isVisible() &&
@@ -1195,7 +1195,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
         // Surface is not closed, so don't cull anything
         glDisable(GL_CULL_FACE);
 
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
             SurfaceObject *object = cache->surfaceObject();
             if (object->indexCount() && cache->surfaceVisible() && cache->isVisible()
@@ -1273,7 +1273,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         glDisable(GL_CULL_FACE);
 
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
             if (cache->surfaceObject()->indexCount() && cache->renderable()) {
                 m_selectionShader->setUniformValue(m_selectionShader->MVP(), projectionViewMatrix);
@@ -1354,7 +1354,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
 
         bool drawGrid = false;
 
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
             QMatrix4x4 modelMatrix;
             QMatrix4x4 MVPMatrix;
@@ -1455,7 +1455,7 @@ void Surface3DRenderer::drawScene(GLuint defaultFboHandle)
             m_surfaceGridShader->setUniformValue(m_surfaceGridShader->color(),
                                                  Utils::vectorFromColor(
                                                      m_cachedTheme->gridLineColor()));
-            foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+            for (auto baseCache: m_renderCacheList) {
                 SurfaceSeriesRenderCache *cache =
                         static_cast<SurfaceSeriesRenderCache *>(baseCache);
                 m_surfaceGridShader->setUniformValue(m_surfaceGridShader->MVP(),
@@ -2433,7 +2433,7 @@ void Surface3DRenderer::updateSelectionTextures()
 {
     uint lastSelectionId = 1;
 
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+    for (auto baseCache: m_renderCacheList) {
         SurfaceSeriesRenderCache *cache =
                 static_cast<SurfaceSeriesRenderCache *>(baseCache);
         GLuint texture = cache->selectionTexture();
@@ -2643,7 +2643,7 @@ void Surface3DRenderer::loadBackgroundMesh()
 
 void Surface3DRenderer::surfacePointSelected(const QPoint &point)
 {
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+    for (auto baseCache: m_renderCacheList) {
         SurfaceSeriesRenderCache *cache =
                 static_cast<SurfaceSeriesRenderCache *>(baseCache);
         cache->setSlicePointerActivity(false);
@@ -2659,7 +2659,7 @@ void Surface3DRenderer::surfacePointSelected(const QPoint &point)
         QSurfaceDataItem item = dataArray.at(point.x())->at(point.y());
         QPointF coords(item.x(), item.z());
 
-        foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+        for (auto baseCache: m_renderCacheList) {
             SurfaceSeriesRenderCache *cache =
                     static_cast<SurfaceSeriesRenderCache *>(baseCache);
             if (cache->series() != m_selectedSeries) {
@@ -2770,7 +2770,7 @@ QPoint Surface3DRenderer::selectionIdToSurfacePoint(uint id)
 
     // Not a label selection
     SurfaceSeriesRenderCache *selectedCache = 0;
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+    for (auto baseCache: m_renderCacheList) {
         SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
         if (cache->isWithinIdRange(id)) {
             selectedCache = cache;
@@ -2857,7 +2857,7 @@ void Surface3DRenderer::updateSlicingActive(bool isSlicing)
 
     m_selectionDirty = true;
 
-    foreach (SeriesRenderCache *baseCache, m_renderCacheList) {
+    for (auto baseCache: m_renderCacheList) {
         SurfaceSeriesRenderCache *cache = static_cast<SurfaceSeriesRenderCache *>(baseCache);
         if (cache->mainSelectionPointer())
             cache->mainSelectionPointer()->updateBoundingRect(m_primarySubViewport);
