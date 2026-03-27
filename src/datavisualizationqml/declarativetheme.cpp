@@ -42,12 +42,12 @@ void DeclarativeTheme3D::handleTypeChange(Theme themeType)
 
     // Theme changed, disconnect base color/gradient connections
     if (!m_colors.isEmpty()) {
-        foreach (DeclarativeColor *item, m_colors)
+        for (auto item: m_colors)
             disconnect(item, 0, this, 0);
         m_colors.clear();
     }
     if (!m_gradients.isEmpty()) {
-        foreach (ColorGradient *item, m_gradients)
+        for (auto item: m_gradients)
             disconnect(item, 0, this, 0);
         m_gradients.clear();
     }
@@ -242,7 +242,7 @@ QList<DeclarativeColor *> DeclarativeTheme3D::colorList()
         // Create dummy ThemeColors from theme's colors
         m_dummyColors = true;
         QList<QColor> list = Q3DTheme::baseColors();
-        foreach (QColor item, list) {
+        for (auto item: list) {
             DeclarativeColor *color = new DeclarativeColor(this);
             color->setColor(item);
             m_colors.append(color);
@@ -256,7 +256,7 @@ QList<DeclarativeColor *> DeclarativeTheme3D::colorList()
 void DeclarativeTheme3D::clearColors()
 {
     clearDummyColors();
-    foreach (DeclarativeColor *item, m_colors)
+    for (auto item: m_colors)
         disconnect(item, 0, this, 0);
     m_colors.clear();
     Q3DTheme::setBaseColors(QList<QColor>());
@@ -265,7 +265,7 @@ void DeclarativeTheme3D::clearColors()
 void DeclarativeTheme3D::clearDummyColors()
 {
     if (m_dummyColors) {
-        foreach (DeclarativeColor *item, m_colors)
+        for (auto item: m_colors)
             delete item;
         m_colors.clear();
         m_dummyColors = false;
@@ -293,7 +293,7 @@ QList<ColorGradient *> DeclarativeTheme3D::gradientList()
         // Create dummy ColorGradients from theme's gradients
         m_dummyGradients = true;
         QList<QLinearGradient> list = Q3DTheme::baseGradients();
-        foreach (QLinearGradient item, list) {
+        for (auto item: list) {
             ColorGradient *gradient = convertGradient(item);
             m_gradients.append(gradient);
             connect(gradient, &ColorGradient::updated,
@@ -307,7 +307,7 @@ QList<ColorGradient *> DeclarativeTheme3D::gradientList()
 void DeclarativeTheme3D::clearGradients()
 {
     clearDummyGradients();
-    foreach (ColorGradient *item, m_gradients)
+    for (auto item: m_gradients)
         disconnect(item, 0, this, 0);
     m_gradients.clear();
     Q3DTheme::setBaseGradients(QList<QLinearGradient>());
@@ -316,7 +316,7 @@ void DeclarativeTheme3D::clearGradients()
 void DeclarativeTheme3D::clearDummyGradients()
 {
     if (m_dummyGradients) {
-        foreach (ColorGradient *item, m_gradients)
+        for (auto item: m_gradients)
             delete item;
         m_gradients.clear();
         m_dummyGradients = false;

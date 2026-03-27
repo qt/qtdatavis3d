@@ -129,7 +129,7 @@ void ScatterDataModifier::massiveDataTest()
         m_chart->setAxisZ(zAxis);
         m_chart->scene()->activeCamera()->setCameraPreset(Q3DCamera::CameraPresetRight);
         m_chart->setShadowQuality(QAbstract3DGraph::ShadowQualityNone);
-        foreach (QAbstract3DSeries *series, m_chart->seriesList())
+        for (auto series: m_chart->seriesList())
             m_chart->removeSeries(static_cast<QScatter3DSeries *>(series));
 
         qDebug() << __FUNCTION__ << testPhase << ": Creating massive array..." << items;
@@ -237,9 +237,9 @@ void ScatterDataModifier::testItemChanges()
     switch (counter) {
     case 0: {
         qDebug() << __FUNCTION__ << counter << "Setup test";
-        foreach (QScatter3DSeries *series, m_chart->seriesList())
+        for (auto series: m_chart->seriesList())
             m_chart->removeSeries(series);
-        foreach (QValue3DAxis *axis, m_chart->axes())
+        for (auto axis: m_chart->axes())
             deleteAxis(axis);
         delete series0;
         delete series1;
@@ -412,9 +412,9 @@ void ScatterDataModifier::testAxisReverse()
     switch (counter) {
     case 0: {
         qDebug() << __FUNCTION__ << counter << "Setup test";
-        foreach (QScatter3DSeries *series, m_chart->seriesList())
+        for (auto series: m_chart->seriesList())
             m_chart->removeSeries(series);
-        foreach (QValue3DAxis *axis, m_chart->axes())
+        for (auto axis: m_chart->axes())
             deleteAxis(axis);
         delete series0;
         delete series1;
@@ -611,7 +611,7 @@ void ScatterDataModifier::shadowQualityUpdatedByVisual(QAbstract3DGraph::ShadowQ
 
 void ScatterDataModifier::clear()
 {
-    foreach (QScatter3DSeries *series, m_chart->seriesList()) {
+    for (auto series: m_chart->seriesList()) {
         m_chart->removeSeries(series);
         delete series;
     }
@@ -831,7 +831,7 @@ void ScatterDataModifier::handleSelectionChange(int index)
     m_selectedItem = index;
     m_targetSeries = static_cast<QScatter3DSeries *>(sender());
     int seriesIndex = 0;
-    foreach (QScatter3DSeries *series, m_chart->seriesList()) {
+    for (auto series: m_chart->seriesList()) {
         if (series == sender())
             break;
         seriesIndex++;
