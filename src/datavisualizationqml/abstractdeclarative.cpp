@@ -12,7 +12,7 @@
 #include <qpa/qplatformnativeinterface.h>
 #endif
 
-#if !defined(Q_OS_MAC) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
+#if !defined(Q_OS_APPLE) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
 #define USE_SHARED_CONTEXT
 #else
 #include "glstatestore_p.h"
