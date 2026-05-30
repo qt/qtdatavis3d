@@ -11,6 +11,8 @@
     \e {Simple Bar Graph} shows how to make a simple 3D bar graph using Bars3D and QML.
 
     \image qmlbars-example.png
+           {3D bar graph comparing monthly income and expenses over several
+           years}
 
     The following sections describe how to switch series and display more than one series
     at a time. For more information about basic QML application functionality, see

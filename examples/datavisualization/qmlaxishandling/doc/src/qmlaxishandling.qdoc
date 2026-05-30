@@ -16,6 +16,8 @@
     functionality - for more detailed QML example documentation, see \l{Simple Scatter Graph}.
 
     \image qmlaxishandling-example.png
+           {3D scatter graph of orange points with draggable yellow axis
+           labels}
 
     \include examples-run.qdocinc
 

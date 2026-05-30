@@ -57,6 +57,8 @@
     In QML, the corresponding types are Bars3D, Bar3DSeries, and BarDataProxy.
 
     \image q3dbars-minimal.png
+           {Minimal 3D bar graph with five green bars of varying heights on a
+           grid floor}
 
     For more information, see \l{How to construct a minimal Q3DBars graph}, and
     \l {Simple Bar Graph} examples.
@@ -70,6 +72,8 @@
     are Scatter3D, Scatter3DSeries, and ScatterDataProxy.
 
     \image q3dscatter-minimal.png
+           {Minimal 3D scatter graph with three green spheres positioned in a
+           wireframe grid box}
 
     For more information, see \l{How to construct a minimal Q3DScatter graph}, and
     \l{Simple Scatter Graph} examples.
@@ -83,6 +87,8 @@
     Surface3DSeries, and SurfaceDataProxy.
 
     \image q3dsurface-minimal.png
+           {Minimal 3D surface graph showing a green folded ridge surface over
+           a grid floor}
 
     For more information, see \l{How to construct a minimal Q3DSurface graph}, \l{Graph Gallery},
     and \l{Surface Graph Gallery} examples.
