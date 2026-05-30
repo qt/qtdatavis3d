@@ -12,6 +12,7 @@
     \e {Volumetric Rendering} shows how to use QCustom3DVolume to display volumetric data.
 
     \image volumetric-example.png
+           {Volumetric rendering of 3D terrain with water and land layers}
 
     \include examples-run.qdocinc
 

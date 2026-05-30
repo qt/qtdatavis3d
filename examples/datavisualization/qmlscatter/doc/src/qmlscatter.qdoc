@@ -17,6 +17,8 @@
     For instructions on how to create a new Qt Quick application of your own, see Qt Creator help.
 
     \image qmlscatter-example.png
+           {3D scatter graph plotting three point series of differing shapes
+           and densities}
 
     \include examples-run.qdocinc
 
