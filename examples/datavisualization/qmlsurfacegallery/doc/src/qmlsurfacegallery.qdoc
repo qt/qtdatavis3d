@@ -15,6 +15,8 @@
     functionality - for more detailed QML example documentation, see \l{Simple Scatter Graph}.
 
     \image qmlsurfacegallery-example.png
+           {3D surface graph rendering a spectrogram as a rainbow-colored
+           peaked ripple}
 
     \include examples-run.qdocinc
 

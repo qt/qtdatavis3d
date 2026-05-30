@@ -12,6 +12,8 @@
     The graphs have their own tabs in the application.
 
     \image graphgallery-example.png
+           {Textured topographic 3D surface graph with bar, scatter, and
+           surface tabs}
 
     \include examples-run.qdocinc
 

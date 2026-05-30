@@ -63,6 +63,8 @@ QT_BEGIN_NAMESPACE
  * And this is what those few lines of code produce:
  *
  * \image q3dsurface-minimal.png
+ *        {Minimal 3D surface graph showing a green folded ridge surface over
+ *        a grid floor}
  *
  * The scene can be rotated, zoomed into, and a surface point can be selected to view its position,
  * but no other interaction is included in this minimal code example.
