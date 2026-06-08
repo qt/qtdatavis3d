@@ -29,7 +29,7 @@ public:
 protected:
     void createExtraData();
 
-    QBarDataItemPrivate *d_ptr;
+    QBarDataItemPrivate *d_ptr = nullptr;
 
 private:
     float m_value;
