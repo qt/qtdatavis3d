@@ -1,10 +1,8 @@
-!include( ../examples.pri ) {
-    error( "Couldn't find the examples.pri file!" )
-}
+TEMPLATE = app
 
 DEFINES += QMAKE_BUILD
 
-QT += datavisualization
+QT += datavisualization qml quick
 
 SOURCES += main.cpp \
            datasource.cpp
