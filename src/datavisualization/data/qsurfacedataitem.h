@@ -33,7 +33,7 @@ public:
 protected:
     void createExtraData();
 
-    QSurfaceDataItemPrivate *d_ptr;
+    QSurfaceDataItemPrivate *d_ptr {};// private data doesn't exist by default (optimization)
 
 private:
     QVector3D m_position;
