@@ -36,7 +36,7 @@ public:
 protected:
     void createExtraData();
 
-    QScatterDataItemPrivate *d_ptr;
+    QScatterDataItemPrivate *d_ptr {}; // private data doesn't exist by default (optimization)
 
 private:
     QVector3D m_position;

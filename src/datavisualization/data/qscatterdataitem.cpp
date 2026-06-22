@@ -22,18 +22,13 @@ QT_BEGIN_NAMESPACE
 /*!
  * Constructs a scatter data item.
  */
-QScatterDataItem::QScatterDataItem()
-    : d_ptr(0) // private data doesn't exist by default (optimization)
-
-{
-}
+QScatterDataItem::QScatterDataItem() = default;
 
 /*!
  * Constructs a scatter data item at the position \a position.
  */
 QScatterDataItem::QScatterDataItem(const QVector3D &position)
-    : d_ptr(0),
-      m_position(position)
+    : m_position(position)
 {
 }
 
@@ -42,8 +37,7 @@ QScatterDataItem::QScatterDataItem(const QVector3D &position)
  * \a rotation.
  */
 QScatterDataItem::QScatterDataItem(const QVector3D &position, const QQuaternion &rotation)
-    : d_ptr(0),
-      m_position(position),
+    : m_position(position),
       m_rotation(rotation)
 {
 }
@@ -59,9 +53,7 @@ QScatterDataItem::QScatterDataItem(const QScatterDataItem &other)
 /*!
  * Deletes a scatter data item.
  */
-QScatterDataItem::~QScatterDataItem()
-{
-}
+QScatterDataItem::~QScatterDataItem() = default;
 
 /*!
  *  Assigns a copy of \a other to this object.

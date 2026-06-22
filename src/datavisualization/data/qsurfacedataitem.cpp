@@ -22,18 +22,13 @@ QT_BEGIN_NAMESPACE
 /*!
  * Constructs a surface data item.
  */
-QSurfaceDataItem::QSurfaceDataItem()
-    : d_ptr(0) // private data doesn't exist by default (optimization)
-
-{
-}
+QSurfaceDataItem::QSurfaceDataItem() = default;
 
 /*!
  * Constructs a surface data item at the position \a position.
  */
 QSurfaceDataItem::QSurfaceDataItem(const QVector3D &position)
-    : d_ptr(0),
-      m_position(position)
+    : m_position(position)
 {
 }
 
@@ -48,9 +43,7 @@ QSurfaceDataItem::QSurfaceDataItem(const QSurfaceDataItem &other)
 /*!
  * Deletes a surface data item.
  */
-QSurfaceDataItem::~QSurfaceDataItem()
-{
-}
+QSurfaceDataItem::~QSurfaceDataItem() = default;
 
 /*!
  *  Assigns a copy of \a other to this object.
