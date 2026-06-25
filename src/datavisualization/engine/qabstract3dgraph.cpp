@@ -173,11 +173,18 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
 
     d_ptr->m_context->setFormat(requestedFormat());
     d_ptr->m_context->create();
-    bool makeSuccess = d_ptr->m_context->makeCurrent(this);
+
+    QOffscreenSurface tempSurface;
+    tempSurface.setFormat(d_ptr->m_context->format());
+    tempSurface.create();
+
+    bool makeSuccess = d_ptr->m_context->makeCurrent(&tempSurface);
 
     // If we fail to get context, just abort
-    if (!makeSuccess || !QOpenGLContext::currentContext())
+    if (!makeSuccess || !QOpenGLContext::currentContext()) {
+        tempSurface.destroy();
         return;
+    }
 
     initializeOpenGLFunctions();
 
@@ -197,6 +204,7 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
     }
 
     d_ptr->m_initialized = true;
+    d_ptr->m_context->makeCurrent(this);
 
     d_ptr->renderLater();
 
