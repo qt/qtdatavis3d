@@ -16,7 +16,7 @@
 #include <QtOpenGL/QOpenGLFramebufferObject>
 #include <QtGui/QOffscreenSurface>
 #if defined(Q_OS_MACOS)
-#include <qpa/qplatformnativeinterface.h>
+#include <qpa/qplatformwindow_p.h>
 #endif
 
 QT_BEGIN_NAMESPACE
@@ -210,12 +210,8 @@ QAbstract3DGraph::QAbstract3DGraph(QAbstract3DGraphPrivate *d, const QSurfaceFor
 
 #if defined(Q_OS_MACOS)
     // Enable touch events for Mac touchpads
-    typedef void * (*EnableTouch)(QWindow*, bool);
-    EnableTouch enableTouch = reinterpret_cast<EnableTouch>(
-            QFunctionPointer(QGuiApplication::platformNativeInterface()
-                                     ->nativeResourceFunctionForIntegration("registertouchwindow")));
-    if (enableTouch)
-        enableTouch(this, true);
+    if (auto *cocoaWindow = nativeInterface<QNativeInterface::Private::QCocoaWindow>())
+        cocoaWindow->enableTrackpadTouchDelivery(true);
 #endif
 }
 

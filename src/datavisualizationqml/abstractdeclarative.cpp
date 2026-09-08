@@ -9,7 +9,7 @@
 #include <QtCore/QTimer>
 #endif
 #if defined(Q_OS_MACOS)
-#include <qpa/qplatformnativeinterface.h>
+#include <qpa/qplatformwindow_p.h>
 #endif
 
 #if !defined(Q_OS_APPLE) && !defined(Q_OS_ANDROID) && !defined(Q_OS_WINRT)
@@ -432,12 +432,8 @@ void AbstractDeclarative::handleWindowChanged(QQuickWindow *window)
     bool previousVisibility = window->isVisible();
     // Enable touch events for Mac touchpads
     window->setVisible(true);
-    typedef void * (*EnableTouch)(QWindow*, bool);
-    EnableTouch enableTouch = reinterpret_cast<EnableTouch>(
-            QFunctionPointer(QGuiApplication::platformNativeInterface()
-                                     ->nativeResourceFunctionForIntegration("registertouchwindow")));
-    if (enableTouch)
-        enableTouch(window, true);
+    if (auto *cocoaWindow = window->nativeInterface<QNativeInterface::Private::QCocoaWindow>())
+        cocoaWindow->enableTrackpadTouchDelivery(true);
     window->setVisible(previousVisibility);
 #endif
 
