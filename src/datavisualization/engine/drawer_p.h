@@ -30,6 +30,7 @@ class SurfaceObject;
 class TextureHelper;
 class Q3DCamera;
 class Abstract3DRenderer;
+class QQuaternion;
 class ScatterPointBufferHelper;
 
 class Drawer : public QObject, public QOpenGLFunctions

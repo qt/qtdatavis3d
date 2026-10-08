@@ -17,6 +17,8 @@
 #include "datavisualizationglobal_p.h"
 #include "surface3dcontroller_p.h"
 
+#include <QtGui/qquaternion.h>
+
 QT_BEGIN_NAMESPACE
 
 class ShaderHelper;

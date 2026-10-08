@@ -5,6 +5,8 @@
 
 #include <QtDataVisualization/QCustom3DItem>
 
+#include <QtGui/qquaternion.h>
+
 class tst_custom: public QObject
 {
     Q_OBJECT

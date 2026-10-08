@@ -6,7 +6,9 @@
 #include <QtDataVisualization/qcustom3dlabel.h>
 #include <QtDataVisualization/q3dinputhandler.h>
 #include <QtCore/qmath.h>
+
 #include <QtGui/qopenglcontext.h>
+#include <QtGui/qquaternion.h>
 
 const int lowDetailSize(256);
 const int mediumDetailSize(512);

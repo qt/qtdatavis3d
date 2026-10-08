@@ -17,6 +17,8 @@
 #include "datavisualizationglobal_p.h"
 #include "qabstract3dseries_p.h"
 
+#include <QtGui/qquaternion.h>
+
 QT_BEGIN_NAMESPACE
 
 class Abstract3DRenderer;
