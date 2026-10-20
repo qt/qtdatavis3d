@@ -45,6 +45,7 @@
 /*!
     \page qtdatavisualization-data-handling.html
     \title Qt Data Visualization Data Handling
+    \ingroup qtdatavis-topics
 
     \section1 Series
 
@@ -148,6 +149,7 @@
 /*!
     \page qtdatavisualization-interacting-with-data.html
     \title Qt Data Visualization Interacting with Data
+    \ingroup qtdatavis-topics
 
     \section1 Interacting with Data
 
@@ -194,6 +196,7 @@
 /*!
     \page qtdatavisualization-known-issues.html
     \title Qt Data Visualization Known Issues
+    \ingroup qtdatavis-topics
 
     \list
         \li As OpenGL is not necessarily the default rendering backend anymore in Qt 6.x (it is
