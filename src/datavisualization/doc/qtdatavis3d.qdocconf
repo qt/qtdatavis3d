@@ -34,19 +34,23 @@ qhp.QtDataVis3D.virtualFolder   = qtdatavisualization
 qhp.QtDataVis3D.indexTitle      = Qt Data Visualization
 qhp.QtDataVis3D.indexRoot       =
 
-qhp.QtDataVis3D.subprojects                             = examples classes types
+qhp.QtDataVis3D.subprojects                             = topics examples classes types
 qhp.QtDataVis3D.subprojects.examples.title              = Examples
 qhp.QtDataVis3D.subprojects.examples.indexTitle         = Qt Data Visualization Examples
-qhp.QtDataVis3D.subprojects.examples.selectors          = doc:example
+qhp.QtDataVis3D.subprojects.examples.selectors          = example
 qhp.QtDataVis3D.subprojects.examples.sortPages          = true
 qhp.QtDataVis3D.subprojects.classes.title               = C++ Classes
 qhp.QtDataVis3D.subprojects.classes.indexTitle          = Qt Data Visualization C++ Classes
-qhp.QtDataVis3D.subprojects.classes.selectors           = class
+qhp.QtDataVis3D.subprojects.classes.selectors           = class namespace headerfile
 qhp.QtDataVis3D.subprojects.classes.sortPages           = true
 qhp.QtDataVis3D.subprojects.types.title                 = QML Types
 qhp.QtDataVis3D.subprojects.types.indexTitle            = Qt Data Visualization QML Types
-qhp.QtDataVis3D.subprojects.types.selectors             = qmlclass
+qhp.QtDataVis3D.subprojects.types.selectors             = qmltype
 qhp.QtDataVis3D.subprojects.types.sortPages             = true
+qhp.QtDataVis3D.subprojects.topics.title                = Overview
+qhp.QtDataVis3D.subprojects.topics.indexTitle           = Qt Data Visualization Overview
+qhp.QtDataVis3D.subprojects.topics.selectors            = group:qtdatavis-topics
+qhp.QtDataVis3D.subprojects.topics.sortPages            = true
 
 navigation.landingpage = Qt Data Visualization
 navigation.cppclassespage = Qt Data Visualization C++ Classes
