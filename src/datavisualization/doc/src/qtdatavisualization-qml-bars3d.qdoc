@@ -3,6 +3,7 @@
 
 /*!
  * \qmltype Bars3D
+ * \nativetype Q3DBars
  * \inherits AbstractGraph3D
  * \inqmlmodule QtDataVisualization
  * \since QtDataVisualization 1.0

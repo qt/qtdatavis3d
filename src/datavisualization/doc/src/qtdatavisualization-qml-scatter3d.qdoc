@@ -3,6 +3,7 @@
 
 /*!
   \qmltype Scatter3D
+  \nativetype Q3DScatter
   \inherits AbstractGraph3D
   \inqmlmodule QtDataVisualization
   \since QtDataVisualization 1.0

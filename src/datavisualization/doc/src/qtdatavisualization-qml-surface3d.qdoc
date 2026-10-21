@@ -3,6 +3,7 @@
 
 /*!
   \qmltype Surface3D
+  \nativetype Q3DSurface
   \inherits AbstractGraph3D
   \inqmlmodule QtDataVisualization
   \since QtDataVisualization 1.0

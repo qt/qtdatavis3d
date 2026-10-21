@@ -34,16 +34,16 @@
 
 /*!
   \qmlproperty bool AbstractGraph3D::shadowsSupported
+  \readonly
   This read-only property indicates whether shadows are supported with the
   current configuration. OpenGL ES2 configurations do not support shadows.
  */
 
 /*!
   \qmlproperty Scene3D AbstractGraph3D::scene
+  \readonly
   The Scene3D pointer that can be used to manipulate the scene and access the
   scene elements, such as the active camera.
-
-  This property is read-only.
  */
 
 /*!
@@ -117,6 +117,7 @@
 
 /*!
  * \qmlproperty int AbstractGraph3D::currentFps
+ * \readonly
  * \since QtDataVisualization 1.1
  *
  * When FPS measuring is enabled, the results for the last second are stored in this read-only
@@ -127,6 +128,7 @@
 
 /*!
  * \qmlproperty list<Custom3DItem> AbstractGraph3D::customItemList
+ * \readonly
  * \since QtDataVisualization 1.1
  *
  * The list of \l{Custom3DItem} items added to the graph. The graph takes ownership
@@ -276,6 +278,7 @@
 
 /*!
  * \qmlproperty AbstractGraph3D.ElementType AbstractGraph3D::selectedElement
+ * \readonly
  *
  * The element selected in the graph.
  *
@@ -390,6 +393,7 @@
 
 /*!
  * \qmlproperty vector3d AbstractGraph3D::queriedGraphPosition
+ * \readonly
  * \since QtDataVisualization 1.2
  *
  * This read-only property contains the latest graph position values along each axis queried using
